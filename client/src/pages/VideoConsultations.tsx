@@ -118,8 +118,8 @@ export default function VideoConsultations() {
       accessorKey: "customerName",
       cell: (row) => (
         <div>
-          <div className="font-semibold text-gray-900 dark:text-white">{row.customerName}</div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">{row.jobCardNumber}</div>
+          <div className="font-semibold text-[#0B1F3B] dark:text-white">{row.customerName}</div>
+          <div className="text-sm text-[#64748B]">{row.jobCardNumber}</div>
         </div>
       ),
     },
@@ -234,22 +234,22 @@ export default function VideoConsultations() {
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('videoConsultations.scheduleVideoConsultation', 'Schedule Video Consultation')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('videoConsultations.scheduleVideoConsultation', 'Schedule Video Consultation')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">{t('customers.customer', 'Customer')}</label>
-              <Input placeholder={t('videoConsultations.selectCustomer', 'Select customer...')} className="mt-1" data-testid="input-customer" />
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('customers.customer', 'Customer')}</label>
+              <Input placeholder={t('videoConsultations.selectCustomer', 'Select customer...')} className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-customer" />
             </div>
             <div>
-              <label className="text-sm font-medium">{t('videoConsultations.platform', 'Platform')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('videoConsultations.platform', 'Platform')}</label>
               <Select>
-                <SelectTrigger className="mt-1" data-testid="select-platform">
+                <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-platform">
                   <SelectValue placeholder={t('videoConsultations.selectPlatform', 'Select platform')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="zoom">Zoom</SelectItem>
                   <SelectItem value="teams">Microsoft Teams</SelectItem>
                   <SelectItem value="meet">Google Meet</SelectItem>
@@ -257,10 +257,10 @@ export default function VideoConsultations() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">{t('videoConsultations.scheduledTime', 'Scheduled Time')}</label>
-              <Input type="datetime-local" className="mt-1" data-testid="input-scheduled-time" />
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('videoConsultations.scheduledTime', 'Scheduled Time')}</label>
+              <Input type="datetime-local" className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-scheduled-time" />
             </div>
-            <Button className="w-full" onClick={() => createConsultation.mutate({})} data-testid="button-schedule">
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" onClick={() => createConsultation.mutate({})} data-testid="button-schedule">
               {t('videoConsultations.scheduleConsultation', 'Schedule Consultation')}
             </Button>
           </div>

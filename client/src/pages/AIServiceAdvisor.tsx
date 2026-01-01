@@ -149,9 +149,9 @@ export default function AIServiceAdvisor() {
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case "high": return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900";
-      case "medium": return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-900";
+      case "medium": return "bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30";
       case "low": return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900";
-      default: return "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-gray-800";
+      default: return "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] dark:border-[#232A36]";
     }
   };
 
@@ -171,23 +171,23 @@ export default function AIServiceAdvisor() {
       icon={Bot}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-blue-500" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Bot className="w-5 h-5 text-[#0A5ED7]" />
               {t('aiServiceAdvisor.aiAssistant', 'AI Assistant')}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {t('aiServiceAdvisor.describeIssue', 'Describe your issue or ask about recommended services')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <ScrollArea className="h-[500px] pr-4">
+            <ScrollArea className="h-[500px] pr-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4">
               <div className="space-y-4">
                 {messages.map((message, idx) => (
                   <div key={idx} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                     {message.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center flex-shrink-0">
                         <Bot className="w-4 h-4 text-white" />
                       </div>
                     )}
@@ -195,8 +195,8 @@ export default function AIServiceAdvisor() {
                     <div className={`flex-1 max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
                       <div className={`rounded-lg p-4 ${
                         message.role === "user" 
-                          ? "bg-blue-500 text-white ml-auto" 
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white ml-auto" 
+                          : "bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       }`}>
                         <p className="text-sm">{message.content}</p>
                       </div>
@@ -204,25 +204,25 @@ export default function AIServiceAdvisor() {
                       {message.recommendations && message.recommendations.length > 0 && (
                         <div className="mt-3 space-y-2">
                           {message.recommendations.map((rec, recIdx) => (
-                            <Card key={recIdx} className={`border ${getUrgencyColor(rec.urgency)}`} data-testid={`card-recommendation-${recIdx}`}>
+                            <Card key={recIdx} className={`border ${getUrgencyColor(rec.urgency)} bg-white dark:bg-[#151A23]`} data-testid={`card-recommendation-${recIdx}`}>
                               <CardContent className="pt-4">
                                 <div className="flex items-start justify-between mb-2">
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <h4 className="font-semibold text-sm text-gray-900 dark:text-white" data-testid={`text-service-name-${recIdx}`}>
+                                      <h4 className="font-semibold text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-service-name-${recIdx}`}>
                                         {rec.service}
                                       </h4>
                                       <Badge variant="outline" className={getUrgencyColor(rec.urgency)} data-testid={`badge-urgency-${recIdx}`}>
                                         {getUrgencyLabel(rec.urgency)}
                                       </Badge>
                                     </div>
-                                    <p className="text-xs text-gray-600 dark:text-gray-400" data-testid={`text-reason-${recIdx}`}>
+                                    <p className="text-xs text-[#64748B]" data-testid={`text-reason-${recIdx}`}>
                                       {rec.reason}
                                     </p>
                                   </div>
                                 </div>
                                 
-                                <div className="flex items-center gap-4 mt-3 text-xs text-gray-600 dark:text-gray-400">
+                                <div className="flex items-center gap-4 mt-3 text-xs text-[#64748B]">
                                   <div className="flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" />
                                     <span data-testid={`text-cost-${recIdx}`}>${rec.cost}</span>
@@ -231,7 +231,7 @@ export default function AIServiceAdvisor() {
                                     <Clock className="w-3 h-3" />
                                     <span data-testid={`text-duration-${recIdx}`}>{rec.duration} {t('aiServiceAdvisor.hours', 'hrs')}</span>
                                   </div>
-                                  <Button size="sm" variant="outline" className="ml-auto" data-testid={`button-book-${recIdx}`}>
+                                  <Button size="sm" variant="outline" className="ml-auto border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid={`button-book-${recIdx}`}>
                                     {t('aiServiceAdvisor.bookService', 'Book Service')}
                                   </Button>
                                 </div>
@@ -241,14 +241,14 @@ export default function AIServiceAdvisor() {
                         </div>
                       )}
                       
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[#64748B] mt-1">
                         {new Date(message.timestamp).toLocaleTimeString()}
                       </p>
                     </div>
                     
                     {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <div className="w-8 h-8 rounded-full bg-[#64748B] flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-white" />
                       </div>
                     )}
                   </div>
@@ -256,14 +256,14 @@ export default function AIServiceAdvisor() {
                 
                 {isTyping && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
                       <Bot className="w-4 h-4 text-white" />
                     </div>
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                    <div className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <div className="w-2 h-2 bg-[#64748B] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 bg-[#64748B] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 bg-[#64748B] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </div>
                   </div>
@@ -278,8 +278,9 @@ export default function AIServiceAdvisor() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
                 data-testid="input-message"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
               />
-              <Button onClick={handleSend} data-testid="button-send">
+              <Button onClick={handleSend} data-testid="button-send" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white">
                 <Send className="w-4 h-4" />
               </Button>
             </div>
@@ -287,57 +288,57 @@ export default function AIServiceAdvisor() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="border-gray-200 dark:border-gray-800">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="text-lg">{t('aiServiceAdvisor.quickQuestions', 'Quick Questions')}</CardTitle>
-              <CardDescription>{t('aiServiceAdvisor.tryCommonQueries', 'Try these common queries')}</CardDescription>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('aiServiceAdvisor.quickQuestions', 'Quick Questions')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('aiServiceAdvisor.tryCommonQueries', 'Try these common queries')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {exampleQueries.map((query, idx) => (
                 <Button
                   key={idx}
                   variant="outline"
-                  className="w-full justify-start text-left h-auto py-3"
+                  className="w-full justify-start text-left h-auto py-3 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                   onClick={() => setInput(query)}
                   data-testid={`button-example-${idx}`}
                 >
-                  <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0 text-[#0A5ED7]" />
                   <span className="text-sm">{query}</span>
                 </Button>
               ))}
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 dark:border-gray-800" data-testid="card-insights">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-insights">
             <CardHeader>
-              <CardTitle className="text-lg">{t('aiServiceAdvisor.aiInsights', 'AI Insights')}</CardTitle>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('aiServiceAdvisor.aiInsights', 'AI Insights')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg" data-testid="card-accuracy">
-                <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center gap-3 p-3 bg-[#0A5ED7]/10 rounded-lg border border-[#0A5ED7]/20" data-testid="card-accuracy">
+                <CheckCircle className="w-5 h-5 text-[#0A5ED7]" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-accuracy">{t('aiServiceAdvisor.accuracy', '95% Accuracy')}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid="text-accuracy">{t('aiServiceAdvisor.accuracy', '95% Accuracy')}</p>
+                  <p className="text-xs text-[#64748B]">
                     {t('aiServiceAdvisor.aiDiagnosticAccuracyRate', 'AI diagnostic accuracy rate')}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg" data-testid="card-response-time">
+              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900" data-testid="card-response-time">
                 <Wrench className="w-5 h-5 text-green-600 dark:text-green-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-response-time">{t('aiServiceAdvisor.responseTime', '2.3 Min')}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid="text-response-time">{t('aiServiceAdvisor.responseTime', '2.3 Min')}</p>
+                  <p className="text-xs text-[#64748B]">
                     {t('aiServiceAdvisor.averageResponseTime', 'Average response time')}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg" data-testid="card-avg-cost">
+              <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900" data-testid="card-avg-cost">
                 <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-avg-cost">{t('aiServiceAdvisor.avgCost', '$420 Avg')}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid="text-avg-cost">{t('aiServiceAdvisor.avgCost', '$420 Avg')}</p>
+                  <p className="text-xs text-[#64748B]">
                     {t('aiServiceAdvisor.perRecommendedService', 'Per recommended service')}
                   </p>
                 </div>

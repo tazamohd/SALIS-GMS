@@ -146,56 +146,64 @@ export default function PartnersCurrentAccount() {
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalBalance', 'Total Balance')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-total-balance">SAR 205,000</p>
+                    <p className="text-sm text-[#64748B]">{t('partners.totalBalance', 'Total Balance')}</p>
+                    <p className="text-2xl font-bold font-montserrat text-[#0B1F3B] dark:text-white" data-testid="text-total-balance">SAR 205,000</p>
                   </div>
-                  <Wallet className="h-8 w-8 text-blue-600" />
+                  <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                    <Wallet className="h-6 w-6 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalCredits', 'Total Credits')}</p>
-                    <p className="text-2xl font-bold font-montserrat text-green-600" data-testid="text-total-credits">SAR 260,000</p>
+                    <p className="text-sm text-[#64748B]">{t('partners.totalCredits', 'Total Credits')}</p>
+                    <p className="text-2xl font-bold font-montserrat text-[#22c55e]" data-testid="text-total-credits">SAR 260,000</p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-green-600" />
+                  <div className="p-2 rounded-xl bg-[#22c55e]/10">
+                    <TrendingUp className="h-6 w-6 text-[#22c55e]" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.totalDebits', 'Total Debits')}</p>
-                    <p className="text-2xl font-bold font-montserrat text-red-600" data-testid="text-total-debits">SAR 155,000</p>
+                    <p className="text-sm text-[#64748B]">{t('partners.totalDebits', 'Total Debits')}</p>
+                    <p className="text-2xl font-bold font-montserrat text-[#F97316]" data-testid="text-total-debits">SAR 155,000</p>
                   </div>
-                  <TrendingDown className="h-8 w-8 text-red-600" />
+                  <div className="p-2 rounded-xl bg-[#F97316]/10">
+                    <TrendingDown className="h-6 w-6 text-[#F97316]" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('partners.activePartners', 'Active Partners')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-active-partners">3</p>
+                    <p className="text-sm text-[#64748B]">{t('partners.activePartners', 'Active Partners')}</p>
+                    <p className="text-2xl font-bold font-montserrat text-[#0B1F3B] dark:text-white" data-testid="text-active-partners">3</p>
                   </div>
-                  <Users className="h-8 w-8 text-purple-600" />
+                  <div className="p-2 rounded-xl bg-[#0BB3FF]/10">
+                    <Users className="h-6 w-6 text-[#0BB3FF]" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Users className="h-5 w-5 text-[#0A5ED7]" />
                 {t('partners.partnersCurrentAccountSummary', 'Partners Current Account Summary')}
               </CardTitle>
             </CardHeader>
@@ -347,16 +355,16 @@ export default function PartnersCurrentAccount() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.date', 'Date')}</TableHead>
-                    <TableHead>{t('partners.partner', 'Partner')}</TableHead>
-                    <TableHead>{t('common.type', 'Type')}</TableHead>
-                    <TableHead>{t('common.description', 'Description')}</TableHead>
-                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
+                <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('partners.partner', 'Partner')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -527,17 +535,17 @@ export default function PartnersCurrentAccount() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.date', 'Date')}</TableHead>
-                    <TableHead>{t('partners.partner', 'Partner')}</TableHead>
-                    <TableHead>{t('common.type', 'Type')}</TableHead>
-                    <TableHead>{t('common.amount', 'Amount')}</TableHead>
-                    <TableHead>{t('partners.method', 'Method')}</TableHead>
-                    <TableHead>{t('common.status', 'Status')}</TableHead>
+                <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('partners.partner', 'Partner')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('partners.method', 'Method')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -570,40 +578,46 @@ export default function PartnersCurrentAccount() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">{t('partners.partnerReports', 'Partner Reports')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-statement">
+            <Card className="cursor-pointer hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-statement">
               <CardHeader className="pb-2">
-                <FileText className="h-8 w-8 text-blue-600 mb-2" />
-                <CardTitle className="text-lg">{t('partners.partnerStatement', 'Partner Statement')}</CardTitle>
+                <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] w-fit mb-2">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('partners.partnerStatement', 'Partner Statement')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{t('partners.partnerStatementDesc', 'Detailed account statement for each partner')}</p>
-                <Button variant="outline" className="w-full">
+                <p className="text-sm text-[#64748B] mb-4">{t('partners.partnerStatementDesc', 'Detailed account statement for each partner')}</p>
+                <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10">
                   {t('partners.generateReport', 'Generate Report')}
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-profit">
+            <Card className="cursor-pointer hover:border-[#22c55e] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-profit">
               <CardHeader className="pb-2">
-                <TrendingUp className="h-8 w-8 text-green-600 mb-2" />
-                <CardTitle className="text-lg">{t('partners.profitDistribution', 'Profit Distribution')}</CardTitle>
+                <div className="p-2 rounded-xl bg-[#22c55e]/10 w-fit mb-2">
+                  <TrendingUp className="h-6 w-6 text-[#22c55e]" />
+                </div>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('partners.profitDistribution', 'Profit Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{t('partners.profitDistributionDesc', 'Profit sharing analysis by partner')}</p>
-                <Button variant="outline" className="w-full">
+                <p className="text-sm text-[#64748B] mb-4">{t('partners.profitDistributionDesc', 'Profit sharing analysis by partner')}</p>
+                <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#22c55e]/5">
                   {t('partners.generateReport', 'Generate Report')}
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-withdrawals">
+            <Card className="cursor-pointer hover:border-[#F97316] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-withdrawals">
               <CardHeader className="pb-2">
-                <ArrowUpRight className="h-8 w-8 text-red-600 mb-2" />
-                <CardTitle className="text-lg">{t('partners.withdrawalHistory', 'Withdrawal History')}</CardTitle>
+                <div className="p-2 rounded-xl bg-[#F97316]/10 w-fit mb-2">
+                  <ArrowUpRight className="h-6 w-6 text-[#F97316]" />
+                </div>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('partners.withdrawalHistory', 'Withdrawal History')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{t('partners.withdrawalHistoryDesc', 'Complete withdrawal records')}</p>
-                <Button variant="outline" className="w-full">
+                <p className="text-sm text-[#64748B] mb-4">{t('partners.withdrawalHistoryDesc', 'Complete withdrawal records')}</p>
+                <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F97316]/5">
                   {t('partners.generateReport', 'Generate Report')}
                 </Button>
               </CardContent>
@@ -615,7 +629,7 @@ export default function PartnersCurrentAccount() {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('partners.partnersCurrentAccount', 'Partners Current Account')}
         subtitle={t('partners.partnersCurrentAccountSubtitle', 'جاري الشركاء - Track partner balances, transactions, and withdrawals')}

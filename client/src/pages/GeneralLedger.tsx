@@ -176,9 +176,9 @@ export default function GeneralLedger() {
   const overviewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-debits">
+        <Card data-testid="card-total-debits" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <ArrowUpRight className="h-4 w-4 text-green-600" />
               {t('accounting.totalDebits', 'Total Debits')}
             </CardTitle>
@@ -187,13 +187,13 @@ export default function GeneralLedger() {
             <p className="text-2xl font-bold text-green-600" data-testid="text-total-debits">
               SAR {totalDebits.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.thisPeriod', 'This period')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.thisPeriod', 'This period')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-credits">
+        <Card data-testid="card-total-credits" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <ArrowDownRight className="h-4 w-4 text-red-600" />
               {t('accounting.totalCredits', 'Total Credits')}
             </CardTitle>
@@ -202,13 +202,13 @@ export default function GeneralLedger() {
             <p className="text-2xl font-bold text-red-600" data-testid="text-total-credits">
               SAR {totalCredits.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.thisPeriod', 'This period')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.thisPeriod', 'This period')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-balance-check">
+        <Card data-testid="card-balance-check" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               {t('accounting.balanceCheck', 'Balance Check')}
             </CardTitle>
@@ -216,39 +216,39 @@ export default function GeneralLedger() {
           <CardContent>
             <Badge 
               variant={totalDebits === totalCredits ? "default" : "destructive"}
-              className="text-sm"
+              className={totalDebits === totalCredits ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white text-sm" : "text-sm"}
               data-testid="badge-balance-status"
             >
               {totalDebits === totalCredits ? t('accounting.balanced', '✓ Balanced') : t('accounting.unbalanced', '⚠ Unbalanced')}
             </Badge>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-[#64748B] mt-2">
               {t('accounting.difference', 'Difference')}: SAR {Math.abs(totalDebits - totalCredits).toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-entries-count">
+        <Card data-testid="card-entries-count" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <Layers className="h-4 w-4" />
               {t('accounting.totalEntries', 'Total Entries')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold" data-testid="text-entries-count">
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-entries-count">
               {ledgerEntries.length}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.journalEntriesPosted', 'Journal entries posted')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.journalEntriesPosted', 'Journal entries posted')}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{t('accounting.accountSummaries', 'Account Summaries')}</CardTitle>
-              <CardDescription>{t('accounting.accountSummariesDescription', 'Overview of all accounts with balances')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.accountSummaries', 'Account Summaries')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('accounting.accountSummariesDescription', 'Overview of all accounts with balances')}</CardDescription>
             </div>
             <Button variant="outline" size="sm" data-testid="button-export-summary">
               <Download className="h-4 w-4 mr-2" />
@@ -294,10 +294,10 @@ export default function GeneralLedger() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
-          <CardDescription>{t('accounting.relatedModulesDescription', 'Navigate to related financial pages')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.relatedModulesDescription', 'Navigate to related financial pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -344,12 +344,12 @@ export default function GeneralLedger() {
             placeholder={t('accounting.searchTransactions', 'Search transactions...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-transactions"
           />
         </div>
         <Select value={accountFilter} onValueChange={setAccountFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-account-filter">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-account-filter">
             <SelectValue placeholder={t('accounting.allAccounts', 'All Accounts')} />
           </SelectTrigger>
           <SelectContent>
@@ -362,7 +362,7 @@ export default function GeneralLedger() {
           </SelectContent>
         </Select>
         <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[180px]" data-testid="select-date-range">
+          <SelectTrigger className="w-[180px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-date-range">
             <SelectValue placeholder={t('common.dateRange', 'Date Range')} />
           </SelectTrigger>
           <SelectContent>
@@ -428,7 +428,7 @@ export default function GeneralLedger() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+      <div className="flex justify-between items-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
         <span className="font-medium">{t('accounting.periodTotals', 'Period Totals')}:</span>
         <div className="flex gap-8">
           <span className="text-green-600 font-bold">
@@ -514,69 +514,69 @@ export default function GeneralLedger() {
   const reportsTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" data-testid="card-report-detailed">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-detailed">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="text-lg flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <FileText className="h-5 w-5" />
               {t('accounting.detailedLedgerReport', 'Detailed Ledger Report')}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {t('accounting.detailedLedgerReportDescription', 'Complete transaction history by account')}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" data-testid="button-generate-detailed">
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-generate-detailed">
               {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" data-testid="card-report-summary">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-summary">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="text-lg flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <BarChart3 className="h-5 w-5" />
               {t('accounting.summaryReport', 'Summary Report')}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {t('accounting.summaryReportDescription', 'Account balances and totals overview')}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" data-testid="button-generate-summary">
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-generate-summary">
               {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" data-testid="card-report-audit">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-audit">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="text-lg flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Calendar className="h-5 w-5" />
               {t('accounting.auditTrailReport', 'Audit Trail Report')}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {t('accounting.auditTrailReportDescription', 'Track all changes and modifications')}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" data-testid="button-generate-audit">
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-generate-audit">
               {t('common.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.reportSettings', 'Report Settings')}</CardTitle>
-          <CardDescription>{t('accounting.reportSettingsDescription', 'Configure report parameters')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.reportSettings', 'Report Settings')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.reportSettingsDescription', 'Configure report parameters')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t('common.dateRange', 'Date Range')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('common.dateRange', 'Date Range')}</label>
               <Select defaultValue="this-month">
-                <SelectTrigger data-testid="select-report-date-range">
+                <SelectTrigger data-testid="select-report-date-range" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -589,9 +589,9 @@ export default function GeneralLedger() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t('accounting.accountType', 'Account Type')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('accounting.accountType', 'Account Type')}</label>
               <Select defaultValue="all">
-                <SelectTrigger data-testid="select-report-account-type">
+                <SelectTrigger data-testid="select-report-account-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -605,9 +605,9 @@ export default function GeneralLedger() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">{t('common.format', 'Format')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('common.format', 'Format')}</label>
               <Select defaultValue="pdf">
-                <SelectTrigger data-testid="select-report-format">
+                <SelectTrigger data-testid="select-report-format" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -14,7 +14,7 @@ export default function MLFraudDetection() {
   const fraudStats = [
     { label: t('mlFraud.casesDetected', 'Cases Detected'), value: '12', change: '+3', trend: 'up', color: 'text-red-600' },
     { label: t('mlFraud.preventedLoss', 'Prevented Loss'), value: '$8,450', change: '+$1,200', trend: 'up', color: 'text-green-600' },
-    { label: t('mlFraud.detectionRate', 'Detection Rate'), value: '94%', change: '+2%', trend: 'up', color: 'text-blue-600' },
+    { label: t('mlFraud.detectionRate', 'Detection Rate'), value: '94%', change: '+2%', trend: 'up', color: 'text-[#0A5ED7]' },
     { label: t('mlFraud.falsePositives', 'False Positives'), value: '3%', change: '-1%', trend: 'down', color: 'text-purple-600' },
   ];
 
@@ -36,7 +36,7 @@ export default function MLFraudDetection() {
       case 'high':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'medium':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-[#F97316]/10 text-[#F97316] dark:bg-[#F97316]/20 dark:text-[#F97316]';
       default:
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
     }
@@ -78,38 +78,38 @@ export default function MLFraudDetection() {
 
   const content = (
     <div className="space-y-6">
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <AlertTriangle className="h-5 w-5 text-orange-600" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <AlertTriangle className="h-5 w-5 text-[#F97316]" />
             {t('mlFraud.activeFraudCases', 'Active Fraud Cases')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-12">
-              <Shield className="h-16 w-16 mx-auto mb-4 text-gray-400 animate-pulse" />
-              <p className="text-gray-500 dark:text-gray-400">{t('mlFraud.loadingFraudCases', 'Loading fraud cases...')}</p>
+              <Shield className="h-16 w-16 mx-auto mb-4 text-[#64748B] animate-pulse" />
+              <p className="text-[#64748B]">{t('mlFraud.loadingFraudCases', 'Loading fraud cases...')}</p>
             </div>
           ) : (
             <div className="space-y-4">
               {cases.map((fraudCase) => (
                 <div
                   key={fraudCase.id}
-                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
+                  className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:shadow-md transition-shadow bg-[#F8FAFC] dark:bg-[#0E1117]"
                   data-testid={`case-${fraudCase.id}`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                        <h4 className="font-semibold text-[#0B1F3B] dark:text-white">
                           {fraudCase.type}
                         </h4>
                         <Badge className={getRiskColor(fraudCase.risk)}>
                           {getRiskLabel(fraudCase.risk)}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-[#64748B]">
                         {t('mlFraud.detected', 'Detected')} {fraudCase.detected}
                       </p>
                     </div>
@@ -120,18 +120,18 @@ export default function MLFraudDetection() {
 
                   <div className="flex items-center justify-between mt-4">
                     <Badge variant="outline" className={
-                      fraudCase.status === 'investigating' ? 'border-orange-500 text-orange-700' :
-                      fraudCase.status === 'resolved' ? 'border-green-500 text-green-700' :
-                      'border-blue-500 text-blue-700'
+                      fraudCase.status === 'investigating' ? 'border-[#F97316] text-[#F97316]' :
+                      fraudCase.status === 'resolved' ? 'border-green-500 text-green-700 dark:text-green-400' :
+                      'border-[#0A5ED7] text-[#0A5ED7]'
                     }>
                       {getStatusLabel(fraudCase.status)}
                     </Badge>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" data-testid={`button-view-${fraudCase.id}`}>
+                      <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-${fraudCase.id}`}>
                         {t('mlFraud.viewDetails', 'View Details')}
                       </Button>
                       {fraudCase.status === 'investigating' && (
-                        <Button size="sm" className="bg-red-600 hover:bg-red-700" data-testid={`button-escalate-${fraudCase.id}`}>
+                        <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" data-testid={`button-escalate-${fraudCase.id}`}>
                           {t('mlFraud.escalate', 'Escalate')}
                         </Button>
                       )}
@@ -144,9 +144,9 @@ export default function MLFraudDetection() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-light">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
             <Activity className="h-5 w-5 text-purple-600" />
             {t('mlFraud.mlModelPerformance', 'ML Model Performance')}
           </CardTitle>
@@ -156,31 +156,31 @@ export default function MLFraudDetection() {
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('mlFraud.accuracy', 'Accuracy')}</p>
+                <p className="text-sm text-[#64748B]">{t('mlFraud.accuracy', 'Accuracy')}</p>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">96.8%</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">96.8%</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Shield className="h-5 w-5 text-blue-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('mlFraud.precision', 'Precision')}</p>
+                <Shield className="h-5 w-5 text-[#0A5ED7]" />
+                <p className="text-sm text-[#64748B]">{t('mlFraud.precision', 'Precision')}</p>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">94.2%</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">94.2%</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5 text-purple-500" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('mlFraud.recall', 'Recall')}</p>
+                <p className="text-sm text-[#64748B]">{t('mlFraud.recall', 'Recall')}</p>
               </div>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">92.5%</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">92.5%</p>
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-            <p className="text-sm text-purple-900 dark:text-purple-200 font-semibold mb-2">
+          <div className="mt-6 p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 rounded-lg border border-[#0A5ED7]/20">
+            <p className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] font-semibold mb-2">
               {t('mlFraud.modelInformation', 'Model Information')}
             </p>
-            <div className="grid grid-cols-2 gap-2 text-sm text-purple-700 dark:text-purple-300">
+            <div className="grid grid-cols-2 gap-2 text-sm text-[#0B1F3B] dark:text-white">
               <p>{t('mlFraud.algorithm', 'Algorithm')}: {t('mlFraud.algorithmValue', 'Random Forest + Neural Network')}</p>
               <p>{t('mlFraud.lastUpdated', 'Last Updated')}: {t('mlFraud.twoDaysAgo', '2 days ago')}</p>
               <p>{t('mlFraud.trainingData', 'Training Data')}: {t('mlFraud.trainingDataValue', '50,000+ transactions')}</p>

@@ -30,7 +30,7 @@ export default function Payments() {
       key: "invoiceId",
       label: t('payments.invoiceNumber', 'Invoice #'),
       render: (payment) => (
-        <span className="font-mono text-sm">{payment.invoiceId}</span>
+        <span className="font-mono text-sm text-[#0B1F3B] dark:text-white">{payment.invoiceId}</span>
       ),
     },
     {
@@ -38,7 +38,7 @@ export default function Payments() {
       label: t('payments.customer', 'Customer'),
       render: (payment) => (
         <div>
-          <p className="font-medium">{payment.customerName}</p>
+          <p className="font-medium text-[#0B1F3B] dark:text-white">{payment.customerName}</p>
         </div>
       ),
     },
@@ -46,14 +46,14 @@ export default function Payments() {
       key: "amount",
       label: t('common.amount', 'Amount'),
       render: (payment) => (
-        <span className="font-semibold">${payment.amount.toFixed(2)}</span>
+        <span className="font-semibold text-[#0B1F3B] dark:text-white">${payment.amount.toFixed(2)}</span>
       ),
     },
     {
       key: "method",
       label: t('payments.paymentMethod', 'Payment Method'),
       render: (payment) => (
-        <Badge variant="outline" className="capitalize">
+        <Badge variant="outline" className="capitalize border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
           {payment.method}
         </Badge>
       ),
@@ -63,10 +63,10 @@ export default function Payments() {
       label: t('common.status', 'Status'),
       render: (payment) => {
         const statusConfig = {
-          completed: { icon: CheckCircle, className: "bg-green-100 text-green-700 dark:bg-green-900/30" },
-          pending: { icon: Clock, className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30" },
-          failed: { icon: XCircle, className: "bg-red-100 text-red-700 dark:bg-red-900/30" },
-          refunded: { icon: XCircle, className: "bg-gray-100 text-gray-700 dark:bg-gray-900/30" },
+          completed: { icon: CheckCircle, className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+          pending: { icon: Clock, className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
+          failed: { icon: XCircle, className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+          refunded: { icon: XCircle, className: "bg-gray-100 text-[#64748B] dark:bg-gray-900/30 dark:text-gray-400" },
         };
         const config = statusConfig[payment.status];
         const Icon = config.icon;
@@ -84,16 +84,20 @@ export default function Payments() {
       label: t('payments.transactionId', 'Transaction ID'),
       render: (payment) =>
         payment.transactionId ? (
-          <span className="font-mono text-xs">{payment.transactionId}</span>
+          <span className="font-mono text-xs text-[#64748B]">{payment.transactionId}</span>
         ) : (
-          <span className="text-muted-foreground">-</span>
+          <span className="text-[#64748B]">-</span>
         ),
     },
     {
       key: "paidAt",
       label: t('payments.paidDate', 'Paid Date'),
       render: (payment) =>
-        payment.paidAt ? new Date(payment.paidAt).toLocaleDateString() : "-",
+        payment.paidAt ? (
+          <span className="text-[#64748B]">{new Date(payment.paidAt).toLocaleDateString()}</span>
+        ) : (
+          <span className="text-[#64748B]">-</span>
+        ),
     },
     {
       key: "actions",
@@ -102,6 +106,7 @@ export default function Payments() {
         <Button
           size="sm"
           variant="outline"
+          className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent"
           data-testid={`button-receipt-${payment.id}`}
         >
           <Download className="h-4 w-4 mr-1" />
@@ -156,21 +161,21 @@ export default function Payments() {
       filters={filters}
       additionalContent={
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">{t('payments.totalReceived', 'Total Received')}</p>
-            <p className="text-2xl font-bold text-green-600">${totalAmount.toFixed(2)}</p>
+          <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
+            <p className="text-sm text-[#64748B]">{t('payments.totalReceived', 'Total Received')}</p>
+            <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">${totalAmount.toFixed(2)}</p>
           </div>
-          <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">{t('common.pending', 'Pending')}</p>
-            <p className="text-2xl font-bold text-yellow-600">${pendingAmount.toFixed(2)}</p>
+          <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
+            <p className="text-sm text-[#64748B]">{t('common.pending', 'Pending')}</p>
+            <p className="text-2xl font-bold text-[#F97316]">${pendingAmount.toFixed(2)}</p>
           </div>
-          <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">{t('payments.totalTransactions', 'Total Transactions')}</p>
-            <p className="text-2xl font-bold">{payments.length}</p>
+          <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
+            <p className="text-sm text-[#64748B]">{t('payments.totalTransactions', 'Total Transactions')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{payments.length}</p>
           </div>
-          <div className="p-4 bg-card border rounded-lg">
-            <p className="text-sm text-muted-foreground">{t('payments.successRate', 'Success Rate')}</p>
-            <p className="text-2xl font-bold">
+          <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
+            <p className="text-sm text-[#64748B]">{t('payments.successRate', 'Success Rate')}</p>
+            <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
               {payments.length > 0
                 ? ((payments.filter((p) => p.status === "completed").length / payments.length) * 100).toFixed(1)
                 : 0}

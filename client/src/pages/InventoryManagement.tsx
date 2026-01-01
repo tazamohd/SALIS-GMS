@@ -118,88 +118,101 @@ export default function InventoryManagement() {
   const overviewContent = (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{t('inventory.totalParts', 'Total Parts')}</CardTitle>
+        <Card className="relative overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+          <CardHeader className="pb-3 relative">
+            <CardTitle className="text-sm font-medium text-white/90">{t('inventory.totalParts', 'Total Parts')}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <div className="text-2xl font-bold">{spareParts.length}</div>
-            <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('inventory.activeItems', 'Active items')}</p>
+            <p className="text-xs text-white/70 mt-1">{t('inventory.activeItems', 'Active items')}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{t('inventory.lowStockAlerts', 'Low Stock Alerts')}</CardTitle>
+        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-[#F97316]/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="pb-3 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.lowStockAlerts', 'Low Stock Alerts')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <CardContent className="relative">
+            <div className="text-2xl font-bold text-[#F97316]">
               {stockAlerts.filter((a: any) => a.alertStatus === "active").length}
             </div>
-            <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('inventory.requiresAttention', 'Requires attention')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('inventory.requiresAttention', 'Requires attention')}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{t('inventory.pendingTransfers', 'Pending Transfers')}</CardTitle>
+        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="pb-3 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.pendingTransfers', 'Pending Transfers')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <CardContent className="relative">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
               {inventoryTransfers.filter((tr: any) => tr.transferStatus === "pending").length}
             </div>
-            <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('inventory.awaitingApproval', 'Awaiting approval')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('inventory.awaitingApproval', 'Awaiting approval')}</p>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{t('inventory.autoReorderEnabled', 'Auto-Reorder Enabled')}</CardTitle>
+        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="pb-3 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.autoReorderEnabled', 'Auto-Reorder Enabled')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <CardContent className="relative">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {reorderSettings.filter((r: any) => r.isAutoReorderEnabled).length}
             </div>
-            <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('inventory.activeRules', 'Active rules')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('inventory.activeRules', 'Active rules')}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">{t('inventory.inventorySummary', 'Inventory Summary')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.quickOverview', 'Quick overview of parts inventory')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.inventorySummary', 'Inventory Summary')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('inventory.quickOverview', 'Quick overview of parts inventory')}</CardDescription>
         </CardHeader>
         <CardContent>
           {isSparePartsLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-900 dark:text-white/60">{t('inventory.loadingInventory', 'Loading inventory...')}</p>
+              <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-[#64748B]">{t('inventory.loadingInventory', 'Loading inventory...')}</p>
             </div>
           ) : spareParts.length === 0 ? (
-            <EmptyState
-              title={t('inventory.noPartsFound', 'No Parts Found')}
-              description={t('inventory.noPartsDesc', 'Get started by adding items to your stock.')}
-              actionLabel={t('inventory.scanBarcode', 'Scan Barcode')}
-              onAction={() => setIsScannerOpen(true)}
-              testId="inventory-empty"
-            />
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                <Package className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('inventory.noPartsFound', 'No Parts Found')}</h3>
+              <p className="text-[#64748B] mb-4">{t('inventory.noPartsDesc', 'Get started by adding items to your stock.')}</p>
+              <Button 
+                onClick={() => setIsScannerOpen(true)}
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+                data-testid="button-scan-barcode"
+              >
+                <Barcode className="mr-2 h-4 w-4" />
+                {t('inventory.scanBarcode', 'Scan Barcode')}
+              </Button>
+            </div>
           ) : (
             <>
               <div className="relative mb-4">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-900 dark:text-white/60 h-4 w-4" />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#64748B] h-4 w-4" />
                 <Input
                   placeholder={t('inventory.searchParts', 'Search parts...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-parts"
                 />
               </div>
               <Table>
-                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-                  <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-                    <TableHead className="text-gray-900 dark:text-white">{t('inventory.partName', 'Part Name')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('inventory.sku', 'SKU')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('common.category', 'Category')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('inventory.stockStatus', 'Stock Status')}</TableHead>
+                <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.partName', 'Part Name')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.sku', 'SKU')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.stockStatus', 'Stock Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -211,14 +224,14 @@ export default function InventoryManagement() {
                     )
                     .slice(0, 10)
                     .map((part: any) => (
-                      <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
-                        <TableCell className="font-medium">{part.name}</TableCell>
-                        <TableCell className="text-gray-900 dark:text-white">{part.sku}</TableCell>
-                        <TableCell className="text-gray-900 dark:text-white">
-                          <Badge variant="outline">{part.category}</Badge>
+                      <TableRow key={part.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-part-${part.id}`}>
+                        <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{part.name}</TableCell>
+                        <TableCell className="text-[#64748B]">{part.sku}</TableCell>
+                        <TableCell>
+                          <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0BB3FF]/10 dark:text-[#0BB3FF] border-0">{part.category}</Badge>
                         </TableCell>
-                        <TableCell className="text-gray-900 dark:text-white">
-                          <Badge variant="secondary">{t('inventory.inStock', 'In Stock')}</Badge>
+                        <TableCell>
+                          <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0">{t('inventory.inStock', 'In Stock')}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -232,14 +245,14 @@ export default function InventoryManagement() {
   );
 
   const alertsContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-gray-900 dark:text-white">{t('inventory.stockAlerts', 'Stock Alerts')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.stockAlertsDesc', 'Low stock and out-of-stock notifications')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.stockAlerts', 'Stock Alerts')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('inventory.stockAlertsDesc', 'Low stock and out-of-stock notifications')}</CardDescription>
           </div>
-          <Button data-testid="button-create-alert">
+          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-alert">
             <Plus className="mr-2 h-4 w-4" />
             {t('inventory.createAlert', 'Create Alert')}
           </Button>
@@ -247,45 +260,46 @@ export default function InventoryManagement() {
       </CardHeader>
       <CardContent>
         <Table>
-          <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-            <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.alertType', 'Alert Type')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.currentStock', 'Current Stock')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.threshold', 'Threshold')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.alertType', 'Alert Type')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.currentStock', 'Current Stock')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.threshold', 'Threshold')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {stockAlerts.map((alert: any) => (
-              <TableRow key={alert.id} data-testid={`row-alert-${alert.id}`}>
-                <TableCell className="text-gray-900 dark:text-white">
-                  <Badge variant={alert.alertType === "out_of_stock" ? "destructive" : "outline"}>
+              <TableRow key={alert.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-alert-${alert.id}`}>
+                <TableCell>
+                  <Badge className={alert.alertType === "out_of_stock" ? "bg-red-500/10 text-red-700 dark:text-red-400 border-0" : "bg-[#F97316]/10 text-[#F97316] border-0"}>
                     {alert.alertType === "out_of_stock" ? t('inventory.outOfStock', 'Out of Stock') : t('inventory.lowStock', 'Low Stock')}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{alert.sparePartId}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{alert.currentQuantity}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{alert.threshold}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+                <TableCell className="text-[#0B1F3B] dark:text-white">{alert.sparePartId}</TableCell>
+                <TableCell className="text-[#64748B]">{alert.currentQuantity}</TableCell>
+                <TableCell className="text-[#64748B]">{alert.threshold}</TableCell>
+                <TableCell>
                   <Badge
-                    variant={
+                    className={
                       alert.alertStatus === "active"
-                        ? "destructive"
+                        ? "bg-red-500/10 text-red-700 dark:text-red-400 border-0"
                         : alert.alertStatus === "acknowledged"
-                        ? "secondary"
-                        : "default"
+                        ? "bg-[#64748B]/10 text-[#64748B] border-0"
+                        : "bg-green-500/10 text-green-700 dark:text-green-400 border-0"
                     }
                   >
                     {alert.alertStatus}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+                <TableCell>
                   {alert.alertStatus === "active" && (
                     <Button
                       size="sm"
                       variant="outline"
+                      className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                       onClick={() => acknowledgeMutation.mutate(alert.id)}
                       data-testid={`button-acknowledge-${alert.id}`}
                     >
@@ -297,8 +311,8 @@ export default function InventoryManagement() {
               </TableRow>
             ))}
             {stockAlerts.length === 0 && (
-              <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-                <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={6} className="text-center text-[#64748B]">
                   {t('inventory.noStockAlerts', 'No stock alerts found')}
                 </TableCell>
               </TableRow>
@@ -310,14 +324,14 @@ export default function InventoryManagement() {
   );
 
   const reorderContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-gray-900 dark:text-white">{t('inventory.autoReorderSettings', 'Automatic Reorder Settings')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.autoReorderDesc', 'Configure automatic reordering rules for parts')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.autoReorderSettings', 'Automatic Reorder Settings')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('inventory.autoReorderDesc', 'Configure automatic reordering rules for parts')}</CardDescription>
           </div>
-          <Button data-testid="button-create-reorder-rule">
+          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-reorder-rule">
             <Plus className="mr-2 h-4 w-4" />
             {t('inventory.addRule', 'Add Rule')}
           </Button>
@@ -325,29 +339,29 @@ export default function InventoryManagement() {
       </CardHeader>
       <CardContent>
         <Table>
-          <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-            <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.reorderPoint', 'Reorder Point')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.reorderQuantity', 'Reorder Quantity')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.supplier', 'Supplier')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.lastReorder', 'Last Reorder')}</TableHead>
+          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.reorderPoint', 'Reorder Point')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.reorderQuantity', 'Reorder Quantity')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.supplier', 'Supplier')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.lastReorder', 'Last Reorder')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {reorderSettings.map((setting: any) => (
-              <TableRow key={setting.id} data-testid={`row-reorder-${setting.id}`}>
-                <TableCell className="font-medium">{setting.sparePartId}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{setting.reorderPoint}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{setting.reorderQuantity}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{setting.supplierId}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
-                  <Badge variant={setting.isAutoReorderEnabled ? "default" : "secondary"}>
+              <TableRow key={setting.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-reorder-${setting.id}`}>
+                <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{setting.sparePartId}</TableCell>
+                <TableCell className="text-[#64748B]">{setting.reorderPoint}</TableCell>
+                <TableCell className="text-[#64748B]">{setting.reorderQuantity}</TableCell>
+                <TableCell className="text-[#64748B]">{setting.supplierId}</TableCell>
+                <TableCell>
+                  <Badge className={setting.isAutoReorderEnabled ? "bg-green-500/10 text-green-700 dark:text-green-400 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}>
                     {setting.isAutoReorderEnabled ? t('common.enable', 'Enabled') : t('common.disable', 'Disabled')}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+                <TableCell className="text-[#64748B]">
                   {setting.lastReorderDate
                     ? new Date(setting.lastReorderDate).toLocaleDateString()
                     : t('inventory.never', 'Never')}
@@ -355,8 +369,8 @@ export default function InventoryManagement() {
               </TableRow>
             ))}
             {reorderSettings.length === 0 && (
-              <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-                <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={6} className="text-center text-[#64748B]">
                   {t('inventory.noReorderRules', 'No reorder rules configured')}
                 </TableCell>
               </TableRow>
@@ -368,14 +382,14 @@ export default function InventoryManagement() {
   );
 
   const transfersContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-gray-900 dark:text-white">{t('inventory.inventoryTransfers', 'Inventory Transfers')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.inventoryTransfersDesc', 'Multi-location inventory movement tracking')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.inventoryTransfers', 'Inventory Transfers')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('inventory.inventoryTransfersDesc', 'Multi-location inventory movement tracking')}</CardDescription>
           </div>
-          <Button data-testid="button-create-transfer">
+          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-transfer">
             <Plus className="mr-2 h-4 w-4" />
             {t('inventory.newTransfer', 'New Transfer')}
           </Button>
@@ -383,46 +397,46 @@ export default function InventoryManagement() {
       </CardHeader>
       <CardContent>
         <Table>
-          <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-            <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.transferNumber', 'Transfer #')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('inventory.fromTo', 'From → To')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.quantity', 'Quantity')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-gray-900 dark:text-white">{t('common.date', 'Date')}</TableHead>
+          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.transferNumber', 'Transfer #')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.fromTo', 'From → To')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.quantity', 'Quantity')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {inventoryTransfers.map((transfer: any) => (
-              <TableRow key={transfer.id} data-testid={`row-transfer-${transfer.id}`}>
-                <TableCell className="font-medium">{transfer.transferNumber}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{transfer.sparePartId}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+              <TableRow key={transfer.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-transfer-${transfer.id}`}>
+                <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{transfer.transferNumber}</TableCell>
+                <TableCell className="text-[#64748B]">{transfer.sparePartId}</TableCell>
+                <TableCell className="text-[#64748B]">
                   {transfer.fromGarageId} → {transfer.toGarageId}
                 </TableCell>
-                <TableCell className="text-gray-900 dark:text-white">{transfer.quantity}</TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+                <TableCell className="text-[#64748B]">{transfer.quantity}</TableCell>
+                <TableCell>
                   <Badge
-                    variant={
+                    className={
                       transfer.transferStatus === "completed"
-                        ? "default"
+                        ? "bg-green-500/10 text-green-700 dark:text-green-400 border-0"
                         : transfer.transferStatus === "in_transit"
-                        ? "secondary"
-                        : "outline"
+                        ? "bg-[#0A5ED7]/10 text-[#0A5ED7] border-0"
+                        : "bg-[#64748B]/10 text-[#64748B] border-0"
                     }
                   >
                     {transfer.transferStatus}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-gray-900 dark:text-white">
+                <TableCell className="text-[#64748B]">
                   {new Date(transfer.createdAt).toLocaleDateString()}
                 </TableCell>
               </TableRow>
             ))}
             {inventoryTransfers.length === 0 && (
-              <TableRow className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark">
-                <TableCell colSpan={6} className="text-center text-gray-900 dark:text-white/60">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={6} className="text-center text-[#64748B]">
                   {t('inventory.noTransfers', 'No transfers found')}
                 </TableCell>
               </TableRow>
@@ -434,29 +448,39 @@ export default function InventoryManagement() {
   );
 
   const pricingContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('inventory.pricingHistory', 'Pricing History')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.pricingHistoryDesc', 'Track price changes over time')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.pricingHistory', 'Pricing History')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('inventory.pricingHistoryDesc', 'Track price changes over time')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-center text-gray-900 dark:text-white/60 py-8">
-          {t('inventory.selectPartPricing', 'Select a part to view pricing history')}
-        </p>
+        <div className="text-center py-12">
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+            <TrendingUp className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-[#64748B]">
+            {t('inventory.selectPartPricing', 'Select a part to view pricing history')}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
 
   const auditContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('inventory.auditTrail', 'Inventory Audit Trail')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('inventory.auditTrailDesc', 'Complete history of inventory changes')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.auditTrail', 'Inventory Audit Trail')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('inventory.auditTrailDesc', 'Complete history of inventory changes')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-center text-gray-900 dark:text-white/60 py-8">
-          {t('inventory.auditTrailInfo', 'Audit trail will display all inventory movements and changes')}
-        </p>
+        <div className="text-center py-12">
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+            <History className="w-10 h-10 text-white" />
+          </div>
+          <p className="text-[#64748B]">
+            {t('inventory.auditTrailInfo', 'Audit trail will display all inventory movements and changes')}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
@@ -464,7 +488,7 @@ export default function InventoryManagement() {
   const headerContent = (
     <div className="flex gap-2">
       <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-        <SelectTrigger className="w-[200px]" data-testid="select-garage">
+        <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
           <SelectValue placeholder={t('inventory.selectGarage', 'Select Garage')} />
         </SelectTrigger>
         <SelectContent>
@@ -496,10 +520,9 @@ export default function InventoryManagement() {
           },
           {
             id: "alerts",
-            label: t('inventory.stockAlerts', 'Stock Alerts'),
+            label: t('inventory.alerts', 'Alerts'),
             icon: AlertTriangle,
             content: alertsContent,
-            badge: stockAlerts.filter((a: any) => a.alertStatus === "active").length || undefined,
           },
           {
             id: "reorder",
@@ -521,23 +544,14 @@ export default function InventoryManagement() {
           },
           {
             id: "audit",
-            label: t('inventory.auditTrail', 'Audit Trail'),
+            label: t('inventory.audit', 'Audit'),
             icon: History,
             content: auditContent,
           },
         ]}
       />
-
-      <Button
-        onClick={() => setIsScannerOpen(true)}
-        className="fixed bottom-8 right-8 rounded-full h-14 w-14 shadow-lg"
-        data-testid="button-barcode-scanner"
-      >
-        <Barcode className="h-6 w-6" />
-      </Button>
-
       <BarcodeScanner
-        open={isScannerOpen}
+        isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onScan={handleBarcodeScan}
       />

@@ -135,12 +135,12 @@ export default function CallCenter() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ringing': return 'bg-blue-500 dark:bg-blue-600';
+      case 'ringing': return 'bg-[#0A5ED7] dark:bg-[#0BB3FF]';
       case 'active': return 'bg-green-500 dark:bg-green-600';
-      case 'completed': return 'bg-gray-500 dark:bg-gray-600';
+      case 'completed': return 'bg-[#64748B] dark:bg-[#64748B]';
       case 'missed': return 'bg-red-500 dark:bg-red-600';
-      case 'abandoned': return 'bg-yellow-500 dark:bg-yellow-600';
-      default: return 'bg-gray-400 dark:bg-gray-500';
+      case 'abandoned': return 'bg-[#F97316] dark:bg-[#F97316]';
+      default: return 'bg-[#64748B] dark:bg-[#64748B]';
     }
   };
 
@@ -153,57 +153,57 @@ export default function CallCenter() {
 
   if (queuesLoading || sessionsLoading) {
     return (
-      <div className="p-6">
-        <div className="text-center text-muted-foreground">{t('callCenter.loading', 'Loading Call Center...')}</div>
+      <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
+        <div className="text-center text-[#64748B] dark:text-[#64748B]">{t('callCenter.loading', 'Loading Call Center...')}</div>
       </div>
     );
   }
 
   const statsCards = (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.activeCalls', 'Active Calls')}</CardTitle>
+          <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('callCenter.activeCalls', 'Active Calls')}</CardTitle>
           <Phone className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground dark:text-gray-50" data-testid="text-active-calls">
+          <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-active-calls">
             {activeSessions.length}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.totalQueues', 'Total Queues')}</CardTitle>
-          <Users className="h-4 w-4 text-blue-500" />
+          <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('callCenter.totalQueues', 'Total Queues')}</CardTitle>
+          <Users className="h-4 w-4 text-[#0A5ED7]" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground dark:text-gray-50" data-testid="text-total-queues">
+          <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-queues">
             {queues?.filter(q => q.isActive).length || 0}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.completedToday', 'Completed Today')}</CardTitle>
-          <TrendingUp className="h-4 w-4 text-purple-500" />
+          <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('callCenter.completedToday', 'Completed Today')}</CardTitle>
+          <TrendingUp className="h-4 w-4 text-[#0BB3FF]" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground dark:text-gray-50" data-testid="text-completed-calls">
+          <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-completed-calls">
             {completedToday.length}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-foreground dark:text-gray-100">{t('callCenter.avgDurationToday', 'Avg Duration Today')}</CardTitle>
-          <Clock className="h-4 w-4 text-orange-500" />
+          <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('callCenter.avgDurationToday', 'Avg Duration Today')}</CardTitle>
+          <Clock className="h-4 w-4 text-[#F97316]" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground dark:text-gray-50" data-testid="text-avg-duration">
+          <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-duration">
             {completedToday.length > 0
               ? formatDuration(
                   Math.floor(
@@ -223,16 +223,16 @@ export default function CallCenter() {
       label: t('callCenter.liveCalls', 'Live Calls'),
       icon: PhoneCall,
       content: activeSessions.length === 0 ? (
-        <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-12 text-center">
-            <PhoneOff className="h-12 w-12 mx-auto mb-4 text-muted-foreground dark:text-gray-500" />
-            <p className="text-muted-foreground dark:text-gray-400">{t('callCenter.noActiveCalls', 'No active calls')}</p>
+            <PhoneOff className="h-12 w-12 mx-auto mb-4 text-[#64748B]" />
+            <p className="text-[#64748B]">{t('callCenter.noActiveCalls', 'No active calls')}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4">
           {activeSessions.map((session) => (
-            <Card key={session.id} className="bg-card dark:bg-gray-900 border-border dark:border-gray-800" data-testid={`card-session-${session.id}`}>
+            <Card key={session.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-session-${session.id}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -240,20 +240,21 @@ export default function CallCenter() {
                       <Phone className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground dark:text-gray-50">{session.phoneNumber}</div>
-                      <div className="text-sm text-muted-foreground dark:text-gray-400">
+                      <div className="font-semibold text-[#0B1F3B] dark:text-white">{session.phoneNumber}</div>
+                      <div className="text-sm text-[#64748B]">
                         {session.direction === 'inbound' ? t('callCenter.incoming', 'Incoming') : t('callCenter.outgoing', 'Outgoing')} • {session.status}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="border-border dark:border-gray-700 text-foreground dark:text-gray-200">
+                    <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                       {session.status}
                     </Badge>
                     {session.status === 'ringing' && (
                       <Button
                         size="sm"
                         onClick={() => updateSessionMutation.mutate({ id: session.id, status: 'active' })}
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                         data-testid={`button-answer-${session.id}`}
                       >
                         {t('callCenter.answer', 'Answer')}
@@ -284,25 +285,25 @@ export default function CallCenter() {
       content: (
         <div className="grid gap-4">
           {queues?.filter(q => q.isActive).map((queue) => (
-            <Card key={queue.id} className="bg-card dark:bg-gray-900 border-border dark:border-gray-800" data-testid={`card-queue-${queue.id}`}>
+            <Card key={queue.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-queue-${queue.id}`}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-foreground dark:text-gray-50">{queue.name}</CardTitle>
-                  <Badge variant="outline" className="border-green-500 text-green-500 dark:border-green-600 dark:text-green-400">
+                  <CardTitle className="text-[#0B1F3B] dark:text-white">{queue.name}</CardTitle>
+                  <Badge variant="outline" className="border-green-500 text-green-500 dark:border-green-400 dark:text-green-400">
                     {t('common.active', 'Active')}
                   </Badge>
                 </div>
                 {queue.description && (
-                  <p className="text-sm text-muted-foreground dark:text-gray-400">{queue.description}</p>
+                  <p className="text-sm text-[#64748B]">{queue.description}</p>
                 )}
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1 text-muted-foreground dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-[#64748B]">
                     <Clock className="h-4 w-4" />
                     {t('callCenter.maxWait', 'Max Wait')}: {queue.maxWaitTime ? `${queue.maxWaitTime}${t('callCenter.secondsShort', 's')}` : t('callCenter.unlimited', 'Unlimited')}
                   </div>
-                  <div className="flex items-center gap-1 text-muted-foreground dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-[#64748B]">
                     <Users className="h-4 w-4" />
                     {t('callCenter.callsInQueue', 'Calls in Queue')}: {sessions?.filter(s => s.queueId === queue.id && s.status === 'ringing').length || 0}
                   </div>
@@ -320,16 +321,16 @@ export default function CallCenter() {
       content: (
         <div className="grid gap-4">
           {completedSessions.slice(0, 20).map((session) => (
-            <Card key={session.id} className="bg-card dark:bg-gray-900 border-border dark:border-gray-800" data-testid={`card-history-${session.id}`}>
+            <Card key={session.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-history-${session.id}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-800">
-                      <MessageSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <div className="p-3 rounded-full bg-[#F8FAFC] dark:bg-[#0E1117]">
+                      <MessageSquare className="h-5 w-5 text-[#64748B]" />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground dark:text-gray-50">{session.phoneNumber}</div>
-                      <div className="text-sm text-muted-foreground dark:text-gray-400">
+                      <div className="font-semibold text-[#0B1F3B] dark:text-white">{session.phoneNumber}</div>
+                      <div className="text-sm text-[#64748B]">
                         {session.direction === 'inbound' ? t('callCenter.incoming', 'Incoming') : t('callCenter.outgoing', 'Outgoing')} • 
                         {session.startedAt ? new Date(session.startedAt).toLocaleString() : t('common.notAvailable', 'N/A')}
                       </div>
@@ -339,7 +340,7 @@ export default function CallCenter() {
                     <Badge className={getStatusColor(session.status)}>
                       {session.status}
                     </Badge>
-                    <div className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
+                    <div className="text-sm text-[#64748B] mt-1">
                       {t('callCenter.duration', 'Duration')}: {formatDuration(session.duration)}
                     </div>
                   </div>
@@ -379,9 +380,9 @@ export default function CallCenter() {
       />
       
       <Dialog open={newQueueOpen} onOpenChange={setNewQueueOpen}>
-        <DialogContent className="bg-card dark:bg-gray-900">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-gray-50">{t('callCenter.createQueue', 'Create Call Queue')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('callCenter.createQueue', 'Create Call Queue')}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -396,38 +397,38 @@ export default function CallCenter() {
             className="space-y-4"
           >
             <div>
-              <Label htmlFor="name" className="text-foreground dark:text-gray-200">{t('callCenter.queueName', 'Queue Name')}</Label>
+              <Label htmlFor="name" className="text-[#0B1F3B] dark:text-white">{t('callCenter.queueName', 'Queue Name')}</Label>
               <Input
                 id="name"
                 name="name"
                 required
                 placeholder={t('callCenter.queueNamePlaceholder', 'e.g., Support Queue')}
                 data-testid="input-queue-name"
-                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
             </div>
             <div>
-              <Label htmlFor="description" className="text-foreground dark:text-gray-200">{t('common.description', 'Description')}</Label>
+              <Label htmlFor="description" className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</Label>
               <Textarea
                 id="description"
                 name="description"
                 placeholder={t('callCenter.queueDescriptionPlaceholder', 'Queue description...')}
                 data-testid="input-queue-description"
-                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
             </div>
             <div>
-              <Label htmlFor="maxWaitTime" className="text-foreground dark:text-gray-200">{t('callCenter.maxWaitTimeSeconds', 'Max Wait Time (seconds)')}</Label>
+              <Label htmlFor="maxWaitTime" className="text-[#0B1F3B] dark:text-white">{t('callCenter.maxWaitTimeSeconds', 'Max Wait Time (seconds)')}</Label>
               <Input
                 id="maxWaitTime"
                 name="maxWaitTime"
                 type="number"
                 defaultValue="300"
                 data-testid="input-max-wait-time"
-                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
             </div>
-            <Button type="submit" className="w-full" data-testid="button-submit-queue">
+            <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-queue">
               {t('callCenter.createQueue', 'Create Queue')}
             </Button>
           </form>
@@ -435,9 +436,9 @@ export default function CallCenter() {
       </Dialog>
 
       <Dialog open={newSessionOpen} onOpenChange={setNewSessionOpen}>
-        <DialogContent className="bg-card dark:bg-gray-900">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-foreground dark:text-gray-50">{t('callCenter.initiateCall', 'Initiate Call')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('callCenter.initiateCall', 'Initiate Call')}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={(e) => {
@@ -452,35 +453,35 @@ export default function CallCenter() {
             className="space-y-4"
           >
             <div>
-              <Label htmlFor="phoneNumber" className="text-foreground dark:text-gray-200">{t('callCenter.phoneNumber', 'Phone Number')}</Label>
+              <Label htmlFor="phoneNumber" className="text-[#0B1F3B] dark:text-white">{t('callCenter.phoneNumber', 'Phone Number')}</Label>
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
                 required
                 placeholder="+1234567890"
                 data-testid="input-phone-number"
-                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
             </div>
             <div>
-              <Label htmlFor="direction" className="text-foreground dark:text-gray-200">{t('callCenter.direction', 'Direction')}</Label>
+              <Label htmlFor="direction" className="text-[#0B1F3B] dark:text-white">{t('callCenter.direction', 'Direction')}</Label>
               <Select name="direction" defaultValue="outbound">
-                <SelectTrigger data-testid="select-direction" className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100">
+                <SelectTrigger data-testid="select-direction" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-gray-900">
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="outbound">{t('callCenter.outbound', 'Outbound')}</SelectItem>
                   <SelectItem value="inbound">{t('callCenter.inbound', 'Inbound')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="queueId" className="text-foreground dark:text-gray-200">{t('callCenter.queueOptional', 'Queue (Optional)')}</Label>
+              <Label htmlFor="queueId" className="text-[#0B1F3B] dark:text-white">{t('callCenter.queueOptional', 'Queue (Optional)')}</Label>
               <Select name="queueId">
-                <SelectTrigger data-testid="select-queue" className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-100">
+                <SelectTrigger data-testid="select-queue" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   <SelectValue placeholder={t('callCenter.selectQueue', 'Select queue...')} />
                 </SelectTrigger>
-                <SelectContent className="bg-card dark:bg-gray-900">
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   {queues?.filter(q => q.isActive).map(queue => (
                     <SelectItem key={queue.id} value={queue.id}>
                       {queue.name}
@@ -489,7 +490,7 @@ export default function CallCenter() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full" data-testid="button-submit-call">
+            <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-call">
               {t('callCenter.initiateCall', 'Initiate Call')}
             </Button>
           </form>

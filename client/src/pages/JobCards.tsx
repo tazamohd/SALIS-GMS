@@ -34,10 +34,18 @@ import { StandardPageLayout } from "@/components/layouts";
 import { EmptyState } from "@/components/ui/empty-state";
 
 const priorityColors = {
-  low: "bg-gray-100 text-gray-800 dark:bg-salis-gray-dark dark:text-gray-300",
-  medium: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
-  high: "bg-gray-400 dark:bg-gray-500 text-gray-900 dark:text-white",
-  urgent: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
+  low: "bg-[#64748B]/10 text-[#64748B]",
+  medium: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+  high: "bg-[#F97316]/10 text-[#F97316]",
+  urgent: "bg-red-500/10 text-red-600 dark:text-red-400",
+};
+
+const statusColors: Record<string, string> = {
+  pending: "bg-[#64748B]/10 text-[#64748B]",
+  assigned: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+  in_progress: "bg-[#0BB3FF]/10 text-[#0BB3FF]",
+  completed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  cancelled: "bg-red-500/10 text-red-600 dark:text-red-400",
 };
 
 const jobCardFormSchema = insertJobCardSchema.extend({
@@ -220,14 +228,14 @@ export function JobCards() {
           },
         ]}
       >
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label>{t('jobCards.garage', 'Garage')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.garage', 'Garage')}</Label>
                 <Select value={filterGarageId} onValueChange={setFilterGarageId}>
-                  <SelectTrigger data-testid="select-filter-garage">
-                    <Building2 className="w-4 h-4 mr-2" />
+                  <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-garage">
+                    <Building2 className="w-4 h-4 mr-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -241,10 +249,10 @@ export function JobCards() {
                 </Select>
               </div>
               <div>
-                <Label>{t('common.status', 'Status')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</Label>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger data-testid="select-filter-status">
-                    <Filter className="w-4 h-4 mr-2" />
+                  <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-status">
+                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,10 +266,10 @@ export function JobCards() {
                 </Select>
               </div>
               <div>
-                <Label>{t('jobCards.priority', 'Priority')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.priority', 'Priority')}</Label>
                 <Select value={filterPriority} onValueChange={setFilterPriority}>
-                  <SelectTrigger data-testid="select-filter-priority">
-                    <Filter className="w-4 h-4 mr-2" />
+                  <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-priority">
+                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -279,17 +287,32 @@ export function JobCards() {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-900 dark:text-white/60">{t('jobCards.loading', 'Loading job cards...')}</p>
+            <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-[#64748B]">{t('jobCards.loading', 'Loading job cards...')}</p>
           </div>
         ) : filteredJobCards.length === 0 ? (
-          <EmptyState
-            title={t('jobCards.noJobCards', 'No Job Cards Found')}
-            description={t('jobCards.emptyDescription', 'Get started by creating your first service job card.')}
-            actionLabel={t('jobCards.create', 'Create Job Card')}
-            onAction={() => setIsCreateOpen(true)}
-            testId="job-cards-empty"
-          />
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative mb-6">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <Wrench className="w-10 h-10 text-white" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#0A5ED7]/20" />
+              <div className="absolute -bottom-1 -left-3 w-6 h-6 rounded-full bg-[#0BB3FF]/20" />
+            </div>
+            <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-2">
+              {t('jobCards.noJobCards', 'No Job Cards Found')}
+            </h3>
+            <p className="text-[#64748B] mb-6 text-center max-w-md">
+              {t('jobCards.emptyDescription', 'Get started by creating your first service job card.')}
+            </p>
+            <Button 
+              onClick={() => setIsCreateOpen(true)}
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {t('jobCards.create', 'Create Job Card')}
+            </Button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredJobCards.map((jobCard) => {
@@ -298,20 +321,26 @@ export function JobCards() {
               const assignedTech = users?.find(u => u.id === jobCard.assignedTo);
 
               return (
-                <Card key={jobCard.id} className="hover:shadow-lg transition-shadow" data-testid={`card-job-card-${jobCard.id}`}>
+                <Card 
+                  key={jobCard.id} 
+                  className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-lg hover:border-[#0A5ED7]/30 transition-all" 
+                  data-testid={`card-job-card-${jobCard.id}`}
+                >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg font-semibold">
+                        <CardTitle className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
                           {jobCard.jobNumber}
                         </CardTitle>
-                        <p className="text-sm text-gray-900 dark:text-white/60 mt-1">
+                        <p className="text-sm text-[#64748B] mt-1">
                           {vehicle?.make} {vehicle?.model} ({vehicle?.year})
                         </p>
-                        <p className="text-xs text-gray-900 dark:text-white/50">{vehicle?.licensePlate}</p>
+                        <p className="text-xs text-[#64748B]">{vehicle?.licensePlate}</p>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <StatusBadge status={jobCard.status} />
+                        <Badge className={statusColors[jobCard.status] || statusColors.pending}>
+                          {t(`jobCards.status.${jobCard.status}`, jobCard.status)}
+                        </Badge>
                         <Badge className={priorityColors[jobCard.priority as keyof typeof priorityColors]}>
                           {t(`jobCards.priority.${jobCard.priority}`, jobCard.priority)}
                         </Badge>
@@ -320,28 +349,28 @@ export function JobCards() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Building2 className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-[#64748B]">
+                        <Building2 className="w-4 h-4 text-[#0A5ED7]" />
                         <span>{garage?.name || t('jobCards.unknownGarage', 'Unknown Garage')}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Wrench className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-[#64748B]">
+                        <Wrench className="w-4 h-4 text-[#0A5ED7]" />
                         <span>{jobCard.serviceType}</span>
                       </div>
                       {assignedTech && (
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <User className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-[#64748B]">
+                          <User className="w-4 h-4 text-[#0A5ED7]" />
                           <span>{assignedTech.fullName || assignedTech.email}</span>
                         </div>
                       )}
                       {jobCard.scheduledDate && (
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <Calendar className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-[#64748B]">
+                          <Calendar className="w-4 h-4 text-[#0A5ED7]" />
                           <span>{new Date(jobCard.scheduledDate).toLocaleDateString()}</span>
                         </div>
                       )}
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-2">
+                    <p className="text-sm text-[#64748B] mt-3 line-clamp-2">
                       {jobCard.description}
                     </p>
                     <div className="flex gap-2 mt-4">
@@ -349,7 +378,7 @@ export function JobCards() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleViewDetails(jobCard)}
-                        className="flex-1"
+                        className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-view-details-${jobCard.id}`}
                       >
                         <Eye className="w-4 h-4 mr-1" />
@@ -360,7 +389,7 @@ export function JobCards() {
                           value={jobCard.status}
                           onValueChange={(status) => handleStatusChange(jobCard, status)}
                         >
-                          <SelectTrigger className="flex-1" data-testid={`select-status-${jobCard.id}`}>
+                          <SelectTrigger className="flex-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`select-status-${jobCard.id}`}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -382,31 +411,32 @@ export function JobCards() {
       </StandardPageLayout>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('jobCards.createNew', 'Create New Job Card')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('jobCards.createNew', 'Create New Job Card')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="jobNumber">{t('jobCards.jobNumber', 'Job Number')} *</Label>
+                <Label htmlFor="jobNumber" className="text-[#0B1F3B] dark:text-white">{t('jobCards.jobNumber', 'Job Number')} *</Label>
                 <Input
                   id="jobNumber"
                   {...createForm.register("jobNumber")}
                   placeholder="JC-2025-001"
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-job-number"
                 />
                 {createForm.formState.errors.jobNumber && (
-                  <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">{createForm.formState.errors.jobNumber.message}</p>
+                  <p className="text-sm text-[#F97316] mt-1">{createForm.formState.errors.jobNumber.message}</p>
                 )}
               </div>
               <div>
-                <Label htmlFor="garageId">{t('jobCards.garage', 'Garage')} *</Label>
+                <Label htmlFor="garageId" className="text-[#0B1F3B] dark:text-white">{t('jobCards.garage', 'Garage')} *</Label>
                 <Select
                   value={createForm.watch("garageId")}
                   onValueChange={(value) => createForm.setValue("garageId", value)}
                 >
-                  <SelectTrigger id="garageId" data-testid="select-garage">
+                  <SelectTrigger id="garageId" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
                     <SelectValue placeholder={t('jobCards.selectGarage', 'Select garage')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -418,72 +448,77 @@ export function JobCards() {
                   </SelectContent>
                 </Select>
                 {createForm.formState.errors.garageId && (
-                  <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">{createForm.formState.errors.garageId.message}</p>
+                  <p className="text-sm text-[#F97316] mt-1">{createForm.formState.errors.garageId.message}</p>
                 )}
               </div>
             </div>
 
-            <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
+            <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4">
+              <h3 className="font-semibold mb-3 text-[#0B1F3B] dark:text-white">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="make">{t('jobCards.make', 'Make')} *</Label>
+                  <Label htmlFor="make" className="text-[#0B1F3B] dark:text-white">{t('jobCards.make', 'Make')} *</Label>
                   <Input
                     id="make"
                     {...createForm.register("vehicleInfo.make")}
                     placeholder="Toyota"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-make"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="model">{t('jobCards.model', 'Model')} *</Label>
+                  <Label htmlFor="model" className="text-[#0B1F3B] dark:text-white">{t('jobCards.model', 'Model')} *</Label>
                   <Input
                     id="model"
                     {...createForm.register("vehicleInfo.model")}
                     placeholder="Camry"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-model"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="year">{t('jobCards.year', 'Year')} *</Label>
+                  <Label htmlFor="year" className="text-[#0B1F3B] dark:text-white">{t('jobCards.year', 'Year')} *</Label>
                   <Input
                     id="year"
                     {...createForm.register("vehicleInfo.year")}
                     placeholder="2023"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-year"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="licensePlate">{t('jobCards.licensePlate', 'License Plate')} *</Label>
+                  <Label htmlFor="licensePlate" className="text-[#0B1F3B] dark:text-white">{t('jobCards.licensePlate', 'License Plate')} *</Label>
                   <Input
                     id="licensePlate"
                     {...createForm.register("vehicleInfo.licensePlate")}
                     placeholder="ABC-1234"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-license"
                   />
                 </div>
                 <div className="col-span-2">
-                  <Label htmlFor="vin">{t('jobCards.vinOptional', 'VIN (Optional)')}</Label>
+                  <Label htmlFor="vin" className="text-[#0B1F3B] dark:text-white">{t('jobCards.vinOptional', 'VIN (Optional)')}</Label>
                   <Input
                     id="vin"
                     {...createForm.register("vehicleInfo.vin")}
                     placeholder="1HGBH41JXMN109186"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-vin"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">{t('jobCards.serviceDetails', 'Service Details')}</h3>
+            <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4">
+              <h3 className="font-semibold mb-3 text-[#0B1F3B] dark:text-white">{t('jobCards.serviceDetails', 'Service Details')}</h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="serviceType">{t('jobCards.serviceType', 'Service Type')} *</Label>
+                  <Label htmlFor="serviceType" className="text-[#0B1F3B] dark:text-white">{t('jobCards.serviceType', 'Service Type')} *</Label>
                   <Select
                     value={createForm.watch("serviceType")}
                     onValueChange={(value) => createForm.setValue("serviceType", value)}
                   >
-                    <SelectTrigger id="serviceType" data-testid="select-service-type">
+                    <SelectTrigger id="serviceType" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-service-type">
                       <SelectValue placeholder={t('jobCards.selectServiceType', 'Select service type')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -496,23 +531,24 @@ export function JobCards() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="description">{t('common.description', 'Description')} *</Label>
+                  <Label htmlFor="description" className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')} *</Label>
                   <Textarea
                     id="description"
                     {...createForm.register("description")}
                     placeholder={t('jobCards.descriptionPlaceholder', 'Describe the service required...')}
                     rows={3}
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-description"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="priority">{t('jobCards.priority', 'Priority')} *</Label>
+                    <Label htmlFor="priority" className="text-[#0B1F3B] dark:text-white">{t('jobCards.priority', 'Priority')} *</Label>
                     <Select
                       value={createForm.watch("priority")}
                       onValueChange={(value: any) => createForm.setValue("priority", value)}
                     >
-                      <SelectTrigger id="priority" data-testid="select-priority">
+                      <SelectTrigger id="priority" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-priority">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -524,75 +560,56 @@ export function JobCards() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="assignedTo">{t('jobCards.assignTechnician', 'Assign Technician')}</Label>
+                    <Label htmlFor="assignedTo" className="text-[#0B1F3B] dark:text-white">{t('jobCards.assignTo', 'Assign To')}</Label>
                     <Select
-                      value={createForm.watch("assignedTo") || undefined}
+                      value={createForm.watch("assignedTo") || ""}
                       onValueChange={(value) => createForm.setValue("assignedTo", value)}
                     >
-                      <SelectTrigger id="assignedTo" data-testid="select-technician">
+                      <SelectTrigger id="assignedTo" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-assigned-to">
                         <SelectValue placeholder={t('jobCards.selectTechnician', 'Select technician')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {technicians?.map((tech) => {
-                          const profile = technicianProfiles?.find((p) => p.userId === tech.id);
-                          return (
-                            <SelectItem key={tech.id} value={tech.id} data-testid={`option-tech-${tech.id}`}>
-                              <div className="flex items-center gap-2">
-                                <span>{tech.fullName || tech.email}</span>
-                                {profile?.level && (
-                                  <span className="text-xs text-gray-900 dark:text-white/60">
-                                    ({profile.level}
-                                    {profile.speciality ? ` - ${profile.speciality}` : ""})
-                                  </span>
-                                )}
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
+                        {(technicians ?? []).map((tech) => (
+                          <SelectItem key={tech.id} value={tech.id}>
+                            {tech.fullName || tech.email}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="estimatedHours">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
+                    <Label htmlFor="estimatedHours" className="text-[#0B1F3B] dark:text-white">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
                     <Input
                       id="estimatedHours"
                       type="number"
                       step="0.5"
                       {...createForm.register("estimatedHours")}
-                      placeholder="4.5"
+                      placeholder="2.5"
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                       data-testid="input-estimated-hours"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="totalCost">{t('jobCards.totalCost', 'Total Cost')}</Label>
-                    <Input
-                      id="totalCost"
-                      type="number"
-                      step="0.01"
-                      {...createForm.register("totalCost")}
-                      placeholder="500.00"
-                      data-testid="input-total-cost"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="scheduledDate">{t('jobCards.scheduledDate', 'Scheduled Date')}</Label>
+                    <Label htmlFor="scheduledDate" className="text-[#0B1F3B] dark:text-white">{t('jobCards.scheduledDate', 'Scheduled Date')}</Label>
                     <Input
                       id="scheduledDate"
                       type="date"
                       {...createForm.register("scheduledDate")}
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                       data-testid="input-scheduled-date"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="notes">{t('common.notes', 'Notes')}</Label>
+                  <Label htmlFor="notes" className="text-[#0B1F3B] dark:text-white">{t('jobCards.notes', 'Notes')}</Label>
                   <Textarea
                     id="notes"
                     {...createForm.register("notes")}
                     placeholder={t('jobCards.notesPlaceholder', 'Additional notes...')}
                     rows={2}
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-notes"
                   />
                 </div>
@@ -604,17 +621,17 @@ export function JobCards() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsCreateOpen(false)}
-                data-testid="button-cancel-create"
+                className="border-[#E2E8F0] dark:border-[#232A36]"
               >
                 {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
-                className="bg-salis-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200"
                 disabled={createMutation.isPending}
-                data-testid="button-submit-create"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+                data-testid="button-create-submit"
               >
-                {createMutation.isPending ? t('jobCards.creating', 'Creating...') : t('jobCards.createJobCard', 'Create Job Card')}
+                {createMutation.isPending ? t('common.creating', 'Creating...') : t('jobCards.create', 'Create Job Card')}
               </Button>
             </DialogFooter>
           </form>
@@ -622,121 +639,43 @@ export function JobCards() {
       </Dialog>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('jobCards.details', 'Job Card Details')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedJobCard?.jobNumber}</DialogTitle>
           </DialogHeader>
           {selectedJobCard && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Badge className={statusColors[selectedJobCard.status] || statusColors.pending}>
+                  {t(`jobCards.status.${selectedJobCard.status}`, selectedJobCard.status)}
+                </Badge>
+                <Badge className={priorityColors[selectedJobCard.priority as keyof typeof priorityColors]}>
+                  {t(`jobCards.priority.${selectedJobCard.priority}`, selectedJobCard.priority)}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <Label className="text-gray-600">{t('jobCards.jobNumber', 'Job Number')}</Label>
-                  <p className="font-semibold">{selectedJobCard.jobNumber}</p>
-                </div>
-                <div>
-                  <Label className="text-gray-600">{t('common.status', 'Status')}</Label>
-                  <div className="mt-1">
-                    <StatusBadge status={selectedJobCard.status} />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-gray-600">{t('jobCards.priority', 'Priority')}</Label>
-                  <div className="mt-1">
-                    <Badge className={priorityColors[selectedJobCard.priority as keyof typeof priorityColors]}>
-                      {t(`jobCards.priority.${selectedJobCard.priority}`, selectedJobCard.priority)}
-                    </Badge>
-                  </div>
+                  <Label className="text-[#64748B]">{t('jobCards.vehicle', 'Vehicle')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">
+                    {(selectedJobCard.vehicleInfo as any)?.make} {(selectedJobCard.vehicleInfo as any)?.model}
+                  </p>
                 </div>
                 <div>
-                  <Label className="text-gray-600">{t('jobCards.serviceType', 'Service Type')}</Label>
-                  <p className="font-semibold capitalize">{selectedJobCard.serviceType}</p>
+                  <Label className="text-[#64748B]">{t('jobCards.licensePlate', 'License Plate')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{(selectedJobCard.vehicleInfo as any)?.licensePlate}</p>
+                </div>
+                <div>
+                  <Label className="text-[#64748B]">{t('jobCards.serviceType', 'Service Type')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedJobCard.serviceType}</p>
+                </div>
+                <div>
+                  <Label className="text-[#64748B]">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedJobCard.estimatedHours || '-'}</p>
                 </div>
               </div>
-
-              <div className="border-t pt-4">
-                <h3 className="font-semibold mb-3">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-gray-600">{t('jobCards.vehicle', 'Vehicle')}</Label>
-                    <p className="font-semibold">
-                      {(selectedJobCard.vehicleInfo as any)?.make} {(selectedJobCard.vehicleInfo as any)?.model} ({(selectedJobCard.vehicleInfo as any)?.year})
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-gray-600">{t('jobCards.licensePlate', 'License Plate')}</Label>
-                    <p className="font-semibold">{(selectedJobCard.vehicleInfo as any)?.licensePlate}</p>
-                  </div>
-                  {(selectedJobCard.vehicleInfo as any)?.vin && (
-                    <div className="col-span-2">
-                      <Label className="text-gray-600">{t('jobCards.vin', 'VIN')}</Label>
-                      <p className="font-semibold">{(selectedJobCard.vehicleInfo as any)?.vin}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <Label className="text-gray-600">{t('common.description', 'Description')}</Label>
-                <p className="mt-1">{selectedJobCard.description}</p>
-              </div>
-
-              {selectedJobCard.notes && (
-                <div className="border-t pt-4">
-                  <Label className="text-gray-600">{t('common.notes', 'Notes')}</Label>
-                  <p className="mt-1">{selectedJobCard.notes}</p>
-                </div>
-              )}
-
-              <div className="border-t pt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {selectedJobCard.estimatedHours && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
-                      <p className="font-semibold">{selectedJobCard.estimatedHours}h</p>
-                    </div>
-                  )}
-                  {selectedJobCard.actualHours && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.actualHours', 'Actual Hours')}</Label>
-                      <p className="font-semibold">{selectedJobCard.actualHours}h</p>
-                    </div>
-                  )}
-                  {selectedJobCard.totalCost && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.totalCost', 'Total Cost')}</Label>
-                      <p className="font-semibold">${selectedJobCard.totalCost}</p>
-                    </div>
-                  )}
-                  {selectedJobCard.scheduledDate && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.scheduledDate', 'Scheduled Date')}</Label>
-                      <p className="font-semibold">
-                        {new Date(selectedJobCard.scheduledDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  {selectedJobCard.startedAt && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.startedAt', 'Started At')}</Label>
-                      <p className="font-semibold">
-                        {new Date(selectedJobCard.startedAt).toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {selectedJobCard.completedAt && (
-                    <div>
-                      <Label className="text-gray-600">{t('jobCards.completedAt', 'Completed At')}</Label>
-                      <p className="font-semibold">
-                        {new Date(selectedJobCard.completedAt).toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                </div>
+              <div>
+                <Label className="text-[#64748B]">{t('common.description', 'Description')}</Label>
+                <p className="text-sm text-[#0B1F3B] dark:text-white mt-1">{selectedJobCard.description}</p>
               </div>
             </div>
           )}
@@ -744,7 +683,7 @@ export function JobCards() {
             <Button
               variant="outline"
               onClick={() => setIsDetailsOpen(false)}
-              data-testid="button-close-details"
+              className="border-[#E2E8F0] dark:border-[#232A36]"
             >
               {t('common.close', 'Close')}
             </Button>

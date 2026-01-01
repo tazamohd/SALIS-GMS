@@ -27,22 +27,23 @@ export default function TaskManagement() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: string } = {
-      'pending': 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
-      'in_progress': 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white',
-      'completed': 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
-      'delivered': 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white',
-      'cancelled': 'bg-salis-black dark:bg-white text-white dark:text-salis-black',
+      'pending': 'bg-[#64748B]/10 text-[#64748B]',
+      'in_progress': 'bg-[#0A5ED7]/10 text-[#0A5ED7]',
+      'completed': 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      'delivered': 'bg-[#0BB3FF]/10 text-[#0BB3FF]',
+      'cancelled': 'bg-red-500/10 text-red-600 dark:text-red-400',
     };
-    return statusColors[status] || 'bg-gray-100 dark:bg-salis-gray-dark';
+    return statusColors[status] || 'bg-[#64748B]/10 text-[#64748B]';
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: string } = {
-      'high': 'bg-salis-black dark:bg-white text-white dark:text-salis-black',
-      'medium': 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
-      'low': 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+      'high': 'bg-[#F97316]/10 text-[#F97316]',
+      'medium': 'bg-[#0A5ED7]/10 text-[#0A5ED7]',
+      'low': 'bg-[#64748B]/10 text-[#64748B]',
+      'urgent': 'bg-red-500/10 text-red-600 dark:text-red-400',
     };
-    return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark';
+    return priorityColors[priority] || 'bg-[#64748B]/10 text-[#64748B]';
   };
 
   const columns = [
@@ -50,7 +51,7 @@ export default function TaskManagement() {
       header: t('taskManagement.taskId', 'Task ID'),
       accessorKey: "id",
       cell: (row: JobCard) => (
-        <span className="font-medium" data-testid={`task-id-${row.id}`}>
+        <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`task-id-${row.id}`}>
           #{row.id}
         </span>
       ),
@@ -59,7 +60,7 @@ export default function TaskManagement() {
       header: t('taskManagement.customer', 'Customer'),
       accessorKey: "vehicleInfo",
       cell: (row: JobCard) => (
-        <span data-testid={`task-customer-${row.id}`}>
+        <span className="text-[#64748B]" data-testid={`task-customer-${row.id}`}>
           {(row.vehicleInfo as any)?.owner || t('common.na', 'N/A')}
         </span>
       ),
@@ -68,7 +69,7 @@ export default function TaskManagement() {
       header: t('taskManagement.serviceType', 'Service Type'),
       accessorKey: "serviceType",
       cell: (row: JobCard) => (
-        <span data-testid={`task-service-${row.id}`}>{row.serviceType}</span>
+        <span className="text-[#0B1F3B] dark:text-white" data-testid={`task-service-${row.id}`}>{row.serviceType}</span>
       ),
     },
     {
@@ -93,7 +94,7 @@ export default function TaskManagement() {
       header: t('taskManagement.dueDate', 'Due Date'),
       accessorKey: "createdAt",
       cell: (row: JobCard) => (
-        <span className="text-sm text-gray-600 dark:text-gray-400" data-testid={`task-date-${row.id}`}>
+        <span className="text-sm text-[#64748B]" data-testid={`task-date-${row.id}`}>
           {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : t('common.na', 'N/A')}
         </span>
       ),
@@ -106,6 +107,7 @@ export default function TaskManagement() {
           size="sm"
           variant="outline"
           onClick={() => handleViewTask(row)}
+          className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
           data-testid={`button-view-${row.id}`}
         >
           {t('common.view', 'View')}

@@ -151,13 +151,13 @@ export default function DataImportExport() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-gray-800 dark:bg-gray-200 text-white dark:text-black"><CheckCircle className="h-3 w-3 mr-1" />{t('common.completed', 'Completed')}</Badge>;
+        return <Badge className="bg-green-600 text-white"><CheckCircle className="h-3 w-3 mr-1" />{t('common.completed', 'Completed')}</Badge>;
       case 'processing':
-        return <Badge className="bg-gray-600 dark:bg-gray-400 text-white dark:text-black">{t('dataImportExport.processing', 'Processing...')}</Badge>;
+        return <Badge className="bg-[#0A5ED7] text-white">{t('dataImportExport.processing', 'Processing...')}</Badge>;
       case 'failed':
         return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />{t('common.failed', 'Failed')}</Badge>;
       default:
-        return <Badge variant="outline">{t('common.pending', 'Pending')}</Badge>;
+        return <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('common.pending', 'Pending')}</Badge>;
     }
   };
 
@@ -171,22 +171,22 @@ export default function DataImportExport() {
   ];
 
   const exportTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Download className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+          <Download className="h-5 w-5 text-[#0A5ED7]" />
           {t('dataImportExport.exportData', 'Export Data')}
         </CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.exportDescription', 'Export data from selected module')}</CardDescription>
+        <CardDescription className="text-[#64748B]">{t('dataImportExport.exportDescription', 'Export data from selected module')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>{t('dataImportExport.module', 'Module')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.module', 'Module')}</Label>
           <Select value={selectedModule} onValueChange={setSelectedModule}>
-            <SelectTrigger data-testid="select-export-module">
+            <SelectTrigger data-testid="select-export-module" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               {modules.map(({ value, label }) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
@@ -195,12 +195,12 @@ export default function DataImportExport() {
         </div>
 
         <div className="space-y-2">
-          <Label>{t('dataImportExport.format', 'Format')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.format', 'Format')}</Label>
           <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger data-testid="select-export-format">
+            <SelectTrigger data-testid="select-export-format" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="csv">
                 <div className="flex items-center gap-2">
                   <FileSpreadsheet className="h-4 w-4" />
@@ -218,7 +218,7 @@ export default function DataImportExport() {
         </div>
 
         <Button
-          className="w-full"
+          className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           onClick={handleExport}
           disabled={exportMutation.isPending || !garageId}
           data-testid="button-export"
@@ -231,22 +231,22 @@ export default function DataImportExport() {
   );
 
   const importTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+          <Upload className="h-5 w-5 text-[#0A5ED7]" />
           {t('dataImportExport.importData', 'Import Data')}
         </CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.importDescription', 'Import data from CSV or JSON file')}</CardDescription>
+        <CardDescription className="text-[#64748B]">{t('dataImportExport.importDescription', 'Import data from CSV or JSON file')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>{t('dataImportExport.module', 'Module')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.module', 'Module')}</Label>
           <Select value={selectedModule} onValueChange={setSelectedModule}>
-            <SelectTrigger data-testid="select-import-module">
+            <SelectTrigger data-testid="select-import-module" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               {modules.map(({ value, label }) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
@@ -255,22 +255,23 @@ export default function DataImportExport() {
         </div>
 
         <div className="space-y-2">
-          <Label>{t('dataImportExport.file', 'File')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.file', 'File')}</Label>
           <Input
             type="file"
             accept=".csv,.json"
             onChange={(e) => setImportFile(e.target.files?.[0] || null)}
             data-testid="input-import-file"
+            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
           />
           {importFile && (
-            <p className="text-sm text-gray-900 dark:text-white/60">
+            <p className="text-sm text-[#64748B]">
               {t('dataImportExport.selected', 'Selected')}: {importFile.name}
             </p>
           )}
         </div>
 
         <Button
-          className="w-full"
+          className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           onClick={handleImport}
           disabled={importMutation.isPending || !importFile}
           data-testid="button-import"
@@ -283,14 +284,14 @@ export default function DataImportExport() {
   );
 
   const historyTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('dataImportExport.exportHistory', 'Export History')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('dataImportExport.recentExportJobs', 'Recent export jobs')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.exportHistory', 'Export History')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('dataImportExport.recentExportJobs', 'Recent export jobs')}</CardDescription>
       </CardHeader>
       <CardContent>
         {!exportJobs || exportJobs.length === 0 ? (
-          <div className="text-center text-gray-900 dark:text-white/60 py-8">
+          <div className="text-center text-[#64748B] py-8">
             {t('dataImportExport.noExportHistory', 'No export history')}
           </div>
         ) : (
@@ -298,20 +299,20 @@ export default function DataImportExport() {
             {exportJobs.map((job) => (
               <div
                 key={job.id}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
+                className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]"
                 data-testid={`export-job-${job.id}`}
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{modules.find(m => m.value === job.module)?.label}</span>
-                    <span className="text-sm text-gray-900 dark:text-white/60">({job.format.toUpperCase()})</span>
+                    <span className="font-medium text-[#0B1F3B] dark:text-white">{modules.find(m => m.value === job.module)?.label}</span>
+                    <span className="text-sm text-[#64748B]">({job.format.toUpperCase()})</span>
                   </div>
-                  <div className="text-sm text-gray-900 dark:text-white/60">
+                  <div className="text-sm text-[#64748B]">
                     {job.createdAt && new Date(job.createdAt).toLocaleString()}
                     {job.recordCount && ` • ${job.recordCount} ${t('dataImportExport.records', 'records')}`}
                   </div>
                   {job.errorMessage && (
-                    <div className="text-sm text-destructive mt-1">
+                    <div className="text-sm text-[#F97316] mt-1">
                       {t('common.error', 'Error')}: {job.errorMessage}
                     </div>
                   )}
@@ -323,6 +324,7 @@ export default function DataImportExport() {
                       variant="outline"
                       size="sm"
                       asChild
+                      className="border-[#E2E8F0] dark:border-[#232A36]"
                       data-testid={`button-download-${job.id}`}
                     >
                       <a href={job.fileUrl} download={job.fileName}>
@@ -347,16 +349,16 @@ export default function DataImportExport() {
       icon={Upload}
       headerContent={
         garages && garages.length > 0 && (
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white">{t('dataImportExport.selectGarageTitle', 'Select Garage')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('dataImportExport.selectGarageTitle', 'Select Garage')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={garageId} onValueChange={setGarageId}>
-                <SelectTrigger data-testid="select-garage">
+                <SelectTrigger data-testid="select-garage" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   {garages.map((garage: any) => (
                     <SelectItem key={garage.id} value={garage.id}>
                       {garage.name}

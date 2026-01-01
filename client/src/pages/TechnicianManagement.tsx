@@ -43,7 +43,6 @@ export default function TechnicianManagement() {
       ).then((r) => r.json()),
   });
 
-  // Fetch all technician profiles using useQueries
   const profileQueries = useQueries({
     queries: (technicians || []).map(technician => ({
       queryKey: ["/api/technician-profiles", technician.id],
@@ -129,7 +128,6 @@ export default function TechnicianManagement() {
         const profile = await response.json();
         setEditingProfile(profile);
       } else {
-        // Create default profile if none exists
         setEditingProfile({
           userId: technicianId,
           skills: "",
@@ -165,16 +163,16 @@ export default function TechnicianManagement() {
     });
   };
 
-  const getLevelBadgeVariant = (level?: string) => {
+  const getLevelBadgeColor = (level?: string) => {
     switch (level) {
       case "master":
-        return "default";
+        return "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0";
       case "senior":
-        return "secondary";
+        return "bg-[#0A5ED7] text-white border-0";
       case "intermediate":
-        return "outline";
+        return "bg-[#0BB3FF] text-white border-0";
       default:
-        return "outline";
+        return "bg-[#64748B] text-white border-0";
     }
   };
 
@@ -192,23 +190,22 @@ export default function TechnicianManagement() {
       ]}
     >
 
-      {/* Filters */}
-      <Card data-testid="card-filters">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-filters">
         <CardHeader>
-          <CardTitle className="text-lg">{t('common.filter', 'Filters')}</CardTitle>
+          <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="w-64">
-              <Label htmlFor="garage-filter">{t('technician.garage', 'Garage')}</Label>
+              <Label htmlFor="garage-filter" className="text-[#0B1F3B] dark:text-white">{t('technician.garage', 'Garage')}</Label>
               <Select value={selectedGarage} onValueChange={setSelectedGarage}>
-                <SelectTrigger id="garage-filter" data-testid="select-garage-filter">
+                <SelectTrigger id="garage-filter" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-garage-filter">
                   <SelectValue placeholder={t('technician.selectGarage', 'Select garage')} />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" data-testid="option-all-garages">{t('technician.allGarages', 'All Garages')}</SelectItem>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                  <SelectItem value="all" className="text-[#0B1F3B] dark:text-white" data-testid="option-all-garages">{t('technician.allGarages', 'All Garages')}</SelectItem>
                   {garages?.map((garage) => (
-                    <SelectItem key={garage.id} value={garage.id} data-testid={`option-garage-${garage.id}`}>
+                    <SelectItem key={garage.id} value={garage.id} className="text-[#0B1F3B] dark:text-white" data-testid={`option-garage-${garage.id}`}>
                       {garage.name}
                     </SelectItem>
                   ))}
@@ -219,17 +216,16 @@ export default function TechnicianManagement() {
         </CardContent>
       </Card>
 
-      {/* Technicians List */}
       {techniciansLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i}>
+            <Card key={i} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-6 w-3/4 bg-[#E2E8F0] dark:bg-[#232A36]" />
+                <Skeleton className="h-4 w-1/2 bg-[#E2E8F0] dark:bg-[#232A36]" />
               </CardHeader>
               <CardContent>
-                <Skeleton className="h-20" />
+                <Skeleton className="h-20 bg-[#E2E8F0] dark:bg-[#232A36]" />
               </CardContent>
             </Card>
           ))}
@@ -237,18 +233,17 @@ export default function TechnicianManagement() {
       ) : technicians && technicians.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {technicians.map((technician: User & { technicianProfile?: TechnicianProfile }, index) => {
-            // Get the profile from the pre-fetched queries
             const profile = profileQueries[index]?.data;
 
             return (
-              <Card key={technician.id} data-testid={`card-technician-${technician.id}`}>
+              <Card key={technician.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-lg hover:border-[#0A5ED7]/30 transition-all" data-testid={`card-technician-${technician.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg" data-testid={`text-name-${technician.id}`}>
+                      <CardTitle className="text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-name-${technician.id}`}>
                         {technician.fullName || t('common.unknown', 'Unknown')}
                       </CardTitle>
-                      <CardDescription data-testid={`text-email-${technician.id}`}>
+                      <CardDescription className="text-[#64748B]" data-testid={`text-email-${technician.id}`}>
                         {technician.email}
                       </CardDescription>
                     </div>
@@ -257,6 +252,7 @@ export default function TechnicianManagement() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(technician)}
+                        className="text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-edit-${technician.id}`}
                       >
                         <Edit className="h-4 w-4" />
@@ -265,70 +261,71 @@ export default function TechnicianManagement() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(technician)}
+                        className="text-[#F97316] hover:bg-[#F97316]/10"
                         data-testid={`button-delete-${technician.id}`}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-2">
                     {profile?.level && (
-                      <Badge variant={getLevelBadgeVariant(profile.level)} data-testid={`badge-level-${technician.id}`}>
+                      <Badge className={getLevelBadgeColor(profile.level)} data-testid={`badge-level-${technician.id}`}>
                         {profile.level}
                       </Badge>
                     )}
                     {profile?.isLead && (
-                      <Badge variant="default" data-testid={`badge-lead-${technician.id}`}>{t('technician.lead', 'Lead')}</Badge>
+                      <Badge className="bg-[#10B981] text-white border-0" data-testid={`badge-lead-${technician.id}`}>{t('technician.lead', 'Lead')}</Badge>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {profile?.speciality && (
                     <div className="flex items-start gap-2" data-testid={`text-speciality-${technician.id}`}>
-                      <Briefcase className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
+                      <Briefcase className="h-4 w-4 mt-0.5 text-[#0A5ED7]" />
                       <div className="text-sm">
-                        <div className="font-medium">{t('technician.speciality', 'Speciality')}</div>
-                        <div className="text-gray-600 dark:text-gray-400">{profile.speciality}</div>
+                        <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.speciality', 'Speciality')}</div>
+                        <div className="text-[#64748B]">{profile.speciality}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.yearsOfExperience !== undefined && (
                     <div className="flex items-start gap-2" data-testid={`text-experience-${technician.id}`}>
-                      <Clock className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
+                      <Clock className="h-4 w-4 mt-0.5 text-[#0A5ED7]" />
                       <div className="text-sm">
-                        <div className="font-medium">{t('technician.experience', 'Experience')}</div>
-                        <div className="text-gray-600 dark:text-gray-400">{t('technician.yearsExperience', '{{count}} years', { count: profile.yearsOfExperience })}</div>
+                        <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.experience', 'Experience')}</div>
+                        <div className="text-[#64748B]">{t('technician.yearsExperience', '{{count}} years', { count: profile.yearsOfExperience })}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.hourlyRate && (
                     <div className="flex items-start gap-2" data-testid={`text-rate-${technician.id}`}>
-                      <DollarSign className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
+                      <DollarSign className="h-4 w-4 mt-0.5 text-[#0BB3FF]" />
                       <div className="text-sm">
-                        <div className="font-medium">{t('technician.hourlyRate', 'Hourly Rate')}</div>
-                        <div className="text-gray-600 dark:text-gray-400">${profile.hourlyRate}/{t('technician.hr', 'hr')}</div>
+                        <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.hourlyRate', 'Hourly Rate')}</div>
+                        <div className="text-[#64748B]">${profile.hourlyRate}/{t('technician.hr', 'hr')}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.qualifications && (
                     <div className="flex items-start gap-2" data-testid={`text-qualifications-${technician.id}`}>
-                      <GraduationCap className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
+                      <GraduationCap className="h-4 w-4 mt-0.5 text-[#0BB3FF]" />
                       <div className="text-sm">
-                        <div className="font-medium">{t('technician.qualifications', 'Qualifications')}</div>
-                        <div className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2">{profile.qualifications}</div>
+                        <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.qualifications', 'Qualifications')}</div>
+                        <div className="text-[#64748B] text-xs line-clamp-2">{profile.qualifications}</div>
                       </div>
                     </div>
                   )}
 
                   {profile?.certifications && (
                     <div className="flex items-start gap-2" data-testid={`text-certifications-${technician.id}`}>
-                      <Award className="h-4 w-4 mt-0.5 text-gray-600 dark:text-gray-400" />
+                      <Award className="h-4 w-4 mt-0.5 text-[#0BB3FF]" />
                       <div className="text-sm">
-                        <div className="font-medium">{t('technician.certifications', 'Certifications')}</div>
-                        <div className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2">{profile.certifications}</div>
+                        <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.certifications', 'Certifications')}</div>
+                        <div className="text-[#64748B] text-xs line-clamp-2">{profile.certifications}</div>
                       </div>
                     </div>
                   )}
@@ -338,23 +335,22 @@ export default function TechnicianManagement() {
           })}
         </div>
       ) : (
-        <Card data-testid="card-empty">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-empty">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="h-12 w-12 text-gray-600 dark:text-gray-400 mb-4" />
-            <p className="text-lg font-medium" data-testid="text-empty">{t('technician.noTechniciansFound', 'No technicians found')}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400" data-testid="text-empty-subtitle">
+            <Users className="h-12 w-12 text-[#64748B] mb-4" />
+            <p className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid="text-empty">{t('technician.noTechniciansFound', 'No technicians found')}</p>
+            <p className="text-sm text-[#64748B]" data-testid="text-empty-subtitle">
               {t('technician.tryAdjustingFilters', 'Try adjusting your filters')}
             </p>
           </CardContent>
         </Card>
       )}
 
-      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="dialog-edit">
           <DialogHeader>
-            <DialogTitle data-testid="text-dialog-title">{t('technician.editProfile', 'Edit Technician Profile')}</DialogTitle>
-            <DialogDescription data-testid="text-dialog-subtitle">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white" data-testid="text-dialog-title">{t('technician.editProfile', 'Edit Technician Profile')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]" data-testid="text-dialog-subtitle">
               {t('technician.editProfileDescription', 'Update technician information, skills, and qualifications')}
             </DialogDescription>
           </DialogHeader>
@@ -362,27 +358,27 @@ export default function TechnicianManagement() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="level">{t('technician.level', 'Level')}</Label>
+                  <Label htmlFor="level" className="text-[#0B1F3B] dark:text-white">{t('technician.level', 'Level')}</Label>
                   <Select
                     value={editingProfile.level || "junior"}
                     onValueChange={(value) =>
                       setEditingProfile({ ...editingProfile, level: value })
                     }
                   >
-                    <SelectTrigger id="level" data-testid="select-level">
+                    <SelectTrigger id="level" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-level">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="junior" data-testid="option-level-junior">{t('technician.levelJunior', 'Junior')}</SelectItem>
-                      <SelectItem value="intermediate" data-testid="option-level-intermediate">{t('technician.levelIntermediate', 'Intermediate')}</SelectItem>
-                      <SelectItem value="senior" data-testid="option-level-senior">{t('technician.levelSenior', 'Senior')}</SelectItem>
-                      <SelectItem value="master" data-testid="option-level-master">{t('technician.levelMaster', 'Master')}</SelectItem>
+                    <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectItem value="junior" className="text-[#0B1F3B] dark:text-white" data-testid="option-level-junior">{t('technician.levelJunior', 'Junior')}</SelectItem>
+                      <SelectItem value="intermediate" className="text-[#0B1F3B] dark:text-white" data-testid="option-level-intermediate">{t('technician.levelIntermediate', 'Intermediate')}</SelectItem>
+                      <SelectItem value="senior" className="text-[#0B1F3B] dark:text-white" data-testid="option-level-senior">{t('technician.levelSenior', 'Senior')}</SelectItem>
+                      <SelectItem value="master" className="text-[#0B1F3B] dark:text-white" data-testid="option-level-master">{t('technician.levelMaster', 'Master')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="yearsOfExperience">{t('technician.yearsOfExperience', 'Years of Experience')}</Label>
+                  <Label htmlFor="yearsOfExperience" className="text-[#0B1F3B] dark:text-white">{t('technician.yearsOfExperience', 'Years of Experience')}</Label>
                   <Input
                     id="yearsOfExperience"
                     type="number"
@@ -394,13 +390,14 @@ export default function TechnicianManagement() {
                         yearsOfExperience: parseInt(e.target.value) || 0,
                       })
                     }
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                     data-testid="input-years"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="speciality">{t('technician.speciality', 'Speciality')}</Label>
+                <Label htmlFor="speciality" className="text-[#0B1F3B] dark:text-white">{t('technician.speciality', 'Speciality')}</Label>
                 <Input
                   id="speciality"
                   value={editingProfile.speciality || ""}
@@ -408,12 +405,13 @@ export default function TechnicianManagement() {
                     setEditingProfile({ ...editingProfile, speciality: e.target.value })
                   }
                   placeholder={t('technician.specialityPlaceholder', 'e.g., Engine Repair & Diagnostics')}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                   data-testid="input-speciality"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="hourlyRate">{t('technician.hourlyRateDollar', 'Hourly Rate ($)')}</Label>
+                <Label htmlFor="hourlyRate" className="text-[#0B1F3B] dark:text-white">{t('technician.hourlyRateDollar', 'Hourly Rate ($)')}</Label>
                 <Input
                   id="hourlyRate"
                   type="number"
@@ -423,12 +421,13 @@ export default function TechnicianManagement() {
                   onChange={(e) =>
                     setEditingProfile({ ...editingProfile, hourlyRate: e.target.value })
                   }
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                   data-testid="input-rate"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="maxConcurrentJobs">{t('technician.maxConcurrentJobs', 'Max Concurrent Jobs')}</Label>
+                <Label htmlFor="maxConcurrentJobs" className="text-[#0B1F3B] dark:text-white">{t('technician.maxConcurrentJobs', 'Max Concurrent Jobs')}</Label>
                 <Input
                   id="maxConcurrentJobs"
                   type="number"
@@ -440,12 +439,13 @@ export default function TechnicianManagement() {
                       maxConcurrentJobs: parseInt(e.target.value) || 3,
                     })
                   }
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                   data-testid="input-max-jobs"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="qualifications">{t('technician.qualifications', 'Qualifications')}</Label>
+                <Label htmlFor="qualifications" className="text-[#0B1F3B] dark:text-white">{t('technician.qualifications', 'Qualifications')}</Label>
                 <Textarea
                   id="qualifications"
                   value={editingProfile.qualifications || ""}
@@ -454,12 +454,13 @@ export default function TechnicianManagement() {
                   }
                   placeholder={t('technician.qualificationsPlaceholder', 'e.g., ASE Master Certification, Automotive Technology Diploma')}
                   rows={3}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                   data-testid="input-qualifications"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="certifications">{t('technician.certifications', 'Certifications')}</Label>
+                <Label htmlFor="certifications" className="text-[#0B1F3B] dark:text-white">{t('technician.certifications', 'Certifications')}</Label>
                 <Textarea
                   id="certifications"
                   value={editingProfile.certifications || ""}
@@ -468,12 +469,13 @@ export default function TechnicianManagement() {
                   }
                   placeholder={t('technician.certificationsPlaceholder', 'e.g., ASE Master, HVAC Specialist')}
                   rows={3}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                   data-testid="input-certifications"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="skills">{t('technician.skills', 'Skills')}</Label>
+                <Label htmlFor="skills" className="text-[#0B1F3B] dark:text-white">{t('technician.skills', 'Skills')}</Label>
                 <Textarea
                   id="skills"
                   value={editingProfile.skills || ""}
@@ -482,6 +484,7 @@ export default function TechnicianManagement() {
                   }
                   placeholder={t('technician.skillsPlaceholder', 'e.g., Engine Repair, Diagnostics, Brake Systems')}
                   rows={3}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                   data-testid="input-skills"
                 />
               </div>
@@ -491,11 +494,17 @@ export default function TechnicianManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsEditDialogOpen(false)}
+                  className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10"
                   data-testid="button-cancel"
                 >
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={updateProfileMutation.isPending} data-testid="button-save">
+                <Button 
+                  type="submit" 
+                  disabled={updateProfileMutation.isPending} 
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
+                  data-testid="button-save"
+                >
                   {updateProfileMutation.isPending ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
                 </Button>
               </div>
@@ -504,30 +513,28 @@ export default function TechnicianManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Technician Dialog */}
       <AddTechnicianDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         garages={garages || []}
       />
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent data-testid="dialog-delete-confirm">
+        <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="dialog-delete-confirm">
           <AlertDialogHeader>
-            <AlertDialogTitle data-testid="text-confirm-title">{t('technician.deleteTechnician', 'Delete Technician')}</AlertDialogTitle>
-            <AlertDialogDescription data-testid="text-confirm-description">
+            <AlertDialogTitle className="text-[#0B1F3B] dark:text-white" data-testid="text-confirm-title">{t('technician.deleteTechnician', 'Delete Technician')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#64748B]" data-testid="text-confirm-description">
               {t('technician.deleteConfirmation', 'Are you sure you want to delete {{name}}? This action cannot be undone.', { name: technicianToDelete?.fullName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-cancel-delete">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-[#F97316] text-white hover:bg-[#F97316]/90"
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
+              {t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

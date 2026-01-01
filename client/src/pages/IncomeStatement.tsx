@@ -331,9 +331,9 @@ export default function IncomeStatement() {
   const analysisTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-revenue">
+        <Card data-testid="card-total-revenue" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
               {t('incomeStatement.totalRevenue', 'Total Revenue')}
             </CardTitle>
@@ -346,9 +346,9 @@ export default function IncomeStatement() {
           </CardContent>
         </Card>
 
-        <Card data-testid="card-gross-profit">
+        <Card data-testid="card-gross-profit" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-blue-600" />
               {t('incomeStatement.grossProfit', 'Gross Profit')}
             </CardTitle>
@@ -357,15 +357,15 @@ export default function IncomeStatement() {
             <p className="text-2xl font-bold text-blue-600">
               SAR {grossProfit.toLocaleString()}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#64748B]">
               {t('incomeStatement.margin', 'Margin')}: {grossMargin.toFixed(1)}%
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-operating-income">
+        <Card data-testid="card-operating-income" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-purple-600" />
               {t('incomeStatement.operatingIncome', 'Operating Income')}
             </CardTitle>
@@ -374,15 +374,15 @@ export default function IncomeStatement() {
             <p className="text-2xl font-bold text-purple-600">
               SAR {operatingIncome.toLocaleString()}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#64748B]">
               {t('incomeStatement.margin', 'Margin')}: {operatingMargin.toFixed(1)}%
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-net-income">
+        <Card data-testid="card-net-income" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
               {t('incomeStatement.netIncome', 'Net Income')}
             </CardTitle>
@@ -391,7 +391,7 @@ export default function IncomeStatement() {
             <p className="text-2xl font-bold text-green-600">
               SAR {netIncome.toLocaleString()}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#64748B]">
               {t('incomeStatement.margin', 'Margin')}: {netMargin.toFixed(1)}%
             </p>
           </CardContent>
@@ -399,10 +399,10 @@ export default function IncomeStatement() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('incomeStatement.profitabilityMargins', 'Profitability Margins')}</CardTitle>
-            <CardDescription>{t('incomeStatement.keyMarginPercentages', 'Key margin percentages')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('incomeStatement.profitabilityMargins', 'Profitability Margins')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('incomeStatement.keyMarginPercentages', 'Key margin percentages')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -429,10 +429,10 @@ export default function IncomeStatement() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('incomeStatement.expenseBreakdown', 'Expense Breakdown')}</CardTitle>
-            <CardDescription>{t('incomeStatement.costDistributionAnalysis', 'Cost distribution analysis')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('incomeStatement.expenseBreakdown', 'Expense Breakdown')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('incomeStatement.costDistributionAnalysis', 'Cost distribution analysis')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -463,10 +463,10 @@ export default function IncomeStatement() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('incomeStatement.relatedReports', 'Related Reports')}</CardTitle>
-          <CardDescription>{t('incomeStatement.navigateToRelated', 'Navigate to related financial statements')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('incomeStatement.relatedReports', 'Related Reports')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('incomeStatement.navigateToRelated', 'Navigate to related financial statements')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -506,10 +506,10 @@ export default function IncomeStatement() {
 
   const trendsTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('incomeStatement.revenueTrends', 'Revenue Trends')}</CardTitle>
-          <CardDescription>{t('incomeStatement.monthlyRevenuePerformance', 'Monthly revenue performance over time')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('incomeStatement.revenueTrends', 'Revenue Trends')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('incomeStatement.monthlyRevenuePerformance', 'Monthly revenue performance over time')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -521,28 +521,28 @@ export default function IncomeStatement() {
               { month: t('incomeStatement.september2023', 'September 2023'), revenue: 475000, expenses: 355000, profit: 120000 },
               { month: t('incomeStatement.august2023', 'August 2023'), revenue: 462000, expenses: 348000, profit: 114000 },
             ].map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg" data-testid={`trend-row-${index}`}>
+              <div key={index} className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`trend-row-${index}`}>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">{item.month}</span>
-                  <Badge variant={item.profit > 130000 ? "default" : "secondary"}>
+                  <span className="font-medium text-[#0B1F3B] dark:text-white">{item.month}</span>
+                  <Badge variant={item.profit > 130000 ? "default" : "secondary"} className={item.profit > 130000 ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""}>
                     {item.profit > 130000 ? t('incomeStatement.aboveTarget', 'Above Target') : t('incomeStatement.onTrack', 'On Track')}
                   </Badge>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-muted-foreground">{t('incomeStatement.revenue', 'Revenue')}</p>
+                    <p className="text-[#64748B]">{t('incomeStatement.revenue', 'Revenue')}</p>
                     <p className="font-mono font-bold text-green-600">
                       SAR {item.revenue.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">{t('incomeStatement.expenses', 'Expenses')}</p>
+                    <p className="text-[#64748B]">{t('incomeStatement.expenses', 'Expenses')}</p>
                     <p className="font-mono font-bold text-red-600">
                       SAR {item.expenses.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">{t('incomeStatement.netProfit', 'Net Profit')}</p>
+                    <p className="text-[#64748B]">{t('incomeStatement.netProfit', 'Net Profit')}</p>
                     <p className="font-mono font-bold text-blue-600">
                       SAR {item.profit.toLocaleString()}
                     </p>

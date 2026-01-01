@@ -70,13 +70,13 @@ export default function SmartPartsRecommender() {
   const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case 'critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-red-500/10 text-red-700 dark:text-red-400 border-0';
       case 'high':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-[#F97316]/10 text-[#F97316] border-0';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-0';
       default:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-500/10 text-green-700 dark:text-green-400 border-0';
     }
   };
 
@@ -87,53 +87,55 @@ export default function SmartPartsRecommender() {
       icon={Brain}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Input Form */}
-        <Card className="lg:col-span-1 bg-white dark:bg-salis-black">
+        <Card className="lg:col-span-1 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Sparkles className="h-5 w-5 text-purple-600" />
               {t('smartParts.vehicleServiceDetails', 'Vehicle & Service Details')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="make">{t('smartParts.vehicleMake', 'Vehicle Make')}</Label>
+              <Label htmlFor="make" className="text-[#0B1F3B] dark:text-white">{t('smartParts.vehicleMake', 'Vehicle Make')}</Label>
               <Input
                 id="make"
                 placeholder={t('smartParts.vehicleMakePlaceholder', 'e.g., Toyota')}
                 value={vehicleMake}
                 onChange={(e) => setVehicleMake(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-make"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="model">{t('smartParts.vehicleModel', 'Vehicle Model')}</Label>
+              <Label htmlFor="model" className="text-[#0B1F3B] dark:text-white">{t('smartParts.vehicleModel', 'Vehicle Model')}</Label>
               <Input
                 id="model"
                 placeholder={t('smartParts.vehicleModelPlaceholder', 'e.g., Camry')}
                 value={vehicleModel}
                 onChange={(e) => setVehicleModel(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-model"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="year">{t('smartParts.year', 'Year')}</Label>
+              <Label htmlFor="year" className="text-[#0B1F3B] dark:text-white">{t('smartParts.year', 'Year')}</Label>
               <Input
                 id="year"
                 type="number"
                 placeholder={t('smartParts.yearPlaceholder', 'e.g., 2020')}
                 value={vehicleYear}
                 onChange={(e) => setVehicleYear(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-year"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="service-type">{t('smartParts.serviceType', 'Service Type')}</Label>
+              <Label htmlFor="service-type" className="text-[#0B1F3B] dark:text-white">{t('smartParts.serviceType', 'Service Type')}</Label>
               <Select value={serviceType} onValueChange={setServiceType}>
-                <SelectTrigger id="service-type" data-testid="select-service-type">
+                <SelectTrigger id="service-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-service-type">
                   <SelectValue placeholder={t('smartParts.selectServiceType', 'Select service type')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -150,13 +152,14 @@ export default function SmartPartsRecommender() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="symptoms">{t('smartParts.symptomsOptional', 'Symptoms (Optional)')}</Label>
+              <Label htmlFor="symptoms" className="text-[#0B1F3B] dark:text-white">{t('smartParts.symptomsOptional', 'Symptoms (Optional)')}</Label>
               <Textarea
                 id="symptoms"
                 placeholder={t('smartParts.symptomsPlaceholder', 'Describe any specific symptoms or issues...')}
                 value={symptoms}
                 onChange={(e) => setSymptoms(e.target.value)}
                 rows={3}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-symptoms"
               />
             </div>
@@ -164,7 +167,7 @@ export default function SmartPartsRecommender() {
             <Button
               onClick={handleGetRecommendations}
               disabled={getRecommendationsMutation.isPending}
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
               data-testid="button-get-recommendations"
             >
               {getRecommendationsMutation.isPending ? (
@@ -182,22 +185,23 @@ export default function SmartPartsRecommender() {
           </CardContent>
         </Card>
 
-        {/* Recommendations Display */}
-        <Card className="lg:col-span-2 bg-white dark:bg-salis-black">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-blue-600" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Package className="h-5 w-5 text-[#0A5ED7]" />
               {t('smartParts.aiRecommendedParts', 'AI-Recommended Parts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recommendations.length === 0 ? (
               <div className="text-center py-12">
-                <Brain className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400 mb-2">
+                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+                  <Brain className="w-10 h-10 text-white" />
+                </div>
+                <p className="text-[#0B1F3B] dark:text-white font-medium mb-2">
                   {t('smartParts.noRecommendationsYet', 'No recommendations yet')}
                 </p>
-                <p className="text-sm text-gray-400 dark:text-gray-500">
+                <p className="text-sm text-[#64748B]">
                   {t('smartParts.enterVehicleDetails', "Enter vehicle details and click 'Get AI Recommendations' to start")}
                 </p>
               </div>
@@ -206,15 +210,15 @@ export default function SmartPartsRecommender() {
                 {recommendations.map((rec, index) => (
                   <div
                     key={index}
-                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
+                    className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:shadow-md transition-shadow bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`recommendation-${index}`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                        <h3 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">
                           {rec.partName || `${t('smartParts.part', 'Part')} ${index + 1}`}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[#64748B]">
                           {t('smartParts.partNumber', 'Part #')}: {rec.partNumber || t('common.notAvailable', 'N/A')}
                         </p>
                       </div>
@@ -225,35 +229,35 @@ export default function SmartPartsRecommender() {
 
                     <div className="grid grid-cols-2 gap-4 mb-3">
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm text-[#0B1F3B] dark:text-white">
                           {t('smartParts.compatibility', 'Compatibility')}: <strong>{rec.compatibility || 95}%</strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm">
+                        <TrendingUp className="h-4 w-4 text-[#0A5ED7]" />
+                        <span className="text-sm text-[#0B1F3B] dark:text-white">
                           {t('smartParts.estCost', 'Est. Cost')}: <strong>${rec.estimatedCost || 0}</strong>
                         </span>
                       </div>
                     </div>
 
                     {rec.reason && (
-                      <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                        <p className="text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                      <div className="p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg">
+                        <p className="text-xs font-semibold text-[#0A5ED7] dark:text-[#0BB3FF] mb-1">
                           {t('smartParts.aiReasoning', 'AI Reasoning')}:
                         </p>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                        <p className="text-sm text-[#0B1F3B] dark:text-white">
                           {rec.reason}
                         </p>
                       </div>
                     )}
 
                     <div className="flex gap-2 mt-3">
-                      <Button size="sm" variant="outline" data-testid={`button-add-${index}`}>
+                      <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-add-${index}`}>
                         {t('smartParts.addToJobCard', 'Add to Job Card')}
                       </Button>
-                      <Button size="sm" variant="ghost" data-testid={`button-check-stock-${index}`}>
+                      <Button size="sm" variant="ghost" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-check-stock-${index}`}>
                         {t('smartParts.checkStock', 'Check Stock')}
                       </Button>
                     </div>
@@ -265,37 +269,36 @@ export default function SmartPartsRecommender() {
         </Card>
       </div>
 
-      {/* Recent Recommendations */}
-      <Card className="mt-6 bg-white dark:bg-salis-black">
+      <Card className="mt-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('smartParts.recentAiRecommendations', 'Recent AI Recommendations')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartParts.recentAiRecommendations', 'Recent AI Recommendations')}</CardTitle>
         </CardHeader>
         <CardContent>
           {(!Array.isArray(recentRecommendations) || recentRecommendations.length === 0) ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">{t('smartParts.noRecommendationHistory', 'No recommendation history yet')}</p>
+              <p className="text-[#64748B]">{t('smartParts.noRecommendationHistory', 'No recommendation history yet')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b">
+                <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                   <tr className="text-left">
-                    <th className="pb-3">{t('common.date', 'Date')}</th>
-                    <th className="pb-3">{t('smartParts.vehicle', 'Vehicle')}</th>
-                    <th className="pb-3">{t('smartParts.serviceType', 'Service Type')}</th>
-                    <th className="pb-3">{t('smartParts.partsRecommended', 'Parts Recommended')}</th>
-                    <th className="pb-3">{t('common.status', 'Status')}</th>
+                    <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</th>
+                    <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('smartParts.vehicle', 'Vehicle')}</th>
+                    <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('smartParts.serviceType', 'Service Type')}</th>
+                    <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('smartParts.partsRecommended', 'Parts Recommended')}</th>
+                    <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Array.isArray(recentRecommendations) && recentRecommendations.map((rec: any) => (
-                    <tr key={rec.id} className="border-b" data-testid={`history-row-${rec.id}`}>
-                      <td className="py-3">{new Date(rec.createdAt).toLocaleDateString()}</td>
-                      <td className="py-3">{rec.vehicleYear} {rec.vehicleMake} {rec.vehicleModel}</td>
-                      <td className="py-3">{rec.serviceType}</td>
-                      <td className="py-3">{rec.recommendedParts?.length || 0} {t('smartParts.parts', 'parts')}</td>
+                    <tr key={rec.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`history-row-${rec.id}`}>
+                      <td className="py-3 text-[#64748B]">{new Date(rec.createdAt).toLocaleDateString()}</td>
+                      <td className="py-3 text-[#0B1F3B] dark:text-white">{rec.vehicleYear} {rec.vehicleMake} {rec.vehicleModel}</td>
+                      <td className="py-3 text-[#64748B]">{rec.serviceType}</td>
+                      <td className="py-3 text-[#0B1F3B] dark:text-white">{rec.recommendedParts?.length || 0} {t('smartParts.parts', 'parts')}</td>
                       <td className="py-3">
-                        <Badge variant="outline">{rec.status}</Badge>
+                        <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0BB3FF]/10 dark:text-[#0BB3FF] border-0">{rec.status}</Badge>
                       </td>
                     </tr>
                   ))}

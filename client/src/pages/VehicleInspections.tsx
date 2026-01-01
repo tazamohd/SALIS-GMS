@@ -272,23 +272,32 @@ export default function VehicleInspections() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusColors: Record<string, string> = {
-      in_progress: "bg-blue-500",
-      completed: "bg-green-500",
-      failed: "bg-red-500",
-      passed: "bg-green-500",
-    };
-    return statusColors[status] || "bg-gray-500";
+    switch (status) {
+      case "in_progress":
+        return <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">{t('common.inProgress', 'In Progress')}</Badge>;
+      case "completed":
+        return <Badge className="bg-emerald-500/10 text-emerald-600 border-0">{t('common.completed', 'Completed')}</Badge>;
+      case "passed":
+        return <Badge className="bg-emerald-500/10 text-emerald-600 border-0">{t('common.passed', 'Passed')}</Badge>;
+      case "failed":
+        return <Badge className="bg-red-500/10 text-red-600 border-0">{t('common.failed', 'Failed')}</Badge>;
+      default:
+        return <Badge className="bg-[#64748B]/10 text-[#64748B] border-0">{status}</Badge>;
+    }
   };
 
   const templatesTabContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('vehicles.inspectionTemplates', 'Inspection Templates')}</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.manageReusableInspectionChecklists', 'Manage reusable inspection checklists')}</p>
+          <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t('vehicles.inspectionTemplates', 'Inspection Templates')}</h2>
+          <p className="text-sm text-[#64748B]">{t('vehicles.manageReusableInspectionChecklists', 'Manage reusable inspection checklists')}</p>
         </div>
-        <Button onClick={handleCreateTemplate} data-testid="button-create-template">
+        <Button 
+          onClick={handleCreateTemplate} 
+          data-testid="button-create-template"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+        >
           <Plus className="h-4 w-4 mr-2" />
           {t('vehicles.createTemplate', 'Create Template')}
         </Button>
@@ -301,30 +310,32 @@ export default function VehicleInspections() {
           ))}
         </div>
       ) : templates.length === 0 ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-12 text-center">
-            <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">{t('vehicles.noTemplatesYet', 'No templates yet. Create your first inspection template.')}</p>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+              <ClipboardList className="h-8 w-8 text-[#0A5ED7]" />
+            </div>
+            <p className="text-[#64748B]">{t('vehicles.noTemplatesYet', 'No templates yet. Create your first inspection template.')}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map((template) => (
-            <Card key={template.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+            <Card key={template.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg">{template.templateName}</CardTitle>
+                    <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{template.templateName}</CardTitle>
                     {template.description && (
-                      <CardDescription className="mt-1">{template.description}</CardDescription>
+                      <CardDescription className="mt-1 text-[#64748B]">{template.description}</CardDescription>
                     )}
                   </div>
                   <div className="flex gap-2">
                     {template.isDefault && (
-                      <Badge variant="secondary">{t('vehicles.default', 'Default')}</Badge>
+                      <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">{t('vehicles.default', 'Default')}</Badge>
                     )}
                     {!template.isActive && (
-                      <Badge variant="outline">{t('common.inactive', 'Inactive')}</Badge>
+                      <Badge className="bg-[#64748B]/10 text-[#64748B] border-0">{t('common.inactive', 'Inactive')}</Badge>
                     )}
                   </div>
                 </div>
@@ -332,17 +343,23 @@ export default function VehicleInspections() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">{t('common.category', 'Category')}:</span>
-                    <Badge variant="outline">{template.category || t('vehicles.general', 'General')}</Badge>
+                    <span className="text-[#64748B]">{t('common.category', 'Category')}:</span>
+                    <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">{template.category || t('vehicles.general', 'General')}</Badge>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">{t('vehicles.items', 'Items')}:</span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="text-[#64748B]">{t('vehicles.items', 'Items')}:</span>
+                    <span className="font-semibold text-[#0B1F3B] dark:text-white">
                       {Array.isArray(template.checklistItems) ? template.checklistItems.length : 0}
                     </span>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <Button size="sm" variant="outline" className="flex-1" data-testid={`button-delete-template-${template.id}`} onClick={() => deleteTemplateMutation.mutate(template.id)}>
+                    <Button 
+                      size="sm" 
+                      className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 bg-transparent" 
+                      variant="outline"
+                      data-testid={`button-delete-template-${template.id}`} 
+                      onClick={() => deleteTemplateMutation.mutate(template.id)}
+                    >
                       <Trash2 className="h-3 w-3 mr-1" />
                       {t('common.delete', 'Delete')}
                     </Button>
@@ -360,10 +377,14 @@ export default function VehicleInspections() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('vehicles.vehicleInspections', 'Vehicle Inspections')}</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.trackInspectionResults', 'Track inspection results')}</p>
+          <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t('vehicles.vehicleInspections', 'Vehicle Inspections')}</h2>
+          <p className="text-sm text-[#64748B]">{t('vehicles.trackInspectionResults', 'Track inspection results')}</p>
         </div>
-        <Button onClick={handleCreateInspection} data-testid="button-create-inspection">
+        <Button 
+          onClick={handleCreateInspection} 
+          data-testid="button-create-inspection"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+        >
           <Plus className="h-4 w-4 mr-2" />
           {t('vehicles.newInspection', 'New Inspection')}
         </Button>
@@ -376,28 +397,28 @@ export default function VehicleInspections() {
           ))}
         </div>
       ) : inspections.length === 0 ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-12 text-center">
-            <FileCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">{t('vehicles.noInspectionsYet', 'No inspections yet. Create your first inspection.')}</p>
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+              <FileCheck className="h-8 w-8 text-[#0A5ED7]" />
+            </div>
+            <p className="text-[#64748B]">{t('vehicles.noInspectionsYet', 'No inspections yet. Create your first inspection.')}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
           {inspections.map((inspection) => (
-            <Card key={inspection.id} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+            <Card key={inspection.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                         {inspection.inspectionNumber || `${t('vehicles.inspection', 'Inspection')} #${inspection.id.substring(0, 8)}`}
                       </h3>
-                      <Badge className={getStatusBadge(inspection.overallStatus || "in_progress")}>
-                        {inspection.overallStatus || t('common.inProgress', 'In Progress')}
-                      </Badge>
+                      {getStatusBadge(inspection.overallStatus || "in_progress")}
                     </div>
-                    <div className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mt-2 space-y-1 text-sm text-[#64748B]">
                       <p>{t('common.type', 'Type')}: {inspection.inspectionType}</p>
                       <p>{t('common.date', 'Date')}: {inspection.inspectionDate ? new Date(inspection.inspectionDate).toLocaleDateString() : t('common.notAvailable', 'N/A')}</p>
                       {inspection.currentMileage && <p>{t('vehicles.mileage', 'Mileage')}: {inspection.currentMileage.toLocaleString()} km</p>}
@@ -405,20 +426,21 @@ export default function VehicleInspections() {
                   </div>
                   <div className="flex gap-2">
                     {inspection.estimateGenerated && (
-                      <Badge variant="secondary">
+                      <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t('vehicles.estimate', 'Estimate')}
                       </Badge>
                     )}
                     {inspection.customerNotified && (
-                      <Badge variant="secondary">
+                      <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t('vehicles.notified', 'Notified')}
                       </Badge>
                     )}
                     <Button 
                       size="sm" 
-                      variant="outline" 
+                      className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 bg-transparent"
+                      variant="outline"
                       data-testid={`button-delete-inspection-${inspection.id}`}
                       onClick={() => deleteInspectionMutation.mutate(inspection.id)}
                     >
@@ -461,10 +483,10 @@ export default function VehicleInspections() {
       />
 
       <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 sm:max-w-[600px]">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>{selectedTemplate ? t('vehicles.editTemplate', 'Edit Template') : t('vehicles.createTemplate', 'Create Template')}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedTemplate ? t('vehicles.editTemplate', 'Edit Template') : t('vehicles.createTemplate', 'Create Template')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {selectedTemplate ? t('vehicles.updateInspectionTemplate', 'Update inspection template') : t('vehicles.createNewInspectionTemplate', 'Create a new inspection template')}
             </DialogDescription>
           </DialogHeader>
@@ -475,9 +497,14 @@ export default function VehicleInspections() {
                 name="templateName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.templateName', 'Template Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.templateName', 'Template Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('vehicles.prePurchaseInspection', 'e.g., Pre-Purchase Inspection')} data-testid="input-template-name" />
+                      <Input 
+                        {...field} 
+                        placeholder={t('vehicles.prePurchaseInspection', 'e.g., Pre-Purchase Inspection')} 
+                        data-testid="input-template-name"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -488,9 +515,15 @@ export default function VehicleInspections() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder={t('vehicles.optionalDescription', 'Optional description')} data-testid="input-template-description" />
+                      <Textarea 
+                        {...field} 
+                        value={field.value || ""} 
+                        placeholder={t('vehicles.optionalDescription', 'Optional description')} 
+                        data-testid="input-template-description"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -501,14 +534,14 @@ export default function VehicleInspections() {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.category', 'Category')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-template-category">
+                        <SelectTrigger data-testid="select-template-category" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                           <SelectValue placeholder={t('vehicles.selectCategory', 'Select category')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="general">{t('vehicles.general', 'General')}</SelectItem>
                         <SelectItem value="pre_purchase">{t('vehicles.prePurchase', 'Pre-Purchase')}</SelectItem>
                         <SelectItem value="seasonal">{t('vehicles.seasonal', 'Seasonal')}</SelectItem>
@@ -525,13 +558,14 @@ export default function VehicleInspections() {
                 name="checklistItemsText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.checklistItemsOnePerLine', 'Checklist Items (one per line)')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.checklistItemsOnePerLine', 'Checklist Items (one per line)')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         {...field} 
                         placeholder={t('vehicles.checklistPlaceholder', 'Check tire pressure\nInspect brake pads\nCheck engine oil level')} 
                         rows={6}
                         data-testid="input-template-checklist"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -551,17 +585,26 @@ export default function VehicleInspections() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>{t('vehicles.setAsDefaultTemplate', 'Set as default template')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.setAsDefaultTemplate', 'Set as default template')}</FormLabel>
                     </div>
                   </FormItem>
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsTemplateDialogOpen(false)} data-testid="button-cancel-template">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsTemplateDialogOpen(false)}
+                  className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
+                >
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={createTemplateMutation.isPending} data-testid="button-save-template">
-                  {createTemplateMutation.isPending ? t('common.saving', 'Saving...') : t('vehicles.saveTemplate', 'Save Template')}
+                <Button 
+                  type="submit" 
+                  disabled={createTemplateMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+                >
+                  {createTemplateMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </div>
             </form>
@@ -570,10 +613,12 @@ export default function VehicleInspections() {
       </Dialog>
 
       <Dialog open={isInspectionDialogOpen} onOpenChange={setIsInspectionDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 sm:max-w-[600px]">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>{t('vehicles.createInspection', 'Create Inspection')}</DialogTitle>
-            <DialogDescription>{t('vehicles.startNewVehicleInspection', 'Start a new vehicle inspection')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.newInspection', 'New Inspection')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
+              {t('vehicles.createNewVehicleInspection', 'Create a new vehicle inspection')}
+            </DialogDescription>
           </DialogHeader>
           <Form {...inspectionForm}>
             <form onSubmit={inspectionForm.handleSubmit((data) => createInspectionMutation.mutate(data))} className="space-y-4">
@@ -582,17 +627,59 @@ export default function VehicleInspections() {
                 name="vehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-inspection-vehicle">
+                        <SelectTrigger data-testid="select-vehicle" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                           <SelectValue placeholder={t('vehicles.selectVehicle', 'Select vehicle')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        {vehicles.map((vehicle: any) => (
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        {vehicles.map((vehicle) => (
                           <SelectItem key={vehicle.id} value={vehicle.id}>
-                            {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
+                            {vehicle.make} {vehicle.model} ({vehicle.licensePlate})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={inspectionForm.control}
+                name="customerId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.customer', 'Customer')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        placeholder={t('vehicles.customerId', 'Customer ID')} 
+                        data-testid="input-customer-id"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={inspectionForm.control}
+                name="inspectorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.inspector', 'Inspector')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-inspector" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
+                          <SelectValue placeholder={t('vehicles.selectInspector', 'Select inspector')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.fullName || user.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -606,18 +693,18 @@ export default function VehicleInspections() {
                 name="inspectionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.inspectionType', 'Inspection Type')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.inspectionType', 'Inspection Type')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-inspection-type">
-                          <SelectValue placeholder={t('vehicles.selectInspectionType', 'Select inspection type')} />
+                        <SelectTrigger data-testid="select-inspection-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
+                          <SelectValue placeholder={t('vehicles.selectInspectionType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="general">{t('vehicles.general', 'General')}</SelectItem>
                         <SelectItem value="pre_purchase">{t('vehicles.prePurchase', 'Pre-Purchase')}</SelectItem>
                         <SelectItem value="safety">{t('vehicles.safety', 'Safety')}</SelectItem>
-                        <SelectItem value="maintenance">{t('vehicles.maintenance', 'Maintenance')}</SelectItem>
+                        <SelectItem value="emissions">{t('vehicles.emissions', 'Emissions')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -629,13 +716,14 @@ export default function VehicleInspections() {
                 name="findingsText"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.findingsOnePerLine', 'Findings (one per line)')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.findings', 'Findings')} ({t('common.optional', 'Optional')})</FormLabel>
                     <FormControl>
                       <Textarea 
                         {...field} 
-                        placeholder={t('vehicles.findingsPlaceholder', 'Enter inspection findings...')} 
+                        placeholder={t('vehicles.findingsPlaceholder', 'Enter findings, one per line')} 
                         rows={4}
-                        data-testid="input-inspection-findings"
+                        data-testid="input-findings"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -643,11 +731,20 @@ export default function VehicleInspections() {
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsInspectionDialogOpen(false)} data-testid="button-cancel-inspection">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsInspectionDialogOpen(false)}
+                  className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
+                >
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={createInspectionMutation.isPending} data-testid="button-save-inspection">
-                  {createInspectionMutation.isPending ? t('common.saving', 'Saving...') : t('vehicles.saveInspection', 'Save Inspection')}
+                <Button 
+                  type="submit" 
+                  disabled={createInspectionMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+                >
+                  {createInspectionMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </div>
             </form>

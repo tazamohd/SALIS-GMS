@@ -63,40 +63,39 @@ export default function ClientProfile() {
 
   if (!user) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-96" />
+      <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
+        <Skeleton className="h-96 bg-[#E2E8F0] dark:bg-[#232A36]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
           My Profile
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-[#64748B] mt-1">
           Manage your account information
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Profile Card */}
-        <Card data-testid="card-profile-info">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-profile-info">
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>Your basic account details</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Profile Information</CardTitle>
+            <CardDescription className="text-[#64748B]">Your basic account details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col items-center gap-4 pb-4 border-b">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                <User className="h-10 w-10 text-primary" />
+            <div className="flex flex-col items-center gap-4 pb-4 border-b border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10">
+                <User className="h-10 w-10 text-[#0A5ED7]" />
               </div>
               <div className="text-center">
-                <p className="font-semibold text-lg" data-testid="text-display-name">
+                <p className="font-semibold text-lg text-[#0B1F3B] dark:text-white" data-testid="text-display-name">
                   {user.fullName}
                 </p>
-                <p className="text-sm text-muted-foreground" data-testid="text-display-email">
+                <p className="text-sm text-[#64748B]" data-testid="text-display-email">
                   {user.email}
                 </p>
               </div>
@@ -104,21 +103,21 @@ export default function ClientProfile() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Email:</span>
-                <span className="font-medium">{user.email}</span>
+                <Mail className="h-4 w-4 text-[#64748B]" />
+                <span className="text-[#64748B]">Email:</span>
+                <span className="font-medium text-[#0B1F3B] dark:text-white">{user.email}</span>
               </div>
               {user.phone && (
                 <div className="flex items-center gap-3 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Phone:</span>
-                  <span className="font-medium">{user.phone}</span>
+                  <Phone className="h-4 w-4 text-[#64748B]" />
+                  <span className="text-[#64748B]">Phone:</span>
+                  <span className="font-medium text-[#0B1F3B] dark:text-white">{user.phone}</span>
                 </div>
               )}
               <div className="flex items-center gap-3 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Member since:</span>
-                <span className="font-medium">
+                <User className="h-4 w-4 text-[#64748B]" />
+                <span className="text-[#64748B]">Member since:</span>
+                <span className="font-medium text-[#0B1F3B] dark:text-white">
                   {new Date(user.createdAt || Date.now()).toLocaleDateString()}
                 </span>
               </div>
@@ -126,11 +125,10 @@ export default function ClientProfile() {
           </CardContent>
         </Card>
 
-        {/* Edit Profile Form */}
-        <Card className="lg:col-span-2" data-testid="card-edit-profile">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-edit-profile">
           <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
-            <CardDescription>Update your account information</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Edit Profile</CardTitle>
+            <CardDescription className="text-[#64748B]">Update your account information</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -140,9 +138,14 @@ export default function ClientProfile() {
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} data-testid="input-fullname" />
+                        <Input 
+                          placeholder="John Doe" 
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
+                          {...field} 
+                          data-testid="input-fullname" 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -154,11 +157,12 @@ export default function ClientProfile() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Email Address</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="john@example.com"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-email"
                         />
@@ -173,11 +177,12 @@ export default function ClientProfile() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Phone Number (Optional)</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
                           placeholder="+966 50 123 4567"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-phone"
                         />
@@ -190,6 +195,7 @@ export default function ClientProfile() {
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                   data-testid="button-save-profile"
                 >
                   <Save className="h-4 w-4 mr-2" />

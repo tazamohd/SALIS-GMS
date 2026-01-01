@@ -149,10 +149,10 @@ export default function VoiceCommands() {
   const recentCommands = commands?.slice(0, 10) || [];
 
   const voiceControlContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('voiceCommands.voiceControl', 'Voice Control')}</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.voiceControl', 'Voice Control')}</CardTitle>
+        <CardDescription className="text-[#64748B]">
           {t('voiceCommands.clickMicToStart', 'Click the microphone to start voice commands. Try saying "Open job cards" or "Create new appointment"')}
         </CardDescription>
       </CardHeader>
@@ -163,7 +163,7 @@ export default function VoiceCommands() {
             className={`h-32 w-32 rounded-full ${
               isListening
                 ? "bg-red-600 hover:bg-red-700 animate-pulse"
-                : "bg-purple-600 hover:bg-purple-700"
+                : "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90"
             } text-white shadow-lg transition-all`}
             data-testid="button-toggle-listening"
           >
@@ -173,21 +173,21 @@ export default function VoiceCommands() {
               <Mic className="h-16 w-16" />
             )}
           </Button>
-          <p className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+          <p className="mt-4 text-lg font-medium text-[#0B1F3B] dark:text-white">
             {isListening ? t('voiceCommands.listening', 'Listening...') : t('voiceCommands.clickToStart', 'Click to Start')}
           </p>
         </div>
 
         {(transcript || interimTranscript) && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
               {t('voiceCommands.transcript', 'Transcript')}:
             </p>
-            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md min-h-[100px]">
-              <p className="text-gray-900 dark:text-white">
+            <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-4 rounded-md min-h-[100px] border border-[#E2E8F0] dark:border-[#232A36]">
+              <p className="text-[#0B1F3B] dark:text-white">
                 {transcript}
                 {interimTranscript && (
-                  <span className="text-gray-500 dark:text-gray-400 italic">
+                  <span className="text-[#64748B] italic">
                     {' '}{interimTranscript}
                   </span>
                 )}
@@ -196,8 +196,8 @@ export default function VoiceCommands() {
           </div>
         )}
 
-        <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4">
+          <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-3">
             {t('voiceCommands.exampleCommands', 'Example Commands')}:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -214,7 +214,7 @@ export default function VoiceCommands() {
               <Badge
                 key={idx}
                 variant="outline"
-                className="text-gray-600 dark:text-gray-400 justify-start"
+                className="text-[#64748B] dark:text-[#64748B] justify-start border-[#E2E8F0] dark:border-[#232A36]"
               >
                 <Mic className="h-3 w-3 mr-2" />
                 "{cmd}"
@@ -229,35 +229,35 @@ export default function VoiceCommands() {
   const statsContent = (
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('voiceCommands.totalCommands', 'Total Commands')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold text-[#0B1F3B] dark:text-white">
               {stats.total}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('voiceCommands.recognized', 'Recognized')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-[#0A5ED7]">
               {stats.recognized}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('voiceCommands.successful', 'Successful')}
             </CardTitle>
           </CardHeader>
@@ -268,9 +268,9 @@ export default function VoiceCommands() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('common.failed', 'Failed')}
             </CardTitle>
           </CardHeader>
@@ -285,10 +285,10 @@ export default function VoiceCommands() {
   );
 
   const historyContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('voiceCommands.recentCommands', 'Recent Commands')}</CardTitle>
-        <CardDescription>{t('voiceCommands.latestVoiceHistory', 'Your latest voice command history')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.recentCommands', 'Recent Commands')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('voiceCommands.latestVoiceHistory', 'Your latest voice command history')}</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -302,7 +302,7 @@ export default function VoiceCommands() {
             {recentCommands.map((command) => (
               <div
                 key={command.id}
-                className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-md"
+                className="flex items-start justify-between p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-md border border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`command-${command.id}`}
               >
                 <div className="flex-1">
@@ -312,14 +312,14 @@ export default function VoiceCommands() {
                     ) : command.success === false ? (
                       <XCircle className="h-4 w-4 text-red-600" />
                     ) : (
-                      <Activity className="h-4 w-4 text-blue-600" />
+                      <Activity className="h-4 w-4 text-[#0A5ED7]" />
                     )}
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">
                       {String(command.transcript)}
                     </p>
                   </div>
                   {command.actionExecuted && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {t('voiceCommands.action', 'Action')}: {String(command.actionExecuted)}
                     </p>
                   )}
@@ -331,13 +331,13 @@ export default function VoiceCommands() {
                         ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                         : command.success === false
                         ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                        : "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                        : "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF]"
                     }
                   >
                     {command.success === true ? t('voiceCommands.executed', 'executed') : command.success === false ? t('common.failed', 'failed') : t('common.pending', 'pending')}
                   </Badge>
                   {command.confidence && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-[#64748B]">
                       {command.confidence}% {t('voiceCommands.confidence', 'confidence')}
                     </span>
                   )}
@@ -347,8 +347,8 @@ export default function VoiceCommands() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12">
-            <Mic className="h-16 w-16 text-gray-400 mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 text-center">
+            <Mic className="h-16 w-16 text-[#64748B] mb-4" />
+            <p className="text-[#64748B] text-center">
               {t('voiceCommands.noCommandsYet', 'No voice commands yet.')}
               <br />
               {t('voiceCommands.startUsingVoice', 'Start using voice commands to see your history here.')}

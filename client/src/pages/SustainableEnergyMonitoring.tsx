@@ -22,8 +22,8 @@ export default function SustainableEnergyMonitoring() {
   ];
 
   const energyBreakdown = [
-    { name: t('energy.solarEnergy', 'Solar Energy'), value: 45, color: "#fbbf24" },
-    { name: t('energy.gridPower', 'Grid Power'), value: 35, color: "#9ca3af" },
+    { name: t('energy.solarEnergy', 'Solar Energy'), value: 45, color: "#0A5ED7" },
+    { name: t('energy.gridPower', 'Grid Power'), value: 35, color: "#64748B" },
     { name: t('energy.energySavings', 'Energy Savings'), value: 20, color: "#10b981" },
   ];
 
@@ -49,7 +49,7 @@ export default function SustainableEnergyMonitoring() {
       value: "1,850 kWh",
       change: "+22%",
       icon: Zap,
-      color: "text-yellow-600 dark:text-yellow-400",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('energy.carbonOffset', 'Carbon Offset'),
@@ -63,7 +63,7 @@ export default function SustainableEnergyMonitoring() {
       value: "85%",
       change: "+5%",
       icon: Battery,
-      color: "text-blue-600 dark:text-blue-400",
+      color: "text-[#0BB3FF]",
     },
   ];
 
@@ -103,13 +103,13 @@ export default function SustainableEnergyMonitoring() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={energyConsumption}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="time" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+            <XAxis dataKey="time" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
+            <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }} />
             <Legend />
-            <Area type="monotone" dataKey="solar" stackId="1" stroke="#fbbf24" fill="#fbbf24" fillOpacity={0.6} name={t('energy.solar', 'Solar')} />
-            <Area type="monotone" dataKey="grid" stackId="1" stroke="#9ca3af" fill="#9ca3af" fillOpacity={0.6} name={t('energy.grid', 'Grid')} />
+            <Area type="monotone" dataKey="solar" stackId="1" stroke="#0A5ED7" fill="#0A5ED7" fillOpacity={0.6} name={t('energy.solar', 'Solar')} />
+            <Area type="monotone" dataKey="grid" stackId="1" stroke="#64748B" fill="#64748B" fillOpacity={0.6} name={t('energy.grid', 'Grid')} />
           </AreaChart>
         </ResponsiveContainer>
       ),
@@ -135,7 +135,7 @@ export default function SustainableEnergyMonitoring() {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+              <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }} />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-4">
@@ -143,9 +143,9 @@ export default function SustainableEnergyMonitoring() {
               <div key={item.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.name}</span>
+                  <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{item.name}</span>
                 </div>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">{item.value}%</span>
+                <span className="text-sm font-bold text-[#0B1F3B] dark:text-white">{item.value}%</span>
               </div>
             ))}
           </div>
@@ -158,12 +158,12 @@ export default function SustainableEnergyMonitoring() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyComparison}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+            <XAxis dataKey="month" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
+            <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }} />
             <Legend />
-            <Bar dataKey="consumption" fill="#9ca3af" name={t('energy.consumptionKwh', 'Consumption (kWh)')} />
+            <Bar dataKey="consumption" fill="#64748B" name={t('energy.consumptionKwh', 'Consumption (kWh)')} />
             <Bar dataKey="savings" fill="#10b981" name={t('energy.savingsKwh', 'Savings (kWh)')} />
           </BarChart>
         </ResponsiveContainer>
@@ -179,10 +179,9 @@ export default function SustainableEnergyMonitoring() {
       filters={filters}
       sections={sections}
     >
-      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {kpis.map((kpi, index) => (
-          <Card key={index}>
+          <Card key={index} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-2">
                 <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
@@ -190,37 +189,36 @@ export default function SustainableEnergyMonitoring() {
                   {kpi.change}
                 </Badge>
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{kpi.value}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{kpi.label}</p>
+              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{kpi.value}</p>
+              <p className="text-sm text-[#64748B]">{kpi.label}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Environmental Impact */}
-      <Card className="mb-6">
+      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
             <Leaf className="w-5 h-5 text-green-600 dark:text-green-400" />
             {t('energy.environmentalImpact', 'Environmental Impact')}
           </CardTitle>
-          <CardDescription>{t('energy.sustainabilityContribution', 'Your contribution to sustainability')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('energy.sustainabilityContribution', 'Your contribution to sustainability')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.co2Reduction', 'CO2 Reduction')}</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">1.8 tons</p>
+              <p className="text-sm text-[#64748B] mb-2">{t('energy.co2Reduction', 'CO2 Reduction')}</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">1.8 tons</p>
               <Progress value={75} className="h-2" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.treesEquivalent', 'Trees Equivalent')}</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">95 trees</p>
+              <p className="text-sm text-[#64748B] mb-2">{t('energy.treesEquivalent', 'Trees Equivalent')}</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">95 trees</p>
               <Progress value={65} className="h-2" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">$2,450</p>
+              <p className="text-sm text-[#64748B] mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">$2,450</p>
               <Progress value={82} className="h-2" />
             </div>
           </div>

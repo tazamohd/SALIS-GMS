@@ -54,8 +54,8 @@ export default function EnvironmentalCompliance() {
 
   const metrics = [
     { label: t('environmental.totalThisMonth', 'Total This Month'), value: stats.totalDisposals, icon: Leaf, color: "text-green-600" },
-    { label: t('environmental.complianceRate', 'Compliance Rate'), value: `${stats.complianceRate}%`, icon: Droplet, color: "text-blue-600" },
-    { label: t('environmental.disposalCosts', 'Disposal Costs'), value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-yellow-600" },
+    { label: t('environmental.complianceRate', 'Compliance Rate'), value: `${stats.complianceRate}%`, icon: Droplet, color: "text-[#0A5ED7]" },
+    { label: t('environmental.disposalCosts', 'Disposal Costs'), value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-[#F97316]" },
     { label: t('environmental.recyclingRate', 'Recycling Rate'), value: `${stats.recyclingRate}%`, icon: Recycle, color: "text-purple-600" },
   ];
 
@@ -82,36 +82,36 @@ export default function EnvironmentalCompliance() {
         }}
         disabled={createRecordMutation.isPending}
         data-testid="button-add-record"
-        className="mb-6"
+        className="mb-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
       >
         {createRecordMutation.isPending ? t('environmental.adding', 'Adding...') : t('environmental.addDisposalRecord', 'Add Disposal Record')}
       </Button>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('environmental.recentDisposalRecords', 'Recent Disposal Records')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('environmental.recentDisposalRecords', 'Recent Disposal Records')}</CardTitle>
         </CardHeader>
         <CardContent>
           {recordsLoading ? (
-            <div className="text-center py-8 text-gray-500">{t('environmental.loadingRecords', 'Loading records...')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('environmental.loadingRecords', 'Loading records...')}</div>
           ) : records.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('environmental.noDisposalRecordsFound', 'No disposal records found')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('environmental.noDisposalRecordsFound', 'No disposal records found')}</div>
           ) : (
             <div className="space-y-3">
               {records.map((record) => (
-                <div key={record.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`record-${record.id}`}>
+                <div key={record.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`record-${record.id}`}>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{record.wasteType}</h3>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{record.wasteType}</h3>
                       <Badge>{record.complianceType?.replace("_", " ")}</Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {record.quantity} {record.unit} • {record.disposalCompany}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">${record.cost || 0}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{new Date(record.recordDate).toLocaleDateString()}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${record.cost || 0}</p>
+                    <p className="text-sm text-[#64748B]">{new Date(record.recordDate).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}

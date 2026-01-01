@@ -152,34 +152,34 @@ export default function TechnicianPerformance() {
           {topPerformers.map((tech: any, index: number) => (
             <div
               key={tech.id}
-              className="flex items-center justify-between p-4 border border-gray-200 dark:border-salis-gray-dark rounded-lg bg-gray-50 dark:bg-salis-gray-dark/30 hover:bg-gray-100 dark:hover:bg-salis-gray-dark/50 transition-colors"
+              className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] hover:bg-white dark:hover:bg-[#151A23] transition-colors"
               data-testid={`technician-${tech.id}`}
             >
               <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 dark:bg-white font-bold text-white dark:text-gray-900">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-bold text-white">
                   #{index + 1}
                 </div>
                 <Avatar>
-                  <AvatarFallback className="bg-gray-900 dark:bg-white text-white dark:text-gray-900">
+                  <AvatarFallback className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                     {tech.name.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-poppins font-semibold text-gray-900 dark:text-white">{tech.name}</p>
-                  <p className="font-poppins text-sm text-gray-600 dark:text-gray-400">{tech.role}</p>
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">{tech.name}</p>
+                  <p className="text-sm text-[#64748B]">{tech.role}</p>
                 </div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.tasksCompleted}</p>
-                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('performance.tasks', 'Tasks')}</p>
+                  <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.tasksCompleted}</p>
+                  <p className="text-xs text-[#64748B]">{t('performance.tasks', 'Tasks')}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-montserrat font-bold text-gray-900 dark:text-white">{tech.rating}</p>
-                  <p className="text-xs font-poppins text-gray-600 dark:text-gray-400">{t('performance.rating', 'Rating')}</p>
+                  <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.rating}</p>
+                  <p className="text-xs text-[#64748B]">{t('performance.rating', 'Rating')}</p>
                 </div>
                 <div className="text-center">
-                  <Badge className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-0">
+                  <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
                     {tech.efficiency}% {t('performance.efficiency', 'Efficiency')}
                   </Badge>
                 </div>
@@ -195,27 +195,23 @@ export default function TechnicianPerformance() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-salis-gray-dark" />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
             <XAxis 
               dataKey="name" 
               className="text-xs" 
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
+              tick={{ fill: '#64748B' }}
             />
-            <YAxis 
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
-            />
+            <YAxis tick={{ fill: '#64748B' }} />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: "hsl(var(--card))", 
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "6px"
+                backgroundColor: "white", 
+                border: "1px solid #E2E8F0",
+                borderRadius: "8px"
               }} 
             />
             <Legend />
-            <Bar dataKey="tasksCompleted" fill="hsl(var(--foreground))" name={t('performance.tasksCompleted', 'Tasks Completed')} />
-            <Bar dataKey="efficiency" fill="hsl(var(--muted-foreground))" name={t('performance.efficiencyPercent', 'Efficiency %')} />
+            <Bar dataKey="tasksCompleted" fill="#0A5ED7" name={t('performance.tasksCompleted', 'Tasks Completed')} />
+            <Bar dataKey="efficiency" fill="#0BB3FF" name={t('performance.efficiencyPercent', 'Efficiency %')} />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -228,30 +224,23 @@ export default function TechnicianPerformance() {
       content: selectedTechnician !== 'all' && weeklyTrends.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={weeklyTrends}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-salis-gray-dark" />
-            <XAxis 
-              dataKey="week" 
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
-            />
-            <YAxis 
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
-            />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+            <XAxis dataKey="week" tick={{ fill: '#64748B' }} />
+            <YAxis tick={{ fill: '#64748B' }} />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: "hsl(var(--card))", 
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "6px"
+                backgroundColor: "white", 
+                border: "1px solid #E2E8F0",
+                borderRadius: "8px"
               }} 
             />
             <Legend />
-            <Line type="monotone" dataKey="completed" stroke="hsl(var(--foreground))" strokeWidth={2} name={t('common.completed', 'Completed')} />
-            <Line type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" name={t('performance.target', 'Target')} />
+            <Line type="monotone" dataKey="completed" stroke="#0A5ED7" strokeWidth={2} name={t('common.completed', 'Completed')} />
+            <Line type="monotone" dataKey="target" stroke="#64748B" strokeWidth={2} strokeDasharray="5 5" name={t('performance.target', 'Target')} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <div className="flex items-center justify-center h-[300px] text-gray-600 dark:text-gray-400 font-poppins">
+        <div className="flex items-center justify-center h-[300px] text-[#64748B]">
           {t('performance.sections.selectTechnicianPrompt', 'Select a specific technician to view completion trends')}
         </div>
       ),
@@ -262,31 +251,29 @@ export default function TechnicianPerformance() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <RadarChart data={skillsData}>
-            <PolarGrid className="stroke-gray-200 dark:stroke-salis-gray-dark" />
+            <PolarGrid className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
             <PolarAngleAxis 
               dataKey="skill" 
               className="text-xs" 
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
+              tick={{ fill: '#64748B' }}
             />
             <PolarRadiusAxis 
               angle={90} 
               domain={[0, 100]}
-              tick={{ fill: 'currentColor' }}
-              style={{ fill: 'hsl(var(--foreground))' }}
+              tick={{ fill: '#64748B' }}
             />
             <Radar 
               name={t('performance.proficiency', 'Proficiency')}
               dataKey="proficiency" 
-              stroke="hsl(var(--foreground))" 
-              fill="hsl(var(--foreground))" 
-              fillOpacity={0.2} 
+              stroke="#0A5ED7" 
+              fill="#0A5ED7" 
+              fillOpacity={0.3} 
             />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: "hsl(var(--card))", 
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "6px"
+                backgroundColor: "white", 
+                border: "1px solid #E2E8F0",
+                borderRadius: "8px"
               }} 
             />
           </RadarChart>

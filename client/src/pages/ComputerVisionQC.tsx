@@ -79,11 +79,11 @@ export default function ComputerVisionQC() {
       case 'critical':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       case 'major':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-100 text-[#F97316] dark:bg-orange-900/30 dark:text-orange-300';
       case 'minor':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       default:
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300';
     }
   };
 
@@ -94,15 +94,15 @@ export default function ComputerVisionQC() {
       icon: Camera,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5 text-blue-600" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Upload className="h-5 w-5 text-[#0A5ED7]" />
                 {t('vision.uploadImage', 'Upload Image for Analysis')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
+              <div className="border-2 border-dashed border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-8 text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors">
                 <input
                   type="file"
                   accept="image/*"
@@ -115,12 +115,12 @@ export default function ComputerVisionQC() {
                   htmlFor="image-upload"
                   className="cursor-pointer flex flex-col items-center gap-3"
                 >
-                  <Camera className="h-12 w-12 text-gray-400" />
+                  <Camera className="h-12 w-12 text-[#64748B]" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                       {t('vision.clickToUpload', 'Click to upload image')}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-[#64748B]">
                       {t('vision.fileFormats', 'PNG, JPG up to 10MB')}
                     </p>
                   </div>
@@ -132,13 +132,13 @@ export default function ComputerVisionQC() {
                   <img
                     src={previewUrl}
                     alt={t('vision.preview', 'Preview')}
-                    className="w-full h-64 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                    className="w-full h-64 object-cover rounded-lg border border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="img-preview"
                   />
                   <Button
                     onClick={handleAnalyze}
                     disabled={analyzeImageMutation.isPending}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                     data-testid="button-analyze"
                   >
                     {analyzeImageMutation.isPending ? (
@@ -158,43 +158,43 @@ export default function ComputerVisionQC() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-purple-600" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Zap className="h-5 w-5 text-purple-500" />
                 {t('vision.aiResults', 'AI Analysis Results')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!analysisResult ? (
                 <div className="text-center py-12">
-                  <Eye className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <Eye className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                  <p className="text-[#64748B]">
                     {t('vision.uploadPrompt', 'Upload an image and click analyze to see AI results')}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                         {t('vision.qualityScore', 'Quality Score')}
                       </span>
                       <Badge className={getSeverityColor(analysisResult.overallQuality)}>
                         {analysisResult.qualityScore || 0}/100
                       </Badge>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-[#E2E8F0] dark:bg-[#232A36] rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] h-2 rounded-full transition-all"
                         style={{ width: `${analysisResult.qualityScore || 0}%` }}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                      <AlertTriangle className="h-4 w-4 text-[#F97316]" />
                       {t('vision.detectedIssues', 'Detected Issues')} ({analysisResult.defects?.length || 0})
                     </h4>
                     {analysisResult.defects && analysisResult.defects.length > 0 ? (
@@ -202,22 +202,22 @@ export default function ComputerVisionQC() {
                         {analysisResult.defects.map((defect: any, index: number) => (
                           <div
                             key={index}
-                            className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                            className="p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]"
                             data-testid={`defect-${index}`}
                           >
                             <div className="flex items-start justify-between mb-1">
-                              <span className="font-medium text-sm text-gray-900 dark:text-white">
+                              <span className="font-medium text-sm text-[#0B1F3B] dark:text-white">
                                 {defect.type || t('vision.defectDetected', 'Defect detected')}
                               </span>
                               <Badge variant="outline" className={getSeverityColor(defect.severity)}>
                                 {defect.severity}
                               </Badge>
                             </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-[#64748B]">
                               {defect.description || t('vision.aiDetectedAnomaly', 'AI detected an anomaly in this area')}
                             </p>
                             {defect.confidence && (
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs text-[#64748B] mt-1">
                                 {t('vision.confidence', 'Confidence')}: {Math.round(defect.confidence * 100)}%
                               </p>
                             )}
@@ -226,8 +226,8 @@ export default function ComputerVisionQC() {
                       </div>
                     ) : (
                       <div className="text-center py-4">
-                        <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <CheckCircle className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
+                        <p className="text-sm text-[#64748B]">
                           {t('vision.noDefects', 'No defects detected - Quality passed!')}
                         </p>
                       </div>
@@ -235,14 +235,14 @@ export default function ComputerVisionQC() {
                   </div>
 
                   {analysisResult.recommendations && (
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
                       <h4 className="text-sm font-semibold mb-2 text-purple-900 dark:text-purple-200">
                         {t('vision.aiRecommendations', 'AI Recommendations')}
                       </h4>
                       <ul className="space-y-1">
                         {analysisResult.recommendations.map((rec: string, index: number) => (
-                          <li key={index} className="text-xs text-gray-700 dark:text-gray-300 flex items-start gap-2">
-                            <CheckCircle className="h-3 w-3 mt-0.5 text-purple-600" />
+                          <li key={index} className="text-xs text-[#64748B] dark:text-gray-300 flex items-start gap-2">
+                            <CheckCircle className="h-3 w-3 mt-0.5 text-purple-500" />
                             <span>{rec}</span>
                           </li>
                         ))}
@@ -261,41 +261,41 @@ export default function ComputerVisionQC() {
       label: t('vision.inspectionHistory', 'Inspection History'),
       icon: ImageIcon,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('vision.recentInspections', 'Recent Quality Inspections')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vision.recentInspections', 'Recent Quality Inspections')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!Array.isArray(checks) || checks.length === 0) ? (
               <div className="text-center py-12">
-                <ImageIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <ImageIcon className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                <p className="text-[#64748B]">
                   {t('vision.noHistory', 'No inspection history yet')}
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="border-b">
+                  <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                     <tr className="text-left text-sm">
-                      <th className="pb-3">{t('vision.date', 'Date')}</th>
-                      <th className="pb-3">{t('vision.type', 'Type')}</th>
-                      <th className="pb-3">{t('vision.qualityScore', 'Quality Score')}</th>
-                      <th className="pb-3">{t('vision.defects', 'Defects')}</th>
-                      <th className="pb-3">{t('vision.status', 'Status')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.date', 'Date')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.type', 'Type')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.qualityScore', 'Quality Score')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.defects', 'Defects')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.status', 'Status')}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm">
                     {Array.isArray(checks) && checks.map((check: any) => (
-                      <tr key={check.id} className="border-b" data-testid={`check-row-${check.id}`}>
-                        <td className="py-3">{new Date(check.inspectionDate).toLocaleDateString()}</td>
-                        <td className="py-3">{check.checkType}</td>
+                      <tr key={check.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`check-row-${check.id}`}>
+                        <td className="py-3 text-[#0B1F3B] dark:text-white">{new Date(check.inspectionDate).toLocaleDateString()}</td>
+                        <td className="py-3 text-[#0B1F3B] dark:text-white">{check.checkType}</td>
                         <td className="py-3">
-                          <Badge variant="outline">{check.qualityScore}/100</Badge>
+                          <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{check.qualityScore}/100</Badge>
                         </td>
-                        <td className="py-3">{check.defectsFound || 0}</td>
+                        <td className="py-3 text-[#0B1F3B] dark:text-white">{check.defectsFound || 0}</td>
                         <td className="py-3">
-                          <Badge className={check.passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+                          <Badge className={check.passed ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-0' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-0'}>
                             {check.passed ? t('vision.passed', 'Passed') : t('vision.failed', 'Failed')}
                           </Badge>
                         </td>

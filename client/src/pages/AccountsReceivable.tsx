@@ -207,10 +207,10 @@ export default function AccountsReceivable() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      Current: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
-      Overdue: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
-      "Past Due": "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200",
-      Delinquent: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200",
+      Current: "bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200",
+      Overdue: "bg-[#F97316]/20 text-[#F97316] dark:bg-[#F97316]/30 dark:text-orange-200",
+      "Past Due": "bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-200",
+      Delinquent: "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200",
     };
     return styles[status] || "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
   };
@@ -230,20 +230,20 @@ export default function AccountsReceivable() {
       <div className="flex flex-col md:flex-row gap-4 justify-between">
         <div className="flex gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
             <Input
               placeholder={t('accounting.searchCustomersOrInvoices', 'Search customers or invoices...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-search"
             />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]" data-testid="select-status-filter">
+            <SelectTrigger className="w-[150px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
               <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="all">{t('accounting.allStatus', 'All Status')}</SelectItem>
               <SelectItem value="current">{t('accounting.status.current', 'Current')}</SelectItem>
               <SelectItem value="overdue">{t('accounting.status.overdue', 'Overdue')}</SelectItem>
@@ -253,21 +253,21 @@ export default function AccountsReceivable() {
           </Select>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" data-testid="button-export">
+          <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-record-payment">
+              <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-record-payment">
                 <Plus className="h-4 w-4 mr-2" />
                 {t('accounting.recordPayment', 'Record Payment')}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <DialogHeader>
-                <DialogTitle>{t('accounting.recordPayment', 'Record Payment')}</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.recordPayment', 'Record Payment')}</DialogTitle>
+                <DialogDescription className="text-[#64748B]">
                   {t('accounting.recordPaymentFromCustomer', 'Record a payment received from a customer')}
                 </DialogDescription>
               </DialogHeader>
@@ -278,14 +278,14 @@ export default function AccountsReceivable() {
                     name="customerId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('accounting.customer', 'Customer')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.customer', 'Customer')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-customer">
+                            <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-customer">
                               <SelectValue placeholder={t('accounting.selectCustomer', 'Select customer')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                             {customers.map((customer) => (
                               <SelectItem key={customer.id} value={customer.id}>
                                 {customer.name}
@@ -302,9 +302,9 @@ export default function AccountsReceivable() {
                     name="invoiceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('accounting.invoice', 'Invoice')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.invoice', 'Invoice')}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('accounting.invoicePlaceholderAR', 'e.g., INV-2024-0089')} {...field} data-testid="input-invoice" />
+                          <Input placeholder={t('accounting.invoicePlaceholderAR', 'e.g., INV-2024-0089')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-invoice" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -316,9 +316,9 @@ export default function AccountsReceivable() {
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('accounting.amountSAR', 'Amount (SAR)')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.amountSAR', 'Amount (SAR)')}</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="0.00" {...field} data-testid="input-amount" />
+                            <Input type="number" placeholder="0.00" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-amount" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -329,9 +329,9 @@ export default function AccountsReceivable() {
                       name="paymentDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('accounting.paymentDate', 'Payment Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.paymentDate', 'Payment Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-payment-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-payment-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -343,14 +343,14 @@ export default function AccountsReceivable() {
                     name="paymentMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('accounting.paymentMethod', 'Payment Method')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.paymentMethod', 'Payment Method')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-payment-method">
+                            <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-payment-method">
                               <SelectValue placeholder={t('accounting.selectMethod', 'Select method')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                             <SelectItem value="cash">{t('accounting.cash', 'Cash')}</SelectItem>
                             <SelectItem value="bank_transfer">{t('accounting.bankTransfer', 'Bank Transfer')}</SelectItem>
                             <SelectItem value="credit_card">{t('accounting.creditCard', 'Credit Card')}</SelectItem>
@@ -366,19 +366,19 @@ export default function AccountsReceivable() {
                     name="reference"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('accounting.referenceOptional', 'Reference (Optional)')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('accounting.referenceOptional', 'Reference (Optional)')}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('accounting.checkReferencePlaceholder', 'e.g., Check #12345')} {...field} data-testid="input-reference" />
+                          <Input placeholder={t('accounting.checkReferencePlaceholder', 'e.g., Check #12345')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-reference" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)}>
+                    <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                       {t('common.cancel', 'Cancel')}
                     </Button>
-                    <Button type="submit" data-testid="button-save-payment">
+                    <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-payment">
                       {t('accounting.recordPayment', 'Record Payment')}
                     </Button>
                   </div>
@@ -389,50 +389,50 @@ export default function AccountsReceivable() {
         </div>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('accounting.customer', 'Customer')}</TableHead>
-                <TableHead>{t('accounting.invoice', 'Invoice')}</TableHead>
-                <TableHead>{t('accounting.dueDate', 'Due Date')}</TableHead>
-                <TableHead className="text-right">{t('accounting.original', 'Original')}</TableHead>
-                <TableHead className="text-right">{t('accounting.paid', 'Paid')}</TableHead>
-                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.customer', 'Customer')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.invoice', 'Invoice')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.dueDate', 'Due Date')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.original', 'Original')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.paid', 'Paid')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {receivables.map((ar) => (
-                <TableRow key={ar.id} data-testid={`row-ar-${ar.id}`}>
+                <TableRow key={ar.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-ar-${ar.id}`}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{ar.customerName}</p>
-                      <p className="text-xs text-muted-foreground">{ar.customerId}</p>
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">{ar.customerName}</p>
+                      <p className="text-xs text-[#64748B]">{ar.customerId}</p>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="font-mono">
+                    <Badge variant="outline" className="font-mono border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                       {ar.invoiceNumber}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p>{ar.dueDate}</p>
+                      <p className="text-[#0B1F3B] dark:text-white">{ar.dueDate}</p>
                       {ar.daysOverdue > 0 && (
-                        <p className="text-xs text-red-600">{t('accounting.daysOverdue', '{{days}} days overdue', { days: ar.daysOverdue })}</p>
+                        <p className="text-xs text-red-600 dark:text-red-400">{t('accounting.daysOverdue', '{{days}} days overdue', { days: ar.daysOverdue })}</p>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">
                     {ar.originalAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-green-600">
+                  <TableCell className="text-right font-mono text-green-600 dark:text-green-400">
                     {ar.paidAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono font-bold">
+                  <TableCell className="text-right font-mono font-bold text-[#0B1F3B] dark:text-white">
                     {ar.balanceDue.toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -440,13 +440,13 @@ export default function AccountsReceivable() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" data-testid={`button-view-${ar.id}`}>
+                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-view-${ar.id}`}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" data-testid={`button-email-${ar.id}`}>
+                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-email-${ar.id}`}>
                         <Mail className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" data-testid={`button-call-${ar.id}`}>
+                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-call-${ar.id}`}>
                         <Phone className="h-4 w-4" />
                       </Button>
                     </div>
@@ -463,71 +463,71 @@ export default function AccountsReceivable() {
   const overviewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-receivables">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-receivables">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               {t('accounting.totalReceivables', 'Total Receivables')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{t('common.sar', 'SAR')} {totalReceivables.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.invoicesCount', '{{count}} invoices', { count: receivables.length })}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('common.sar', 'SAR')} {totalReceivables.toLocaleString()}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.invoicesCount', '{{count}} invoices', { count: receivables.length })}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-current">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-current">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
               {t('accounting.status.current', 'Current')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
               {t('common.sar', 'SAR')} {currentReceivables.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#64748B]">
               {t('accounting.percentOfTotal', '{{percent}}% of total', { percent: ((currentReceivables / totalReceivables) * 100).toFixed(0) })}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-overdue">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-overdue">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />
               {t('accounting.status.overdue', 'Overdue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
               {t('common.sar', 'SAR')} {overdueReceivables.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#64748B]">
               {t('accounting.percentOfTotal', '{{percent}}% of total', { percent: ((overdueReceivables / totalReceivables) * 100).toFixed(0) })}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-avg-days">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-days">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <Clock className="h-4 w-4" />
               {t('accounting.avgDaysOverdue', 'Avg Days Overdue')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{avgDaysOverdue}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.daysAverage', 'days average')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{avgDaysOverdue}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.daysAverage', 'days average')}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.agingAnalysis', 'Aging Analysis')}</CardTitle>
-          <CardDescription>{t('accounting.receivablesBreakdownByAge', 'Receivables breakdown by age')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.agingAnalysis', 'Aging Analysis')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.receivablesBreakdownByAge', 'Receivables breakdown by age')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -539,8 +539,8 @@ export default function AccountsReceivable() {
             ].map((item, index) => (
               <div key={index}>
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm">{item.label}</span>
-                  <span className="text-sm font-bold">{t('common.sar', 'SAR')} {item.amount.toLocaleString()}</span>
+                  <span className="text-sm text-[#0B1F3B] dark:text-white">{item.label}</span>
+                  <span className="text-sm font-bold text-[#0B1F3B] dark:text-white">{t('common.sar', 'SAR')} {item.amount.toLocaleString()}</span>
                 </div>
                 <Progress value={item.percentage} className="h-2" />
               </div>
@@ -549,37 +549,37 @@ export default function AccountsReceivable() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
-          <CardDescription>{t('accounting.navigateToRelatedPages', 'Navigate to related pages')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.navigateToRelatedPages', 'Navigate to related pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/invoices">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-invoices">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-invoices">
                 <FileText className="h-4 w-4 mr-2" />
                 {t('accounting.invoices', 'Invoices')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/customers">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-customers">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-customers">
                 <Users className="h-4 w-4 mr-2" />
                 {t('accounting.customers', 'Customers')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
-                <TrendingUp className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
+                <FileText className="h-4 w-4 mr-2" />
                 {t('accounting.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/accounts-payable">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-accounts-payable">
-                <DollarSign className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-accounts-payable">
+                <TrendingUp className="h-4 w-4 mr-2" />
                 {t('accounting.accountsPayable', 'Accounts Payable')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
@@ -590,73 +590,15 @@ export default function AccountsReceivable() {
     </div>
   );
 
-  const collectionsTab = (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-semibold">{t('accounting.collectionActions', 'Collection Actions')}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t('accounting.trackCollectionEfforts', 'Track and manage collection efforts for overdue accounts')}
-          </p>
-        </div>
-        <Button data-testid="button-send-reminders">
-          <Send className="h-4 w-4 mr-2" />
-          {t('accounting.sendBulkReminders', 'Send Bulk Reminders')}
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {receivables
-          .filter((r) => r.status !== "Current")
-          .map((ar) => (
-            <Card key={ar.id} data-testid={`card-collection-${ar.id}`}>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{ar.customerName}</CardTitle>
-                  <Badge className={getStatusBadge(ar.status)}>{getStatusLabel(ar.status)}</Badge>
-                </div>
-                <CardDescription>{ar.invoiceNumber}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{t('accounting.balanceDue', 'Balance Due')}:</span>
-                    <span className="font-bold text-red-600">
-                      {t('common.sar', 'SAR')} {ar.balanceDue.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{t('accounting.daysOverdueLabel', 'Days Overdue')}:</span>
-                    <span className="font-bold">{ar.daysOverdue}</span>
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1" data-testid={`button-email-reminder-${ar.id}`}>
-                      <Mail className="h-3 w-3 mr-1" />
-                      {t('accounting.email', 'Email')}
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1" data-testid={`button-call-customer-${ar.id}`}>
-                      <Phone className="h-3 w-3 mr-1" />
-                      {t('accounting.call', 'Call')}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-      </div>
-    </div>
-  );
-
   const tabs = [
-    { id: "receivables", label: t('accounting.receivables', 'Receivables'), icon: FileText, content: receivablesTab },
-    { id: "overview", label: t('accounting.overview', 'Overview'), icon: TrendingUp, content: overviewTab },
-    { id: "collections", label: t('accounting.collections', 'Collections'), icon: Calendar, content: collectionsTab },
+    { id: "receivables", label: t('accounting.receivables', 'Receivables'), icon: Users, content: receivablesTab },
+    { id: "overview", label: t('common.overview', 'Overview'), icon: DollarSign, content: overviewTab },
   ];
 
   return (
     <TabsPageLayout
-      title={t('accounting.accountsReceivableTitle', 'Accounts Receivable - الذمم المدينة')}
-      description={t('accounting.accountsReceivableDescription', 'Track customer invoices and payments')}
+      title={t('accounting.accountsReceivableTitle', 'Accounts Receivable - الحسابات المدينة')}
+      description={t('accounting.accountsReceivableDescription', 'Manage customer invoices and collections')}
       icon={Users}
       tabs={tabs}
       defaultTab="receivables"

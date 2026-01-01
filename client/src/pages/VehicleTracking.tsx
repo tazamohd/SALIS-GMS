@@ -216,9 +216,9 @@ export default function VehicleTracking() {
   const getEngineStatusColor = (status: string) => {
     switch (status) {
       case 'running': return 'bg-green-500';
-      case 'idle': return 'bg-yellow-500';
-      case 'off': return 'bg-gray-500';
-      default: return 'bg-gray-400';
+      case 'idle': return 'bg-amber-500';
+      case 'off': return 'bg-[#64748B]';
+      default: return 'bg-[#64748B]';
     }
   };
 
@@ -234,9 +234,9 @@ export default function VehicleTracking() {
   const getReminderStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'sent': return <Bell className="h-4 w-4 text-blue-500" />;
-      case 'snoozed': return <Clock className="h-4 w-4 text-yellow-500" />;
-      default: return <AlertTriangle className="h-4 w-4 text-orange-500" />;
+      case 'sent': return <Bell className="h-4 w-4 text-[#0A5ED7]" />;
+      case 'snoozed': return <Clock className="h-4 w-4 text-amber-500" />;
+      default: return <AlertTriangle className="h-4 w-4 text-[#F97316]" />;
     }
   };
 
@@ -253,13 +253,13 @@ export default function VehicleTracking() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6" data-testid="page-vehicle-tracking">
+    <div className="container mx-auto py-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen" data-testid="page-vehicle-tracking">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight" data-testid="text-page-title">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
             {t('vehicleTracking.title', 'Real-Time Vehicle Tracking')}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[#64748B]">
             {t('vehicleTracking.description', 'Monitor vehicle locations, service reminders, and notifications')}
           </p>
         </div>
@@ -271,7 +271,7 @@ export default function VehicleTracking() {
               onCheckedChange={setAutoRefresh}
               data-testid="switch-auto-refresh"
             />
-            <Label htmlFor="auto-refresh" className="text-sm">
+            <Label htmlFor="auto-refresh" className="text-sm text-[#64748B]">
               {t('vehicleTracking.autoRefresh', 'Auto-refresh')}
             </Label>
           </div>
@@ -279,13 +279,14 @@ export default function VehicleTracking() {
             variant="outline"
             size="sm"
             onClick={() => refetchTracking()}
+            className="border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="button-refresh"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             {t('common.refresh', 'Refresh')}
           </Button>
           {unreadCount && unreadCount.count > 0 && (
-            <Badge variant="destructive" className="rounded-full">
+            <Badge variant="destructive" className="rounded-full bg-[#F97316]">
               {unreadCount.count}
             </Badge>
           )}
@@ -293,25 +294,25 @@ export default function VehicleTracking() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="tracking" className="flex items-center gap-2" data-testid="tab-tracking">
+        <TabsList className="grid w-full grid-cols-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
+          <TabsTrigger value="tracking" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-tracking">
             <MapPin className="h-4 w-4" />
             {t('vehicleTracking.tabs.tracking', 'Live Tracking')}
           </TabsTrigger>
-          <TabsTrigger value="reminders" className="flex items-center gap-2" data-testid="tab-reminders">
+          <TabsTrigger value="reminders" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-reminders">
             <Bell className="h-4 w-4" />
             {t('vehicleTracking.tabs.reminders', 'Service Reminders')}
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2" data-testid="tab-notifications">
+          <TabsTrigger value="notifications" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-notifications">
             <BellRing className="h-4 w-4" />
             {t('vehicleTracking.tabs.notifications', 'Notifications')}
             {unreadCount && unreadCount.count > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs">
+              <Badge variant="secondary" className="ml-1 text-xs bg-[#0A5ED7]/10 text-[#0A5ED7]">
                 {unreadCount.count}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2" data-testid="tab-settings">
+          <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-settings">
             <Settings className="h-4 w-4" />
             {t('vehicleTracking.tabs.settings', 'Settings')}
           </TabsTrigger>
@@ -319,77 +320,77 @@ export default function VehicleTracking() {
 
         <TabsContent value="tracking" className="space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.stats.activeVehicles', 'Active Vehicles')}
                 </CardTitle>
-                <Car className="h-4 w-4 text-muted-foreground" />
+                <Car className="h-4 w-4 text-[#0A5ED7]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold" data-testid="text-active-vehicles">
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-active-vehicles">
                   {trackingData?.filter(v => v.isMoving).length || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#64748B]">
                   {t('vehicleTracking.stats.activeVehiclesDesc', 'Currently in motion')}
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.stats.totalTracked', 'Total Tracked')}
                 </CardTitle>
-                <Signal className="h-4 w-4 text-muted-foreground" />
+                <Signal className="h-4 w-4 text-[#0A5ED7]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold" data-testid="text-total-tracked">
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-tracked">
                   {trackingData?.length || 0}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#64748B]">
                   {t('vehicleTracking.stats.totalTrackedDesc', 'Vehicles with GPS')}
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.stats.avgFuel', 'Avg Fuel Level')}
                 </CardTitle>
-                <Fuel className="h-4 w-4 text-muted-foreground" />
+                <Fuel className="h-4 w-4 text-[#0A5ED7]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold" data-testid="text-avg-fuel">
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-fuel">
                   {trackingData && trackingData.length > 0
                     ? Math.round(trackingData.reduce((acc, v) => acc + (v.fuelLevel || 0), 0) / trackingData.length)
                     : 0}%
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#64748B]">
                   {t('vehicleTracking.stats.avgFuelDesc', 'Across all vehicles')}
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="h-96">
+          <Card className="h-96 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <MapPin className="h-5 w-5 text-[#0A5ED7]" />
                 {t('vehicleTracking.map.title', 'Vehicle Locations')}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-[#64748B]">
                 {t('vehicleTracking.map.description', 'Real-time GPS tracking map visualization')}
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-64 flex items-center justify-center bg-muted rounded-lg">
+            <CardContent className="h-64 flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
               <div className="text-center space-y-4">
-                <MapPin className="h-16 w-16 mx-auto text-muted-foreground" />
+                <MapPin className="h-16 w-16 mx-auto text-[#0A5ED7]" />
                 <div>
-                  <p className="text-lg font-medium">{t('vehicleTracking.map.placeholder', 'Map View')}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('vehicleTracking.map.placeholder', 'Map View')}</p>
+                  <p className="text-sm text-[#64748B]">
                     {t('vehicleTracking.map.placeholderDesc', 'Interactive map with vehicle markers would be displayed here')}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-[#64748B] mt-2">
                     {t('vehicleTracking.map.integration', 'Integrate with Google Maps, Mapbox, or OpenStreetMap')}
                   </p>
                 </div>
@@ -397,13 +398,13 @@ export default function VehicleTracking() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Activity className="h-5 w-5 text-[#0A5ED7]" />
                 {t('vehicleTracking.vehicleList.title', 'Vehicle Status')}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-[#64748B]">
                 {t('vehicleTracking.vehicleList.description', 'Current status of all tracked vehicles')}
               </CardDescription>
             </CardHeader>
@@ -412,7 +413,7 @@ export default function VehicleTracking() {
                 {loadingTracking ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                      <div key={i} className="flex items-center gap-4 p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
                         <Skeleton className="h-12 w-12 rounded-full" />
                         <div className="flex-1 space-y-2">
                           <Skeleton className="h-4 w-48" />
@@ -427,31 +428,31 @@ export default function VehicleTracking() {
                     {trackingData.map((vehicle) => (
                       <div
                         key={vehicle.id}
-                        className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors hover:bg-accent ${
-                          selectedVehicle === vehicle.vehicleId ? 'bg-accent border-primary' : ''
+                        className={`flex items-center gap-4 p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg cursor-pointer transition-colors hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] ${
+                          selectedVehicle === vehicle.vehicleId ? 'bg-[#0A5ED7]/5 border-[#0A5ED7]' : ''
                         }`}
                         onClick={() => setSelectedVehicle(vehicle.vehicleId)}
                         data-testid={`vehicle-row-${vehicle.vehicleId}`}
                       >
                         <div className="relative">
-                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Car className="h-6 w-6 text-primary" />
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 flex items-center justify-center">
+                            <Car className="h-6 w-6 text-[#0A5ED7]" />
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background ${getEngineStatusColor(vehicle.engineStatus)}`} />
+                          <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white dark:border-[#151A23] ${getEngineStatusColor(vehicle.engineStatus)}`} />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">
+                            <span className="font-medium text-[#0B1F3B] dark:text-white">
                               {vehicle.vehicle?.make || 'Unknown'} {vehicle.vehicle?.model || ''}
                             </span>
                             {vehicle.isMoving && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs border-[#0A5ED7] text-[#0A5ED7]">
                                 <Navigation className="h-3 w-3 mr-1" />
                                 {t('vehicleTracking.moving', 'Moving')}
                               </Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                          <div className="flex items-center gap-4 text-sm text-[#64748B] mt-1">
                             <span className="flex items-center gap-1">
                               <Gauge className="h-3 w-3" />
                               {formatSpeed(vehicle.speed || 0)}
@@ -467,11 +468,11 @@ export default function VehicleTracking() {
                           </div>
                         </div>
                         <div className="text-right text-sm">
-                          <Badge variant={vehicle.engineStatus === 'running' ? 'default' : 'secondary'}>
+                          <Badge variant={vehicle.engineStatus === 'running' ? 'default' : 'secondary'} className={vehicle.engineStatus === 'running' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0' : 'bg-[#64748B]/10 text-[#64748B] border-0'}>
                             <Power className="h-3 w-3 mr-1" />
                             {vehicle.engineStatus}
                           </Badge>
-                          <div className="text-xs text-muted-foreground mt-1">
+                          <div className="text-xs text-[#64748B] mt-1">
                             {new Date(vehicle.lastUpdated).toLocaleTimeString()}
                           </div>
                         </div>
@@ -479,9 +480,9 @@ export default function VehicleTracking() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
+                  <div className="text-center py-12 text-[#64748B]">
                     <Car className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>{t('vehicleTracking.noVehicles', 'No tracked vehicles found')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.noVehicles', 'No tracked vehicles found')}</p>
                     <p className="text-sm">{t('vehicleTracking.noVehiclesDesc', 'Connect GPS devices to start tracking')}</p>
                   </div>
                 )}
@@ -493,14 +494,15 @@ export default function VehicleTracking() {
         <TabsContent value="reminders" className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">{t('vehicleTracking.reminders.title', 'Service Reminders')}</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t('vehicleTracking.reminders.title', 'Service Reminders')}</h2>
+              <p className="text-sm text-[#64748B]">
                 {t('vehicleTracking.reminders.description', 'Upcoming and overdue service reminders')}
               </p>
             </div>
             <Button
               onClick={() => generateRemindersMutation.mutate()}
               disabled={generateRemindersMutation.isPending}
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               data-testid="button-generate-reminders"
             >
               <Wrench className="h-4 w-4 mr-2" />
@@ -509,57 +511,57 @@ export default function VehicleTracking() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.reminders.pending', 'Pending')}
                 </CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="h-4 w-4 text-amber-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-yellow-600" data-testid="text-pending-reminders">
+                <div className="text-2xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-pending-reminders">
                   {serviceReminders?.filter(r => r.status === 'pending').length || 0}
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.reminders.sent', 'Sent')}
                 </CardTitle>
-                <Bell className="h-4 w-4 text-muted-foreground" />
+                <Bell className="h-4 w-4 text-[#0A5ED7]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600" data-testid="text-sent-reminders">
+                <div className="text-2xl font-bold text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="text-sent-reminders">
                   {serviceReminders?.filter(r => r.status === 'sent').length || 0}
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-[#64748B]">
                   {t('vehicleTracking.reminders.completed', 'Completed')}
                 </CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600" data-testid="text-completed-reminders">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-completed-reminders">
                   {serviceReminders?.filter(r => r.status === 'completed').length || 0}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('vehicleTracking.reminders.list', 'Reminder List')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.reminders.list', 'Reminder List')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-96">
                 {loadingReminders ? (
                   <div className="space-y-4">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
+                      <div key={i} className="flex items-center gap-4 p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
                         <Skeleton className="h-10 w-10 rounded" />
                         <div className="flex-1 space-y-2">
                           <Skeleton className="h-4 w-40" />
@@ -574,66 +576,41 @@ export default function VehicleTracking() {
                     {serviceReminders.map((reminder) => (
                       <div
                         key={reminder.id}
-                        className="flex items-center gap-4 p-4 border rounded-lg"
+                        className="flex items-center gap-4 p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                         data-testid={`reminder-row-${reminder.id}`}
                       >
-                        <div className="h-10 w-10 rounded bg-primary/10 flex items-center justify-center">
-                          <Wrench className="h-5 w-5 text-primary" />
+                        <div className="h-10 w-10 rounded-lg bg-[#0A5ED7]/10 flex items-center justify-center">
+                          {getReminderStatusIcon(reminder.status)}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            {getReminderStatusIcon(reminder.status)}
-                            <span className="font-medium">{reminder.serviceType}</span>
-                            <Badge variant={getPriorityColor(reminder.priority) as any}>
+                            <span className="font-medium text-[#0B1F3B] dark:text-white">{reminder.serviceType}</span>
+                            <Badge className={reminder.priority === 'high' ? 'bg-[#F97316]/10 text-[#F97316] border-0' : 'bg-[#64748B]/10 text-[#64748B] border-0'}>
                               {reminder.priority}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {new Date(reminder.reminderDate).toLocaleDateString()}
-                            </span>
-                            {reminder.mileageThreshold && (
-                              <span className="flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3" />
-                                {reminder.mileageThreshold.toLocaleString()} km
-                              </span>
-                            )}
-                          </div>
-                          {reminder.notes && (
-                            <p className="text-xs text-muted-foreground mt-1">{reminder.notes}</p>
-                          )}
+                          <p className="text-sm text-[#64748B]">
+                            Due: {new Date(reminder.reminderDate).toLocaleDateString()}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {reminder.status !== 'completed' && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => updateReminderStatusMutation.mutate({ id: reminder.id, status: 'completed' })}
-                                data-testid={`button-complete-${reminder.id}`}
-                              >
-                                <CheckCircle2 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => updateReminderStatusMutation.mutate({ id: reminder.id, status: 'snoozed' })}
-                                data-testid={`button-snooze-${reminder.id}`}
-                              >
-                                <Clock className="h-4 w-4" />
-                              </Button>
-                            </>
-                          )}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-[#E2E8F0] dark:border-[#232A36]"
+                            onClick={() => updateReminderStatusMutation.mutate({ id: reminder.id, status: 'completed' })}
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
+                  <div className="text-center py-12 text-[#64748B]">
                     <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>{t('vehicleTracking.reminders.noReminders', 'No service reminders')}</p>
-                    <p className="text-sm">{t('vehicleTracking.reminders.noRemindersDesc', 'Click "Generate Reminders" to create new reminders')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.noReminders', 'No service reminders')}</p>
+                    <p className="text-sm">{t('vehicleTracking.noRemindersDesc', 'Generate reminders based on vehicle service schedules')}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -642,56 +619,21 @@ export default function VehicleTracking() {
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold">{t('vehicleTracking.notifications.title', 'Push Notifications')}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t('vehicleTracking.notifications.description', 'View and manage your notifications')}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {!notificationsEnabled && (
-                <Button
-                  variant="outline"
-                  onClick={requestBrowserNotificationPermission}
-                  data-testid="button-enable-notifications"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  {t('vehicleTracking.notifications.enable', 'Enable Browser Notifications')}
-                </Button>
-              )}
-              {notificationsEnabled && (
-                <Button
-                  variant="outline"
-                  onClick={showDemoNotification}
-                  data-testid="button-test-notification"
-                >
-                  <BellRing className="h-4 w-4 mr-2" />
-                  {t('vehicleTracking.notifications.test', 'Test Notification')}
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
-                {t('vehicleTracking.notifications.history', 'Notification History')}
-              </CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.notifications.title', 'Recent Notifications')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
+                {t('vehicleTracking.notifications.description', 'Your recent alerts and notifications')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-96">
                 {loadingNotifications ? (
                   <div className="space-y-4">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-64" />
-                          <Skeleton className="h-3 w-40" />
-                        </div>
-                        <Skeleton className="h-6 w-16" />
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
+                        <Skeleton className="h-4 w-48 mb-2" />
+                        <Skeleton className="h-3 w-full" />
                       </div>
                     ))}
                   </div>
@@ -700,47 +642,31 @@ export default function VehicleTracking() {
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors hover:bg-accent ${
-                          !notification.readAt ? 'bg-primary/5 border-primary/20' : ''
+                        className={`p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg cursor-pointer transition-colors ${
+                          !notification.readAt ? 'bg-[#0A5ED7]/5' : ''
                         }`}
-                        onClick={() => {
-                          if (!notification.readAt) {
-                            markNotificationReadMutation.mutate(notification.id);
-                          }
-                        }}
-                        data-testid={`notification-row-${notification.id}`}
+                        onClick={() => markNotificationReadMutation.mutate(notification.id)}
+                        data-testid={`notification-${notification.id}`}
                       >
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <BellRing className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{notification.title}</span>
-                            {!notification.readAt && (
-                              <Badge variant="default" className="text-xs">
-                                {t('vehicleTracking.notifications.new', 'New')}
-                              </Badge>
-                            )}
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-medium text-[#0B1F3B] dark:text-white">{notification.title}</h4>
+                            <p className="text-sm text-[#64748B] mt-1">{notification.body}</p>
                           </div>
-                          <p className="text-sm text-muted-foreground">{notification.body}</p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
-                            <span>{new Date(notification.createdAt).toLocaleString()}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {notification.notificationType}
-                            </Badge>
-                          </div>
+                          {!notification.readAt && (
+                            <div className="h-2 w-2 rounded-full bg-[#0A5ED7]" />
+                          )}
                         </div>
-                        <Badge variant={getPriorityColor(notification.priority) as any}>
-                          {notification.priority}
-                        </Badge>
+                        <p className="text-xs text-[#64748B] mt-2">
+                          {new Date(notification.createdAt).toLocaleString()}
+                        </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
+                  <div className="text-center py-12 text-[#64748B]">
                     <BellRing className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>{t('vehicleTracking.notifications.noNotifications', 'No notifications yet')}</p>
-                    <p className="text-sm">{t('vehicleTracking.notifications.noNotificationsDesc', 'You will see notifications here when they arrive')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.noNotifications', 'No notifications')}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -749,203 +675,34 @@ export default function VehicleTracking() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                {t('vehicleTracking.settings.title', 'Notification Settings')}
-              </CardTitle>
-              <CardDescription>
-                {t('vehicleTracking.settings.description', 'Configure how you receive notifications')}
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.settings.browser', 'Browser Notifications')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
+                {t('vehicleTracking.settings.browserDesc', 'Enable browser push notifications for real-time alerts')}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="font-medium">{t('vehicleTracking.settings.channels', 'Notification Channels')}</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Smartphone className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <Label>{t('vehicleTracking.settings.push', 'Push Notifications')}</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('vehicleTracking.settings.pushDesc', 'Receive browser push notifications')}
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.pushEnabled ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, pushEnabled: checked });
-                        }
-                      }}
-                      data-testid="switch-push-enabled"
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Bell className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <Label>{t('vehicleTracking.settings.email', 'Email Notifications')}</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('vehicleTracking.settings.emailDesc', 'Receive notifications via email')}
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.emailEnabled ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, emailEnabled: checked });
-                        }
-                      }}
-                      data-testid="switch-email-enabled"
-                    />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Smartphone className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <Label>{t('vehicleTracking.settings.sms', 'SMS Notifications')}</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('vehicleTracking.settings.smsDesc', 'Receive notifications via SMS')}
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.smsEnabled ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, smsEnabled: checked });
-                        }
-                      }}
-                      data-testid="switch-sms-enabled"
-                    />
-                  </div>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-5 w-5 text-[#0A5ED7]" />
+                  <span className="text-[#0B1F3B] dark:text-white">{t('vehicleTracking.settings.pushNotifications', 'Push Notifications')}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {notificationsEnabled ? (
+                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0">{t('vehicleTracking.settings.enabled', 'Enabled')}</Badge>
+                  ) : (
+                    <Button size="sm" onClick={requestBrowserNotificationPermission} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+                      {t('vehicleTracking.settings.enable', 'Enable')}
+                    </Button>
+                  )}
                 </div>
               </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="font-medium">{t('vehicleTracking.settings.types', 'Notification Types')}</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t('vehicleTracking.settings.serviceReminders', 'Service Reminders')}</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('vehicleTracking.settings.serviceRemindersDesc', 'Reminders for upcoming service')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.serviceReminders ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, serviceReminders: checked });
-                        }
-                      }}
-                      data-testid="switch-service-reminders"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t('vehicleTracking.settings.appointmentReminders', 'Appointment Reminders')}</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('vehicleTracking.settings.appointmentRemindersDesc', 'Reminders for scheduled appointments')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.appointmentReminders ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, appointmentReminders: checked });
-                        }
-                      }}
-                      data-testid="switch-appointment-reminders"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t('vehicleTracking.settings.statusUpdates', 'Status Updates')}</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('vehicleTracking.settings.statusUpdatesDesc', 'Updates on vehicle service status')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.statusUpdates ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, statusUpdates: checked });
-                        }
-                      }}
-                      data-testid="switch-status-updates"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t('vehicleTracking.settings.vehicleAlerts', 'Vehicle Alerts')}</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('vehicleTracking.settings.vehicleAlertsDesc', 'Alerts for vehicle issues')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.vehicleAlerts ?? true}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, vehicleAlerts: checked });
-                        }
-                      }}
-                      data-testid="switch-vehicle-alerts"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t('vehicleTracking.settings.promotions', 'Promotions & Offers')}</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('vehicleTracking.settings.promotionsDesc', 'Special offers and promotions')}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPrefs?.promotions ?? false}
-                      onCheckedChange={(checked) => {
-                        if (notificationPrefs) {
-                          updateNotificationPrefsMutation.mutate({ ...notificationPrefs, promotions: checked });
-                        }
-                      }}
-                      data-testid="switch-promotions"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Bell className="h-5 w-5" />
-                  <div>
-                    <p className="font-medium">{t('vehicleTracking.settings.browserStatus', 'Browser Notification Status')}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {notificationsEnabled
-                        ? t('vehicleTracking.settings.browserEnabled', 'Browser notifications are enabled')
-                        : t('vehicleTracking.settings.browserDisabled', 'Browser notifications are disabled')}
-                    </p>
-                  </div>
-                </div>
-                {notificationsEnabled ? (
-                  <Badge variant="default" className="bg-green-500">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    {t('common.enabled', 'Enabled')}
-                  </Badge>
-                ) : (
-                  <Button size="sm" onClick={requestBrowserNotificationPermission}>
-                    {t('vehicleTracking.settings.enableBrowser', 'Enable')}
-                  </Button>
-                )}
-              </div>
+              {notificationsEnabled && (
+                <Button variant="outline" onClick={showDemoNotification} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  {t('vehicleTracking.settings.testNotification', 'Send Test Notification')}
+                </Button>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

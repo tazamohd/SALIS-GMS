@@ -152,33 +152,41 @@ export default function Suppliers() {
         description={t('inventory.manageSupplierNetwork', 'Manage your supplier network')}
         icon={Building2}
         headerAction={
-          <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-supplier">
+          <Button 
+            onClick={() => setIsCreateOpen(true)} 
+            data-testid="button-create-supplier"
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+          >
             <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
           </Button>
         }
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-900 dark:text-white/60" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder={t('inventory.searchSuppliers', 'Search by name, contact person, or email...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
       </div>
 
       {error ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-lg font-medium mb-2">{t('inventory.failedToLoadSuppliers', 'Failed to load suppliers')}</p>
-            <p className="text-gray-900 dark:text-white/60 mb-4">
+            <Building2 className="h-12 w-12 text-[#F97316] mb-4" />
+            <p className="text-lg font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.failedToLoadSuppliers', 'Failed to load suppliers')}</p>
+            <p className="text-[#64748B] mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
-            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] })} data-testid="button-retry">
+            <Button 
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] })} 
+              data-testid="button-retry"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+            >
               {t('common.retry', 'Retry')}
             </Button>
           </CardContent>
@@ -186,31 +194,35 @@ export default function Suppliers() {
       ) : isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse" data-testid={`skeleton-card-${i}`}>
+            <Card key={i} className="animate-pulse bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`skeleton-card-${i}`}>
               <CardHeader className="pb-3">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/2"></div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-2">
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
                 </div>
-                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredSuppliers.length === 0 ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="h-12 w-12 text-gray-900 dark:text-white/60 mb-4" />
-            <p className="text-lg font-medium mb-2">{t('inventory.noSuppliersFound', 'No suppliers found')}</p>
-            <p className="text-gray-900 dark:text-white/60 mb-4">
+            <Building2 className="h-12 w-12 text-[#64748B] mb-4" />
+            <p className="text-lg font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.noSuppliersFound', 'No suppliers found')}</p>
+            <p className="text-[#64748B] mb-4">
               {searchQuery ? t('inventory.tryAdjustingSearch', 'Try adjusting your search') : t('inventory.getStartedAddingSupplier', 'Get started by creating your first supplier')}
             </p>
             {!searchQuery && (
-              <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-first">
+              <Button 
+                onClick={() => setIsCreateOpen(true)} 
+                data-testid="button-create-first"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+              >
                 <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
               </Button>
             )}
@@ -221,49 +233,55 @@ export default function Suppliers() {
           {filteredSuppliers.map((supplier) => (
             <Card
               key={supplier.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
+              className="cursor-pointer hover:shadow-lg transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
               onClick={() => handleViewDetails(supplier)}
               data-testid={`card-supplier-${supplier.id}`}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg" data-testid={`text-name-${supplier.id}`}>
+                    <CardTitle className="text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-name-${supplier.id}`}>
                       {supplier.name}
                     </CardTitle>
                     {supplier.contactPerson && (
-                      <CardDescription data-testid={`text-contact-${supplier.id}`}>
+                      <CardDescription className="text-[#64748B]" data-testid={`text-contact-${supplier.id}`}>
                         {supplier.contactPerson}
                       </CardDescription>
                     )}
                   </div>
-                  <Badge variant={supplier.isActive ? "default" : "secondary"} data-testid={`badge-status-${supplier.id}`}>
+                  <Badge 
+                    className={supplier.isActive 
+                      ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
+                      : "bg-[#64748B] text-white"
+                    } 
+                    data-testid={`badge-status-${supplier.id}`}
+                  >
                     {supplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
                 {supplier.email && (
-                  <div className="flex items-center text-sm text-gray-900 dark:text-white/60" data-testid={`text-email-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-email-${supplier.id}`}>
                     <Mail className="mr-2 h-4 w-4" />
                     {supplier.email}
                   </div>
                 )}
                 {supplier.phone && (
-                  <div className="flex items-center text-sm text-gray-900 dark:text-white/60" data-testid={`text-phone-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-phone-${supplier.id}`}>
                     <Phone className="mr-2 h-4 w-4" />
                     {supplier.phone}
                   </div>
                 )}
                 {(supplier.city || supplier.country) && (
-                  <div className="flex items-center text-sm text-gray-900 dark:text-white/60" data-testid={`text-location-${supplier.id}`}>
+                  <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-location-${supplier.id}`}>
                     <MapPin className="mr-2 h-4 w-4" />
                     {[supplier.city, supplier.country].filter(Boolean).join(", ")}
                   </div>
                 )}
                 {supplier.paymentTerms && (
                   <div className="mt-3">
-                    <Badge variant="outline" data-testid={`badge-payment-${supplier.id}`}>
+                    <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid={`badge-payment-${supplier.id}`}>
                       {supplier.paymentTerms.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                     </Badge>
                   </div>
@@ -277,10 +295,10 @@ export default function Suppliers() {
       </StandardPageLayout>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('inventory.createNewSupplier', 'Create New Supplier')}</DialogTitle>
-            <DialogDescription>{t('inventory.addNewSupplierDesc', 'Add a new supplier to your network')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.createNewSupplier', 'Create New Supplier')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('inventory.addNewSupplierDesc', 'Add a new supplier to your network')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(createSupplier)} className="space-y-4">
@@ -290,9 +308,9 @@ export default function Suppliers() {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} data-testid="input-name" />
+                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -304,9 +322,9 @@ export default function Suppliers() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} data-testid="input-contact-person" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -318,9 +336,9 @@ export default function Suppliers() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('auth.email', 'Email')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('auth.email', 'Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} data-testid="input-email" />
+                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -332,9 +350,9 @@ export default function Suppliers() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.phone', 'Phone')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.phone', 'Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} data-testid="input-phone" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -346,9 +364,9 @@ export default function Suppliers() {
                   name="taxId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.taxId', 'Tax ID')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.taxId', 'Tax ID')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} data-testid="input-tax-id" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-tax-id" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -360,9 +378,9 @@ export default function Suppliers() {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.address', 'Address')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.address', 'Address')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} data-testid="input-address" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-address" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -374,9 +392,9 @@ export default function Suppliers() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.city', 'City')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.city', 'City')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} data-testid="input-city" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-city" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -388,9 +406,9 @@ export default function Suppliers() {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.country', 'Country')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.country', 'Country')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} data-testid="input-country" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-country" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -402,14 +420,14 @@ export default function Suppliers() {
                   name="paymentTerms"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-payment-terms">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-payment-terms">
                             <SelectValue placeholder={t('inventory.selectPaymentTerms', 'Select payment terms')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="net30">{t('inventory.net30', 'Net 30')}</SelectItem>
                           <SelectItem value="net60">{t('inventory.net60', 'Net 60')}</SelectItem>
                           <SelectItem value="cod">{t('inventory.cashOnDelivery', 'Cash on Delivery')}</SelectItem>
@@ -427,9 +445,9 @@ export default function Suppliers() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} data-testid="input-notes" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -438,10 +456,10 @@ export default function Suppliers() {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} data-testid="button-cancel">
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-cancel">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-submit">{t('inventory.createSupplier', 'Create Supplier')}</Button>
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-submit">{t('inventory.createSupplier', 'Create Supplier')}</Button>
               </div>
             </form>
           </Form>
@@ -449,10 +467,10 @@ export default function Suppliers() {
       </Dialog>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('inventory.editSupplier', 'Edit Supplier')}</DialogTitle>
-            <DialogDescription>{t('inventory.updateSupplierInfo', 'Update supplier information')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.editSupplier', 'Edit Supplier')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('inventory.updateSupplierInfo', 'Update supplier information')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(updateSupplier)} className="space-y-4">
@@ -462,9 +480,9 @@ export default function Suppliers() {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.supplierName', 'Supplier Name')} *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} data-testid="input-edit-name" />
+                        <Input {...field} placeholder={t('inventory.supplierNamePlaceholder', 'ABC Auto Parts')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -476,9 +494,9 @@ export default function Suppliers() {
                   name="contactPerson"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.contactPerson', 'Contact Person')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} data-testid="input-edit-contact-person" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.contactPersonPlaceholder', 'John Doe')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-contact-person" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -490,9 +508,9 @@ export default function Suppliers() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('auth.email', 'Email')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('auth.email', 'Email')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} data-testid="input-edit-email" />
+                        <Input {...field} value={field.value ?? ""} type="email" placeholder={t('inventory.emailPlaceholder', 'contact@supplier.com')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -504,9 +522,9 @@ export default function Suppliers() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.phone', 'Phone')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.phone', 'Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} data-testid="input-edit-phone" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.phonePlaceholder', '+1 234 567 8900')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -518,9 +536,9 @@ export default function Suppliers() {
                   name="taxId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.taxId', 'Tax ID')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.taxId', 'Tax ID')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} data-testid="input-edit-tax-id" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.taxIdPlaceholder', 'TAX123456')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-tax-id" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -532,9 +550,9 @@ export default function Suppliers() {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.address', 'Address')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.address', 'Address')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} data-testid="input-edit-address" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.addressPlaceholder', '123 Main Street')} rows={2} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-address" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -546,9 +564,9 @@ export default function Suppliers() {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.city', 'City')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.city', 'City')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} data-testid="input-edit-city" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.cityPlaceholder', 'New York')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-city" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -560,9 +578,9 @@ export default function Suppliers() {
                   name="country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.country', 'Country')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.country', 'Country')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} data-testid="input-edit-country" />
+                        <Input {...field} value={field.value ?? ""} placeholder={t('inventory.countryPlaceholder', 'USA')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-country" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -574,14 +592,14 @@ export default function Suppliers() {
                   name="paymentTerms"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.paymentTerms', 'Payment Terms')}</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-edit-payment-terms">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-edit-payment-terms">
                             <SelectValue placeholder={t('inventory.selectPaymentTerms', 'Select payment terms')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="net30">{t('inventory.net30', 'Net 30')}</SelectItem>
                           <SelectItem value="net60">{t('inventory.net60', 'Net 60')}</SelectItem>
                           <SelectItem value="cod">{t('inventory.cashOnDelivery', 'Cash on Delivery')}</SelectItem>
@@ -599,9 +617,9 @@ export default function Suppliers() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} data-testid="input-edit-notes" />
+                        <Textarea {...field} value={field.value ?? ""} placeholder={t('inventory.additionalInfo', 'Additional information')} rows={3} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-edit-notes" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -610,10 +628,10 @@ export default function Suppliers() {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} data-testid="button-edit-cancel">
+                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-edit-cancel">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-edit-submit">{t('inventory.updateSupplier', 'Update Supplier')}</Button>
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-edit-submit">{t('inventory.updateSupplier', 'Update Supplier')}</Button>
               </div>
             </form>
           </Form>
@@ -621,97 +639,62 @@ export default function Suppliers() {
       </Dialog>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('inventory.supplierDetails', 'Supplier Details')}</DialogTitle>
-            <DialogDescription>{t('inventory.viewSupplierInfo', 'View supplier information')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedSupplier?.name}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('inventory.supplierDetails', 'Supplier Details')}</DialogDescription>
           </DialogHeader>
           {selectedSupplier && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.supplierName', 'Supplier Name')}</p>
-                  <p className="text-base" data-testid="detail-name">{selectedSupplier.name}</p>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.contactPerson', 'Contact Person')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.contactPerson || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</p>
-                  <Badge variant={selectedSupplier.isActive ? "default" : "secondary"} data-testid="detail-status">
-                    {selectedSupplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
-                  </Badge>
+                  <p className="text-sm font-medium text-[#64748B]">{t('auth.email', 'Email')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.email || "-"}</p>
                 </div>
-                {selectedSupplier.contactPerson && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.contactPerson', 'Contact Person')}</p>
-                    <p className="text-base" data-testid="detail-contact-person">{selectedSupplier.contactPerson}</p>
-                  </div>
-                )}
-                {selectedSupplier.email && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('auth.email', 'Email')}</p>
-                    <p className="text-base" data-testid="detail-email">{selectedSupplier.email}</p>
-                  </div>
-                )}
-                {selectedSupplier.phone && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.phone', 'Phone')}</p>
-                    <p className="text-base" data-testid="detail-phone">{selectedSupplier.phone}</p>
-                  </div>
-                )}
-                {selectedSupplier.taxId && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.taxId', 'Tax ID')}</p>
-                    <p className="text-base" data-testid="detail-tax-id">{selectedSupplier.taxId}</p>
-                  </div>
-                )}
-                {selectedSupplier.address && (
+                <div>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.phone', 'Phone')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.phone || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.taxId', 'Tax ID')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.taxId || "-"}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.address', 'Address')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.address || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.city', 'City')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.city || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.country', 'Country')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.country || "-"}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.paymentTerms', 'Payment Terms')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.paymentTerms || "-"}</p>
+                </div>
+                {selectedSupplier.notes && (
                   <div className="col-span-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.address', 'Address')}</p>
-                    <p className="text-base" data-testid="detail-address">{selectedSupplier.address}</p>
-                  </div>
-                )}
-                {selectedSupplier.city && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.city', 'City')}</p>
-                    <p className="text-base" data-testid="detail-city">{selectedSupplier.city}</p>
-                  </div>
-                )}
-                {selectedSupplier.country && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.country', 'Country')}</p>
-                    <p className="text-base" data-testid="detail-country">{selectedSupplier.country}</p>
-                  </div>
-                )}
-                {selectedSupplier.paymentTerms && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('inventory.paymentTerms', 'Payment Terms')}</p>
-                    <p className="text-base" data-testid="detail-payment-terms">
-                      {selectedSupplier.paymentTerms.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    </p>
+                    <p className="text-sm font-medium text-[#64748B]">{t('common.notes', 'Notes')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{selectedSupplier.notes}</p>
                   </div>
                 )}
               </div>
-              {selectedSupplier.notes && (
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">{t('common.notes', 'Notes')}</p>
-                  <p className="text-base whitespace-pre-wrap" data-testid="detail-notes">{selectedSupplier.notes}</p>
-                </div>
-              )}
-              <div className="flex justify-between pt-4 border-t">
-                <Button
-                  variant="destructive"
-                  onClick={() => deleteSupplier(selectedSupplier.id)}
-                  data-testid="button-delete"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" /> {t('inventory.deleteSupplier', 'Delete Supplier')}
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => handleEdit(selectedSupplier)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-details-edit">
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('common.edit', 'Edit')}
                 </Button>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleEdit(selectedSupplier)} data-testid="button-edit">
-                    <Pencil className="mr-2 h-4 w-4" /> {t('common.edit', 'Edit')}
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsDetailsOpen(false)} data-testid="button-close">
-                    {t('common.close', 'Close')}
-                  </Button>
-                </div>
+                <Button variant="outline" onClick={() => deleteSupplier(selectedSupplier.id)} className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10" data-testid="button-details-delete">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('common.delete', 'Delete')}
+                </Button>
               </div>
             </div>
           )}

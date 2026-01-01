@@ -74,7 +74,7 @@ export default function DocumentManagement() {
       name: "",
       description: "",
       iconName: "FileText",
-      colorCode: "#010101",
+      colorCode: "#0A5ED7",
     }
   });
 
@@ -145,11 +145,11 @@ export default function DocumentManagement() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      active: "bg-salis-black text-white",
-      archived: "bg-salis-gray text-white",
-      expired: "bg-salis-gray-light text-salis-black",
+      active: "bg-green-600 text-white",
+      archived: "bg-[#64748B] text-white",
+      expired: "bg-[#F97316] text-white",
     };
-    return colors[status] || "bg-salis-gray text-white";
+    return colors[status] || "bg-[#64748B] text-white";
   };
 
   const isExpiringSoon = (expirationDate: string | null) => {
@@ -165,20 +165,20 @@ export default function DocumentManagement() {
       label: t('documents.documents', 'Documents'),
       icon: FileText,
       content: (
-        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('documents.documentLibrary', 'Document Library')}</CardTitle>
-            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.documentLibrary', 'Document Library')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('documents.manageDocuments', 'Manage all your documents in one place')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 mb-4">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[200px]" data-testid="select-category-filter">
+                <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category-filter">
                   <SelectValue placeholder={t('documents.filterByCategory', 'Filter by category')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="">{t('documents.allCategories', 'All Categories')}</SelectItem>
                   {categories.map((cat: any) => (
                     <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
@@ -187,10 +187,10 @@ export default function DocumentManagement() {
               </Select>
 
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
+                <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
                   <SelectValue placeholder={t('documents.filterByStatus', 'Filter by status')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="">{t('documents.allStatuses', 'All Statuses')}</SelectItem>
                   <SelectItem value="active">{t('common.active', 'Active')}</SelectItem>
                   <SelectItem value="archived">{t('documents.archived', 'Archived')}</SelectItem>
@@ -200,55 +200,55 @@ export default function DocumentManagement() {
             </div>
 
             {documentsLoading ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('documents.loadingDocuments', 'Loading documents...')}</p>
+              <p className="text-[#64748B]" data-testid="text-loading">{t('documents.loadingDocuments', 'Loading documents...')}</p>
             ) : documents.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-documents">{t('documents.noDocuments', 'No documents found')}</p>
+              <p className="text-[#64748B]" data-testid="text-no-documents">{t('documents.noDocuments', 'No documents found')}</p>
             ) : (
               <div className="grid gap-4">
                 {documents.map((doc: any) => (
                   <Card 
                     key={doc.id} 
-                    className="border-salis-gray-light dark:border-salis-gray-dark hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
+                    className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23]"
                     data-testid={`card-document-${doc.id}`}
                   >
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <FileText className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
-                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-document-name-${doc.id}`}>
+                            <FileText className="h-5 w-5 text-[#0A5ED7]" />
+                            <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-document-name-${doc.id}`}>
                               {doc.documentName}
                             </h3>
                             <Badge className={getStatusColor(doc.status)} data-testid={`badge-status-${doc.id}`}>
                               {doc.status}
                             </Badge>
                             {isExpiringSoon(doc.expirationDate) && (
-                              <Badge className="bg-salis-gray-light text-salis-black" data-testid={`badge-expiring-${doc.id}`}>
+                              <Badge className="bg-[#F97316] text-white" data-testid={`badge-expiring-${doc.id}`}>
                                 <AlertTriangle className="h-3 w-3 mr-1" />
                                 {t('documents.expiringSoon', 'Expiring Soon')}
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-3" data-testid={`text-document-type-${doc.id}`}>
+                          <p className="text-sm text-[#64748B] mb-3" data-testid={`text-document-type-${doc.id}`}>
                             {doc.documentType}
                           </p>
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
-                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('documents.relatedTo', 'Related To')}</p>
-                              <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-related-type-${doc.id}`}>
+                              <p className="text-[#64748B]">{t('documents.relatedTo', 'Related To')}</p>
+                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-related-type-${doc.id}`}>
                                 {doc.relatedType}
                               </p>
                             </div>
                             <div>
-                              <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('documents.uploaded', 'Uploaded')}</p>
-                              <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-created-${doc.id}`}>
+                              <p className="text-[#64748B]">{t('documents.uploaded', 'Uploaded')}</p>
+                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-created-${doc.id}`}>
                                 {doc.createdAt ? format(new Date(doc.createdAt), "MMM dd, yyyy") : "N/A"}
                               </p>
                             </div>
                             {doc.expirationDate && (
                               <div>
-                                <p className="text-salis-gray dark:text-salis-gray-light font-poppins">{t('documents.expires', 'Expires')}</p>
-                                <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-expiration-${doc.id}`}>
+                                <p className="text-[#64748B]">{t('documents.expires', 'Expires')}</p>
+                                <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-expiration-${doc.id}`}>
                                   {format(new Date(doc.expirationDate), "MMM dd, yyyy")}
                                 </p>
                               </div>
@@ -260,7 +260,7 @@ export default function DocumentManagement() {
                             size="sm"
                             variant="outline"
                             onClick={() => window.open(doc.documentUrl, "_blank")}
-                            className="border-salis-gray-light dark:border-salis-gray-dark"
+                            className="border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`button-view-${doc.id}`}
                           >
                             {t('common.view', 'View')}
@@ -273,7 +273,7 @@ export default function DocumentManagement() {
                                 deleteDocumentMutation.mutate(doc.id);
                               }
                             }}
-                            className="border-salis-gray-light dark:border-salis-gray-dark"
+                            className="border-[#E2E8F0] dark:border-[#232A36] text-[#F97316] hover:text-red-700"
                             data-testid={`button-delete-${doc.id}`}
                           >
                             {t('common.delete', 'Delete')}
@@ -294,35 +294,35 @@ export default function DocumentManagement() {
       label: t('documents.categories', 'Categories'),
       icon: Folder,
       content: (
-        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('documents.documentCategories', 'Document Categories')}</CardTitle>
-            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.documentCategories', 'Document Categories')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('documents.organizeDocuments', 'Organize documents into categories')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {categoriesLoading ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-loading-categories">{t('documents.loadingCategories', 'Loading categories...')}</p>
+              <p className="text-[#64748B]" data-testid="text-loading-categories">{t('documents.loadingCategories', 'Loading categories...')}</p>
             ) : categories.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-categories">{t('documents.noCategories', 'No categories found')}</p>
+              <p className="text-[#64748B]" data-testid="text-no-categories">{t('documents.noCategories', 'No categories found')}</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {categories.map((category: any) => (
                   <Card 
                     key={category.id} 
-                    className="border-salis-gray-light dark:border-salis-gray-dark hover:border-salis-gray dark:hover:border-salis-gray transition-colors"
+                    className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23]"
                     data-testid={`card-category-${category.id}`}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <Folder className="h-6 w-6 text-salis-gray dark:text-salis-gray-light" />
+                          <Folder className="h-6 w-6 text-[#0A5ED7]" />
                           <div>
-                            <h3 className="font-medium text-salis-black dark:text-white" data-testid={`text-category-name-${category.id}`}>
+                            <h3 className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-category-name-${category.id}`}>
                               {category.name}
                             </h3>
-                            <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-category-description-${category.id}`}>
+                            <p className="text-sm text-[#64748B]" data-testid={`text-category-description-${category.id}`}>
                               {category.description || t('documents.noDescription', 'No description')}
                             </p>
                           </div>
@@ -335,6 +335,7 @@ export default function DocumentManagement() {
                               deleteCategoryMutation.mutate(category.id);
                             }
                           }}
+                          className="text-[#F97316] hover:text-red-700"
                           data-testid={`button-delete-category-${category.id}`}
                         >
                           {t('common.delete', 'Delete')}
@@ -355,16 +356,16 @@ export default function DocumentManagement() {
       icon: AlertTriangle,
       badge: expiringDocuments.length,
       content: (
-        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('documents.expiringDocuments', 'Expiring Documents')}</CardTitle>
-            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.expiringDocuments', 'Expiring Documents')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('documents.documentsExpiringWithin30Days', 'Documents expiring within the next 30 days')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {expiringDocuments.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-expiring">{t('documents.noExpiringDocuments', 'No expiring documents')}</p>
+              <p className="text-[#64748B]" data-testid="text-no-expiring">{t('documents.noExpiringDocuments', 'No expiring documents')}</p>
             ) : (
               <div className="grid gap-4">
                 {expiringDocuments.map((doc: any) => {
@@ -372,18 +373,18 @@ export default function DocumentManagement() {
                   return (
                     <Card 
                       key={doc.id} 
-                      className="border-salis-gray-light dark:border-salis-gray-dark"
+                      className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]"
                       data-testid={`card-expiring-${doc.id}`}
                     >
                       <CardContent className="p-6">
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-4">
-                            <AlertTriangle className="h-6 w-6 text-salis-gray dark:text-salis-gray-light" />
+                            <AlertTriangle className="h-6 w-6 text-[#F97316]" />
                             <div>
-                              <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-expiring-name-${doc.id}`}>
+                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-expiring-name-${doc.id}`}>
                                 {doc.documentName}
                               </p>
-                              <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">
+                              <p className="text-sm text-[#64748B]">
                                 {t('documents.expiresIn', 'Expires in')} {daysUntilExpiry} {t('documents.days', 'days')} ({format(new Date(doc.expirationDate), "MMM dd, yyyy")})
                               </p>
                             </div>
@@ -391,7 +392,7 @@ export default function DocumentManagement() {
                           <Button
                             size="sm"
                             onClick={() => window.open(doc.documentUrl, "_blank")}
-                            className="bg-salis-black hover:bg-salis-gray-dark text-white"
+                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                             data-testid={`button-view-expiring-${doc.id}`}
                           >
                             {t('common.view', 'View')}
@@ -438,10 +439,10 @@ export default function DocumentManagement() {
       />
 
       <Dialog open={isCreateCategoryDialogOpen} onOpenChange={setIsCreateCategoryDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
+        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('documents.createDocumentCategory', 'Create Document Category')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('documents.createDocumentCategory', 'Create Document Category')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('documents.createCategoryDescription', 'Create a new category to organize your documents')}
             </DialogDescription>
           </DialogHeader>
@@ -452,9 +453,9 @@ export default function DocumentManagement() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.categoryName', 'Category Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.categoryName', 'Category Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('documents.categoryNamePlaceholder', 'Insurance Documents')} data-testid="input-category-name" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('documents.categoryNamePlaceholder', 'Insurance Documents')} data-testid="input-category-name" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -466,9 +467,9 @@ export default function DocumentManagement() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('documents.descriptionPlaceholder', 'For storing insurance-related documents...')} rows={3} data-testid="input-category-description" className="bg-white dark:bg-[#010101]" />
+                      <Textarea {...field} placeholder={t('documents.descriptionPlaceholder', 'For storing insurance-related documents...')} rows={3} data-testid="input-category-description" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -480,7 +481,7 @@ export default function DocumentManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsCreateCategoryDialogOpen(false)}
-                  className="border-salis-gray-light dark:border-salis-gray-dark"
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="button-cancel-category"
                 >
                   {t('common.cancel', 'Cancel')}
@@ -488,10 +489,10 @@ export default function DocumentManagement() {
                 <Button
                   type="submit"
                   disabled={createCategoryMutation.isPending}
-                  className="bg-salis-black hover:bg-salis-gray-dark text-white"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   data-testid="button-submit-category"
                 >
-                  {createCategoryMutation.isPending ? t('documents.creating', 'Creating...') : t('documents.createCategory', 'Create Category')}
+                  {createCategoryMutation.isPending ? t('common.creating', 'Creating...') : t('common.create', 'Create')}
                 </Button>
               </DialogFooter>
             </form>
@@ -500,61 +501,24 @@ export default function DocumentManagement() {
       </Dialog>
 
       <Dialog open={isCreateDocumentDialogOpen} onOpenChange={setIsCreateDocumentDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#010101] border-salis-gray-light dark:border-salis-gray-dark">
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('documents.uploadDocument', 'Upload Document')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
-              {t('documents.addDocumentDescription', 'Add a new document to your library')}
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('documents.uploadDocument', 'Upload Document')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
+              {t('documents.uploadDocumentDescription', 'Add a new document to the library')}
             </DialogDescription>
           </DialogHeader>
           <Form {...documentForm}>
             <form onSubmit={documentForm.handleSubmit(onSubmitDocument)} className="space-y-4">
-              <FormField
-                control={documentForm.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('common.category', 'Category')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-document-category">
-                          <SelectValue placeholder={t('documents.selectCategory', 'Select category')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((cat: any) => (
-                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={documentForm.control}
-                name="documentName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.documentName', 'Document Name')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('documents.documentNamePlaceholder', 'Vehicle Insurance Certificate')} data-testid="input-document-name" className="bg-white dark:bg-[#010101]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={documentForm.control}
-                  name="documentType"
+                  name="documentName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.documentType', 'Document Type')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentName', 'Document Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('documents.documentTypePlaceholder', 'PDF, Image, etc.')} data-testid="input-document-type" className="bg-white dark:bg-[#010101]" />
+                        <Input {...field} placeholder={t('documents.documentNamePlaceholder', 'Insurance Policy')} data-testid="input-document-name" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -563,13 +527,63 @@ export default function DocumentManagement() {
 
                 <FormField
                   control={documentForm.control}
-                  name="expirationDate"
+                  name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.expirationDate', 'Expiration Date')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.category', 'Category')}</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-document-category" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                            <SelectValue placeholder={t('documents.selectCategory', 'Select category')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          {categories.map((cat: any) => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={documentForm.control}
+                  name="documentType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentType', 'Document Type')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="date" data-testid="input-expiration-date" className="bg-white dark:bg-[#010101]" />
+                        <Input {...field} placeholder={t('documents.documentTypePlaceholder', 'PDF')} data-testid="input-document-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={documentForm.control}
+                  name="relatedType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.relatedTo', 'Related To')}</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-related-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="general">{t('documents.general', 'General')}</SelectItem>
+                          <SelectItem value="customer">{t('documents.customer', 'Customer')}</SelectItem>
+                          <SelectItem value="vehicle">{t('documents.vehicle', 'Vehicle')}</SelectItem>
+                          <SelectItem value="job_card">{t('documents.jobCard', 'Job Card')}</SelectItem>
+                          <SelectItem value="invoice">{t('documents.invoice', 'Invoice')}</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -581,9 +595,9 @@ export default function DocumentManagement() {
                 name="documentUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.documentUrl', 'Document URL')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentUrl', 'Document URL')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="https://..." data-testid="input-document-url" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('documents.documentUrlPlaceholder', 'https://...')} data-testid="input-document-url" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -592,24 +606,27 @@ export default function DocumentManagement() {
 
               <FormField
                 control={documentForm.control}
-                name="relatedType"
+                name="expirationDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white font-poppins">{t('documents.relatedTo', 'Related To')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-related-type">
-                          <SelectValue placeholder={t('documents.selectType', 'Select type')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="general">{t('documents.general', 'General')}</SelectItem>
-                        <SelectItem value="customer">{t('documents.customer', 'Customer')}</SelectItem>
-                        <SelectItem value="vehicle">{t('documents.vehicle', 'Vehicle')}</SelectItem>
-                        <SelectItem value="job_card">{t('documents.jobCard', 'Job Card')}</SelectItem>
-                        <SelectItem value="invoice">{t('documents.invoice', 'Invoice')}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.expirationDate', 'Expiration Date')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="date" data-testid="input-expiration-date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={documentForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder={t('documents.descriptionPlaceholder', 'Document description...')} rows={2} data-testid="input-document-description" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -620,7 +637,7 @@ export default function DocumentManagement() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsCreateDocumentDialogOpen(false)}
-                  className="border-salis-gray-light dark:border-salis-gray-dark"
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="button-cancel-document"
                 >
                   {t('common.cancel', 'Cancel')}
@@ -628,10 +645,10 @@ export default function DocumentManagement() {
                 <Button
                   type="submit"
                   disabled={createDocumentMutation.isPending}
-                  className="bg-salis-black hover:bg-salis-gray-dark text-white"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   data-testid="button-submit-document"
                 >
-                  {createDocumentMutation.isPending ? t('documents.uploading', 'Uploading...') : t('documents.uploadDocument', 'Upload Document')}
+                  {createDocumentMutation.isPending ? t('common.uploading', 'Uploading...') : t('common.upload', 'Upload')}
                 </Button>
               </DialogFooter>
             </form>

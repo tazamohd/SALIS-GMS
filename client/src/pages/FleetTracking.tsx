@@ -127,14 +127,14 @@ export default function FleetTracking() {
       label: t('vehicles.fleetOverview', 'Fleet Overview'),
       icon: Map,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t('vehicles.liveFleetOverview', 'Live Fleet Overview')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.liveFleetOverview', 'Live Fleet Overview')}</CardTitle>
             <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
-              <SelectTrigger className="w-64">
+              <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue placeholder={t('vehicles.filterByVehicle', 'Filter by vehicle...')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="all">{t('vehicles.allVehicles', 'All Vehicles')}</SelectItem>
                 {vehicles.map((vehicle: any) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
@@ -147,55 +147,55 @@ export default function FleetTracking() {
           <CardContent>
             {vehicles.length === 0 ? (
               <div className="text-center py-12">
-                <MapPin className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <MapPin className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                <p className="text-[#64748B]">
                   {t('vehicles.noVehiclesFoundAddToTrack', 'No vehicles found. Add vehicles to start tracking.')}
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="border-b">
+                  <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                     <tr className="text-left">
-                      <th className="pb-3">{t('vehicles.vehicle', 'Vehicle')}</th>
-                      <th className="pb-3">{t('common.status', 'Status')}</th>
-                      <th className="pb-3">{t('vehicles.lastKnownLocation', 'Last Known Location')}</th>
-                      <th className="pb-3">{t('vehicles.speed', 'Speed')}</th>
-                      <th className="pb-3">{t('vehicles.lastUpdated', 'Last Updated')}</th>
-                      <th className="pb-3">{t('common.actions', 'Actions')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.lastKnownLocation', 'Last Known Location')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.speed', 'Speed')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.lastUpdated', 'Last Updated')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {vehicles.map((vehicle: any) => (
-                      <tr key={vehicle.id} className="border-b" data-testid={`vehicle-row-${vehicle.id}`}>
+                      <tr key={vehicle.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`vehicle-row-${vehicle.id}`}>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <MapPin className="h-4 w-4 text-[#0A5ED7]" />
                             <div>
-                              <div className="font-medium">{vehicle.make} {vehicle.model}</div>
-                              <div className="text-sm text-gray-500">{vehicle.licensePlate}</div>
+                              <div className="font-medium text-[#0B1F3B] dark:text-white">{vehicle.make} {vehicle.model}</div>
+                              <div className="text-sm text-[#64748B]">{vehicle.licensePlate}</div>
                             </div>
                           </div>
                         </td>
                         <td className="py-3">
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 border-0">
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             {t('common.active', 'Active')}
                           </Badge>
                         </td>
                         <td className="py-3">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className="text-sm text-[#64748B]">
                             {t('vehicles.awaitingGPSData', 'Awaiting GPS data')}
                           </span>
                         </td>
                         <td className="py-3">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">-</span>
+                          <span className="text-sm text-[#64748B]">-</span>
                         </td>
                         <td className="py-3">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">-</span>
+                          <span className="text-sm text-[#64748B]">-</span>
                         </td>
                         <td className="py-3">
-                          <Button size="sm" variant="outline" data-testid={`button-view-${vehicle.id}`}>
+                          <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-${vehicle.id}`}>
                             <Navigation className="h-4 w-4 mr-1" />
                             {t('common.view', 'View')}
                           </Button>
@@ -216,10 +216,10 @@ export default function FleetTracking() {
       icon: Radio,
       badge: geofences.length,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t('vehicles.geofenceZones', 'Geofence Zones')}</CardTitle>
-            <Button onClick={() => setIsGeofenceDialogOpen(true)} data-testid="button-create-geofence">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.geofenceZones', 'Geofence Zones')}</CardTitle>
+            <Button onClick={() => setIsGeofenceDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-create-geofence">
               <Radio className="h-4 w-4 mr-2" />
               {t('vehicles.createGeofence', 'Create Geofence')}
             </Button>
@@ -227,52 +227,52 @@ export default function FleetTracking() {
           <CardContent>
             {geofencesLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#0A5ED7]" />
               </div>
             ) : geofences.length === 0 ? (
               <div className="text-center py-12">
-                <Radio className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <Radio className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                <p className="text-[#64748B]">
                   {t('vehicles.noGeofenceZonesConfigured', 'No geofence zones configured yet')}
                 </p>
-                <Button className="mt-4" onClick={() => setIsGeofenceDialogOpen(true)}>
+                <Button className="mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" onClick={() => setIsGeofenceDialogOpen(true)}>
                   {t('vehicles.createFirstGeofence', 'Create First Geofence')}
                 </Button>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="border-b">
+                  <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                     <tr className="text-left">
-                      <th className="pb-3">{t('vehicles.name', 'Name')}</th>
-                      <th className="pb-3">{t('common.type', 'Type')}</th>
-                      <th className="pb-3">{t('vehicles.center', 'Center')}</th>
-                      <th className="pb-3">{t('vehicles.radius', 'Radius')}</th>
-                      <th className="pb-3">{t('vehicles.alerts', 'Alerts')}</th>
-                      <th className="pb-3">{t('common.status', 'Status')}</th>
-                      <th className="pb-3">{t('common.actions', 'Actions')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.name', 'Name')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.center', 'Center')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.radius', 'Radius')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.alerts', 'Alerts')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</th>
+                      <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {geofences.map((zone: any) => (
-                      <tr key={zone.id} className="border-b" data-testid={`geofence-row-${zone.id}`}>
-                        <td className="py-3 font-medium">{zone.name}</td>
+                      <tr key={zone.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`geofence-row-${zone.id}`}>
+                        <td className="py-3 font-medium text-[#0B1F3B] dark:text-white">{zone.name}</td>
                         <td className="py-3">
-                          <Badge variant="outline">{zone.zoneType}</Badge>
+                          <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{zone.zoneType}</Badge>
                         </td>
-                        <td className="py-3 text-sm font-mono">
+                        <td className="py-3 text-sm font-mono text-[#64748B]">
                           {zone.centerLatitude?.toFixed(4)}, {zone.centerLongitude?.toFixed(4)}
                         </td>
-                        <td className="py-3 text-sm">{zone.radius ? `${zone.radius}m` : '-'}</td>
+                        <td className="py-3 text-sm text-[#64748B]">{zone.radius ? `${zone.radius}m` : '-'}</td>
                         <td className="py-3">
                           <div className="flex gap-1">
-                            {zone.alertOnEntry && <Badge variant="outline" className="text-xs">{t('vehicles.entry', 'Entry')}</Badge>}
-                            {zone.alertOnExit && <Badge variant="outline" className="text-xs">{t('vehicles.exit', 'Exit')}</Badge>}
-                            {!zone.alertOnEntry && !zone.alertOnExit && <span className="text-sm text-gray-500">{t('common.none', 'None')}</span>}
+                            {zone.alertOnEntry && <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">{t('vehicles.entry', 'Entry')}</Badge>}
+                            {zone.alertOnExit && <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">{t('vehicles.exit', 'Exit')}</Badge>}
+                            {!zone.alertOnEntry && !zone.alertOnExit && <span className="text-sm text-[#64748B]">{t('common.none', 'None')}</span>}
                           </div>
                         </td>
                         <td className="py-3">
-                          <Badge className={zone.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 border-0' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 border-0'}>
+                          <Badge className={zone.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0' : 'bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-0'}>
                             {zone.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                           </Badge>
                         </td>
@@ -282,6 +282,7 @@ export default function FleetTracking() {
                             variant="outline" 
                             onClick={() => deleteGeofenceMutation.mutate(zone.id)}
                             disabled={deleteGeofenceMutation.isPending}
+                            className="border-[#E2E8F0] dark:border-[#232A36] text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                             data-testid={`button-delete-${zone.id}`}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -303,45 +304,45 @@ export default function FleetTracking() {
       icon: Route,
       badge: routes.length,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('vehicles.plannedRoutes', 'Planned Routes')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.plannedRoutes', 'Planned Routes')}</CardTitle>
           </CardHeader>
           <CardContent>
             {routesLoading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#0A5ED7]" />
               </div>
             ) : routes.length === 0 ? (
               <div className="text-center py-12">
-                <Route className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <Route className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                <p className="text-[#64748B]">
                   {t('vehicles.noRoutesPlannedYet', 'No routes planned yet')}
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {routes.map((route: any) => (
-                  <div key={route.id} className="p-4 border rounded-lg" data-testid={`route-${route.id}`}>
+                  <div key={route.id} className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`route-${route.id}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-lg">{route.routeName}</h3>
-                      <Badge variant="outline">{route.status}</Badge>
+                      <h3 className="font-medium text-lg text-[#0B1F3B] dark:text-white">{route.routeName}</h3>
+                      <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{route.status}</Badge>
                     </div>
                     {route.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{route.description}</p>
+                      <p className="text-sm text-[#64748B] mb-3">{route.description}</p>
                     )}
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">{t('vehicles.distance', 'Distance')}:</span>
-                        <span className="ml-2 font-medium">{route.totalDistance ? `${route.totalDistance} km` : '-'}</span>
+                        <span className="text-[#64748B]">{t('vehicles.distance', 'Distance')}:</span>
+                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{route.totalDistance ? `${route.totalDistance} km` : '-'}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">{t('vehicles.duration', 'Duration')}:</span>
-                        <span className="ml-2 font-medium">{route.estimatedDuration ? `${route.estimatedDuration} min` : '-'}</span>
+                        <span className="text-[#64748B]">{t('vehicles.duration', 'Duration')}:</span>
+                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{route.estimatedDuration ? `${route.estimatedDuration} min` : '-'}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">{t('vehicles.created', 'Created')}:</span>
-                        <span className="ml-2 font-medium">{format(new Date(route.createdAt), 'PP')}</span>
+                        <span className="text-[#64748B]">{t('vehicles.created', 'Created')}:</span>
+                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{format(new Date(route.createdAt), 'PP')}</span>
                       </div>
                     </div>
                   </div>
@@ -358,35 +359,35 @@ export default function FleetTracking() {
       icon: AlertTriangle,
       badge: geofenceEvents.length,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('vehicles.geofenceEvents', 'Geofence Events')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.geofenceEvents', 'Geofence Events')}</CardTitle>
           </CardHeader>
           <CardContent>
             {geofenceEvents.length === 0 ? (
               <div className="text-center py-12">
-                <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                <p className="text-[#64748B]">
                   {t('vehicles.noGeofenceEventsRecorded', 'No geofence events recorded yet')}
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {geofenceEvents.map((event: any) => (
-                  <div key={event.id} className="p-4 border rounded-lg" data-testid={`event-${event.id}`}>
+                  <div key={event.id} className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`event-${event.id}`}>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
-                        <AlertTriangle className={`h-5 w-5 mt-0.5 ${event.eventType === 'entry' ? 'text-green-500' : 'text-orange-500'}`} />
+                        <AlertTriangle className={`h-5 w-5 mt-0.5 ${event.eventType === 'entry' ? 'text-green-500' : 'text-[#F97316]'}`} />
                         <div>
-                          <div className="font-medium">
+                          <div className="font-medium text-[#0B1F3B] dark:text-white">
                             {event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1)} {t('vehicles.event', 'Event')}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <div className="text-sm text-[#64748B] mt-1">
                             {format(new Date(event.timestamp), 'PPpp')}
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                         {event.eventType}
                       </Badge>
                     </div>
@@ -411,23 +412,23 @@ export default function FleetTracking() {
         headerContent={
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             {[
-              { name: t('vehicles.activeVehicles', 'Active Vehicles'), value: activeVehicles, icon: MapPin, color: 'text-blue-500', bgColor: 'bg-blue-100 dark:bg-blue-900/30' },
+              { name: t('vehicles.activeVehicles', 'Active Vehicles'), value: activeVehicles, icon: MapPin, color: 'text-[#0A5ED7]', bgColor: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20' },
               { name: t('vehicles.activeGeofences', 'Active Geofences'), value: activeGeofences, icon: Radio, color: 'text-green-500', bgColor: 'bg-green-100 dark:bg-green-900/30' },
               { name: t('vehicles.activeRoutes', 'Active Routes'), value: activeRoutes, icon: Route, color: 'text-purple-500', bgColor: 'bg-purple-100 dark:bg-purple-900/30' },
-              { name: t('vehicles.recentEvents', 'Recent Events'), value: recentEvents, icon: AlertTriangle, color: recentEvents > 0 ? 'text-orange-500' : 'text-gray-500', bgColor: recentEvents > 0 ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-gray-100 dark:bg-gray-900/30' },
+              { name: t('vehicles.recentEvents', 'Recent Events'), value: recentEvents, icon: AlertTriangle, color: recentEvents > 0 ? 'text-[#F97316]' : 'text-[#64748B]', bgColor: recentEvents > 0 ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20' : 'bg-[#F8FAFC] dark:bg-[#0E1117]' },
             ].map((stat) => {
               const Icon = stat.icon;
               return (
-                <Card key={stat.name} className="bg-white dark:bg-salis-black">
+                <Card key={stat.name} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                         <Icon className={`h-6 w-6 ${stat.color}`} />
                       </div>
-                      <Badge variant="outline" className="text-xs">{t('vehicles.live', 'Live')}</Badge>
+                      <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">{t('vehicles.live', 'Live')}</Badge>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{stat.name}</h3>
-                    <div className="text-3xl font-bold text-gray-900 dark:text-white" data-testid={`stat-${stat.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <h3 className="text-sm font-medium text-[#64748B] mb-1">{stat.name}</h3>
+                    <div className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid={`stat-${stat.name.toLowerCase().replace(/\s+/g, '-')}`}>
                       {stat.value}
                     </div>
                   </CardContent>
@@ -439,30 +440,31 @@ export default function FleetTracking() {
       />
 
       <Dialog open={isGeofenceDialogOpen} onOpenChange={setIsGeofenceDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('vehicles.createGeofenceZone', 'Create Geofence Zone')}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.createGeofenceZone', 'Create Geofence Zone')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('vehicles.defineCircularGeofenceZone', 'Define a circular geofence zone to monitor vehicle entry and exit events.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">{t('vehicles.zoneName', 'Zone Name')} *</Label>
+              <Label htmlFor="name" className="text-[#0B1F3B] dark:text-white">{t('vehicles.zoneName', 'Zone Name')} *</Label>
               <Input
                 id="name"
                 placeholder={t('vehicles.zoneNamePlaceholder', 'e.g., Downtown Service Area')}
                 value={newGeofence.name}
                 onChange={(e) => setNewGeofence({ ...newGeofence, name: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
             <div>
-              <Label htmlFor="zoneType">{t('vehicles.zoneType', 'Zone Type')}</Label>
+              <Label htmlFor="zoneType" className="text-[#0B1F3B] dark:text-white">{t('vehicles.zoneType', 'Zone Type')}</Label>
               <Select value={newGeofence.zoneType} onValueChange={(value) => setNewGeofence({ ...newGeofence, zoneType: value })}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="service_area">{t('vehicles.serviceArea', 'Service Area')}</SelectItem>
                   <SelectItem value="restricted">{t('vehicles.restrictedArea', 'Restricted Area')}</SelectItem>
                   <SelectItem value="preferred_route">{t('vehicles.preferredRoute', 'Preferred Route')}</SelectItem>
@@ -472,7 +474,7 @@ export default function FleetTracking() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="latitude">{t('vehicles.latitude', 'Latitude')} *</Label>
+                <Label htmlFor="latitude" className="text-[#0B1F3B] dark:text-white">{t('vehicles.latitude', 'Latitude')} *</Label>
                 <Input
                   id="latitude"
                   type="number"
@@ -480,10 +482,11 @@ export default function FleetTracking() {
                   placeholder="e.g., 24.7136"
                   value={newGeofence.centerLatitude}
                   onChange={(e) => setNewGeofence({ ...newGeofence, centerLatitude: e.target.value })}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 />
               </div>
               <div>
-                <Label htmlFor="longitude">{t('vehicles.longitude', 'Longitude')} *</Label>
+                <Label htmlFor="longitude" className="text-[#0B1F3B] dark:text-white">{t('vehicles.longitude', 'Longitude')} *</Label>
                 <Input
                   id="longitude"
                   type="number"
@@ -491,46 +494,32 @@ export default function FleetTracking() {
                   placeholder="e.g., 46.6753"
                   value={newGeofence.centerLongitude}
                   onChange={(e) => setNewGeofence({ ...newGeofence, centerLongitude: e.target.value })}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 />
               </div>
             </div>
             <div>
-              <Label htmlFor="radius">{t('vehicles.radiusMeters', 'Radius (meters)')} *</Label>
+              <Label htmlFor="radius" className="text-[#0B1F3B] dark:text-white">{t('vehicles.radiusMeters', 'Radius (meters)')} *</Label>
               <Input
                 id="radius"
                 type="number"
                 placeholder="e.g., 500"
                 value={newGeofence.radius}
                 onChange={(e) => setNewGeofence({ ...newGeofence, radius: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={newGeofence.alertOnEntry}
-                  onChange={(e) => setNewGeofence({ ...newGeofence, alertOnEntry: e.target.checked })}
-                  className="h-4 w-4"
-                />
-                <span className="text-sm">{t('vehicles.alertOnEntry', 'Alert on Entry')}</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={newGeofence.alertOnExit}
-                  onChange={(e) => setNewGeofence({ ...newGeofence, alertOnExit: e.target.checked })}
-                  className="h-4 w-4"
-                />
-                <span className="text-sm">{t('vehicles.alertOnExit', 'Alert on Exit')}</span>
-              </label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsGeofenceDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsGeofenceDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
               {t('common.cancel', 'Cancel')}
             </Button>
-            <Button onClick={handleCreateGeofence} disabled={createGeofenceMutation.isPending}>
-              {createGeofenceMutation.isPending ? t('vehicles.creating', 'Creating...') : t('vehicles.createGeofence', 'Create Geofence')}
+            <Button 
+              onClick={handleCreateGeofence} 
+              disabled={createGeofenceMutation.isPending}
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+            >
+              {createGeofenceMutation.isPending ? t('common.creating', 'Creating...') : t('vehicles.createGeofence', 'Create Geofence')}
             </Button>
           </DialogFooter>
         </DialogContent>

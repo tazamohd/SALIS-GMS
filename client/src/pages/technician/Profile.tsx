@@ -23,49 +23,48 @@ export default function TechnicianProfile() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/4"></div>
-        <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded"></div>
+      <div className="animate-pulse space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
+        <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4"></div>
+        <div className="h-64 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-2">
           My Profile
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-[#64748B]">
           Your professional information and credentials
         </p>
       </div>
 
-      {/* Basic Info */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                <User className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <User className="h-8 w-8 text-white" />
               </div>
               <div>
-                <CardTitle className="text-gray-900 dark:text-white text-2xl">
+                <CardTitle className="text-[#0B1F3B] dark:text-white text-2xl">
                   {user?.fullName || "Technician"}
                 </CardTitle>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-[#64748B] mt-1">
                   {user?.email}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
               {profile?.level && (
-                <Badge variant="outline" className="text-lg px-4 py-1">
+                <Badge variant="outline" className="text-lg px-4 py-1 border-[#E2E8F0] dark:border-[#232A36]">
                   {profile.level}
                 </Badge>
               )}
               {profile?.isLead && (
-                <Badge className="bg-blue-600 text-lg px-4 py-1">
+                <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-lg px-4 py-1">
                   Lead Technician
                 </Badge>
               )}
@@ -74,20 +73,19 @@ export default function TechnicianProfile() {
         </CardHeader>
       </Card>
 
-      {/* Professional Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profile?.speciality && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <Briefcase className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <Briefcase className="h-6 w-6 text-[#0A5ED7]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-[#64748B] mb-1">
                     Speciality
                   </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
                     {profile.speciality}
                   </p>
                 </div>
@@ -97,17 +95,17 @@ export default function TechnicianProfile() {
         )}
 
         {profile?.yearsOfExperience !== undefined && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                   <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-[#64748B] mb-1">
                     Experience
                   </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
                     {profile.yearsOfExperience} years
                   </p>
                 </div>
@@ -117,17 +115,17 @@ export default function TechnicianProfile() {
         )}
 
         {profile?.maxConcurrentJobs !== undefined && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <Wrench className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                  <Wrench className="h-6 w-6 text-[#F97316]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-[#64748B] mb-1">
                     Job Capacity
                   </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
                     Up to {profile.maxConcurrentJobs} jobs
                   </p>
                 </div>
@@ -137,17 +135,17 @@ export default function TechnicianProfile() {
         )}
 
         {profile?.rating && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                   <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-sm text-[#64748B] mb-1">
                     Rating
                   </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
                     {profile.rating.toFixed(1)} / 5.0
                   </p>
                 </div>
@@ -157,20 +155,19 @@ export default function TechnicianProfile() {
         )}
       </div>
 
-      {/* Skills & Qualifications */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {profile?.qualifications && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <GraduationCap className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                <CardTitle className="text-gray-900 dark:text-white">
+                <GraduationCap className="h-5 w-5 text-[#64748B]" />
+                <CardTitle className="text-[#0B1F3B] dark:text-white">
                   Qualifications
                 </CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-[#0B1F3B] dark:text-gray-300">
                 {profile.qualifications}
               </p>
             </CardContent>
@@ -178,17 +175,17 @@ export default function TechnicianProfile() {
         )}
 
         {profile?.certifications && (
-          <Card className="bg-white dark:bg-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <Award className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                <CardTitle className="text-gray-900 dark:text-white">
+                <Award className="h-5 w-5 text-[#64748B]" />
+                <CardTitle className="text-[#0B1F3B] dark:text-white">
                   Certifications
                 </CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-[#0B1F3B] dark:text-gray-300">
                 {profile.certifications}
               </p>
             </CardContent>
@@ -197,17 +194,17 @@ export default function TechnicianProfile() {
       </div>
 
       {profile?.skills && (
-        <Card className="bg-white dark:bg-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <Wrench className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              <CardTitle className="text-gray-900 dark:text-white">
+              <Wrench className="h-5 w-5 text-[#64748B]" />
+              <CardTitle className="text-[#0B1F3B] dark:text-white">
                 Skills
               </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 dark:text-gray-300">{profile.skills}</p>
+            <p className="text-[#0B1F3B] dark:text-gray-300">{profile.skills}</p>
           </CardContent>
         </Card>
       )}

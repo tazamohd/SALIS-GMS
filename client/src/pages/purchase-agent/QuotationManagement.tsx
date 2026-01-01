@@ -207,7 +207,7 @@ export default function QuotationManagement() {
     const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; className?: string }> = {
       draft: { variant: "outline", label: "Draft" },
       sent: { variant: "secondary", label: "Sent to Suppliers" },
-      received: { variant: "default", label: "Quotations Received", className: "bg-blue-500" },
+      received: { variant: "default", label: "Quotations Received", className: "bg-[#0A5ED7]" },
       selected: { variant: "default", label: "Supplier Selected", className: "bg-green-500" },
       cancelled: { variant: "destructive", label: "Cancelled" },
     };
@@ -235,8 +235,8 @@ export default function QuotationManagement() {
   };
 
   const stats = [
-    { label: "Total Requests", value: requests.length, icon: FileText, color: "text-blue-500" },
-    { label: "Awaiting Response", value: requests.filter(r => r.status === "sent").length, icon: Clock, color: "text-orange-500" },
+    { label: "Total Requests", value: requests.length, icon: FileText, color: "text-[#0A5ED7]" },
+    { label: "Awaiting Response", value: requests.filter(r => r.status === "sent").length, icon: Clock, color: "text-[#F97316]" },
     { label: "Ready to Select", value: requests.filter(r => r.status === "received").length, icon: CheckCircle, color: "text-green-500" },
     { label: "Completed", value: requests.filter(r => r.status === "selected").length, icon: Package, color: "text-purple-500" },
   ];
@@ -245,14 +245,14 @@ export default function QuotationManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
             Quotation Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-[#64748B] mt-1">
             Manage supplier quotations with store location information and pricing details
           </p>
         </div>
-        <Button data-testid="button-new-quotation-request">
+        <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-new-quotation-request">
           <Plus className="h-4 w-4 mr-2" />
           New Request
         </Button>
@@ -260,15 +260,15 @@ export default function QuotationManagement() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.label} data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+          <Card key={stat.label} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
+                <div className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{stat.value}</p>
+                  <p className="text-sm text-[#64748B]">{stat.label}</p>
                 </div>
               </div>
             </CardContent>
@@ -276,23 +276,23 @@ export default function QuotationManagement() {
         ))}
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <FileText className="h-5 w-5 text-[#0A5ED7]" />
                 Quotation Requests
               </CardTitle>
-              <CardDescription>Compare and select the best supplier quotations</CardDescription>
+              <CardDescription className="text-[#64748B]">Compare and select the best supplier quotations</CardDescription>
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder="Search requests..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64"
+                className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-requests"
               />
             </div>
@@ -310,42 +310,42 @@ export default function QuotationManagement() {
             <TabsContent value={activeTab} className="space-y-4">
               {filteredRequests.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No quotation requests found</p>
+                  <FileText className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
+                  <p className="text-[#64748B]">No quotation requests found</p>
                 </div>
               ) : (
                 filteredRequests.map((request) => (
                   <div
                     key={request.id}
-                    className="border rounded-lg p-4 hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+                    className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`request-${request.id}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-mono text-sm text-gray-500">{request.requestNumber}</span>
+                          <span className="font-mono text-sm text-[#64748B]">{request.requestNumber}</span>
                           {getStatusBadge(request.status)}
                           {request.quotations.length > 0 && (
-                            <Badge variant="outline">{request.quotations.length} Quotations</Badge>
+                            <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{request.quotations.length} Quotations</Badge>
                           )}
                         </div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{request.title}</h3>
-                        <p className="text-sm text-gray-500">Task: {request.taskNumber}</p>
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{request.title}</h3>
+                        <p className="text-sm text-[#64748B]">Task: {request.taskNumber}</p>
                         
                         <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-[#64748B]">
                             <MapPin className="h-4 w-4" />
                             <span>{request.storeLocation}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-[#64748B]">
                             <Clock className="h-4 w-4" />
                             <span>Due: {new Date(request.dueDate).toLocaleDateString()}</span>
                           </div>
                         </div>
 
                         {request.quotations.length > 0 && request.status === "received" && (
-                          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <p className="text-xs text-gray-500 mb-2">Price Comparison:</p>
+                          <div className="mt-4 p-3 bg-white dark:bg-[#151A23] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                            <p className="text-xs text-[#64748B] mb-2">Price Comparison:</p>
                             <div className="flex flex-wrap gap-3">
                               {request.quotations.map((q) => (
                                 <div
@@ -353,12 +353,12 @@ export default function QuotationManagement() {
                                   className={`flex items-center gap-2 px-3 py-1.5 rounded border ${
                                     q.isRecommended
                                       ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                                      : "border-gray-200 dark:border-gray-700"
+                                      : "border-[#E2E8F0] dark:border-[#232A36]"
                                   }`}
                                 >
                                   {q.isRecommended && <Star className="h-3 w-3 text-green-500" />}
-                                  <span className="text-sm font-medium">{q.supplierName}</span>
-                                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                  <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{q.supplierName}</span>
+                                  <span className="text-sm font-bold text-[#0B1F3B] dark:text-white">
                                     {q.totalPrice} {q.currency}
                                   </span>
                                 </div>
@@ -374,6 +374,7 @@ export default function QuotationManagement() {
                             <Button
                               variant="outline"
                               size="sm"
+                              className="border-[#E2E8F0] dark:border-[#232A36]"
                               onClick={() => setSelectedRequest(request)}
                               data-testid={`button-view-request-${request.id}`}
                             >
@@ -381,29 +382,29 @@ export default function QuotationManagement() {
                               View
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-[#151A23]">
                             <DialogHeader>
-                              <DialogTitle>Quotation Request - {request.requestNumber}</DialogTitle>
-                              <DialogDescription>{request.title}</DialogDescription>
+                              <DialogTitle className="text-[#0B1F3B] dark:text-white">Quotation Request - {request.requestNumber}</DialogTitle>
+                              <DialogDescription className="text-[#64748B]">{request.title}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                              <div className="grid grid-cols-2 gap-4 p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                                 <div>
-                                  <p className="text-sm text-gray-500">Store Location</p>
-                                  <p className="font-medium flex items-center gap-1">
+                                  <p className="text-sm text-[#64748B]">Store Location</p>
+                                  <p className="font-medium flex items-center gap-1 text-[#0B1F3B] dark:text-white">
                                     <MapPin className="h-4 w-4" />
                                     {request.storeLocation}
                                   </p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">Due Date</p>
-                                  <p className="font-medium">{new Date(request.dueDate).toLocaleDateString()}</p>
+                                  <p className="text-sm text-[#64748B]">Due Date</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">{new Date(request.dueDate).toLocaleDateString()}</p>
                                 </div>
                               </div>
 
                               {request.quotations.length > 0 ? (
                                 <div>
-                                  <h4 className="font-semibold mb-3">Supplier Quotations</h4>
+                                  <h4 className="font-semibold mb-3 text-[#0B1F3B] dark:text-white">Supplier Quotations</h4>
                                   <RadioGroup
                                     value={selectedQuotation?.toString() || ""}
                                     onValueChange={(v) => setSelectedQuotation(parseInt(v))}
@@ -415,7 +416,7 @@ export default function QuotationManagement() {
                                           className={`border rounded-lg p-4 ${
                                             quotation.isRecommended
                                               ? "border-green-500 bg-green-50/50 dark:bg-green-900/10"
-                                              : ""
+                                              : "border-[#E2E8F0] dark:border-[#232A36]"
                                           }`}
                                         >
                                           <div className="flex items-start gap-3">
@@ -429,7 +430,7 @@ export default function QuotationManagement() {
                                                 <div className="flex items-center gap-2">
                                                   <Label
                                                     htmlFor={`quotation-${quotation.id}`}
-                                                    className="font-semibold text-lg cursor-pointer"
+                                                    className="font-semibold text-lg cursor-pointer text-[#0B1F3B] dark:text-white"
                                                   >
                                                     {quotation.supplierName}
                                                   </Label>
@@ -441,58 +442,58 @@ export default function QuotationManagement() {
                                                   )}
                                                   <div className="flex items-center gap-1">
                                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                                                    <span className="text-sm">{quotation.supplierRating}</span>
+                                                    <span className="text-sm text-[#64748B]">{quotation.supplierRating}</span>
                                                   </div>
                                                 </div>
                                                 <div className="text-right">
-                                                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                                                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                                                     {quotation.totalPrice} {quotation.currency}
                                                   </p>
-                                                  <p className="text-sm text-gray-500">
+                                                  <p className="text-sm text-[#64748B]">
                                                     Valid until {new Date(quotation.validUntil).toLocaleDateString()}
                                                   </p>
                                                 </div>
                                               </div>
 
                                               <div className="grid grid-cols-3 gap-4 text-sm mb-3">
-                                                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                                <div className="flex items-center gap-1 text-[#64748B]">
                                                   <MapPin className="h-4 w-4" />
                                                   {quotation.supplierLocation}
                                                 </div>
-                                                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                                <div className="flex items-center gap-1 text-[#64748B]">
                                                   <Truck className="h-4 w-4" />
                                                   {quotation.deliveryTime}
                                                 </div>
-                                                <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                                <div className="flex items-center gap-1 text-[#64748B]">
                                                   <DollarSign className="h-4 w-4" />
                                                   {quotation.paymentTerms}
                                                 </div>
                                               </div>
 
-                                              <div className="border rounded overflow-hidden">
+                                              <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded overflow-hidden">
                                                 <table className="w-full text-sm">
-                                                  <thead className="bg-gray-100 dark:bg-gray-700">
+                                                  <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                                                     <tr>
-                                                      <th className="px-3 py-2 text-left">Part</th>
-                                                      <th className="px-3 py-2 text-center">Qty</th>
-                                                      <th className="px-3 py-2 text-right">Unit Price</th>
-                                                      <th className="px-3 py-2 text-center">Availability</th>
-                                                      <th className="px-3 py-2 text-center">Lead Time</th>
+                                                      <th className="px-3 py-2 text-left text-[#0B1F3B] dark:text-white">Part</th>
+                                                      <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Qty</th>
+                                                      <th className="px-3 py-2 text-right text-[#0B1F3B] dark:text-white">Unit Price</th>
+                                                      <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Availability</th>
+                                                      <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Lead Time</th>
                                                     </tr>
                                                   </thead>
                                                   <tbody>
                                                     {quotation.items.map((item, idx) => (
-                                                      <tr key={idx} className="border-t">
+                                                      <tr key={idx} className="border-t border-[#E2E8F0] dark:border-[#232A36]">
                                                         <td className="px-3 py-2">
-                                                          <p className="font-medium">{item.partName}</p>
-                                                          <p className="text-xs text-gray-500">{item.partNumber}</p>
+                                                          <p className="font-medium text-[#0B1F3B] dark:text-white">{item.partName}</p>
+                                                          <p className="text-xs text-[#64748B]">{item.partNumber}</p>
                                                         </td>
-                                                        <td className="px-3 py-2 text-center">{item.quantity}</td>
-                                                        <td className="px-3 py-2 text-right">{item.unitPrice} SAR</td>
+                                                        <td className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">{item.quantity}</td>
+                                                        <td className="px-3 py-2 text-right font-medium text-[#0B1F3B] dark:text-white">{item.unitPrice} SAR</td>
                                                         <td className="px-3 py-2 text-center">
                                                           {getAvailabilityBadge(item.availability)}
                                                         </td>
-                                                        <td className="px-3 py-2 text-center">{item.leadTime}</td>
+                                                        <td className="px-3 py-2 text-center text-[#64748B]">{item.leadTime}</td>
                                                       </tr>
                                                     ))}
                                                   </tbody>
@@ -500,9 +501,7 @@ export default function QuotationManagement() {
                                               </div>
 
                                               {quotation.notes && (
-                                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 italic">
-                                                  Note: {quotation.notes}
-                                                </p>
+                                                <p className="text-sm text-[#64748B] mt-2 italic">{quotation.notes}</p>
                                               )}
                                             </div>
                                           </div>
@@ -511,30 +510,24 @@ export default function QuotationManagement() {
                                     </div>
                                   </RadioGroup>
 
-                                  <div className="flex justify-end gap-2 mt-4">
-                                    <Button
-                                      variant="outline"
-                                      disabled={!selectedQuotation}
-                                      data-testid="button-request-revision"
-                                    >
-                                      Request Revision
-                                    </Button>
-                                    <Button
-                                      disabled={!selectedQuotation}
-                                      onClick={() => selectedQuotation && handleSelectQuotation(selectedQuotation)}
-                                      data-testid="button-confirm-selection"
-                                    >
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Confirm Selection
-                                    </Button>
-                                  </div>
+                                  {request.status === "received" && (
+                                    <div className="flex justify-end mt-4">
+                                      <Button
+                                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+                                        disabled={!selectedQuotation}
+                                        onClick={() => selectedQuotation && handleSelectQuotation(selectedQuotation)}
+                                        data-testid="button-confirm-selection"
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Confirm Selection & Create Order
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
                               ) : (
-                                <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                  <p className="text-gray-600 dark:text-gray-400">
-                                    Waiting for supplier quotations...
-                                  </p>
+                                <div className="text-center py-8">
+                                  <Clock className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
+                                  <p className="text-[#64748B]">Waiting for supplier quotations...</p>
                                 </div>
                               )}
                             </div>

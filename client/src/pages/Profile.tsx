@@ -46,8 +46,8 @@ export function Profile() {
         icon={UserIcon}
       >
         <div className="animate-pulse space-y-4">
-          <div className="h-64 bg-gray-200 rounded"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg"></div>
+          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg"></div>
         </div>
       </StandardPageLayout>
     );
@@ -73,115 +73,112 @@ export function Profile() {
       ] : []}
     >
 
-      {/* Personal Details */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.personalDetails', 'Personal Details')}</h2>
+          <h2 className="font-poppins font-semibold text-lg text-[#0B1F3B] dark:text-white mb-6">{t('profile.personalDetails', 'Personal Details')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.fullName', 'Full Name')}
               </Label>
               <Input
                 defaultValue={user?.fullName || "John Doe"}
                 disabled={!isEditing}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-full-name"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.email', 'Email')}
               </Label>
               <Input
                 defaultValue={user?.email || "example@email.com"}
                 disabled={!isEditing}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-email"
               />
             </div>
           </div>
 
           <div className="mb-4">
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+            <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
               {t('profile.mobileNumber', 'Mobile Number')}
             </Label>
             <Input
               defaultValue="+971 51 234 5678"
               disabled={!isEditing}
-              className="border-gray-200 dark:border-salis-gray-dark"
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-mobile"
             />
           </div>
 
-          <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" data-testid="button-add-phone">
+          <Button variant="ghost" className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:text-[#0952C0] dark:hover:text-[#0AA3EE]" data-testid="button-add-phone">
             + {t('profile.addAdditionalPhone', 'Add an additional phone number')}
           </Button>
         </CardContent>
       </Card>
 
-      {/* Role and Specialization */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.roleAndSpecialization', 'Role and Specialization')}</h2>
+          <h2 className="font-poppins font-semibold text-lg text-[#0B1F3B] dark:text-white mb-6">{t('profile.roleAndSpecialization', 'Role and Specialization')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.jobTitle', 'Job Title')}
               </Label>
               <Input
                 defaultValue="Senior Mechanic"
                 disabled={!isEditing}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-job-title"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.specialization', 'Specialization')}
               </Label>
               <Input
                 defaultValue="Engine Repair, Electrical Systems, Diagnostics"
                 disabled={!isEditing}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-specialization"
               />
             </div>
           </div>
 
           <div>
-            <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+            <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
               {t('profile.certifications', 'Certifications')}
             </Label>
             <Input
               defaultValue="ASE, EV Technician"
               disabled={!isEditing}
-              className="border-gray-200 dark:border-salis-gray-dark"
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-certifications"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Availability */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardContent className="p-6">
-          <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white mb-6">{t('profile.availability', 'Availability')}</h2>
+          <h2 className="font-poppins font-semibold text-lg text-[#0B1F3B] dark:text-white mb-6">{t('profile.availability', 'Availability')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('common.from', 'From')}
               </Label>
               <Select disabled={!isEditing} defaultValue="sunday">
-                <SelectTrigger data-testid="select-from-day">
+                <SelectTrigger data-testid="select-from-day" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="sunday">{t('profile.sunday', 'Sunday')}</SelectItem>
                   <SelectItem value="monday">{t('profile.monday', 'Monday')}</SelectItem>
                   <SelectItem value="tuesday">{t('profile.tuesday', 'Tuesday')}</SelectItem>
@@ -194,14 +191,14 @@ export function Profile() {
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('common.to', 'To')}
               </Label>
               <Select disabled={!isEditing} defaultValue="tuesday">
-                <SelectTrigger data-testid="select-to-day">
+                <SelectTrigger data-testid="select-to-day" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="sunday">{t('profile.sunday', 'Sunday')}</SelectItem>
                   <SelectItem value="monday">{t('profile.monday', 'Monday')}</SelectItem>
                   <SelectItem value="tuesday">{t('profile.tuesday', 'Tuesday')}</SelectItem>
@@ -216,26 +213,26 @@ export function Profile() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.workHours', 'Work hours')}
               </Label>
               <Input
-                defaultValue="ASE, EV Technician"
+                defaultValue="8:00 AM - 5:00 PM"
                 disabled={!isEditing}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-work-hours"
               />
             </div>
 
             <div>
-              <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+              <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                 {t('profile.currentStatus', 'Current Status')}
               </Label>
               <Select disabled={!isEditing} defaultValue="available">
-                <SelectTrigger data-testid="select-current-status">
+                <SelectTrigger data-testid="select-current-status" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="available">{t('profile.available', 'Available')}</SelectItem>
                   <SelectItem value="busy">{t('profile.busy', 'Busy')}</SelectItem>
                   <SelectItem value="off">{t('profile.offDuty', 'Off Duty')}</SelectItem>
@@ -246,14 +243,14 @@ export function Profile() {
         </CardContent>
       </Card>
 
-      {/* Change Password */}
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">{t('profile.changePassword', 'Change Password')}</h2>
+            <h2 className="font-poppins font-semibold text-lg text-[#0B1F3B] dark:text-white">{t('profile.changePassword', 'Change Password')}</h2>
             <Button
               variant="outline"
               onClick={() => setIsChangingPassword(!isChangingPassword)}
+              className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
               data-testid="button-toggle-password"
             >
               {isChangingPassword ? t('common.cancel', 'Cancel') : t('profile.changePassword', 'Change Password')}
@@ -263,46 +260,55 @@ export function Profile() {
           {isChangingPassword && (
             <div className="space-y-4">
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+                <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                   {t('profile.currentPassword', 'Current Password')}
                 </Label>
                 <Input
                   type="password"
                   placeholder={t('profile.enterCurrentPassword', 'Enter Current password')}
-                  className="border-gray-200 dark:border-salis-gray-dark"
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                   data-testid="input-current-password"
                 />
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+                <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                   {t('profile.newPassword', 'New Password')}
                 </Label>
                 <Input
                   type="password"
-                  placeholder="********"
-                  className="border-gray-200 dark:border-salis-gray-dark"
+                  placeholder="••••••••"
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                   data-testid="input-new-password"
                 />
               </div>
 
               <div>
-                <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
+                <Label className="font-poppins font-medium text-sm text-[#0B1F3B] dark:text-white mb-2 block">
                   {t('profile.confirmPassword', 'Confirm Password')}
                 </Label>
                 <Input
                   type="password"
-                  placeholder="********"
-                  className="border-gray-200 dark:border-salis-gray-dark"
+                  placeholder="••••••••"
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                   data-testid="input-confirm-password"
                 />
               </div>
 
               <div className="flex gap-4 pt-4">
-                <Button variant="outline" onClick={() => setIsChangingPassword(false)} data-testid="button-cancel-password">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsChangingPassword(false)} 
+                  className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                  data-testid="button-cancel-password"
+                >
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button onClick={handleChangePassword} data-testid="button-save-password">
+                <Button 
+                  onClick={handleChangePassword} 
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                  data-testid="button-save-password"
+                >
                   {t('common.save', 'Save')}
                 </Button>
               </div>

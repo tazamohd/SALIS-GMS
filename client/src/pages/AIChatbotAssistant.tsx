@@ -119,18 +119,18 @@ export default function AIChatbotAssistant() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
-          <Card className="h-[600px] flex flex-col">
+          <Card className="h-[600px] flex flex-col bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('aiChatbot.chatWithAssistant', 'Chat with AI Assistant')}</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('aiChatbot.chatWithAssistant', 'Chat with AI Assistant')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('aiChatbot.getInstantHelp', 'Get instant help with service questions and vehicle issues')}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-4" data-testid="chat-messages">
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4" data-testid="chat-messages">
                 {messages.length === 0 && (
-                  <div className="text-center text-gray-500 dark:text-gray-400 py-12">
-                    <Bot className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+                  <div className="text-center text-[#64748B] py-12">
+                    <Bot className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
                     <p>{t('aiChatbot.startConversation', 'Start a conversation! Ask me anything about')}:</p>
                     <ul className="mt-2 space-y-1 text-sm">
                       <li>• {t('aiChatbot.servicePricingAvailability', 'Service pricing and availability')}</li>
@@ -148,21 +148,21 @@ export default function AIChatbotAssistant() {
                     data-testid={`message-${msg.role}`}
                   >
                     {msg.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center flex-shrink-0">
                         <Bot className="w-5 h-5 text-white" />
                       </div>
                     )}
                     <div
                       className={`max-w-[70%] rounded-lg p-3 ${
                         msg.role === "user"
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                          : "bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       }`}
                     >
                       <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
                     </div>
                     {msg.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-[#64748B] flex items-center justify-center flex-shrink-0">
                         <User className="w-5 h-5 text-white" />
                       </div>
                     )}
@@ -171,11 +171,11 @@ export default function AIChatbotAssistant() {
 
                 {sendMessageMutation.isPending && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
                       <Bot className="w-5 h-5 text-white" />
                     </div>
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
-                      <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+                    <div className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-3">
+                      <Loader2 className="w-5 h-5 animate-spin text-[#0A5ED7]" />
                     </div>
                   </div>
                 )}
@@ -191,12 +191,13 @@ export default function AIChatbotAssistant() {
                   placeholder={t('aiChatbot.typeYourMessage', 'Type your message...')}
                   disabled={sendMessageMutation.isPending || !conversationId}
                   data-testid="chat-input"
-                  className="flex-1"
+                  className="flex-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || sendMessageMutation.isPending || !conversationId}
                   data-testid="send-button"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                 >
                   {sendMessageMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -210,61 +211,61 @@ export default function AIChatbotAssistant() {
         </div>
 
         <div className="space-y-4">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="text-lg">{t('aiChatbot.quickActions', 'Quick Actions')}</CardTitle>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('aiChatbot.quickActions', 'Quick Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => handleQuickAction(t('aiChatbot.bookOilChangeMessage', 'I need to book an oil change service'))}
                 data-testid="quick-oil-change"
               >
-                <Calendar className="w-4 h-4 mr-2" />
+                <Calendar className="w-4 h-4 mr-2 text-[#0A5ED7]" />
                 {t('aiChatbot.bookOilChange', 'Book Oil Change')}
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => handleQuickAction(t('aiChatbot.viewServicesMessage', 'What services do you offer?'))}
                 data-testid="quick-services"
               >
-                <Wrench className="w-4 h-4 mr-2" />
+                <Wrench className="w-4 h-4 mr-2 text-[#0A5ED7]" />
                 {t('aiChatbot.viewServices', 'View Services')}
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F97316]/10 hover:border-[#F97316]"
                 onClick={() => handleQuickAction(t('aiChatbot.checkEngineLightMessage', 'My check engine light is on. What should I do?'))}
                 data-testid="quick-diagnosis"
               >
-                <AlertCircle className="w-4 h-4 mr-2" />
+                <AlertCircle className="w-4 h-4 mr-2 text-[#F97316]" />
                 {t('aiChatbot.checkEngineLight', 'Check Engine Light')}
               </Button>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="text-lg">{t('aiChatbot.features', 'Features')}</CardTitle>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('aiChatbot.features', 'Features')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.aiBadge', 'AI')}</Badge>
-                <span className="text-gray-600 dark:text-gray-400">
+                <Badge variant="outline" className="mt-0.5 border-[#0A5ED7] text-[#0A5ED7]">{t('aiChatbot.aiBadge', 'AI')}</Badge>
+                <span className="text-[#64748B]">
                   {t('aiChatbot.naturalLanguageUnderstanding', 'Natural language understanding')}
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.alwaysAvailable', '24/7')}</Badge>
-                <span className="text-gray-600 dark:text-gray-400">
+                <Badge variant="outline" className="mt-0.5 border-[#0A5ED7] text-[#0A5ED7]">{t('aiChatbot.alwaysAvailable', '24/7')}</Badge>
+                <span className="text-[#64748B]">
                   {t('aiChatbot.alwaysAvailableDesc', 'Always available')}
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <Badge variant="outline" className="mt-0.5">{t('aiChatbot.smartBadge', 'Smart')}</Badge>
-                <span className="text-gray-600 dark:text-gray-400">
+                <Badge variant="outline" className="mt-0.5 border-[#0A5ED7] text-[#0A5ED7]">{t('aiChatbot.smartBadge', 'Smart')}</Badge>
+                <span className="text-[#64748B]">
                   {t('aiChatbot.contextAwareResponses', 'Context-aware responses')}
                 </span>
               </div>

@@ -76,31 +76,31 @@ export default function InsuranceClaims() {
       label: t('payments.insurance.totalClaims', 'Total Claims'),
       value: stats.totalClaims,
       icon: FileText,
-      color: "text-blue-600",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('payments.insurance.pendingReview', 'Pending Review'),
       value: stats.pendingReview,
       icon: Shield,
-      color: "text-yellow-600",
+      color: "text-[#F97316]",
     },
     {
       label: t('payments.insurance.approvalRate', 'Approval Rate'),
       value: `${stats.approvalRate}%`,
       icon: TrendingUp,
-      color: "text-green-600",
+      color: "text-[#0BB3FF]",
     },
     {
       label: t('payments.insurance.totalValue', 'Total Value'),
       value: `$${Math.round(stats.totalValue).toLocaleString()}`,
       icon: DollarSign,
-      color: "text-purple-600",
+      color: "text-[#0A5ED7]",
     },
   ];
 
   return (
     <DashboardPage
-      title={t('payments.insurance.title', '🛡️ Insurance Claims')}
+      title={t('payments.insurance.title', 'Insurance Claims')}
       description={t('payments.insurance.description', 'Manage and track insurance claims')}
       icon={Shield}
       metrics={metrics}
@@ -121,42 +121,51 @@ export default function InsuranceClaims() {
         }}
         disabled={createClaimMutation.isPending}
         data-testid="button-create-claim"
-        className="absolute top-8 right-8"
+        className="absolute top-8 right-8 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
       >
         {createClaimMutation.isPending ? t('common.submitting', 'Submitting...') : t('payments.insurance.submitClaim', 'Submit Claim')}
       </Button>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('payments.insurance.recentClaims', 'Recent Claims')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.insurance.recentClaims', 'Recent Claims')}</CardTitle>
         </CardHeader>
         <CardContent>
           {claimsLoading ? (
-            <div className="text-center py-8 text-gray-500">{t('common.loading', 'Loading claims...')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('common.loading', 'Loading claims...')}</div>
           ) : claims.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('payments.insurance.noClaimsFound', 'No insurance claims found')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('payments.insurance.noClaimsFound', 'No insurance claims found')}</div>
           ) : (
             <div className="space-y-3">
               {claims.map((claim) => (
-                <div key={claim.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`claim-${claim.id}`}>
+                <div key={claim.id} className="flex items-start justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`claim-${claim.id}`}>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{claim.claimNumber}</h3>
-                      <Badge variant={claim.status === "paid" ? "default" : claim.status === "approved" ? "secondary" : "outline"}>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{claim.claimNumber}</h3>
+                      <Badge 
+                        variant={claim.status === "paid" ? "default" : claim.status === "approved" ? "secondary" : "outline"}
+                        className={
+                          claim.status === "paid" 
+                            ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
+                            : claim.status === "approved" 
+                            ? "bg-[#0A5ED7] text-white" 
+                            : "border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
+                        }
+                      >
                         {claim.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-900 dark:text-white mb-1">
+                    <p className="text-sm text-[#0B1F3B] dark:text-white mb-1">
                       {claim.claimType} - {claim.insuranceCompany}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       Policy: {claim.policyNumber} • {new Date(claim.incidentDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">${Number(claim.claimAmount || 0).toLocaleString()}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${Number(claim.claimAmount || 0).toLocaleString()}</p>
                     {claim.approvedAmount && (
-                      <p className="text-sm text-green-600">{t('payments.insurance.approved', 'Approved')}: ${Number(claim.approvedAmount).toLocaleString()}</p>
+                      <p className="text-sm text-[#0BB3FF]">{t('payments.insurance.approved', 'Approved')}: ${Number(claim.approvedAmount).toLocaleString()}</p>
                     )}
                   </div>
                 </div>

@@ -76,19 +76,19 @@ export default function PaymentGatewaySimulator() {
       icon={CreditCard}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('paymentSimulator.simulatePayment', 'Simulate Payment')}</CardTitle>
-            <CardDescription>{t('paymentSimulator.testPaymentFlow', 'Test payment processing flow')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.simulatePayment', 'Simulate Payment')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('paymentSimulator.testPaymentFlow', 'Test payment processing flow')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="gateway">{t('paymentSimulator.paymentGateway', 'Payment Gateway')}</Label>
+              <Label htmlFor="gateway" className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.paymentGateway', 'Payment Gateway')}</Label>
               <Select value={gateway} onValueChange={setGateway}>
-                <SelectTrigger id="gateway" data-testid="select-gateway">
+                <SelectTrigger id="gateway" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-gateway">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="stripe">Stripe</SelectItem>
                   <SelectItem value="paypal">PayPal</SelectItem>
                   <SelectItem value="square">Square</SelectItem>
@@ -98,7 +98,7 @@ export default function PaymentGatewaySimulator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount">{t('paymentSimulator.amountDollar', 'Amount ($)')}</Label>
+              <Label htmlFor="amount" className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.amountDollar', 'Amount ($)')}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -106,20 +106,22 @@ export default function PaymentGatewaySimulator() {
                 placeholder="100.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-amount"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cardNumber">{t('paymentSimulator.cardNumberTest', 'Card Number (Test)')}</Label>
+              <Label htmlFor="cardNumber" className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.cardNumberTest', 'Card Number (Test)')}</Label>
               <Input
                 id="cardNumber"
                 placeholder="4242 4242 4242 4242"
                 value={cardNumber}
                 onChange={(e) => setCardNumber(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-card-number"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-[#64748B]">
                 {t('paymentSimulator.testCardsHint', 'Test cards: 4242 4242 4242 4242 (success), 4000 0000 0000 0002 (declined)')}
               </p>
             </div>
@@ -127,7 +129,7 @@ export default function PaymentGatewaySimulator() {
             <Button
               onClick={simulatePayment}
               disabled={isProcessing}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
               data-testid="button-process-payment"
             >
               {isProcessing ? (
@@ -145,14 +147,14 @@ export default function PaymentGatewaySimulator() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('paymentSimulator.transactionHistory', 'Transaction History')}</CardTitle>
-            <CardDescription>{t('paymentSimulator.recentTransactions', 'Recent simulated transactions')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.transactionHistory', 'Transaction History')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('paymentSimulator.recentTransactions', 'Recent simulated transactions')}</CardDescription>
           </CardHeader>
           <CardContent>
             {transactions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-[#64748B]">
                 <CreditCard className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>{t('paymentSimulator.noTransactionsYet', 'No transactions yet')}</p>
               </div>
@@ -161,7 +163,7 @@ export default function PaymentGatewaySimulator() {
                 {transactions.map((txn) => (
                   <div
                     key={txn.id}
-                    className="p-3 border rounded-lg"
+                    className="p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`transaction-${txn.id}`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -171,19 +173,19 @@ export default function PaymentGatewaySimulator() {
                         ) : (
                           <XCircle className="h-4 w-4 text-red-500" />
                         )}
-                        <span className="font-medium">${txn.amount.toFixed(2)}</span>
+                        <span className="font-medium text-[#0B1F3B] dark:text-white">${txn.amount.toFixed(2)}</span>
                       </div>
                       <Badge
                         className={
                           txn.status === "success"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                         }
                       >
                         {txn.status}
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-[#64748B]">
                       <p>{t('paymentSimulator.gateway', 'Gateway')}: {txn.gateway}</p>
                       <p>{t('paymentSimulator.cardLabel', 'Card')}: **** **** **** {txn.cardLast4}</p>
                       <p>{txn.timestamp.toLocaleString()}</p>
@@ -196,10 +198,10 @@ export default function PaymentGatewaySimulator() {
         </Card>
       </div>
 
-      <Card className="mt-6">
+      <Card className="mt-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('paymentSimulator.gatewayStatistics', 'Gateway Statistics')}</CardTitle>
-          <CardDescription>{t('paymentSimulator.successRatesByGateway', 'Success rates by payment gateway')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('paymentSimulator.gatewayStatistics', 'Gateway Statistics')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('paymentSimulator.successRatesByGateway', 'Success rates by payment gateway')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -210,10 +212,10 @@ export default function PaymentGatewaySimulator() {
                 : 0;
 
               return (
-                <div key={gw} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <p className="text-sm text-muted-foreground capitalize">{gw}</p>
-                  <p className="text-2xl font-bold">{successRate.toFixed(0)}%</p>
-                  <p className="text-xs text-muted-foreground">
+                <div key={gw} className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-sm text-[#64748B] capitalize">{gw}</p>
+                  <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">{successRate.toFixed(0)}%</p>
+                  <p className="text-xs text-[#64748B]">
                     {gwTransactions.length} {t('paymentSimulator.transactions', 'transactions')}
                   </p>
                 </div>

@@ -29,9 +29,8 @@ export default function CustomerMobileProfile() {
   ];
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Profile Header */}
-      <Card className="bg-gradient-to-r from-blue-600 to-purple-600 border-0 text-white">
+    <div className="p-4 space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
+      <Card className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
@@ -46,51 +45,49 @@ export default function CustomerMobileProfile() {
         </CardContent>
       </Card>
 
-      {/* Contact Information */}
-      <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-base text-gray-900 dark:text-white">Contact Information</CardTitle>
+          <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Contact Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-3">
-            <Mail className="h-5 w-5 text-gray-400" />
+            <Mail className="h-5 w-5 text-[#64748B]" />
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email || "Not set"}</p>
+              <p className="text-xs text-[#64748B]">Email</p>
+              <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">{user?.email || "Not set"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Phone className="h-5 w-5 text-gray-400" />
+            <Phone className="h-5 w-5 text-[#64748B]" />
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.phone || "Not set"}</p>
+              <p className="text-xs text-[#64748B]">Phone</p>
+              <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">{user?.phone || "Not set"}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Settings Sections */}
       {profileSections.map((section) => (
         <div key={section.title}>
-          <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300 px-1">
+          <h3 className="text-sm font-semibold mb-2 text-[#0B1F3B] dark:text-gray-300 px-1">
             {section.title}
           </h3>
-          <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               {section.items.map((item, index) => (
                 <Link key={item.route} href={item.route}>
                   <div
-                    className={`flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer ${
-                      index < section.items.length - 1 ? "border-b border-gray-100 dark:border-gray-800" : ""
+                    className={`flex items-center justify-between p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors cursor-pointer ${
+                      index < section.items.length - 1 ? "border-b border-[#E2E8F0] dark:border-[#232A36]" : ""
                     }`}
                     data-testid={item.testId}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 text-gray-400" />
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</span>
+                      <item.icon className="h-5 w-5 text-[#64748B]" />
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{item.label}</span>
                     </div>
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-[#64748B]"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -105,7 +102,6 @@ export default function CustomerMobileProfile() {
         </div>
       ))}
 
-      {/* Logout */}
       <Button
         variant="destructive"
         className="w-full"
@@ -118,8 +114,7 @@ export default function CustomerMobileProfile() {
         Logout
       </Button>
 
-      {/* App Version */}
-      <p className="text-xs text-center text-gray-400 dark:text-gray-600">
+      <p className="text-xs text-center text-[#64748B]">
         SALIS AUTO Mobile v1.0.0
       </p>
     </div>

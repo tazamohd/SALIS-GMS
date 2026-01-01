@@ -44,21 +44,21 @@ export default function ProductivityTracker() {
       label: t('productivity.metrics.averageEfficiency', 'Average Efficiency'),
       value: "92%",
       icon: TrendingUp,
-      color: "text-blue-500",
+      color: "text-[#0A5ED7]",
       trend: { value: "+3%", isPositive: true },
     },
     {
       label: t('productivity.metrics.avgTaskDuration', 'Avg Task Duration'),
       value: "2.4h",
       icon: Clock,
-      color: "text-purple-500",
+      color: "text-[#0BB3FF]",
       trend: { value: "-12%", isPositive: true },
     },
     {
       label: t('productivity.metrics.activeTechnicians', 'Active Technicians'),
       value: "4",
       icon: Users,
-      color: "text-orange-500",
+      color: "text-[#F97316]",
     },
   ];
 
@@ -70,25 +70,25 @@ export default function ProductivityTracker() {
       metrics={metrics}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('productivity.hourlyProductivity', 'Hourly Productivity')}</CardTitle>
-            <CardDescription>{t('productivity.hourlyProductivityDesc', 'Tasks completed and efficiency by hour')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.hourlyProductivity', 'Hourly Productivity')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('productivity.hourlyProductivityDesc', 'Tasks completed and efficiency by hour')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={hourlyProductivity}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="hour" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+                <XAxis dataKey="hour" tick={{ fill: '#64748B' }} />
+                <YAxis yAxisId="left" tick={{ fill: '#64748B' }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#64748B' }} />
+                <Tooltip contentStyle={{ backgroundColor: "white", border: "1px solid #E2E8F0", borderRadius: "8px" }} />
                 <Legend />
                 <Line
                   yAxisId="left"
                   type="monotone"
                   dataKey="tasks"
-                  stroke="#8884d8"
+                  stroke="#0A5ED7"
                   name={t('productivity.tasksCompleted', 'Tasks Completed')}
                   strokeWidth={2}
                 />
@@ -96,7 +96,7 @@ export default function ProductivityTracker() {
                   yAxisId="right"
                   type="monotone"
                   dataKey="efficiency"
-                  stroke="#82ca9d"
+                  stroke="#0BB3FF"
                   name={t('productivity.efficiencyPercent', 'Efficiency %')}
                   strokeWidth={2}
                 />
@@ -105,54 +105,54 @@ export default function ProductivityTracker() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('productivity.taskDistribution', 'Task Distribution')}</CardTitle>
-            <CardDescription>{t('productivity.taskDistributionDesc', 'Completed vs pending tasks by technician')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.taskDistribution', 'Task Distribution')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('productivity.taskDistributionDesc', 'Completed vs pending tasks by technician')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={technicianStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+                <XAxis dataKey="name" tick={{ fill: '#64748B' }} />
+                <YAxis tick={{ fill: '#64748B' }} />
+                <Tooltip contentStyle={{ backgroundColor: "white", border: "1px solid #E2E8F0", borderRadius: "8px" }} />
                 <Legend />
-                <Bar dataKey="completed" fill="#82ca9d" name={t('common.completed', 'Completed')} />
-                <Bar dataKey="pending" fill="#ffc658" name={t('common.pending', 'Pending')} />
+                <Bar dataKey="completed" fill="#0A5ED7" name={t('common.completed', 'Completed')} />
+                <Bar dataKey="pending" fill="#F97316" name={t('common.pending', 'Pending')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('productivity.technicianPerformance', 'Technician Performance')}</CardTitle>
-          <CardDescription>{t('productivity.technicianPerformanceDesc', 'Individual productivity metrics and efficiency scores')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.technicianPerformance', 'Technician Performance')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('productivity.technicianPerformanceDesc', 'Individual productivity metrics and efficiency scores')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {technicianStats.map((tech, idx) => (
               <div
                 key={idx}
-                className="p-4 border rounded-lg"
+                className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`technician-stats-${idx}`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="font-medium">{tech.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{tech.name}</p>
+                    <p className="text-sm text-[#64748B]">
                       {tech.completed} {t('common.completed', 'completed')} • {tech.pending} {t('common.pending', 'pending')} • {t('productivity.avg', 'Avg')}: {tech.avgTime}
                     </p>
                   </div>
                   <Badge
                     className={
                       tech.efficiency >= 95
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : tech.efficiency >= 90
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        ? "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20"
+                        : "bg-[#F97316]/10 text-[#F97316] dark:bg-[#F97316]/20"
                     }
                   >
                     {tech.efficiency}% {t('productivity.efficiency', 'Efficiency')}
@@ -160,8 +160,8 @@ export default function ProductivityTracker() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{t('productivity.efficiency', 'Efficiency')}</span>
-                    <span className="font-medium">{tech.efficiency}%</span>
+                    <span className="text-[#64748B]">{t('productivity.efficiency', 'Efficiency')}</span>
+                    <span className="font-medium text-[#0B1F3B] dark:text-white">{tech.efficiency}%</span>
                   </div>
                   <Progress value={tech.efficiency} className="h-2" />
                 </div>
@@ -172,9 +172,9 @@ export default function ProductivityTracker() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('productivity.topPerformer', 'Top Performer')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.topPerformer', 'Top Performer')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -182,42 +182,42 @@ export default function ProductivityTracker() {
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold">Mike Johnson</p>
-                <p className="text-sm text-muted-foreground">96% {t('productivity.efficiency', 'efficiency')}</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">Mike Johnson</p>
+                <p className="text-sm text-[#64748B]">96% {t('productivity.efficiency', 'efficiency')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('productivity.mostProductiveHour', 'Most Productive Hour')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.mostProductiveHour', 'Most Productive Hour')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-full bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 flex items-center justify-center">
+                <Clock className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="font-semibold">2PM - 4PM</p>
-                <p className="text-sm text-muted-foreground">15 {t('productivity.tasksCompletedShort', 'tasks completed')}</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">2PM - 4PM</p>
+                <p className="text-sm text-[#64748B]">15 {t('productivity.tasksCompletedShort', 'tasks completed')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('productivity.teamGoalProgress', 'Team Goal Progress')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('productivity.teamGoalProgress', 'Team Goal Progress')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{t('productivity.dailyTarget', 'Daily Target')}</span>
-                <span className="font-medium">42/50</span>
+                <span className="text-sm text-[#64748B]">{t('productivity.dailyTarget', 'Daily Target')}</span>
+                <span className="font-medium text-[#0B1F3B] dark:text-white">42/50</span>
               </div>
               <Progress value={84} className="h-2" />
-              <p className="text-xs text-muted-foreground">{t('productivity.goalAchieved', '84% of daily goal achieved')}</p>
+              <p className="text-xs text-[#64748B]">{t('productivity.goalAchieved', '84% of daily goal achieved')}</p>
             </div>
           </CardContent>
         </Card>

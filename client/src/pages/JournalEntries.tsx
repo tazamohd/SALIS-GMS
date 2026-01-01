@@ -461,85 +461,85 @@ export default function JournalEntries() {
   const summaryTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-entries">
+        <Card data-testid="card-total-entries" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.totalEntries', 'Total Entries')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{journalEntries.length}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.thisMonth', 'This month')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{journalEntries.length}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.thisMonth', 'This month')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-posted-entries">
+        <Card data-testid="card-posted-entries" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
               {t('accounting.posted', 'Posted')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold text-green-600">{totalPosted}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.completedEntries', 'Completed entries')}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.completedEntries', 'Completed entries')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-pending-entries">
+        <Card data-testid="card-pending-entries" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Clock className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
+              <Clock className="h-4 w-4 text-[#F97316]" />
               {t('common.pending', 'Pending')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-yellow-600">{totalPending}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.awaitingApproval', 'Awaiting approval')}</p>
+            <p className="text-2xl font-bold text-[#F97316]">{totalPending}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.awaitingApproval', 'Awaiting approval')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-amount">
+        <Card data-testid="card-total-amount" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.totalAmount', 'Total Amount')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">SAR {totalAmount.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{t('accounting.totalTransactions', 'Total transactions')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalAmount.toLocaleString()}</p>
+            <p className="text-xs text-[#64748B]">{t('accounting.totalTransactions', 'Total transactions')}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.recentActivity', 'Recent Activity')}</CardTitle>
-          <CardDescription>{t('accounting.recentActivityDescription', 'Latest journal entries and their status')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.recentActivity', 'Recent Activity')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.recentActivityDescription', 'Latest journal entries and their status')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {journalEntries.slice(0, 5).map((entry) => (
               <div
                 key={entry.id}
-                className="flex items-center justify-between p-3 border rounded-lg"
+                className="flex items-center justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`activity-${entry.id}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-muted rounded-lg">
-                    <FileText className="h-4 w-4" />
+                  <div className="p-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-lg">
+                    <FileText className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <p className="font-medium">{entry.id}</p>
-                    <p className="text-sm text-muted-foreground truncate max-w-[300px]">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{entry.id}</p>
+                    <p className="text-sm text-[#64748B] truncate max-w-[300px]">
                       {entry.description}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="font-mono font-bold">SAR {entry.totalDebit.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">{entry.createdAt}</p>
+                    <p className="font-mono font-bold text-[#0B1F3B] dark:text-white">SAR {entry.totalDebit.toLocaleString()}</p>
+                    <p className="text-xs text-[#64748B]">{entry.createdAt}</p>
                   </div>
                   {getStatusBadge(entry.status)}
                 </div>
@@ -549,10 +549,10 @@ export default function JournalEntries() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
-          <CardDescription>{t('accounting.relatedModulesDescription', 'Navigate to related accounting pages')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.relatedModulesDescription', 'Navigate to related accounting pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -644,7 +644,7 @@ export default function JournalEntries() {
             credit: "Accumulated Depreciation",
           },
         ].map((template, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow" data-testid={`card-template-${index}`}>
+          <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-template-${index}`}>
             <CardHeader>
               <CardTitle className="text-lg">{template.name}</CardTitle>
               <CardDescription>{template.description}</CardDescription>

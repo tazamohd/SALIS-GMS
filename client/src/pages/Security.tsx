@@ -123,20 +123,20 @@ function TwoFactorAuthTab() {
   };
 
   return (
-    <Card data-testid="card-2fa">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-2fa">
       <CardHeader>
-        <CardTitle>{t('security.twoFactorAuth', 'Two-Factor Authentication (2FA)')}</CardTitle>
-        <CardDescription>{t('security.addExtraLayerSecurity', 'Add an extra layer of security to your account')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.twoFactorAuth', 'Two-Factor Authentication (2FA)')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.addExtraLayerSecurity', 'Add an extra layer of security to your account')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {status?.enabled ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-900/30">
               <div className="flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-gray-700" />
+                <CheckCircle className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="font-medium">{t('security.2faIsActive', '2FA is Active')}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{t('security.2faIsActive', '2FA is Active')}</p>
+                  <p className="text-sm text-[#64748B]">
                     {t('security.backupCodesRemaining', 'Backup codes remaining')}: {status.backupCodesCount}
                   </p>
                 </div>
@@ -145,6 +145,7 @@ function TwoFactorAuthTab() {
                 variant="outline" 
                 onClick={() => disableMutation.mutate()}
                 disabled={disableMutation.isPending}
+                className="border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="button-disable-2fa"
               >
                 {t('security.disable2fa', 'Disable 2FA')}
@@ -153,18 +154,19 @@ function TwoFactorAuthTab() {
           </div>
         ) : setupData ? (
           <div className="space-y-4">
-            <div className="flex justify-center p-4 bg-white dark:bg-salis-black rounded-lg">
+            <div className="flex justify-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
               <img src={setupData.qrCodeUrl} alt={t('security.2faQRCode', '2FA QR Code')} className="w-64 h-64" data-testid="img-qr-code" />
             </div>
             
             <div className="space-y-2">
-              <Label>{t('security.manualEntryKey', 'Manual Entry Key')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.manualEntryKey', 'Manual Entry Key')}</Label>
               <div className="flex gap-2">
-                <Input value={setupData.secret} readOnly data-testid="input-secret-key" />
+                <Input value={setupData.secret} readOnly className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-secret-key" />
                 <Button 
                   variant="outline" 
                   size="icon"
                   onClick={() => copyToClipboard(setupData.secret)}
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="button-copy-secret"
                 >
                   <Copy className="h-4 w-4" />
@@ -173,16 +175,17 @@ function TwoFactorAuthTab() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('security.backupCodes', 'Backup Codes (Save these securely)')}</Label>
-              <div className="grid grid-cols-2 gap-2 p-3 bg-muted rounded-lg">
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.backupCodes', 'Backup Codes (Save these securely)')}</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
                 {setupData.backupCodes.map((code: string, i: number) => (
-                  <code key={i} className="text-sm" data-testid={`text-backup-code-${i}`}>{code}</code>
+                  <code key={i} className="text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-backup-code-${i}`}>{code}</code>
                 ))}
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => copyToClipboard(setupData.backupCodes.join('\n'))}
+                className="border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="button-copy-backup-codes"
               >
                 <Copy className="h-4 w-4 mr-2" />
@@ -191,11 +194,12 @@ function TwoFactorAuthTab() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('security.verificationCode', 'Verification Code')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.verificationCode', 'Verification Code')}</Label>
               <Input 
                 placeholder={t('security.enter6DigitCode', 'Enter 6-digit code from your app')}
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-verification-code"
               />
             </div>
@@ -204,6 +208,7 @@ function TwoFactorAuthTab() {
               <Button 
                 onClick={() => enableMutation.mutate(verificationCode)}
                 disabled={!verificationCode || enableMutation.isPending}
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                 data-testid="button-verify-enable"
               >
                 {t('security.verifyAndEnable', 'Verify & Enable')}
@@ -214,6 +219,7 @@ function TwoFactorAuthTab() {
                   setSetupData(null);
                   setVerificationCode("");
                 }}
+                className="border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="button-cancel-setup"
               >
                 {t('common.cancel', 'Cancel')}
@@ -222,12 +228,13 @@ function TwoFactorAuthTab() {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-muted-foreground">
+            <p className="text-[#64748B]">
               {t('security.2faDescription', 'Two-factor authentication adds an extra layer of security by requiring a code from your authenticator app.')}
             </p>
             <Button 
               onClick={() => setupMutation.mutate()}
               disabled={setupMutation.isPending}
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-setup-2fa"
             >
               <Lock className="h-4 w-4 mr-2" />
@@ -262,20 +269,20 @@ function AuditLogsTab() {
   });
 
   return (
-    <Card data-testid="card-audit-logs">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-audit-logs">
       <CardHeader>
-        <CardTitle>{t('security.auditLogs', 'Audit Logs')}</CardTitle>
-        <CardDescription>{t('security.trackAllSystemActivities', 'Track all system activities and changes')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.auditLogs', 'Audit Logs')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.trackAllSystemActivities', 'Track all system activities and changes')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-4 gap-4">
           <div className="space-y-2">
-            <Label>{t('security.resourceType', 'Resource Type')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.resourceType', 'Resource Type')}</Label>
             <Select value={filters.resourceType} onValueChange={(value) => setFilters({...filters, resourceType: value === 'all' ? '' : value})}>
-              <SelectTrigger data-testid="select-resource-type">
+              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-resource-type">
                 <SelectValue placeholder={t('common.all', 'All')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
                 <SelectItem value="job_card">{t('security.jobCards', 'Job Cards')}</SelectItem>
                 <SelectItem value="customer">{t('security.customers', 'Customers')}</SelectItem>
@@ -286,12 +293,12 @@ function AuditLogsTab() {
           </div>
 
           <div className="space-y-2">
-            <Label>{t('security.action', 'Action')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.action', 'Action')}</Label>
             <Select value={filters.action} onValueChange={(value) => setFilters({...filters, action: value === 'all' ? '' : value})}>
-              <SelectTrigger data-testid="select-action">
+              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-action">
                 <SelectValue placeholder={t('common.all', 'All')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
                 <SelectItem value="create">{t('common.create', 'Create')}</SelectItem>
                 <SelectItem value="update">{t('common.update', 'Update')}</SelectItem>
@@ -301,58 +308,60 @@ function AuditLogsTab() {
           </div>
 
           <div className="space-y-2">
-            <Label>{t('security.startDate', 'Start Date')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.startDate', 'Start Date')}</Label>
             <Input 
               type="date" 
               value={filters.startDate}
               onChange={(e) => setFilters({...filters, startDate: e.target.value})}
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-start-date"
             />
           </div>
 
           <div className="space-y-2">
-            <Label>{t('security.endDate', 'End Date')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.endDate', 'End Date')}</Label>
             <Input 
               type="date" 
               value={filters.endDate}
               onChange={(e) => setFilters({...filters, endDate: e.target.value})}
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-end-date"
             />
           </div>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('security.timestamp', 'Timestamp')}</TableHead>
-                <TableHead>{t('security.action', 'Action')}</TableHead>
-                <TableHead>{t('security.resource', 'Resource')}</TableHead>
-                <TableHead>{t('security.user', 'User')}</TableHead>
-                <TableHead>{t('security.ipAddress', 'IP Address')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('security.timestamp', 'Timestamp')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.action', 'Action')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.resource', 'Resource')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.user', 'User')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.ipAddress', 'IP Address')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">
                     {t('security.noAuditLogsFound', 'No audit logs found')}
                   </TableCell>
                 </TableRow>
               ) : (
                 logs.map((log: any) => (
-                  <TableRow key={log.id} data-testid={`row-audit-log-${log.id}`}>
-                    <TableCell>{format(new Date(log.timestamp), 'MMM d, yyyy HH:mm:ss')}</TableCell>
+                  <TableRow key={log.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-audit-log-${log.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(log.timestamp), 'MMM d, yyyy HH:mm:ss')}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{log.action}</Badge>
+                      <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{log.action}</Badge>
                     </TableCell>
-                    <TableCell>{log.resourceType}</TableCell>
-                    <TableCell>{log.userId}</TableCell>
-                    <TableCell>{log.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell className="text-[#64748B]">{log.resourceType}</TableCell>
+                    <TableCell className="text-[#64748B]">{log.userId}</TableCell>
+                    <TableCell className="text-[#64748B]">{log.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -389,20 +398,20 @@ function BackupRestoreTab() {
   });
 
   return (
-    <Card data-testid="card-backup">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-backup">
       <CardHeader>
-        <CardTitle>{t('security.backupRestore', 'Backup & Restore')}</CardTitle>
-        <CardDescription>{t('security.createAndManageBackups', 'Create and manage data backups')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.backupRestore', 'Backup & Restore')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.createAndManageBackups', 'Create and manage data backups')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
-            <Label>{t('security.backupType', 'Backup Type')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.backupType', 'Backup Type')}</Label>
             <Select value={backupType} onValueChange={setBackupType}>
-              <SelectTrigger data-testid="select-backup-type">
+              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-backup-type">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="full">{t('security.fullBackup', 'Full Backup')}</SelectItem>
                 <SelectItem value="incremental">{t('security.incremental', 'Incremental')}</SelectItem>
                 <SelectItem value="database">{t('security.databaseOnly', 'Database Only')}</SelectItem>
@@ -412,6 +421,7 @@ function BackupRestoreTab() {
           <Button 
             onClick={() => createBackupMutation.mutate(backupType)}
             disabled={createBackupMutation.isPending}
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
             data-testid="button-create-backup"
           >
             <Database className="h-4 w-4 mr-2" />
@@ -419,39 +429,39 @@ function BackupRestoreTab() {
           </Button>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('security.created', 'Created')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('security.size', 'Size')}</TableHead>
-                <TableHead>{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('security.created', 'Created')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.size', 'Size')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : backups.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">
                     {t('security.noBackupsFound', 'No backups found')}
                   </TableCell>
                 </TableRow>
               ) : (
                 backups.map((backup: any) => (
-                  <TableRow key={backup.id} data-testid={`row-backup-${backup.id}`}>
-                    <TableCell>{format(new Date(backup.createdAt), 'MMM d, yyyy HH:mm')}</TableCell>
-                    <TableCell><Badge variant="secondary">{backup.type}</Badge></TableCell>
+                  <TableRow key={backup.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-backup-${backup.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(backup.createdAt), 'MMM d, yyyy HH:mm')}</TableCell>
+                    <TableCell><Badge className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]">{backup.type}</Badge></TableCell>
                     <TableCell>
-                      <Badge variant={backup.status === 'completed' ? 'default' : backup.status === 'failed' ? 'destructive' : 'outline'}>
+                      <Badge className={backup.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : backup.status === 'failed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]'}>
                         {backup.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{backup.size ? `${(backup.size / 1024 / 1024).toFixed(2)} MB` : t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell className="text-[#64748B]">{backup.size ? `${(backup.size / 1024 / 1024).toFixed(2)} MB` : t('common.notAvailable', 'N/A')}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         {backup.status === 'completed' && (
@@ -461,6 +471,7 @@ function BackupRestoreTab() {
                               variant="outline"
                               onClick={() => restoreMutation.mutate(backup.id)}
                               disabled={restoreMutation.isPending}
+                              className="border-[#E2E8F0] dark:border-[#232A36]"
                               data-testid={`button-restore-${backup.id}`}
                             >
                               <Upload className="h-3 w-3 mr-1" />
@@ -469,6 +480,7 @@ function BackupRestoreTab() {
                             <Button 
                               size="sm" 
                               variant="outline"
+                              className="border-[#E2E8F0] dark:border-[#232A36]"
                               data-testid={`button-download-${backup.id}`}
                             >
                               <Download className="h-3 w-3 mr-1" />
@@ -511,21 +523,21 @@ function GDPRTab() {
   });
 
   return (
-    <Card data-testid="card-gdpr">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-gdpr">
       <CardHeader>
-        <CardTitle>{t('security.gdprCompliance', 'GDPR Compliance')}</CardTitle>
-        <CardDescription>{t('security.manageDataSubjectRights', 'Manage data subject rights requests')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.gdprCompliance', 'GDPR Compliance')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.manageDataSubjectRights', 'Manage data subject rights requests')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{t('security.requestType', 'Request Type')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.requestType', 'Request Type')}</Label>
               <Select value={requestType} onValueChange={setRequestType}>
-                <SelectTrigger data-testid="select-request-type">
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-request-type">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="export">{t('security.dataExport', 'Data Export')}</SelectItem>
                   <SelectItem value="deletion">{t('security.dataDeletion', 'Data Deletion')}</SelectItem>
                   <SelectItem value="rectification">{t('security.dataRectification', 'Data Rectification')}</SelectItem>
@@ -535,22 +547,24 @@ function GDPRTab() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('security.dataSubjectId', 'Data Subject ID')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.dataSubjectId', 'Data Subject ID')}</Label>
               <Input 
                 placeholder={t('security.customerUserId', 'Customer/User ID')}
                 value={dataSubjectId}
                 onChange={(e) => setDataSubjectId(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-subject-id"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>{t('security.reasonOptional', 'Reason (Optional)')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.reasonOptional', 'Reason (Optional)')}</Label>
             <Textarea 
               placeholder={t('security.reasonForRequest', 'Reason for this request...')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="textarea-reason"
             />
           </div>
@@ -558,46 +572,47 @@ function GDPRTab() {
           <Button 
             onClick={() => createRequestMutation.mutate()}
             disabled={!dataSubjectId || createRequestMutation.isPending}
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
             data-testid="button-create-request"
           >
             {t('security.createRequest', 'Create Request')}
           </Button>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('security.created', 'Created')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('security.subjectId', 'Subject ID')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('common.completed', 'Completed')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('security.created', 'Created')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.subjectId', 'Subject ID')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.completed', 'Completed')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : requests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">
                     {t('security.noGdprRequestsFound', 'No GDPR requests found')}
                   </TableCell>
                 </TableRow>
               ) : (
                 requests.map((request: any) => (
-                  <TableRow key={request.id} data-testid={`row-gdpr-${request.id}`}>
-                    <TableCell>{format(new Date(request.createdAt), 'MMM d, yyyy')}</TableCell>
-                    <TableCell><Badge variant="outline">{request.requestType}</Badge></TableCell>
-                    <TableCell>{request.userId}</TableCell>
+                  <TableRow key={request.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-gdpr-${request.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(request.createdAt), 'MMM d, yyyy')}</TableCell>
+                    <TableCell><Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{request.requestType}</Badge></TableCell>
+                    <TableCell className="text-[#64748B]">{request.userId}</TableCell>
                     <TableCell>
-                      <Badge variant={request.status === 'completed' ? 'default' : 'secondary'}>
+                      <Badge className={request.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]'}>
                         {request.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-[#64748B]">
                       {request.completedAt ? format(new Date(request.completedAt), 'MMM d, yyyy') : '-'}
                     </TableCell>
                   </TableRow>
@@ -631,20 +646,20 @@ function ConsentsTab() {
   });
 
   return (
-    <Card data-testid="card-consents">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-consents">
       <CardHeader>
-        <CardTitle>{t('security.userConsents', 'User Consents')}</CardTitle>
-        <CardDescription>{t('security.manageConsentPreferences', 'Manage user consent preferences')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.userConsents', 'User Consents')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.manageConsentPreferences', 'Manage user consent preferences')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
-            <Label>{t('security.consentType', 'Consent Type')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.consentType', 'Consent Type')}</Label>
             <Select value={consentType} onValueChange={setConsentType}>
-              <SelectTrigger data-testid="select-consent-type">
+              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-consent-type">
                 <SelectValue placeholder={t('security.selectConsentType', 'Select consent type')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="marketing">{t('security.marketingCommunications', 'Marketing Communications')}</SelectItem>
                 <SelectItem value="analytics">{t('security.analyticsTracking', 'Analytics & Tracking')}</SelectItem>
                 <SelectItem value="data_processing">{t('security.dataProcessing', 'Data Processing')}</SelectItem>
@@ -654,7 +669,7 @@ function ConsentsTab() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Label>{t('security.granted', 'Granted')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.granted', 'Granted')}</Label>
             <Switch 
               checked={granted} 
               onCheckedChange={setGranted}
@@ -665,44 +680,45 @@ function ConsentsTab() {
           <Button 
             onClick={() => createConsentMutation.mutate()}
             disabled={!consentType || createConsentMutation.isPending}
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
             data-testid="button-record-consent"
           >
             {t('security.recordConsent', 'Record Consent')}
           </Button>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('security.grantedAt', 'Granted At')}</TableHead>
-                <TableHead>{t('security.ipAddress', 'IP Address')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.grantedAt', 'Granted At')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.ipAddress', 'IP Address')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
+                  <TableCell colSpan={4} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : consents.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={4} className="text-center text-[#64748B]">
                     {t('security.noConsentRecordsFound', 'No consent records found')}
                   </TableCell>
                 </TableRow>
               ) : (
                 consents.map((consent: any) => (
-                  <TableRow key={consent.id} data-testid={`row-consent-${consent.id}`}>
-                    <TableCell>{consent.consentType}</TableCell>
+                  <TableRow key={consent.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-consent-${consent.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{consent.consentType}</TableCell>
                     <TableCell>
-                      <Badge variant={consent.granted ? 'default' : 'secondary'}>
+                      <Badge className={consent.granted ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]'}>
                         {consent.granted ? t('security.granted', 'Granted') : t('security.denied', 'Denied')}
                       </Badge>
                     </TableCell>
-                    <TableCell>{format(new Date(consent.createdAt), 'MMM d, yyyy HH:mm')}</TableCell>
-                    <TableCell>{consent.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell className="text-[#64748B]">{format(new Date(consent.createdAt), 'MMM d, yyyy HH:mm')}</TableCell>
+                    <TableCell className="text-[#64748B]">{consent.ipAddress || t('common.notAvailable', 'N/A')}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -746,56 +762,60 @@ function PermissionsTab() {
   });
 
   return (
-    <Card data-testid="card-permissions">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-permissions">
       <CardHeader>
-        <CardTitle>{t('security.permissionOverrides', 'Permission Overrides')}</CardTitle>
-        <CardDescription>{t('security.grantOrRestrictPermissions', 'Grant or restrict specific permissions for users')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('security.permissionOverrides', 'Permission Overrides')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('security.grantOrRestrictPermissions', 'Grant or restrict specific permissions for users')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>{t('security.userId', 'User ID')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.userId', 'User ID')}</Label>
               <Input 
                 placeholder={t('security.enterUserId', 'Enter user ID')}
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-user-id"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>{t('security.permission', 'Permission')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('security.permission', 'Permission')}</Label>
               <Select value={permission} onValueChange={setPermission}>
-                <SelectTrigger data-testid="select-permission">
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-permission">
                   <SelectValue placeholder={t('security.selectPermission', 'Select permission')} />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="manage_users">{t('security.manageUsers', 'Manage Users')}</SelectItem>
-                  <SelectItem value="view_reports">{t('security.viewReports', 'View Reports')}</SelectItem>
-                  <SelectItem value="manage_inventory">{t('security.manageInventory', 'Manage Inventory')}</SelectItem>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                  <SelectItem value="view_financial">{t('security.viewFinancialData', 'View Financial Data')}</SelectItem>
+                  <SelectItem value="edit_customers">{t('security.editCustomers', 'Edit Customers')}</SelectItem>
                   <SelectItem value="delete_records">{t('security.deleteRecords', 'Delete Records')}</SelectItem>
-                  <SelectItem value="manage_billing">{t('security.manageBilling', 'Manage Billing')}</SelectItem>
+                  <SelectItem value="manage_users">{t('security.manageUsers', 'Manage Users')}</SelectItem>
+                  <SelectItem value="export_data">{t('security.exportData', 'Export Data')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <Label>{t('security.grantPermission', 'Grant Permission')}</Label>
-            <Switch 
-              checked={granted} 
-              onCheckedChange={setGranted}
-              data-testid="switch-grant-permission"
-            />
+            <div className="flex items-end gap-2">
+              <div className="flex items-center gap-2">
+                <Label className="text-[#0B1F3B] dark:text-white">{t('security.granted', 'Granted')}</Label>
+                <Switch 
+                  checked={granted} 
+                  onCheckedChange={setGranted}
+                  data-testid="switch-permission-granted"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
-            <Label>{t('security.reason', 'Reason')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('security.reason', 'Reason')}</Label>
             <Textarea 
               placeholder={t('security.reasonForOverride', 'Reason for this override...')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="textarea-override-reason"
             />
           </div>
@@ -803,54 +823,56 @@ function PermissionsTab() {
           <Button 
             onClick={() => createOverrideMutation.mutate()}
             disabled={!userId || !permission || createOverrideMutation.isPending}
+            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
             data-testid="button-create-override"
           >
             {t('security.createOverride', 'Create Override')}
           </Button>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('security.user', 'User')}</TableHead>
-                <TableHead>{t('security.permission', 'Permission')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('security.grantedBy', 'Granted By')}</TableHead>
-                <TableHead>{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('security.user', 'User')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.permission', 'Permission')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('security.reason', 'Reason')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">{t('common.loading', 'Loading...')}</TableCell>
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                 </TableRow>
               ) : overrides.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    {t('security.noPermissionOverridesFound', 'No permission overrides found')}
+                  <TableCell colSpan={5} className="text-center text-[#64748B]">
+                    {t('security.noOverridesFound', 'No permission overrides found')}
                   </TableCell>
                 </TableRow>
               ) : (
                 overrides.map((override: any) => (
-                  <TableRow key={override.id} data-testid={`row-override-${override.id}`}>
-                    <TableCell>{override.userId}</TableCell>
-                    <TableCell>{override.permission}</TableCell>
+                  <TableRow key={override.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-override-${override.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{override.userId}</TableCell>
+                    <TableCell className="text-[#64748B]">{override.permission}</TableCell>
                     <TableCell>
-                      <Badge variant={override.granted ? 'default' : 'destructive'}>
+                      <Badge className={override.granted ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}>
                         {override.granted ? t('security.granted', 'Granted') : t('security.denied', 'Denied')}
                       </Badge>
                     </TableCell>
-                    <TableCell>{override.grantedBy}</TableCell>
+                    <TableCell className="text-[#64748B] max-w-[200px] truncate">{override.reason || '-'}</TableCell>
                     <TableCell>
                       <Button 
                         size="sm" 
                         variant="outline"
                         onClick={() => deleteOverrideMutation.mutate(override.id)}
                         disabled={deleteOverrideMutation.isPending}
+                        className="border-[#E2E8F0] dark:border-[#232A36] text-red-600 hover:text-red-700"
                         data-testid={`button-delete-override-${override.id}`}
                       >
-                        {t('common.remove', 'Remove')}
+                        {t('common.delete', 'Delete')}
                       </Button>
                     </TableCell>
                   </TableRow>

@@ -16,13 +16,13 @@ import { subDays } from "date-fns";
 import type { Garage } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-const COLORS = ['#000000', '#404040', '#737373', '#a3a3a3', '#d4d4d4', '#e5e5e5'];
+const COLORS = ['#0A5ED7', '#0BB3FF', '#10B981', '#6366F1', '#0B1F3B', '#64748B'];
 
 const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-salis-black p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg shadow-lg">
-        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+      <div className="bg-white dark:bg-[#151A23] p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg shadow-lg">
+        <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: <span className="font-bold">${parseFloat(entry.value).toFixed(2)}</span>
@@ -37,8 +37,8 @@ const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
 const CustomCountTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-salis-black p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg shadow-lg">
-        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+      <div className="bg-white dark:bg-[#151A23] p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg shadow-lg">
+        <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: <span className="font-bold">{entry.value}</span>
@@ -53,8 +53,8 @@ const CustomCountTooltip = ({ active, payload, label }: any) => {
 const CustomPercentTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-salis-black p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg shadow-lg">
-        <p className="font-semibold text-gray-800 mb-1">{label}</p>
+      <div className="bg-white dark:bg-[#151A23] p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg shadow-lg">
+        <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: <span className="font-bold">{entry.value.toFixed(1)}%</span>
@@ -180,45 +180,45 @@ export function Reports() {
     <div className="space-y-6">
       {overviewLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">{t('common.loading', 'Loading overview...')}</p>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[#64748B]">{t('common.loading', 'Loading overview...')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${overview?.totalRevenue || "0"}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('analytics.allTime', 'All time')}</p>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${overview?.totalRevenue || "0"}</div>
+              <p className="text-xs text-[#64748B] mt-1">{t('analytics.allTime', 'All time')}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalInvoices', 'Total Invoices')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalInvoices', 'Total Invoices')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{overview?.totalInvoices || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.pendingInvoices || 0} {t('common.pending', 'pending')}</p>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{overview?.totalInvoices || 0}</div>
+              <p className="text-xs text-[#64748B] mt-1">{overview?.pendingInvoices || 0} {t('common.pending', 'pending')}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">{t('nav.job_cards', 'Job Cards')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('nav.job_cards', 'Job Cards')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{overview?.totalJobCards || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{overview?.activeJobCards || 0} {t('common.active', 'active')}</p>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{overview?.totalJobCards || 0}</div>
+              <p className="text-xs text-[#64748B] mt-1">{overview?.activeJobCards || 0} {t('common.active', 'active')}</p>
             </CardContent>
           </Card>
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">{t('nav.customers', 'Customers')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('nav.customers', 'Customers')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{overview?.totalCustomers || 0}</div>
-              <p className="text-xs text-gray-900 dark:text-white/60 mt-1">{t('analytics.totalRegistered', 'Total registered')}</p>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{overview?.totalCustomers || 0}</div>
+              <p className="text-xs text-[#64748B] mt-1">{t('analytics.totalRegistered', 'Total registered')}</p>
             </CardContent>
           </Card>
         </div>
@@ -230,60 +230,60 @@ export function Reports() {
     <div className="space-y-6">
       {revenueLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingRevenueData', 'Loading revenue data...')}</p>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[#64748B]">{t('analytics.loadingRevenueData', 'Loading revenue data...')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
+                <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">${revenueReport?.totalRevenue || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.totalRevenue || "0"}</div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.paidAmount', 'Paid Amount')}</CardTitle>
+                <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.paidAmount', 'Paid Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">${revenueReport?.paidAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.paidAmount || "0"}</div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.pendingAmount', 'Pending Amount')}</CardTitle>
+                <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.pendingAmount', 'Pending Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">${revenueReport?.pendingAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.pendingAmount || "0"}</div>
               </CardContent>
             </Card>
           </div>
 
           {revenueReport?.comparison && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.monthOverMonth', 'Month-over-Month')}</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.monthOverMonth', 'Month-over-Month')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-900 dark:text-white/60">{t('analytics.previousMonth', 'Previous Month')}</span>
-                      <span className="text-sm font-medium">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
+                      <span className="text-xs text-[#64748B]">{t('analytics.previousMonth', 'Previous Month')}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousMonth.change >= 0 ? (
-                        <ArrowUp className="w-4 h-4 text-gray-800 dark:text-gray-200" data-testid="icon-mom-up" />
+                        <ArrowUp className="w-4 h-4 text-[#10B981]" data-testid="icon-mom-up" />
                       ) : (
-                        <ArrowDown className="w-4 h-4 text-gray-900 dark:text-white" data-testid="icon-mom-down" />
+                        <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-mom-down" />
                       )}
-                      <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'}`} data-testid="text-mom-change">
+                      <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-mom-change">
                         {revenueReport.comparison.previousMonth.change >= 0 ? '+' : ''}${revenueReport.comparison.previousMonth.change.toFixed(2)}
                       </span>
-                      <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'}`} data-testid="text-mom-percent">
+                      <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-mom-percent">
                         ({revenueReport.comparison.previousMonth.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousMonth.percentChange.toFixed(1)}%)
                       </span>
                     </div>
@@ -291,26 +291,26 @@ export function Reports() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.yearOverYear', 'Year-over-Year')}</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.yearOverYear', 'Year-over-Year')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-900 dark:text-white/60">{t('analytics.samePeriodLastYear', 'Same Period Last Year')}</span>
-                      <span className="text-sm font-medium">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
+                      <span className="text-xs text-[#64748B]">{t('analytics.samePeriodLastYear', 'Same Period Last Year')}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousYear.change >= 0 ? (
-                        <ArrowUp className="w-4 h-4 text-gray-800 dark:text-gray-200" data-testid="icon-yoy-up" />
+                        <ArrowUp className="w-4 h-4 text-[#10B981]" data-testid="icon-yoy-up" />
                       ) : (
-                        <ArrowDown className="w-4 h-4 text-gray-900 dark:text-white" data-testid="icon-yoy-down" />
+                        <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-yoy-down" />
                       )}
-                      <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'}`} data-testid="text-yoy-change">
+                      <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-yoy-change">
                         {revenueReport.comparison.previousYear.change >= 0 ? '+' : ''}${revenueReport.comparison.previousYear.change.toFixed(2)}
                       </span>
-                      <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'}`} data-testid="text-yoy-percent">
+                      <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-yoy-percent">
                         ({revenueReport.comparison.previousYear.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousYear.percentChange.toFixed(1)}%)
                       </span>
                     </div>
@@ -321,9 +321,9 @@ export function Reports() {
           )}
 
           {revenueReport?.revenueByMonth && revenueReport.revenueByMonth.length > 0 && (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-white">{t('analytics.revenueTrend', 'Revenue Trend')}</CardTitle>
+                <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.revenueTrend', 'Revenue Trend')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -333,7 +333,7 @@ export function Reports() {
                     <YAxis tickFormatter={(value) => `$${value}`} />
                     <Tooltip content={<CustomCurrencyTooltip />} />
                     <Legend />
-                    <Line type="monotone" dataKey="revenue" stroke="#000000" strokeWidth={2} name={t('analytics.revenue', 'Revenue')} />
+                    <Line type="monotone" dataKey="revenue" stroke="#0A5ED7" strokeWidth={2} name={t('analytics.revenue', 'Revenue')} />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -342,9 +342,9 @@ export function Reports() {
 
           {revenueReport?.invoicesByStatus && revenueReport.invoicesByStatus.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">{t('analytics.invoicesByStatus', 'Invoices by Status')}</CardTitle>
+                  <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.invoicesByStatus', 'Invoices by Status')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -370,9 +370,9 @@ export function Reports() {
               </Card>
 
               {revenueReport?.paymentsByMethod && revenueReport.paymentsByMethod.length > 0 && (
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.paymentsByMethod', 'Payments by Method')}</CardTitle>
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.paymentsByMethod', 'Payments by Method')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>
@@ -381,7 +381,7 @@ export function Reports() {
                         <XAxis dataKey="method" />
                         <YAxis tickFormatter={(value) => `$${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
-                        <Bar dataKey="total" fill="#404040" name={t('analytics.totalAmount', 'Total Amount')} />
+                        <Bar dataKey="total" fill="#0A5ED7" name={t('analytics.totalAmount', 'Total Amount')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -398,35 +398,35 @@ export function Reports() {
     <div className="space-y-6">
       {jobCardsLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingJobCardAnalytics', 'Loading job card analytics...')}</p>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[#64748B]">{t('analytics.loadingJobCardAnalytics', 'Loading job card analytics...')}</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalJobCards', 'Total Job Cards')}</CardTitle>
+                <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalJobCards', 'Total Job Cards')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{jobCardAnalytics?.totalJobCards || 0}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{jobCardAnalytics?.totalJobCards || 0}</div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.avgCompletionTime', 'Avg. Completion Time')}</CardTitle>
+                <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.avgCompletionTime', 'Avg. Completion Time')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{jobCardAnalytics?.averageCompletionTime || 0}h</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{jobCardAnalytics?.averageCompletionTime || 0}h</div>
               </CardContent>
             </Card>
           </div>
 
           {jobCardAnalytics?.byStatus && jobCardAnalytics.byStatus.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobCardsByStatus', 'Job Cards by Status')}</CardTitle>
+                  <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.jobCardsByStatus', 'Job Cards by Status')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={250}>
@@ -452,9 +452,9 @@ export function Reports() {
               </Card>
 
               {jobCardAnalytics?.byPriority && jobCardAnalytics.byPriority.length > 0 && (
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobCardsByPriority', 'Job Cards by Priority')}</CardTitle>
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.jobCardsByPriority', 'Job Cards by Priority')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={250}>
@@ -463,7 +463,7 @@ export function Reports() {
                         <XAxis dataKey="priority" />
                         <YAxis />
                         <Tooltip content={<CustomCountTooltip />} />
-                        <Bar dataKey="count" fill="#8b5cf6" name={t('analytics.count', 'Count')} />
+                        <Bar dataKey="count" fill="#0BB3FF" name={t('analytics.count', 'Count')} />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -480,8 +480,8 @@ export function Reports() {
     <div className="space-y-6">
       {technicianLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingTechnicianPerformance', 'Loading technician performance...')}</p>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[#64748B]">{t('analytics.loadingTechnicianPerformance', 'Loading technician performance...')}</p>
         </div>
       ) : (
         <>
@@ -545,9 +545,9 @@ export function Reports() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
-                    <CardTitle className="text-gray-900 dark:text-white">{t('analytics.jobsCompletedByTechnician', 'Jobs Completed by Technician')}</CardTitle>
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.jobsCompletedByTechnician', 'Jobs Completed by Technician')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -563,7 +563,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.revenueGeneratedByTechnician', 'Revenue Generated by Technician')}</CardTitle>
                   </CardHeader>
@@ -581,7 +581,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.averageCompletionTime', 'Average Completion Time')}</CardTitle>
                   </CardHeader>
@@ -599,7 +599,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.efficiencyRating', 'Efficiency Rating')}</CardTitle>
                   </CardHeader>
@@ -652,8 +652,8 @@ export function Reports() {
                         <span 
                           className={`text-xs px-2 py-1 rounded-full ${
                             customer.status === 'active' ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200' :
-                            customer.status === 'recent' ? 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white' :
-                            'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300'
+                            customer.status === 'recent' ? 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white' :
+                            'bg-[#E2E8F0] dark:bg-[#232A36] text-[#64748B]'
                           }`}
                           data-testid={`status-${customer.id}`}
                         >
@@ -703,7 +703,7 @@ export function Reports() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.top10CustomersByLTV', 'Top 10 Customers by Lifetime Value')}</CardTitle>
                   </CardHeader>
@@ -721,7 +721,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.visitFrequency', 'Visit Frequency')}</CardTitle>
                   </CardHeader>
@@ -739,7 +739,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.averageInvoiceValue', 'Average Invoice Value')}</CardTitle>
                   </CardHeader>
@@ -757,7 +757,7 @@ export function Reports() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader>
                     <CardTitle className="text-gray-900 dark:text-white">{t('analytics.customerStatusDistribution', 'Customer Status Distribution')}</CardTitle>
                   </CardHeader>
@@ -817,7 +817,7 @@ export function Reports() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.totalTools', 'Total Tools')}</CardTitle>
               </CardHeader>
@@ -825,7 +825,7 @@ export function Reports() {
                 <div className="text-2xl font-bold">{inventoryReport?.totalTools || 0}</div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.available', 'Available')}</CardTitle>
               </CardHeader>
@@ -833,7 +833,7 @@ export function Reports() {
                 <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">{inventoryReport?.availableTools || 0}</div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{t('analytics.inUse', 'In Use')}</CardTitle>
               </CardHeader>
@@ -844,7 +844,7 @@ export function Reports() {
           </div>
 
           {inventoryReport?.toolsByCategory && inventoryReport.toolsByCategory.length > 0 && (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
                 <CardTitle className="text-gray-900 dark:text-white">{t('analytics.toolsByCategory', 'Tools by Category')}</CardTitle>
               </CardHeader>

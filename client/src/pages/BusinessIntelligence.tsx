@@ -29,7 +29,7 @@ import {
 } from "recharts";
 import { DashboardPage } from "@/components/layouts/DashboardPage";
 
-const COLORS = ['#1a1a1a', '#404040', '#5a5a5a', '#737373', '#8c8c8c', '#a6a6a6'];
+const COLORS = ['#0A5ED7', '#0BB3FF', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE'];
 
 export default function BusinessIntelligence() {
   const { t } = useTranslation();
@@ -93,25 +93,25 @@ export default function BusinessIntelligence() {
       label: t('analytics.avgCustomerLifetimeValue', 'Avg. Customer Lifetime Value'),
       value: `$${avgLifetimeValue.toFixed(2)}`,
       icon: DollarSign,
-      color: "text-gray-900 dark:text-white",
+      color: "text-[#0B1F3B] dark:text-white",
     },
     {
       label: t('analytics.customerAcquisitionCost', 'Customer Acquisition Cost'),
       value: `$${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
       icon: Users,
-      color: "text-gray-900 dark:text-white",
+      color: "text-[#0B1F3B] dark:text-white",
     },
     {
       label: t('analytics.peakHour', 'Peak Hour'),
       value: `${peakHours?.peakHour || 0}:00`,
       icon: Clock,
-      color: "text-gray-900 dark:text-white",
+      color: "text-[#0B1F3B] dark:text-white",
     },
     {
       label: t('analytics.peakDay', 'Peak Day'),
       value: peakHours?.peakDay || t('common.notAvailable', 'N/A'),
       icon: TrendingUp,
-      color: "text-gray-900 dark:text-white",
+      color: "text-[#0B1F3B] dark:text-white",
     },
   ];
 
@@ -122,10 +122,10 @@ export default function BusinessIntelligence() {
       icon={TrendingUp}
       metrics={metrics}
     >
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.selectGarageAndDateRange', 'Select garage and date range for analysis')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('analytics.selectGarageAndDateRange', 'Select garage and date range for analysis')}</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
@@ -169,31 +169,31 @@ export default function BusinessIntelligence() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.mostProfitableServices', 'Most Profitable Services')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.revenueCostProfit', 'Revenue, cost, and profit by service type')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.mostProfitableServices', 'Most Profitable Services')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.revenueCostProfit', 'Revenue, cost, and profit by service type')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={profitableServices?.services || []}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="serviceType" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="serviceType" stroke="#64748B" />
+                <YAxis stroke="#64748B" />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="revenue" fill="#404040" name={t('analytics.revenue', 'Revenue')} />
-                <Bar dataKey="cost" fill="#8c8c8c" name={t('analytics.cost', 'Cost')} />
-                <Bar dataKey="profit" fill="#5a5a5a" name={t('analytics.profit', 'Profit')} />
+                <Bar dataKey="revenue" fill="#0A5ED7" name={t('analytics.revenue', 'Revenue')} />
+                <Bar dataKey="cost" fill="#F97316" name={t('analytics.cost', 'Cost')} />
+                <Bar dataKey="profit" fill="#22c55e" name={t('analytics.profit', 'Profit')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.profitMarginByService', 'Profit Margin by Service')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.percentageProfitMargin', 'Percentage profit margin for each service type')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.profitMarginByService', 'Profit Margin by Service')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.percentageProfitMargin', 'Percentage profit margin for each service type')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -205,7 +205,7 @@ export default function BusinessIntelligence() {
                   labelLine={false}
                   label={(entry) => `${entry.serviceType}: ${entry.profitMargin.toFixed(1)}%`}
                   outerRadius={80}
-                  fill="#737373"
+                  fill="#0A5ED7"
                   dataKey="profitMargin"
                 >
                   {profitableServices?.services?.map((entry: any, index: number) => (
@@ -220,43 +220,43 @@ export default function BusinessIntelligence() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.hourlyDistribution', 'Hourly Distribution')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.appointmentsRevenueByHour', 'Appointments and revenue by hour of day')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.hourlyDistribution', 'Hourly Distribution')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.appointmentsRevenueByHour', 'Appointments and revenue by hour of day')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={peakHours?.hourlyDistribution || []}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="hour" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="hour" stroke="#64748B" />
+                <YAxis yAxisId="left" stroke="#64748B" />
+                <YAxis yAxisId="right" orientation="right" stroke="#64748B" />
                 <Tooltip />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="count" stroke="#737373" name={t('nav.appointments', 'Appointments')} />
-                <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#a6a6a6" name={t('analytics.revenueAmount', 'Revenue ($)')} />
+                <Line yAxisId="left" type="monotone" dataKey="count" stroke="#0A5ED7" name={t('nav.appointments', 'Appointments')} />
+                <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#0BB3FF" name={t('analytics.revenueAmount', 'Revenue ($)')} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.dailyDistribution', 'Daily Distribution')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.appointmentsRevenueByDay', 'Appointments and revenue by day of week')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.dailyDistribution', 'Daily Distribution')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.appointmentsRevenueByDay', 'Appointments and revenue by day of week')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={peakHours?.dailyDistribution || []}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="day" stroke="#64748B" />
+                <YAxis yAxisId="left" stroke="#64748B" />
+                <YAxis yAxisId="right" orientation="right" stroke="#64748B" />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="count" fill="#737373" name={t('nav.appointments', 'Appointments')} />
-                <Bar yAxisId="right" dataKey="revenue" fill="#82ca9d" name={t('analytics.revenueAmount', 'Revenue ($)')} />
+                <Bar yAxisId="left" dataKey="count" fill="#0A5ED7" name={t('nav.appointments', 'Appointments')} />
+                <Bar yAxisId="right" dataKey="revenue" fill="#22c55e" name={t('analytics.revenueAmount', 'Revenue ($)')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -264,30 +264,30 @@ export default function BusinessIntelligence() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.technicianUtilizationRates', 'Technician Utilization Rates')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.hoursWorkedVsAvailable', 'Hours worked vs available by technician')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.technicianUtilizationRates', 'Technician Utilization Rates')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.hoursWorkedVsAvailable', 'Hours worked vs available by technician')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={technicianUtilization?.technicians || []}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" />
+                <YAxis stroke="#64748B" />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="totalHoursWorked" fill="#0088FE" name={t('analytics.hoursWorked', 'Hours Worked')} />
-                <Bar dataKey="totalHoursAvailable" fill="#82ca9d" name={t('analytics.hoursAvailable', 'Hours Available')} />
+                <Bar dataKey="totalHoursWorked" fill="#0A5ED7" name={t('analytics.hoursWorked', 'Hours Worked')} />
+                <Bar dataKey="totalHoursAvailable" fill="#0BB3FF" name={t('analytics.hoursAvailable', 'Hours Available')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">{t('analytics.customerAcquisitionSources', 'Customer Acquisition Sources')}</CardTitle>
-            <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.newCustomersByChannel', 'New customers by acquisition channel')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.customerAcquisitionSources', 'Customer Acquisition Sources')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('analytics.newCustomersByChannel', 'New customers by acquisition channel')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -299,7 +299,7 @@ export default function BusinessIntelligence() {
                   labelLine={false}
                   label={(entry) => `${entry.source}: ${entry.count}`}
                   outerRadius={80}
-                  fill="#737373"
+                  fill="#0A5ED7"
                   dataKey="count"
                 >
                   {acquisitionCost?.customersBySource?.map((entry: any, index: number) => (
@@ -313,35 +313,35 @@ export default function BusinessIntelligence() {
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark mb-6">
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] mb-6">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">{t('analytics.topCustomersByLifetimeValue', 'Top Customers by Lifetime Value')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.top5CustomersByRevenue', 'Top 5 customers ranked by total revenue')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.topCustomersByLifetimeValue', 'Top Customers by Lifetime Value')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('analytics.top5CustomersByRevenue', 'Top 5 customers ranked by total revenue')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {topCustomers.map((customer: any, index: number) => (
               <div
                 key={customer.id}
-                className="flex items-center justify-between p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
+                className="flex items-center justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                 data-testid={`customer-${index}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-900 dark:text-white font-semibold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center text-white font-semibold">
                     {index + 1}
                   </div>
                   <div>
-                    <p className="font-medium">{customer.name || t('common.unknown', 'Unknown')}</p>
-                    <p className="text-sm text-gray-900 dark:text-white/60">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{customer.name || t('common.unknown', 'Unknown')}</p>
+                    <p className="text-sm text-[#64748B]">
                       {customer.totalInvoices} {t('nav.invoices', 'invoices')} • {customer.totalVisits} {t('analytics.visits', 'visits')}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                     ${customer.lifetimeValue.toFixed(2)}
                   </p>
-                  <p className="text-sm text-gray-900 dark:text-white/60">
+                  <p className="text-sm text-[#64748B]">
                     {t('analytics.avg', 'Avg')}: ${customer.avgInvoiceValue.toFixed(2)}
                   </p>
                 </div>
@@ -351,40 +351,40 @@ export default function BusinessIntelligence() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">{t('analytics.technicianPerformanceDetails', 'Technician Performance Details')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('analytics.detailedMetricsForTechnicians', 'Detailed metrics for each technician')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.technicianPerformanceDetails', 'Technician Performance Details')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('analytics.detailedMetricsForTechnicians', 'Detailed metrics for each technician')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {technicianUtilization?.technicians?.map((tech: any) => (
               <div
                 key={tech.id}
-                className="flex items-center justify-between p-3 border border-gray-200 dark:border-salis-gray-dark rounded-lg"
+                className="flex items-center justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                 data-testid={`technician-${tech.id}`}
               >
                 <div className="flex items-center gap-3">
-                  <Wrench className="w-8 h-8 text-gray-700 dark:text-gray-300" />
+                  <Wrench className="w-8 h-8 text-[#0A5ED7]" />
                   <div>
-                    <p className="font-medium">{tech.name}</p>
-                    <p className="text-sm text-gray-900 dark:text-white/60">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{tech.name}</p>
+                    <p className="text-sm text-[#64748B]">
                       {tech.jobsCompleted} {t('analytics.jobsCompleted', 'jobs completed')}
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-8 text-right">
                   <div>
-                    <p className="text-sm text-gray-900 dark:text-white/60">{t('analytics.utilization', 'Utilization')}</p>
-                    <p className="text-lg font-bold">{tech.utilizationRate.toFixed(1)}%</p>
+                    <p className="text-sm text-[#64748B]">{t('analytics.utilization', 'Utilization')}</p>
+                    <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.utilizationRate.toFixed(1)}%</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-900 dark:text-white/60">{t('analytics.hoursWorked', 'Hours Worked')}</p>
-                    <p className="text-lg font-bold">{tech.totalHoursWorked.toFixed(1)}</p>
+                    <p className="text-sm text-[#64748B]">{t('analytics.hoursWorked', 'Hours Worked')}</p>
+                    <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.totalHoursWorked.toFixed(1)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-900 dark:text-white/60">{t('analytics.revenue', 'Revenue')}</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    <p className="text-sm text-[#64748B]">{t('analytics.revenue', 'Revenue')}</p>
+                    <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                       ${tech.revenueGenerated.toFixed(2)}
                     </p>
                   </div>

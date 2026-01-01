@@ -29,29 +29,28 @@ export default function TechnicianTimeClock() {
   const currentTime = new Date();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-2">
           Time Clock
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-[#64748B]">
           Track your working hours
         </p>
       </div>
 
-      {/* Current Status */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="text-center space-y-6">
-            <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gray-100 dark:bg-salis-gray">
-              <Clock className="h-16 w-16 text-gray-600 dark:text-gray-400" />
+            <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+              <Clock className="h-16 w-16 text-white" />
             </div>
             
             <div>
-              <p className="text-5xl font-bold text-gray-900 dark:text-white mb-2">
+              <p className="text-5xl font-bold text-[#0B1F3B] dark:text-white mb-2">
                 {format(currentTime, "HH:mm:ss")}
               </p>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-[#64748B]">
                 {format(currentTime, "EEEE, MMMM d, yyyy")}
               </p>
             </div>
@@ -72,7 +71,7 @@ export default function TechnicianTimeClock() {
                 <Button
                   onClick={handleClockIn}
                   size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-white px-8"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white px-8"
                   data-testid="button-clock-in"
                 >
                   <LogIn className="h-5 w-5 mr-2" />
@@ -94,37 +93,36 @@ export default function TechnicianTimeClock() {
         </CardContent>
       </Card>
 
-      {/* Recent Time Entries */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Recent Time Entries</CardTitle>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Recent Time Entries</CardTitle>
+          <p className="text-sm text-[#64748B] mt-1">
             Your work hour history
           </p>
         </CardHeader>
         <CardContent>
           {!timeEntries || timeEntries.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">No time entries yet</p>
+              <Calendar className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+              <p className="text-[#64748B]">No time entries yet</p>
             </div>
           ) : (
             <div className="space-y-3">
               {timeEntries.slice(0, 10).map((entry, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-salis-gray rounded-lg"
+                  className="flex items-center justify-between p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">
                       {entry.date}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {entry.clockIn} - {entry.clockOut}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       {entry.totalHours} hrs
                     </p>
                   </div>

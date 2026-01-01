@@ -63,7 +63,7 @@ export default function ISOQualityManagement() {
       label: t('quality.totalNCs', 'Total NCs'),
       value: stats.totalNCs,
       icon: AlertCircle,
-      color: 'text-yellow-600',
+      color: 'text-[#F97316]',
     },
     {
       label: t('quality.open', 'Open'),
@@ -81,7 +81,7 @@ export default function ISOQualityManagement() {
       label: t('quality.complianceScore', 'Compliance Score'),
       value: `${stats.complianceScore}%`,
       icon: Award,
-      color: 'text-blue-600',
+      color: 'text-[#0A5ED7]',
     },
   ];
 
@@ -92,27 +92,27 @@ export default function ISOQualityManagement() {
       icon: FileText,
       badge: nonConformances.length,
       content: (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('quality.recentNonConformances', 'Recent Non-Conformances')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('quality.recentNonConformances', 'Recent Non-Conformances')}</CardTitle>
           </CardHeader>
           <CardContent>
             {ncsLoading ? (
-              <div className="text-center py-8 text-gray-500">{t('quality.loadingNonConformances', 'Loading non-conformances...')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('quality.loadingNonConformances', 'Loading non-conformances...')}</div>
             ) : nonConformances.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">{t('quality.noNonConformancesFound', 'No non-conformances found')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('quality.noNonConformancesFound', 'No non-conformances found')}</div>
             ) : (
               <div className="space-y-3">
                 {nonConformances.map((nc) => (
-                  <div key={nc.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`nc-${nc.id}`}>
+                  <div key={nc.id} className="flex items-start justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`nc-${nc.id}`}>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{nc.ncNumber}</h3>
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{nc.ncNumber}</h3>
                         <Badge variant={nc.severity === "major" ? "destructive" : "secondary"}>{nc.severity}</Badge>
                         <Badge>{nc.category}</Badge>
                       </div>
-                      <p className="text-sm text-gray-900 dark:text-white mb-1">{nc.title}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('quality.detectedBy', 'Detected by')} {nc.detectedBy} • {new Date(nc.detectedDate).toLocaleDateString()}</p>
+                      <p className="text-sm text-[#0B1F3B] dark:text-white mb-1">{nc.title}</p>
+                      <p className="text-sm text-[#64748B]">{t('quality.detectedBy', 'Detected by')} {nc.detectedBy} • {new Date(nc.detectedDate).toLocaleDateString()}</p>
                     </div>
                     <Badge variant={nc.status === "resolved" ? "default" : "secondary"}>{nc.status}</Badge>
                   </div>
@@ -129,26 +129,26 @@ export default function ISOQualityManagement() {
       icon: ClipboardCheck,
       badge: checklists.length,
       content: (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('quality.qualityChecklists', 'Quality Checklists')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('quality.qualityChecklists', 'Quality Checklists')}</CardTitle>
           </CardHeader>
           <CardContent>
             {checklistsLoading ? (
-              <div className="text-center py-8 text-gray-500">{t('quality.loadingChecklists', 'Loading checklists...')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('quality.loadingChecklists', 'Loading checklists...')}</div>
             ) : checklists.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">{t('quality.noChecklistsFound', 'No quality checklists found')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('quality.noChecklistsFound', 'No quality checklists found')}</div>
             ) : (
               <div className="space-y-3">
                 {checklists.map((checklist) => (
-                  <div key={checklist.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`checklist-${checklist.id}`}>
+                  <div key={checklist.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`checklist-${checklist.id}`}>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{checklist.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{checklist.itemCount || 0} {t('quality.items', 'items')} • {checklist.category?.replace("_", " ")}</p>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{checklist.name}</h3>
+                      <p className="text-sm text-[#64748B]">{checklist.itemCount || 0} {t('quality.items', 'items')} • {checklist.category?.replace("_", " ")}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900 dark:text-white">{checklist.completionRate || 0}%</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('quality.completion', 'Completion')}</p>
+                      <p className="font-semibold text-[#0B1F3B] dark:text-white">{checklist.completionRate || 0}%</p>
+                      <p className="text-sm text-[#64748B]">{t('quality.completion', 'Completion')}</p>
                     </div>
                   </div>
                 ))}
@@ -182,6 +182,7 @@ export default function ISOQualityManagement() {
           }}
           disabled={createNCMutation.isPending}
           data-testid="button-report-nc"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
         >
           {createNCMutation.isPending ? t('quality.reporting', 'Reporting...') : t('quality.reportNonConformance', 'Report Non-Conformance')}
         </Button>

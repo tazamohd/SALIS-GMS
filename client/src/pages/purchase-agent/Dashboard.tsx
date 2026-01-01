@@ -51,7 +51,7 @@ export default function PurchaseAgentDashboard() {
       title: "Pending Orders",
       value: pendingOrders.length,
       icon: Clock,
-      color: "text-orange-500",
+      color: "text-[#F97316]",
       bgColor: "bg-orange-50 dark:bg-orange-900/20",
       trend: "+3 this week",
       trendUp: true,
@@ -69,7 +69,7 @@ export default function PurchaseAgentDashboard() {
       title: "Active Suppliers",
       value: activeSuppliers.length,
       icon: Users,
-      color: "text-blue-500",
+      color: "text-[#0A5ED7]",
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
       trend: "+2 this month",
       trendUp: true,
@@ -101,17 +101,17 @@ export default function PurchaseAgentDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
           Purchase Agent Dashboard
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-[#64748B] mt-1">
           Manage procurement, track orders, and monitor inventory levels
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title} data-testid={`stat-${stat.title.toLowerCase().replace(/\s+/g, "-")}`}>
+          <Card key={stat.title} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`stat-${stat.title.toLowerCase().replace(/\s+/g, "-")}`}>
             <CardContent className="pt-6">
               <div className="flex items-start justify-between">
                 <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -129,10 +129,10 @@ export default function PurchaseAgentDashboard() {
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                   {stat.value}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.title}</p>
+                <p className="text-sm text-[#64748B]">{stat.title}</p>
               </div>
             </CardContent>
           </Card>
@@ -140,39 +140,39 @@ export default function PurchaseAgentDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Recent Purchase Orders</CardTitle>
-              <CardDescription>Latest procurement activities</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">Recent Purchase Orders</CardTitle>
+              <CardDescription className="text-[#64748B]">Latest procurement activities</CardDescription>
             </div>
             <Link href="/purchase-agent/orders">
-              <Button variant="outline" size="sm" data-testid="button-view-all-orders">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-view-all-orders">
                 View All
               </Button>
             </Link>
           </CardHeader>
           <CardContent>
             {recentOrders.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No purchase orders yet</p>
+              <p className="text-center text-[#64748B] py-8">No purchase orders yet</p>
             ) : (
               <div className="space-y-4">
                 {recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`order-${order.id}`}
                   >
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">
                         {order.poNumber}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-[#64748B]">
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold">${order.totalAmount}</span>
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white">${order.totalAmount}</span>
                       {getStatusBadge(order.status)}
                     </div>
                   </div>
@@ -182,14 +182,14 @@ export default function PurchaseAgentDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Low Stock Alerts</CardTitle>
-              <CardDescription>Items requiring immediate attention</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">Low Stock Alerts</CardTitle>
+              <CardDescription className="text-[#64748B]">Items requiring immediate attention</CardDescription>
             </div>
             <Link href="/purchase-agent/inventory">
-              <Button variant="outline" size="sm" data-testid="button-view-inventory">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-view-inventory">
                 View All
               </Button>
             </Link>
@@ -198,7 +198,7 @@ export default function PurchaseAgentDashboard() {
             {lowStockItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <CheckCircle className="h-12 w-12 text-green-500 mb-2" />
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-[#64748B]">
                   All inventory levels are healthy!
                 </p>
               </div>
@@ -213,16 +213,16 @@ export default function PurchaseAgentDashboard() {
                       data-testid={`low-stock-${inv.id}`}
                     >
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">
+                        <p className="font-medium text-[#0B1F3B] dark:text-white">
                           {part?.name || "Unknown Part"}
                         </p>
-                        <p className="text-sm text-gray-500">{part?.sku}</p>
+                        <p className="text-sm text-[#64748B]">{part?.sku}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-red-600">
                           {inv.stockQuantity} in stock
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-[#64748B]">
                           Min: {inv.minThreshold}
                         </p>
                       </div>
@@ -235,51 +235,51 @@ export default function PurchaseAgentDashboard() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common procurement tasks</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Quick Actions</CardTitle>
+          <CardDescription className="text-[#64748B]">Common procurement tasks</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/purchase-agent/orders">
               <Button
                 variant="outline"
-                className="w-full h-24 flex flex-col gap-2"
+                className="w-full h-24 flex flex-col gap-2 border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 data-testid="button-create-order"
               >
-                <ShoppingCart className="h-6 w-6" />
-                <span>Create Order</span>
+                <ShoppingCart className="h-6 w-6 text-[#0A5ED7]" />
+                <span className="text-[#0B1F3B] dark:text-white">Create Order</span>
               </Button>
             </Link>
             <Link href="/purchase-agent/suppliers">
               <Button
                 variant="outline"
-                className="w-full h-24 flex flex-col gap-2"
+                className="w-full h-24 flex flex-col gap-2 border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 data-testid="button-manage-suppliers"
               >
-                <Users className="h-6 w-6" />
-                <span>Manage Suppliers</span>
+                <Users className="h-6 w-6 text-[#0A5ED7]" />
+                <span className="text-[#0B1F3B] dark:text-white">Manage Suppliers</span>
               </Button>
             </Link>
             <Link href="/purchase-agent/price-compare">
               <Button
                 variant="outline"
-                className="w-full h-24 flex flex-col gap-2"
+                className="w-full h-24 flex flex-col gap-2 border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 data-testid="button-compare-prices"
               >
-                <TrendingUp className="h-6 w-6" />
-                <span>Compare Prices</span>
+                <TrendingUp className="h-6 w-6 text-[#0A5ED7]" />
+                <span className="text-[#0B1F3B] dark:text-white">Compare Prices</span>
               </Button>
             </Link>
             <Link href="/purchase-agent/inventory">
               <Button
                 variant="outline"
-                className="w-full h-24 flex flex-col gap-2"
+                className="w-full h-24 flex flex-col gap-2 border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 data-testid="button-check-inventory"
               >
-                <Package className="h-6 w-6" />
-                <span>Check Inventory</span>
+                <Package className="h-6 w-6 text-[#0A5ED7]" />
+                <span className="text-[#0B1F3B] dark:text-white">Check Inventory</span>
               </Button>
             </Link>
           </div>

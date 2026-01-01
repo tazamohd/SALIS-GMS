@@ -125,13 +125,13 @@ export default function CustomerLTVAnalysis() {
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "low":
-        return "text-green-600";
+        return "text-[#10B981]";
       case "medium":
-        return "text-yellow-600";
+        return "text-[#F97316]";
       case "high":
-        return "text-red-600";
+        return "text-[#ef4444]";
       default:
-        return "text-gray-600";
+        return "text-[#64748B]";
     }
   };
 
@@ -150,54 +150,54 @@ export default function CustomerLTVAnalysis() {
 
   const summaryCards = (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-customers">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-customers">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.totalCustomers', 'Total Customers')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">604</h3>
-              <p className="text-sm text-green-600 mt-1">+23 this month</p>
+              <p className="text-sm text-[#64748B]">{t('customers.ltv.totalCustomers', 'Total Customers')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">604</h3>
+              <p className="text-sm text-[#10B981] mt-1">+23 this month</p>
             </div>
-            <Users className="h-12 w-12 text-blue-600" />
+            <Users className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-avg-ltv">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-ltv">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">$51,600</h3>
-              <p className="text-sm text-green-600 mt-1">+8.5% vs last year</p>
+              <p className="text-sm text-[#64748B]">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">$51,600</h3>
+              <p className="text-sm text-[#10B981] mt-1">+8.5% vs last year</p>
             </div>
-            <DollarSign className="h-12 w-12 text-green-600" />
+            <DollarSign className="h-12 w-12 text-[#10B981]" />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-high-risk">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-high-risk">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.highRisk', 'High Risk')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">42</h3>
-              <p className="text-sm text-red-600 mt-1">Need attention</p>
+              <p className="text-sm text-[#64748B]">{t('customers.ltv.highRisk', 'High Risk')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">42</h3>
+              <p className="text-sm text-[#F97316] mt-1">Need attention</p>
             </div>
-            <AlertTriangle className="h-12 w-12 text-red-600" />
+            <AlertTriangle className="h-12 w-12 text-[#F97316]" />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-retention-rate">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-retention-rate">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('customers.ltv.retentionRate', 'Retention Rate')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">87.3%</h3>
-              <p className="text-sm text-green-600 mt-1">+2.1% improvement</p>
+              <p className="text-sm text-[#64748B]">{t('customers.ltv.retentionRate', 'Retention Rate')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">87.3%</h3>
+              <p className="text-sm text-[#10B981] mt-1">+2.1% improvement</p>
             </div>
-            <CheckCircle className="h-12 w-12 text-green-600" />
+            <CheckCircle className="h-12 w-12 text-[#10B981]" />
           </div>
         </CardContent>
       </Card>
@@ -205,9 +205,9 @@ export default function CustomerLTVAnalysis() {
   );
 
   const ltvSegmentsChart = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.ltv.segmentsByLTV', 'Customer Segments by LTV')}</CardTitle>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.ltv.segmentsByLTV', 'Customer Segments by LTV')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -218,8 +218,8 @@ export default function CustomerLTVAnalysis() {
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip />
             <Legend />
-            <Bar yAxisId="left" dataKey="count" fill="#000000" name="Customer Count" />
-            <Bar yAxisId="right" dataKey="avgLTV" fill="#6B7280" name="Avg LTV ($)" />
+            <Bar yAxisId="left" dataKey="count" fill="#0A5ED7" name="Customer Count" />
+            <Bar yAxisId="right" dataKey="avgLTV" fill="#0BB3FF" name="Avg LTV ($)" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -227,16 +227,16 @@ export default function CustomerLTVAnalysis() {
   );
 
   const allCustomersTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
             <Input
               placeholder={t('customers.searchPlaceholder', 'Search customers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-search-customers"
             />
           </div>
@@ -247,17 +247,17 @@ export default function CustomerLTVAnalysis() {
           {customers.map((customer) => (
             <div
               key={customer.id}
-              className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+              className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
               data-testid={`customer-${customer.id}`}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                     {customer.name}
                   </h3>
                   {getRiskBadge(customer.retentionRisk)}
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-[#64748B]">
                   <div>
                     <span className="font-medium">Revenue:</span> ${customer.totalRevenue.toLocaleString()}
                   </div>
@@ -273,10 +273,10 @@ export default function CustomerLTVAnalysis() {
                 </div>
               </div>
               <div className="text-right ml-4">
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                   ${customer.predictedLTV.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Predicted LTV</p>
+                <p className="text-xs text-[#64748B]">Predicted LTV</p>
                 <p className={`text-sm font-medium mt-1 ${getRiskColor(customer.retentionRisk)}`}>
                   {customer.retentionScore}% retention
                 </p>
@@ -289,32 +289,32 @@ export default function CustomerLTVAnalysis() {
   );
 
   const highValueTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.ltv.highValueCustomers', 'High Value Customers (Top 10%)')}</CardTitle>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.ltv.highValueCustomers', 'High Value Customers (Top 10%)')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-[#64748B] mb-4">
           {t('customers.ltv.highValueDescription', 'These customers represent your most valuable relationships. Focus on retention and expansion opportunities.')}
         </p>
         <div className="space-y-3">
           {customers.filter(c => c.predictedLTV > 150000).map((customer) => (
             <div
               key={customer.id}
-              className="p-4 border-2 border-green-200 dark:border-green-900 rounded-lg bg-green-50 dark:bg-green-950"
+              className="p-4 border-2 border-[#10B981]/30 rounded-lg bg-[#10B981]/5 dark:bg-[#10B981]/10"
               data-testid={`high-value-${customer.id}`}
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{customer.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{customer.name}</h3>
+                  <p className="text-sm text-[#64748B] mt-1">
                     LTV: ${customer.predictedLTV.toLocaleString()} | {customer.visits} visits
                   </p>
-                  <p className="text-sm text-green-700 dark:text-green-400 mt-2 font-medium">
+                  <p className="text-sm text-[#10B981] mt-2 font-medium">
                     ✓ {customer.recommendedAction}
                   </p>
                 </div>
-                <Badge className="bg-green-600 text-white">VIP</Badge>
+                <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">VIP</Badge>
               </div>
             </div>
           ))}
@@ -324,38 +324,38 @@ export default function CustomerLTVAnalysis() {
   );
 
   const atRiskTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-red-600" />
+        <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+          <AlertTriangle className="h-5 w-5 text-[#F97316]" />
           {t('customers.ltv.atRiskCustomers', 'At-Risk Customers')}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-[#64748B] mb-4">
           {t('customers.ltv.atRiskDescription', 'These customers show signs of potential churn. Immediate action recommended.')}
         </p>
         <div className="space-y-3">
           {customers.filter(c => c.retentionRisk === "high" || c.retentionRisk === "medium").map((customer) => (
             <div
               key={customer.id}
-              className="p-4 border-2 border-red-200 dark:border-red-900 rounded-lg bg-red-50 dark:bg-red-950"
+              className="p-4 border-2 border-[#F97316]/30 rounded-lg bg-[#F97316]/5 dark:bg-[#F97316]/10"
               data-testid={`at-risk-${customer.id}`}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{customer.name}</h3>
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{customer.name}</h3>
                     {getRiskBadge(customer.retentionRisk)}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[#64748B]">
                     Churn Probability: {customer.churnProbability}% | Last visit: {new Date(customer.lastVisit).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-red-700 dark:text-red-400 mt-2 font-medium">
+                  <p className="text-sm text-[#F97316] mt-2 font-medium">
                     → {customer.recommendedAction}
                   </p>
                 </div>
-                <Button size="sm" variant="outline" data-testid={`button-action-${customer.id}`}>
+                <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-action-${customer.id}`}>
                   {t('customers.ltv.takeAction', 'Take Action')}
                 </Button>
               </div>
@@ -367,9 +367,9 @@ export default function CustomerLTVAnalysis() {
   );
 
   const insightsTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.ltv.insights', 'Customer Value Insights')}</CardTitle>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.ltv.insights', 'Customer Value Insights')}</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
@@ -380,25 +380,25 @@ export default function CustomerLTVAnalysis() {
             <ZAxis type="number" dataKey="z" range={[100, 1000]} name="Predicted LTV" />
             <Tooltip cursor={{ strokeDasharray: '3 3' }} />
             <Legend />
-            <Scatter name="Customers" data={scatterData} fill="#000000" />
+            <Scatter name="Customers" data={scatterData} fill="#0A5ED7" />
           </ScatterChart>
         </ResponsiveContainer>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.keyFinding', 'Key Finding')}</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+            <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('customers.ltv.keyFinding', 'Key Finding')}</h4>
+            <p className="text-sm text-[#64748B]">
               {t('customers.ltv.keyFindingText', 'Customers with 20+ visits have 3.2x higher lifetime value')}
             </p>
           </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.recommendation', 'Recommendation')}</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+            <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('customers.ltv.recommendation', 'Recommendation')}</h4>
+            <p className="text-sm text-[#64748B]">
               {t('customers.ltv.recommendationText', 'Focus retention efforts on customers with 5-15 visits')}
             </p>
           </div>
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('customers.ltv.opportunity', 'Opportunity')}</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+            <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('customers.ltv.opportunity', 'Opportunity')}</h4>
+            <p className="text-sm text-[#64748B]">
               {t('customers.ltv.opportunityText', '42 customers at risk represent $6.4M potential loss')}
             </p>
           </div>

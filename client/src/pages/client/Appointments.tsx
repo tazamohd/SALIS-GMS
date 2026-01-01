@@ -127,27 +127,27 @@ export default function ClientAppointments() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">
+          <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
             Appointments
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-[#64748B] mt-1">
             View and manage your service appointments
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button data-testid="button-book-new">
+            <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-book-new">
               <Plus className="h-4 w-4 mr-2" />
               Book Appointment
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <DialogHeader>
-              <DialogTitle>Book Service Appointment</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">Book Service Appointment</DialogTitle>
+              <DialogDescription className="text-[#64748B]">
                 Schedule a service appointment for your vehicle
               </DialogDescription>
             </DialogHeader>
@@ -158,16 +158,16 @@ export default function ClientAppointments() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vehicle</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Vehicle</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-vehicle">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
                             <SelectValue placeholder="Select vehicle" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           {myVehicles.map((vehicle: any) => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>
+                            <SelectItem key={vehicle.id} value={vehicle.id} className="text-[#0B1F3B] dark:text-white">
                               {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
                             </SelectItem>
                           ))}
@@ -183,20 +183,20 @@ export default function ClientAppointments() {
                   name="scheduledDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date & Time</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Date & Time</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
+                                "w-full pl-3 text-left font-normal bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]",
+                                !field.value && "text-[#64748B]"
                               )}
                               data-testid="button-select-date"
                             >
                               {field.value ? (
-                                format(field.value, "PPP")
+                                <span className="text-[#0B1F3B] dark:text-white">{format(field.value, "PPP")}</span>
                               ) : (
                                 <span>Pick a date</span>
                               )}
@@ -204,7 +204,7 @@ export default function ClientAppointments() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
+                        <PopoverContent className="w-auto p-0 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" align="start">
                           <Calendar
                             mode="single"
                             selected={field.value}
@@ -224,10 +224,11 @@ export default function ClientAppointments() {
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Service Type</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Service Type</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Describe the service needed (e.g., Oil change, Brake inspection)"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-service-type"
                         />
@@ -242,10 +243,11 @@ export default function ClientAppointments() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Additional Notes (Optional)</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Additional Notes (Optional)</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Any additional information..."
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-notes"
                         />
@@ -260,7 +262,7 @@ export default function ClientAppointments() {
                     type="button"
                     variant="outline"
                     onClick={() => setDialogOpen(false)}
-                    className="flex-1"
+                    className="flex-1 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                     data-testid="button-cancel"
                   >
                     Cancel
@@ -268,7 +270,7 @@ export default function ClientAppointments() {
                   <Button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="flex-1"
+                    className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                     data-testid="button-submit"
                   >
                     {createMutation.isPending ? "Booking..." : "Book Appointment"}
@@ -280,20 +282,19 @@ export default function ClientAppointments() {
         </Dialog>
       </div>
 
-      {/* Upcoming Appointments */}
-      <Card data-testid="card-upcoming">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-upcoming">
         <CardHeader>
-          <CardTitle>Upcoming Appointments</CardTitle>
-          <CardDescription>Your scheduled service appointments</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Upcoming Appointments</CardTitle>
+          <CardDescription className="text-[#64748B]">Your scheduled service appointments</CardDescription>
         </CardHeader>
         <CardContent>
           {appointmentsLoading ? (
             <div className="space-y-4">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
+              <Skeleton className="h-24 bg-[#E2E8F0] dark:bg-[#232A36]" />
+              <Skeleton className="h-24 bg-[#E2E8F0] dark:bg-[#232A36]" />
             </div>
           ) : upcomingAppointments.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12 text-[#64748B]">
               <CalendarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>No upcoming appointments</p>
             </div>
@@ -302,26 +303,28 @@ export default function ClientAppointments() {
               {upcomingAppointments.map((appointment: any) => (
                 <div
                   key={appointment.id}
-                  className="flex items-start gap-4 p-4 rounded-lg border"
+                  className="flex items-start gap-4 p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]"
                   data-testid={`appointment-${appointment.id}`}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Car className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10">
+                    <Car className="h-5 w-5 text-[#0A5ED7]" />
                   </div>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">{getVehicleInfo(appointment.vehicleId)}</p>
-                        <p className="text-sm text-muted-foreground">{appointment.serviceType}</p>
+                        <p className="font-medium text-[#0B1F3B] dark:text-white">{getVehicleInfo(appointment.vehicleId)}</p>
+                        <p className="text-sm text-[#64748B]">{appointment.serviceType}</p>
                       </div>
-                      <Badge variant={
-                        appointment.status === "confirmed" ? "default" :
-                        appointment.status === "scheduled" ? "secondary" : "outline"
-                      }>
+                      <Badge 
+                        variant={appointment.status === "confirmed" ? "default" : "secondary"}
+                        className={appointment.status === "confirmed" 
+                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
+                          : "bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white"}
+                      >
                         {appointment.status}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4 text-sm text-[#64748B]">
                       <div className="flex items-center gap-1">
                         <CalendarIcon className="h-4 w-4" />
                         {new Date(appointment.scheduledDate).toLocaleDateString("en-US", {
@@ -333,7 +336,7 @@ export default function ClientAppointments() {
                       </div>
                     </div>
                     {appointment.notes && (
-                      <p className="text-sm text-muted-foreground italic">
+                      <p className="text-sm text-[#64748B] italic">
                         Note: {appointment.notes}
                       </p>
                     )}
@@ -345,20 +348,19 @@ export default function ClientAppointments() {
         </CardContent>
       </Card>
 
-      {/* Past Appointments */}
-      <Card data-testid="card-past">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-past">
         <CardHeader>
-          <CardTitle>Past Appointments</CardTitle>
-          <CardDescription>Your appointment history</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Past Appointments</CardTitle>
+          <CardDescription className="text-[#64748B]">Your appointment history</CardDescription>
         </CardHeader>
         <CardContent>
           {appointmentsLoading ? (
             <div className="space-y-4">
-              <Skeleton className="h-20" />
-              <Skeleton className="h-20" />
+              <Skeleton className="h-20 bg-[#E2E8F0] dark:bg-[#232A36]" />
+              <Skeleton className="h-20 bg-[#E2E8F0] dark:bg-[#232A36]" />
             </div>
           ) : pastAppointments.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-[#64748B]">
               <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>No past appointments</p>
             </div>
@@ -372,16 +374,16 @@ export default function ClientAppointments() {
                 .map((appointment: any) => (
                   <div
                     key={appointment.id}
-                    className="flex items-center justify-between p-3 rounded-lg border"
+                    className="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`past-appointment-${appointment.id}`}
                   >
                     <div>
-                      <p className="font-medium text-sm">{getVehicleInfo(appointment.vehicleId)}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{getVehicleInfo(appointment.vehicleId)}</p>
+                      <p className="text-xs text-[#64748B]">
                         {new Date(appointment.scheduledDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <Badge variant="outline">{appointment.status}</Badge>
+                    <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{appointment.status}</Badge>
                   </div>
                 ))}
             </div>

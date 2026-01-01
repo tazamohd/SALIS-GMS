@@ -42,24 +42,23 @@ export default function TechnicianJobDocumentation() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-2">
           Job Documentation
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-[#64748B]">
           Upload photos and videos for job cards
         </p>
       </div>
 
-      {/* Job Selection */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Select Active Job</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Select Active Job</CardTitle>
         </CardHeader>
         <CardContent>
           {activeJobs.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-400 text-center py-4">
+            <p className="text-[#64748B] text-center py-4">
               No active jobs to document
             </p>
           ) : (
@@ -70,15 +69,15 @@ export default function TechnicianJobDocumentation() {
                   onClick={() => setSelectedJobId(job.id)}
                   className={`p-4 rounded-lg border-2 transition-all text-left ${
                     selectedJobId === job.id
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                      ? "border-[#0A5ED7] bg-blue-50 dark:bg-blue-900/20"
+                      : "border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/50"
                   }`}
                   data-testid={`button-select-job-${job.id}`}
                 >
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">
                     Job #{job.jobNumber}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-[#64748B] mt-1">
                     {job.serviceType}
                   </p>
                 </button>
@@ -88,12 +87,11 @@ export default function TechnicianJobDocumentation() {
         </CardContent>
       </Card>
 
-      {/* Upload Section */}
       {selectedJobId && (
-        <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Upload Media</CardTitle>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Upload Media</CardTitle>
+            <p className="text-sm text-[#64748B] mt-1">
               Add photos or videos to document your work
             </p>
           </CardHeader>
@@ -101,13 +99,13 @@ export default function TechnicianJobDocumentation() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label
                 htmlFor="photo-upload"
-                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#E2E8F0] dark:border-[#232A36] rounded-lg cursor-pointer hover:border-[#0A5ED7] transition-colors"
               >
-                <ImageIcon className="h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                <ImageIcon className="h-12 w-12 text-[#64748B] mb-3" />
+                <span className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
                   Upload Photos
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-[#64748B]">
                   JPG, PNG, or GIF
                 </span>
                 <Input
@@ -123,13 +121,13 @@ export default function TechnicianJobDocumentation() {
 
               <label
                 htmlFor="video-upload"
-                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#E2E8F0] dark:border-[#232A36] rounded-lg cursor-pointer hover:border-[#0A5ED7] transition-colors"
               >
-                <Video className="h-12 w-12 text-gray-400 dark:text-gray-600 mb-3" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                <Video className="h-12 w-12 text-[#64748B] mb-3" />
+                <span className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
                   Upload Videos
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-[#64748B]">
                   MP4, MOV, or AVI
                 </span>
                 <Input
@@ -144,7 +142,7 @@ export default function TechnicianJobDocumentation() {
               </label>
             </div>
 
-            <Button className="w-full" size="lg" data-testid="button-capture-photo">
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" size="lg" data-testid="button-capture-photo">
               <Camera className="h-5 w-5 mr-2" />
               Capture with Camera
             </Button>
@@ -152,15 +150,14 @@ export default function TechnicianJobDocumentation() {
         </Card>
       )}
 
-      {/* Recent Uploads */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Recent Uploads</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">Recent Uploads</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
-            <Upload className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-600 dark:text-gray-400">No uploads yet</p>
+            <Upload className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+            <p className="text-[#64748B]">No uploads yet</p>
           </div>
         </CardContent>
       </Card>

@@ -109,8 +109,8 @@ function SortableWidget({ widget, onToggle, onDelete }: {
       style={style}
       className={`p-4 rounded-lg border ${
         widget.isActive 
-          ? 'bg-white dark:bg-salis-gray-dark/50 border-gray-200 dark:border-salis-gray-dark' 
-          : 'bg-gray-100 dark:bg-salis-gray-dark/20 border-gray-200 dark:border-salis-gray-dark/50 opacity-60'
+          ? 'bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]' 
+          : 'bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] opacity-60'
       }`}
       data-testid={`widget-item-${widget.id}`}
     >
@@ -118,23 +118,23 @@ function SortableWidget({ widget, onToggle, onDelete }: {
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          className="cursor-grab active:cursor-grabbing text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white"
         >
           <GripVertical className="h-5 w-5" />
         </div>
         
         <div className="flex-1 flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${widget.isActive ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-200 dark:bg-gray-700'}`}>
-            <Icon className={`h-5 w-5 ${widget.isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500'}`} />
+          <div className={`p-2 rounded-lg ${widget.isActive ? 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20' : 'bg-[#F8FAFC] dark:bg-[#0E1117]'}`}>
+            <Icon className={`h-5 w-5 ${widget.isActive ? 'text-[#0A5ED7] dark:text-[#0BB3FF]' : 'text-[#64748B]'}`} />
           </div>
           <div className="flex-1">
-            <h4 className="font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+            <h4 className="font-medium text-[#0B1F3B] dark:text-white">{widget.title}</h4>
             <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B]">
                 <SourceIcon className="h-3 w-3 mr-1" />
                 {widget.dataSource}
               </Badge>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                 {widget.widgetType}
               </Badge>
             </div>
@@ -146,7 +146,7 @@ function SortableWidget({ widget, onToggle, onDelete }: {
             {widget.isActive ? (
               <Eye className="h-4 w-4 text-green-500" />
             ) : (
-              <EyeOff className="h-4 w-4 text-gray-400" />
+              <EyeOff className="h-4 w-4 text-[#64748B]" />
             )}
             <Switch
               checked={widget.isActive}
@@ -330,87 +330,87 @@ export default function DashboardWidgets() {
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-total-widgets">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-total-widgets">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total Widgets</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{widgets.length}</p>
+                  <p className="text-sm text-[#64748B]">Total Widgets</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{widgets.length}</p>
                 </div>
-                <LayoutDashboard className="h-8 w-8 text-blue-500" />
+                <LayoutDashboard className="h-8 w-8 text-[#0A5ED7]" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-active-widgets">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-active-widgets">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Active Widgets</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{activeWidgetsCount}</p>
+                  <p className="text-sm text-[#64748B]">Active Widgets</p>
+                  <p className="text-2xl font-bold text-green-600">{activeWidgetsCount}</p>
                 </div>
                 <Eye className="h-8 w-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-hidden-widgets">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-hidden-widgets">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Hidden Widgets</p>
-                  <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">{widgets.length - activeWidgetsCount}</p>
+                  <p className="text-sm text-[#64748B]">Hidden Widgets</p>
+                  <p className="text-2xl font-bold text-[#64748B]">{widgets.length - activeWidgetsCount}</p>
                 </div>
-                <EyeOff className="h-8 w-8 text-gray-400" />
+                <EyeOff className="h-8 w-8 text-[#64748B]" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-widgets-list">
+          <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-widgets-list">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-gray-500" />
+                <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-[#64748B]" />
                   Your Widgets
                 </CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardDescription className="text-[#64748B]">
                   Drag to reorder, toggle visibility, or remove widgets
                 </CardDescription>
               </div>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-add-widget">
+                  <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-add-widget">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('dashboard.addWidget', 'Add Widget')}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <DialogHeader>
-                    <DialogTitle className="text-gray-900 dark:text-white">Add New Widget</DialogTitle>
-                    <DialogDescription className="text-gray-500 dark:text-gray-400">
+                    <DialogTitle className="text-[#0B1F3B] dark:text-white">Add New Widget</DialogTitle>
+                    <DialogDescription className="text-[#64748B]">
                       Create a custom widget for your dashboard
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-gray-700 dark:text-gray-300">Widget Title</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Widget Title</Label>
                       <Input
                         value={newWidget.title}
                         onChange={(e) => setNewWidget({ ...newWidget, title: e.target.value })}
                         placeholder="e.g., Monthly Revenue"
-                        className="mt-1 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark"
+                        className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                         data-testid="input-widget-title"
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-700 dark:text-gray-300">Widget Type</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Widget Type</Label>
                       <Select value={newWidget.widgetType} onValueChange={(v) => setNewWidget({ ...newWidget, widgetType: v })}>
-                        <SelectTrigger className="mt-1 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark" data-testid="select-widget-type">
+                        <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-widget-type">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="kpi">
                             <span className="flex items-center gap-2">
                               <TrendingUp className="h-4 w-4" /> KPI Card
@@ -435,12 +435,12 @@ export default function DashboardWidgets() {
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-gray-700 dark:text-gray-300">Data Source</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Data Source</Label>
                       <Select value={newWidget.dataSource} onValueChange={(v) => setNewWidget({ ...newWidget, dataSource: v })}>
-                        <SelectTrigger className="mt-1 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark" data-testid="select-data-source">
+                        <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-data-source">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="invoices">
                             <span className="flex items-center gap-2">
                               <DollarSign className="h-4 w-4" /> Invoices
@@ -466,11 +466,11 @@ export default function DashboardWidgets() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-gray-200 dark:border-salis-gray-dark">
+                    <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                       Cancel
                     </Button>
                     <Button 
-                      className="bg-blue-600 hover:bg-blue-700" 
+                      className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
                       onClick={handleAddWidget}
                       disabled={createWidgetMutation.isPending}
                       data-testid="button-save-widget"
@@ -485,10 +485,10 @@ export default function DashboardWidgets() {
             <CardContent>
               {isLoading ? (
                 <div className="flex items-center justify-center h-48">
-                  <RotateCcw className="h-8 w-8 animate-spin text-gray-400" />
+                  <RotateCcw className="h-8 w-8 animate-spin text-[#0A5ED7]" />
                 </div>
               ) : widgets.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-48 text-gray-500 dark:text-gray-400">
+                <div className="flex flex-col items-center justify-center h-48 text-[#64748B]">
                   <LayoutDashboard className="h-12 w-12 mb-4 opacity-50" />
                   <p>No widgets configured</p>
                   <p className="text-sm">Add widgets to customize your dashboard</p>
@@ -519,13 +519,13 @@ export default function DashboardWidgets() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-preset-widgets">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-preset-widgets">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
+              <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-purple-500" />
                 Preset Widgets
               </CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
+              <CardDescription className="text-[#64748B]">
                 Quick-add popular widget configurations
               </CardDescription>
             </CardHeader>
@@ -536,7 +536,7 @@ export default function DashboardWidgets() {
                   return (
                     <div 
                       key={index}
-                      className="p-3 rounded-lg border border-gray-200 dark:border-salis-gray-dark hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer"
+                      className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0A5ED7]/10 transition-colors cursor-pointer"
                       onClick={() => handleAddDefaultWidget(preset)}
                       data-testid={`preset-widget-${index}`}
                     >
@@ -545,12 +545,12 @@ export default function DashboardWidgets() {
                           <Icon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white text-sm">{preset.title}</h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <h4 className="font-medium text-[#0B1F3B] dark:text-white text-sm">{preset.title}</h4>
+                          <p className="text-xs text-[#64748B]">
                             {preset.widgetType} • {preset.dataSource}
                           </p>
                         </div>
-                        <Plus className="h-4 w-4 text-gray-400" />
+                        <Plus className="h-4 w-4 text-[#64748B]" />
                       </div>
                     </div>
                   );
@@ -560,37 +560,37 @@ export default function DashboardWidgets() {
           </Card>
         </div>
 
-        <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-widget-tips">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-widget-tips">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Widget Tips</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Widget Tips</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+              <div className="p-4 rounded-lg bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
+                <h4 className="font-medium text-[#0A5ED7] dark:text-[#0BB3FF] mb-2 flex items-center gap-2">
                   <GripVertical className="h-4 w-4" />
                   {t('dashboard.dragToReorder', 'Drag to Reorder')}
                 </h4>
-                <p className="text-sm text-blue-700 dark:text-blue-400">
+                <p className="text-sm text-[#0A5ED7]/70 dark:text-[#0BB3FF]/70">
                   Use the drag handle to rearrange widgets in your preferred order.
                 </p>
               </div>
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
+              <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/20">
                 <h4 className="font-medium text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
                   <Eye className="h-4 w-4" />
                   Toggle Visibility
                 </h4>
                 <p className="text-sm text-green-700 dark:text-green-400">
-                  Toggle widgets on or off without deleting them for easy customization.
+                  Hide widgets you don't need without deleting them.
                 </p>
               </div>
-              <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+              <div className="p-4 rounded-lg bg-purple-100 dark:bg-purple-900/20">
                 <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Widget Types
+                  <Plus className="h-4 w-4" />
+                  Quick Add
                 </h4>
                 <p className="text-sm text-purple-700 dark:text-purple-400">
-                  Choose from KPI cards, charts, tables, and metrics to display your data.
+                  Click preset widgets to instantly add them to your dashboard.
                 </p>
               </div>
             </div>

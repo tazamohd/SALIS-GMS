@@ -36,7 +36,7 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ["#000000", "#4B5563", "#6B7280", "#9CA3AF", "#D1D5DB"];
+const COLORS = ["#0A5ED7", "#0BB3FF", "#64748B", "#94A3B8", "#CBD5E1"];
 
 export default function ProfitAnalysis() {
   const { t } = useTranslation();
@@ -88,10 +88,10 @@ export default function ProfitAnalysis() {
     <>
       <div className="flex items-center justify-end mb-6">
         <Select value={periodType} onValueChange={setPeriodType}>
-          <SelectTrigger className="w-40" data-testid="select-period">
+          <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-period">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <SelectItem value="daily">{t('analytics.daily', 'Daily')}</SelectItem>
             <SelectItem value="weekly">{t('analytics.weekly', 'Weekly')}</SelectItem>
             <SelectItem value="monthly">{t('analytics.monthly', 'Monthly')}</SelectItem>
@@ -101,12 +101,12 @@ export default function ProfitAnalysis() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-revenue">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-revenue">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.totalRevenue', 'Total Revenue')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
+                <p className="text-sm text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">
                   $328,000
                 </h3>
                 <p className="text-sm text-green-600 mt-1">+12.5% {t('analytics.vsLastPeriod', 'vs last period')}</p>
@@ -116,67 +116,67 @@ export default function ProfitAnalysis() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-costs">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-costs">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.totalCosts', 'Total Costs')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
+                <p className="text-sm text-[#64748B]">{t('analytics.totalCosts', 'Total Costs')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">
                   $214,000
                 </h3>
-                <p className="text-sm text-orange-600 mt-1">+8.2% {t('analytics.vsLastPeriod', 'vs last period')}</p>
+                <p className="text-sm text-[#F97316] mt-1">+8.2% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
-              <TrendingUp className="h-12 w-12 text-orange-600" />
+              <TrendingUp className="h-12 w-12 text-[#F97316]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-net-profit">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-net-profit">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.netProfit', 'Net Profit')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
+                <p className="text-sm text-[#64748B]">{t('analytics.netProfit', 'Net Profit')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">
                   $114,000
                 </h3>
                 <p className="text-sm text-green-600 mt-1">+18.9% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
-              <BarChart3 className="h-12 w-12 text-blue-600" />
+              <BarChart3 className="h-12 w-12 text-[#0A5ED7]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-profit-margin">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-profit-margin">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.profitMargin', 'Profit Margin')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">
+                <p className="text-sm text-[#64748B]">{t('analytics.profitMargin', 'Profit Margin')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">
                   34.8%
                 </h3>
                 <p className="text-sm text-green-600 mt-1">+2.3% {t('analytics.vsLastPeriod', 'vs last period')}</p>
               </div>
-              <Percent className="h-12 w-12 text-purple-600" />
+              <Percent className="h-12 w-12 text-[#0BB3FF]" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('analytics.profitTrend', 'Profit Trend')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.profitTrend', 'Profit Trend')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={monthlyProfit}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="month" stroke="#64748B" />
+              <YAxis yAxisId="left" stroke="#64748B" />
+              <YAxis yAxisId="right" orientation="right" stroke="#64748B" />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="profit" stroke="#000000" name={t('analytics.netProfit', 'Net Profit')} strokeWidth={2} />
-              <Line yAxisId="right" type="monotone" dataKey="margin" stroke="#6B7280" name={t('analytics.marginPercent', 'Margin %')} strokeWidth={2} />
+              <Line yAxisId="left" type="monotone" dataKey="profit" stroke="#0A5ED7" name={t('analytics.netProfit', 'Net Profit')} strokeWidth={2} />
+              <Line yAxisId="right" type="monotone" dataKey="margin" stroke="#0BB3FF" name={t('analytics.marginPercent', 'Margin %')} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -190,26 +190,26 @@ export default function ProfitAnalysis() {
       label: t('analytics.byServiceType', 'By Service Type'),
       icon: Wrench,
       content: (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('analytics.serviceTypeProfitability', 'Service Type Profitability')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.serviceTypeProfitability', 'Service Type Profitability')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {serviceTypeProfitability.map((service, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                  className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                   data-testid={`service-${index}`}
                 >
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{service.service}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{service.service}</h3>
+                    <p className="text-sm text-[#64748B] mt-1">
                       {t('analytics.revenue', 'Revenue')}: ${service.revenue.toLocaleString()} | {t('analytics.cost', 'Cost')}: ${service.cost.toLocaleString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">
+                    <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${service.profit.toLocaleString()}
                     </p>
                     <p className="text-sm text-green-600">{service.margin.toFixed(1)}% {t('analytics.margin', 'margin')}</p>
@@ -226,31 +226,31 @@ export default function ProfitAnalysis() {
       label: t('analytics.byTechnician', 'By Technician'),
       icon: Users,
       content: (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('analytics.technicianPerformance', 'Technician Performance')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.technicianPerformance', 'Technician Performance')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {technicianPerformance.map((tech, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                  className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                   data-testid={`technician-${index}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                      <Wrench className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                      <Wrench className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{tech.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{tech.name}</h3>
+                      <p className="text-sm text-[#64748B]">
                         {tech.jobs} {t('analytics.jobsCompleted', 'jobs completed')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">
+                    <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${tech.revenue.toLocaleString()}
                     </p>
                     <p className="text-sm text-green-600">{tech.avgMargin.toFixed(1)}% {t('analytics.avgMargin', 'avg margin')}</p>
@@ -267,34 +267,34 @@ export default function ProfitAnalysis() {
       label: t('analytics.byCustomer', 'By Customer'),
       icon: Users,
       content: (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('analytics.topCustomersByRevenue', 'Top Customers by Revenue')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.topCustomersByRevenue', 'Top Customers by Revenue')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {topCustomers.map((customer, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+                  className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg"
                   data-testid={`customer-${index}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                      <Users className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                      <Users className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{customer.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{customer.name}</h3>
+                      <p className="text-sm text-[#64748B]">
                         {customer.visits} {t('analytics.visits', 'visits')} | {t('analytics.ltv', 'LTV')}: ${customer.ltv.toLocaleString()}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg text-gray-900 dark:text-white">
+                    <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${customer.revenue.toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('analytics.thisPeriod', 'This period')}</p>
+                    <p className="text-sm text-[#64748B]">{t('analytics.thisPeriod', 'This period')}</p>
                   </div>
                 </div>
               ))}
@@ -309,9 +309,9 @@ export default function ProfitAnalysis() {
       icon: PieChart,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('analytics.costDistribution', 'Cost Distribution')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.costDistribution', 'Cost Distribution')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
@@ -336,27 +336,27 @@ export default function ProfitAnalysis() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('analytics.costDetails', 'Cost Details')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('analytics.costDetails', 'Cost Details')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.laborCosts', 'Labor Costs')}</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">$96,300 (45%)</span>
+                <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <span className="text-[#64748B]">{t('analytics.laborCosts', 'Labor Costs')}</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$96,300 (45%)</span>
                 </div>
-                <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.partsCosts', 'Parts Costs')}</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">$74,900 (35%)</span>
+                <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <span className="text-[#64748B]">{t('analytics.partsCosts', 'Parts Costs')}</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$74,900 (35%)</span>
                 </div>
-                <div className="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-800">
-                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.overhead', 'Overhead')}</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">$32,100 (15%)</span>
+                <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <span className="text-[#64748B]">{t('analytics.overhead', 'Overhead')}</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$32,100 (15%)</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-400">{t('analytics.otherExpenses', 'Other Expenses')}</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">$10,700 (5%)</span>
+                  <span className="text-[#64748B]">{t('analytics.otherExpenses', 'Other Expenses')}</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$10,700 (5%)</span>
                 </div>
               </div>
             </CardContent>

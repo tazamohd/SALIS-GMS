@@ -553,9 +553,9 @@ export default function ChartOfAccounts() {
   const treeViewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card data-testid="card-total-assets">
+        <Card data-testid="card-total-assets" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <Building2 className="h-4 w-4 text-green-600" />
               {t('accounting.totalAssets', 'Total Assets')}
             </CardTitle>
@@ -564,13 +564,13 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-green-600">
               SAR {totalAssets.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalAssetsAr', 'إجمالي الأصول')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalAssetsAr', 'إجمالي الأصول')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-liabilities">
+        <Card data-testid="card-total-liabilities" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-red-600" />
               {t('accounting.totalLiabilities', 'Total Liabilities')}
             </CardTitle>
@@ -579,11 +579,11 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-red-600">
               SAR {totalLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-equity">
+        <Card data-testid="card-total-equity" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Wallet className="h-4 w-4 text-blue-600" />
@@ -629,28 +629,28 @@ export default function ChartOfAccounts() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                 <FolderTree className="h-5 w-5" />
                 {t('accounting.accountTreeStructure', 'Account Tree Structure')}
               </CardTitle>
-              <CardDescription>{t('accounting.accountTreeDescription', 'شجرة الحسابات - Hierarchical view of all accounts')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('accounting.accountTreeDescription', 'شجرة الحسابات - Hierarchical view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" data-testid="button-expand-all">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-expand-all">
                 <ChevronDown className="h-4 w-4 mr-1" />
                 {t('common.expandAll', 'Expand All')}
               </Button>
-              <Button variant="outline" size="sm" data-testid="button-collapse-all">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-collapse-all">
                 <ChevronRight className="h-4 w-4 mr-1" />
                 {t('common.collapseAll', 'Collapse All')}
               </Button>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button data-testid="button-add-account">
+                  <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-account">
                     <Plus className="h-4 w-4 mr-2" />
                     {t('accounting.addAccount', 'Add Account')}
                   </Button>
@@ -833,7 +833,7 @@ export default function ChartOfAccounts() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg p-2">
+          <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-2">
             {sampleAccounts.map((account) => (
               <AccountTreeNode key={account.id} account={account} />
             ))}
@@ -841,61 +841,61 @@ export default function ChartOfAccounts() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription>{t('accounting.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to related modules')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to related modules')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link href="/assets-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-assets-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-assets-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <Building2 className="h-8 w-8 text-green-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('nav.assets_management', 'Assets Management')}</CardTitle>
-                  <CardDescription>{t('accounting.assetsAr', 'الأصول')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.assets_management', 'Assets Management')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('accounting.assetsAr', 'الأصول')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
 
             <Link href="/liabilities-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-liabilities-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-liabilities-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CreditCard className="h-8 w-8 text-red-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('nav.liabilities', 'Liabilities')}</CardTitle>
-                  <CardDescription>{t('accounting.liabilitiesAr', 'الخصوم')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.liabilities', 'Liabilities')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('accounting.liabilitiesAr', 'الخصوم')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
 
             <Link href="/equity-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-equity-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-equity-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <Wallet className="h-8 w-8 text-blue-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('nav.equity_management', 'Equity Management')}</CardTitle>
-                  <CardDescription>{t('accounting.equityAr', 'حقوق الملكية')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.equity_management', 'Equity Management')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('accounting.equityAr', 'حقوق الملكية')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
 
             <Link href="/sales-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-sales-management">
+              <Card className="cursor-pointer hover:border-primary transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-sales-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <TrendingUp className="h-8 w-8 text-purple-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('nav.sales_revenue', 'Sales & Revenue')}</CardTitle>
-                  <CardDescription>{t('accounting.salesRevenueAr', 'المبيعات والإيرادات')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.sales_revenue', 'Sales & Revenue')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('accounting.salesRevenueAr', 'المبيعات والإيرادات')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -907,29 +907,29 @@ export default function ChartOfAccounts() {
 
   const listViewTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                 <LayoutList className="h-5 w-5" />
                 {t('accounting.allAccountsList', 'All Accounts List')}
               </CardTitle>
-              <CardDescription>{t('accounting.allAccountsListDescription', 'قائمة جميع الحسابات - Flat view of all accounts')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('accounting.allAccountsListDescription', 'قائمة جميع الحسابات - Flat view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
                   placeholder={t('accounting.searchAccounts', 'Search accounts...')}
-                  className="pl-9 w-64"
+                  className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   data-testid="input-search-accounts"
                 />
               </div>
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-40" data-testid="select-filter-type">
+                <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-type">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder={t('accounting.filterByType', 'Filter by type')} />
                 </SelectTrigger>
@@ -942,7 +942,7 @@ export default function ChartOfAccounts() {
                   <SelectItem value="expense">{t('accounting.expenses', 'Expenses')}</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" data-testid="button-export">
+              <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export">
                 <Download className="h-4 w-4 mr-2" />
                 {t('common.export', 'Export')}
               </Button>
@@ -1012,176 +1012,176 @@ export default function ChartOfAccounts() {
   const accountTypesTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="border-l-4 border-l-green-500" data-testid="card-assets-summary">
+        <Card className="border-l-4 border-l-green-500 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-assets-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Building2 className="h-5 w-5 text-green-600" />
               {t('accounting.assetsTitle', 'Assets (الأصول)')}
             </CardTitle>
-            <CardDescription>{t('accounting.assetsDescription', 'Resources owned by the business')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.assetsDescription', 'Resources owned by the business')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600 mb-4">
               SAR {totalAssets.toLocaleString()}
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.currentAssets', 'Current Assets')}</span>
                 <span className="font-medium">SAR 2,750,000</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.fixedAssets', 'Fixed Assets')}</span>
                 <span className="font-medium">SAR 2,500,000</span>
               </div>
             </div>
-            <div className="mt-4 text-xs text-muted-foreground">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
+            <div className="mt-4 text-xs text-[#64748B]">
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-red-500" data-testid="card-liabilities-summary">
+        <Card className="border-l-4 border-l-red-500 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-liabilities-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <CreditCard className="h-5 w-5 text-red-600" />
               {t('accounting.liabilitiesTitle', 'Liabilities (الخصوم)')}
             </CardTitle>
-            <CardDescription>{t('accounting.liabilitiesDescription', 'Obligations owed to others')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.liabilitiesDescription', 'Obligations owed to others')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600 mb-4">
               SAR {totalLiabilities.toLocaleString()}
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.currentLiabilities', 'Current Liabilities')}</span>
                 <span className="font-medium">SAR 920,000</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.longTermLiabilities', 'Long-term Liabilities')}</span>
                 <span className="font-medium">SAR 800,000</span>
               </div>
             </div>
-            <div className="mt-4 text-xs text-muted-foreground">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+            <div className="mt-4 text-xs text-[#64748B]">
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500" data-testid="card-equity-summary">
+        <Card className="border-l-4 border-l-blue-500 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-equity-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Wallet className="h-5 w-5 text-blue-600" />
               {t('accounting.equityTitle', 'Equity (حقوق الملكية)')}
             </CardTitle>
-            <CardDescription>{t('accounting.equityDescription', "Owner's stake in the business")}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.equityDescription', "Owner's stake in the business")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600 mb-4">
               SAR {totalEquity.toLocaleString()}
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.shareCapital', 'Share Capital')}</span>
                 <span className="font-medium">SAR 2,500,000</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.retainedEarnings', 'Retained Earnings')}</span>
                 <span className="font-medium">SAR 1,030,000</span>
               </div>
             </div>
-            <div className="mt-4 text-xs text-muted-foreground">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+            <div className="mt-4 text-xs text-[#64748B]">
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500" data-testid="card-revenue-summary">
+        <Card className="border-l-4 border-l-purple-500 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-revenue-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <TrendingUp className="h-5 w-5 text-purple-600" />
               {t('accounting.revenueTitle', 'Revenue (الإيرادات)')}
             </CardTitle>
-            <CardDescription>{t('accounting.revenueDescription', 'Income from business operations')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.revenueDescription', 'Income from business operations')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-600 mb-4">
               SAR {totalRevenue.toLocaleString()}
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.serviceRevenue', 'Service Revenue')}</span>
                 <span className="font-medium">SAR 3,200,000</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.salesRevenue', 'Sales Revenue')}</span>
                 <span className="font-medium">SAR 1,650,000</span>
               </div>
             </div>
-            <div className="mt-4 text-xs text-muted-foreground">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+            <div className="mt-4 text-xs text-[#64748B]">
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-orange-500" data-testid="card-expenses-summary">
+        <Card className="border-l-4 border-l-[#F97316] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-expenses-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-orange-600" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <TrendingDown className="h-5 w-5 text-[#F97316]" />
               {t('accounting.expensesTitle', 'Expenses (المصروفات)')}
             </CardTitle>
-            <CardDescription>{t('accounting.expensesDescription', 'Costs of business operations')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.expensesDescription', 'Costs of business operations')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-600 mb-4">
+            <div className="text-3xl font-bold text-[#F97316] mb-4">
               SAR {totalExpenses.toLocaleString()}
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.costOfSales', 'Cost of Sales')}</span>
                 <span className="font-medium">SAR 2,850,000</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-sm text-[#0B1F3B] dark:text-white">
                 <span>{t('accounting.operatingExpenses', 'Operating Expenses')}</span>
                 <span className="font-medium">SAR 1,820,000</span>
               </div>
             </div>
-            <div className="mt-4 text-xs text-muted-foreground">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
+            <div className="mt-4 text-xs text-[#64748B]">
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-gray-500" data-testid="card-accounting-equation">
+        <Card className="border-l-4 border-l-gray-500 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-accounting-equation">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <DollarSign className="h-5 w-5" />
               {t('accounting.accountingEquation', 'Accounting Equation')}
             </CardTitle>
-            <CardDescription>{t('accounting.accountingEquationAr', 'معادلة الميزانية العمومية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.accountingEquationAr', 'معادلة الميزانية العمومية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="text-center p-4 bg-muted rounded-lg">
-                <p className="text-lg font-medium">{t('accounting.equationFormula', 'Assets = Liabilities + Equity')}</p>
-                <p className="text-sm text-muted-foreground mt-1">{t('accounting.equationFormulaAr', 'الأصول = الخصوم + حقوق الملكية')}</p>
+              <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                <p className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('accounting.equationFormula', 'Assets = Liabilities + Equity')}</p>
+                <p className="text-sm text-[#64748B] mt-1">{t('accounting.equationFormulaAr', 'الأصول = الخصوم + حقوق الملكية')}</p>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded">
-                  <p className="text-xs text-muted-foreground">{t('accounting.assets', 'Assets')}</p>
+                  <p className="text-xs text-[#64748B]">{t('accounting.assets', 'Assets')}</p>
                   <p className="font-bold text-green-600">{totalAssets.toLocaleString()}</p>
                 </div>
                 <div className="p-2 bg-red-100 dark:bg-red-900 rounded">
-                  <p className="text-xs text-muted-foreground">{t('accounting.liabilities', 'Liabilities')}</p>
+                  <p className="text-xs text-[#64748B]">{t('accounting.liabilities', 'Liabilities')}</p>
                   <p className="font-bold text-red-600">{totalLiabilities.toLocaleString()}</p>
                 </div>
                 <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded">
-                  <p className="text-xs text-muted-foreground">{t('accounting.equityType', 'Equity')}</p>
+                  <p className="text-xs text-[#64748B]">{t('accounting.equityType', 'Equity')}</p>
                   <p className="font-bold text-blue-600">{totalEquity.toLocaleString()}</p>
                 </div>
               </div>
               <div className="text-center">
-                <Badge variant={totalAssets === (totalLiabilities + totalEquity) ? "default" : "destructive"}>
+                <Badge variant={totalAssets === (totalLiabilities + totalEquity) ? "default" : "destructive"} className={totalAssets === (totalLiabilities + totalEquity) ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-[#F97316] text-white"}>
                   {totalAssets === (totalLiabilities + totalEquity) ? t('accounting.balancedCheck', '✓ Balanced') : t('accounting.unbalancedCheck', '⚠ Unbalanced')}
                 </Badge>
               </div>

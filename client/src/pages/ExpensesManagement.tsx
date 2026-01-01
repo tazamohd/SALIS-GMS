@@ -226,64 +226,92 @@ export default function ExpensesManagement() {
   const overviewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-expenses">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-expenses">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.totalExpenses', 'Total Expenses')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.totalExpenses', 'Total Expenses')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              SAR {totalExpenses.toLocaleString()}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#F97316]">
+                  SAR {totalExpenses.toLocaleString()}
+                </div>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalExpensesAr', 'إجمالي المصروفات')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#F97316]/10">
+                <TrendingDown className="h-6 w-6 text-[#F97316]" />
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.totalExpensesAr', 'إجمالي المصروفات')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-pending-expenses">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-pending-expenses">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.pendingPayments', 'Pending Payments')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.pendingPayments', 'Pending Payments')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              SAR {pendingExpenses.toLocaleString()}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#F97316]">
+                  SAR {pendingExpenses.toLocaleString()}
+                </div>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.pendingPaymentsAr', 'المدفوعات المعلقة')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#F97316]/10">
+                <Clock className="h-6 w-6 text-[#F97316]" />
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.pendingPaymentsAr', 'المدفوعات المعلقة')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-budget-used">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-budget-used">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.budgetUsed', 'Budget Used')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.budgetUsed', 'Budget Used')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">74%</div>
-            <Progress value={74} className="mt-2 h-2" />
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">74%</div>
+                <Progress value={74} className="mt-2 h-2" />
+              </div>
+              <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <PieChart className="h-6 w-6 text-white" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-transactions-count">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-transactions-count">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.transactions', 'Transactions')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.transactions', 'Transactions')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sampleExpenses.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('common.thisMonth', 'This month')}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{sampleExpenses.length}</div>
+                <p className="text-xs text-[#64748B] mt-1">{t('common.thisMonth', 'This month')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#0BB3FF]/10">
+                <Receipt className="h-6 w-6 text-[#0BB3FF]" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('payments.expenses.monthlyTrend', 'Monthly Expense Trend')}</CardTitle>
-            <CardDescription>{t('payments.expenses.monthlyTrendAr', 'اتجاه المصروفات الشهرية')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.monthlyTrend', 'Monthly Expense Trend')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyTrendAr', 'اتجاه المصروفات الشهرية')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {monthlyExpenses.map((month, index) => (
                 <div key={index} data-testid={`bar-expense-month-${index}`}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{month.month}</span>
-                    <span className="text-sm text-muted-foreground">SAR {month.amount.toLocaleString()}</span>
+                    <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{month.month}</span>
+                    <span className="text-sm text-[#64748B]">SAR {month.amount.toLocaleString()}</span>
                   </div>
                   <Progress value={(month.amount / 150000) * 100} className="h-3" />
                 </div>
@@ -292,21 +320,21 @@ export default function ExpensesManagement() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('payments.expenses.expenseByCategory', 'Expense by Category')}</CardTitle>
-            <CardDescription>{t('payments.expenses.expenseByCategoryAr', 'المصروفات حسب الفئة')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.expenseByCategory', 'Expense by Category')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.expenseByCategoryAr', 'المصروفات حسب الفئة')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {categoryBudgets.map((cat, index) => (
                 <div key={index} data-testid={`bar-category-${index}`}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium flex items-center gap-2">
+                    <span className="text-sm font-medium flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                       {getCategoryIcon(cat.category)}
                       {t(`payments.expenses.categories.${cat.category.toLowerCase()}`, cat.category)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-[#64748B]">
                       SAR {cat.spent.toLocaleString()} / {cat.budget.toLocaleString()}
                     </span>
                   </div>
@@ -318,41 +346,45 @@ export default function ExpensesManagement() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('payments.expenses.relatedModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription>{t('payments.expenses.relatedModulesDesc', 'Quick access to related accounting')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.relatedModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('payments.expenses.relatedModulesDesc', 'Quick access to related accounting')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link href="/sales-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-sales-management">
+              <Card className="cursor-pointer hover:border-[#22c55e] transition-colors h-full bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-sales-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <ShoppingCart className="h-8 w-8 text-green-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <div className="p-2 rounded-xl bg-[#22c55e]/10">
+                      <ShoppingCart className="h-6 w-6 text-[#22c55e]" />
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('sales.management', 'Sales Management')}</CardTitle>
-                  <CardDescription>{t('sales.managementAr', 'المبيعات')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('sales.management', 'Sales Management')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('sales.managementAr', 'المبيعات')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{t('sales.description', 'Track revenue, transactions, and sales performance')}</p>
+                  <p className="text-sm text-[#64748B]">{t('sales.description', 'Track revenue, transactions, and sales performance')}</p>
                 </CardContent>
               </Card>
             </Link>
 
             <Link href="/invoices">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-invoices">
+              <Card className="cursor-pointer hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors h-full bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-invoices">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <FileText className="h-8 w-8 text-blue-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                      <FileText className="h-6 w-6 text-white" />
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('invoices.title', 'Invoices')}</CardTitle>
-                  <CardDescription>{t('invoices.titleAr', 'الفواتير')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('invoices.title', 'Invoices')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('invoices.titleAr', 'الفواتير')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{t('invoices.description', 'Manage customer invoices and payment tracking')}</p>
+                  <p className="text-sm text-[#64748B]">{t('invoices.description', 'Manage customer invoices and payment tracking')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -364,12 +396,12 @@ export default function ExpensesManagement() {
 
   const transactionsTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{t('payments.expenses.expenseTransactions', 'Expense Transactions')}</CardTitle>
-              <CardDescription>{t('payments.expenses.allExpenseRecords', 'All expense records')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.expenseTransactions', 'Expense Transactions')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('payments.expenses.allExpenseRecords', 'All expense records')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -615,52 +647,73 @@ export default function ExpensesManagement() {
   const budgetTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card data-testid="card-total-budget">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-budget">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.totalBudget', 'Total Budget')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.totalBudget', 'Total Budget')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">SAR 166,000</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.totalBudgetAr', 'الميزانية الإجمالية')}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR 166,000</div>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalBudgetAr', 'الميزانية الإجمالية')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <DollarSign className="h-6 w-6 text-white" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-spent">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-spent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.spent', 'Spent')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.spent', 'Spent')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">SAR 122,650</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.spentAr', 'المصروف')}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#F97316]">SAR 122,650</div>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.spentAr', 'المصروف')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#F97316]/10">
+                <TrendingDown className="h-6 w-6 text-[#F97316]" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-remaining-budget">
+        <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-remaining-budget">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('payments.expenses.remaining', 'Remaining')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('payments.expenses.remaining', 'Remaining')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">SAR 43,350</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('payments.expenses.remainingAr', 'المتبقي')}</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-[#22c55e]">SAR 43,350</div>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.remainingAr', 'المتبقي')}</p>
+              </div>
+              <div className="p-2 rounded-xl bg-[#22c55e]/10">
+                <CheckCircle className="h-6 w-6 text-[#22c55e]" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('payments.expenses.budgetByCategory', 'Budget by Category')}</CardTitle>
-          <CardDescription>{t('payments.expenses.budgetByCategoryDesc', 'Budget allocation and usage')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.budgetByCategory', 'Budget by Category')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('payments.expenses.budgetByCategoryDesc', 'Budget allocation and usage')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.category', 'Category')}</TableHead>
-                <TableHead>{t('payments.expenses.budget', 'Budget')}</TableHead>
-                <TableHead>{t('payments.expenses.spent', 'Spent')}</TableHead>
-                <TableHead>{t('payments.expenses.remaining', 'Remaining')}</TableHead>
-                <TableHead>{t('common.progress', 'Progress')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+            <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.budget', 'Budget')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.spent', 'Spent')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.remaining', 'Remaining')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.progress', 'Progress')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -669,26 +722,26 @@ export default function ExpensesManagement() {
                 const percentage = (cat.spent / cat.budget) * 100;
                 return (
                   <TableRow key={index} data-testid={`row-budget-${index}`}>
-                    <TableCell className="font-medium flex items-center gap-2">
+                    <TableCell className="font-medium flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                       {getCategoryIcon(cat.category)}
                       {t(`payments.expenses.categories.${cat.category.toLowerCase()}`, cat.category)}
                     </TableCell>
-                    <TableCell>SAR {cat.budget.toLocaleString()}</TableCell>
-                    <TableCell className="text-red-600">SAR {cat.spent.toLocaleString()}</TableCell>
-                    <TableCell className="text-green-600">SAR {remaining.toLocaleString()}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {cat.budget.toLocaleString()}</TableCell>
+                    <TableCell className="text-[#F97316]">SAR {cat.spent.toLocaleString()}</TableCell>
+                    <TableCell className="text-[#22c55e]">SAR {remaining.toLocaleString()}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress value={percentage} className="w-20 h-2" />
-                        <span className="text-xs text-muted-foreground">{Math.round(percentage)}%</span>
+                        <span className="text-xs text-[#64748B]">{Math.round(percentage)}%</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       {percentage > 90 ? (
-                        <Badge className="bg-red-600">{t('payments.expenses.overBudget', 'Over Budget')}</Badge>
+                        <Badge className="bg-[#ef4444]">{t('payments.expenses.overBudget', 'Over Budget')}</Badge>
                       ) : percentage > 70 ? (
-                        <Badge className="bg-yellow-600">{t('common.warning', 'Warning')}</Badge>
+                        <Badge className="bg-[#F97316]">{t('common.warning', 'Warning')}</Badge>
                       ) : (
-                        <Badge className="bg-green-600">{t('payments.expenses.onTrack', 'On Track')}</Badge>
+                        <Badge className="bg-[#22c55e]">{t('payments.expenses.onTrack', 'On Track')}</Badge>
                       )}
                     </TableCell>
                   </TableRow>
@@ -704,91 +757,103 @@ export default function ExpensesManagement() {
   const reportsTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-monthly">
+        <Card className="cursor-pointer hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-monthly">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.monthlyExpenseReport', 'Monthly Expense Report')}</CardTitle>
+              <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <Calendar className="h-4 w-4 text-white" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.monthlyExpenseReport', 'Monthly Expense Report')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.monthlyExpenseReportAr', 'تقرير المصروفات الشهري')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyExpenseReportAr', 'تقرير المصروفات الشهري')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-monthly">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10" variant="outline" data-testid="button-generate-monthly">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-category">
+        <Card className="cursor-pointer hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-category">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.categoryAnalysis', 'Category Analysis')}</CardTitle>
+              <div className="p-2 rounded-xl bg-[#0BB3FF]/10">
+                <PieChart className="h-4 w-4 text-[#0BB3FF]" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.categoryAnalysis', 'Category Analysis')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.categoryAnalysisAr', 'تحليل الفئات')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.categoryAnalysisAr', 'تحليل الفئات')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-category">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-category">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-vendor">
+        <Card className="cursor-pointer hover:border-[#22c55e] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-vendor">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.vendorReport', 'Vendor Report')}</CardTitle>
+              <div className="p-2 rounded-xl bg-[#22c55e]/10">
+                <Building2 className="h-4 w-4 text-[#22c55e]" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.vendorReport', 'Vendor Report')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.vendorReportAr', 'تقرير الموردين')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.vendorReportAr', 'تقرير الموردين')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-vendor">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-vendor">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-budget">
+        <Card className="cursor-pointer hover:border-[#F97316] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-budget">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-orange-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.budgetVariance', 'Budget Variance')}</CardTitle>
+              <div className="p-2 rounded-xl bg-[#F97316]/10">
+                <TrendingDown className="h-4 w-4 text-[#F97316]" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.budgetVariance', 'Budget Variance')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.budgetVarianceAr', 'تحليل فروقات الميزانية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.budgetVarianceAr', 'تحليل فروقات الميزانية')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-budget">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-budget">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-tax">
+        <Card className="cursor-pointer hover:border-[#ef4444] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-tax">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-red-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.taxDeductible', 'Tax Deductible')}</CardTitle>
+              <div className="p-2 rounded-xl bg-[#ef4444]/10">
+                <FileText className="h-4 w-4 text-[#ef4444]" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.taxDeductible', 'Tax Deductible')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.taxDeductibleAr', 'المصروفات المخصومة ضريبياً')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.taxDeductibleAr', 'المصروفات المخصومة ضريبياً')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-tax">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-tax">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-primary transition-colors" data-testid="card-report-receipts">
+        <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-receipts">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-teal-600" />
-              <CardTitle className="text-lg">{t('payments.expenses.receiptSummary', 'Receipt Summary')}</CardTitle>
+              <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
+                <Receipt className="h-4 w-4 text-[#0A5ED7]" />
+              </div>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.receiptSummary', 'Receipt Summary')}</CardTitle>
             </div>
-            <CardDescription>{t('payments.expenses.receiptSummaryAr', 'ملخص الإيصالات')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.receiptSummaryAr', 'ملخص الإيصالات')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" variant="outline" data-testid="button-generate-receipts">
+            <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-receipts">
               {t('payments.expenses.generateReport', 'Generate Report')}
             </Button>
           </CardContent>
@@ -798,7 +863,7 @@ export default function ExpensesManagement() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('payments.expenses.expensesManagement', 'Expenses Management')}
         description={t('payments.expenses.expensesManagementDesc', 'Track, categorize, and analyze business expenses')}

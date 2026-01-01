@@ -105,32 +105,32 @@ export default function IoTDashboard() {
       label: t('iot.totalSensors', 'Total Sensors'),
       value: summary?.totalSensors || 0,
       icon: Zap,
-      color: 'text-blue-500',
+      color: 'text-[#0A5ED7]',
     },
     {
       label: t('iot.activeSensors', 'Active Sensors'),
       value: summary?.activeSensors || 0,
       icon: CheckCircle,
-      color: 'text-green-500',
+      color: 'text-emerald-500',
     },
     {
       label: t('iot.activeAlerts', 'Active Alerts'),
       value: summary?.activeAlerts || 0,
       icon: AlertTriangle,
-      color: (summary?.activeAlerts ?? 0) > 0 ? 'text-orange-500' : 'text-gray-500',
+      color: (summary?.activeAlerts ?? 0) > 0 ? 'text-[#F97316]' : 'text-[#64748B]',
     },
     {
       label: t('iot.criticalAlerts', 'Critical Alerts'),
       value: summary?.criticalAlerts || 0,
       icon: AlertTriangle,
-      color: (summary?.criticalAlerts ?? 0) > 0 ? 'text-red-500' : 'text-gray-500',
+      color: (summary?.criticalAlerts ?? 0) > 0 ? 'text-red-500' : 'text-[#64748B]',
     },
   ];
 
   if (summaryLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      <div className="flex justify-center items-center h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0A5ED7]" />
       </div>
     );
   }
@@ -144,7 +144,7 @@ export default function IoTDashboard() {
     >
       <div className="mb-6 flex items-center justify-between">
         <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
             <SelectValue placeholder={t('iot.selectVehicle', 'Select vehicle...')} />
           </SelectTrigger>
           <SelectContent>
@@ -158,8 +158,8 @@ export default function IoTDashboard() {
         <div className="flex items-center gap-2">
           {isConnected ? (
             <>
-              <Wifi className="h-5 w-5 text-green-500" />
-              <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
+              <Wifi className="h-5 w-5 text-emerald-500" />
+              <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-0">
                 {t('iot.connected', 'Connected')}
               </Badge>
             </>
@@ -175,7 +175,7 @@ export default function IoTDashboard() {
       </div>
 
       <Tabs defaultValue="sensors" className="space-y-6">
-        <TabsList>
+        <TabsList className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="sensors" data-testid="tab-sensors">
             <Zap className="h-4 w-4 mr-2" />
             {t('iot.sensorList', 'Sensor List')} ({sensors.length})
@@ -193,50 +193,50 @@ export default function IoTDashboard() {
         </TabsList>
 
         <TabsContent value="sensors">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('iot.installedSensors', 'Installed Sensors')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('iot.installedSensors', 'Installed Sensors')}</CardTitle>
             </CardHeader>
             <CardContent>
               {sensorsLoading ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0A5ED7]" />
                 </div>
               ) : !Array.isArray(sensors) || sensors.length === 0 ? (
                 <div className="text-center py-12">
-                  <Zap className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <Zap className="h-16 w-16 mx-auto mb-4 text-[#64748B]" />
+                  <p className="text-[#64748B]">
                     {t('iot.noSensorsConfigured', 'No sensors configured yet')}
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="border-b">
+                    <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                       <tr className="text-left">
-                        <th className="pb-3">{t('iot.sensorId', 'Sensor ID')}</th>
-                        <th className="pb-3">{t('iot.type', 'Type')}</th>
-                        <th className="pb-3">{t('iot.vehicle', 'Vehicle')}</th>
-                        <th className="pb-3">{t('iot.status', 'Status')}</th>
-                        <th className="pb-3">{t('iot.lastCommunication', 'Last Communication')}</th>
+                        <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.sensorId', 'Sensor ID')}</th>
+                        <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.type', 'Type')}</th>
+                        <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.vehicle', 'Vehicle')}</th>
+                        <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.status', 'Status')}</th>
+                        <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.lastCommunication', 'Last Communication')}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {sensors.map((sensor) => {
                         const vehicle = vehicles.find((v) => v.id === sensor.vehicleId);
                         return (
-                          <tr key={sensor.id} className="border-b" data-testid={`sensor-row-${sensor.id}`}>
-                            <td className="py-3 font-mono text-xs">{sensor.sensorIdentifier}</td>
-                            <td className="py-3">{sensor.sensorType}</td>
-                            <td className="py-3">
+                          <tr key={sensor.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`sensor-row-${sensor.id}`}>
+                            <td className="py-3 font-mono text-xs text-[#0B1F3B] dark:text-white">{sensor.sensorIdentifier}</td>
+                            <td className="py-3 text-[#0B1F3B] dark:text-white">{sensor.sensorType}</td>
+                            <td className="py-3 text-[#0B1F3B] dark:text-white">
                               {vehicle ? `${vehicle.make} ${vehicle.model}` : t('iot.unknown', 'Unknown')}
                             </td>
                             <td className="py-3">
-                              <Badge className={sensor.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 border-0' : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 border-0'}>
+                              <Badge className={sensor.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-0' : 'bg-[#F8FAFC] text-[#64748B] dark:bg-[#232A36] border-0'}>
                                 {sensor.status === 'active' ? t('iot.active', 'active') : sensor.status}
                               </Badge>
                             </td>
-                            <td className="py-3 text-sm text-gray-600 dark:text-gray-400">
+                            <td className="py-3 text-sm text-[#64748B]">
                               {sensor.lastCommunication ? new Date(sensor.lastCommunication).toLocaleString() : t('iot.never', 'Never')}
                             </td>
                           </tr>
@@ -251,22 +251,22 @@ export default function IoTDashboard() {
         </TabsContent>
 
         <TabsContent value="alerts">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <AlertTriangle className="h-5 w-5 text-[#F97316]" />
                 {t('iot.activeAlertsTitle', 'Active Alerts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {alertsLoading ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#0A5ED7]" />
                 </div>
               ) : activeAlerts.length === 0 ? (
                 <div className="text-center py-12">
-                  <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <CheckCircle className="h-16 w-16 mx-auto mb-4 text-emerald-500" />
+                  <p className="text-[#64748B]">
                     {t('iot.noActiveAlerts', 'No active alerts - all systems normal')}
                   </p>
                 </div>
@@ -279,10 +279,10 @@ export default function IoTDashboard() {
                         key={alert.id}
                         className={`p-4 rounded-lg border ${
                           alert.severity === 'critical'
-                            ? 'border-red-200 bg-red-50 dark:bg-red-900/10'
+                            ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10'
                             : alert.severity === 'high'
-                            ? 'border-orange-200 bg-orange-50 dark:bg-orange-900/10'
-                            : 'border-yellow-200 bg-yellow-50 dark:bg-yellow-900/10'
+                            ? 'border-[#F97316]/30 bg-orange-50 dark:bg-orange-900/10'
+                            : 'border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/10'
                         }`}
                         data-testid={`alert-${alert.id}`}
                       >
@@ -293,28 +293,28 @@ export default function IoTDashboard() {
                                 alert.severity === 'critical'
                                   ? 'text-red-500'
                                   : alert.severity === 'high'
-                                  ? 'text-orange-500'
+                                  ? 'text-[#F97316]'
                                   : 'text-yellow-500'
                               }`}
                             />
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">
+                                <h4 className="font-semibold text-[#0B1F3B] dark:text-white">
                                   {alert.alertType}
                                 </h4>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                                   {alert.severity}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-[#64748B] mt-1">
                                 {alert.message}
                               </p>
                               {vehicle && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-[#64748B] mt-1">
                                   {t('iot.vehicleLabel', 'Vehicle')}: {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
                                 </p>
                               )}
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs text-[#64748B] mt-1">
                                 {new Date(alert.createdAt).toLocaleString()}
                               </p>
                             </div>
@@ -322,6 +322,7 @@ export default function IoTDashboard() {
                           <Button 
                             size="sm" 
                             variant="outline" 
+                            className="border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`button-acknowledge-${alert.id}`}
                             onClick={() => acknowledgeAlertMutation.mutate(alert.id)}
                             disabled={acknowledgeAlertMutation.isPending}
@@ -344,22 +345,22 @@ export default function IoTDashboard() {
 
         {selectedVehicleId && latestReadings && (
           <TabsContent value="live">
-            <Card className="bg-white dark:bg-salis-black">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-blue-500" />
+                <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                  <Activity className="h-5 w-5 text-[#0A5ED7]" />
                   {t('iot.latestReadings', 'Latest Sensor Readings')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {Object.entries(latestReadings).map(([sensorType, reading]) => (
-                    <div key={sensorType} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                      <span className="font-medium capitalize">{sensorType.replace(/_/g, ' ')}</span>
+                    <div key={sensorType} className="flex justify-between items-center p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                      <span className="font-medium capitalize text-[#0B1F3B] dark:text-white">{sensorType.replace(/_/g, ' ')}</span>
                       <div className="text-right">
-                        <span className="text-lg font-bold">{reading.value.toFixed(2)}</span>
-                        {reading.unit && <span className="text-sm text-gray-500 ml-1">{reading.unit}</span>}
-                        <div className="text-xs text-gray-500">
+                        <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">{reading.value.toFixed(2)}</span>
+                        {reading.unit && <span className="text-sm text-[#64748B] ml-1">{reading.unit}</span>}
+                        <div className="text-xs text-[#64748B]">
                           {new Date(reading.timestamp).toLocaleTimeString()}
                         </div>
                       </div>

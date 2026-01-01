@@ -56,12 +56,12 @@ export default function VideoEstimates() {
     {
       header: t('vehicles.vehicle', 'Vehicle'),
       accessorKey: "vehicleId",
-      cell: (row) => row.vehicleId || t('common.notAvailable', 'N/A'),
+      cell: (row) => <span className="text-[#0B1F3B] dark:text-white">{row.vehicleId || t('common.notAvailable', 'N/A')}</span>,
     },
     {
       header: t('videoEstimates.estimatedCost', 'Estimated Cost'),
       accessorKey: "estimatedCost",
-      cell: (row) => `$${row.estimatedCost || 0}`,
+      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">${row.estimatedCost || 0}</span>,
     },
     {
       header: t('common.status', 'Status'),
@@ -77,6 +77,7 @@ export default function VideoEstimates() {
             <Button
               size="sm"
               variant="outline"
+              className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               onClick={() => window.open(row.videoUrl, "_blank")}
               data-testid={`button-play-${row.id}`}
             >
@@ -87,6 +88,7 @@ export default function VideoEstimates() {
           {row.status !== "approved" && row.status !== "declined" && (
             <Button
               size="sm"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               onClick={() => approveEstimate.mutate(row.id)}
               data-testid={`button-approve-${row.id}`}
             >

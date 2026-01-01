@@ -79,15 +79,15 @@ export default function StaffPerformanceReview() {
       content: (
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="name" className="text-xs" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+            <XAxis dataKey="name" className="text-xs" tick={{ fill: '#64748B' }} />
+            <YAxis tick={{ fill: '#64748B' }} />
+            <Tooltip contentStyle={{ backgroundColor: "white", border: "1px solid #E2E8F0", borderRadius: "8px" }} />
             <Legend />
-            <Bar dataKey="efficiency" fill="#1f2937" name={t('staffReview.kpi.efficiency', 'Efficiency')} />
-            <Bar dataKey="quality" fill="#4b5563" name={t('staffReview.kpi.quality', 'Quality')} />
-            <Bar dataKey="punctuality" fill="#6b7280" name={t('staffReview.kpi.punctuality', 'Punctuality')} />
-            <Bar dataKey="teamwork" fill="#9ca3af" name={t('staffReview.kpi.teamwork', 'Teamwork')} />
+            <Bar dataKey="efficiency" fill="#0A5ED7" name={t('staffReview.kpi.efficiency', 'Efficiency')} />
+            <Bar dataKey="quality" fill="#0BB3FF" name={t('staffReview.kpi.quality', 'Quality')} />
+            <Bar dataKey="punctuality" fill="#64748B" name={t('staffReview.kpi.punctuality', 'Punctuality')} />
+            <Bar dataKey="teamwork" fill="#0B1F3B" name={t('staffReview.kpi.teamwork', 'Teamwork')} />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -98,13 +98,13 @@ export default function StaffPerformanceReview() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={monthlyTrends}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+            <XAxis dataKey="month" tick={{ fill: '#64748B' }} />
+            <YAxis tick={{ fill: '#64748B' }} />
+            <Tooltip contentStyle={{ backgroundColor: "white", border: "1px solid #E2E8F0", borderRadius: "8px" }} />
             <Legend />
-            <Line type="monotone" dataKey="average" stroke="#1f2937" strokeWidth={2} name={t('staffReview.averageScore', 'Average Score')} />
-            <Line type="monotone" dataKey="target" stroke="#9ca3af" strokeWidth={2} strokeDasharray="5 5" name={t('staffReview.target', 'Target')} />
+            <Line type="monotone" dataKey="average" stroke="#0A5ED7" strokeWidth={2} name={t('staffReview.averageScore', 'Average Score')} />
+            <Line type="monotone" dataKey="target" stroke="#64748B" strokeWidth={2} strokeDasharray="5 5" name={t('staffReview.target', 'Target')} />
           </LineChart>
         </ResponsiveContainer>
       ),
@@ -116,19 +116,19 @@ export default function StaffPerformanceReview() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ResponsiveContainer width="100%" height={300}>
             <RadarChart data={kpiData}>
-              <PolarGrid className="stroke-gray-200 dark:stroke-gray-700" />
-              <PolarAngleAxis dataKey="category" className="text-xs" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} />
-              <Radar name={t('staffReview.performance', 'Performance')} dataKey="value" stroke="#1f2937" fill="#1f2937" fillOpacity={0.3} />
-              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+              <PolarGrid className="stroke-[#E2E8F0] dark:stroke-[#232A36]" />
+              <PolarAngleAxis dataKey="category" className="text-xs" tick={{ fill: '#64748B' }} />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#64748B' }} />
+              <Radar name={t('staffReview.performance', 'Performance')} dataKey="value" stroke="#0A5ED7" fill="#0A5ED7" fillOpacity={0.3} />
+              <Tooltip contentStyle={{ backgroundColor: "white", border: "1px solid #E2E8F0", borderRadius: "8px" }} />
             </RadarChart>
           </ResponsiveContainer>
           <div className="space-y-4">
             {kpiData.map((kpi) => (
               <div key={kpi.category}>
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{kpi.category}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{kpi.value}%</span>
+                  <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{kpi.category}</span>
+                  <span className="text-sm font-bold text-[#0B1F3B] dark:text-white">{kpi.value}%</span>
                 </div>
                 <Progress value={kpi.value} className="h-2" />
               </div>
@@ -147,11 +147,10 @@ export default function StaffPerformanceReview() {
       filters={filters}
       sections={sections}
     >
-      {/* Top Performers Card */}
-      <Card className="mb-6">
+      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
             {t('staffReview.topPerformers', 'Top Performers')}
           </CardTitle>
         </CardHeader>
@@ -160,21 +159,21 @@ export default function StaffPerformanceReview() {
             {topPerformers.map((performer, index) => (
               <div
                 key={performer.name}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`performer-${index}`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 font-bold text-gray-900 dark:text-white">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-bold text-white">
                     #{index + 1}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">{performer.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{performer.role}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{performer.name}</p>
+                    <p className="text-sm text-[#64748B]">{performer.role}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{performer.score}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{performer.score}</p>
+                  <p className="text-sm text-[#64748B]">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
                 </div>
               </div>
             ))}

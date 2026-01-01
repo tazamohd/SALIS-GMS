@@ -65,25 +65,25 @@ export default function ClientVehicles() {
     return vehicleInvoices.reduce((sum, inv) => sum + parseFloat(inv.totalAmount || "0"), 0);
   };
 
-  const getStatusColor = (status: string): "default" | "secondary" | "outline" | "destructive" => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
-      case "completed": return "default";
-      case "in_progress": return "secondary";
-      case "pending": return "outline";
-      case "paid": return "default";
-      case "unpaid": return "destructive";
-      default: return "outline";
+      case "completed": return "bg-green-500 text-white";
+      case "in_progress": return "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white";
+      case "pending": return "bg-[#F97316] text-white";
+      case "paid": return "bg-green-500 text-white";
+      case "unpaid": return "bg-red-500 text-white";
+      default: return "bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white";
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold" data-testid="text-page-title">
+          <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
             My Vehicles
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-[#64748B] mt-1">
             Manage your vehicles, view service history, and invoices
           </p>
         </div>
@@ -91,15 +91,15 @@ export default function ClientVehicles() {
 
       {isLoading ? (
         <div className="grid gap-6 md:grid-cols-2">
-          <Skeleton className="h-96" />
-          <Skeleton className="h-96" />
+          <Skeleton className="h-96 bg-[#E2E8F0] dark:bg-[#232A36]" />
+          <Skeleton className="h-96 bg-[#E2E8F0] dark:bg-[#232A36]" />
         </div>
       ) : myVehicles.length === 0 ? (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <Car className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Vehicles Yet</h3>
-            <p className="text-muted-foreground text-center mb-4">
+            <Car className="h-16 w-16 text-[#64748B] mb-4" />
+            <h3 className="text-lg font-semibold mb-2 text-[#0B1F3B] dark:text-white">No Vehicles Yet</h3>
+            <p className="text-[#64748B] text-center mb-4">
               Contact your service center to add vehicles to your account
             </p>
           </CardContent>
@@ -116,18 +116,18 @@ export default function ClientVehicles() {
             const totalSpending = getTotalSpending(history.invoices);
 
             return (
-              <Card key={vehicle.id} data-testid={`vehicle-card-${vehicle.id}`}>
+              <Card key={vehicle.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`vehicle-card-${vehicle.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                        <Car className="h-6 w-6 text-primary" />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10">
+                        <Car className="h-6 w-6 text-[#0A5ED7]" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">
+                        <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">
                           {vehicle.make} {vehicle.model}
                         </CardTitle>
-                        <CardDescription>{vehicle.year}</CardDescription>
+                        <CardDescription className="text-[#64748B]">{vehicle.year}</CardDescription>
                       </div>
                     </div>
                     <Dialog>
@@ -136,18 +136,19 @@ export default function ClientVehicles() {
                           variant="ghost" 
                           size="icon"
                           onClick={() => setSelectedVehicle(vehicle)}
+                          className="text-[#64748B] hover:text-[#0A5ED7]"
                           data-testid={`button-details-${vehicle.id}`}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-3xl max-h-[90vh]">
+                      <DialogContent className="max-w-3xl max-h-[90vh] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <DialogHeader>
-                          <DialogTitle className="flex items-center gap-2">
-                            <Car className="h-5 w-5" />
+                          <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                            <Car className="h-5 w-5 text-[#0A5ED7]" />
                             {vehicle.make} {vehicle.model} ({vehicle.year})
                           </DialogTitle>
-                          <DialogDescription>
+                          <DialogDescription className="text-[#64748B]">
                             Complete vehicle details, service history, and invoices
                           </DialogDescription>
                         </DialogHeader>
@@ -164,85 +165,85 @@ export default function ClientVehicles() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">License Plate</span>
-                      <span className="font-medium">{vehicle.licensePlate}</span>
+                      <span className="text-[#64748B]">License Plate</span>
+                      <span className="font-medium text-[#0B1F3B] dark:text-white">{vehicle.licensePlate}</span>
                     </div>
                     {vehicle.vin && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">VIN</span>
-                        <span className="font-mono text-xs">{vehicle.vin}</span>
+                        <span className="text-[#64748B]">VIN</span>
+                        <span className="font-mono text-xs text-[#0B1F3B] dark:text-white">{vehicle.vin}</span>
                       </div>
                     )}
                     {vehicle.color && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Color</span>
-                        <span className="font-medium">{vehicle.color}</span>
+                        <span className="text-[#64748B]">Color</span>
+                        <span className="font-medium text-[#0B1F3B] dark:text-white">{vehicle.color}</span>
                       </div>
                     )}
                     {vehicle.mileage && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Mileage</span>
-                        <span className="font-medium">{vehicle.mileage.toLocaleString()} km</span>
+                        <span className="text-[#64748B]">Mileage</span>
+                        <span className="font-medium text-[#0B1F3B] dark:text-white">{vehicle.mileage.toLocaleString()} km</span>
                       </div>
                     )}
                   </div>
 
                   <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="overview" data-testid={`tab-overview-${vehicle.id}`}>
+                    <TabsList className="grid w-full grid-cols-3 bg-[#E2E8F0] dark:bg-[#232A36]">
+                      <TabsTrigger value="overview" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23] text-[#0B1F3B] dark:text-white" data-testid={`tab-overview-${vehicle.id}`}>
                         Overview
                       </TabsTrigger>
-                      <TabsTrigger value="history" data-testid={`tab-history-${vehicle.id}`}>
+                      <TabsTrigger value="history" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23] text-[#0B1F3B] dark:text-white" data-testid={`tab-history-${vehicle.id}`}>
                         Jobs
                       </TabsTrigger>
-                      <TabsTrigger value="invoices" data-testid={`tab-invoices-${vehicle.id}`}>
+                      <TabsTrigger value="invoices" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23] text-[#0B1F3B] dark:text-white" data-testid={`tab-invoices-${vehicle.id}`}>
                         Invoices
                       </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="overview" className="space-y-3 mt-4">
                       {lastService ? (
-                        <div className="p-3 rounded-lg border">
+                        <div className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
                           <div className="flex items-center gap-2 mb-2">
-                            <Wrench className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Last Service</span>
+                            <Wrench className="h-4 w-4 text-[#64748B]" />
+                            <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">Last Service</span>
                           </div>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-[#64748B]">
                             {new Date(lastService.createdAt).toLocaleDateString()}
                           </p>
-                          <Badge variant="secondary" className="mt-2">
+                          <Badge className={`mt-2 ${getStatusColor(lastService.status)}`}>
                             {lastService.status}
                           </Badge>
                         </div>
                       ) : (
-                        <div className="p-3 rounded-lg border text-center text-sm text-muted-foreground">
+                        <div className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center text-sm text-[#64748B]">
                           No service history yet
                         </div>
                       )}
 
                       <div className="grid grid-cols-3 gap-2">
-                        <div className="p-3 rounded-lg border text-center">
-                          <div className="text-2xl font-bold text-primary">
+                        <div className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+                          <div className="text-2xl font-bold text-[#0A5ED7]">
                             {history.jobs.length}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">Services</p>
+                          <p className="text-xs text-[#64748B] mt-1">Services</p>
                         </div>
-                        <div className="p-3 rounded-lg border text-center">
-                          <div className="text-2xl font-bold text-primary">
+                        <div className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+                          <div className="text-2xl font-bold text-[#0A5ED7]">
                             {history.invoices.length}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">Invoices</p>
+                          <p className="text-xs text-[#64748B] mt-1">Invoices</p>
                         </div>
-                        <div className="p-3 rounded-lg border text-center">
-                          <div className="text-lg font-bold text-primary">
+                        <div className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+                          <div className="text-lg font-bold text-[#0A5ED7]">
                             ${totalSpending.toFixed(0)}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">Spent</p>
+                          <p className="text-xs text-[#64748B] mt-1">Spent</p>
                         </div>
                       </div>
 
                       <Link href="/client/appointments">
-                        <Button className="w-full" data-testid={`button-book-${vehicle.id}`}>
+                        <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid={`button-book-${vehicle.id}`}>
                           <Calendar className="h-4 w-4 mr-2" />
                           Book Service
                         </Button>
@@ -251,7 +252,7 @@ export default function ClientVehicles() {
 
                     <TabsContent value="history" className="space-y-2 mt-4">
                       {history.jobs.length === 0 ? (
-                        <div className="p-6 text-center text-sm text-muted-foreground">
+                        <div className="p-6 text-center text-sm text-[#64748B]">
                           No service history
                         </div>
                       ) : (
@@ -266,21 +267,21 @@ export default function ClientVehicles() {
                               return (
                                 <div
                                   key={job.id}
-                                  className="p-3 rounded-lg border text-sm"
+                                  className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-sm"
                                   data-testid={`job-${job.id}`}
                                 >
                                   <div className="flex items-center justify-between mb-1">
-                                    <span className="font-medium">Job #{job.jobNumber}</span>
-                                    <Badge variant={getStatusColor(job.status)} className="text-xs">
+                                    <span className="font-medium text-[#0B1F3B] dark:text-white">Job #{job.jobNumber}</span>
+                                    <Badge className={`text-xs ${getStatusColor(job.status)}`}>
                                       {job.status}
                                     </Badge>
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-[#64748B]">
                                       {new Date(job.createdAt).toLocaleDateString()}
                                     </p>
                                     {invoice && (
-                                      <span className="text-xs font-medium text-primary">
+                                      <span className="text-xs font-medium text-[#0A5ED7]">
                                         ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                                       </span>
                                     )}
@@ -294,7 +295,7 @@ export default function ClientVehicles() {
 
                     <TabsContent value="invoices" className="space-y-2 mt-4">
                       {history.invoices.length === 0 ? (
-                        <div className="p-6 text-center text-sm text-muted-foreground">
+                        <div className="p-6 text-center text-sm text-[#64748B]">
                           <Receipt className="h-8 w-8 mx-auto mb-2 opacity-50" />
                           No invoices yet
                         </div>
@@ -308,20 +309,20 @@ export default function ClientVehicles() {
                             .map((invoice: any) => (
                               <div
                                 key={invoice.id}
-                                className="p-3 rounded-lg border text-sm"
+                                className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-sm"
                                 data-testid={`invoice-${invoice.id}`}
                               >
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="font-medium">#{invoice.invoiceNumber}</span>
-                                  <Badge variant={getStatusColor(invoice.status)} className="text-xs">
+                                  <span className="font-medium text-[#0B1F3B] dark:text-white">#{invoice.invoiceNumber}</span>
+                                  <Badge className={`text-xs ${getStatusColor(invoice.status)}`}>
                                     {invoice.status}
                                   </Badge>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                  <p className="text-xs text-muted-foreground">
+                                  <p className="text-xs text-[#64748B]">
                                     {new Date(invoice.createdAt).toLocaleDateString()}
                                   </p>
-                                  <span className="font-medium text-primary">
+                                  <span className="font-medium text-[#0A5ED7]">
                                     ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                                   </span>
                                 </div>
@@ -350,7 +351,7 @@ function VehicleDetailView({
   vehicle: any; 
   history: { jobs: any[]; appointments: any[]; invoices: any[] };
   getInvoiceForJob: (jobId: string) => any;
-  getStatusColor: (status: string) => "default" | "secondary" | "outline" | "destructive";
+  getStatusColor: (status: string) => string;
 }) {
   const totalSpending = history.invoices.reduce((sum, inv) => sum + parseFloat(inv.totalAmount || "0"), 0);
   const completedJobs = history.jobs.filter((j: any) => j.status === "completed").length;
@@ -359,58 +360,58 @@ function VehicleDetailView({
     <ScrollArea className="max-h-[70vh]">
       <div className="space-y-6 pr-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg border text-center">
-            <Wrench className="h-6 w-6 mx-auto mb-2 text-primary" />
-            <div className="text-2xl font-bold">{history.jobs.length}</div>
-            <p className="text-xs text-muted-foreground">Total Services</p>
+          <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+            <Wrench className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7]" />
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{history.jobs.length}</div>
+            <p className="text-xs text-[#64748B]">Total Services</p>
           </div>
-          <div className="p-4 rounded-lg border text-center">
+          <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
             <CheckCircle className="h-6 w-6 mx-auto mb-2 text-green-500" />
-            <div className="text-2xl font-bold">{completedJobs}</div>
-            <p className="text-xs text-muted-foreground">Completed</p>
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{completedJobs}</div>
+            <p className="text-xs text-[#64748B]">Completed</p>
           </div>
-          <div className="p-4 rounded-lg border text-center">
-            <Receipt className="h-6 w-6 mx-auto mb-2 text-blue-500" />
-            <div className="text-2xl font-bold">{history.invoices.length}</div>
-            <p className="text-xs text-muted-foreground">Invoices</p>
+          <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+            <Receipt className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7]" />
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{history.invoices.length}</div>
+            <p className="text-xs text-[#64748B]">Invoices</p>
           </div>
-          <div className="p-4 rounded-lg border text-center">
-            <DollarSign className="h-6 w-6 mx-auto mb-2 text-yellow-500" />
-            <div className="text-2xl font-bold">${totalSpending.toFixed(0)}</div>
-            <p className="text-xs text-muted-foreground">Total Spent</p>
+          <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
+            <DollarSign className="h-6 w-6 mx-auto mb-2 text-[#F97316]" />
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${totalSpending.toFixed(0)}</div>
+            <p className="text-xs text-[#64748B]">Total Spent</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="space-y-2">
-            <h4 className="font-semibold">Vehicle Information</h4>
-            <div className="space-y-1 text-muted-foreground">
-              <p>Make: <span className="text-foreground">{vehicle.make}</span></p>
-              <p>Model: <span className="text-foreground">{vehicle.model}</span></p>
-              <p>Year: <span className="text-foreground">{vehicle.year}</span></p>
-              <p>License: <span className="text-foreground">{vehicle.licensePlate}</span></p>
+            <h4 className="font-semibold text-[#0B1F3B] dark:text-white">Vehicle Information</h4>
+            <div className="space-y-1 text-[#64748B]">
+              <p>Make: <span className="text-[#0B1F3B] dark:text-white">{vehicle.make}</span></p>
+              <p>Model: <span className="text-[#0B1F3B] dark:text-white">{vehicle.model}</span></p>
+              <p>Year: <span className="text-[#0B1F3B] dark:text-white">{vehicle.year}</span></p>
+              <p>License: <span className="text-[#0B1F3B] dark:text-white">{vehicle.licensePlate}</span></p>
             </div>
           </div>
           <div className="space-y-2">
-            <h4 className="font-semibold">Additional Details</h4>
-            <div className="space-y-1 text-muted-foreground">
-              {vehicle.vin && <p>VIN: <span className="text-foreground font-mono text-xs">{vehicle.vin}</span></p>}
-              {vehicle.color && <p>Color: <span className="text-foreground">{vehicle.color}</span></p>}
-              {vehicle.mileage && <p>Mileage: <span className="text-foreground">{vehicle.mileage.toLocaleString()} km</span></p>}
-              {vehicle.engineType && <p>Engine: <span className="text-foreground">{vehicle.engineType}</span></p>}
+            <h4 className="font-semibold text-[#0B1F3B] dark:text-white">Additional Details</h4>
+            <div className="space-y-1 text-[#64748B]">
+              {vehicle.vin && <p>VIN: <span className="text-[#0B1F3B] dark:text-white font-mono text-xs">{vehicle.vin}</span></p>}
+              {vehicle.color && <p>Color: <span className="text-[#0B1F3B] dark:text-white">{vehicle.color}</span></p>}
+              {vehicle.mileage && <p>Mileage: <span className="text-[#0B1F3B] dark:text-white">{vehicle.mileage.toLocaleString()} km</span></p>}
+              {vehicle.engineType && <p>Engine: <span className="text-[#0B1F3B] dark:text-white">{vehicle.engineType}</span></p>}
             </div>
           </div>
         </div>
 
-        <Separator />
+        <Separator className="bg-[#E2E8F0] dark:bg-[#232A36]" />
 
         <div>
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
+          <h4 className="font-semibold mb-3 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Wrench className="h-4 w-4 text-[#0A5ED7]" />
             Service History
           </h4>
           {history.jobs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No service history available</p>
+            <p className="text-sm text-[#64748B]">No service history available</p>
           ) : (
             <div className="space-y-3">
               {history.jobs
@@ -418,17 +419,17 @@ function VehicleDetailView({
                 .map((job: any) => {
                   const invoice = getInvoiceForJob(job.id);
                   return (
-                    <div key={job.id} className="p-4 rounded-lg border" data-testid={`detail-job-${job.id}`}>
+                    <div key={job.id} className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`detail-job-${job.id}`}>
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <p className="font-medium">Job #{job.jobNumber}</p>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">Job #{job.jobNumber}</p>
                           {job.description && (
-                            <p className="text-sm text-muted-foreground mt-1">{job.description}</p>
+                            <p className="text-sm text-[#64748B] mt-1">{job.description}</p>
                           )}
                         </div>
-                        <Badge variant={getStatusColor(job.status)}>{job.status}</Badge>
+                        <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
                       </div>
-                      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mt-2">
+                      <div className="flex flex-wrap gap-4 text-xs text-[#64748B] mt-2">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           Created: {new Date(job.createdAt).toLocaleDateString()}
@@ -440,16 +441,16 @@ function VehicleDetailView({
                           </span>
                         )}
                         {invoice && (
-                          <span className="flex items-center gap-1 text-primary font-medium">
+                          <span className="flex items-center gap-1 text-[#0A5ED7] font-medium">
                             <DollarSign className="h-3 w-3" />
                             ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                           </span>
                         )}
                       </div>
                       {invoice && (
-                        <div className="mt-3 p-2 bg-muted/50 rounded flex items-center justify-between">
-                          <span className="text-xs">Invoice #{invoice.invoiceNumber}</span>
-                          <Badge variant={getStatusColor(invoice.status)} className="text-xs">
+                        <div className="mt-3 p-2 bg-[#E2E8F0]/50 dark:bg-[#232A36]/50 rounded flex items-center justify-between">
+                          <span className="text-xs text-[#64748B]">Invoice #{invoice.invoiceNumber}</span>
+                          <Badge className={`text-xs ${getStatusColor(invoice.status)}`}>
                             {invoice.status}
                           </Badge>
                         </div>
@@ -461,32 +462,32 @@ function VehicleDetailView({
           )}
         </div>
 
-        <Separator />
+        <Separator className="bg-[#E2E8F0] dark:bg-[#232A36]" />
 
         <div>
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Receipt className="h-4 w-4" />
+          <h4 className="font-semibold mb-3 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Receipt className="h-4 w-4 text-[#0A5ED7]" />
             All Invoices
           </h4>
           {history.invoices.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No invoices available</p>
+            <p className="text-sm text-[#64748B]">No invoices available</p>
           ) : (
             <div className="space-y-2">
               {history.invoices
                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                 .map((invoice: any) => (
-                  <div key={invoice.id} className="p-3 rounded-lg border flex items-center justify-between" data-testid={`detail-invoice-${invoice.id}`}>
+                  <div key={invoice.id} className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] flex items-center justify-between" data-testid={`detail-invoice-${invoice.id}`}>
                     <div>
-                      <p className="font-medium text-sm">Invoice #{invoice.invoiceNumber}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Invoice #{invoice.invoiceNumber}</p>
+                      <p className="text-xs text-[#64748B]">
                         {new Date(invoice.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-primary">
+                      <span className="font-bold text-[#0A5ED7]">
                         ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                       </span>
-                      <Badge variant={getStatusColor(invoice.status)}>{invoice.status}</Badge>
+                      <Badge className={getStatusColor(invoice.status)}>{invoice.status}</Badge>
                     </div>
                   </div>
                 ))}

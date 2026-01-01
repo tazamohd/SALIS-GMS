@@ -103,30 +103,30 @@ export default function PurchaseAgentInventory() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
             Inventory Needs
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-[#64748B] mt-1">
             Monitor stock levels and identify reorder needs
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-blue-50 dark:bg-blue-900/20">
-                <Package className="h-6 w-6 text-blue-500" />
+                <Package className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{spareParts.length}</div>
-                <p className="text-sm text-gray-500">Total Items</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{spareParts.length}</div>
+                <p className="text-sm text-[#64748B]">Total Items</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-red-200 dark:border-red-800">
+        <Card className="bg-white dark:bg-[#151A23] border-red-200 dark:border-red-800">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-red-50 dark:bg-red-900/20">
@@ -134,25 +134,25 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-500">{lowStockItems.length}</div>
-                <p className="text-sm text-gray-500">Need Reorder</p>
+                <p className="text-sm text-[#64748B]">Need Reorder</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-orange-50 dark:bg-orange-900/20">
-                <TrendingDown className="h-6 w-6 text-orange-500" />
+                <TrendingDown className="h-6 w-6 text-[#F97316]" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-orange-500">{outOfStockItems.length}</div>
-                <p className="text-sm text-gray-500">Out of Stock</p>
+                <div className="text-2xl font-bold text-[#F97316]">{outOfStockItems.length}</div>
+                <p className="text-sm text-[#64748B]">Out of Stock</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-green-50 dark:bg-green-900/20">
@@ -160,7 +160,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-500">{healthyItems.length}</div>
-                <p className="text-sm text-gray-500">Healthy Stock</p>
+                <p className="text-sm text-[#64748B]">Healthy Stock</p>
               </div>
             </div>
           </CardContent>
@@ -168,7 +168,7 @@ export default function PurchaseAgentInventory() {
       </div>
 
       {lowStockItems.length > 0 && (
-        <Card className="border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
+        <Card className="bg-white dark:bg-[#151A23] border-red-200 dark:border-red-800">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -178,13 +178,13 @@ export default function PurchaseAgentInventory() {
                 </CardTitle>
               </div>
               <Link href="/purchase-agent/orders">
-                <Button size="sm" data-testid="button-create-bulk-order">
+                <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-create-bulk-order">
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Create Bulk Order
                 </Button>
               </Link>
             </div>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {lowStockItems.length} items require immediate attention
             </CardDescription>
           </CardHeader>
@@ -195,18 +195,18 @@ export default function PurchaseAgentInventory() {
                 return (
                   <div
                     key={part.id}
-                    className="p-3 bg-white dark:bg-salis-gray-dark rounded-lg border"
+                    className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`critical-item-${part.id}`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-medium text-sm">{part.name}</p>
-                        <p className="text-xs text-gray-500">{part.sku}</p>
+                        <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{part.name}</p>
+                        <p className="text-xs text-[#64748B]">{part.sku}</p>
                       </div>
                       {getStatusBadge(getStockStatus(part))}
                     </div>
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
+                      <div className="flex justify-between text-xs text-[#64748B]">
                         <span>Current: {inv?.stockQuantity || 0}</span>
                         <span>Min: {inv?.minThreshold || 0}</span>
                       </div>
@@ -223,22 +223,22 @@ export default function PurchaseAgentInventory() {
         </Card>
       )}
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="flex gap-2 flex-1">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
                   placeholder="Search parts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search"
                 />
               </div>
               <Select value={stockFilter} onValueChange={setStockFilter}>
-                <SelectTrigger className="w-44" data-testid="select-stock-filter">
+                <SelectTrigger className="w-44 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-stock-filter">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Stock Level" />
                 </SelectTrigger>
@@ -255,34 +255,34 @@ export default function PurchaseAgentInventory() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8">Loading inventory...</div>
+            <div className="text-center py-8 text-[#64748B]">Loading inventory...</div>
           ) : filteredParts.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[#64748B]">
               No items found
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Part</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>In Stock</TableHead>
-                  <TableHead>Min Level</TableHead>
-                  <TableHead>Stock Level</TableHead>
-                  <TableHead>Status</TableHead>
+                <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">SKU</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">In Stock</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Min Level</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Stock Level</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredParts.map((part) => {
                   const inv = getPartInventory(part.id);
                   return (
-                    <TableRow key={part.id} data-testid={`row-part-${part.id}`}>
-                      <TableCell className="font-medium">{part.name}</TableCell>
-                      <TableCell>{part.sku}</TableCell>
-                      <TableCell>{part.category || "N/A"}</TableCell>
-                      <TableCell className="font-semibold">{inv?.stockQuantity || 0}</TableCell>
-                      <TableCell>{inv?.minThreshold || 0}</TableCell>
+                    <TableRow key={part.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-part-${part.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{part.name}</TableCell>
+                      <TableCell className="text-[#64748B]">{part.sku}</TableCell>
+                      <TableCell className="text-[#64748B]">{part.category || "N/A"}</TableCell>
+                      <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">{inv?.stockQuantity || 0}</TableCell>
+                      <TableCell className="text-[#64748B]">{inv?.minThreshold || 0}</TableCell>
                       <TableCell className="w-32">
                         <Progress value={getStockLevel(part)} className="h-2" />
                       </TableCell>

@@ -117,16 +117,16 @@ export default function PurchaseAgentReports() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
             Procurement Reports
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-[#64748B] mt-1">
             Analytics and insights for procurement activities
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-40" data-testid="select-date-range">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-date-range">
               <Calendar className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
@@ -141,54 +141,54 @@ export default function PurchaseAgentReports() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-green-50 dark:bg-green-900/20">
                 <DollarSign className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">${totalSpend.toLocaleString()}</div>
-                <p className="text-sm text-gray-500">Total Spend</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${totalSpend.toLocaleString()}</div>
+                <p className="text-sm text-[#64748B]">Total Spend</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-blue-50 dark:bg-blue-900/20">
-                <Package className="h-6 w-6 text-blue-500" />
+                <Package className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{purchaseOrders.length}</div>
-                <p className="text-sm text-gray-500">Total Orders</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{purchaseOrders.length}</div>
+                <p className="text-sm text-[#64748B]">Total Orders</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-purple-50 dark:bg-purple-900/20">
                 <TrendingUp className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold">${avgOrderValue.toFixed(0)}</div>
-                <p className="text-sm text-gray-500">Avg Order Value</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${avgOrderValue.toFixed(0)}</div>
+                <p className="text-sm text-[#64748B]">Avg Order Value</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-orange-50 dark:bg-orange-900/20">
-                <Users className="h-6 w-6 text-orange-500" />
+                <Users className="h-6 w-6 text-[#F97316]" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{suppliers.filter((s) => s.isActive).length}</div>
-                <p className="text-sm text-gray-500">Active Suppliers</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{suppliers.filter((s) => s.isActive).length}</div>
+                <p className="text-sm text-[#64748B]">Active Suppliers</p>
               </div>
             </div>
           </CardContent>
@@ -213,10 +213,10 @@ export default function PurchaseAgentReports() {
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle>Order Status Distribution</CardTitle>
-                <CardDescription>Breakdown of orders by current status</CardDescription>
+                <CardTitle className="text-[#0B1F3B] dark:text-white">Order Status Distribution</CardTitle>
+                <CardDescription className="text-[#64748B]">Breakdown of orders by current status</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -225,18 +225,18 @@ export default function PurchaseAgentReports() {
                       ? ((count / purchaseOrders.length) * 100).toFixed(1)
                       : 0;
                     const colors: Record<string, string> = {
-                      pending: "bg-orange-500",
-                      ordered: "bg-blue-500",
+                      pending: "bg-[#F97316]",
+                      ordered: "bg-[#0A5ED7]",
                       received: "bg-green-500",
                       cancelled: "bg-red-500",
                     };
                     return (
                       <div key={status}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm capitalize">{status}</span>
-                          <span className="text-sm text-gray-500">{count} ({percentage}%)</span>
+                          <span className="text-sm capitalize text-[#0B1F3B] dark:text-white">{status}</span>
+                          <span className="text-sm text-[#64748B]">{count} ({percentage}%)</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className={`${colors[status]} h-2 rounded-full`}
                             style={{ width: `${percentage}%` }}
@@ -249,35 +249,35 @@ export default function PurchaseAgentReports() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle>Top Suppliers by Spend</CardTitle>
-                <CardDescription>Highest value supplier relationships</CardDescription>
+                <CardTitle className="text-[#0B1F3B] dark:text-white">Top Suppliers by Spend</CardTitle>
+                <CardDescription className="text-[#64748B]">Highest value supplier relationships</CardDescription>
               </CardHeader>
               <CardContent>
                 {topSuppliers.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No supplier data</p>
+                  <p className="text-[#64748B] text-center py-4">No supplier data</p>
                 ) : (
                   <div className="space-y-4">
                     {topSuppliers.map((supplier, index) => (
                       <div
                         key={supplier.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
+                        className="flex items-center justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                         data-testid={`top-supplier-${supplier.id}`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-lg font-bold text-gray-400">#{index + 1}</span>
+                          <span className="text-lg font-bold text-[#64748B]">#{index + 1}</span>
                           <div>
-                            <p className="font-medium">{supplier.name}</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="font-medium text-[#0B1F3B] dark:text-white">{supplier.name}</p>
+                            <p className="text-sm text-[#64748B]">
                               {supplier.orderCount} orders
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold">${supplier.totalSpend.toLocaleString()}</p>
+                          <p className="font-semibold text-[#0B1F3B] dark:text-white">${supplier.totalSpend.toLocaleString()}</p>
                           {supplier.rating && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                               ★ {supplier.rating}
                             </Badge>
                           )}
@@ -290,28 +290,28 @@ export default function PurchaseAgentReports() {
             </Card>
           </div>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>Inventory Alerts Summary</CardTitle>
-              <CardDescription>Items requiring procurement attention</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">Inventory Alerts Summary</CardTitle>
+              <CardDescription className="text-[#64748B]">Items requiring procurement attention</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg text-center">
+                <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center bg-[#F8FAFC] dark:bg-[#0E1117]">
                   <div className="text-3xl font-bold text-red-500">{lowStockItems.length}</div>
-                  <p className="text-sm text-gray-500 mt-1">Low Stock Items</p>
+                  <p className="text-sm text-[#64748B] mt-1">Low Stock Items</p>
                 </div>
-                <div className="p-4 border rounded-lg text-center">
-                  <div className="text-3xl font-bold text-orange-500">
+                <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <div className="text-3xl font-bold text-[#F97316]">
                     {inventories.filter((inv) => (inv.stockQuantity || 0) === 0).length}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Out of Stock</p>
+                  <p className="text-sm text-[#64748B] mt-1">Out of Stock</p>
                 </div>
-                <div className="p-4 border rounded-lg text-center">
-                  <div className="text-3xl font-bold text-blue-500">
+                <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <div className="text-3xl font-bold text-[#0A5ED7]">
                     {ordersByStatus.pending + ordersByStatus.ordered}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Orders in Progress</p>
+                  <p className="text-sm text-[#64748B] mt-1">Orders in Progress</p>
                 </div>
               </div>
             </CardContent>
@@ -319,14 +319,14 @@ export default function PurchaseAgentReports() {
         </TabsContent>
 
         <TabsContent value="suppliers" className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>Supplier Performance Overview</CardTitle>
-              <CardDescription>Performance metrics for all active suppliers</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">Supplier Performance Overview</CardTitle>
+              <CardDescription className="text-[#64748B]">Performance metrics for all active suppliers</CardDescription>
             </CardHeader>
             <CardContent>
               {suppliers.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">No suppliers found</p>
+                <p className="text-[#64748B] text-center py-8">No suppliers found</p>
               ) : (
                 <div className="space-y-4">
                   {suppliers.filter((s) => s.isActive).map((supplier) => {
@@ -339,31 +339,31 @@ export default function PurchaseAgentReports() {
                     return (
                       <div
                         key={supplier.id}
-                        className="p-4 border rounded-lg"
+                        className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                         data-testid={`supplier-perf-${supplier.id}`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <h4 className="font-semibold">{supplier.name}</h4>
-                            <p className="text-sm text-gray-500">{supplier.city}, {supplier.country}</p>
+                            <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{supplier.name}</h4>
+                            <p className="text-sm text-[#64748B]">{supplier.city}, {supplier.country}</p>
                           </div>
                           {avgRating && (
-                            <Badge variant="outline" className="text-lg">★ {avgRating}</Badge>
+                            <Badge variant="outline" className="text-lg border-[#E2E8F0] dark:border-[#232A36]">★ {avgRating}</Badge>
                           )}
                         </div>
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div>
-                            <p className="text-gray-500">Total Orders</p>
-                            <p className="font-semibold">{supplierOrders.length}</p>
+                            <p className="text-[#64748B]">Total Orders</p>
+                            <p className="font-semibold text-[#0B1F3B] dark:text-white">{supplierOrders.length}</p>
                           </div>
                           <div>
-                            <p className="text-gray-500">Total Value</p>
-                            <p className="font-semibold">
+                            <p className="text-[#64748B]">Total Value</p>
+                            <p className="font-semibold text-[#0B1F3B] dark:text-white">
                               ${supplierOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0).toLocaleString()}
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-500">Status</p>
+                            <p className="text-[#64748B]">Status</p>
                             <Badge variant={supplier.isActive ? "default" : "secondary"}>
                               {supplier.isActive ? "Active" : "Inactive"}
                             </Badge>
@@ -381,24 +381,24 @@ export default function PurchaseAgentReports() {
         <TabsContent value="reports" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {reports.map((report) => (
-              <Card key={report.id} data-testid={`report-${report.id}`}>
+              <Card key={report.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`report-${report.id}`}>
                 <CardHeader>
                   <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-gray-100 dark:bg-salis-gray">
-                      <report.icon className="h-6 w-6" />
+                    <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                      <report.icon className="h-6 w-6 text-[#0A5ED7]" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-lg">{report.title}</CardTitle>
-                      <CardDescription className="mt-1">{report.description}</CardDescription>
+                      <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{report.title}</CardTitle>
+                      <CardDescription className="mt-1 text-[#64748B]">{report.description}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" data-testid={`button-view-${report.id}`}>
+                    <Button variant="outline" className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-${report.id}`}>
                       View Report
                     </Button>
-                    <Button variant="outline" data-testid={`button-download-${report.id}`}>
+                    <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-download-${report.id}`}>
                       <Download className="h-4 w-4" />
                     </Button>
                   </div>

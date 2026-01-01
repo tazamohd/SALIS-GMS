@@ -124,10 +124,10 @@ export default function IncomingRequests() {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case "urgent": return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "normal": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "low": return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-      default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      case "urgent": return "bg-[#F97316]/20 text-[#F97316] border-[#F97316]/30";
+      case "normal": return "bg-[#0A5ED7]/20 text-[#0A5ED7] border-[#0A5ED7]/30";
+      case "low": return "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30";
+      default: return "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30";
     }
   };
 
@@ -148,18 +148,18 @@ export default function IncomingRequests() {
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search by part, request ID, or garage name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800 border-gray-700"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <div className="flex gap-2">
           <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
-            <SelectTrigger className="w-32 bg-gray-800 border-gray-700" data-testid="select-urgency-filter">
+            <SelectTrigger className="w-32 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-urgency-filter">
               <SelectValue placeholder="Urgency" />
             </SelectTrigger>
             <SelectContent>
@@ -170,7 +170,7 @@ export default function IncomingRequests() {
             </SelectContent>
           </Select>
           <Select value={respondedFilter} onValueChange={setRespondedFilter}>
-            <SelectTrigger className="w-36 bg-gray-800 border-gray-700" data-testid="select-responded-filter">
+            <SelectTrigger className="w-36 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-responded-filter">
               <SelectValue placeholder="Response" />
             </SelectTrigger>
             <SelectContent>
@@ -184,28 +184,28 @@ export default function IncomingRequests() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <Card className="bg-red-900/20 border-red-700/30">
+        <Card className="bg-[#F97316]/10 border-[#F97316]/30 dark:bg-[#F97316]/10 dark:border-[#F97316]/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-red-400">
+            <p className="text-3xl font-bold text-[#F97316]">
               {displayRequests.filter(r => r.urgency === "urgent" && !r.hasResponded).length}
             </p>
-            <p className="text-sm text-gray-400">Urgent Pending</p>
+            <p className="text-sm text-[#64748B]">Urgent Pending</p>
           </CardContent>
         </Card>
-        <Card className="bg-blue-900/20 border-blue-700/30">
+        <Card className="bg-[#0A5ED7]/10 border-[#0A5ED7]/30 dark:bg-[#0A5ED7]/10 dark:border-[#0A5ED7]/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-blue-400">
+            <p className="text-3xl font-bold text-[#0A5ED7]">
               {displayRequests.filter(r => !r.hasResponded).length}
             </p>
-            <p className="text-sm text-gray-400">Awaiting Response</p>
+            <p className="text-sm text-[#64748B]">Awaiting Response</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-900/20 border-green-700/30">
+        <Card className="bg-green-500/10 border-green-500/30 dark:bg-green-500/10 dark:border-green-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-green-400">
+            <p className="text-3xl font-bold text-green-500">
               {displayRequests.filter(r => r.hasResponded).length}
             </p>
-            <p className="text-sm text-gray-400">Responded</p>
+            <p className="text-sm text-[#64748B]">Responded</p>
           </CardContent>
         </Card>
       </div>
@@ -213,11 +213,11 @@ export default function IncomingRequests() {
       {/* Requests List */}
       <div className="space-y-4">
         {filteredRequests.length === 0 ? (
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
-              <Package className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="font-medium text-lg mb-2">No Incoming Requests</h3>
-              <p className="text-gray-400">
+              <Package className="h-12 w-12 mx-auto text-[#64748B] mb-4" />
+              <h3 className="font-medium text-lg mb-2 text-[#0B1F3B] dark:text-white">No Incoming Requests</h3>
+              <p className="text-[#64748B]">
                 No quotation requests match your filters
               </p>
             </CardContent>
@@ -226,10 +226,10 @@ export default function IncomingRequests() {
           filteredRequests.map((request) => (
             <Card 
               key={request.id} 
-              className={`border-gray-700 hover:border-gray-600 transition-colors ${
+              className={`border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors ${
                 request.urgency === "urgent" && !request.hasResponded 
-                  ? "bg-red-900/10 border-red-700/50" 
-                  : "bg-gray-800"
+                  ? "bg-[#F97316]/5 border-[#F97316]/50 dark:bg-[#F97316]/5" 
+                  : "bg-white dark:bg-[#151A23]"
               }`}
               data-testid={`incoming-request-${request.id}`}
             >
@@ -238,31 +238,31 @@ export default function IncomingRequests() {
                   {/* Part Info */}
                   <div className="flex items-start gap-4 flex-1">
                     <div className={`p-3 rounded-lg ${
-                      request.urgency === "urgent" ? "bg-red-500/20" : "bg-gray-700"
+                      request.urgency === "urgent" ? "bg-[#F97316]/20" : "bg-[#F8FAFC] dark:bg-[#0E1117]"
                     }`}>
                       <Package className={`h-6 w-6 ${
-                        request.urgency === "urgent" ? "text-red-400" : "text-blue-400"
+                        request.urgency === "urgent" ? "text-[#F97316]" : "text-[#0A5ED7]"
                       }`} />
                     </div>
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg">{request.partName}</h3>
+                        <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{request.partName}</h3>
                         <Badge className={getUrgencyColor(request.urgency)}>
                           {request.urgency === "urgent" && <AlertCircle className="h-3 w-3 mr-1" />}
                           {request.urgency}
                         </Badge>
                         {request.hasResponded && (
-                          <Badge className="bg-green-500/20 text-green-400">
+                          <Badge className="bg-green-500/20 text-green-500">
                             Responded
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-[#64748B]">
                         {request.requestNumber}
                         {request.partNumber && ` • Part: ${request.partNumber}`}
                         {request.brand && ` • Brand: ${request.brand}`}
                       </p>
-                      <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-[#64748B]">
                         {request.vehicleMake && (
                           <span className="flex items-center gap-1">
                             <Car className="h-4 w-4" />
@@ -280,21 +280,21 @@ export default function IncomingRequests() {
                   {/* Requester & Timing */}
                   <div className="flex flex-col lg:items-end gap-2 min-w-48">
                     <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{request.requesterName}</span>
+                      <Building2 className="h-4 w-4 text-[#64748B]" />
+                      <span className="font-medium text-[#0B1F3B] dark:text-white">{request.requesterName}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-[#64748B]">
                       <MapPin className="h-4 w-4" />
                       {request.requesterCity}
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="text-gray-400">
+                      <Clock className="h-4 w-4 text-[#64748B]" />
+                      <span className="text-[#64748B]">
                         {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
                       </span>
                     </div>
                     {request.expiresAt && (
-                      <p className="text-xs text-orange-400">
+                      <p className="text-xs text-[#F97316]">
                         Expires: {format(new Date(request.expiresAt), "MMM d, HH:mm")}
                       </p>
                     )}
@@ -303,14 +303,14 @@ export default function IncomingRequests() {
                   {/* Quantity & Actions */}
                   <div className="flex items-center gap-4">
                     <div className="text-center px-4">
-                      <p className="text-2xl font-bold">{request.quantity}</p>
-                      <p className="text-xs text-gray-400">Qty Needed</p>
+                      <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{request.quantity}</p>
+                      <p className="text-xs text-[#64748B]">Qty Needed</p>
                     </div>
                     <Link href={`/parts-network/respond/${request.id}`}>
                       <Button 
                         className={request.hasResponded 
-                          ? "bg-gray-600 hover:bg-gray-500" 
-                          : "bg-green-600 hover:bg-green-700"
+                          ? "bg-[#64748B] hover:bg-[#64748B]/80" 
+                          : "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                         }
                         data-testid={`btn-respond-${request.id}`}
                       >

@@ -54,7 +54,7 @@ export default function EquipmentCalibration() {
   const getStatusBadge = (status: string) => {
     const config = {
       valid: { variant: "default" as const, icon: CheckCircle, color: "text-green-600" },
-      due: { variant: "secondary" as const, icon: Clock, color: "text-yellow-600" },
+      due: { variant: "secondary" as const, icon: Clock, color: "text-[#F97316]" },
       overdue: { variant: "destructive" as const, icon: AlertCircle, color: "text-red-600" },
     };
     const { variant, icon: Icon, color } = config[status as keyof typeof config] || config.valid;
@@ -71,7 +71,7 @@ export default function EquipmentCalibration() {
       label: t('calibration.totalEquipment', 'Total Equipment'),
       value: stats.totalEquipment,
       icon: Wrench,
-      color: "text-blue-600",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('calibration.valid', 'Valid'),
@@ -83,7 +83,7 @@ export default function EquipmentCalibration() {
       label: t('calibration.dueSoon', 'Due Soon'),
       value: stats.due,
       icon: Clock,
-      color: "text-yellow-600",
+      color: "text-[#F97316]",
     },
     {
       label: t('calibration.overdue', 'Overdue'),
@@ -104,32 +104,32 @@ export default function EquipmentCalibration() {
         onClick={() => addCalibrationMutation.mutate()}
         disabled={addCalibrationMutation.isPending}
         data-testid="button-add-calibration"
-        className="absolute top-8 right-8"
+        className="absolute top-8 right-8 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
       >
         {addCalibrationMutation.isPending ? t('calibration.adding', 'Adding...') : t('calibration.addCalibration', 'Add Calibration')}
       </Button>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('calibration.calibrationRecords', 'Calibration Records')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('calibration.calibrationRecords', 'Calibration Records')}</CardTitle>
         </CardHeader>
         <CardContent>
           {records.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[#64748B]">
               {t('calibration.noRecordsAvailable', 'No calibration records available. Click "Add Calibration" to create a new record.')}
             </div>
           ) : (
             <div className="space-y-3">
               {records.map((record: any) => (
-                <div key={record.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`calibration-${record.id}`}>
+                <div key={record.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`calibration-${record.id}`}>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{record.toolName || `#${record.toolNumber}`}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{record.toolName || `#${record.toolNumber}`}</h3>
+                    <p className="text-sm text-[#64748B]">
                       {record.calibrationType || t('calibration.standardCalibration', 'Standard Calibration')}
                     </p>
                   </div>
                   <div className="text-right mr-4">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">
                       {t('calibration.due', 'Due')}: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : t('common.notAvailable', 'N/A')}
                     </p>
                   </div>

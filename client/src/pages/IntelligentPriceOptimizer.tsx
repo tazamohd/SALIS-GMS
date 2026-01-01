@@ -52,13 +52,13 @@ export default function IntelligentPriceOptimizer() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={marketData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="month" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+            <XAxis dataKey="month" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: '#1F2937', 
-                border: '1px solid #374151',
+                backgroundColor: 'var(--tooltip-bg, #fff)', 
+                border: '1px solid #E2E8F0',
                 borderRadius: '8px'
               }}
             />
@@ -66,21 +66,21 @@ export default function IntelligentPriceOptimizer() {
             <Line 
               type="monotone" 
               dataKey="current" 
-              stroke="#6B7280" 
+              stroke="#64748B" 
               strokeWidth={2}
               name={t('priceOptimizer.currentPrice', 'Current Price')}
             />
             <Line 
               type="monotone" 
               dataKey="optimized" 
-              stroke="#10B981" 
+              stroke="#0A5ED7" 
               strokeWidth={2}
               name={t('priceOptimizer.aiOptimized', 'AI Optimized')}
             />
             <Line 
               type="monotone" 
               dataKey="demand" 
-              stroke="#3B82F6" 
+              stroke="#0BB3FF" 
               strokeWidth={2}
               strokeDasharray="5 5"
               name={t('priceOptimizer.demandIndex', 'Demand Index')}
@@ -95,19 +95,19 @@ export default function IntelligentPriceOptimizer() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={competitorData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="name" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+            <XAxis dataKey="name" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: '#1F2937', 
-                border: '1px solid #374151',
+                backgroundColor: 'var(--tooltip-bg, #fff)', 
+                border: '1px solid #E2E8F0',
                 borderRadius: '8px'
               }}
             />
             <Legend />
-            <Bar dataKey="price" fill="#3B82F6" name={t('priceOptimizer.priceDollar', 'Price ($)')} />
-            <Bar dataKey="volume" fill="#10B981" name={t('priceOptimizer.monthlyVolume', 'Monthly Volume')} />
+            <Bar dataKey="price" fill="#0A5ED7" name={t('priceOptimizer.priceDollar', 'Price ($)')} />
+            <Bar dataKey="volume" fill="#0BB3FF" name={t('priceOptimizer.monthlyVolume', 'Monthly Volume')} />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -122,24 +122,24 @@ export default function IntelligentPriceOptimizer() {
       sections={sections}
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-optimized-price">
+        <Card className="border-[#0A5ED7]/30 dark:border-[#0A5ED7]/50 bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" data-testid="card-optimized-price">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <Target className="w-8 h-8 text-[#0A5ED7]" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.optimizedPrice', 'Optimized Price')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-optimized-price">${optimizedPrice}</p>
+                <p className="text-sm text-[#64748B]">{t('priceOptimizer.optimizedPrice', 'Optimized Price')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-optimized-price">${optimizedPrice}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20" data-testid="card-revenue-impact">
+        <Card className="border-green-200 dark:border-green-900/50 bg-green-50/50 dark:bg-green-950/20" data-testid="card-revenue-impact">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.revenueImpact', 'Revenue Impact')}</p>
+                <p className="text-sm text-[#64748B]">{t('priceOptimizer.revenueImpact', 'Revenue Impact')}</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400" data-testid="text-revenue-impact">
                   +{revenueImpact}%
                 </p>
@@ -148,25 +148,25 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-950/20" data-testid="card-demand-score">
+        <Card className="border-purple-200 dark:border-purple-900/50 bg-purple-50/50 dark:bg-purple-950/20" data-testid="card-demand-score">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <Users className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.demandScore', 'Demand Score')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-demand-score">94/100</p>
+                <p className="text-sm text-[#64748B]">{t('priceOptimizer.demandScore', 'Demand Score')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-demand-score">94/100</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-950/20" data-testid="card-market-position">
+        <Card className="border-[#F97316]/30 dark:border-[#F97316]/50 bg-[#F97316]/5 dark:bg-[#F97316]/10" data-testid="card-market-position">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <BarChart3 className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+              <BarChart3 className="w-8 h-8 text-[#F97316]" />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.marketPosition', 'Market Position')}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-market-position">2nd</p>
+                <p className="text-sm text-[#64748B]">{t('priceOptimizer.marketPosition', 'Market Position')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-market-position">2nd</p>
               </div>
             </div>
           </CardContent>
@@ -174,22 +174,22 @@ export default function IntelligentPriceOptimizer() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-500" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Zap className="w-5 h-5 text-[#F97316]" />
               {t('priceOptimizer.optimizationSettings', 'Optimization Settings')}
             </CardTitle>
-            <CardDescription>{t('priceOptimizer.configureAIPricingParameters', 'Configure AI pricing parameters')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('priceOptimizer.configureAIPricingParameters', 'Configure AI pricing parameters')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label>{t('priceOptimizer.serviceType', 'Service Type')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('priceOptimizer.serviceType', 'Service Type')}</Label>
               <Select value={serviceType} onValueChange={setServiceType}>
-                <SelectTrigger data-testid="select-service-type">
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-service-type">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="oil-change">{t('priceOptimizer.oilChange', 'Oil Change')}</SelectItem>
                   <SelectItem value="brake-service">{t('priceOptimizer.brakeService', 'Brake Service')}</SelectItem>
                   <SelectItem value="tire-rotation">{t('priceOptimizer.tireRotation', 'Tire Rotation')}</SelectItem>
@@ -199,17 +199,18 @@ export default function IntelligentPriceOptimizer() {
             </div>
 
             <div className="space-y-2">
-              <Label>{t('priceOptimizer.currentPriceDollar', 'Current Price ($)')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('priceOptimizer.currentPriceDollar', 'Current Price ($)')}</Label>
               <Input
                 type="number"
                 value={currentPrice}
                 onChange={(e) => setCurrentPrice(e.target.value)}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-current-price"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>{t('priceOptimizer.demandSensitivity', 'Demand Sensitivity')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('priceOptimizer.demandSensitivity', 'Demand Sensitivity')}</Label>
               <div className="flex items-center gap-4">
                 <Slider
                   value={demandSensitivity}
@@ -219,29 +220,29 @@ export default function IntelligentPriceOptimizer() {
                   className="flex-1"
                   data-testid="slider-demand-sensitivity"
                 />
-                <span className="text-sm font-medium w-12 text-gray-900 dark:text-white" data-testid="text-sensitivity-value">
+                <span className="text-sm font-medium w-12 text-[#0B1F3B] dark:text-white" data-testid="text-sensitivity-value">
                   {demandSensitivity[0]}%
                 </span>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[#64748B]">
                 {t('priceOptimizer.howMuchPriceAffectsDemand', 'How much price affects customer demand')}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs">{t('priceOptimizer.competitionWeight', 'Competition Weight')}</Label>
-                <Badge variant="outline" className="w-full justify-center" data-testid="badge-competition-weight">65%</Badge>
+                <Label className="text-xs text-[#64748B]">{t('priceOptimizer.competitionWeight', 'Competition Weight')}</Label>
+                <Badge variant="outline" className="w-full justify-center border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="badge-competition-weight">65%</Badge>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs">{t('priceOptimizer.seasonFactor', 'Season Factor')}</Label>
-                <Badge variant="outline" className="w-full justify-center" data-testid="badge-season-factor">{t('priceOptimizer.high', 'High')}</Badge>
+                <Label className="text-xs text-[#64748B]">{t('priceOptimizer.seasonFactor', 'Season Factor')}</Label>
+                <Badge variant="outline" className="w-full justify-center border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="badge-season-factor">{t('priceOptimizer.high', 'High')}</Badge>
               </div>
             </div>
 
             <Button 
               onClick={handleOptimize}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               data-testid="button-optimize-price"
             >
               <Target className="w-4 h-4 mr-2" />
@@ -250,36 +251,36 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('priceOptimizer.aiInsightsStrategy', 'AI Insights & Strategy')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('priceOptimizer.aiInsightsStrategy', 'AI Insights & Strategy')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10 rounded-lg border border-[#0A5ED7]/20">
+              <TrendingUp className="w-5 h-5 text-[#0A5ED7] mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">{t('priceOptimizer.peakDemandPeriod', 'Peak Demand Period')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">{t('priceOptimizer.peakDemandPeriod', 'Peak Demand Period')}</p>
+                <p className="text-sm text-[#64748B]">
                   {t('priceOptimizer.increasePricesSummer', 'Increase prices by 12% during summer months (May-Aug)')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200/50 dark:border-green-900/30">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">{t('priceOptimizer.bundleOpportunity', 'Bundle Opportunity')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">{t('priceOptimizer.bundleOpportunity', 'Bundle Opportunity')}</p>
+                <p className="text-sm text-[#64748B]">
                   {t('priceOptimizer.customersOilChangeTireRotation', 'Customers buying oil changes also need tire rotation (+35%)')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200/50 dark:border-purple-900/30">
               <Users className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">{t('priceOptimizer.customerSegment', 'Customer Segment')}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">{t('priceOptimizer.customerSegment', 'Customer Segment')}</p>
+                <p className="text-sm text-[#64748B]">
                   {t('priceOptimizer.premiumCustomersSameDayService', 'Premium customers willing to pay 20% more for same-day service')}
                 </p>
               </div>
@@ -287,25 +288,25 @@ export default function IntelligentPriceOptimizer() {
 
             <div className="pt-4 space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.basePrice', 'Base Price')}</span>
-                <span className="font-semibold text-gray-900 dark:text-white">$125</span>
+                <span className="text-sm text-[#64748B]">{t('priceOptimizer.basePrice', 'Base Price')}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white">$125</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.marketAdjustment', 'Market Adjustment')}</span>
+                <span className="text-sm text-[#64748B]">{t('priceOptimizer.marketAdjustment', 'Market Adjustment')}</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">+$10</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.demandMultiplier', 'Demand Multiplier')}</span>
+                <span className="text-sm text-[#64748B]">{t('priceOptimizer.demandMultiplier', 'Demand Multiplier')}</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">+$8</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('priceOptimizer.competitiveEdge', 'Competitive Edge')}</span>
+                <span className="text-sm text-[#64748B]">{t('priceOptimizer.competitiveEdge', 'Competitive Edge')}</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">+$2</span>
               </div>
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+              <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-2 mt-2">
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-gray-900 dark:text-white">{t('priceOptimizer.optimizedPrice', 'Optimized Price')}</span>
-                  <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('priceOptimizer.optimizedPrice', 'Optimized Price')}</span>
+                  <span className="text-xl font-bold text-[#0A5ED7]">
                     ${optimizedPrice}
                   </span>
                 </div>

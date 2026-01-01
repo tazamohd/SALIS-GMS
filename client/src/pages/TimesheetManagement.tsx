@@ -82,11 +82,11 @@ export default function TimesheetManagement() {
 
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: string } = {
-      'approved': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-      'pending': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+      'approved': 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
+      'pending': 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
       'rejected': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
     };
-    return statusColors[status] || 'bg-gray-100 dark:bg-gray-800';
+    return statusColors[status] || 'bg-[#F8FAFC] dark:bg-[#151A23]';
   };
 
   const getStatusLabel = (status: string) => {
@@ -112,8 +112,8 @@ export default function TimesheetManagement() {
       accessorKey: "date",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-date-${row.id}`}>
-          <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span>{new Date(row.date).toLocaleDateString()}</span>
+          <Calendar className="w-4 h-4 text-[#64748B]" />
+          <span className="text-[#0B1F3B] dark:text-white">{new Date(row.date).toLocaleDateString()}</span>
         </div>
       ),
     },
@@ -122,8 +122,8 @@ export default function TimesheetManagement() {
       accessorKey: "technicianName",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-tech-${row.id}`}>
-          <User className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span>{row.technicianName}</span>
+          <User className="w-4 h-4 text-[#64748B]" />
+          <span className="text-[#0B1F3B] dark:text-white">{row.technicianName}</span>
         </div>
       ),
     },
@@ -131,14 +131,14 @@ export default function TimesheetManagement() {
       header: t('timesheet.columns.clockIn', 'Clock In'),
       accessorKey: "clockIn",
       cell: (row: Timesheet) => (
-        <span className="font-medium" data-testid={`timesheet-in-${row.id}`}>{row.clockIn}</span>
+        <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`timesheet-in-${row.id}`}>{row.clockIn}</span>
       ),
     },
     {
       header: t('timesheet.columns.clockOut', 'Clock Out'),
       accessorKey: "clockOut",
       cell: (row: Timesheet) => (
-        <span className="font-medium" data-testid={`timesheet-out-${row.id}`}>{row.clockOut}</span>
+        <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`timesheet-out-${row.id}`}>{row.clockOut}</span>
       ),
     },
     {
@@ -146,8 +146,8 @@ export default function TimesheetManagement() {
       accessorKey: "hoursWorked",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-hours-${row.id}`}>
-          <Clock className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span className="font-semibold">{row.hoursWorked}{t('timesheet.hours', 'h')}</span>
+          <Clock className="w-4 h-4 text-[#64748B]" />
+          <span className="font-semibold text-[#0B1F3B] dark:text-white">{row.hoursWorked}{t('timesheet.hours', 'h')}</span>
         </div>
       ),
     },
@@ -156,8 +156,8 @@ export default function TimesheetManagement() {
       accessorKey: "totalPay",
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-pay-${row.id}`}>
-          <DollarSign className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span className="font-semibold">${row.totalPay.toFixed(2)}</span>
+          <DollarSign className="w-4 h-4 text-[#64748B]" />
+          <span className="font-semibold text-[#0B1F3B] dark:text-white">${row.totalPay.toFixed(2)}</span>
         </div>
       ),
     },
@@ -181,7 +181,7 @@ export default function TimesheetManagement() {
                 size="sm"
                 variant="outline"
                 onClick={() => handleApprove(row.id)}
-                className="bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30"
+                className="bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 border-[#E2E8F0] dark:border-[#232A36] text-emerald-700 dark:text-emerald-300"
                 data-testid={`button-approve-${row.id}`}
               >
                 {t('timesheet.actions.approve', 'Approve')}
@@ -190,7 +190,7 @@ export default function TimesheetManagement() {
                 size="sm"
                 variant="outline"
                 onClick={() => handleReject(row.id)}
-                className="bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30"
+                className="bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border-[#E2E8F0] dark:border-[#232A36] text-red-700 dark:text-red-300"
                 data-testid={`button-reject-${row.id}`}
               >
                 {t('timesheet.actions.reject', 'Reject')}
@@ -198,7 +198,12 @@ export default function TimesheetManagement() {
             </>
           )}
           {row.status !== "pending" && (
-            <Button size="sm" variant="ghost" data-testid={`button-view-${row.id}`}>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#232A36]"
+              data-testid={`button-view-${row.id}`}
+            >
               {t('common.view', 'View')}
             </Button>
           )}

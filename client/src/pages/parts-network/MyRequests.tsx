@@ -127,21 +127,21 @@ export default function MyRequests() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "open": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "reviewing": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "ordered": return "bg-green-500/20 text-green-400 border-green-500/30";
-      case "cancelled": return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "expired": return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-      default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      case "open": return "bg-[#0A5ED7]/20 text-[#0A5ED7] border-[#0A5ED7]/30";
+      case "reviewing": return "bg-[#F97316]/20 text-[#F97316] border-[#F97316]/30";
+      case "ordered": return "bg-green-500/20 text-green-500 border-green-500/30";
+      case "cancelled": return "bg-red-500/20 text-red-500 border-red-500/30";
+      case "expired": return "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30";
+      default: return "bg-[#64748B]/20 text-[#64748B] border-[#64748B]/30";
     }
   };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case "urgent": return "bg-red-500/20 text-red-400";
-      case "normal": return "bg-blue-500/20 text-blue-400";
-      case "low": return "bg-gray-500/20 text-gray-400";
-      default: return "bg-gray-500/20 text-gray-400";
+      case "urgent": return "bg-[#F97316]/20 text-[#F97316]";
+      case "normal": return "bg-[#0A5ED7]/20 text-[#0A5ED7]";
+      case "low": return "bg-[#64748B]/20 text-[#64748B]";
+      default: return "bg-[#64748B]/20 text-[#64748B]";
     }
   };
 
@@ -153,18 +153,18 @@ export default function MyRequests() {
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search by part name, number, or request ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800 border-gray-700"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <div className="flex gap-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40 bg-gray-800 border-gray-700" data-testid="select-status-filter">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -178,7 +178,7 @@ export default function MyRequests() {
             </SelectContent>
           </Select>
           <Link href="/parts-network/send-request">
-            <Button className="bg-blue-600 hover:bg-blue-700" data-testid="btn-new-request">
+            <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-new-request">
               <Plus className="h-4 w-4 mr-2" />
               New Request
             </Button>
@@ -189,17 +189,17 @@ export default function MyRequests() {
       {/* Requests List */}
       <div className="space-y-4">
         {filteredRequests.length === 0 ? (
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
-              <Package className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="font-medium text-lg mb-2">No Requests Found</h3>
-              <p className="text-gray-400 mb-4">
+              <Package className="h-12 w-12 mx-auto text-[#64748B] mb-4" />
+              <h3 className="font-medium text-lg mb-2 text-[#0B1F3B] dark:text-white">No Requests Found</h3>
+              <p className="text-[#64748B] mb-4">
                 {searchTerm || statusFilter !== "all" 
                   ? "Try adjusting your filters"
                   : "Start by sending your first quotation request"}
               </p>
               <Link href="/parts-network/send-request">
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white">
                   <Plus className="h-4 w-4 mr-2" />
                   Send Request
                 </Button>
@@ -210,30 +210,30 @@ export default function MyRequests() {
           filteredRequests.map((request) => (
             <Card 
               key={request.id} 
-              className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors"
+              className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors"
               data-testid={`request-card-${request.id}`}
             >
               <CardContent className="p-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   {/* Part Info */}
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="p-3 bg-gray-700 rounded-lg">
-                      <Package className="h-6 w-6 text-blue-400" />
+                    <div className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                      <Package className="h-6 w-6 text-[#0A5ED7]" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg">{request.partName}</h3>
+                        <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{request.partName}</h3>
                         <Badge className={getUrgencyColor(request.urgency)}>
                           {request.urgency}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-[#64748B]">
                         {request.requestNumber}
                         {request.partNumber && ` • ${request.partNumber}`}
                         {request.brand && ` • ${request.brand}`}
                       </p>
                       {request.vehicleMake && (
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-[#64748B] mt-1">
                           {request.vehicleMake} {request.vehicleModel} {request.vehicleYear}
                         </p>
                       )}
@@ -243,16 +243,16 @@ export default function MyRequests() {
                   {/* Stats */}
                   <div className="flex items-center gap-6 text-sm">
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-green-400">{request.responseCount}</p>
-                      <p className="text-gray-400">Quotes</p>
+                      <p className="text-2xl font-bold text-green-500">{request.responseCount}</p>
+                      <p className="text-[#64748B]">Quotes</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-400">{request.viewCount}</p>
-                      <p className="text-gray-400">Views</p>
+                      <p className="text-2xl font-bold text-[#0A5ED7]">{request.viewCount}</p>
+                      <p className="text-[#64748B]">Views</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold">{request.quantity}</p>
-                      <p className="text-gray-400">Qty</p>
+                      <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{request.quantity}</p>
+                      <p className="text-[#64748B]">Qty</p>
                     </div>
                   </div>
 
@@ -262,17 +262,17 @@ export default function MyRequests() {
                       {getStatusIcon(request.status)}
                       {request.status}
                     </Badge>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#64748B]">
                       {format(new Date(request.createdAt), "MMM d, yyyy")}
                     </p>
                     <div className="flex gap-2 mt-2">
                       <Link href={`/parts-network/requests/${request.id}`}>
-                        <Button variant="outline" size="sm" className="border-gray-600" data-testid={`btn-view-${request.id}`}>
+                        <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]" data-testid={`btn-view-${request.id}`}>
                           <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
                       </Link>
-                      <Button variant="outline" size="sm" className="border-gray-600" data-testid={`btn-messages-${request.id}`}>
+                      <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]" data-testid={`btn-messages-${request.id}`}>
                         <MessageSquare className="h-4 w-4 mr-1" />
                         Messages
                       </Button>

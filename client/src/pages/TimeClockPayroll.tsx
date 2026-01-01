@@ -81,19 +81,19 @@ export default function TimeClockPayroll() {
   const statsContent = (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {[
-        { label: t('payroll.periodGross', 'Period Gross'), value: `$${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "green", testId: "text-period-gross" },
-        { label: t('payroll.deductions', 'Deductions'), value: `$${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "red", testId: "text-deductions" },
-        { label: t('payroll.netPay', 'Net Pay'), value: `$${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "blue", testId: "text-net-pay" },
-        { label: t('payroll.employees', 'Employees'), value: "12", icon: Users, color: "purple", testId: "text-employees" },
+        { label: t('payroll.periodGross', 'Period Gross'), value: `$${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-emerald-600 dark:text-emerald-400", testId: "text-period-gross" },
+        { label: t('payroll.deductions', 'Deductions'), value: `$${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#F97316]", testId: "text-deductions" },
+        { label: t('payroll.netPay', 'Net Pay'), value: `$${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#0A5ED7]", testId: "text-net-pay" },
+        { label: t('payroll.employees', 'Employees'), value: "12", icon: Users, color: "text-purple-600 dark:text-purple-400", testId: "text-employees" },
       ].map((stat, i) => (
-        <Card key={i} className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card key={i} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid={stat.testId}>{stat.value}</h3>
+                <p className="text-sm text-[#64748B]">{stat.label}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid={stat.testId}>{stat.value}</h3>
               </div>
-              <stat.icon className={`h-12 w-12 text-${stat.color}-600`} />
+              <stat.icon className={`h-12 w-12 ${stat.color}`} />
             </div>
           </CardContent>
         </Card>
@@ -102,10 +102,10 @@ export default function TimeClockPayroll() {
   );
 
   const timeclockContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>{t('timeClock.recentTimeEntries', 'Recent Time Entries')}</CardTitle></CardHeader>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+      <CardHeader><CardTitle className="text-[#0B1F3B] dark:text-white">{t('timeClock.recentTimeEntries', 'Recent Time Entries')}</CardTitle></CardHeader>
       <CardContent>
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-[#64748B]">
           {t('timeClock.noTimeEntries', 'No time entries available. Clock in to start tracking time.')}
         </div>
       </CardContent>
@@ -113,14 +113,15 @@ export default function TimeClockPayroll() {
   );
 
   const payrollContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{t('payroll.currentPayPeriod', 'Current Pay Period')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payroll.currentPayPeriod', 'Current Pay Period')}</CardTitle>
           <Button 
             variant="outline" 
             onClick={() => currentPeriod.id && calculatePayrollMutation.mutate(currentPeriod.id)}
             disabled={calculatePayrollMutation.isPending || !currentPeriod.id}
+            className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
             data-testid="button-calculate-payroll"
           >
             {calculatePayrollMutation.isPending ? t('payroll.calculating', 'Calculating...') : t('payroll.calculatePayroll', 'Calculate Payroll')}
@@ -129,36 +130,36 @@ export default function TimeClockPayroll() {
       </CardHeader>
       <CardContent>
         {periods.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">{t('payroll.noPeriodsAvailable', 'No payroll periods available')}</div>
+          <div className="text-center py-8 text-[#64748B]">{t('payroll.noPeriodsAvailable', 'No payroll periods available')}</div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.period', 'Period')}</p>
-                <p className="font-semibold text-gray-900 dark:text-white" data-testid="text-period-range">
+                <p className="text-sm text-[#64748B]">{t('payroll.period', 'Period')}</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-period-range">
                   {new Date(currentPeriod.periodStart).toLocaleDateString()} - {new Date(currentPeriod.periodEnd).toLocaleDateString()}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.status', 'Status')}</p>
-                <Badge data-testid="badge-period-status">{currentPeriod.status}</Badge>
+                <p className="text-sm text-[#64748B]">{t('common.status', 'Status')}</p>
+                <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0" data-testid="badge-period-status">{currentPeriod.status}</Badge>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between p-2">
-                <span className="text-gray-600 dark:text-gray-400">{t('payroll.totalGrossPay', 'Total Gross Pay')}</span>
-                <span className="font-semibold text-gray-900 dark:text-white" data-testid="text-gross-detail">${(currentPeriod.totalGrossPay || 0).toLocaleString()}</span>
+                <span className="text-[#64748B]">{t('payroll.totalGrossPay', 'Total Gross Pay')}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-gross-detail">${(currentPeriod.totalGrossPay || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between p-2">
-                <span className="text-gray-600 dark:text-gray-400">{t('payroll.totalDeductions', 'Total Deductions')}</span>
-                <span className="font-semibold text-red-600" data-testid="text-deductions-detail">-${(currentPeriod.totalDeductions || 0).toLocaleString()}</span>
+                <span className="text-[#64748B]">{t('payroll.totalDeductions', 'Total Deductions')}</span>
+                <span className="font-semibold text-[#F97316]" data-testid="text-deductions-detail">-${(currentPeriod.totalDeductions || 0).toLocaleString()}</span>
               </div>
-              <div className="flex justify-between p-3 bg-blue-50 dark:bg-blue-900 rounded font-semibold">
-                <span className="text-gray-900 dark:text-white">{t('payroll.totalNetPay', 'Total Net Pay')}</span>
-                <span className="text-gray-900 dark:text-white" data-testid="text-net-detail">${(currentPeriod.totalNetPay || 0).toLocaleString()}</span>
+              <div className="flex justify-between p-3 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 rounded font-semibold">
+                <span className="text-[#0B1F3B] dark:text-white">{t('payroll.totalNetPay', 'Total Net Pay')}</span>
+                <span className="text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="text-net-detail">${(currentPeriod.totalNetPay || 0).toLocaleString()}</span>
               </div>
             </div>
-            <Button className="w-full" data-testid="button-process-payroll">{t('payroll.processPayroll', 'Process Payroll')}</Button>
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-process-payroll">{t('payroll.processPayroll', 'Process Payroll')}</Button>
           </div>
         )}
       </CardContent>

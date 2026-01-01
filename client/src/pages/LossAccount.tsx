@@ -74,7 +74,7 @@ interface LossEntry {
   createdAt: string;
 }
 
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
+const COLORS = ['#0A5ED7', '#0BB3FF', '#F97316', '#64748B', '#0B1F3B', '#E2E8F0', '#232A36', '#151A23'];
 
 export default function LossAccount() {
   const { t } = useTranslation();
@@ -197,10 +197,10 @@ export default function LossAccount() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40" data-testid="select-period">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-period">
               <SelectValue placeholder={t('lossAccount.period', 'Period')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="7">{t('lossAccount.last7Days', 'Last 7 days')}</SelectItem>
               <SelectItem value="30">{t('lossAccount.last30Days', 'Last 30 days')}</SelectItem>
               <SelectItem value="90">{t('lossAccount.last90Days', 'Last 90 days')}</SelectItem>
@@ -208,10 +208,10 @@ export default function LossAccount() {
             </SelectContent>
           </Select>
           <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-40" data-testid="select-type">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-type">
               <SelectValue placeholder={t('lossAccount.allTypes', 'All Types')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="all">{t('lossAccount.allTypes', 'All Types')}</SelectItem>
               <SelectItem value="inventory">{t('lossAccount.inventory', 'Inventory')}</SelectItem>
               <SelectItem value="service">{t('lossAccount.service', 'Service')}</SelectItem>
@@ -224,74 +224,74 @@ export default function LossAccount() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => setIsLossDialogOpen(true)} data-testid="button-add-loss">
+        <Button onClick={() => setIsLossDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-loss">
           <Plus className="h-4 w-4 mr-2" />
           {t('lossAccount.recordLoss', 'Record Loss')}
         </Button>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        <Card data-testid="card-total-losses">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-losses">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">{t('lossAccount.totalLosses', 'Total Losses')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('lossAccount.totalLosses', 'Total Losses')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-[#F97316]">
               SAR {totalLosses.toLocaleString()}
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-recovered">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-recovered">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">{t('lossAccount.recovered', 'Recovered')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('lossAccount.recovered', 'Recovered')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-[#0A5ED7]">
               SAR {totalRecovered.toLocaleString()}
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-net-loss">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-net-loss">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">{t('lossAccount.netLoss', 'Net Loss')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('lossAccount.netLoss', 'Net Loss')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
               SAR {(totalLosses - totalRecovered).toLocaleString()}
             </div>
           </CardContent>
         </Card>
-        <Card data-testid="card-pending">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-pending">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">{t('lossAccount.pendingReview', 'Pending Review')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('lossAccount.pendingReview', 'Pending Review')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingLosses}</div>
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{pendingLosses}</div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('lossAccount.lossTrend', 'Loss Trend')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.lossTrend', 'Loss Trend')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="losses" stroke="#ef4444" name={t('lossAccount.losses', 'Losses')} />
-                <Line type="monotone" dataKey="recovered" stroke="#22c55e" name={t('lossAccount.recovered', 'Recovered')} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="month" stroke="#64748B" />
+                <YAxis stroke="#64748B" />
+                <Tooltip contentStyle={{ backgroundColor: '#151A23', border: '1px solid #232A36', color: '#fff' }} />
+                <Line type="monotone" dataKey="losses" stroke="#F97316" name={t('lossAccount.losses', 'Losses')} />
+                <Line type="monotone" dataKey="recovered" stroke="#0A5ED7" name={t('lossAccount.recovered', 'Recovered')} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('lossAccount.lossesByType', 'Losses by Type')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.lossesByType', 'Losses by Type')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -310,7 +310,7 @@ export default function LossAccount() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: '#151A23', border: '1px solid #232A36', color: '#fff' }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -322,62 +322,62 @@ export default function LossAccount() {
   const entriesTab = (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">{t('lossAccount.lossEntries', 'Loss Entries')}</h3>
-        <Button onClick={() => setIsLossDialogOpen(true)} data-testid="button-new-entry">
+        <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('lossAccount.lossEntries', 'Loss Entries')}</h3>
+        <Button onClick={() => setIsLossDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-new-entry">
           <Plus className="h-4 w-4 mr-2" />
           {t('lossAccount.newEntry', 'New Entry')}
         </Button>
       </div>
 
       {isLoading ? (
-        <Card>
-          <CardContent className="py-8 text-center">{t('common.loading', 'Loading entries...')}</CardContent>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardContent className="py-8 text-center text-[#64748B]">{t('common.loading', 'Loading entries...')}</CardContent>
         </Card>
       ) : filteredEntries.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardContent className="py-8 text-center text-[#64748B]">
             {t('lossAccount.noLossEntries', 'No loss entries found for the selected period')}
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.date', 'Date')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
-                <TableHead className="text-right">{t('lossAccount.recovered', 'Recovered')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead className="text-right text-[#64748B]">{t('lossAccount.recovered', 'Recovered')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEntries.map((entry) => {
                 const Icon = getLossIcon(entry.lossType);
                 return (
-                  <TableRow key={entry.id} data-testid={`row-loss-${entry.id}`}>
-                    <TableCell>{format(new Date(entry.lossDate), "dd/MM/yyyy")}</TableCell>
+                  <TableRow key={entry.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-loss-${entry.id}`}>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(entry.lossDate), "dd/MM/yyyy")}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
-                        <span className="capitalize">{entry.lossType.replace("_", " ")}</span>
+                        <Icon className="h-4 w-4 text-[#0A5ED7]" />
+                        <span className="capitalize text-[#0B1F3B] dark:text-white">{entry.lossType.replace("_", " ")}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">{entry.description}</TableCell>
-                    <TableCell className="text-right font-medium text-red-600">
+                    <TableCell className="max-w-xs truncate text-[#0B1F3B] dark:text-white">{entry.description}</TableCell>
+                    <TableCell className="text-right font-medium text-[#F97316]">
                       {entry.currency} {parseFloat(entry.amount).toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right font-medium text-green-600">
+                    <TableCell className="text-right font-medium text-[#0A5ED7]">
                       {entry.currency} {parseFloat(entry.recoveredAmount || "0").toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={
-                          entry.status === "written_off" ? "destructive" :
-                          entry.status === "recovered" ? "default" :
-                          entry.status === "approved" ? "secondary" : "outline"
+                        className={
+                          entry.status === "written_off" ? "bg-[#F97316] text-white" :
+                          entry.status === "recovered" ? "bg-[#0A5ED7] text-white" :
+                          entry.status === "approved" ? "bg-[#0BB3FF] text-white" : "bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B] border border-[#E2E8F0] dark:border-[#232A36]"
                         }
                       >
                         {entry.status.replace("_", " ")}
@@ -392,6 +392,7 @@ export default function LossAccount() {
                             writeOffForm.setValue("lossEntryId", entry.id);
                             setIsWriteOffDialogOpen(true);
                           }}
+                          className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid={`button-writeoff-${entry.id}`}
                         >
                           {t('lossAccount.writeOff', 'Write Off')}
@@ -410,35 +411,35 @@ export default function LossAccount() {
 
   const writeOffsTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('lossAccount.writeOffSummary', 'Write-Off Summary')}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.writeOffSummary', 'Write-Off Summary')}</CardTitle>
+          <CardDescription className="text-[#64748B]">
             {t('lossAccount.totalWrittenOff', 'Total written off')}: SAR {filteredEntries.filter(e => e.status === "written_off").reduce((sum, e) => sum + parseFloat(e.amount), 0).toLocaleString()}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {filteredEntries.filter(e => e.status === "written_off").length === 0 ? (
-            <p className="text-center text-gray-500 py-4">{t('lossAccount.noWriteOffs', 'No write-offs in this period')}</p>
+            <p className="text-center text-[#64748B] py-4">{t('lossAccount.noWriteOffs', 'No write-offs in this period')}</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>{t('common.date', 'Date')}</TableHead>
-                  <TableHead>{t('common.type', 'Type')}</TableHead>
-                  <TableHead>{t('common.description', 'Description')}</TableHead>
-                  <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
+                <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('common.description', 'Description')}</TableHead>
+                  <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredEntries
                   .filter(e => e.status === "written_off")
                   .map((entry) => (
-                    <TableRow key={entry.id} data-testid={`row-writeoff-${entry.id}`}>
-                      <TableCell>{format(new Date(entry.lossDate), "dd/MM/yyyy")}</TableCell>
-                      <TableCell className="capitalize">{entry.lossType.replace("_", " ")}</TableCell>
-                      <TableCell>{entry.description}</TableCell>
-                      <TableCell className="text-right font-medium">
+                    <TableRow key={entry.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-writeoff-${entry.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(entry.lossDate), "dd/MM/yyyy")}</TableCell>
+                      <TableCell className="capitalize text-[#0B1F3B] dark:text-white">{entry.lossType.replace("_", " ")}</TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{entry.description}</TableCell>
+                      <TableCell className="text-right font-medium text-[#F97316]">
                         {entry.currency} {parseFloat(entry.amount).toLocaleString()}
                       </TableCell>
                     </TableRow>
@@ -454,40 +455,40 @@ export default function LossAccount() {
   const reportsTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('lossAccount.lossReportByCategory', 'Loss Report by Category')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.lossReportByCategory', 'Loss Report by Category')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {Object.entries(lossesByType).map(([type, amount]) => (
                 <div key={type} className="flex justify-between items-center">
-                  <span className="capitalize">{type.replace("_", " ")}</span>
+                  <span className="capitalize text-[#0B1F3B] dark:text-white">{type.replace("_", " ")}</span>
                   <div className="flex items-center gap-4">
-                    <div className="w-32 h-2 bg-gray-200 rounded-full">
+                    <div className="w-32 h-2 bg-[#F8FAFC] dark:bg-[#232A36] rounded-full">
                       <div
-                        className="h-2 bg-red-500 rounded-full"
+                        className="h-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full"
                         style={{ width: `${(amount / totalLosses) * 100}%` }}
                       />
                     </div>
-                    <span className="font-medium w-24 text-right">SAR {amount.toLocaleString()}</span>
+                    <span className="font-medium w-24 text-right text-[#0B1F3B] dark:text-white">SAR {amount.toLocaleString()}</span>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('lossAccount.recoveryRate', 'Recovery Rate')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.recoveryRate', 'Recovery Rate')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8">
-              <div className="text-5xl font-bold">
+              <div className="text-5xl font-bold text-[#0A5ED7]">
                 {totalLosses > 0 ? Math.round((totalRecovered / totalLosses) * 100) : 0}%
               </div>
-              <p className="text-gray-500 mt-2">{t('lossAccount.ofLossesRecovered', 'of losses recovered')}</p>
-              <div className="mt-4 text-sm">
+              <p className="text-[#64748B] mt-2">{t('lossAccount.ofLossesRecovered', 'of losses recovered')}</p>
+              <div className="mt-4 text-sm text-[#64748B]">
                 <p>{t('lossAccount.totalLosses', 'Total Losses')}: SAR {totalLosses.toLocaleString()}</p>
                 <p>{t('lossAccount.totalRecovered', 'Total Recovered')}: SAR {totalRecovered.toLocaleString()}</p>
               </div>
@@ -495,18 +496,18 @@ export default function LossAccount() {
           </CardContent>
         </Card>
       </div>
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('lossAccount.exportReports', 'Export Reports')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.exportReports', 'Export Reports')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button variant="outline" data-testid="button-export-pdf">
-              <FileText className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-pdf">
+              <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
               {t('lossAccount.exportPDF', 'Export PDF')}
             </Button>
-            <Button variant="outline" data-testid="button-export-excel">
-              <BarChart3 className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-excel">
+              <BarChart3 className="h-4 w-4 mr-2 text-[#0A5ED7]" />
               {t('lossAccount.exportExcel', 'Export Excel')}
             </Button>
           </div>
@@ -516,7 +517,7 @@ export default function LossAccount() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen space-y-6">
       <TabsPageLayout
         title={t('lossAccount.title', 'Loss Account')}
         description={t('lossAccount.description', 'حساب الخسائر - Track and manage business losses, write-offs, and recovery')}
@@ -530,10 +531,10 @@ export default function LossAccount() {
       />
 
       <Dialog open={isLossDialogOpen} onOpenChange={setIsLossDialogOpen}>
-        <DialogContent className="max-w-2xl" data-testid="modal-loss-entry">
+        <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-loss-entry">
           <DialogHeader>
-            <DialogTitle>{t('lossAccount.recordLossEntry', 'Record Loss Entry')}</DialogTitle>
-            <DialogDescription>{t('lossAccount.documentNewLoss', 'Document a new loss for accounting purposes')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.recordLossEntry', 'Record Loss Entry')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('lossAccount.documentNewLoss', 'Document a new loss for accounting purposes')}</DialogDescription>
           </DialogHeader>
           <Form {...lossForm}>
             <form onSubmit={lossForm.handleSubmit((data) => lossMutation.mutate(data))} className="space-y-4">
@@ -543,21 +544,21 @@ export default function LossAccount() {
                   name="lossType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('lossAccount.lossType', 'Loss Type')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('lossAccount.lossType', 'Loss Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-loss-type">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-loss-type">
                             <SelectValue placeholder={t('lossAccount.selectType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="inventory">{t('lossAccount.inventoryLoss', 'Inventory Loss')}</SelectItem>
-                          <SelectItem value="service">{t('lossAccount.serviceLoss', 'Service Loss')}</SelectItem>
-                          <SelectItem value="equipment">{t('lossAccount.equipmentLoss', 'Equipment Loss')}</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="inventory">{t('lossAccount.inventory', 'Inventory')}</SelectItem>
+                          <SelectItem value="service">{t('lossAccount.service', 'Service')}</SelectItem>
+                          <SelectItem value="equipment">{t('lossAccount.equipment', 'Equipment')}</SelectItem>
                           <SelectItem value="bad_debt">{t('lossAccount.badDebt', 'Bad Debt')}</SelectItem>
                           <SelectItem value="theft">{t('lossAccount.theft', 'Theft')}</SelectItem>
                           <SelectItem value="damage">{t('lossAccount.damage', 'Damage')}</SelectItem>
-                          <SelectItem value="obsolete">{t('lossAccount.obsoleteStock', 'Obsolete Stock')}</SelectItem>
+                          <SelectItem value="obsolete">{t('lossAccount.obsolete', 'Obsolete')}</SelectItem>
                           <SelectItem value="other">{t('lossAccount.other', 'Other')}</SelectItem>
                         </SelectContent>
                       </Select>
@@ -567,73 +568,12 @@ export default function LossAccount() {
                 />
                 <FormField
                   control={lossForm.control}
-                  name="lossDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('common.date', 'Date')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-loss-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={lossForm.control}
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.amount', 'Amount')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('lossAccount.amountSAR', 'Amount (SAR)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" step="0.01" placeholder="0.00" data-testid="input-loss-amount" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={lossForm.control}
-                  name="currency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('lossAccount.currency', 'Currency')}</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-loss-currency">
-                            <SelectValue placeholder={t('lossAccount.selectCurrency', 'Select currency')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="SAR">SAR</SelectItem>
-                          <SelectItem value="USD">USD</SelectItem>
-                          <SelectItem value="EUR">EUR</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={lossForm.control}
-                  name="recoveredAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('lossAccount.recoveredAmount', 'Recovered Amount')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" step="0.01" placeholder="0.00" data-testid="input-recovered" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={lossForm.control}
-                  name="referenceId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('lossAccount.referenceId', 'Reference ID')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="INV-001, JC-001, etc." data-testid="input-reference" />
+                        <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-loss-amount" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -645,9 +585,22 @@ export default function LossAccount() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('lossAccount.describeLoss', 'Describe the loss...')} data-testid="input-loss-description" />
+                      <Textarea {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-loss-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={lossForm.control}
+                name="lossDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('lossAccount.lossDate', 'Loss Date')}</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-loss-date" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -658,20 +611,20 @@ export default function LossAccount() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')} ({t('common.optional', 'Optional')})</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('lossAccount.additionalNotes', 'Additional notes...')} data-testid="input-loss-notes" />
+                      <Textarea {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-loss-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsLossDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsLossDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={lossMutation.isPending} data-testid="button-save-loss">
-                  {lossMutation.isPending ? t('common.saving', 'Saving...') : t('lossAccount.recordLoss', 'Record Loss')}
+                <Button type="submit" disabled={lossMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-submit-loss">
+                  {t('lossAccount.recordLoss', 'Record Loss')}
                 </Button>
               </DialogFooter>
             </form>
@@ -680,10 +633,10 @@ export default function LossAccount() {
       </Dialog>
 
       <Dialog open={isWriteOffDialogOpen} onOpenChange={setIsWriteOffDialogOpen}>
-        <DialogContent data-testid="modal-writeoff">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-write-off">
           <DialogHeader>
-            <DialogTitle>{t('lossAccount.approveWriteOff', 'Approve Write-Off')}</DialogTitle>
-            <DialogDescription>{t('lossAccount.approveLossForWriteOff', 'Approve this loss for write-off')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('lossAccount.approveWriteOff', 'Approve Write-Off')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('lossAccount.confirmWriteOff', 'Confirm the write-off of this loss entry')}</DialogDescription>
           </DialogHeader>
           <Form {...writeOffForm}>
             <form onSubmit={writeOffForm.handleSubmit((data) => writeOffMutation.mutate(data))} className="space-y-4">
@@ -692,22 +645,9 @@ export default function LossAccount() {
                 name="approvedBy"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('lossAccount.approvedBy', 'Approved By')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('lossAccount.approvedBy', 'Approved By')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('lossAccount.managerName', 'Manager name')} data-testid="input-approver" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={writeOffForm.control}
-                name="approvalDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('lossAccount.approvalDate', 'Approval Date')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" data-testid="input-approval-date" />
+                      <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-approved-by" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -718,20 +658,20 @@ export default function LossAccount() {
                 name="reason"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('lossAccount.reason', 'Reason')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('lossAccount.reason', 'Reason')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('lossAccount.reasonForWriteOff', 'Reason for write-off...')} data-testid="input-writeoff-reason" />
+                      <Textarea {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-reason" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsWriteOffDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsWriteOffDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" variant="destructive" disabled={writeOffMutation.isPending} data-testid="button-confirm-writeoff">
-                  {writeOffMutation.isPending ? t('lossAccount.processing', 'Processing...') : t('lossAccount.confirmWriteOff', 'Confirm Write-Off')}
+                <Button type="submit" disabled={writeOffMutation.isPending} className="bg-[#F97316] hover:bg-[#ea6c0e] text-white" data-testid="button-confirm-writeoff">
+                  {t('lossAccount.confirmWriteOff', 'Confirm Write-Off')}
                 </Button>
               </DialogFooter>
             </form>

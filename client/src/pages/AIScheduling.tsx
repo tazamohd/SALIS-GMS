@@ -67,7 +67,7 @@ export default function AIScheduling() {
       label: t('aiScheduling.optimizedToday', 'Optimized Today'),
       value: String(latestOptimization.appointmentsOptimized || 0),
       icon: Calendar,
-      color: "text-blue-600",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('aiScheduling.efficiencyGain', 'Efficiency Gain'),
@@ -85,7 +85,7 @@ export default function AIScheduling() {
       label: t('aiScheduling.activeRules', 'Active Rules'),
       value: String(rules.filter((r: any) => r.isActive).length),
       icon: Zap,
-      color: "text-yellow-600",
+      color: "text-[#F97316]",
     },
   ];
 
@@ -101,6 +101,7 @@ export default function AIScheduling() {
           onClick={() => optimizeMutation.mutate()}
           disabled={optimizeMutation.isPending}
           data-testid="button-run-optimization"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
         >
           <Zap className="h-4 w-4 mr-2" />
           {optimizeMutation.isPending ? t('aiScheduling.optimizing', 'Optimizing...') : t('aiScheduling.runOptimization', 'Run Optimization')}
@@ -108,20 +109,20 @@ export default function AIScheduling() {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('aiScheduling.schedulingRules', 'Scheduling Rules')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('aiScheduling.schedulingRules', 'Scheduling Rules')}</CardTitle>
           </CardHeader>
           <CardContent>
             {rules.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">{t('aiScheduling.noSchedulingRulesDefined', 'No scheduling rules defined')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('aiScheduling.noSchedulingRulesDefined', 'No scheduling rules defined')}</div>
             ) : (
               <div className="space-y-3">
                 {rules.map((rule: any) => (
-                  <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`rule-${rule.id}`}>
+                  <div key={rule.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`rule-${rule.id}`}>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{rule.ruleName || t('aiScheduling.unnamedRule', 'Unnamed Rule')}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('aiScheduling.priority', 'Priority')}: {rule.priority || 1}</p>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{rule.ruleName || t('aiScheduling.unnamedRule', 'Unnamed Rule')}</h3>
+                      <p className="text-sm text-[#64748B]">{t('aiScheduling.priority', 'Priority')}: {rule.priority || 1}</p>
                     </div>
                     <Switch checked={rule.isActive} data-testid={`switch-rule-${rule.id}`} />
                   </div>
@@ -131,21 +132,21 @@ export default function AIScheduling() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('aiScheduling.aiSuggestions', 'AI Suggestions')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('aiScheduling.aiSuggestions', 'AI Suggestions')}</CardTitle>
           </CardHeader>
           <CardContent>
             {(!latestOptimization.suggestions || latestOptimization.suggestions.length === 0) ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-[#64748B]">
                 {t('aiScheduling.runOptimizationToSeeSuggestions', 'Run an optimization to see AI suggestions')}
               </div>
             ) : (
               <div className="space-y-2">
                 {latestOptimization.suggestions.map((suggestion: string, i: number) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900 rounded" data-testid={`suggestion-${i}`}>
-                    <Zap className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <p className="text-sm text-gray-900 dark:text-white">{suggestion}</p>
+                  <div key={i} className="flex items-start gap-3 p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid={`suggestion-${i}`}>
+                    <Zap className="h-5 w-5 text-[#0A5ED7] mt-0.5" />
+                    <p className="text-sm text-[#0B1F3B] dark:text-white">{suggestion}</p>
                   </div>
                 ))}
               </div>

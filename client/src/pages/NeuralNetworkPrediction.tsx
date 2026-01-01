@@ -71,13 +71,19 @@ export default function NeuralNetworkPrediction() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={demandData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+            <XAxis dataKey="day" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'var(--tooltip-bg, #fff)', 
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px'
+              }}
+            />
             <Legend />
-            <Line type="monotone" dataKey="predicted" stroke="#8884d8" name={t('neuralNetwork.predicted', 'Predicted')} strokeWidth={2} />
-            <Line type="monotone" dataKey="actual" stroke="#82ca9d" name={t('neuralNetwork.actual', 'Actual')} strokeWidth={2} />
+            <Line type="monotone" dataKey="predicted" stroke="#0A5ED7" name={t('neuralNetwork.predicted', 'Predicted')} strokeWidth={2} />
+            <Line type="monotone" dataKey="actual" stroke="#0BB3FF" name={t('neuralNetwork.actual', 'Actual')} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       ),
@@ -88,13 +94,19 @@ export default function NeuralNetworkPrediction() {
       content: (
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={partsDemandData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="part" />
-            <YAxis />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+            <XAxis dataKey="part" stroke="#64748B" />
+            <YAxis stroke="#64748B" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'var(--tooltip-bg, #fff)', 
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px'
+              }}
+            />
             <Legend />
-            <Bar dataKey="current" fill="#8884d8" name={t('neuralNetwork.currentStock', 'Current Stock')} />
-            <Bar dataKey="forecast" fill="#82ca9d" name={t('neuralNetwork.forecastedNeed', 'Forecasted Need')} />
+            <Bar dataKey="current" fill="#0A5ED7" name={t('neuralNetwork.currentStock', 'Current Stock')} />
+            <Bar dataKey="forecast" fill="#0BB3FF" name={t('neuralNetwork.forecastedNeed', 'Forecasted Need')} />
           </BarChart>
         </ResponsiveContainer>
       ),
@@ -104,21 +116,21 @@ export default function NeuralNetworkPrediction() {
       description: t('neuralNetwork.modelAccuracyDesc', 'Historical accuracy of AI predictions'),
       content: (
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
             <div>
-              <p className="text-sm text-muted-foreground">{t('neuralNetwork.overallAccuracy', 'Overall Accuracy')}</p>
-              <p className="text-2xl font-bold">92.5%</p>
+              <p className="text-sm text-[#64748B]">{t('neuralNetwork.overallAccuracy', 'Overall Accuracy')}</p>
+              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">92.5%</p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-500" />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <p className="text-sm text-muted-foreground">{t('neuralNetwork.serviceDemand', 'Service Demand')}</p>
-              <p className="text-xl font-bold">94.2%</p>
+            <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <p className="text-sm text-[#64748B]">{t('neuralNetwork.serviceDemand', 'Service Demand')}</p>
+              <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">94.2%</p>
             </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <p className="text-sm text-muted-foreground">{t('neuralNetwork.partsForecast', 'Parts Forecast')}</p>
-              <p className="text-xl font-bold">90.8%</p>
+            <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <p className="text-sm text-[#64748B]">{t('neuralNetwork.partsForecast', 'Parts Forecast')}</p>
+              <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">90.8%</p>
             </div>
           </div>
         </div>
@@ -132,13 +144,13 @@ export default function NeuralNetworkPrediction() {
       description: t('neuralNetwork.predictionAlertsDesc', 'Important forecasts requiring attention'),
       content: (
         <div className="space-y-3">
-          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <p className="font-medium">{t('neuralNetwork.highDemandFriday', 'High demand expected on Friday')}</p>
-            <p className="text-sm text-muted-foreground">{t('neuralNetwork.highDemandFridayDesc', 'Predicted 72 service appointments - 40% above average')}</p>
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800/50 rounded-lg">
+            <p className="font-medium text-[#0B1F3B] dark:text-white">{t('neuralNetwork.highDemandFriday', 'High demand expected on Friday')}</p>
+            <p className="text-sm text-[#64748B]">{t('neuralNetwork.highDemandFridayDesc', 'Predicted 72 service appointments - 40% above average')}</p>
           </div>
-          <div className="p-3 bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-lg">
-            <p className="font-medium">{t('neuralNetwork.oilFilterLow', 'Oil filter stock running low')}</p>
-            <p className="text-sm text-muted-foreground">{t('neuralNetwork.oilFilterLowDesc', 'Current: 95 units, Forecast need: 120 units')}</p>
+          <div className="p-3 bg-[#F97316]/5 dark:bg-[#F97316]/10 border border-[#F97316]/30 rounded-lg">
+            <p className="font-medium text-[#0B1F3B] dark:text-white">{t('neuralNetwork.oilFilterLow', 'Oil filter stock running low')}</p>
+            <p className="text-sm text-[#64748B]">{t('neuralNetwork.oilFilterLowDesc', 'Current: 95 units, Forecast need: 120 units')}</p>
           </div>
         </div>
       ),

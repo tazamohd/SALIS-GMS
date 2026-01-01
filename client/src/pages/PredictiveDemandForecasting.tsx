@@ -42,13 +42,13 @@ export default function PredictiveDemandForecasting() {
       label: t('demandForecasting.predictedPeakDay', 'Predicted Peak Day'),
       value: t('demandForecasting.thursday', 'Thursday'),
       icon: Calendar,
-      color: "text-blue-500",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('demandForecasting.partsReorderAlerts', 'Parts Reorder Alerts'),
       value: "3",
       icon: Package,
-      color: "text-orange-500",
+      color: "text-[#F97316]",
     },
     {
       label: t('demandForecasting.avgDailyAppointments', 'Avg Daily Appointments'),
@@ -68,10 +68,10 @@ export default function PredictiveDemandForecasting() {
     >
       <div className="mb-6">
         <Select value={forecastPeriod} onValueChange={setForecastPeriod}>
-          <SelectTrigger className="w-64" data-testid="select-forecast-period">
+          <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-forecast-period">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <SelectItem value="7">{t('demandForecasting.next7Days', 'Next 7 Days')}</SelectItem>
             <SelectItem value="30">{t('demandForecasting.next30Days', 'Next 30 Days')}</SelectItem>
             <SelectItem value="90">{t('demandForecasting.next90Days', 'Next 90 Days')}</SelectItem>
@@ -80,30 +80,36 @@ export default function PredictiveDemandForecasting() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('demandForecasting.serviceDemandForecast', 'Service Demand Forecast')}</CardTitle>
-            <CardDescription>{t('demandForecasting.serviceDemandForecastDesc', 'Predicted vs historical appointment demand')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('demandForecasting.serviceDemandForecast', 'Service Demand Forecast')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('demandForecasting.serviceDemandForecastDesc', 'Predicted vs historical appointment demand')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={demandForecast}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="week" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+                <XAxis dataKey="week" stroke="#64748B" />
+                <YAxis stroke="#64748B" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'var(--tooltip-bg, #fff)', 
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px'
+                  }}
+                />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey="historical"
-                  stroke="#8884d8"
+                  stroke="#0A5ED7"
                   name={t('demandForecasting.historical', 'Historical')}
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="predicted"
-                  stroke="#82ca9d"
+                  stroke="#0BB3FF"
                   name={t('demandForecasting.predicted', 'Predicted')}
                   strokeWidth={2}
                   strokeDasharray="5 5"
@@ -113,35 +119,41 @@ export default function PredictiveDemandForecasting() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('demandForecasting.partsInventoryForecast', 'Parts Inventory Forecast')}</CardTitle>
-            <CardDescription>{t('demandForecasting.partsInventoryForecastDesc', 'Current stock vs forecasted demand')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('demandForecasting.partsInventoryForecast', 'Parts Inventory Forecast')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('demandForecasting.partsInventoryForecastDesc', 'Current stock vs forecasted demand')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={partsDemand}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="part" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+                <XAxis dataKey="part" stroke="#64748B" />
+                <YAxis stroke="#64748B" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'var(--tooltip-bg, #fff)', 
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px'
+                  }}
+                />
                 <Legend />
-                <Bar dataKey="current" fill="#8884d8" name={t('demandForecasting.currentStock', 'Current Stock')} />
-                <Bar dataKey="forecasted" fill="#82ca9d" name={t('demandForecasting.forecastedNeed', 'Forecasted Need')} />
-                <Bar dataKey="reorderPoint" fill="#ffc658" name={t('demandForecasting.reorderPoint', 'Reorder Point')} />
+                <Bar dataKey="current" fill="#0A5ED7" name={t('demandForecasting.currentStock', 'Current Stock')} />
+                <Bar dataKey="forecasted" fill="#0BB3FF" name={t('demandForecasting.forecastedNeed', 'Forecasted Need')} />
+                <Bar dataKey="reorderPoint" fill="#F97316" name={t('demandForecasting.reorderPoint', 'Reorder Point')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-orange-500" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <AlertTriangle className="h-5 w-5 text-[#F97316]" />
             {t('demandForecasting.reorderRecommendations', 'Reorder Recommendations')}
           </CardTitle>
-          <CardDescription>{t('demandForecasting.reorderRecommendationsDesc', 'Parts requiring attention based on forecasted demand')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('demandForecasting.reorderRecommendationsDesc', 'Parts requiring attention based on forecasted demand')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -150,24 +162,24 @@ export default function PredictiveDemandForecasting() {
               .map((part, idx) => (
                 <div
                   key={idx}
-                  className="p-4 border border-orange-200 bg-orange-50 dark:bg-orange-900/10 rounded-lg"
+                  className="p-4 border border-[#F97316]/30 bg-[#F97316]/5 dark:bg-[#F97316]/10 rounded-lg"
                   data-testid={`reorder-alert-${idx}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{part.part}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">{part.part}</p>
+                      <p className="text-sm text-[#64748B]">
                         {t('demandForecasting.current', 'Current')}: {part.current} {t('demandForecasting.units', 'units')} • {t('demandForecasting.forecastedNeedLabel', 'Forecasted need')}: {part.forecasted} {t('demandForecasting.units', 'units')}
                       </p>
                     </div>
-                    <Badge className="bg-orange-500 text-white">
+                    <Badge className="bg-[#F97316] text-white hover:bg-[#F97316]/90">
                       {t('demandForecasting.reorder', 'Reorder')} {part.forecasted - part.current} {t('demandForecasting.units', 'units')}
                     </Badge>
                   </div>
                 </div>
               ))}
             {partsDemand.filter((part) => part.current < part.reorderPoint).length === 0 && (
-              <p className="text-center text-muted-foreground py-4">
+              <p className="text-center text-[#64748B] py-4">
                 {t('demandForecasting.allPartsStocked', 'All parts are adequately stocked')}
               </p>
             )}
@@ -175,23 +187,23 @@ export default function PredictiveDemandForecasting() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('demandForecasting.forecastConfidenceLevels', 'Forecast Confidence Levels')}</CardTitle>
-          <CardDescription>{t('demandForecasting.forecastConfidenceLevelsDesc', 'Prediction accuracy by forecast period')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('demandForecasting.forecastConfidenceLevels', 'Forecast Confidence Levels')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('demandForecasting.forecastConfidenceLevelsDesc', 'Prediction accuracy by forecast period')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {demandForecast.map((item, idx) => (
               <div key={idx} className="flex items-center gap-4">
-                <span className="text-sm font-medium w-20">{item.week}</span>
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <span className="text-sm font-medium w-20 text-[#0B1F3B] dark:text-white">{item.week}</span>
+                <div className="flex-1 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-full h-2">
                   <div
-                    className="bg-green-500 h-2 rounded-full"
+                    className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] h-2 rounded-full"
                     style={{ width: `${item.confidence}%` }}
                   />
                 </div>
-                <span className="text-sm font-medium w-12 text-right">{item.confidence}%</span>
+                <span className="text-sm font-medium w-12 text-right text-[#0B1F3B] dark:text-white">{item.confidence}%</span>
               </div>
             ))}
           </div>

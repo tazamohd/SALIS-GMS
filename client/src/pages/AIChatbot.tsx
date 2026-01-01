@@ -32,8 +32,8 @@ export default function AIChatbot() {
   const getStatusBadge = (status: string) => {
     const statuses: { [key: string]: { bg: string; text: string; icon: string } } = {
       active: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '🟢' },
-      resolved: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '✅' },
-      escalated: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-300', icon: '⚠️' },
+      resolved: { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '✅' },
+      escalated: { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⚠️' },
     };
     const s = statuses[status] || statuses.active;
     return <Badge className={`${s.bg} ${s.text} border-0`}>{s.icon} {status}</Badge>;
@@ -188,15 +188,15 @@ export default function AIChatbot() {
       icon: MessageSquare,
       content: (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 p-6 bg-white dark:bg-salis-black">
-            <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
+          <Card className="lg:col-span-2 p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
               {t('aiChatbot.chatWithAI', 'Chat with AI Assistant')}
             </h2>
             
-            <ScrollArea className="h-[500px] mb-4 border border-gray-200 dark:border-gray-700 rounded p-4">
+            <ScrollArea className="h-[500px] mb-4 border border-[#E2E8F0] dark:border-[#232A36] rounded p-4 bg-[#F8FAFC] dark:bg-[#0E1117]">
               {messages.length === 0 ? (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-12">
-                  <Bot className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <div className="text-center text-[#64748B] py-12">
+                  <Bot className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
                   <p className="font-['Poppins']">{t('aiChatbot.startConversation', 'Start a conversation with the AI assistant')}</p>
                   <p className="text-sm mt-2">{t('aiChatbot.askAbout', 'Ask about appointments, services, or vehicle status')}</p>
                 </div>
@@ -208,27 +208,27 @@ export default function AIChatbot() {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       data-testid={`message-${msg.id}`}
                     >
-                      <div className={`max-w-[80%] ${msg.role === 'user' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-800'} rounded-lg p-3`}>
+                      <div className={`max-w-[80%] ${msg.role === 'user' ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white' : 'bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]'} rounded-lg p-3`}>
                         <div className="flex items-center gap-2 mb-1">
                           {msg.role === 'user' ? (
                             <User className="w-4 h-4" />
                           ) : (
-                            <Bot className="w-4 h-4" />
+                            <Bot className="w-4 h-4 text-[#0A5ED7]" />
                           )}
                           <span className="text-xs font-semibold">
                             {msg.role === 'user' ? t('aiChatbot.you', 'You') : t('aiChatbot.aiAssistant', 'AI Assistant')}
                           </span>
                           {msg.intent && (
-                            <Badge className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0">
+                            <Badge className="text-xs bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-0">
                               {msg.intent}
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm font-['Poppins'] text-gray-900 dark:text-gray-100">
+                        <p className={`text-sm font-['Poppins'] ${msg.role === 'user' ? 'text-white' : 'text-[#0B1F3B] dark:text-white'}`}>
                           {msg.content}
                         </p>
                         {msg.confidence && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-[#64748B] mt-1">
                             {t('aiChatbot.confidence', 'Confidence')}: {Number(msg.confidence).toFixed(0)}%
                           </p>
                         )}
@@ -247,25 +247,27 @@ export default function AIChatbot() {
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 disabled={isStreaming}
                 data-testid="input-message"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={isStreaming || !messageInput.trim()}
                 data-testid="button-send"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
                 {isStreaming ? "..." : <Send className="w-4 h-4" />}
               </Button>
             </div>
           </Card>
 
-          <Card className="p-6 bg-white dark:bg-salis-black">
-            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
+          <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
               {t('common.quick_actions', 'Quick Actions')}
             </h3>
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left"
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.bookAppointmentMessage', 'I want to book an appointment'))}
                 data-testid="button-book-appointment"
               >
@@ -273,7 +275,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left"
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.checkStatusMessage', 'Check my vehicle status'))}
                 data-testid="button-check-status"
               >
@@ -281,7 +283,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left"
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.getQuoteMessage', 'Get a quote for service'))}
                 data-testid="button-get-quote"
               >
@@ -289,7 +291,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left"
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.viewHistoryMessage', 'View my service history'))}
                 data-testid="button-service-history"
               >
@@ -297,11 +299,11 @@ export default function AIChatbot() {
               </Button>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">
+            <div className="mt-6 pt-6 border-t border-[#E2E8F0] dark:border-[#232A36]">
+              <h4 className="text-sm font-semibold mb-2 text-[#0B1F3B] dark:text-white">
                 {t('aiChatbot.aiCapabilities', 'AI Capabilities')}
               </h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
+              <ul className="space-y-2 text-sm text-[#64748B] font-['Poppins']">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
                   {t('aiChatbot.capability1', 'Book & manage appointments')}
@@ -329,21 +331,21 @@ export default function AIChatbot() {
       label: t('aiChatbot.conversations', 'Conversations'),
       icon: Bot,
       content: (
-        <Card className="p-6 bg-white dark:bg-salis-black">
-          <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
+        <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
             {t('aiChatbot.recentConversations', 'Recent Conversations')}
           </h2>
           
           {conversations.length === 0 ? (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-12">
-              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <div className="text-center text-[#64748B] py-12">
+              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
               <p className="font-['Poppins']">{t('aiChatbot.noConversations', 'No conversations yet')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="border-b border-gray-200 dark:border-gray-700">
-                  <tr className="text-left text-sm font-semibold text-gray-700 dark:text-gray-300 font-['Poppins']">
+                <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <tr className="text-left text-sm font-semibold text-[#64748B] font-['Poppins']">
                     <th className="pb-3">{t('aiChatbot.session', 'Session')}</th>
                     <th className="pb-3">{t('common.status', 'Status')}</th>
                     <th className="pb-3">{t('aiChatbot.handler', 'Handler')}</th>
@@ -356,24 +358,24 @@ export default function AIChatbot() {
                   {conversations.map((conv) => (
                     <tr
                       key={conv.id}
-                      className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                       data-testid={`conversation-${conv.id}`}
                     >
-                      <td className="py-3 text-gray-900 dark:text-gray-100">
+                      <td className="py-3 text-[#0B1F3B] dark:text-white">
                         {conv.sessionId || 'N/A'}
                       </td>
                       <td className="py-3">{getStatusBadge(conv.status || 'active')}</td>
                       <td className="py-3">
-                        <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-0">
+                        <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-0">
                           {conv.handoffTo ? t('aiChatbot.escalated', 'Escalated') : t('aiChatbot.ai', 'AI')}
                         </Badge>
                       </td>
                       <td className="py-3">
-                        <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-0">
+                        <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-0">
                           web
                         </Badge>
                       </td>
-                      <td className="py-3 text-gray-600 dark:text-gray-400">
+                      <td className="py-3 text-[#64748B]">
                         {conv.createdAt ? new Date(conv.createdAt).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="py-3">
@@ -382,6 +384,7 @@ export default function AIChatbot() {
                           variant="outline"
                           onClick={() => setSelectedConversation(conv.id)}
                           data-testid={`button-view-${conv.id}`}
+                          className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                         >
                           {t('common.view', 'View')}
                         </Button>
@@ -402,48 +405,48 @@ export default function AIChatbot() {
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="p-6 bg-white dark:bg-salis-black">
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-3 bg-[#0A5ED7]/10 rounded-lg">
+                  <MessageSquare className="w-6 h-6 text-[#0A5ED7]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
                     {t('aiChatbot.totalConversations', 'Total Conversations')}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-total-conversations">
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-total-conversations">
                     {conversations.length}
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-6 bg-white dark:bg-salis-black">
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                   <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
                     {t('aiChatbot.resolved', 'Resolved')}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-resolved">
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-resolved">
                     {conversations.filter(c => c.status === 'resolved').length}
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-6 bg-white dark:bg-salis-black">
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                  <AlertCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                <div className="p-3 bg-[#F97316]/10 rounded-lg">
+                  <AlertCircle className="w-6 h-6 text-[#F97316]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 font-['Poppins']">
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
                     {t('common.active', 'Active')}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white font-['Montserrat']" data-testid="text-active">
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-active">
                     {conversations.filter(c => c.status === 'active').length}
                   </p>
                 </div>
@@ -451,12 +454,12 @@ export default function AIChatbot() {
             </Card>
           </div>
 
-          <Card className="p-6 bg-white dark:bg-salis-black">
-            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-gray-900 dark:text-white">
+          <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
               📊 {t('aiChatbot.performanceMetrics', 'Performance Metrics')}
             </h3>
-            <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-              <Clock className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+            <div className="text-center text-[#64748B] py-8">
+              <Clock className="w-12 h-12 mx-auto mb-2 text-[#64748B]" />
               <p className="font-['Poppins']">{t('aiChatbot.advancedAnalytics', 'Advanced analytics coming soon')}</p>
               <p className="text-sm mt-1">{t('aiChatbot.analyticsDescription', 'Response time, satisfaction scores, intent analysis')}</p>
             </div>

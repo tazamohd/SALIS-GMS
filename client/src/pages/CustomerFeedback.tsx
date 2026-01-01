@@ -330,7 +330,7 @@ export default function CustomerFeedback() {
       isLoading={isLoading || analyticsLoading}
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-gray-100 dark:bg-salis-gray-dark/50">
+        <TabsList className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="overview" data-testid="tab-overview">{t('customers.feedback.overview', 'Overview')}</TabsTrigger>
           <TabsTrigger value="feedback" data-testid="tab-feedback">{t('customers.feedback.allFeedback', 'All Feedback')}</TabsTrigger>
           <TabsTrigger value="sentiment" data-testid="tab-sentiment">{t('customers.feedback.sentimentAnalysis', 'Sentiment Analysis')}</TabsTrigger>
@@ -339,9 +339,9 @@ export default function CustomerFeedback() {
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="text-base font-medium">{t('customers.feedback.sentimentDistribution', 'Sentiment Distribution')}</CardTitle>
+                <CardTitle className="text-base font-medium text-[#0B1F3B] dark:text-white">{t('customers.feedback.sentimentDistribution', 'Sentiment Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -371,16 +371,16 @@ export default function CustomerFeedback() {
                   {sentimentChartData.map((item: any) => (
                     <div key={item.name} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{item.name}: {item.value}</span>
+                      <span className="text-sm text-[#64748B]">{item.name}: {item.value}</span>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="text-base font-medium">{t('customers.feedback.ratingDistribution', 'Rating Distribution')}</CardTitle>
+                <CardTitle className="text-base font-medium text-[#0B1F3B] dark:text-white">{t('customers.feedback.ratingDistribution', 'Rating Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -400,15 +400,15 @@ export default function CustomerFeedback() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="text-base font-medium">{t('customers.feedback.categoryRatings', 'Category Ratings')}</CardTitle>
+                <CardTitle className="text-base font-medium text-[#0B1F3B] dark:text-white">{t('customers.feedback.categoryRatings', 'Category Ratings')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {categoryData.map((cat: any) => (
                   <div key={cat.category}>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">{cat.category}</span>
+                      <span className="text-sm text-[#64748B]">{cat.category}</span>
                       <span className="text-sm font-medium">{cat.rating.toFixed(1)}/5</span>
                     </div>
                     <Progress value={(cat.rating / 5) * 100} className="h-2" />
@@ -418,9 +418,9 @@ export default function CustomerFeedback() {
             </Card>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="text-base font-medium">{t('customers.feedback.recentFeedback', 'Recent Feedback')}</CardTitle>
+              <CardTitle className="text-base font-medium text-[#0B1F3B] dark:text-white">{t('customers.feedback.recentFeedback', 'Recent Feedback')}</CardTitle>
               <CardDescription>{t('customers.feedback.latestSubmissions', 'Latest customer feedback submissions')}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -463,7 +463,7 @@ export default function CustomerFeedback() {
                 placeholder={t('customers.feedback.searchPlaceholder', 'Search by customer name or comment...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 bg-white dark:bg-salis-gray-dark"
+                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-feedback"
               />
             </div>
@@ -492,10 +492,10 @@ export default function CustomerFeedback() {
         </TabsContent>
 
         <TabsContent value="sentiment" className="space-y-4">
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-base font-medium">{t('customers.feedback.aiSentimentAnalysis', 'AI Sentiment Analysis')}</CardTitle>
+                <CardTitle className="text-base font-medium text-[#0B1F3B] dark:text-white">{t('customers.feedback.aiSentimentAnalysis', 'AI Sentiment Analysis')}</CardTitle>
                 <CardDescription>{t('customers.feedback.poweredByGPT', 'Powered by GPT-4 for accurate sentiment detection')}</CardDescription>
               </div>
               <Button 
@@ -517,7 +517,7 @@ export default function CustomerFeedback() {
                   const percentage = ((count / total) * 100).toFixed(1);
                   
                   return (
-                    <Card key={sentiment} className="bg-white dark:bg-salis-gray-dark/50">
+                    <Card key={sentiment} className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                       <CardContent className="pt-6">
                         <div className="flex items-center gap-3">
                           <div 
@@ -530,7 +530,7 @@ export default function CustomerFeedback() {
                           </div>
                           <div>
                             <p className="text-2xl font-bold font-montserrat">{count}</p>
-                            <p className="text-sm text-gray-500 capitalize">{sentiment} ({percentage}%)</p>
+                            <p className="text-sm text-[#64748B] capitalize">{sentiment} ({percentage}%)</p>
                           </div>
                         </div>
                       </CardContent>

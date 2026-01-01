@@ -32,17 +32,17 @@ export function CustomerAppointments() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+        return 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white';
       case 'scheduled':
-        return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white';
+        return 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white';
       case 'in_progress':
-        return 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300';
+        return 'bg-[#0BB3FF]/20 text-[#0A5ED7] dark:text-[#0BB3FF]';
       case 'completed':
-        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
+        return 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
       case 'cancelled':
-        return 'bg-salis-black dark:bg-white text-white dark:text-salis-black';
+        return 'bg-[#F97316]/20 text-[#F97316]';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
+        return 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#64748B]';
     }
   };
 
@@ -60,14 +60,17 @@ export function CustomerAppointments() {
       ]}
     >
       <div className="flex items-center gap-4 mb-6">
-        <Filter className="h-4 w-4 text-gray-500" />
-        <div className="flex gap-2">
+        <Filter className="h-4 w-4 text-[#64748B]" />
+        <div className="flex gap-2 flex-wrap">
           {statusOptions.map(option => (
             <Button
               key={option.value}
               variant={statusFilter === option.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => setStatusFilter(option.value)}
+              className={statusFilter === option.value 
+                ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90' 
+                : 'border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#151A23]'}
               data-testid={`button-filter-${option.value}`}
             >
               {option.label}
@@ -77,20 +80,24 @@ export function CustomerAppointments() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading appointments...</div>
+        <div className="text-center py-12 text-[#64748B]">Loading appointments...</div>
       ) : filteredAppointments.length === 0 ? (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="text-center py-12">
-            <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <Calendar className="h-16 w-16 text-[#64748B] mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white mb-2">
               No appointments found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-[#64748B] mb-6">
               {statusFilter === 'all' 
                 ? "You haven't booked any appointments yet."
                 : `No ${statusFilter} appointments.`}
             </p>
-            <Button onClick={() => setBookingOpen(true)} data-testid="button-book-first-appointment">
+            <Button 
+              onClick={() => setBookingOpen(true)} 
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
+              data-testid="button-book-first-appointment"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Book Your First Appointment
             </Button>
@@ -99,14 +106,14 @@ export function CustomerAppointments() {
       ) : (
         <div className="grid gap-4">
           {filteredAppointments.map(apt => (
-            <Card key={apt.id} data-testid={`card-appointment-${apt.id}`}>
+            <Card key={apt.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-appointment-${apt.id}`}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-xl" data-testid={`text-appointment-service-${apt.id}`}>
+                    <CardTitle className="text-xl text-[#0B1F3B] dark:text-white" data-testid={`text-appointment-service-${apt.id}`}>
                       {apt.serviceType}
                     </CardTitle>
-                    <CardDescription className="mt-1">
+                    <CardDescription className="mt-1 text-[#64748B]">
                       Appointment #{apt.appointmentNumber}
                     </CardDescription>
                   </div>
@@ -121,27 +128,27 @@ export function CustomerAppointments() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Date & Time</p>
-                    <p className="font-medium mt-1" data-testid={`text-appointment-date-${apt.id}`}>
+                    <p className="text-sm text-[#64748B]">Date & Time</p>
+                    <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white" data-testid={`text-appointment-date-${apt.id}`}>
                       {format(new Date(apt.appointmentDate), 'PPP p')}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Duration</p>
-                    <p className="font-medium mt-1">{apt.duration} minutes</p>
+                    <p className="text-sm text-[#64748B]">Duration</p>
+                    <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white">{apt.duration} minutes</p>
                   </div>
                   {apt.vehicleInfo && typeof apt.vehicleInfo === 'object' && (
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Vehicle</p>
-                      <p className="font-medium mt-1">
+                      <p className="text-sm text-[#64748B]">Vehicle</p>
+                      <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white">
                         {String((apt.vehicleInfo as any).make || '')} {String((apt.vehicleInfo as any).model || '')} ({String((apt.vehicleInfo as any).year || '')})
                       </p>
                     </div>
                   )}
                   {apt.description && (
                     <div className="md:col-span-2">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Description</p>
-                      <p className="mt-1">{apt.description}</p>
+                      <p className="text-sm text-[#64748B]">Description</p>
+                      <p className="mt-1 text-[#0B1F3B] dark:text-white">{apt.description}</p>
                     </div>
                   )}
                 </div>

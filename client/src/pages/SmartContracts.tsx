@@ -54,13 +54,11 @@ export default function SmartContracts() {
     terms: { service: "", paymentTrigger: "on_completion" },
   });
 
-  // Fetch smart contracts
   const { data: contracts, isLoading } = useQuery<SmartContract[]>({
     queryKey: ["/api/smart-contracts"],
     enabled: !!(user as any)?.garageId,
   });
 
-  // Create contract mutation
   const createContractMutation = useMutation({
     mutationFn: async (data: any) => {
       return await apiRequest("POST", "/api/smart-contracts", data);
@@ -89,7 +87,6 @@ export default function SmartContracts() {
     },
   });
 
-  // Update contract status mutation (simulates signing/execution)
   const updateContractMutation = useMutation({
     mutationFn: async ({ contractId, status }: { contractId: string; status: string }) => {
       return await apiRequest("PATCH", `/api/smart-contracts/${contractId}`, { status });
@@ -127,14 +124,14 @@ export default function SmartContracts() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-gray-500",
-      pending_signature: "bg-yellow-500",
-      signed: "bg-blue-500",
-      active: "bg-green-500",
+      draft: "bg-[#64748B]",
+      pending_signature: "bg-[#F97316]",
+      signed: "bg-[#0A5ED7]",
+      active: "bg-emerald-500",
       executed: "bg-purple-500",
-      completed: "bg-green-700",
+      completed: "bg-emerald-600",
     };
-    return colors[status] || "bg-gray-500";
+    return colors[status] || "bg-[#64748B]";
   };
 
   const getStatusIcon = (status: string) => {
@@ -159,24 +156,24 @@ export default function SmartContracts() {
     >
 
         {showCreateForm && (
-          <Card className="mb-8 border-2 border-blue-600">
+          <Card className="mb-8 border-2 border-[#0A5ED7] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle>{t('smartContracts.createNewContract', 'Create New Smart Contract')}</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartContracts.createNewContract', 'Create New Smart Contract')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('smartContracts.automatedContractDesc', 'Automated contract with digital signatures and payment automation')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>{t('smartContracts.contractType', 'Contract Type')}</Label>
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('smartContracts.contractType', 'Contract Type')}</Label>
                   <Select
                     value={newContract.contractType}
                     onValueChange={(value) =>
                       setNewContract({ ...newContract, contractType: value })
                     }
                   >
-                    <SelectTrigger data-testid="select-contract-type">
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-contract-type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -188,7 +185,7 @@ export default function SmartContracts() {
                   </Select>
                 </div>
                 <div>
-                  <Label>{t('smartContracts.paymentTrigger', 'Payment Trigger')}</Label>
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('smartContracts.paymentTrigger', 'Payment Trigger')}</Label>
                   <Select
                     value={newContract.terms.paymentTrigger}
                     onValueChange={(value) =>
@@ -198,7 +195,7 @@ export default function SmartContracts() {
                       })
                     }
                   >
-                    <SelectTrigger data-testid="select-payment-trigger">
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-payment-trigger">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -212,7 +209,7 @@ export default function SmartContracts() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>{t('smartContracts.customerName', 'Customer Name (Party B)')}</Label>
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('smartContracts.customerName', 'Customer Name (Party B)')}</Label>
                   <Input
                     placeholder={t('smartContracts.enterCustomerName', 'Enter customer name')}
                     value={newContract.partyB}
@@ -222,11 +219,12 @@ export default function SmartContracts() {
                         partyB: e.target.value,
                       })
                     }
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-customer-name"
                   />
                 </div>
                 <div>
-                  <Label>{t('smartContracts.contractAmount', 'Contract Amount ($)')}</Label>
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('smartContracts.contractAmount', 'Contract Amount ($)')}</Label>
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -237,13 +235,14 @@ export default function SmartContracts() {
                         contractValue: e.target.value,
                       })
                     }
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-contract-amount"
                   />
                 </div>
               </div>
 
               <div>
-                <Label>{t('smartContracts.serviceDescription', 'Service Description')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('smartContracts.serviceDescription', 'Service Description')}</Label>
                 <Textarea
                   placeholder={t('smartContracts.describeService', 'Describe the service to be provided...')}
                   value={newContract.terms.service}
@@ -253,6 +252,7 @@ export default function SmartContracts() {
                       terms: { ...newContract.terms, service: e.target.value },
                     })
                   }
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-service-description"
                 />
               </div>
@@ -261,12 +261,13 @@ export default function SmartContracts() {
                 <Button
                   onClick={handleCreateContract}
                   disabled={createContractMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                   data-testid="button-submit-contract"
                 >
                   <Shield className="w-4 h-4 mr-2" />
                   {t('smartContracts.createSignedContract', 'Create Signed Contract')}
                 </Button>
-                <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+                <Button variant="outline" onClick={() => setShowCreateForm(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   {t('common.cancel', 'Cancel')}
                 </Button>
               </div>
@@ -274,83 +275,81 @@ export default function SmartContracts() {
           </Card>
         )}
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.totalContracts', 'Total Contracts')}</p>
-                  <p className="text-2xl font-bold" data-testid="text-total-contracts">
+                  <p className="text-sm text-[#64748B]">{t('smartContracts.totalContracts', 'Total Contracts')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-contracts">
                     {contracts?.length || 0}
                   </p>
                 </div>
-                <FileSignature className="w-8 h-8 text-blue-600" />
+                <FileSignature className="w-8 h-8 text-[#0A5ED7]" />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.active', 'Active')}</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-sm text-[#64748B]">{t('common.active', 'Active')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                     {contracts?.filter((c) => c.status === "active").length || 0}
                   </p>
                 </div>
-                <Zap className="w-8 h-8 text-green-600" />
+                <Zap className="w-8 h-8 text-emerald-500" />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.executed', 'Executed')}</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-sm text-[#64748B]">{t('smartContracts.executed', 'Executed')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                     {contracts?.filter((c) => c.status === "executed" || c.status === "completed").length || 0}
                   </p>
                 </div>
-                <CheckCircle2 className="w-8 h-8 text-purple-600" />
+                <CheckCircle2 className="w-8 h-8 text-purple-500" />
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartContracts.paymentReady', 'Payment Ready')}</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-sm text-[#64748B]">{t('smartContracts.paymentReady', 'Payment Ready')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                     {contracts?.filter((c) => c.status === "signed").length || 0}
                   </p>
                 </div>
-                <CreditCard className="w-8 h-8 text-yellow-600" />
+                <CreditCard className="w-8 h-8 text-[#F97316]" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-      {/* Contracts List */}
       {isLoading && (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">{t('smartContracts.loadingContracts', 'Loading contracts...')}</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+            <p className="mt-4 text-[#64748B]">{t('smartContracts.loadingContracts', 'Loading contracts...')}</p>
           </div>
         </div>
       )}
 
       {!isLoading && contracts && contracts.length === 0 && !showCreateForm && (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="text-center py-12">
-            <FileSignature className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <FileSignature className="w-16 h-16 text-[#64748B] mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-2">
               {t('smartContracts.noContracts', 'No Smart Contracts')}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-[#64748B] mb-6">
               {t('smartContracts.createFirstContract', 'Create your first smart contract with automated payment processing')}
             </p>
-            <Button onClick={() => setShowCreateForm(true)}>
+            <Button onClick={() => setShowCreateForm(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white">
               <FileSignature className="w-4 h-4 mr-2" />
               {t('smartContracts.createContract', 'Create Contract')}
             </Button>
@@ -360,15 +359,15 @@ export default function SmartContracts() {
 
       {!isLoading && contracts && contracts.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-4">
             {t('smartContracts.contracts', 'Contracts')} ({contracts.length})
           </h2>
           {contracts.map((contract) => (
-            <Card key={contract.id} className="border-l-4 border-l-blue-600">
+            <Card key={contract.id} className="border-l-4 border-l-[#0A5ED7] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-3">
+                    <CardTitle className="flex items-center gap-3 text-[#0B1F3B] dark:text-white">
                       {contract.contractType.replace("_", " ").toUpperCase()}
                       <Badge className={getStatusColor(contract.status)}>
                         <span className="flex items-center gap-1">
@@ -377,7 +376,7 @@ export default function SmartContracts() {
                         </span>
                       </Badge>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-[#64748B]">
                       {t('smartContracts.created', 'Created')}: {new Date(contract.createdAt).toLocaleDateString()}
                     </CardDescription>
                   </div>
@@ -387,6 +386,7 @@ export default function SmartContracts() {
                         size="sm"
                         onClick={() => handleSignContract(contract.id)}
                         disabled={updateContractMutation.isPending}
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                         data-testid={`button-sign-contract-${contract.id}`}
                       >
                         <FileSignature className="w-4 h-4 mr-2" />
@@ -398,6 +398,7 @@ export default function SmartContracts() {
                         size="sm"
                         onClick={() => handleExecuteContract(contract.id)}
                         disabled={updateContractMutation.isPending}
+                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                         data-testid={`button-execute-contract-${contract.id}`}
                       >
                         <Zap className="w-4 h-4 mr-2" />
@@ -410,16 +411,16 @@ export default function SmartContracts() {
               <CardContent>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.parties', 'Parties')}</p>
-                    <p className="text-sm font-semibold">{contract.partyA} ↔ {contract.partyB}</p>
+                    <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.parties', 'Parties')}</p>
+                    <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{contract.partyA} ↔ {contract.partyB}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.contractValue', 'Contract Value')}</p>
-                    <p className="font-semibold">${contract.contractValue} {contract.currency}</p>
+                    <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.contractValue', 'Contract Value')}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${contract.contractValue} {contract.currency}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('smartContracts.blockchain', 'Blockchain')}</p>
-                    <Badge variant="outline">{contract.blockchain}</Badge>
+                    <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.blockchain', 'Blockchain')}</p>
+                    <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{contract.blockchain}</Badge>
                   </div>
                 </div>
               </CardContent>

@@ -275,17 +275,17 @@ export default function TowingAssistance() {
 
   const getRequestStatusBadge = (status: string, requestId: string) => {
     const statusColors: Record<string, string> = {
-      requested: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
-      assigned: "bg-salis-50-black text-white",
-      en_route: "bg-salis-gray text-white",
-      arrived: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      in_progress: "bg-salis-50-black text-white",
-      completed: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      cancelled: "bg-salis-gray text-white",
+      requested: "bg-[#F8FAFC] text-[#0B1F3B] dark:bg-[#232A36] dark:text-white",
+      assigned: "bg-[#0A5ED7] text-white",
+      en_route: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      arrived: "bg-green-600 text-white",
+      in_progress: "bg-[#0A5ED7] text-white",
+      completed: "bg-green-600 text-white",
+      cancelled: "bg-[#64748B] text-white",
     };
     
     return (
-      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-request-status-${requestId}`}>
+      <Badge className={statusColors[status] || "bg-[#64748B] text-white"} data-testid={`badge-request-status-${requestId}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
@@ -293,13 +293,13 @@ export default function TowingAssistance() {
 
   const getUrgencyBadge = (urgency: string, requestId: string) => {
     const urgencyColors: Record<string, string> = {
-      normal: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
-      urgent: "bg-salis-50-black text-white",
-      emergency: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
+      normal: "bg-[#F8FAFC] text-[#0B1F3B] dark:bg-[#232A36] dark:text-white",
+      urgent: "bg-[#F97316] text-white",
+      emergency: "bg-red-600 text-white",
     };
     
     return (
-      <Badge className={urgencyColors[urgency] || "bg-salis-gray text-white"} data-testid={`badge-urgency-${requestId}`}>
+      <Badge className={urgencyColors[urgency] || "bg-[#64748B] text-white"} data-testid={`badge-urgency-${requestId}`}>
         {urgency.toUpperCase()}
       </Badge>
     );
@@ -307,14 +307,14 @@ export default function TowingAssistance() {
 
   const getTruckStatusBadge = (status: string, truckId: string) => {
     const statusColors: Record<string, string> = {
-      available: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      on_job: "bg-salis-50-black text-white",
-      maintenance: "bg-salis-gray text-white",
-      offline: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      available: "bg-green-600 text-white",
+      on_job: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      maintenance: "bg-[#F97316] text-white",
+      offline: "bg-[#64748B] text-white",
     };
     
     return (
-      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-truck-status-${truckId}`}>
+      <Badge className={statusColors[status] || "bg-[#64748B] text-white"} data-testid={`badge-truck-status-${truckId}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
@@ -323,14 +323,14 @@ export default function TowingAssistance() {
   const requestsTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">{t('towingAssistance.towingRequests', 'Towing Requests')}</h2>
+        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t('towingAssistance.towingRequests', 'Towing Requests')}</h2>
         <Button
           onClick={() => {
             setEditingRequestId(null);
             requestForm.reset();
             setIsRequestDialogOpen(true);
           }}
-          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           data-testid="button-create-request"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -338,49 +338,49 @@ export default function TowingAssistance() {
         </Button>
       </div>
 
-      <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
+      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden bg-white dark:bg-[#151A23]">
         <Table>
-          <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
-            <TableRow>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.requestNumber', 'Request #')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('customers.customer', 'Customer')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.serviceType', 'Service Type')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towing.pickupLocation', 'Pickup Location')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.urgency', 'Urgency')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.requestedAt', 'Requested At')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+            <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.requestNumber', 'Request #')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('customers.customer', 'Customer')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.serviceType', 'Service Type')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towing.pickupLocation', 'Pickup Location')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.urgency', 'Urgency')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.requestedAt', 'Requested At')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {requestsLoading ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={9} className="text-center text-[#64748B]">
                   {t('common.loading', 'Loading')}...
                 </TableCell>
               </TableRow>
             ) : towingRequests.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={9} className="text-center text-[#64748B]">
                   {t('towingAssistance.noTowingRequestsFound', 'No towing requests found')}
                 </TableCell>
               </TableRow>
             ) : (
               towingRequests.map((request) => (
-                <TableRow key={request.id} data-testid={`row-request-${request.id}`}>
-                  <TableCell className="text-salis-black dark:text-white">{request.requestNumber || t('common.na', 'N/A')}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">
+                <TableRow key={request.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-request-${request.id}`}>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{request.requestNumber || t('common.na', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {customers.find(c => c.id === request.customerId)?.fullName || t('common.unknown', 'Unknown')}
                   </TableCell>
-                  <TableCell className="text-salis-black dark:text-white">
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {vehicles.find(v => v.id === request.vehicleId)?.make || t('common.na', 'N/A')} {vehicles.find(v => v.id === request.vehicleId)?.model || ""}
                   </TableCell>
-                  <TableCell className="text-salis-black dark:text-white capitalize">{request.serviceType.replace("_", " ")}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white max-w-xs truncate">{request.pickupLocation}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white capitalize">{request.serviceType.replace("_", " ")}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white max-w-xs truncate">{request.pickupLocation}</TableCell>
                   <TableCell>{getRequestStatusBadge(request.status || "requested", request.id)}</TableCell>
                   <TableCell>{getUrgencyBadge(request.urgency || "normal", request.id)}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {request.requestedAt ? format(new Date(request.requestedAt), "MMM dd, yyyy HH:mm") : t('common.na', 'N/A')}
                   </TableCell>
                   <TableCell>
@@ -399,7 +399,7 @@ export default function TowingAssistance() {
                         onClick={() => deleteRequestMutation.mutate(request.id)}
                         data-testid={`button-delete-request-${request.id}`}
                       >
-                        <Trash2 className="w-4 h-4 text-salis-gray" />
+                        <Trash2 className="w-4 h-4 text-[#64748B]" />
                       </Button>
                     </div>
                   </TableCell>
@@ -415,14 +415,14 @@ export default function TowingAssistance() {
   const trucksTab = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-salis-black dark:text-white">{t('towingAssistance.towTrucks', 'Tow Trucks')}</h2>
+        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t('towingAssistance.towTrucks', 'Tow Trucks')}</h2>
         <Button
           onClick={() => {
             setEditingTruckId(null);
             truckForm.reset();
             setIsTruckDialogOpen(true);
           }}
-          className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           data-testid="button-create-truck"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -430,47 +430,47 @@ export default function TowingAssistance() {
         </Button>
       </div>
 
-      <div className="border border-salis-gray-light dark:border-salis-gray rounded-lg overflow-hidden">
+      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden bg-white dark:bg-[#151A23]">
         <Table>
-          <TableHeader className="bg-salis-gray-light dark:bg-salis-gray-dark">
-            <TableRow>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.truckName', 'Truck Name')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.truckNumber', 'Truck #')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.licensePlate', 'License Plate')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.capacity', 'Capacity')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.currentDriver', 'Current Driver')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.gpsEnabled', 'GPS Enabled')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('towingAssistance.lastUpdated', 'Last Updated')}</TableHead>
-              <TableHead className="text-salis-black dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+            <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.truckName', 'Truck Name')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.truckNumber', 'Truck #')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.licensePlate', 'License Plate')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.capacity', 'Capacity')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.currentDriver', 'Current Driver')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.gpsEnabled', 'GPS Enabled')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.lastUpdated', 'Last Updated')}</TableHead>
+              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {trucksLoading ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={9} className="text-center text-[#64748B]">
                   {t('common.loading', 'Loading')}...
                 </TableCell>
               </TableRow>
             ) : towTrucks.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center text-salis-gray dark:text-salis-gray-light">
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableCell colSpan={9} className="text-center text-[#64748B]">
                   {t('towingAssistance.noTowTrucksFound', 'No tow trucks found')}
                 </TableCell>
               </TableRow>
             ) : (
               towTrucks.map((truck) => (
-                <TableRow key={truck.id} data-testid={`row-truck-${truck.id}`}>
-                  <TableCell className="text-salis-black dark:text-white">{truck.truckName}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">{truck.truckNumber || t('common.na', 'N/A')}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">{truck.licensePlate || t('common.na', 'N/A')}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white capitalize">{truck.capacity?.replace("_", " ") || t('common.na', 'N/A')}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">
+                <TableRow key={truck.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-truck-${truck.id}`}>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{truck.truckName}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{truck.truckNumber || t('common.na', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{truck.licensePlate || t('common.na', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white capitalize">{truck.capacity?.replace("_", " ") || t('common.na', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {drivers.find(d => d.id === truck.currentDriverId)?.fullName || t('towingAssistance.unassigned', 'Unassigned')}
                   </TableCell>
                   <TableCell>{getTruckStatusBadge(truck.status || "available", truck.id)}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">{truck.gpsEnabled ? t('common.yes', 'Yes') : t('common.no', 'No')}</TableCell>
-                  <TableCell className="text-salis-black dark:text-white">
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{truck.gpsEnabled ? t('common.yes', 'Yes') : t('common.no', 'No')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {truck.updatedAt ? format(new Date(truck.updatedAt), "MMM dd, yyyy HH:mm") : t('common.na', 'N/A')}
                   </TableCell>
                   <TableCell>
@@ -489,7 +489,7 @@ export default function TowingAssistance() {
                         onClick={() => deleteTruckMutation.mutate(truck.id)}
                         data-testid={`button-delete-truck-${truck.id}`}
                       >
-                        <Trash2 className="w-4 h-4 text-salis-gray" />
+                        <Trash2 className="w-4 h-4 text-[#64748B]" />
                       </Button>
                     </div>
                   </TableCell>
@@ -527,12 +527,12 @@ export default function TowingAssistance() {
       />
 
       <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-black">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingRequestId ? t('towingAssistance.editTowingRequest', 'Edit Towing Request') : t('towingAssistance.createTowingRequest', 'Create Towing Request')}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray dark:text-salis-gray-light">
+            <DialogDescription className="text-[#64748B]">
               {editingRequestId ? t('towingAssistance.updateTowingRequestDetails', 'Update towing request details') : t('towingAssistance.createNewTowingRequest', 'Create a new towing or roadside assistance request')}
             </DialogDescription>
           </DialogHeader>
@@ -544,14 +544,14 @@ export default function TowingAssistance() {
                   name="requestNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.requestNumber', 'Request Number')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.requestNumber', 'Request Number')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           value={field.value ?? ''}
                           placeholder={t('towingAssistance.autoGenerated', 'Auto-generated')}
                           readOnly={!editingRequestId}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-request-number"
                         />
                       </FormControl>
@@ -565,10 +565,10 @@ export default function TowingAssistance() {
                   name="customerId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('customers.customer', 'Customer')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('customers.customer', 'Customer')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-customer">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-customer">
                             <SelectValue placeholder={t('towingAssistance.selectCustomer', 'Select customer')} />
                           </SelectTrigger>
                         </FormControl>
@@ -590,10 +590,10 @@ export default function TowingAssistance() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-vehicle">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
                             <SelectValue placeholder={t('towingAssistance.selectVehicle', 'Select vehicle')} />
                           </SelectTrigger>
                         </FormControl>
@@ -615,10 +615,10 @@ export default function TowingAssistance() {
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.serviceType', 'Service Type')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.serviceType', 'Service Type')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-service-type">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-service-type">
                             <SelectValue placeholder={t('towingAssistance.selectServiceType', 'Select service type')} />
                           </SelectTrigger>
                         </FormControl>
@@ -641,10 +641,10 @@ export default function TowingAssistance() {
                   name="urgency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.urgency', 'Urgency')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.urgency', 'Urgency')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-urgency">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-urgency">
                             <SelectValue placeholder={t('towingAssistance.selectUrgency', 'Select urgency')} />
                           </SelectTrigger>
                         </FormControl>
@@ -664,10 +664,10 @@ export default function TowingAssistance() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('common.status', 'Status')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-request-status">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-request-status">
                             <SelectValue placeholder={t('towingAssistance.selectStatus', 'Select status')} />
                           </SelectTrigger>
                         </FormControl>
@@ -691,10 +691,10 @@ export default function TowingAssistance() {
                   name="assignedDriverId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.assignedDriver', 'Assigned Driver')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.assignedDriver', 'Assigned Driver')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-assigned-driver">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-assigned-driver">
                             <SelectValue placeholder={t('towingAssistance.selectDriver', 'Select driver')} />
                           </SelectTrigger>
                         </FormControl>
@@ -717,12 +717,12 @@ export default function TowingAssistance() {
                 name="pickupLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">{t('towing.pickupLocation', 'Pickup Location')} *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.pickupLocation', 'Pickup Location')} *</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         placeholder={t('towingAssistance.enterPickupLocation', 'Enter pickup location')}
-                        className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-pickup-location"
                       />
                     </FormControl>
@@ -737,14 +737,14 @@ export default function TowingAssistance() {
                   name="pickupLatitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.pickupLatitude', 'Pickup Latitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.pickupLatitude', 'Pickup Latitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.latitudePlaceholder', 'e.g., 40.7128')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-pickup-latitude"
                         />
                       </FormControl>
@@ -758,14 +758,14 @@ export default function TowingAssistance() {
                   name="pickupLongitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.pickupLongitude', 'Pickup Longitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.pickupLongitude', 'Pickup Longitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.longitudePlaceholder', 'e.g., -74.0060')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-pickup-longitude"
                         />
                       </FormControl>
@@ -780,13 +780,13 @@ export default function TowingAssistance() {
                 name="dropoffLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">{t('towing.dropoffLocation', 'Dropoff Location')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.dropoffLocation', 'Dropoff Location')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         value={field.value ?? ''}
                         placeholder={t('towingAssistance.enterDropoffLocation', 'Enter dropoff location')}
-                        className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-dropoff-location"
                       />
                     </FormControl>
@@ -801,14 +801,14 @@ export default function TowingAssistance() {
                   name="dropoffLatitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.dropoffLatitude', 'Dropoff Latitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.dropoffLatitude', 'Dropoff Latitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.latitudePlaceholder', 'e.g., 40.7128')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-dropoff-latitude"
                         />
                       </FormControl>
@@ -822,14 +822,14 @@ export default function TowingAssistance() {
                   name="dropoffLongitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.dropoffLongitude', 'Dropoff Longitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.dropoffLongitude', 'Dropoff Longitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.longitudePlaceholder', 'e.g., -74.0060')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-dropoff-longitude"
                         />
                       </FormControl>
@@ -845,14 +845,14 @@ export default function TowingAssistance() {
                   name="serviceCost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.serviceCost', 'Service Cost')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.serviceCost', 'Service Cost')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.01"
                           placeholder="0.00"
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-service-cost"
                         />
                       </FormControl>
@@ -866,14 +866,14 @@ export default function TowingAssistance() {
                   name="distance"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.distanceKm', 'Distance (km)')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.distanceKm', 'Distance (km)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.1"
                           placeholder="0.0"
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-distance"
                         />
                       </FormControl>
@@ -889,12 +889,12 @@ export default function TowingAssistance() {
                   name="estimatedArrival"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.estimatedArrival', 'Estimated Arrival')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.estimatedArrival', 'Estimated Arrival')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="datetime-local"
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-estimated-arrival"
                         />
                       </FormControl>
@@ -908,12 +908,12 @@ export default function TowingAssistance() {
                   name="actualArrival"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.actualArrival', 'Actual Arrival')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.actualArrival', 'Actual Arrival')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="datetime-local"
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-actual-arrival"
                         />
                       </FormControl>
@@ -928,13 +928,13 @@ export default function TowingAssistance() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.internalNotes', 'Internal Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.internalNotes', 'Internal Notes')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         value={field.value ?? ''}
                         placeholder={t('towingAssistance.internalNotesPlaceholder', 'Notes for internal use')}
-                        className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-notes"
                       />
                     </FormControl>
@@ -948,13 +948,13 @@ export default function TowingAssistance() {
                 name="customerNotes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.customerNotes', 'Customer Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.customerNotes', 'Customer Notes')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         value={field.value ?? ''}
                         placeholder={t('towingAssistance.customerNotesPlaceholder', 'Notes from customer')}
-                        className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-customer-notes"
                       />
                     </FormControl>
@@ -968,13 +968,13 @@ export default function TowingAssistance() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsRequestDialogOpen(false)}
-                  className="border-salis-gray-light dark:border-salis-gray"
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                 >
                   {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   disabled={requestMutation.isPending}
                   data-testid="button-save-request"
                 >
@@ -987,12 +987,12 @@ export default function TowingAssistance() {
       </Dialog>
 
       <Dialog open={isTruckDialogOpen} onOpenChange={setIsTruckDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-salis-black">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingTruckId ? t('towingAssistance.editTowTruck', 'Edit Tow Truck') : t('towingAssistance.addTowTruck', 'Add Tow Truck')}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray dark:text-salis-gray-light">
+            <DialogDescription className="text-[#64748B]">
               {editingTruckId ? t('towingAssistance.updateTowTruckDetails', 'Update tow truck details') : t('towingAssistance.addNewTowTruck', 'Add a new tow truck to the fleet')}
             </DialogDescription>
           </DialogHeader>
@@ -1004,12 +1004,12 @@ export default function TowingAssistance() {
                   name="truckName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.truckName', 'Truck Name')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.truckName', 'Truck Name')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           placeholder={t('towingAssistance.truckNamePlaceholder', 'e.g., Tow Truck Alpha')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-truck-name"
                         />
                       </FormControl>
@@ -1023,13 +1023,13 @@ export default function TowingAssistance() {
                   name="truckNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.truckNumber', 'Truck Number')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.truckNumber', 'Truck Number')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           value={field.value ?? ''}
                           placeholder={t('towingAssistance.truckNumberPlaceholder', 'e.g., TOW-001')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-truck-number"
                         />
                       </FormControl>
@@ -1043,13 +1043,13 @@ export default function TowingAssistance() {
                   name="licensePlate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.licensePlate', 'License Plate')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.licensePlate', 'License Plate')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           value={field.value ?? ''}
                           placeholder={t('towingAssistance.licensePlatePlaceholder', 'e.g., ABC-1234')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-license-plate"
                         />
                       </FormControl>
@@ -1063,10 +1063,10 @@ export default function TowingAssistance() {
                   name="capacity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.capacity', 'Capacity')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.capacity', 'Capacity')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-capacity">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-capacity">
                             <SelectValue placeholder={t('towingAssistance.selectCapacity', 'Select capacity')} />
                           </SelectTrigger>
                         </FormControl>
@@ -1086,10 +1086,10 @@ export default function TowingAssistance() {
                   name="currentDriverId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.currentDriver', 'Current Driver')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.currentDriver', 'Current Driver')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-current-driver">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-current-driver">
                             <SelectValue placeholder={t('towingAssistance.selectDriver', 'Select driver')} />
                           </SelectTrigger>
                         </FormControl>
@@ -1111,10 +1111,10 @@ export default function TowingAssistance() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('common.status', 'Status')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white" data-testid="select-truck-status">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-truck-status">
                             <SelectValue placeholder={t('towingAssistance.selectStatus', 'Select status')} />
                           </SelectTrigger>
                         </FormControl>
@@ -1136,13 +1136,13 @@ export default function TowingAssistance() {
                 name="currentLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.currentLocation', 'Current Location')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.currentLocation', 'Current Location')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         value={field.value ?? ''}
                         placeholder={t('towingAssistance.enterCurrentLocation', 'Enter current location')}
-                        className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-current-location"
                       />
                     </FormControl>
@@ -1157,14 +1157,14 @@ export default function TowingAssistance() {
                   name="lastKnownLatitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.lastKnownLatitude', 'Last Known Latitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.lastKnownLatitude', 'Last Known Latitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.latitudePlaceholder', 'e.g., 40.7128')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-last-latitude"
                         />
                       </FormControl>
@@ -1178,14 +1178,14 @@ export default function TowingAssistance() {
                   name="lastKnownLongitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">{t('towingAssistance.lastKnownLongitude', 'Last Known Longitude')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towingAssistance.lastKnownLongitude', 'Last Known Longitude')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.0000001"
                           placeholder={t('towingAssistance.longitudePlaceholder', 'e.g., -74.0060')}
-                          className="bg-white dark:bg-salis-gray-dark border-salis-gray-light dark:border-salis-gray text-salis-black dark:text-white"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-last-longitude"
                         />
                       </FormControl>
@@ -1208,7 +1208,7 @@ export default function TowingAssistance() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel className="text-salis-black dark:text-white">
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">
                         {t('towingAssistance.gpsEnabled', 'GPS Enabled')}
                       </FormLabel>
                     </div>
@@ -1229,7 +1229,7 @@ export default function TowingAssistance() {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel className="text-salis-black dark:text-white">
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">
                         {t('towingAssistance.activeTruck', 'Active Truck')}
                       </FormLabel>
                     </div>
@@ -1242,13 +1242,13 @@ export default function TowingAssistance() {
                   type="button"
                   variant="outline"
                   onClick={() => setIsTruckDialogOpen(false)}
-                  className="border-salis-gray-light dark:border-salis-gray"
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                 >
                   {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   disabled={truckMutation.isPending}
                   data-testid="button-save-truck"
                 >

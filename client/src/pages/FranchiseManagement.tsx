@@ -323,48 +323,48 @@ export default function FranchiseManagement() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseGroups', 'Franchise Groups')}</h2>
-            <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} data-testid="button-add-group">
+            <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-group">
               <Plus className="h-4 w-4 mr-2" />
               {t('franchise.addFranchiseGroup', 'Add Franchise Group')}
             </Button>
           </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border dark:border-border">
-                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.name', 'Name')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.headquarters', 'Headquarters')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground text-right">{t('common.actions', 'Actions')}</TableHead>
+                  <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.name', 'Name')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.headquarters', 'Headquarters')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {groupsLoading ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">{t('common.loading', 'Loading...')}</TableCell>
+                      <TableCell colSpan={4} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                     </TableRow>
                   ) : franchiseGroups.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground dark:text-muted-foreground">{t('franchise.noFranchiseGroupsFound', 'No franchise groups found')}</TableCell>
+                      <TableCell colSpan={4} className="text-center text-[#64748B]">{t('franchise.noFranchiseGroupsFound', 'No franchise groups found')}</TableCell>
                     </TableRow>
                   ) : (
                     franchiseGroups.map((group) => (
-                      <TableRow key={group.id} className="border-border dark:border-border" data-testid={`row-group-${group.id}`}>
-                        <TableCell className="text-foreground dark:text-foreground">
+                      <TableRow key={group.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-group-${group.id}`}>
+                        <TableCell className="text-[#0B1F3B] dark:text-white">
                           <div>
                             <div className="font-medium">{group.name}</div>
                             {group.description && (
-                              <div className="text-sm text-muted-foreground dark:text-muted-foreground">{group.description}</div>
+                              <div className="text-sm text-[#64748B]">{group.description}</div>
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-foreground dark:text-foreground">
+                        <TableCell className="text-[#0B1F3B] dark:text-white">
                           {group.headquarters ? (
                             <div className="text-sm">{group.headquarters}</div>
                           ) : (
-                            <div className="text-sm text-muted-foreground dark:text-muted-foreground">-</div>
+                            <div className="text-sm text-[#64748B]">-</div>
                           )}
                         </TableCell>
                         <TableCell>
@@ -400,46 +400,46 @@ export default function FranchiseManagement() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseContracts', 'Franchise Contracts')}</h2>
-            <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} data-testid="button-add-contract">
+            <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-contract">
               <Plus className="h-4 w-4 mr-2" />
               {t('franchise.addContract', 'Add Contract')}
             </Button>
           </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border dark:border-border">
-                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.contractNumber', 'Contract #')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.period', 'Period')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">{t('franchise.fees', 'Fees')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-foreground dark:text-foreground text-right">{t('common.actions', 'Actions')}</TableHead>
+                  <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.contractNumber', 'Contract #')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.period', 'Period')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.fees', 'Fees')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {contractsLoading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">{t('common.loading', 'Loading...')}</TableCell>
+                      <TableCell colSpan={5} className="text-center text-[#64748B]">{t('common.loading', 'Loading...')}</TableCell>
                     </TableRow>
                   ) : franchiseContracts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground dark:text-muted-foreground">{t('franchise.noFranchiseContractsFound', 'No franchise contracts found')}</TableCell>
+                      <TableCell colSpan={5} className="text-center text-[#64748B]">{t('franchise.noFranchiseContractsFound', 'No franchise contracts found')}</TableCell>
                     </TableRow>
                   ) : (
                     franchiseContracts.map((contract) => (
-                      <TableRow key={contract.id} className="border-border dark:border-border" data-testid={`row-contract-${contract.id}`}>
-                        <TableCell className="text-foreground dark:text-foreground font-medium">{contract.contractNumber}</TableCell>
-                        <TableCell className="text-foreground dark:text-foreground">
+                      <TableRow key={contract.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-contract-${contract.id}`}>
+                        <TableCell className="text-[#0B1F3B] dark:text-white font-medium">{contract.contractNumber}</TableCell>
+                        <TableCell className="text-[#0B1F3B] dark:text-white">
                           <div className="text-sm">
                             {new Date(contract.startDate).toLocaleDateString()} - {contract.endDate ? new Date(contract.endDate).toLocaleDateString() : t('franchise.ongoing', 'Ongoing')}
                           </div>
                         </TableCell>
-                        <TableCell className="text-foreground dark:text-foreground">
+                        <TableCell className="text-[#0B1F3B] dark:text-white">
                           <div className="text-sm">
                             {contract.royaltyPercentage && <div>{t('franchise.royalty', 'Royalty')}: {contract.royaltyPercentage}%</div>}
-                            {contract.marketingFeePercentage && <div className="text-muted-foreground dark:text-muted-foreground">{t('franchise.marketing', 'Marketing')}: {contract.marketingFeePercentage}%</div>}
+                            {contract.marketingFeePercentage && <div className="text-[#64748B]">{t('franchise.marketing', 'Marketing')}: {contract.marketingFeePercentage}%</div>}
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(contract.status || "active")}</TableCell>
@@ -466,19 +466,19 @@ export default function FranchiseManagement() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseKpis', 'Franchise KPIs')}</h2>
-            <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} data-testid="button-add-kpi">
+            <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-kpi">
               <Plus className="h-4 w-4 mr-2" />
               {t('franchise.addKpiReport', 'Add KPI Report')}
             </Button>
           </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle className="text-foreground dark:text-foreground">{t('franchise.performanceMetrics', 'Performance Metrics')}</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-muted-foreground">{t('franchise.trackFranchisePerformance', 'Track franchise performance across key metrics')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('franchise.performanceMetrics', 'Performance Metrics')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('franchise.trackFranchisePerformance', 'Track franchise performance across key metrics')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('franchise.selectBranchToViewKpi', 'Select a branch to view KPI reports')}</p>
+              <p className="text-sm text-[#64748B]">{t('franchise.selectBranchToViewKpi', 'Select a branch to view KPI reports')}</p>
             </CardContent>
           </Card>
         </div>
@@ -492,16 +492,16 @@ export default function FranchiseManagement() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.revenueSharingRules', 'Revenue Sharing Rules')}</h2>
-            <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} data-testid="button-add-rule">
+            <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-rule">
               <Plus className="h-4 w-4 mr-2" />
               {t('franchise.addRevenueRule', 'Add Revenue Rule')}
             </Button>
           </div>
 
-          <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle className="text-foreground dark:text-foreground">{t('franchise.revenueDistribution', 'Revenue Distribution')}</CardTitle>
-              <CardDescription className="text-muted-foreground dark:text-muted-foreground">{t('franchise.manageRevenueSharingAgreements', 'Manage revenue sharing agreements between franchisor and franchisees')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('franchise.revenueDistribution', 'Revenue Distribution')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('franchise.manageRevenueSharingAgreements', 'Manage revenue sharing agreements between franchisor and franchisees')}</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground dark:text-muted-foreground">{t('franchise.noRevenueSharingRulesConfigured', 'No revenue sharing rules configured')}</p>

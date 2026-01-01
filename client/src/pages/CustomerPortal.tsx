@@ -226,23 +226,23 @@ export default function CustomerPortal() {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-salis-black to-gray-900 p-4">
-        <Card className="w-full max-w-md bg-white dark:bg-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] p-4">
+        <Card className="w-full max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="space-y-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-salis-black to-salis-50-black rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
                 <Car className="w-8 h-8 text-white" />
               </div>
             </div>
             <div className="text-center">
-              <CardTitle className="text-2xl font-montserrat font-semibold">{t('customers.portal.title', 'Customer Portal')}</CardTitle>
+              <CardTitle className="text-2xl font-montserrat font-semibold text-[#0B1F3B] dark:text-white">{t('customers.portal.title', 'Customer Portal')}</CardTitle>
               <CardDescription>{t('customers.portal.description', 'Access your service history and appointments')}</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">{t('auth.email', 'Email')}</Label>
+                <Label htmlFor="email" className="text-[#0B1F3B] dark:text-white">{t('auth.email', 'Email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -250,11 +250,12 @@ export default function CustomerPortal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-email"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">{t('auth.password', 'Password')}</Label>
+                <Label htmlFor="password" className="text-[#0B1F3B] dark:text-white">{t('auth.password', 'Password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -262,12 +263,13 @@ export default function CustomerPortal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-password"
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full bg-salis-black hover:bg-salis-gray text-white"
+                className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                 disabled={isLoading}
                 data-testid="button-login"
               >
@@ -281,26 +283,26 @@ export default function CustomerPortal() {
   }
 
   const appointmentsTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.yourAppointments', 'Your Appointments')}</CardTitle>
-        <CardDescription>{t('customers.portal.manageAppointments', 'View and manage your service appointments')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.yourAppointments', 'Your Appointments')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.manageAppointments', 'View and manage your service appointments')}</CardDescription>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noAppointments', 'No appointments found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noAppointments', 'No appointments found')}</p>
         ) : (
           <div className="space-y-4">
             {appointments.map((appt: any) => (
               <div 
                 key={appt.id} 
-                className="border rounded-lg p-4 space-y-2"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-2 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`appointment-${appt.id}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">{appt.serviceType || t('customers.portal.serviceAppointment', 'Service Appointment')}</p>
-                    <p className="text-sm text-salis-gray">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{appt.serviceType || t('customers.portal.serviceAppointment', 'Service Appointment')}</p>
+                    <p className="text-sm text-[#64748B]">
                       {new Date(appt.appointmentDate).toLocaleDateString()} at{' '}
                       {appt.appointmentTime}
                     </p>
@@ -308,7 +310,7 @@ export default function CustomerPortal() {
                   {getStatusBadge(appt.status)}
                 </div>
                 {appt.notes && (
-                  <p className="text-sm text-salis-gray">{appt.notes}</p>
+                  <p className="text-sm text-[#64748B]">{appt.notes}</p>
                 )}
               </div>
             ))}
@@ -319,34 +321,34 @@ export default function CustomerPortal() {
   );
 
   const vehiclesTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.yourVehicles', 'Your Vehicles')}</CardTitle>
-        <CardDescription>{t('customers.portal.manageVehicles', 'Manage your registered vehicles')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.yourVehicles', 'Your Vehicles')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.manageVehicles', 'Manage your registered vehicles')}</CardDescription>
       </CardHeader>
       <CardContent>
         {vehicles.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noVehicles', 'No vehicles found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noVehicles', 'No vehicles found')}</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {vehicles.map((vehicle: any) => (
               <div 
                 key={vehicle.id} 
-                className="border rounded-lg p-4 space-y-2"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-2 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`vehicle-${vehicle.id}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </p>
-                    <p className="text-sm text-salis-gray">{vehicle.licensePlate}</p>
-                    <p className="text-xs text-salis-gray">VIN: {vehicle.vin}</p>
+                    <p className="text-sm text-[#64748B]">{vehicle.licensePlate}</p>
+                    <p className="text-xs text-[#64748B]">VIN: {vehicle.vin}</p>
                   </div>
-                  <Car className="w-8 h-8 text-salis-gray" />
+                  <Car className="w-8 h-8 text-[#64748B]" />
                 </div>
                 {vehicle.currentMileage && (
-                  <p className="text-sm text-salis-gray">
+                  <p className="text-sm text-[#64748B]">
                     {vehicle.currentMileage.toLocaleString()} miles
                   </p>
                 )}
@@ -359,40 +361,40 @@ export default function CustomerPortal() {
   );
 
   const historyTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.serviceHistory', 'Service History')}</CardTitle>
-        <CardDescription>{t('customers.portal.viewServiceRecords', 'View your complete service records')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.serviceHistory', 'Service History')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.viewServiceRecords', 'View your complete service records')}</CardDescription>
       </CardHeader>
       <CardContent>
         {serviceHistory.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noServiceHistory', 'No service history found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noServiceHistory', 'No service history found')}</p>
         ) : (
           <div className="space-y-4">
             {serviceHistory.map((record: any) => (
               <div 
                 key={record.history.id} 
-                className="border rounded-lg p-4 space-y-2"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-2 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`history-${record.history.id}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">{record.history.serviceType}</p>
-                    <p className="text-sm text-salis-gray">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{record.history.serviceType}</p>
+                    <p className="text-sm text-[#64748B]">
                       {new Date(record.history.serviceDate).toLocaleDateString()}
                     </p>
                     {record.vehicle && (
-                      <p className="text-sm text-salis-gray">
+                      <p className="text-sm text-[#64748B]">
                         {record.vehicle.make} {record.vehicle.model}
                       </p>
                     )}
                   </div>
                   {record.history.cost && (
-                    <p className="font-semibold">${record.history.cost}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${record.history.cost}</p>
                   )}
                 </div>
                 {record.history.description && (
-                  <p className="text-sm text-salis-gray">{record.history.description}</p>
+                  <p className="text-sm text-[#64748B]">{record.history.description}</p>
                 )}
               </div>
             ))}
@@ -403,50 +405,50 @@ export default function CustomerPortal() {
   );
 
   const estimatesTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.estimates', 'Estimates')}</CardTitle>
-        <CardDescription>{t('customers.portal.reviewEstimates', 'Review and approve service estimates')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.estimates', 'Estimates')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.reviewEstimates', 'Review and approve service estimates')}</CardDescription>
       </CardHeader>
       <CardContent>
         {estimates.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noEstimates', 'No estimates found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noEstimates', 'No estimates found')}</p>
         ) : (
           <div className="space-y-4">
             {estimates.map((est: any) => (
               <div 
                 key={est.estimate.id} 
-                className="border rounded-lg p-4 space-y-3"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-3 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`estimate-${est.estimate.id}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">Estimate #{est.estimate.estimateNumber}</p>
-                    <p className="text-sm text-salis-gray">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">Estimate #{est.estimate.estimateNumber}</p>
+                    <p className="text-sm text-[#64748B]">
                       {new Date(est.estimate.createdAt).toLocaleDateString()}
                     </p>
                     {est.vehicle && (
-                      <p className="text-sm text-salis-gray">
+                      <p className="text-sm text-[#64748B]">
                         {est.vehicle.make} {est.vehicle.model}
                       </p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-salis-black dark:text-white">
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                       ${est.estimate.totalAmount}
                     </p>
                     {getStatusBadge(est.estimate.status)}
                   </div>
                 </div>
                 {est.estimate.notes && (
-                  <p className="text-sm text-salis-gray">{est.estimate.notes}</p>
+                  <p className="text-sm text-[#64748B]">{est.estimate.notes}</p>
                 )}
                 {est.estimate.status === 'pending' && (
                   <>
                     <Separator />
                     <Button
                       onClick={() => approveEstimate(est.estimate.id)}
-                      className="w-full bg-salis-black hover:bg-salis-gray text-white"
+                      className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                       data-testid={`button-approve-${est.estimate.id}`}
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -463,32 +465,32 @@ export default function CustomerPortal() {
   );
 
   const invoicesTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.invoices', 'Invoices')}</CardTitle>
-        <CardDescription>{t('customers.portal.viewInvoices', 'View your service invoices')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.invoices', 'Invoices')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.viewInvoices', 'View your service invoices')}</CardDescription>
       </CardHeader>
       <CardContent>
         {invoices.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noInvoices', 'No invoices found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noInvoices', 'No invoices found')}</p>
         ) : (
           <div className="space-y-4">
             {invoices.map((inv: any) => (
               <div 
                 key={inv.id} 
-                className="border rounded-lg p-4 space-y-2"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-2 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`invoice-${inv.id}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">Invoice #{inv.invoiceNumber}</p>
-                    <p className="text-sm text-salis-gray">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">Invoice #{inv.invoiceNumber}</p>
+                    <p className="text-sm text-[#64748B]">
                       {new Date(inv.invoiceDate).toLocaleDateString()}
                     </p>
-                    <p className="text-xs text-salis-gray">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-[#64748B]">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold text-salis-black dark:text-white">
+                    <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">
                       ${inv.totalAmount}
                     </p>
                     {getStatusBadge(inv.status)}
@@ -503,37 +505,37 @@ export default function CustomerPortal() {
   );
 
   const paymentsTab = (
-    <Card>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('customers.portal.paymentHistory', 'Payment History')}</CardTitle>
-        <CardDescription>{t('customers.portal.viewPayments', 'View all your payment transactions')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('customers.portal.paymentHistory', 'Payment History')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('customers.portal.viewPayments', 'View all your payment transactions')}</CardDescription>
       </CardHeader>
       <CardContent>
         {payments.length === 0 ? (
-          <p className="text-center text-salis-gray py-8">{t('customers.portal.noPayments', 'No payments found')}</p>
+          <p className="text-center text-[#64748B] py-8">{t('customers.portal.noPayments', 'No payments found')}</p>
         ) : (
           <div className="space-y-4">
             {payments.map((payment: any) => (
               <div 
                 key={payment.payment.id} 
-                className="border rounded-lg p-4 space-y-2"
+                className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 space-y-2 bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`payment-${payment.payment.id}`}
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       Payment - {payment.payment.paymentMethod}
                     </p>
-                    <p className="text-sm text-salis-gray">
+                    <p className="text-sm text-[#64748B]">
                       {new Date(payment.payment.paymentDate).toLocaleDateString()}
                     </p>
                     {payment.invoice && (
-                      <p className="text-xs text-salis-gray">
+                      <p className="text-xs text-[#64748B]">
                         Invoice: {payment.invoice.invoiceNumber}
                       </p>
                     )}
                   </div>
-                  <p className="text-xl font-bold text-green-600">
+                  <p className="text-xl font-bold text-green-500">
                     ${payment.payment.amount}
                   </p>
                 </div>

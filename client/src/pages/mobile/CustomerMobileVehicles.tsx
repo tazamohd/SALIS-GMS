@@ -12,43 +12,41 @@ export default function CustomerMobileVehicles() {
 
   if (isLoading) {
     return (
-      <div className="p-4 flex justify-center items-center h-64">
+      <div className="p-4 flex justify-center items-center h-64 bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500 dark:text-gray-400">Loading vehicles...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto mb-4"></div>
+          <p className="text-[#64748B]">Loading vehicles...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Header */}
+    <div className="p-4 space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Vehicles</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{vehicles?.data?.length || 0} vehicle(s)</p>
+          <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">My Vehicles</h2>
+          <p className="text-sm text-[#64748B]">{vehicles?.data?.length || 0} vehicle(s)</p>
         </div>
         <Link href="/vehicles">
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700" data-testid="button-add-vehicle">
+          <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6]" data-testid="button-add-vehicle">
             <Plus className="h-4 w-4 mr-1" />
             Add
           </Button>
         </Link>
       </div>
 
-      {/* Vehicles List */}
       <div className="space-y-3">
         {vehicles?.data?.map((vehicle) => (
           <Card 
             key={vehicle.id} 
-            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid={`vehicle-card-${vehicle.id}`}
           >
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Car className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-gray-900 dark:text-white">
+                <Car className="h-5 w-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
+                <span className="text-[#0B1F3B] dark:text-white">
                   {vehicle.year} {vehicle.make} {vehicle.model}
                 </span>
               </CardTitle>
@@ -56,22 +54,22 @@ export default function CustomerMobileVehicles() {
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">License Plate</p>
-                  <p className="font-semibold text-gray-900 dark:text-white">{vehicle.licensePlate}</p>
+                  <p className="text-[#64748B] text-xs">License Plate</p>
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">{vehicle.licensePlate}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">VIN</p>
-                  <p className="font-mono text-xs text-gray-900 dark:text-white">{vehicle.vin?.substring(0, 8)}...</p>
+                  <p className="text-[#64748B] text-xs">VIN</p>
+                  <p className="font-mono text-xs text-[#0B1F3B] dark:text-white">{vehicle.vin?.substring(0, 8)}...</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">Mileage</p>
-                  <p className="font-semibold text-gray-900 dark:text-white">
+                  <p className="text-[#64748B] text-xs">Mileage</p>
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">
                     {vehicle.currentMileage?.toLocaleString() || "N/A"} {vehicle.mileageUnit}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">Color</p>
-                  <p className="font-semibold text-gray-900 dark:text-white">{vehicle.color || "N/A"}</p>
+                  <p className="text-[#64748B] text-xs">Color</p>
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">{vehicle.color || "N/A"}</p>
                 </div>
               </div>
 
@@ -80,7 +78,7 @@ export default function CustomerMobileVehicles() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full"
+                    className="w-full border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`button-book-${vehicle.id}`}
                   >
                     <Calendar className="h-4 w-4 mr-1" />
@@ -91,7 +89,7 @@ export default function CustomerMobileVehicles() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full"
+                    className="w-full border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`button-history-${vehicle.id}`}
                   >
                     <Wrench className="h-4 w-4 mr-1" />
@@ -104,15 +102,15 @@ export default function CustomerMobileVehicles() {
         ))}
 
         {(!vehicles?.data || vehicles.data.length === 0) && (
-          <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
-              <Car className="h-16 w-16 mx-auto mb-4 text-gray-300 dark:text-gray-700" />
-              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">No Vehicles Yet</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <Car className="h-16 w-16 mx-auto mb-4 text-[#E2E8F0] dark:text-[#232A36]" />
+              <h3 className="text-lg font-semibold mb-2 text-[#0B1F3B] dark:text-white">No Vehicles Yet</h3>
+              <p className="text-sm text-[#64748B] mb-4">
                 Add your first vehicle to start tracking service history
               </p>
               <Link href="/vehicles">
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6]">
                   <Plus className="h-4 w-4 mr-1" />
                   Add Vehicle
                 </Button>

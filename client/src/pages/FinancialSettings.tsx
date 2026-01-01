@@ -241,11 +241,11 @@ export default function FinancialSettings() {
   );
 
   const taxesTabContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-gray-900 dark:text-white">{t('financial.taxConfigurations', 'Tax Configurations')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('financial.taxConfigurationsDesc', 'Configure automatic tax calculations for your garage')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('financial.taxConfigurations', 'Tax Configurations')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('financial.taxConfigurationsDesc', 'Configure automatic tax calculations for your garage')}</CardDescription>
         </div>
         <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
           <DialogTrigger asChild>
@@ -328,20 +328,20 @@ export default function FinancialSettings() {
       </CardHeader>
       <CardContent>
         {taxLoading ? (
-          <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
+          <div className="text-center py-8 text-[#64748B]">{t('common.loading', 'Loading...')}</div>
         ) : taxConfigs.length === 0 ? (
-          <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-taxes">
+          <div className="text-center py-8 text-[#64748B]" data-testid="text-no-taxes">
             {t('financial.noTaxConfigurations', 'No tax configurations found. Add one to get started.')}
           </div>
         ) : (
           <Table>
-            <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-              <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
-                <TableHead className="text-gray-900 dark:text-white">{t('financial.taxName', 'Tax Name')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('financial.rate', 'Rate')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.category', 'Category')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+            <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('financial.taxName', 'Tax Name')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('financial.rate', 'Rate')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -350,12 +350,12 @@ export default function FinancialSettings() {
                   <TableCell className="font-medium" data-testid={`text-tax-name-${tax.id}`}>{tax.taxName}</TableCell>
                   <TableCell data-testid={`text-tax-rate-${tax.id}`}>{tax.taxRate}%</TableCell>
                   <TableCell data-testid={`text-tax-category-${tax.id}`}>{tax.category || t('common.all', 'All')}</TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">
-                    <Badge variant={tax.isActive ? "default" : "secondary"} data-testid={`badge-tax-status-${tax.id}`}>
+                  <TableCell>
+                    <Badge variant={tax.isActive ? "default" : "secondary"} className={tax.isActive ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""} data-testid={`badge-tax-status-${tax.id}`}>
                       {tax.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">
+                  <TableCell>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm" onClick={() => handleEditTax(tax)} data-testid={`button-edit-tax-${tax.id}`}>
                         <Edit className="h-4 w-4" />
@@ -375,11 +375,11 @@ export default function FinancialSettings() {
   );
 
   const discountsTabContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+    <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="text-gray-900 dark:text-white">{t('financial.discountsPromotions', 'Discounts & Promotions')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('financial.discountsPromotionsDesc', 'Create and manage discount codes and promotional campaigns')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('financial.discountsPromotions', 'Discounts & Promotions')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('financial.discountsPromotionsDesc', 'Create and manage discount codes and promotional campaigns')}</CardDescription>
         </div>
         <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
           <DialogTrigger asChild>
@@ -615,49 +615,49 @@ export default function FinancialSettings() {
           </CardHeader>
           <CardContent>
             {discountsLoading ? (
-              <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
+              <div className="text-center py-8 text-[#64748B]">{t('common.loading', 'Loading...')}</div>
             ) : discounts.length === 0 ? (
-              <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-discounts">
+              <div className="text-center py-8 text-[#64748B]" data-testid="text-no-discounts">
                 {t('financial.noDiscounts', 'No discounts found. Create one to get started.')}
               </div>
             ) : (
               <Table>
-                <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-                  <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
-                    <TableHead className="text-gray-900 dark:text-white">{t('financial.code', 'Code')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('common.name', 'Name')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('common.type', 'Type')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('financial.value', 'Value')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('financial.validPeriod', 'Valid Period')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+                <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('financial.code', 'Code')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.name', 'Name')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('financial.value', 'Value')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('financial.validPeriod', 'Valid Period')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {discounts.map((discount) => (
                     <TableRow key={discount.id} data-testid={`row-discount-${discount.id}`}>
-                      <TableCell className="font-mono font-medium" data-testid={`text-discount-code-${discount.id}`}>
+                      <TableCell className="font-mono font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-discount-code-${discount.id}`}>
                         {discount.code}
                       </TableCell>
-                      <TableCell data-testid={`text-discount-name-${discount.id}`}>{discount.name}</TableCell>
-                      <TableCell className="text-gray-900 dark:text-white">
-                        <Badge variant="outline" data-testid={`badge-discount-type-${discount.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-discount-name-${discount.id}`}>{discount.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] dark:border-[#0BB3FF] dark:text-[#0BB3FF]" data-testid={`badge-discount-type-${discount.id}`}>
                           {discount.discountType === "percentage" ? <Percent className="h-3 w-3 mr-1" /> : <DollarSign className="h-3 w-3 mr-1" />}
                           {discount.discountType === "percentage" ? t('financial.percentage', 'Percentage') : t('financial.fixedAmount', 'Fixed Amount')}
                         </Badge>
                       </TableCell>
-                      <TableCell data-testid={`text-discount-value-${discount.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-discount-value-${discount.id}`}>
                         {discount.discountType === "percentage" ? `${discount.discountValue}%` : `$${discount.discountValue}`}
                       </TableCell>
-                      <TableCell className="text-sm" data-testid={`text-discount-period-${discount.id}`}>
+                      <TableCell className="text-sm text-[#64748B]" data-testid={`text-discount-period-${discount.id}`}>
                         {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}
                       </TableCell>
-                      <TableCell className="text-gray-900 dark:text-white">
-                        <Badge variant={discount.isActive ? "default" : "secondary"} data-testid={`badge-discount-status-${discount.id}`}>
+                      <TableCell>
+                        <Badge variant={discount.isActive ? "default" : "secondary"} className={discount.isActive ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""} data-testid={`badge-discount-status-${discount.id}`}>
                           {discount.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-900 dark:text-white">
+                      <TableCell>
                         <div className="flex gap-2">
                           <Button variant="ghost" size="sm" onClick={() => handleEditDiscount(discount)} data-testid={`button-edit-discount-${discount.id}`}>
                             <Edit className="h-4 w-4" />

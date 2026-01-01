@@ -74,29 +74,29 @@ export default function GlobalizationLayer() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.languageLocales', 'Language Locales')}</h2>
-        <Button onClick={() => { localeForm.reset(); setShowLocaleDialog(true); }} data-testid="button-add-locale">
+        <Button onClick={() => { localeForm.reset(); setShowLocaleDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-locale">
           <Plus className="h-4 w-4 mr-2" />
           {t('globalization.addLocale', 'Add Locale')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('globalization.code', 'Code')}</TableHead>
-                <TableHead>{t('globalization.name', 'Name')}</TableHead>
-                <TableHead>{t('globalization.englishName', 'English Name')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.code', 'Code')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.name', 'Name')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.englishName', 'English Name')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {locales.map((locale) => (
-                <TableRow key={locale.id}>
-                  <TableCell className="font-mono">{locale.code}</TableCell>
-                  <TableCell>{locale.name}</TableCell>
-                  <TableCell>{locale.englishName || t('common.notAvailable', 'N/A')}</TableCell>
+                <TableRow key={locale.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono text-[#0B1F3B] dark:text-white">{locale.code}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{locale.name}</TableCell>
+                  <TableCell className="text-[#64748B]">{locale.englishName || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${locale.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
                       {locale.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
@@ -115,28 +115,28 @@ export default function GlobalizationLayer() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.translationResources', 'Translation Resources')}</h2>
-        <Button onClick={() => { translationForm.reset(); setShowTranslationDialog(true); }} data-testid="button-add-translation">
+        <Button onClick={() => { translationForm.reset(); setShowTranslationDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-translation">
           <Plus className="h-4 w-4 mr-2" />
           {t('globalization.addTranslation', 'Add Translation')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('globalization.locale', 'Locale')}</TableHead>
-                <TableHead>{t('globalization.key', 'Key')}</TableHead>
-                <TableHead>{t('globalization.value', 'Value')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.locale', 'Locale')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.key', 'Key')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.value', 'Value')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {translations.map((trans) => (
-                <TableRow key={trans.id}>
-                  <TableCell className="font-mono">{locales.find(l => l.id === trans.localeId)?.code || t('common.notAvailable', 'N/A')}</TableCell>
-                  <TableCell className="font-mono text-sm">{trans.translationKey}</TableCell>
-                  <TableCell>{trans.translationValue}</TableCell>
+                <TableRow key={trans.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono text-[#0B1F3B] dark:text-white">{locales.find(l => l.id === trans.localeId)?.code || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="font-mono text-sm text-[#64748B]">{trans.translationKey}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{trans.translationValue}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -150,29 +150,29 @@ export default function GlobalizationLayer() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.currencyExchangeRates', 'Currency Exchange Rates')}</h2>
-        <Button onClick={() => { currencyForm.reset(); setShowCurrencyDialog(true); }} data-testid="button-add-currency">
+        <Button onClick={() => { currencyForm.reset(); setShowCurrencyDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-currency">
           <Plus className="h-4 w-4 mr-2" />
           {t('globalization.addRate', 'Add Rate')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.from', 'From')}</TableHead>
-                <TableHead>{t('common.to', 'To')}</TableHead>
-                <TableHead>{t('globalization.rate', 'Rate')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.from', 'From')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.to', 'To')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.rate', 'Rate')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currencies.map((curr) => (
-                <TableRow key={curr.id}>
-                  <TableCell className="font-mono font-semibold">{curr.fromCurrency}</TableCell>
-                  <TableCell className="font-mono font-semibold">{curr.toCurrency}</TableCell>
-                  <TableCell>{parseFloat(curr.rate).toFixed(4)}</TableCell>
+                <TableRow key={curr.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono font-semibold text-[#0B1F3B] dark:text-white">{curr.fromCurrency}</TableCell>
+                  <TableCell className="font-mono font-semibold text-[#0B1F3B] dark:text-white">{curr.toCurrency}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{parseFloat(curr.rate).toFixed(4)}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
                       ✅ {curr.source || t('globalization.manual', 'Manual')}
@@ -191,29 +191,29 @@ export default function GlobalizationLayer() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.taxRegions', 'Tax Regions')}</h2>
-        <Button onClick={() => { taxForm.reset(); setShowTaxDialog(true); }} data-testid="button-add-tax">
+        <Button onClick={() => { taxForm.reset(); setShowTaxDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-tax">
           <Plus className="h-4 w-4 mr-2" />
           {t('globalization.addTaxRegion', 'Add Tax Region')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('globalization.code', 'Code')}</TableHead>
-                <TableHead>{t('globalization.region', 'Region')}</TableHead>
-                <TableHead>{t('globalization.taxRate', 'Tax Rate')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.code', 'Code')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.region', 'Region')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('globalization.taxRate', 'Tax Rate')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {taxRegions.map((tax) => (
-                <TableRow key={tax.id}>
-                  <TableCell className="font-mono">{tax.regionCode}</TableCell>
-                  <TableCell>{tax.regionName}</TableCell>
-                  <TableCell>{parseFloat(tax.taxRate).toFixed(2)}%</TableCell>
+                <TableRow key={tax.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono text-[#0B1F3B] dark:text-white">{tax.regionCode}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{tax.regionName}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{parseFloat(tax.taxRate).toFixed(2)}%</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${tax.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
                       {tax.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}

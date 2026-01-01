@@ -152,56 +152,56 @@ export default function RetainedEarnings() {
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('retainedEarnings.totalRetainedEarnings', 'Total Retained Earnings')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-total-retained">SAR 1,120,000</p>
+                    <p className="text-sm text-[#64748B]">{t('retainedEarnings.totalRetainedEarnings', 'Total Retained Earnings')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-retained">SAR 1,120,000</p>
                   </div>
-                  <PiggyBank className="h-8 w-8 text-blue-600" />
+                  <PiggyBank className="h-8 w-8 text-[#0A5ED7]" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('retainedEarnings.totalReserves', 'Total Reserves')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-total-reserves">SAR 375,000</p>
+                    <p className="text-sm text-[#64748B]">{t('retainedEarnings.totalReserves', 'Total Reserves')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-reserves">SAR 375,000</p>
                   </div>
-                  <Shield className="h-8 w-8 text-green-600" />
+                  <Shield className="h-8 w-8 text-[#0A5ED7]" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('retainedEarnings.currentYearProfit', 'Current Year Profit')}</p>
-                    <p className="text-2xl font-bold font-montserrat text-green-600" data-testid="text-current-profit">SAR 700,000</p>
+                    <p className="text-sm text-[#64748B]">{t('retainedEarnings.currentYearProfit', 'Current Year Profit')}</p>
+                    <p className="text-2xl font-bold text-[#0A5ED7]" data-testid="text-current-profit">SAR 700,000</p>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-green-600" />
+                  <TrendingUp className="h-8 w-8 text-[#0A5ED7]" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('retainedEarnings.distributedYTD', 'Distributed YTD')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-distributed-ytd">SAR 210,000</p>
+                    <p className="text-sm text-[#64748B]">{t('retainedEarnings.distributedYTD', 'Distributed YTD')}</p>
+                    <p className="text-2xl font-bold text-[#F97316]" data-testid="text-distributed-ytd">SAR 210,000</p>
                   </div>
-                  <DollarSign className="h-8 w-8 text-amber-600" />
+                  <DollarSign className="h-8 w-8 text-[#F97316]" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Shield className="h-5 w-5 text-[#0A5ED7]" />
                 {t('retainedEarnings.reserveStatus', 'Reserve Status')}
               </CardTitle>
             </CardHeader>
@@ -211,21 +211,21 @@ export default function RetainedEarnings() {
                   <div key={reserve.id} className="space-y-2" data-testid={`reserve-progress-${reserve.id}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{reserve.type}</span>
+                        <span className="font-medium text-[#0B1F3B] dark:text-white">{reserve.type}</span>
                         {reserve.requiredPercent > 0 && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                             {reserve.requiredPercent}% {t('retainedEarnings.required', 'Required')}
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[#64748B]">
                         SAR {reserve.currentBalance.toLocaleString()} / SAR {reserve.targetBalance.toLocaleString()}
                       </div>
                     </div>
                     <Progress value={(reserve.currentBalance / reserve.targetBalance) * 100} className="h-2" />
-                    <div className="flex justify-between text-xs text-gray-400">
+                    <div className="flex justify-between text-xs text-[#64748B]">
                       <span>{Math.round((reserve.currentBalance / reserve.targetBalance) * 100)}% {t('retainedEarnings.complete', 'Complete')}</span>
-                      <Badge className={reserve.status === "Active" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}>
+                      <Badge className={reserve.status === "Active" ? "bg-[#0A5ED7] text-white" : "bg-[#0BB3FF] text-white"}>
                         {reserve.status}
                       </Badge>
                     </div>
@@ -243,29 +243,29 @@ export default function RetainedEarnings() {
       icon: BarChart3,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">{t('retainedEarnings.annualProfitLossSummary', 'Annual Profit & Loss Summary')}</h3>
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('retainedEarnings.annualProfitLossSummary', 'Annual Profit & Loss Summary')}</h3>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
-                    <TableHead className="text-right">{t('retainedEarnings.revenue', 'Revenue')}</TableHead>
-                    <TableHead className="text-right">{t('retainedEarnings.expenses', 'Expenses')}</TableHead>
-                    <TableHead className="text-right">{t('retainedEarnings.netProfit', 'Net Profit')}</TableHead>
-                    <TableHead className="text-right">{t('retainedEarnings.retained', 'Retained')}</TableHead>
-                    <TableHead className="text-right">{t('retainedEarnings.distributed', 'Distributed')}</TableHead>
+                  <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#64748B]">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.revenue', 'Revenue')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.expenses', 'Expenses')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.netProfit', 'Net Profit')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.retained', 'Retained')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.distributed', 'Distributed')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {profitLossHistory.map((record) => (
-                    <TableRow key={record.id} data-testid={`row-profit-loss-${record.id}`}>
-                      <TableCell className="font-medium font-montserrat">{record.year}</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {record.revenue.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat text-red-600">SAR {record.expenses.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat text-green-600 font-bold">SAR {record.netProfit.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {record.retained.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {record.distributed.toLocaleString()}</TableCell>
+                    <TableRow key={record.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-profit-loss-${record.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{record.year}</TableCell>
+                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.revenue.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-[#F97316]">SAR {record.expenses.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-[#0A5ED7] font-bold">SAR {record.netProfit.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.retained.toLocaleString()}</TableCell>
+                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.distributed.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -274,25 +274,25 @@ export default function RetainedEarnings() {
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4 text-center">
-                <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                <p className="text-sm text-gray-500">{t('retainedEarnings.threeYearAvgProfit', '3-Year Avg Profit')}</p>
-                <p className="text-xl font-bold font-montserrat" data-testid="text-avg-profit">SAR 533,333</p>
+                <TrendingUp className="h-8 w-8 mx-auto mb-2 text-[#0A5ED7]" />
+                <p className="text-sm text-[#64748B]">{t('retainedEarnings.threeYearAvgProfit', '3-Year Avg Profit')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-profit">SAR 533,333</p>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4 text-center">
-                <Percent className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <p className="text-sm text-gray-500">{t('retainedEarnings.retentionRate', 'Retention Rate')}</p>
-                <p className="text-xl font-bold font-montserrat" data-testid="text-retention-rate">70%</p>
+                <Percent className="h-8 w-8 mx-auto mb-2 text-[#0A5ED7]" />
+                <p className="text-sm text-[#64748B]">{t('retainedEarnings.retentionRate', 'Retention Rate')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-retention-rate">70%</p>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4 text-center">
-                <Target className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <p className="text-sm text-gray-500">{t('retainedEarnings.profitMargin', 'Profit Margin')}</p>
-                <p className="text-xl font-bold font-montserrat" data-testid="text-profit-margin">28%</p>
+                <Target className="h-8 w-8 mx-auto mb-2 text-[#0BB3FF]" />
+                <p className="text-sm text-[#64748B]">{t('retainedEarnings.profitMargin', 'Profit Margin')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-profit-margin">28%</p>
               </CardContent>
             </Card>
           </div>
@@ -306,17 +306,17 @@ export default function RetainedEarnings() {
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{t('retainedEarnings.reserveAllocations', 'Reserve Allocations')}</h3>
+            <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('retainedEarnings.reserveAllocations', 'Reserve Allocations')}</h3>
             <Dialog open={isReserveDialogOpen} onOpenChange={setIsReserveDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-reserve">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-reserve">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('retainedEarnings.allocateToReserve', 'Allocate to Reserve')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <DialogHeader>
-                  <DialogTitle>{t('retainedEarnings.allocateToReserve', 'Allocate to Reserve')}</DialogTitle>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.allocateToReserve', 'Allocate to Reserve')}</DialogTitle>
                 </DialogHeader>
                 <Form {...reserveForm}>
                   <form onSubmit={reserveForm.handleSubmit(onReserveSubmit)} className="space-y-4">
@@ -325,14 +325,14 @@ export default function RetainedEarnings() {
                       name="reserveType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.reserveType', 'Reserve Type')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.reserveType', 'Reserve Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-reserve-type">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-reserve-type">
                                 <SelectValue placeholder={t('retainedEarnings.selectReserveType', 'Select reserve type')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="legal">{t('retainedEarnings.legalReserve', 'Legal Reserve')}</SelectItem>
                               <SelectItem value="general">{t('retainedEarnings.generalReserve', 'General Reserve')}</SelectItem>
                               <SelectItem value="statutory">{t('retainedEarnings.statutoryReserve', 'Statutory Reserve')}</SelectItem>
@@ -350,9 +350,9 @@ export default function RetainedEarnings() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('retainedEarnings.amountSAR', 'Amount (SAR)')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-reserve-amount" />
+                              <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-reserve-amount" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -363,14 +363,14 @@ export default function RetainedEarnings() {
                         name="fiscalYear"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger data-testid="select-fiscal-year">
+                                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-fiscal-year">
                                   <SelectValue placeholder={t('retainedEarnings.selectYear', 'Select year')} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectItem value="2024">2024</SelectItem>
                                 <SelectItem value="2023">2023</SelectItem>
                                 <SelectItem value="2022">2022</SelectItem>
@@ -386,9 +386,9 @@ export default function RetainedEarnings() {
                       name="allocationDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.allocationDate', 'Allocation Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.allocationDate', 'Allocation Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-allocation-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-allocation-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -399,14 +399,14 @@ export default function RetainedEarnings() {
                       name="approvedBy"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.approvedBy', 'Approved By')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.approvedBy', 'Approved By')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-approved-by">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-approved-by">
                                 <SelectValue placeholder={t('retainedEarnings.selectApprover', 'Select approver')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="board">{t('retainedEarnings.boardOfDirectors', 'Board of Directors')}</SelectItem>
                               <SelectItem value="management">{t('retainedEarnings.management', 'Management')}</SelectItem>
                               <SelectItem value="partners">{t('retainedEarnings.partnersMeeting', 'Partners Meeting')}</SelectItem>
@@ -421,15 +421,15 @@ export default function RetainedEarnings() {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.descriptionOptional', 'Description (Optional)')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.descriptionOptional', 'Description (Optional)')}</FormLabel>
                           <FormControl>
-                            <Textarea {...field} data-testid="input-reserve-description" />
+                            <Textarea {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-reserve-description" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" data-testid="button-submit-reserve">
+                    <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-submit-reserve">
                       {t('retainedEarnings.allocateToReserve', 'Allocate to Reserve')}
                     </Button>
                   </form>
@@ -438,28 +438,28 @@ export default function RetainedEarnings() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.date', 'Date')}</TableHead>
-                    <TableHead>{t('retainedEarnings.reserveType', 'Reserve Type')}</TableHead>
-                    <TableHead>{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
-                    <TableHead>{t('retainedEarnings.approvedBy', 'Approved By')}</TableHead>
-                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
+                  <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('retainedEarnings.reserveType', 'Reserve Type')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('retainedEarnings.approvedBy', 'Approved By')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {reserveAllocations.map((allocation) => (
-                    <TableRow key={allocation.id} data-testid={`row-reserve-allocation-${allocation.id}`}>
-                      <TableCell className="font-montserrat">{allocation.date}</TableCell>
+                    <TableRow key={allocation.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-reserve-allocation-${allocation.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{allocation.date}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{allocation.type}</Badge>
+                        <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{allocation.type}</Badge>
                       </TableCell>
-                      <TableCell className="font-montserrat">{allocation.year}</TableCell>
-                      <TableCell>{allocation.approvedBy}</TableCell>
-                      <TableCell className="text-right font-montserrat text-blue-600">
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{allocation.year}</TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{allocation.approvedBy}</TableCell>
+                      <TableCell className="text-right text-[#0A5ED7]">
                         SAR {allocation.amount.toLocaleString()}
                       </TableCell>
                     </TableRow>
@@ -478,17 +478,17 @@ export default function RetainedEarnings() {
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{t('retainedEarnings.profitDistributions', 'Profit Distributions')}</h3>
+            <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('retainedEarnings.profitDistributions', 'Profit Distributions')}</h3>
             <Dialog open={isDistributionDialogOpen} onOpenChange={setIsDistributionDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-distribution">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-distribution">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('retainedEarnings.newDistribution', 'New Distribution')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <DialogHeader>
-                  <DialogTitle>{t('retainedEarnings.newProfitDistribution', 'New Profit Distribution')}</DialogTitle>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.newProfitDistribution', 'New Profit Distribution')}</DialogTitle>
                 </DialogHeader>
                 <Form {...distributionForm}>
                   <form onSubmit={distributionForm.handleSubmit(onDistributionSubmit)} className="space-y-4">
@@ -497,68 +497,65 @@ export default function RetainedEarnings() {
                       name="distributionType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.distributionType', 'Distribution Type')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.distributionType', 'Distribution Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-distribution-type">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-distribution-type">
                                 <SelectValue placeholder={t('retainedEarnings.selectType', 'Select type')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
-                              <SelectItem value="dividend">{t('retainedEarnings.partnerDividend', 'Partner Dividend')}</SelectItem>
-                              <SelectItem value="bonus">{t('retainedEarnings.staffBonus', 'Staff Bonus')}</SelectItem>
-                              <SelectItem value="interim">{t('retainedEarnings.interimDividend', 'Interim Dividend')}</SelectItem>
-                              <SelectItem value="special">{t('retainedEarnings.specialDistribution', 'Special Distribution')}</SelectItem>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                              <SelectItem value="dividend">{t('retainedEarnings.dividend', 'Dividend')}</SelectItem>
+                              <SelectItem value="bonus">{t('retainedEarnings.bonus', 'Staff Bonus')}</SelectItem>
+                              <SelectItem value="withdrawal">{t('retainedEarnings.partnerWithdrawal', 'Partner Withdrawal')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={distributionForm.control}
-                        name="totalAmount"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('retainedEarnings.totalAmountSAR', 'Total Amount (SAR)')}</FormLabel>
+                    <FormField
+                      control={distributionForm.control}
+                      name="totalAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.totalAmountSAR', 'Total Amount (SAR)')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-distribution-amount" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={distributionForm.control}
+                      name="fiscalYear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-distribution-amount" />
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-dist-fiscal-year">
+                                <SelectValue placeholder={t('retainedEarnings.selectYear', 'Select year')} />
+                              </SelectTrigger>
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={distributionForm.control}
-                        name="fiscalYear"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger data-testid="select-dist-fiscal-year">
-                                  <SelectValue placeholder={t('retainedEarnings.selectYear', 'Select year')} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="2024">2024</SelectItem>
-                                <SelectItem value="2023">2023</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                              <SelectItem value="2024">2024</SelectItem>
+                              <SelectItem value="2023">2023</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                       control={distributionForm.control}
                       name="distributionDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.distributionDate', 'Distribution Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.distributionDate', 'Distribution Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-distribution-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-distribution-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -569,15 +566,15 @@ export default function RetainedEarnings() {
                       name="notes"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('retainedEarnings.notesOptional', 'Notes (Optional)')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('retainedEarnings.notesOptional', 'Notes (Optional)')}</FormLabel>
                           <FormControl>
-                            <Textarea {...field} data-testid="input-distribution-notes" />
+                            <Textarea {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-distribution-notes" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" data-testid="button-submit-distribution">
+                    <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-submit-distribution">
                       {t('retainedEarnings.createDistribution', 'Create Distribution')}
                     </Button>
                   </form>
@@ -586,33 +583,31 @@ export default function RetainedEarnings() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.date', 'Date')}</TableHead>
-                    <TableHead>{t('common.type', 'Type')}</TableHead>
-                    <TableHead>{t('retainedEarnings.recipients', 'Recipients')}</TableHead>
-                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
-                    <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('retainedEarnings.recipients', 'Recipients')}</TableHead>
+                    <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {distributions.map((distribution) => (
-                    <TableRow key={distribution.id} data-testid={`row-distribution-${distribution.id}`}>
-                      <TableCell className="font-montserrat">{distribution.date}</TableCell>
+                  {distributions.map((dist) => (
+                    <TableRow key={dist.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-distribution-${dist.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{dist.date}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{distribution.type}</Badge>
+                        <Badge className="bg-[#0A5ED7] text-white">{dist.type}</Badge>
                       </TableCell>
-                      <TableCell>{distribution.recipients}</TableCell>
-                      <TableCell className="text-right font-montserrat text-amber-600">
-                        SAR {distribution.amount.toLocaleString()}
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{dist.recipients}</TableCell>
+                      <TableCell className="text-right text-[#F97316] font-medium">
+                        SAR {dist.amount.toLocaleString()}
                       </TableCell>
                       <TableCell>
-                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                          {distribution.status}
-                        </Badge>
+                        <Badge className="bg-[#0A5ED7] text-white">{dist.status}</Badge>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -626,14 +621,13 @@ export default function RetainedEarnings() {
   ];
 
   return (
-    <TabsPageLayout
-      title={t('retainedEarnings.title', 'Retained Earnings & Reserves')}
-      titleArabic={t('retainedEarnings.titleArabic', 'الاحتياطات والأرباح والخسائر')}
-      description={t('retainedEarnings.description', 'Manage retained earnings, profit reserves, and distributions')}
-      descriptionArabic={t('retainedEarnings.descriptionArabic', 'إدارة الأرباح المحتجزة والاحتياطات وتوزيعات الأرباح')}
-      icon={PiggyBank}
-      tabs={tabs}
-      defaultTab="overview"
-    />
+    <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
+      <TabsPageLayout
+        title={t('retainedEarnings.title', 'Retained Earnings')}
+        description={t('retainedEarnings.description', 'الأرباح المحتجزة - Manage reserves, profit allocations, and distributions')}
+        defaultTab="overview"
+        tabs={tabs}
+      />
+    </div>
   );
 }

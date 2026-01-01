@@ -86,23 +86,23 @@ export default function TowingServices() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      requested: "bg-yellow-500 text-white",
-      dispatched: "bg-blue-500 text-white",
-      in_progress: "bg-purple-500 text-white",
-      completed: "bg-green-500 text-white",
-      cancelled: "bg-red-500 text-white",
+      requested: "bg-[#64748B] text-white",
+      dispatched: "bg-[#0A5ED7] text-white",
+      in_progress: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      completed: "bg-[#10B981] text-white",
+      cancelled: "bg-[#F97316] text-white",
     };
-    return colors[status] || "bg-salis-gray text-white";
+    return colors[status] || "bg-[#64748B] text-white";
   };
 
   const getPriorityBadge = (priority: string) => {
     const colors: Record<string, string> = {
-      low: "bg-salis-gray text-white",
-      medium: "bg-blue-500 text-white",
-      high: "bg-orange-500 text-white",
-      emergency: "bg-red-600 text-white",
+      low: "bg-[#64748B] text-white",
+      medium: "bg-[#0A5ED7] text-white",
+      high: "bg-[#F97316] text-white",
+      emergency: "bg-[#EF4444] text-white",
     };
-    return colors[priority] || "bg-salis-gray text-white";
+    return colors[priority] || "bg-[#64748B] text-white";
   };
 
   const filteredJobs = statusFilter === "all" ? jobs : jobs.filter((job: any) => job.status === statusFilter);
@@ -121,112 +121,120 @@ export default function TowingServices() {
       ]}
     >
       <div className="flex gap-2 items-center mb-4">
-        <span className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('common.filterByStatus', 'Filter by status')}:</span>
+        <span className="text-sm text-[#64748B]">{t('common.filterByStatus', 'Filter by status')}:</span>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-status-filter">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('towing.allJobs', 'All Jobs')}</SelectItem>
-            <SelectItem value="requested">{t('status.requested', 'Requested')}</SelectItem>
-            <SelectItem value="dispatched">{t('status.dispatched', 'Dispatched')}</SelectItem>
-            <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
-            <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
-            <SelectItem value="cancelled">{t('status.cancelled', 'Cancelled')}</SelectItem>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <SelectItem value="all" className="text-[#0B1F3B] dark:text-white">{t('towing.allJobs', 'All Jobs')}</SelectItem>
+            <SelectItem value="requested" className="text-[#0B1F3B] dark:text-white">{t('status.requested', 'Requested')}</SelectItem>
+            <SelectItem value="dispatched" className="text-[#0B1F3B] dark:text-white">{t('status.dispatched', 'Dispatched')}</SelectItem>
+            <SelectItem value="in_progress" className="text-[#0B1F3B] dark:text-white">{t('common.inProgress', 'In Progress')}</SelectItem>
+            <SelectItem value="completed" className="text-[#0B1F3B] dark:text-white">{t('common.completed', 'Completed')}</SelectItem>
+            <SelectItem value="cancelled" className="text-[#0B1F3B] dark:text-white">{t('status.cancelled', 'Cancelled')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('towing.towingJobs', 'Towing Jobs')}</CardTitle>
-          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('towing.towingJobs', 'Towing Jobs')}</CardTitle>
+          <CardDescription className="text-[#64748B]">
             {t('towing.allTowingServiceRequests', 'All towing service requests and their current status')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading')}...</p>
+            <p className="text-[#64748B]" data-testid="text-loading">{t('common.loading', 'Loading')}...</p>
           ) : filteredJobs.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-jobs">{t('towing.noTowingJobsFound', 'No towing jobs found')}</p>
+            <div className="text-center py-12">
+              <Truck className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
+              <p className="text-[#0B1F3B] dark:text-white font-medium" data-testid="text-no-jobs">{t('towing.noTowingJobsFound', 'No towing jobs found')}</p>
+              <p className="text-sm text-[#64748B] mt-1">{t('towing.createFirstJob', 'Create your first towing job to get started')}</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('customers.customer', 'Customer')}</TableHead>
-                  <TableHead>{t('towing.pickup', 'Pickup')}</TableHead>
-                  <TableHead>{t('towing.dropoff', 'Dropoff')}</TableHead>
-                  <TableHead>{t('common.type', 'Type')}</TableHead>
-                  <TableHead>{t('common.priority', 'Priority')}</TableHead>
-                  <TableHead>{t('common.status', 'Status')}</TableHead>
-                  <TableHead>{t('common.actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredJobs.map((job: any) => (
-                  <TableRow key={job.id} data-testid={`row-job-${job.id}`}>
-                    <TableCell data-testid={`text-customer-${job.id}`}>
-                      <div>
-                        <p className="font-medium">{job.customerName}</p>
-                        <p className="text-sm text-salis-gray dark:text-salis-gray-light">{job.customerPhone}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell data-testid={`text-pickup-${job.id}`}>{job.pickupLocation}</TableCell>
-                    <TableCell data-testid={`text-dropoff-${job.id}`}>{job.dropoffLocation}</TableCell>
-                    <TableCell data-testid={`text-type-${job.id}`}>{job.towType}</TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityBadge(job.priority)} data-testid={`badge-priority-${job.id}`}>
-                        {job.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadge(job.status)} data-testid={`badge-status-${job.id}`}>
-                        {job.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {job.status === "requested" && (
-                        <Button
-                          size="sm"
-                          onClick={() => updateStatusMutation.mutate({ id: job.id, status: "dispatched" })}
-                          data-testid={`button-dispatch-${job.id}`}
-                        >
-                          {t('towing.dispatch', 'Dispatch')}
-                        </Button>
-                      )}
-                      {job.status === "dispatched" && (
-                        <Button
-                          size="sm"
-                          onClick={() => updateStatusMutation.mutate({ id: job.id, status: "in_progress" })}
-                          data-testid={`button-start-${job.id}`}
-                        >
-                          {t('towing.start', 'Start')}
-                        </Button>
-                      )}
-                      {job.status === "in_progress" && (
-                        <Button
-                          size="sm"
-                          onClick={() => updateStatusMutation.mutate({ id: job.id, status: "completed" })}
-                          className="bg-green-500 hover:bg-green-600"
-                          data-testid={`button-complete-${job.id}`}
-                        >
-                          {t('towing.complete', 'Complete')}
-                        </Button>
-                      )}
-                    </TableCell>
+            <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('customers.customer', 'Customer')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('towing.pickup', 'Pickup')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('towing.dropoff', 'Dropoff')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.priority', 'Priority')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredJobs.map((job: any) => (
+                    <TableRow key={job.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid={`row-job-${job.id}`}>
+                      <TableCell data-testid={`text-customer-${job.id}`}>
+                        <div>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">{job.customerName}</p>
+                          <p className="text-sm text-[#64748B]">{job.customerPhone}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-pickup-${job.id}`}>{job.pickupLocation}</TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-dropoff-${job.id}`}>{job.dropoffLocation}</TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white capitalize" data-testid={`text-type-${job.id}`}>{job.towType?.replace('_', ' ')}</TableCell>
+                      <TableCell>
+                        <Badge className={getPriorityBadge(job.priority)} data-testid={`badge-priority-${job.id}`}>
+                          {job.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusBadge(job.status)} data-testid={`badge-status-${job.id}`}>
+                          {job.status?.replace('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {job.status === "requested" && (
+                          <Button
+                            size="sm"
+                            onClick={() => updateStatusMutation.mutate({ id: job.id, status: "dispatched" })}
+                            className="bg-[#0A5ED7] text-white hover:bg-[#0A5ED7]/90"
+                            data-testid={`button-dispatch-${job.id}`}
+                          >
+                            {t('towing.dispatch', 'Dispatch')}
+                          </Button>
+                        )}
+                        {job.status === "dispatched" && (
+                          <Button
+                            size="sm"
+                            onClick={() => updateStatusMutation.mutate({ id: job.id, status: "in_progress" })}
+                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
+                            data-testid={`button-start-${job.id}`}
+                          >
+                            {t('towing.start', 'Start')}
+                          </Button>
+                        )}
+                        {job.status === "in_progress" && (
+                          <Button
+                            size="sm"
+                            onClick={() => updateStatusMutation.mutate({ id: job.id, status: "completed" })}
+                            className="bg-[#10B981] text-white hover:bg-[#10B981]/90"
+                            data-testid={`button-complete-${job.id}`}
+                          >
+                            {t('towing.complete', 'Complete')}
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       <Dialog open={isJobDialogOpen} onOpenChange={setIsJobDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black max-w-2xl">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('towing.createTowingJob', 'Create Towing Job')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('towing.createTowingJob', 'Create Towing Job')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('towing.createNewTowingRequest', 'Create a new towing service request')}
             </DialogDescription>
           </DialogHeader>
@@ -238,9 +246,9 @@ export default function TowingServices() {
                   name="customerName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('customers.customerName', 'Customer Name')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('customers.customerName', 'Customer Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="John Doe" data-testid="input-customer-name" />
+                        <Input {...field} placeholder="John Doe" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-customer-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -251,9 +259,9 @@ export default function TowingServices() {
                   name="customerPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('customers.customerPhone', 'Customer Phone')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('customers.customerPhone', 'Customer Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="+1 (555) 123-4567" data-testid="input-customer-phone" />
+                        <Input {...field} placeholder="+1 (555) 123-4567" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-customer-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -265,9 +273,9 @@ export default function TowingServices() {
                 name="pickupLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('towing.pickupLocation', 'Pickup Location')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.pickupLocation', 'Pickup Location')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="123 Main St, City, State ZIP" data-testid="input-pickup-location" />
+                      <Input {...field} placeholder="123 Main St, City, State ZIP" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-pickup-location" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -278,9 +286,9 @@ export default function TowingServices() {
                 name="dropoffLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('towing.dropoffLocation', 'Dropoff Location')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.dropoffLocation', 'Dropoff Location')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="456 Oak Ave, City, State ZIP" data-testid="input-dropoff-location" />
+                      <Input {...field} placeholder="456 Oak Ave, City, State ZIP" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-dropoff-location" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -291,9 +299,9 @@ export default function TowingServices() {
                 name="vehicleInfo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('towing.vehicleInformation', 'Vehicle Information')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.vehicleInformation', 'Vehicle Information')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="2020 Honda Civic, License: ABC123" data-testid="input-vehicle-info" />
+                      <Input {...field} placeholder="2020 Honda Civic, License: ABC123" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-vehicle-info" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,18 +313,18 @@ export default function TowingServices() {
                   name="towType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('towing.towType', 'Tow Type')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.towType', 'Tow Type')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-tow-type">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-tow-type">
                             <SelectValue placeholder={t('towing.selectTowType', 'Select tow type')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="flatbed">{t('towing.flatbed', 'Flatbed')}</SelectItem>
-                          <SelectItem value="wheel_lift">{t('towing.wheelLift', 'Wheel Lift')}</SelectItem>
-                          <SelectItem value="dolly">{t('towing.dolly', 'Dolly')}</SelectItem>
-                          <SelectItem value="integrated">{t('towing.integrated', 'Integrated')}</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="flatbed" className="text-[#0B1F3B] dark:text-white">{t('towing.flatbed', 'Flatbed')}</SelectItem>
+                          <SelectItem value="wheel_lift" className="text-[#0B1F3B] dark:text-white">{t('towing.wheelLift', 'Wheel Lift')}</SelectItem>
+                          <SelectItem value="dolly" className="text-[#0B1F3B] dark:text-white">{t('towing.dolly', 'Dolly')}</SelectItem>
+                          <SelectItem value="integrated" className="text-[#0B1F3B] dark:text-white">{t('towing.integrated', 'Integrated')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -328,18 +336,18 @@ export default function TowingServices() {
                   name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.priority', 'Priority')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.priority', 'Priority')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-priority">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-priority">
                             <SelectValue placeholder={t('common.selectPriority', 'Select priority')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="low">{t('priority.low', 'Low')}</SelectItem>
-                          <SelectItem value="medium">{t('priority.medium', 'Medium')}</SelectItem>
-                          <SelectItem value="high">{t('priority.high', 'High')}</SelectItem>
-                          <SelectItem value="emergency">{t('priority.emergency', 'Emergency')}</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="low" className="text-[#0B1F3B] dark:text-white">{t('priority.low', 'Low')}</SelectItem>
+                          <SelectItem value="medium" className="text-[#0B1F3B] dark:text-white">{t('priority.medium', 'Medium')}</SelectItem>
+                          <SelectItem value="high" className="text-[#0B1F3B] dark:text-white">{t('priority.high', 'High')}</SelectItem>
+                          <SelectItem value="emergency" className="text-[#0B1F3B] dark:text-white">{t('priority.emergency', 'Emergency')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -353,13 +361,14 @@ export default function TowingServices() {
                   name="distance"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('towing.distanceMiles', 'Distance (miles)')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.distanceMiles', 'Distance (miles)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.1"
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-distance"
                         />
                       </FormControl>
@@ -372,13 +381,14 @@ export default function TowingServices() {
                   name="estimatedCost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('towing.estimatedCost', 'Estimated Cost')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('towing.estimatedCost', 'Estimated Cost')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           type="number"
                           step="0.01"
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-estimated-cost"
                         />
                       </FormControl>
@@ -392,16 +402,21 @@ export default function TowingServices() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('towing.additionalDetails', 'Additional details...')} data-testid="input-notes" />
+                      <Textarea {...field} placeholder={t('towing.additionalDetails', 'Additional details...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" disabled={createJobMutation.isPending} data-testid="button-submit-job">
+                <Button 
+                  type="submit" 
+                  disabled={createJobMutation.isPending} 
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
+                  data-testid="button-submit-job"
+                >
                   {createJobMutation.isPending ? t('common.creating', 'Creating...') : t('towing.createJob', 'Create Job')}
                 </Button>
               </DialogFooter>

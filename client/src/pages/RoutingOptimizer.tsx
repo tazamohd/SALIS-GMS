@@ -53,55 +53,55 @@ export default function RoutingOptimizer() {
       ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('routing.totalRoutes', 'Total Routes')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-routes">{stats.totalRoutes}</h3>
+                <p className="text-sm text-[#64748B]">{t('routing.totalRoutes', 'Total Routes')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-total-routes">{stats.totalRoutes}</h3>
               </div>
-              <Truck className="h-12 w-12 text-blue-600" />
+              <Truck className="h-12 w-12 text-[#0A5ED7]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('routing.activeRoutes', 'Active Routes')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-active-routes">{stats.activeRoutes}</h3>
+                <p className="text-sm text-[#64748B]">{t('routing.activeRoutes', 'Active Routes')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-active-routes">{stats.activeRoutes}</h3>
               </div>
               <MapPin className="h-12 w-12 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('routing.distanceSaved', 'Distance Saved')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-distance-saved">{stats.distanceSaved} {t('common.km', 'km')}</h3>
+                <p className="text-sm text-[#64748B]">{t('routing.distanceSaved', 'Distance Saved')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-distance-saved">{stats.distanceSaved} {t('common.km', 'km')}</h3>
               </div>
               <TrendingUp className="h-12 w-12 text-purple-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('routing.timeSaved', 'Time Saved')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-time-saved">{stats.timeSaved} {t('common.min', 'min')}</h3>
+                <p className="text-sm text-[#64748B]">{t('routing.timeSaved', 'Time Saved')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-time-saved">{stats.timeSaved} {t('common.min', 'min')}</h3>
               </div>
-              <Clock className="h-12 w-12 text-orange-600" />
+              <Clock className="h-12 w-12 text-[#F97316]" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800 mt-6">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mt-6">
         <CardContent className="p-6">
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-[#64748B]">
             {t('routing.noRoutesAvailable', 'No routes available. Click "Create Route" to optimize a new delivery route.')}
           </div>
         </CardContent>

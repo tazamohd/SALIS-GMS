@@ -73,49 +73,50 @@ export default function SafetyIncidents() {
               immediateActions: 'Area secured and cleaned',
             });
           },
+          className: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white",
         },
       ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.totalThisYear', 'Total This Year')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-total-incidents">{stats.totalIncidents}</h3>
+                <p className="text-sm text-[#64748B]">{t('safety.totalThisYear', 'Total This Year')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-total-incidents">{stats.totalIncidents}</h3>
               </div>
-              <AlertTriangle className="h-12 w-12 text-yellow-600" />
+              <AlertTriangle className="h-12 w-12 text-[#F97316]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.investigating', 'Investigating')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-open-investigations">{stats.openInvestigations}</h3>
+                <p className="text-sm text-[#64748B]">{t('safety.investigating', 'Investigating')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-open-investigations">{stats.openInvestigations}</h3>
               </div>
-              <Activity className="h-12 w-12 text-blue-600" />
+              <Activity className="h-12 w-12 text-[#0A5ED7]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.oshaRecordable', 'OSHA Recordable')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-osha-recordable">{stats.oshaRecordable}</h3>
+                <p className="text-sm text-[#64748B]">{t('safety.oshaRecordable', 'OSHA Recordable')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-osha-recordable">{stats.oshaRecordable}</h3>
               </div>
               <Shield className="h-12 w-12 text-red-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('safety.daysWithout', 'Days Without')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="text-days-without">{stats.daysWithoutIncident}</h3>
+                <p className="text-sm text-[#64748B]">{t('safety.daysWithout', 'Days Without')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="text-days-without">{stats.daysWithoutIncident}</h3>
               </div>
               <Users className="h-12 w-12 text-green-600" />
             </div>
@@ -123,27 +124,27 @@ export default function SafetyIncidents() {
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('safety.recentIncidents', 'Recent Incidents')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('safety.recentIncidents', 'Recent Incidents')}</CardTitle>
         </CardHeader>
         <CardContent>
           {incidentsLoading ? (
-            <div className="text-center py-8 text-gray-500">{t('safety.loadingIncidents', 'Loading incidents...')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('safety.loadingIncidents', 'Loading incidents...')}</div>
           ) : incidents.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('safety.noIncidentsFound', 'No incidents found')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('safety.noIncidentsFound', 'No incidents found')}</div>
           ) : (
             <div className="space-y-3">
               {incidents.map((incident) => (
-                <div key={incident.id} className="flex items-start justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`incident-${incident.id}`}>
+                <div key={incident.id} className="flex items-start justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`incident-${incident.id}`}>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{incident.incidentNumber}</h3>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{incident.incidentNumber}</h3>
                       <Badge variant={getSeverityColor(incident.severity)}>{incident.severity}</Badge>
                       <Badge>{incident.incidentType?.replace("_", " ")}</Badge>
                     </div>
-                    <p className="text-sm text-gray-900 dark:text-white mb-1">{incident.description}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#0B1F3B] dark:text-white mb-1">{incident.description}</p>
+                    <p className="text-sm text-[#64748B]">
                       {incident.location} • {new Date(incident.incidentDate).toLocaleDateString()}
                     </p>
                   </div>

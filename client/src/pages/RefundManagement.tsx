@@ -38,19 +38,16 @@ export default function RefundManagement() {
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [selectedRefund, setSelectedRefund] = useState<any | null>(null);
 
-  // Fetch garages
   const { data: garages = [] } = useQuery<any[]>({
     queryKey: ["/api/garages"],
   });
 
-  // Set default garage
   useEffect(() => {
     if (!selectedGarageId && garages.length > 0) {
       setSelectedGarageId(garages[0].id);
     }
   }, [garages, selectedGarageId]);
 
-  // Fetch refunds
   const { data: refunds = [], isLoading } = useQuery<any[]>({
     queryKey: [
       "/api/refunds",
@@ -59,12 +56,10 @@ export default function RefundManagement() {
     enabled: !!selectedGarageId,
   });
 
-  // Fetch invoices for dropdown
   const { data: invoices = [] } = useQuery<any[]>({
     queryKey: ["/api/invoices"],
   });
 
-  // Refund form
   const refundForm = useForm<RefundFormData>({
     resolver: zodResolver(refundSchema),
     defaultValues: {
@@ -76,7 +71,6 @@ export default function RefundManagement() {
     },
   });
 
-  // Create Refund
   const createRefundMutation = useMutation({
     mutationFn: async (data: RefundFormData) => {
       const payload = {
@@ -101,7 +95,6 @@ export default function RefundManagement() {
     },
   });
 
-  // Approve Refund
   const approveRefundMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiRequest("POST", `/api/refunds/${id}/approve`, {});
@@ -118,7 +111,6 @@ export default function RefundManagement() {
     },
   });
 
-  // Process Refund
   const processRefundMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiRequest("POST", `/api/refunds/${id}/process`, {});
@@ -137,15 +129,15 @@ export default function RefundManagement() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, any> = {
-      pending: { variant: "outline", icon: AlertTriangle, color: "text-gray-700 dark:text-gray-300" },
-      approved: { variant: "default", icon: CheckCircle, color: "text-gray-900 dark:text-gray-100" },
-      processed: { variant: "default", icon: CheckCircle, color: "text-gray-950 dark:text-gray-50" },
-      rejected: { variant: "destructive", icon: XCircle, color: "text-gray-800 dark:text-gray-200" },
+      pending: { variant: "outline", icon: AlertTriangle, className: "border-[#F97316] text-[#F97316]" },
+      approved: { variant: "default", icon: CheckCircle, className: "bg-[#0A5ED7] text-white" },
+      processed: { variant: "default", icon: CheckCircle, className: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" },
+      rejected: { variant: "destructive", icon: XCircle, className: "bg-red-500 text-white" },
     };
     const config = variants[status] || variants.pending;
     const Icon = config.icon;
     return (
-      <Badge variant={config.variant}>
+      <Badge variant={config.variant} className={config.className}>
         <Icon className="h-3 w-3 mr-1" />
         {status}
       </Badge>
@@ -160,10 +152,10 @@ export default function RefundManagement() {
     >
       <div className="flex gap-2 items-center mb-6">
         <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-          <SelectTrigger className="w-[200px]" data-testid="select-garage">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
             <SelectValue placeholder="Select garage" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             {garages.map((garage) => (
               <SelectItem key={garage.id} value={garage.id} data-testid={`select-garage-${garage.id}`}>
                 {garage.name}
@@ -173,15 +165,15 @@ export default function RefundManagement() {
         </Select>
         <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => refundForm.reset()} data-testid="button-create-refund">
+              <Button onClick={() => refundForm.reset()} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" data-testid="button-create-refund">
                 <Plus className="h-4 w-4 mr-2" />
                 {t('payments.refunds.createRefund', 'Create Refund')}
               </Button>
             </DialogTrigger>
-            <DialogContent data-testid="dialog-refund-form">
+            <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="dialog-refund-form">
               <DialogHeader>
-                <DialogTitle>{t('payments.refunds.createRefundRequest', 'Create Refund Request')}</DialogTitle>
-                <DialogDescription>{t('payments.refunds.initiateRefund', 'Initiate a refund for a customer invoice')}</DialogDescription>
+                <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.createRefundRequest', 'Create Refund Request')}</DialogTitle>
+                <DialogDescription className="text-[#64748B]">{t('payments.refunds.initiateRefund', 'Initiate a refund for a customer invoice')}</DialogDescription>
               </DialogHeader>
               <Form {...refundForm}>
                 <form onSubmit={refundForm.handleSubmit((data) => createRefundMutation.mutate(data))} className="space-y-4">
@@ -190,14 +182,14 @@ export default function RefundManagement() {
                     name="invoiceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('invoices.invoice', 'Invoice')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('invoices.invoice', 'Invoice')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-refund-invoice">
+                            <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-refund-invoice">
                               <SelectValue placeholder={t('payments.refunds.selectInvoice', 'Select invoice')} />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                             {invoices.map((invoice) => (
                               <SelectItem key={invoice.id} value={invoice.id} data-testid={`select-invoice-${invoice.id}`}>
                                 {t('invoices.invoice', 'Invoice')} #{invoice.id.slice(0, 8)} - ${invoice.totalAmount}
@@ -214,9 +206,9 @@ export default function RefundManagement() {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('payments.refunds.refundAmount', 'Refund Amount')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.refundAmount', 'Refund Amount')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="0.00" {...field} data-testid="input-refund-amount" />
+                          <Input type="number" step="0.01" placeholder="0.00" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-refund-amount" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -227,9 +219,9 @@ export default function RefundManagement() {
                     name="reason"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('payments.refunds.reason', 'Reason')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.reason', 'Reason')}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('payments.refunds.reasonPlaceholder', 'e.g., Customer dissatisfaction')} {...field} data-testid="input-refund-reason" />
+                          <Input placeholder={t('payments.refunds.reasonPlaceholder', 'e.g., Customer dissatisfaction')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-refund-reason" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -240,14 +232,14 @@ export default function RefundManagement() {
                     name="refundMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('payments.refunds.refundMethod', 'Refund Method')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.refundMethod', 'Refund Method')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-refund-method">
+                            <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-refund-method">
                               <SelectValue />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                             <SelectItem value="original" data-testid="select-method-original">{t('payments.refunds.methods.original', 'Original Payment Method')}</SelectItem>
                             <SelectItem value="store_credit" data-testid="select-method-credit">{t('payments.refunds.methods.storeCredit', 'Store Credit')}</SelectItem>
                             <SelectItem value="cash" data-testid="select-method-cash">{t('payments.methods.cash', 'Cash')}</SelectItem>
@@ -263,16 +255,16 @@ export default function RefundManagement() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('payments.refunds.notesOptional', 'Notes (Optional)')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.notesOptional', 'Notes (Optional)')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder={t('payments.refunds.notesPlaceholder', 'Additional notes...')} {...field} data-testid="textarea-refund-notes" />
+                          <Textarea placeholder={t('payments.refunds.notesPlaceholder', 'Additional notes...')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="textarea-refund-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <DialogFooter>
-                    <Button type="submit" disabled={createRefundMutation.isPending} data-testid="button-submit-refund">
+                    <Button type="submit" disabled={createRefundMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" data-testid="button-submit-refund">
                       {createRefundMutation.isPending ? t('common.creating', 'Creating...') : t('payments.refunds.createRefund', 'Create Refund')}
                     </Button>
                   </DialogFooter>
@@ -282,12 +274,12 @@ export default function RefundManagement() {
           </Dialog>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 mb-6">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-status-filter">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
@@ -297,60 +289,61 @@ export default function RefundManagement() {
         </Select>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">{t('payments.refunds.refundRequests', 'Refund Requests')}</CardTitle>
-          <CardDescription className="text-gray-900 dark:text-white/60">{t('payments.refunds.reviewAndProcess', 'Review and process customer refund requests')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.refundRequests', 'Refund Requests')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('payments.refunds.reviewAndProcess', 'Review and process customer refund requests')}</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('common.loading', 'Loading...')}</div>
+            <div className="text-center py-8 text-[#64748B]">{t('common.loading', 'Loading...')}</div>
           ) : refunds.length === 0 ? (
-            <div className="text-center py-8 text-gray-900 dark:text-white/60" data-testid="text-no-refunds">
+            <div className="text-center py-8 text-[#64748B]" data-testid="text-no-refunds">
               {t('payments.refunds.noRefundsFound', 'No refund requests found')}
             </div>
           ) : (
             <Table>
-              <TableHeader className="bg-gray-100 dark:bg-salis-gray-dark">
-                <TableRow className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-100 dark:hover:bg-salis-gray-dark">
-                  <TableHead className="text-gray-900 dark:text-white">{t('invoices.invoice', 'Invoice')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('common.amount', 'Amount')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.reason', 'Reason')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.method', 'Method')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('payments.refunds.requested', 'Requested')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-                  <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+              <TableHeader>
+                <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('invoices.invoice', 'Invoice')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.reason', 'Reason')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.method', 'Method')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('payments.refunds.requested', 'Requested')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {refunds.map((refund) => (
-                  <TableRow key={refund.id} data-testid={`row-refund-${refund.id}`}>
-                    <TableCell className="font-mono text-sm" data-testid={`text-refund-invoice-${refund.id}`}>
+                  <TableRow key={refund.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-refund-${refund.id}`}>
+                    <TableCell className="font-mono text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-refund-invoice-${refund.id}`}>
                       #{refund.invoiceId.slice(0, 8)}
                     </TableCell>
-                    <TableCell className="font-semibold" data-testid={`text-refund-amount-${refund.id}`}>
+                    <TableCell className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-refund-amount-${refund.id}`}>
                       <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
+                        <DollarSign className="h-4 w-4 text-[#0A5ED7]" />
                         {parseFloat(refund.amount).toFixed(2)}
                       </div>
                     </TableCell>
-                    <TableCell data-testid={`text-refund-reason-${refund.id}`}>{refund.reason}</TableCell>
-                    <TableCell data-testid={`text-refund-method-${refund.id}`}>
+                    <TableCell className="text-[#64748B]" data-testid={`text-refund-reason-${refund.id}`}>{refund.reason}</TableCell>
+                    <TableCell className="text-[#64748B] capitalize" data-testid={`text-refund-method-${refund.id}`}>
                       {refund.refundMethod.replace("_", " ")}
                     </TableCell>
-                    <TableCell className="text-sm" data-testid={`text-refund-date-${refund.id}`}>
+                    <TableCell className="text-sm text-[#64748B]" data-testid={`text-refund-date-${refund.id}`}>
                       {format(new Date(refund.createdAt), "MMM dd, yyyy")}
                     </TableCell>
                     <TableCell data-testid={`badge-refund-status-${refund.id}`}>
                       {getStatusBadge(refund.status)}
                     </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
+                    <TableCell>
                       <div className="flex gap-2">
                         {refund.status === "pending" && (
                           <Button
                             size="sm"
                             onClick={() => approveRefundMutation.mutate(refund.id)}
                             disabled={approveRefundMutation.isPending}
+                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                             data-testid={`button-approve-refund-${refund.id}`}
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
@@ -360,9 +353,9 @@ export default function RefundManagement() {
                         {refund.status === "approved" && (
                           <Button
                             size="sm"
-                            variant="default"
                             onClick={() => processRefundMutation.mutate(refund.id)}
                             disabled={processRefundMutation.isPending}
+                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                             data-testid={`button-process-refund-${refund.id}`}
                           >
                             <DollarSign className="h-4 w-4 mr-1" />

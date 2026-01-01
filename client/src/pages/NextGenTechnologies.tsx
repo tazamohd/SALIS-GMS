@@ -160,7 +160,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.neuralNetworkDiagnostics', 'Neural Network Diagnostics'),
       icon: Brain,
-      color: "text-purple-500 dark:text-purple-400",
+      color: "text-[#0A5ED7]",
       data: [
         { label: t('nextGen.diagnostics', 'Diagnostics'), count: neuralDiagnostics?.data?.length || 0, loading: loadingNeural },
         { label: t('nextGen.trainingSessions', 'Training Sessions'), count: neuralTrainingSessions?.data?.length || 0, loading: loadingTraining },
@@ -169,7 +169,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.computerVisionQC', 'Computer Vision QC'),
       icon: Eye,
-      color: "text-blue-500 dark:text-blue-400",
+      color: "text-[#0BB3FF]",
       data: [
         { label: t('nextGen.qualityChecks', 'Quality Checks'), count: visionQualityChecks?.data?.length || 0, loading: loadingVision },
         { label: t('nextGen.defectsDetected', 'Defects Detected'), count: visionDefects?.data?.length || 0, loading: loadingDefects },
@@ -178,7 +178,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.nlpServiceWriter', 'NLP Service Writer'),
       icon: MessageSquare,
-      color: "text-green-500 dark:text-green-400",
+      color: "text-green-500",
       data: [
         { label: t('nextGen.serviceRequests', 'Service Requests'), count: nlpServiceRequests?.data?.length || 0, loading: loadingNLP },
         { label: t('nextGen.trainingData', 'Training Data'), count: nlpTrainingData?.data?.length || 0, loading: loadingNLPData },
@@ -187,7 +187,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.rlPartsOptimizer', 'RL Parts Optimizer'),
       icon: Package,
-      color: "text-orange-500 dark:text-orange-400",
+      color: "text-[#F97316]",
       data: [
         { label: t('nextGen.optimizations', 'Optimizations'), count: rlPartsOptimizations?.data?.length || 0, loading: loadingRL },
         { label: t('nextGen.learningEpisodes', 'Learning Episodes'), count: rlLearningEpisodes?.data?.length || 0, loading: loadingRLEpisodes },
@@ -196,7 +196,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.metaverseShowroom', 'Metaverse Showroom'),
       icon: MonitorPlay,
-      color: "text-pink-500 dark:text-pink-400",
+      color: "text-[#0A5ED7]",
       data: [
         { label: t('nextGen.showrooms', 'Showrooms'), count: metaverseShowrooms?.data?.length || 0, loading: loadingMetaverse },
         { label: t('nextGen.virtualVisits', 'Virtual Visits'), count: metaverseVisits?.data?.length || 0, loading: loadingVisits },
@@ -205,7 +205,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.holographicGuides', 'Holographic Guides'),
       icon: Glasses,
-      color: "text-cyan-500 dark:text-cyan-400",
+      color: "text-[#0BB3FF]",
       data: [
         { label: t('nextGen.repairGuides', 'Repair Guides'), count: holographicGuides?.data?.length || 0, loading: loadingHolo },
         { label: t('nextGen.activeSessions', 'Active Sessions'), count: holographicSessions?.data?.length || 0, loading: loadingHoloSessions },
@@ -214,7 +214,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.spatialComputing', 'Spatial Computing'),
       icon: Network,
-      color: "text-indigo-500 dark:text-indigo-400",
+      color: "text-[#0A5ED7]",
       data: [
         { label: t('nextGen.workstations', 'Workstations'), count: spatialWorkstations?.data?.length || 0, loading: loadingSpatial },
         { label: t('nextGen.diagnosticSessions', 'Diagnostic Sessions'), count: spatialDiagnosticSessions?.data?.length || 0, loading: loadingSpatialSessions },
@@ -223,7 +223,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.autonomousRobots', 'Autonomous Robots'),
       icon: Bot,
-      color: "text-red-500 dark:text-red-400",
+      color: "text-[#F97316]",
       data: [
         { label: t('nextGen.robots', 'Robots'), count: autonomousRobots?.data?.length || 0, loading: loadingRobots },
         { label: t('nextGen.tasksCompleted', 'Tasks Completed'), count: robotTasks?.data?.length || 0, loading: loadingTasks },
@@ -232,7 +232,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.droneFleet', 'Drone Fleet'),
       icon: Plane,
-      color: "text-sky-500 dark:text-sky-400",
+      color: "text-[#0BB3FF]",
       data: [
         { label: t('nextGen.drones', 'Drones'), count: droneFleets?.data?.length || 0, loading: loadingDrones },
         { label: t('nextGen.missions', 'Missions'), count: droneMissions?.data?.length || 0, loading: loadingMissions },
@@ -241,7 +241,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.smartContracts', 'Smart Contracts'),
       icon: FileCode,
-      color: "text-amber-500 dark:text-amber-400",
+      color: "text-[#0A5ED7]",
       data: [
         { label: t('nextGen.contracts', 'Contracts'), count: smartContracts?.data?.length || 0, loading: loadingContracts },
         { label: t('nextGen.events', 'Events'), count: contractEvents?.data?.length || 0, loading: loadingEvents },
@@ -250,7 +250,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.carbonCredits', 'Carbon Credits'),
       icon: Leaf,
-      color: "text-emerald-500 dark:text-emerald-400",
+      color: "text-green-500",
       data: [
         { label: t('nextGen.credits', 'Credits'), count: carbonCredits?.data?.length || 0, loading: loadingCarbon },
         { label: t('nextGen.emissionsTracked', 'Emissions Tracked'), count: carbonEmissions?.data?.length || 0, loading: loadingEmissions },
@@ -259,7 +259,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.greenEnergy', 'Green Energy'),
       icon: Zap,
-      color: "text-yellow-500 dark:text-yellow-400",
+      color: "text-[#0BB3FF]",
       data: [
         { label: t('nextGen.energyAssets', 'Energy Assets'), count: greenEnergyAssets?.data?.length || 0, loading: loadingEnergy },
         { label: t('nextGen.evChargingStations', 'EV Charging Stations'), count: evChargingStations?.data?.length || 0, loading: loadingEV },
@@ -268,7 +268,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.circularEconomy', 'Circular Economy'),
       icon: Recycle,
-      color: "text-teal-500 dark:text-teal-400",
+      color: "text-green-500",
       data: [
         { label: t('nextGen.recycledParts', 'Recycled Parts'), count: recycledParts?.data?.length || 0, loading: loadingRecycled },
         { label: t('nextGen.sustainabilityMetrics', 'Sustainability Metrics'), count: sustainabilityMetrics?.data?.length || 0, loading: loadingSustainability },
@@ -277,7 +277,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.satelliteConnectivity', 'Satellite Connectivity'),
       icon: Satellite,
-      color: "text-violet-500 dark:text-violet-400",
+      color: "text-[#0A5ED7]",
       data: [
         { label: t('nextGen.connections', 'Connections'), count: satelliteConnections?.data?.length || 0, loading: loadingSatellite },
         { label: t('nextGen.usageLogs', 'Usage Logs'), count: satelliteUsageLogs?.data?.length || 0, loading: loadingSatelliteUsage },
@@ -286,7 +286,7 @@ export default function NextGenTechnologies() {
     {
       name: t('nextGen.quantumEncryption', 'Quantum Encryption'),
       icon: Shield,
-      color: "text-fuchsia-500 dark:text-fuchsia-400",
+      color: "text-[#0BB3FF]",
       data: [
         { label: t('nextGen.encryptionKeys', 'Encryption Keys'), count: quantumEncryptionKeys?.data?.length || 0, loading: loadingQuantum },
         { label: t('nextGen.secureMessages', 'Secure Messages'), count: quantumSecureMessages?.data?.length || 0, loading: loadingQuantumMessages },
@@ -310,23 +310,23 @@ export default function NextGenTechnologies() {
         {modules.map((module) => (
           <Card
             key={module.name}
-            className="bg-card dark:bg-gray-900 border-border dark:border-gray-800 hover:border-primary dark:hover:border-primary transition-all"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-all"
             data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, "-")}`}
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <module.icon className={`h-5 w-5 ${module.color}`} />
-                <span className="text-foreground dark:text-white">{module.name}</span>
+                <span className="text-[#0B1F3B] dark:text-white">{module.name}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {module.data.map((item) => (
                 <div key={item.label} className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground dark:text-gray-400">
+                  <span className="text-sm text-[#64748B]">
                     {item.label}
                   </span>
                   {item.loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    <Loader2 className="h-4 w-4 animate-spin text-[#64748B]" />
                   ) : (
                     <span className={`text-lg font-bold ${module.color}`} data-testid={`count-${item.label.toLowerCase().replace(/\s+/g, "-")}`}>
                       {item.count}
@@ -339,13 +339,13 @@ export default function NextGenTechnologies() {
         ))}
       </div>
 
-      <Card className="bg-card dark:bg-gray-900 border-border dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mt-6">
         <CardHeader>
-          <CardTitle className="text-foreground dark:text-white">{t('nextGen.phase10Title', 'Phase 10: Next-Generation Features')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('nextGen.phase10Title', 'Phase 10: Next-Generation Features')}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground dark:text-gray-400">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-[#64748B]">
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.aiMachineLearning', 'AI & Machine Learning')}</h3>
+            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t('nextGen.aiMachineLearning', 'AI & Machine Learning')}</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>{t('nextGen.neuralNetworkDiagnosticsDesc', 'Neural network vehicle diagnostics with failure prediction')}</li>
               <li>{t('nextGen.computerVisionQCDesc', 'Computer vision quality control for defect detection')}</li>
@@ -354,7 +354,7 @@ export default function NextGenTechnologies() {
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.extendedReality', 'Extended Reality')}</h3>
+            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t('nextGen.extendedReality', 'Extended Reality')}</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>{t('nextGen.metaverseShowroomDesc', 'Metaverse virtual showroom for customer experiences')}</li>
               <li>{t('nextGen.holographicGuidesDesc', 'Holographic repair instructions for technicians')}</li>
@@ -362,7 +362,7 @@ export default function NextGenTechnologies() {
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.advancedAutomation', 'Advanced Automation')}</h3>
+            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t('nextGen.advancedAutomation', 'Advanced Automation')}</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>{t('nextGen.autonomousRobotsDesc', 'Autonomous robots for parts retrieval and basic maintenance')}</li>
               <li>{t('nextGen.droneFleetDesc', 'Drone fleet for large facility inspections')}</li>
@@ -370,7 +370,7 @@ export default function NextGenTechnologies() {
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.sustainability', 'Sustainability')}</h3>
+            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t('nextGen.sustainability', 'Sustainability')}</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>{t('nextGen.carbonCreditDesc', 'Carbon credit trading and emissions tracking')}</li>
               <li>{t('nextGen.greenEnergyDesc', 'Green energy management with solar and EV charging')}</li>
@@ -378,7 +378,7 @@ export default function NextGenTechnologies() {
             </ul>
           </div>
           <div className="space-y-2">
-            <h3 className="font-semibold text-foreground dark:text-white">{t('nextGen.advancedInfrastructure', 'Advanced Infrastructure')}</h3>
+            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t('nextGen.advancedInfrastructure', 'Advanced Infrastructure')}</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>{t('nextGen.satelliteConnectivityDesc', 'Satellite connectivity for remote operations')}</li>
               <li>{t('nextGen.quantumEncryptionDesc', 'Quantum-encrypted secure communications')}</li>

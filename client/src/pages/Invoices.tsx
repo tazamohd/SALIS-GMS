@@ -42,7 +42,7 @@ export function Invoices() {
       key: "invoiceNumber",
       label: t('invoices.invoiceNumber', 'Invoice #'),
       render: (invoice) => (
-        <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
+        <span className="font-['Poppins',Helvetica] font-medium text-sm text-[#0B1F3B] dark:text-white">
           {invoice.invoiceNumber}
         </span>
       ),
@@ -51,7 +51,7 @@ export function Invoices() {
       key: "customerId",
       label: t('invoices.customer', 'Customer'),
       render: (invoice) => (
-        <span className="text-sm text-gray-700 dark:text-gray-300">
+        <span className="text-sm text-[#64748B] dark:text-gray-300">
           {customers?.find(c => c.id === invoice.customerId)?.fullName || 
            customers?.find(c => c.id === invoice.customerId)?.email || 
            t('common.unknown', 'Unknown')}
@@ -62,7 +62,7 @@ export function Invoices() {
       key: "invoiceDate",
       label: t('invoices.invoiceDate', 'Invoice Date'),
       render: (invoice) => (
-        <span className="text-sm text-gray-700 dark:text-gray-300">
+        <span className="text-sm text-[#64748B] dark:text-gray-300">
           {new Date(invoice.invoiceDate).toLocaleDateString()}
         </span>
       ),
@@ -71,7 +71,7 @@ export function Invoices() {
       key: "dueDate",
       label: t('invoices.dueDate', 'Due Date'),
       render: (invoice) => (
-        <span className="text-sm text-gray-700 dark:text-gray-300">
+        <span className="text-sm text-[#64748B] dark:text-gray-300">
           {new Date(invoice.dueDate).toLocaleDateString()}
         </span>
       ),
@@ -80,7 +80,7 @@ export function Invoices() {
       key: "totalAmount",
       label: t('invoices.totalAmount', 'Total Amount'),
       render: (invoice) => (
-        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
           ${parseFloat(invoice.totalAmount).toFixed(2)}
         </span>
       ),
@@ -89,7 +89,7 @@ export function Invoices() {
       key: "balanceAmount",
       label: t('invoices.balance', 'Balance'),
       render: (invoice) => (
-        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
           ${parseFloat(invoice.balanceAmount).toFixed(2)}
         </span>
       ),

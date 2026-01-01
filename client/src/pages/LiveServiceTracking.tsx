@@ -73,6 +73,17 @@ export default function LiveServiceTracking() {
     };
   });
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <Badge className="bg-emerald-500/10 text-emerald-600 border-0">{status}</Badge>;
+      case "in_progress":
+        return <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">{status}</Badge>;
+      default:
+        return <Badge className="bg-[#64748B]/10 text-[#64748B] border-0">{status}</Badge>;
+    }
+  };
+
   return (
     <StandardPageLayout
       title={t('liveTracking.title', 'Live Service Tracking')}
@@ -88,33 +99,40 @@ export default function LiveServiceTracking() {
       ]}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('liveTracking.activeJobCards', 'Active Job Cards')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('liveTracking.activeJobCards', 'Active Job Cards')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {transformedJobs.length === 0 ? (
-                <p className="text-center py-8 text-gray-500">{t('liveTracking.noActiveJobCards', 'No active job cards')}</p>
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                    <Wrench className="h-8 w-8 text-[#0A5ED7]" />
+                  </div>
+                  <p className="text-[#64748B]">{t('liveTracking.noActiveJobCards', 'No active job cards')}</p>
+                </div>
               ) : (
                 transformedJobs.map((job) => (
                   <div
                     key={job.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
                       selectedJobCard === job.id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                        : "border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
+                        ? "border-[#0A5ED7] bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10 shadow-sm"
+                        : "border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] hover:border-[#0A5ED7]/50"
                     }`}
                     onClick={() => setSelectedJobCard(job.id)}
                     data-testid={`job-card-${job.id}`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{job.jobNumber}</h3>
-                      <Badge>{job.status}</Badge>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{job.jobNumber}</h3>
+                      {getStatusBadge(job.status)}
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{job.vehicle}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{job.customer}</p>
-                    <Progress value={job.progress} className="h-2" />
+                    <p className="text-sm text-[#64748B] mb-2">{job.vehicle}</p>
+                    <p className="text-sm text-[#64748B] mb-2">{job.customer}</p>
+                    <div className="relative">
+                      <Progress value={job.progress} className="h-2 bg-[#E2E8F0] dark:bg-[#232A36]" />
+                    </div>
                   </div>
                 ))
               )}
@@ -122,37 +140,56 @@ export default function LiveServiceTracking() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('liveTracking.serviceTimeline', 'Service Timeline')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('liveTracking.serviceTimeline', 'Service Timeline')}</CardTitle>
           </CardHeader>
           <CardContent>
             {!selectedJobCard ? (
-              <p className="text-center py-8 text-gray-500">{t('liveTracking.selectJobCard', 'Select a job card to view timeline')}</p>
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-[#0A5ED7]" />
+                </div>
+                <p className="text-[#64748B]">{t('liveTracking.selectJobCard', 'Select a job card to view timeline')}</p>
+              </div>
             ) : timelineLoading ? (
-              <p className="text-center py-8 text-gray-500">{t('liveTracking.loadingTimeline', 'Loading timeline...')}</p>
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                  <Clock className="h-8 w-8 text-[#0A5ED7]" />
+                </div>
+                <p className="text-[#64748B]">{t('liveTracking.loadingTimeline', 'Loading timeline...')}</p>
+              </div>
             ) : selectedTimeline.length === 0 ? (
-              <p className="text-center py-8 text-gray-500">{t('liveTracking.noUpdatesYet', 'No updates yet')}</p>
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-[#0A5ED7]" />
+                </div>
+                <p className="text-[#64748B]">{t('liveTracking.noUpdatesYet', 'No updates yet')}</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {(selectedTimeline as any[]).map((update, index) => (
                   <div key={index} className="flex gap-3">
                     <div className="flex flex-col items-center">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
+                        update.status === 'completed' 
+                          ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]' 
+                          : 'bg-[#0A5ED7]/10'
+                      }`}>
                         {update.status === 'completed' ? (
-                          <CheckCircle className="h-4 w-4 text-blue-600" />
+                          <CheckCircle className="h-4 w-4 text-white" />
                         ) : (
-                          <Clock className="h-4 w-4 text-blue-600" />
+                          <Clock className="h-4 w-4 text-[#0A5ED7]" />
                         )}
                       </div>
                       {index < selectedTimeline.length - 1 && (
-                        <div className="w-0.5 h-full bg-gray-200 dark:bg-gray-800 mt-1" />
+                        <div className="w-0.5 h-full bg-gradient-to-b from-[#0A5ED7] to-[#0BB3FF] mt-1" />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 dark:text-white">{update.status}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{update.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                    <div className="flex-1 pb-4">
+                      <p className="font-semibold text-[#0B1F3B] dark:text-white capitalize">{update.status}</p>
+                      <p className="text-sm text-[#64748B]">{update.message}</p>
+                      <p className="text-xs text-[#64748B]/70 mt-1">
                         {update.timestamp ? new Date(update.timestamp).toLocaleString() : "N/A"}
                       </p>
                     </div>
@@ -165,18 +202,18 @@ export default function LiveServiceTracking() {
       </div>
 
       <Dialog open={isAddUpdateOpen} onOpenChange={setIsAddUpdateOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('liveTracking.postServiceUpdate', 'Post Service Update')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('liveTracking.postServiceUpdate', 'Post Service Update')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label>{t('common.status', 'Status')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</Label>
               <Select value={updateForm.status} onValueChange={(value) => setUpdateForm({ ...updateForm, status: value })}>
-                <SelectTrigger className="mt-1" data-testid="select-status">
+                <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-status">
                   <SelectValue placeholder={t('liveTracking.selectStatus', 'Select status')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="started">{t('liveTracking.statusStarted', 'Started')}</SelectItem>
                   <SelectItem value="in_progress">{t('common.inProgress', 'In Progress')}</SelectItem>
                   <SelectItem value="completed">{t('common.completed', 'Completed')}</SelectItem>
@@ -184,17 +221,17 @@ export default function LiveServiceTracking() {
               </Select>
             </div>
             <div>
-              <Label>{t('liveTracking.message', 'Message')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('liveTracking.message', 'Message')}</Label>
               <Textarea
                 placeholder={t('liveTracking.updateMessagePlaceholder', 'Update message for customer...')}
                 value={updateForm.message}
                 onChange={(e) => setUpdateForm({ ...updateForm, message: e.target.value })}
-                className="mt-1"
+                className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="textarea-message"
               />
             </div>
             <Button
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
               onClick={() => postUpdateMutation.mutate(updateForm)}
               disabled={!selectedJobCard || !updateForm.status || !updateForm.message}
               data-testid="button-post-update"

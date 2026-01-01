@@ -134,28 +134,28 @@ export default function GoogleMyBusiness() {
   });
 
   const profilesContent = (
-    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+    <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.businessProfiles', 'Business Profiles')}</CardTitle>
-        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+        <CardTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('gmb.businessProfiles', 'Business Profiles')}</CardTitle>
+        <CardDescription className="font-poppins text-[#64748B]">
           {t('gmb.connectedGMBLocations', 'Connected Google My Business locations')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {profilesLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('gmb.loadingProfiles', 'Loading profiles...')}</p>
+          <p className="text-[#64748B] font-poppins" data-testid="text-loading">{t('gmb.loadingProfiles', 'Loading profiles...')}</p>
         ) : profiles.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-profiles">{t('gmb.noProfilesFound', 'No GMB profiles found')}</p>
+          <p className="text-[#64748B] font-poppins" data-testid="text-no-profiles">{t('gmb.noProfilesFound', 'No GMB profiles found')}</p>
         ) : (
           <div className="grid gap-4">
             {profiles.map((profile: any) => (
-              <Card key={profile.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-profile-${profile.id}`}>
+              <Card key={profile.id} className="border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-profile-${profile.id}`}>
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <Building className="h-5 w-5 text-salis-gray dark:text-salis-gray-light" />
-                        <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-location-name-${profile.id}`}>
+                        <Building className="h-5 w-5 text-[#64748B]" />
+                        <h3 className="text-lg font-montserrat font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-location-name-${profile.id}`}>
                           {profile.locationName}
                         </h3>
                         {profile.isVerified && (
@@ -164,12 +164,12 @@ export default function GoogleMyBusiness() {
                           </Badge>
                         )}
                         {profile.isConnected && (
-                          <Badge className="bg-salis-black text-white" data-testid={`badge-connected-${profile.id}`}>
+                          <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid={`badge-connected-${profile.id}`}>
                             {t('gmb.connected', 'Connected')}
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-salis-gray dark:text-salis-gray-light space-y-1">
+                      <div className="text-sm text-[#64748B] space-y-1">
                         {profile.address && <p data-testid={`text-address-${profile.id}`}>{t('gmb.address', 'Address')}: {profile.address}</p>}
                         {profile.phone && <p data-testid={`text-phone-${profile.id}`}>{t('gmb.phone', 'Phone')}: {profile.phone}</p>}
                         {profile.website && <p data-testid={`text-website-${profile.id}`}>{t('gmb.website', 'Website')}: {profile.website}</p>}
@@ -190,45 +190,45 @@ export default function GoogleMyBusiness() {
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsPostDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white font-poppins"
           data-testid="button-create-post"
         >
           <MessageCircle className="mr-2 h-4 w-4" />
           {t('gmb.createPost', 'Create Post')}
         </Button>
       </div>
-      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.gmbPosts', 'GMB Posts')}</CardTitle>
-          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          <CardTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('gmb.gmbPosts', 'GMB Posts')}</CardTitle>
+          <CardDescription className="font-poppins text-[#64748B]">
             {t('gmb.updatesOffersEvents', 'Updates, offers, and events posted to Google')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {postsLoading ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-loading-posts">{t('gmb.loadingPosts', 'Loading posts...')}</p>
+            <p className="text-[#64748B] font-poppins" data-testid="text-loading-posts">{t('gmb.loadingPosts', 'Loading posts...')}</p>
           ) : posts.length === 0 ? (
-            <p className="text-salis-gray font-poppins" data-testid="text-no-posts">{t('gmb.noPostsFound', 'No posts found')}</p>
+            <p className="text-[#64748B] font-poppins" data-testid="text-no-posts">{t('gmb.noPostsFound', 'No posts found')}</p>
           ) : (
             <div className="grid gap-4">
               {posts.map((post: any) => (
-                <Card key={post.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-post-${post.id}`}>
+                <Card key={post.id} className="border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-post-${post.id}`}>
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge className="bg-salis-black text-white" data-testid={`badge-post-type-${post.id}`}>
+                          <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid={`badge-post-type-${post.id}`}>
                             {post.postType}
                           </Badge>
-                          <Badge className={post.status === "published" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-post-status-${post.id}`}>
+                          <Badge className={post.status === "published" ? "bg-green-500 text-white" : "bg-[#F97316] text-white"} data-testid={`badge-post-status-${post.id}`}>
                             {post.status}
                           </Badge>
                         </div>
-                        <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-post-content-${post.id}`}>
+                        <p className="text-sm text-[#64748B] font-poppins mb-2" data-testid={`text-post-content-${post.id}`}>
                           {post.content}
                         </p>
                         {post.createdAt && (
-                          <p className="text-xs text-salis-gray dark:text-salis-gray-light" data-testid={`text-post-date-${post.id}`}>
+                          <p className="text-xs text-[#64748B]" data-testid={`text-post-date-${post.id}`}>
                             {new Date(post.createdAt).toLocaleDateString()}
                           </p>
                         )}
@@ -256,18 +256,18 @@ export default function GoogleMyBusiness() {
   );
 
   const reviewsContent = (
-    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+    <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.customerReviews', 'Customer Reviews')}</CardTitle>
-        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+        <CardTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('gmb.customerReviews', 'Customer Reviews')}</CardTitle>
+        <CardDescription className="font-poppins text-[#64748B]">
           {t('gmb.reviewsFromGMB', 'Reviews from Google My Business')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {reviewsLoading ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-loading-reviews">{t('gmb.loadingReviews', 'Loading reviews...')}</p>
+          <p className="text-[#64748B] font-poppins" data-testid="text-loading-reviews">{t('gmb.loadingReviews', 'Loading reviews...')}</p>
         ) : reviews.length === 0 ? (
-          <p className="text-salis-gray font-poppins" data-testid="text-no-reviews">{t('gmb.noReviewsFound', 'No reviews found')}</p>
+          <p className="text-[#64748B] font-poppins" data-testid="text-no-reviews">{t('gmb.noReviewsFound', 'No reviews found')}</p>
         ) : (
           <Table>
             <TableHeader>
@@ -358,10 +358,10 @@ export default function GoogleMyBusiness() {
       />
 
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.addGMBProfile', 'Add GMB Profile')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('gmb.addGMBProfile', 'Add GMB Profile')}</DialogTitle>
+            <DialogDescription className="font-poppins text-[#64748B]">
               {t('gmb.connectGMBLocation', 'Connect a Google My Business location')}
             </DialogDescription>
           </DialogHeader>
@@ -372,9 +372,9 @@ export default function GoogleMyBusiness() {
                 name="locationName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.locationName', 'Location Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.locationName', 'Location Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('gmb.locationNamePlaceholder', 'Downtown Auto Shop')} data-testid="input-location-name" />
+                      <Input {...field} placeholder={t('gmb.locationNamePlaceholder', 'Downtown Auto Shop')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-location-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -385,9 +385,9 @@ export default function GoogleMyBusiness() {
                 name="locationId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.locationId', 'Location ID')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.locationId', 'Location ID')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="accounts/.../locations/..." data-testid="input-location-id" />
+                      <Input {...field} placeholder="accounts/.../locations/..." className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-location-id" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -398,9 +398,9 @@ export default function GoogleMyBusiness() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.address', 'Address')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.address', 'Address')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('gmb.addressPlaceholder', '123 Main St, City, State')} data-testid="input-profile-address" />
+                      <Input {...field} placeholder={t('gmb.addressPlaceholder', '123 Main St, City, State')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-profile-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -412,9 +412,9 @@ export default function GoogleMyBusiness() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('gmb.phone', 'Phone')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.phone', 'Phone')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="+1 (555) 123-4567" data-testid="input-profile-phone" />
+                        <Input {...field} placeholder="+1 (555) 123-4567" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-profile-phone" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -425,9 +425,9 @@ export default function GoogleMyBusiness() {
                   name="website"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('gmb.website', 'Website')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.website', 'Website')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://example.com" data-testid="input-website" />
+                        <Input {...field} placeholder="https://example.com" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-website" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -435,7 +435,7 @@ export default function GoogleMyBusiness() {
                 />
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={createProfileMutation.isPending} data-testid="button-submit-profile">
+                <Button type="submit" disabled={createProfileMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-submit-profile">
                   {createProfileMutation.isPending ? t('gmb.adding', 'Adding...') : t('gmb.addProfile', 'Add Profile')}
                 </Button>
               </DialogFooter>
@@ -445,10 +445,10 @@ export default function GoogleMyBusiness() {
       </Dialog>
 
       <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('gmb.createGMBPost', 'Create GMB Post')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('gmb.createGMBPost', 'Create GMB Post')}</DialogTitle>
+            <DialogDescription className="font-poppins text-[#64748B]">
               {t('gmb.createNewPostForGMB', 'Create a new post for Google My Business')}
             </DialogDescription>
           </DialogHeader>
@@ -459,14 +459,14 @@ export default function GoogleMyBusiness() {
                 name="profileId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.profile', 'Profile')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.profile', 'Profile')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-profile">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-profile">
                           <SelectValue placeholder={t('gmb.selectProfile', 'Select profile')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         {profiles.map((profile: any) => (
                           <SelectItem key={profile.id} value={profile.id}>
                             {profile.locationName}
@@ -483,14 +483,14 @@ export default function GoogleMyBusiness() {
                 name="postType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.postType', 'Post Type')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.postType', 'Post Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-post-type">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-post-type">
                           <SelectValue placeholder={t('gmb.selectType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="update">{t('gmb.update', 'Update')}</SelectItem>
                         <SelectItem value="offer">{t('gmb.offer', 'Offer')}</SelectItem>
                         <SelectItem value="event">{t('gmb.event', 'Event')}</SelectItem>
@@ -506,16 +506,16 @@ export default function GoogleMyBusiness() {
                 name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('gmb.content', 'Content')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('gmb.content', 'Content')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('gmb.postContentPlaceholder', 'Post content...')} rows={4} data-testid="input-post-content" />
+                      <Textarea {...field} placeholder={t('gmb.postContentPlaceholder', 'Post content...')} rows={4} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-post-content" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" disabled={createPostMutation.isPending} data-testid="button-submit-post">
+                <Button type="submit" disabled={createPostMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-submit-post">
                   {createPostMutation.isPending ? t('gmb.creating', 'Creating...') : t('gmb.createPost', 'Create Post')}
                 </Button>
               </DialogFooter>

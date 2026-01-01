@@ -298,23 +298,23 @@ export default function DataBackup() {
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-total-backups">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-total-backups">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('backup.totalBackups', 'Total Backups')}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats?.totalBackups || 0}</p>
+                  <p className="text-sm text-[#64748B]">{t('backup.totalBackups', 'Total Backups')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{stats?.totalBackups || 0}</p>
                 </div>
-                <Database className="h-8 w-8 text-blue-500" />
+                <Database className="h-8 w-8 text-[#0A5ED7]" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-completed-backups">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-completed-backups">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Completed</p>
+                  <p className="text-sm text-[#64748B]">Completed</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats?.completedBackups || 0}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500" />
@@ -322,52 +322,52 @@ export default function DataBackup() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-storage-used">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-storage-used">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('backup.storageUsed', 'Storage Used')}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatFileSize(stats?.totalStorageUsed || 0)}</p>
+                  <p className="text-sm text-[#64748B]">{t('backup.storageUsed', 'Storage Used')}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatFileSize(stats?.totalStorageUsed || 0)}</p>
                 </div>
                 <HardDrive className="h-8 w-8 text-purple-500" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="stat-last-backup">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-last-backup">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('backup.lastBackup', 'Last Backup')}</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  <p className="text-sm text-[#64748B]">{t('backup.lastBackup', 'Last Backup')}</p>
+                  <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                     {stats?.lastBackupDate ? format(new Date(stats.lastBackupDate), 'MMM dd, yyyy') : 'Never'}
                   </p>
                 </div>
-                <Calendar className="h-8 w-8 text-orange-500" />
+                <Calendar className="h-8 w-8 text-[#F97316]" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-1 bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-create-backup">
+          <Card className="lg:col-span-1 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-create-backup">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-500" />
+              <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                <Shield className="h-5 w-5 text-[#0A5ED7]" />
                 {t('backup.createBackup', 'Create Backup')}
               </CardTitle>
-              <CardDescription className="text-gray-500 dark:text-gray-400">
+              <CardDescription className="text-[#64748B]">
                 Configure and create a new backup
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-gray-700 dark:text-gray-300">{t('backup.backupType', 'Backup Type')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('backup.backupType', 'Backup Type')}</Label>
                 <Select value={backupType} onValueChange={setBackupType}>
-                  <SelectTrigger className="mt-1 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark" data-testid="select-backup-type">
+                  <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-backup-type">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <SelectItem value="full">{t('backup.fullBackup', 'Full Backup')}</SelectItem>
                     <SelectItem value="incremental">{t('backup.incrementalBackup', 'Incremental Backup')}</SelectItem>
                   </SelectContent>
@@ -375,12 +375,12 @@ export default function DataBackup() {
               </div>
 
               <div>
-                <Label className="text-gray-700 dark:text-gray-300">{t('backup.schedule', 'Schedule')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('backup.schedule', 'Schedule')}</Label>
                 <Select value={schedule} onValueChange={setSchedule}>
-                  <SelectTrigger className="mt-1 bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark" data-testid="select-schedule">
+                  <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-schedule">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <SelectItem value="manual">Manual Only</SelectItem>
                     <SelectItem value="daily">{t('backup.daily', 'Daily')}</SelectItem>
                     <SelectItem value="weekly">{t('backup.weekly', 'Weekly')}</SelectItem>
@@ -390,12 +390,12 @@ export default function DataBackup() {
               </div>
 
               <div>
-                <Label className="text-gray-700 dark:text-gray-300 mb-2 block">{t('backup.selectData', 'Select Data')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white mb-2 block">{t('backup.selectData', 'Select Data')}</Label>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {dataTypeOptions.map((option) => (
                     <div 
                       key={option.id} 
-                      className="flex items-start space-x-2 p-2 rounded-md hover:bg-gray-50 dark:hover:bg-salis-gray-dark/50"
+                      className="flex items-start space-x-2 p-2 rounded-md hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                     >
                       <Checkbox
                         id={option.id}
@@ -405,10 +405,10 @@ export default function DataBackup() {
                         data-testid={`checkbox-${option.id}`}
                       />
                       <div className="flex-1">
-                        <Label htmlFor={option.id} className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+                        <Label htmlFor={option.id} className="text-sm font-medium text-[#0B1F3B] dark:text-white cursor-pointer">
                           {option.label}
                         </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{option.description}</p>
+                        <p className="text-xs text-[#64748B]">{option.description}</p>
                       </div>
                     </div>
                   ))}
@@ -416,7 +416,7 @@ export default function DataBackup() {
               </div>
 
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" 
                 onClick={handleCreateBackup}
                 disabled={createBackupMutation.isPending || isCreatingBackup || selectedDataTypes.length === 0}
                 data-testid="button-create-backup"
@@ -436,7 +436,7 @@ export default function DataBackup() {
 
               {isCreatingBackup && (
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-sm text-[#64748B]">
                     <span>Creating backup...</span>
                     <span>Please wait</span>
                   </div>
@@ -446,14 +446,14 @@ export default function DataBackup() {
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2 bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-backup-history">
+          <Card className="lg:col-span-2 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-backup-history">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-gray-500" />
+                <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-[#64748B]" />
                   {t('backup.backupHistory', 'Backup History')}
                 </CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardDescription className="text-[#64748B]">
                   View and manage your backup archives
                 </CardDescription>
               </div>
@@ -461,7 +461,7 @@ export default function DataBackup() {
                 variant="outline" 
                 size="sm" 
                 onClick={() => refetchBackups()}
-                className="border-gray-200 dark:border-salis-gray-dark"
+                className="border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="button-refresh-backups"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -471,10 +471,10 @@ export default function DataBackup() {
             <CardContent>
               {loadingBackups ? (
                 <div className="flex items-center justify-center h-48">
-                  <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
+                  <RefreshCw className="h-8 w-8 animate-spin text-[#64748B]" />
                 </div>
               ) : backups.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-48 text-gray-500 dark:text-gray-400">
+                <div className="flex flex-col items-center justify-center h-48 text-[#64748B]">
                   <Database className="h-12 w-12 mb-4 opacity-50" />
                   <p>{t('backup.noBackups', 'No backups found')}</p>
                   <p className="text-sm">Create your first backup to protect your data</p>
@@ -483,18 +483,18 @@ export default function DataBackup() {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow className="border-gray-200 dark:border-salis-gray-dark">
-                        <TableHead className="text-gray-600 dark:text-gray-400">Type</TableHead>
-                        <TableHead className="text-gray-600 dark:text-gray-400">Status</TableHead>
-                        <TableHead className="text-gray-600 dark:text-gray-400">Size</TableHead>
-                        <TableHead className="text-gray-600 dark:text-gray-400">Date</TableHead>
-                        <TableHead className="text-gray-600 dark:text-gray-400 text-right">Actions</TableHead>
+                      <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                        <TableHead className="text-[#64748B]">Type</TableHead>
+                        <TableHead className="text-[#64748B]">Status</TableHead>
+                        <TableHead className="text-[#64748B]">Size</TableHead>
+                        <TableHead className="text-[#64748B]">Date</TableHead>
+                        <TableHead className="text-[#64748B] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {backups.map((backup) => (
-                        <TableRow key={backup.id} className="border-gray-200 dark:border-salis-gray-dark" data-testid={`backup-row-${backup.id}`}>
-                          <TableCell className="text-gray-900 dark:text-white font-medium">
+                        <TableRow key={backup.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`backup-row-${backup.id}`}>
+                          <TableCell className="text-[#0B1F3B] dark:text-white font-medium">
                             {backup.jobType === 'restore' ? (
                               <span className="flex items-center gap-2">
                                 <Upload className="h-4 w-4 text-purple-500" />
@@ -502,16 +502,16 @@ export default function DataBackup() {
                               </span>
                             ) : (
                               <span className="flex items-center gap-2">
-                                <Download className="h-4 w-4 text-blue-500" />
+                                <Download className="h-4 w-4 text-[#0A5ED7]" />
                                 {backup.jobType === 'full' ? 'Full' : 'Incremental'}
                               </span>
                             )}
                           </TableCell>
                           <TableCell>{getStatusBadge(backup.status)}</TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400">
+                          <TableCell className="text-[#64748B]">
                             {formatFileSize(backup.fileSize)}
                           </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400">
+                          <TableCell className="text-[#64748B]">
                             {backup.completedAt 
                               ? format(new Date(backup.completedAt), 'MMM dd, yyyy HH:mm')
                               : format(new Date(backup.createdAt), 'MMM dd, yyyy HH:mm')}
@@ -524,26 +524,26 @@ export default function DataBackup() {
                                     <Button 
                                       variant="outline" 
                                       size="sm"
-                                      className="border-gray-200 dark:border-salis-gray-dark"
+                                      className="border-[#E2E8F0] dark:border-[#232A36]"
                                       data-testid={`button-restore-${backup.id}`}
                                     >
                                       <Upload className="h-4 w-4 mr-1" />
                                       Restore
                                     </Button>
                                   </AlertDialogTrigger>
-                                  <AlertDialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                                  <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle className="text-gray-900 dark:text-white">Restore Backup?</AlertDialogTitle>
-                                      <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
-                                        This will restore your data to the state from {backup.completedAt ? format(new Date(backup.completedAt), 'MMM dd, yyyy HH:mm') : 'this backup'}. 
-                                        Current data will be replaced. This action cannot be undone.
+                                      <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">Restore Backup?</AlertDialogTitle>
+                                      <AlertDialogDescription className="text-[#64748B]">
+                                        This will restore your data to the state when this backup was created. 
+                                        Current data may be overwritten.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel className="border-gray-200 dark:border-salis-gray-dark">Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">Cancel</AlertDialogCancel>
                                       <AlertDialogAction 
-                                        className="bg-blue-600 hover:bg-blue-700"
                                         onClick={() => restoreBackupMutation.mutate(backup.id)}
+                                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                                       >
                                         Restore
                                       </AlertDialogAction>
@@ -554,26 +554,26 @@ export default function DataBackup() {
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <Button 
-                                    variant="ghost" 
+                                    variant="outline" 
                                     size="sm"
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    className="text-red-600 hover:text-red-700 border-[#E2E8F0] dark:border-[#232A36]"
                                     data-testid={`button-delete-${backup.id}`}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </AlertDialogTrigger>
-                                <AlertDialogContent className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                                <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-gray-900 dark:text-white">Delete Backup?</AlertDialogTitle>
-                                    <AlertDialogDescription className="text-gray-500 dark:text-gray-400">
-                                      This will permanently delete this backup. This action cannot be undone.
+                                    <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">Delete Backup?</AlertDialogTitle>
+                                    <AlertDialogDescription className="text-[#64748B]">
+                                      This action cannot be undone. This backup will be permanently deleted.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-gray-200 dark:border-salis-gray-dark">Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">Cancel</AlertDialogCancel>
                                     <AlertDialogAction 
-                                      className="bg-red-600 hover:bg-red-700"
                                       onClick={() => deleteBackupMutation.mutate(backup.id)}
+                                      className="bg-red-600 hover:bg-red-700 text-white"
                                     >
                                       Delete
                                     </AlertDialogAction>
@@ -591,37 +591,6 @@ export default function DataBackup() {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="bg-white dark:bg-salis-gray-dark/30 border-gray-200 dark:border-salis-gray-dark" data-testid="card-backup-info">
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-500" />
-              Backup Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Full Backup</h4>
-                <p className="text-sm text-blue-700 dark:text-blue-400">
-                  Creates a complete copy of all selected data. Recommended for disaster recovery.
-                </p>
-              </div>
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
-                <h4 className="font-medium text-green-800 dark:text-green-300 mb-2">Incremental Backup</h4>
-                <p className="text-sm text-green-700 dark:text-green-400">
-                  Only backs up changes since the last backup. Faster and uses less storage.
-                </p>
-              </div>
-              <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20">
-                <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2">Scheduled Backups</h4>
-                <p className="text-sm text-purple-700 dark:text-purple-400">
-                  Set up automatic backups to run daily, weekly, or monthly for continuous protection.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </StandardPageLayout>
   );

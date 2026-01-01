@@ -60,12 +60,12 @@ export default function BlockchainServiceHistory() {
 
   const getRecordTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      service: "bg-blue-500",
-      repair: "bg-orange-500",
+      service: "bg-[#0A5ED7]",
+      repair: "bg-[#F97316]",
       inspection: "bg-green-500",
-      ownership_transfer: "bg-purple-500",
+      ownership_transfer: "bg-[#0BB3FF]",
     };
-    return colors[type] || "bg-gray-500";
+    return colors[type] || "bg-[#64748B]";
   };
 
   return (
@@ -76,17 +76,17 @@ export default function BlockchainServiceHistory() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="text-lg">{t('blockchain.selectVehicle', 'Select Vehicle')}</CardTitle>
-              <CardDescription>{t('blockchain.viewRecords', 'View blockchain service records')}</CardDescription>
+              <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('blockchain.selectVehicle', 'Select Vehicle')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('blockchain.viewRecords', 'View blockchain service records')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {vehicles?.map((vehicle) => (
                 <Button
                   key={vehicle.id}
                   variant={selectedVehicle === vehicle.id ? "default" : "outline"}
-                  className="w-full justify-start"
+                  className={`w-full justify-start ${selectedVehicle === vehicle.id ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white' : 'border-[#E2E8F0] dark:border-[#232A36]'}`}
                   onClick={() => setSelectedVehicle(vehicle.id)}
                   data-testid={`button-select-vehicle-${vehicle.id}`}
                 >
@@ -99,34 +99,34 @@ export default function BlockchainServiceHistory() {
                 </Button>
               ))}
               {!vehicles?.length && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t('blockchain.noVehicles', 'No vehicles found')}</p>
+                <p className="text-sm text-[#64748B]">{t('blockchain.noVehicles', 'No vehicles found')}</p>
               )}
             </CardContent>
           </Card>
 
           {selectedVehicle && blockchainRecords && (
-            <Card className="mt-4">
+            <Card className="mt-4 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="text-lg flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                   <Lock className="w-5 h-5 text-green-600" />
                   {t('blockchain.stats', 'Blockchain Stats')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.totalRecords', 'Total Records')}:</span>
-                  <span className="font-semibold" data-testid="text-total-records">
+                  <span className="text-sm text-[#64748B]">{t('blockchain.totalRecords', 'Total Records')}:</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-total-records">
                     {blockchainRecords.length}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.chainHeight', 'Chain Height')}:</span>
-                  <span className="font-semibold" data-testid="text-chain-height">
+                  <span className="text-sm text-[#64748B]">{t('blockchain.chainHeight', 'Chain Height')}:</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-chain-height">
                     {blockchainRecords.length > 0 ? blockchainRecords[0].blockNumber : 0}
                   </span>
                 </div>
                 <Button
-                  className="w-full mt-4"
+                  className="w-full mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                   variant="default"
                   onClick={() => verifyChainMutation.mutate()}
                   disabled={verifyChainMutation.isPending}
@@ -142,13 +142,13 @@ export default function BlockchainServiceHistory() {
 
         <div className="lg:col-span-3">
           {!selectedVehicle && (
-            <Card className="h-full flex items-center justify-center min-h-[400px]">
+            <Card className="h-full flex items-center justify-center min-h-[400px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="text-center">
-                <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <Shield className="w-16 h-16 text-[#64748B] mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-2">
                   {t('blockchain.selectVehiclePrompt', 'Select a Vehicle')}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-[#64748B]">
                   {t('blockchain.selectVehicleDesc', 'Choose a vehicle from the sidebar to view its blockchain service history')}
                 </p>
               </CardContent>
@@ -158,20 +158,20 @@ export default function BlockchainServiceHistory() {
           {selectedVehicle && isLoading && (
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-400">{t('blockchain.loadingRecords', 'Loading blockchain records...')}</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+                <p className="mt-4 text-[#64748B]">{t('blockchain.loadingRecords', 'Loading blockchain records...')}</p>
               </div>
             </div>
           )}
 
           {selectedVehicle && !isLoading && blockchainRecords && blockchainRecords.length === 0 && (
-            <Card>
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="text-center py-12">
-                <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <AlertCircle className="w-12 h-12 text-[#64748B] mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">
                   {t('blockchain.noRecords', 'No Blockchain Records')}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-[#64748B]">
                   {t('blockchain.noRecordsDesc', 'This vehicle has no blockchain service history yet')}
                 </p>
               </CardContent>
@@ -181,17 +181,17 @@ export default function BlockchainServiceHistory() {
           {selectedVehicle && !isLoading && blockchainRecords && blockchainRecords.length > 0 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
                   {t('blockchain.serviceRecords', 'Service Records')} ({blockchainRecords.length})
                 </h2>
-                <Badge variant="outline" className="flex items-center gap-2">
+                <Badge variant="outline" className="flex items-center gap-2 border-[#E2E8F0] dark:border-[#232A36]">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
                   {t('blockchain.verifiedImmutable', 'Verified & Immutable')}
                 </Badge>
               </div>
 
               {blockchainRecords.map((record, index) => (
-                <Card key={record.id} className="border-l-4 border-l-blue-600">
+                <Card key={record.id} className="border-l-4 border-l-[#0A5ED7] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -199,10 +199,10 @@ export default function BlockchainServiceHistory() {
                           {record.recordType.replace("_", " ").toUpperCase()}
                         </Badge>
                         <div>
-                          <CardTitle className="text-lg" data-testid={`text-record-type-${record.id}`}>
+                          <CardTitle className="text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-record-type-${record.id}`}>
                             {(record.recordData?.eventType || record.recordType).replace("_", " ").toUpperCase()}
                           </CardTitle>
-                          <CardDescription>
+                          <CardDescription className="text-[#64748B]">
                             {new Date(record.timestamp).toLocaleString()}
                           </CardDescription>
                         </div>
@@ -225,24 +225,24 @@ export default function BlockchainServiceHistory() {
                   </CardHeader>
 
                   {expandedRecord === record.id && (
-                    <CardContent className="border-t pt-4 space-y-3">
+                    <CardContent className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-3">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.blockNumber', 'Block Number')}</p>
-                          <p className="font-mono font-semibold" data-testid={`text-block-number-${record.id}`}>
+                          <p className="text-sm text-[#64748B]">{t('blockchain.blockNumber', 'Block Number')}</p>
+                          <p className="font-mono font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-block-number-${record.id}`}>
                             #{record.blockNumber}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">{t('blockchain.position', 'Position')}</p>
-                          <p className="font-semibold">{t('blockchain.recordNumber', 'Record')} #{index + 1}</p>
+                          <p className="text-sm text-[#64748B]">{t('blockchain.position', 'Position')}</p>
+                          <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('blockchain.recordNumber', 'Record')} #{index + 1}</p>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.transactionHash', 'Transaction Hash')}</p>
-                        <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
-                          <p className="font-mono text-xs break-all" data-testid={`text-tx-hash-${record.id}`}>
+                        <p className="text-sm text-[#64748B] mb-1">{t('blockchain.transactionHash', 'Transaction Hash')}</p>
+                        <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-2 rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
+                          <p className="font-mono text-xs break-all text-[#0B1F3B] dark:text-white" data-testid={`text-tx-hash-${record.id}`}>
                             {record.transactionHash}
                           </p>
                         </div>
@@ -250,23 +250,23 @@ export default function BlockchainServiceHistory() {
 
                       {record.previousHash && (
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.previousHash', 'Previous Hash')}</p>
-                          <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
-                            <p className="font-mono text-xs break-all">{record.previousHash}</p>
+                          <p className="text-sm text-[#64748B] mb-1">{t('blockchain.previousHash', 'Previous Hash')}</p>
+                          <div className="bg-[#F8FAFC] dark:bg-[#0E1117] p-2 rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
+                            <p className="font-mono text-xs break-all text-[#0B1F3B] dark:text-white">{record.previousHash}</p>
                           </div>
                         </div>
                       )}
 
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('blockchain.network', 'Blockchain Network')}</p>
-                        <Badge variant="outline">{record.blockchainNetwork || "Ethereum"}</Badge>
+                        <p className="text-sm text-[#64748B] mb-1">{t('blockchain.network', 'Blockchain Network')}</p>
+                        <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">{record.blockchainNetwork || "Ethereum"}</Badge>
                       </div>
 
                       {record.recordData && (
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('blockchain.recordData', 'Record Data')}</p>
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
-                            <pre className="text-xs overflow-auto">
+                          <p className="text-sm text-[#64748B] mb-2">{t('blockchain.recordData', 'Record Data')}</p>
+                          <div className="bg-[#0A5ED7]/10 p-3 rounded-md border border-[#0A5ED7]/20">
+                            <pre className="text-xs overflow-auto text-[#0B1F3B] dark:text-white">
                               {JSON.stringify(record.recordData, null, 2)}
                             </pre>
                           </div>
@@ -283,8 +283,8 @@ export default function BlockchainServiceHistory() {
                           </>
                         ) : (
                           <>
-                            <AlertCircle className="w-5 h-5 text-yellow-600" />
-                            <span className="text-sm font-semibold text-yellow-600">
+                            <AlertCircle className="w-5 h-5 text-[#F97316]" />
+                            <span className="text-sm font-semibold text-[#F97316]">
                               {t('blockchain.verification', 'Verification')}: {record.verificationStatus}
                             </span>
                           </>

@@ -33,7 +33,6 @@ export default function CustomerMobileBooking() {
         description: "Your service appointment has been scheduled successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
-      // Reset form
       setSelectedVehicle("");
       setServiceType("");
       setDate("");
@@ -89,51 +88,48 @@ export default function CustomerMobileBooking() {
   ];
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Header */}
+    <div className="p-4 space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Book Service</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Schedule your next service appointment</p>
+        <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">Book Service</h2>
+        <p className="text-sm text-[#64748B]">Schedule your next service appointment</p>
       </div>
 
-      {/* Quick Service Cards */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Popular Services</h3>
+        <h3 className="text-sm font-semibold mb-2 text-[#0B1F3B] dark:text-gray-300">Popular Services</h3>
         <div className="grid grid-cols-2 gap-2">
           <Card 
-            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] cursor-pointer hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF]"
             onClick={() => setServiceType("Oil Change")}
             data-testid="service-oil-change"
           >
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-1">🛢️</div>
-              <div className="text-xs font-medium text-gray-900 dark:text-white">Oil Change</div>
+              <div className="text-xs font-medium text-[#0B1F3B] dark:text-white">Oil Change</div>
             </CardContent>
           </Card>
           <Card 
-            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer hover:border-blue-500 dark:hover:border-blue-400"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] cursor-pointer hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF]"
             onClick={() => setServiceType("Brake Inspection")}
             data-testid="service-brakes"
           >
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-1">🔧</div>
-              <div className="text-xs font-medium text-gray-900 dark:text-white">Brake Service</div>
+              <div className="text-xs font-medium text-[#0B1F3B] dark:text-white">Brake Service</div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Booking Form */}
-      <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="text-base text-gray-900 dark:text-white">Appointment Details</CardTitle>
+          <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Appointment Details</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="vehicle" className="text-gray-700 dark:text-gray-300">Select Vehicle *</Label>
+              <Label htmlFor="vehicle" className="text-[#0B1F3B] dark:text-gray-300">Select Vehicle *</Label>
               <Select value={selectedVehicle} onValueChange={setSelectedVehicle}>
-                <SelectTrigger id="vehicle" data-testid="select-vehicle">
+                <SelectTrigger id="vehicle" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-vehicle">
                   <SelectValue placeholder="Choose a vehicle" />
                 </SelectTrigger>
                 <SelectContent>
@@ -147,9 +143,9 @@ export default function CustomerMobileBooking() {
             </div>
 
             <div>
-              <Label htmlFor="service" className="text-gray-700 dark:text-gray-300">Service Type *</Label>
+              <Label htmlFor="service" className="text-[#0B1F3B] dark:text-gray-300">Service Type *</Label>
               <Select value={serviceType} onValueChange={setServiceType}>
-                <SelectTrigger id="service" data-testid="select-service">
+                <SelectTrigger id="service" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-service">
                   <SelectValue placeholder="Select service" />
                 </SelectTrigger>
                 <SelectContent>
@@ -163,25 +159,25 @@ export default function CustomerMobileBooking() {
             </div>
 
             <div>
-              <Label htmlFor="date" className="text-gray-700 dark:text-gray-300">Preferred Date *</Label>
+              <Label htmlFor="date" className="text-[#0B1F3B] dark:text-gray-300">Preferred Date *</Label>
               <div className="relative">
-                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
                   id="date"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-date"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="time" className="text-gray-700 dark:text-gray-300">Preferred Time *</Label>
+              <Label htmlFor="time" className="text-[#0B1F3B] dark:text-gray-300">Preferred Time *</Label>
               <Select value={time} onValueChange={setTime}>
-                <SelectTrigger id="time" data-testid="select-time">
+                <SelectTrigger id="time" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-time">
                   <SelectValue placeholder="Select time" />
                 </SelectTrigger>
                 <SelectContent>
@@ -195,20 +191,21 @@ export default function CustomerMobileBooking() {
             </div>
 
             <div>
-              <Label htmlFor="description" className="text-gray-700 dark:text-gray-300">Additional Notes</Label>
+              <Label htmlFor="description" className="text-[#0B1F3B] dark:text-gray-300">Additional Notes</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe any issues or special requests..."
                 rows={3}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="textarea-notes"
               />
             </div>
 
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6] text-white"
               disabled={bookingMutation.isPending}
               data-testid="button-book-appointment"
             >

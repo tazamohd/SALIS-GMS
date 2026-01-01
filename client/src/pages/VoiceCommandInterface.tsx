@@ -57,16 +57,16 @@ export default function VoiceCommandInterface() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('voiceCommands.voiceControl', 'Voice Control')}</CardTitle>
-              <CardDescription>{t('voiceCommands.activateVoiceCommands', 'Activate and use voice commands')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.voiceControl', 'Voice Control')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('voiceCommands.activateVoiceCommands', 'Activate and use voice commands')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  <Label htmlFor="voice-enabled">{t('voiceCommands.enableVoiceCommands', 'Enable Voice Commands')}</Label>
+                  <Volume2 className="w-5 h-5 text-[#64748B]" />
+                  <Label htmlFor="voice-enabled" className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.enableVoiceCommands', 'Enable Voice Commands')}</Label>
                 </div>
                 <Switch
                   id="voice-enabled"
@@ -77,12 +77,12 @@ export default function VoiceCommandInterface() {
               </div>
 
               <div className="space-y-2">
-                <Label>{t('voiceCommands.language', 'Language')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.language', 'Language')}</Label>
                 <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger data-testid="select-language">
+                  <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-language">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <SelectItem value="en-US">{t('voiceCommands.englishUS', 'English (US)')}</SelectItem>
                     <SelectItem value="en-GB">{t('voiceCommands.englishUK', 'English (UK)')}</SelectItem>
                     <SelectItem value="ar-SA">{t('voiceCommands.arabicSA', 'Arabic (Saudi Arabia)')}</SelectItem>
@@ -92,13 +92,13 @@ export default function VoiceCommandInterface() {
                 </Select>
               </div>
 
-              <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+              <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <Button
                   size="lg"
                   variant={isListening ? "destructive" : "default"}
                   onClick={toggleListening}
                   disabled={!isEnabled}
-                  className={`w-24 h-24 rounded-full ${isListening ? 'animate-pulse' : ''}`}
+                  className={`w-24 h-24 rounded-full ${isListening ? 'animate-pulse bg-red-600 hover:bg-red-700' : 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90'}`}
                   data-testid="button-mic"
                 >
                   {isListening ? (
@@ -107,11 +107,11 @@ export default function VoiceCommandInterface() {
                     <Mic className="w-12 h-12" />
                   )}
                 </Button>
-                <p className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                <p className="mt-4 text-lg font-medium text-[#0B1F3B] dark:text-white">
                   {isListening ? t('voiceCommands.listening', 'Listening...') : t('voiceCommands.clickToStart', 'Click to start')}
                 </p>
                 {transcript && (
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400" data-testid="text-transcript">
+                  <p className="mt-2 text-sm text-[#64748B]" data-testid="text-transcript">
                     {transcript}
                   </p>
                 )}
@@ -119,29 +119,29 @@ export default function VoiceCommandInterface() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Zap className="w-5 h-5 text-[#F97316]" />
                 {t('voiceCommands.availableCommands', 'Available Commands')}
               </CardTitle>
-              <CardDescription>{t('voiceCommands.listOfCommands', 'List of supported voice commands')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('voiceCommands.listOfCommands', 'List of supported voice commands')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {commands.map((cmd, index) => (
                   <div
                     key={index}
-                    className="flex items-start justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    className="flex items-start justify-between p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`command-${index}`}
                   >
                     <div className="flex-1">
-                      <p className="font-mono text-sm font-semibold text-gray-900 dark:text-white">
+                      <p className="font-mono text-sm font-semibold text-[#0B1F3B] dark:text-white">
                         "{cmd.command}"
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{cmd.description}</p>
+                      <p className="text-sm text-[#64748B]">{cmd.description}</p>
                     </div>
-                    <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-0">
+                    <Badge className="bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border-0">
                       {cmd.category}
                     </Badge>
                   </div>
@@ -152,33 +152,33 @@ export default function VoiceCommandInterface() {
         </div>
 
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Settings className="w-5 h-5 text-[#64748B]" />
                 {t('common.settings', 'Settings')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="continuous">{t('voiceCommands.continuousListening', 'Continuous Listening')}</Label>
+                <Label htmlFor="continuous" className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.continuousListening', 'Continuous Listening')}</Label>
                 <Switch id="continuous" data-testid="switch-continuous" />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="feedback">{t('voiceCommands.audioFeedback', 'Audio Feedback')}</Label>
+                <Label htmlFor="feedback" className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.audioFeedback', 'Audio Feedback')}</Label>
                 <Switch id="feedback" defaultChecked data-testid="switch-feedback" />
               </div>
               <div className="flex items-center justify-between">
-                <Label htmlFor="wakeword">{t('voiceCommands.wakeWordDetection', 'Wake Word Detection')}</Label>
+                <Label htmlFor="wakeword" className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.wakeWordDetection', 'Wake Word Detection')}</Label>
                 <Switch id="wakeword" data-testid="switch-wakeword" />
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('voiceCommands.recentCommands', 'Recent Commands')}</CardTitle>
-              <CardDescription>{t('voiceCommands.commandHistory', 'Your command history')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.recentCommands', 'Recent Commands')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('voiceCommands.commandHistory', 'Your command history')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -189,10 +189,10 @@ export default function VoiceCommandInterface() {
                     data-testid={`recent-${index}`}
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                         {cmd.command}
                       </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{cmd.time}</p>
+                      <p className="text-xs text-[#64748B]">{cmd.time}</p>
                     </div>
                     <Badge className={`${getStatusColor(cmd.status)} border-0 capitalize`}>
                       {cmd.status === "success" ? t('common.success', 'success') : t('common.failed', 'failed')}
@@ -203,26 +203,26 @@ export default function VoiceCommandInterface() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('voiceCommands.quickTips', 'Quick Tips')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('voiceCommands.quickTips', 'Quick Tips')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <ul className="space-y-2 text-sm text-[#64748B]">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0A5ED7]" />
                   <span>{t('voiceCommands.tipSpeakClearly', 'Speak clearly and at a normal pace')}</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0A5ED7]" />
                   <span>{t('voiceCommands.tipExactPhrases', 'Use exact command phrases')}</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0A5ED7]" />
                   <span>{t('voiceCommands.tipSayHelp', 'Say "Help" for assistance')}</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0A5ED7]" />
                   <span>{t('voiceCommands.tipReduceNoise', 'Reduce background noise')}</span>
                 </li>
               </ul>

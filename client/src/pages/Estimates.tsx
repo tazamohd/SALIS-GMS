@@ -36,13 +36,13 @@ export function Estimates() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200",
-      sent: "bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white",
-      accepted: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200",
-      declined: "bg-salis-black dark:bg-white text-white dark:text-salis-black",
-      expired: "bg-gray-100 dark:bg-salis-gray-dark text-gray-600 dark:text-gray-400",
+      draft: "bg-[#64748B]/10 text-[#64748B]",
+      sent: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+      accepted: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      declined: "bg-red-500/10 text-red-600 dark:text-red-400",
+      expired: "bg-[#F97316]/10 text-[#F97316]",
     };
-    return colors[status] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
+    return colors[status] || "bg-[#64748B]/10 text-[#64748B]";
   };
 
   const columns = [
@@ -51,12 +51,14 @@ export function Estimates() {
       label: t('estimates.estimateNumber', 'Estimate #'),
       render: (estimate: Estimate) => (
         <div className="flex items-center gap-3">
-          <FileText className="w-5 h-5 text-gray-900 dark:text-white/50" />
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
           <div>
-            <p className="font-semibold text-sm text-gray-900 dark:text-white" data-testid={`text-estimate-number-${estimate.id}`}>
+            <p className="font-semibold text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-estimate-number-${estimate.id}`}>
               {estimate.estimateNumber}
             </p>
-            <p className="text-xs text-gray-900 dark:text-white/60" data-testid={`text-customer-${estimate.id}`}>
+            <p className="text-xs text-[#64748B]" data-testid={`text-customer-${estimate.id}`}>
               {customers?.find(c => c.id === estimate.customerId)?.fullName || t('estimates.unknownCustomer', 'Unknown Customer')}
             </p>
           </div>
@@ -68,11 +70,11 @@ export function Estimates() {
       label: t('common.amount', 'Amount'),
       render: (estimate: Estimate) => (
         <div className="text-right">
-          <p className="font-bold text-sm text-gray-900 dark:text-white" data-testid={`text-amount-${estimate.id}`}>
+          <p className="font-bold text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-amount-${estimate.id}`}>
             ${estimate.totalAmount}
           </p>
           {estimate.validUntil && (
-            <p className="text-xs text-gray-900 dark:text-white/60">
+            <p className="text-xs text-[#64748B]">
               {t('estimates.validUntil', 'Valid until')} {new Date(estimate.validUntil).toLocaleDateString()}
             </p>
           )}

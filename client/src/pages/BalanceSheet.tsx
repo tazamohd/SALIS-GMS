@@ -337,9 +337,9 @@ export default function BalanceSheet() {
   const ratiosTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-current-ratio">
+        <Card data-testid="card-current-ratio" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.currentRatio', 'Current Ratio')}
             </CardTitle>
           </CardHeader>
@@ -347,15 +347,15 @@ export default function BalanceSheet() {
             <p className="text-2xl font-bold text-blue-600">
               {currentRatio.toFixed(2)}
             </p>
-            <Badge variant={currentRatio >= 1.5 ? "default" : "secondary"}>
+            <Badge variant={currentRatio >= 1.5 ? "default" : "secondary"} className={currentRatio >= 1.5 ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""}>
               {currentRatio >= 1.5 ? t('accounting.healthy', 'Healthy') : t('accounting.monitor', 'Monitor')}
             </Badge>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-debt-ratio">
+        <Card data-testid="card-debt-ratio" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.debtRatio', 'Debt Ratio')}
             </CardTitle>
           </CardHeader>
@@ -363,15 +363,15 @@ export default function BalanceSheet() {
             <p className="text-2xl font-bold text-red-600">
               {debtRatio.toFixed(1)}%
             </p>
-            <Badge variant={debtRatio < 50 ? "default" : "destructive"}>
+            <Badge variant={debtRatio < 50 ? "default" : "destructive"} className={debtRatio < 50 ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-[#F97316] text-white"}>
               {debtRatio < 50 ? t('accounting.lowRisk', 'Low Risk') : t('accounting.highDebt', 'High Debt')}
             </Badge>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-working-capital">
+        <Card data-testid="card-working-capital" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.workingCapital', 'Working Capital')}
             </CardTitle>
           </CardHeader>
@@ -379,13 +379,13 @@ export default function BalanceSheet() {
             <p className="text-2xl font-bold text-green-600">
               {t('common.sar', 'SAR')} {(totalCurrentAssets - totalCurrentLiabilities).toLocaleString()}
             </p>
-            <Badge variant="default">{t('accounting.positive', 'Positive')}</Badge>
+            <Badge variant="default" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t('accounting.positive', 'Positive')}</Badge>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-equity-ratio">
+        <Card data-testid="card-equity-ratio" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-[#64748B]">
               {t('accounting.equityRatio', 'Equity Ratio')}
             </CardTitle>
           </CardHeader>
@@ -393,15 +393,15 @@ export default function BalanceSheet() {
             <p className="text-2xl font-bold text-purple-600">
               {((totalEquity / totalAssets) * 100).toFixed(1)}%
             </p>
-            <Badge variant="default">{t('accounting.strong', 'Strong')}</Badge>
+            <Badge variant="default" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t('accounting.strong', 'Strong')}</Badge>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.financialPositionAnalysis', 'Financial Position Analysis')}</CardTitle>
-          <CardDescription>{t('accounting.keyBalanceSheetMetrics', 'Key balance sheet metrics and trends')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.financialPositionAnalysis', 'Financial Position Analysis')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.keyBalanceSheetMetrics', 'Key balance sheet metrics and trends')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -459,10 +459,10 @@ export default function BalanceSheet() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.relatedReports', 'Related Reports')}</CardTitle>
-          <CardDescription>{t('accounting.navigateToRelatedStatements', 'Navigate to related financial statements')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedReports', 'Related Reports')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.navigateToRelatedStatements', 'Navigate to related financial statements')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -502,26 +502,26 @@ export default function BalanceSheet() {
 
   const comparativeTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('accounting.comparativeBalanceSheet', 'Comparative Balance Sheet')}</CardTitle>
-          <CardDescription>{t('accounting.yearOverYearComparison', 'Year-over-year comparison')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.comparativeBalanceSheet', 'Comparative Balance Sheet')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('accounting.yearOverYearComparison', 'Year-over-year comparison')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
               <div>
-                <p className="text-sm text-muted-foreground">{t('accounting.totalAssets', 'Total Assets')}</p>
-                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalAssets.toLocaleString()}</p>
+                <p className="text-sm text-[#64748B]">{t('accounting.totalAssets', 'Total Assets')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('common.sar', 'SAR')} {totalAssets.toLocaleString()}</p>
                 <p className="text-xs text-green-600">+{((totalAssets - previousTotalAssets) / previousTotalAssets * 100).toFixed(1)}% {t('accounting.vsLastYear', 'vs last year')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t('accounting.totalLiabilities', 'Total Liabilities')}</p>
-                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}</p>
+                <p className="text-sm text-[#64748B]">{t('accounting.totalLiabilities', 'Total Liabilities')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t('accounting.totalEquity', 'Total Equity')}</p>
-                <p className="text-xl font-bold">{t('common.sar', 'SAR')} {totalEquity.toLocaleString()}</p>
+                <p className="text-sm text-[#64748B]">{t('accounting.totalEquity', 'Total Equity')}</p>
+                <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('common.sar', 'SAR')} {totalEquity.toLocaleString()}</p>
               </div>
             </div>
           </div>

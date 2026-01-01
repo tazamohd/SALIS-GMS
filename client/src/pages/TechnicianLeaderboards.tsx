@@ -31,17 +31,17 @@ export default function TechnicianLeaderboards() {
   }).sort((a, b) => b.points - a.points);
 
   const badges = [
-    { name: t('leaderboards.badges.speedDemon', 'Speed Demon'), icon: Zap, description: t('leaderboards.badges.speedDemonDesc', 'Complete 5 jobs in one day'), color: "text-yellow-500" },
-    { name: t('leaderboards.badges.qualityMaster', 'Quality Master'), icon: Star, description: t('leaderboards.badges.qualityMasterDesc', 'Perfect 5-star rating streak'), color: "text-purple-500" },
+    { name: t('leaderboards.badges.speedDemon', 'Speed Demon'), icon: Zap, description: t('leaderboards.badges.speedDemonDesc', 'Complete 5 jobs in one day'), color: "text-[#F97316]" },
+    { name: t('leaderboards.badges.qualityMaster', 'Quality Master'), icon: Star, description: t('leaderboards.badges.qualityMasterDesc', 'Perfect 5-star rating streak'), color: "text-[#0A5ED7]" },
     { name: t('leaderboards.badges.revenueKing', 'Revenue King'), icon: Trophy, description: t('leaderboards.badges.revenueKingDesc', 'Generate $10k+ in one month'), color: "text-green-500" },
-    { name: t('leaderboards.badges.efficiencyExpert', 'Efficiency Expert'), icon: Target, description: t('leaderboards.badges.efficiencyExpertDesc', '95%+ efficiency for 30 days'), color: "text-blue-500" },
+    { name: t('leaderboards.badges.efficiencyExpert', 'Efficiency Expert'), icon: Target, description: t('leaderboards.badges.efficiencyExpertDesc', '95%+ efficiency for 30 days'), color: "text-[#0BB3FF]" },
   ];
 
   const getRankIcon = (index: number) => {
-    if (index === 0) return { icon: Trophy, color: "text-yellow-500", bg: "bg-yellow-50 dark:bg-yellow-900/20" };
-    if (index === 1) return { icon: Medal, color: "text-gray-400", bg: "bg-gray-50 dark:bg-gray-800" };
-    if (index === 2) return { icon: Medal, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-900/20" };
-    return { icon: Award, color: "text-gray-400", bg: "bg-gray-50 dark:bg-gray-800" };
+    if (index === 0) return { icon: Trophy, color: "text-[#F97316]", bg: "bg-[#F97316]/10 dark:bg-[#F97316]/20" };
+    if (index === 1) return { icon: Medal, color: "text-[#64748B]", bg: "bg-[#F8FAFC] dark:bg-[#0E1117]" };
+    if (index === 2) return { icon: Medal, color: "text-[#0BB3FF]", bg: "bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20" };
+    return { icon: Award, color: "text-[#64748B]", bg: "bg-[#F8FAFC] dark:bg-[#0E1117]" };
   };
 
   return (
@@ -51,12 +51,11 @@ export default function TechnicianLeaderboards() {
       icon={Trophy}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Leaderboard */}
         <div className="lg:col-span-2 space-y-4">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-yellow-500" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Trophy className="h-5 w-5 text-[#F97316]" />
                 {t('leaderboards.overallLeaderboard', 'Overall Leaderboard')}
               </CardTitle>
             </CardHeader>
@@ -69,28 +68,28 @@ export default function TechnicianLeaderboards() {
                   return (
                     <div
                       key={tech.id}
-                      className={`p-4 ${rank.bg} rounded-lg border border-gray-200 dark:border-gray-700`}
+                      className={`p-4 ${rank.bg} rounded-lg border border-[#E2E8F0] dark:border-[#232A36]`}
                       data-testid={`leaderboard-${index + 1}`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="flex items-center justify-center w-12 h-12 bg-white dark:bg-gray-700 rounded-full">
+                        <div className="flex items-center justify-center w-12 h-12 bg-white dark:bg-[#151A23] rounded-full border border-[#E2E8F0] dark:border-[#232A36]">
                           <RankIcon className={`h-6 w-6 ${rank.color}`} />
                         </div>
                         
                         <Avatar className="h-12 w-12">
-                          <AvatarFallback className="bg-blue-600 text-white">
+                          <AvatarFallback className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                             {tech.name?.substring(0, 2).toUpperCase() || "TN"}
                           </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                            <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                               {tech.name || `${t('leaderboards.technician', 'Technician')} ${index + 1}`}
                             </h3>
-                            <Badge className="bg-blue-600">#{index + 1}</Badge>
+                            <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">#{index + 1}</Badge>
                             {tech.badges > 0 && (
-                              <Badge variant="outline" className="flex items-center gap-1">
+                              <Badge variant="outline" className="flex items-center gap-1 border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                                 <Award className="h-3 w-3" />
                                 {tech.badges}
                               </Badge>
@@ -98,25 +97,25 @@ export default function TechnicianLeaderboards() {
                           </div>
                           <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.points', 'Points')}</p>
-                              <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-points-${tech.id}`}>{tech.points}</p>
+                              <p className="text-[#64748B]">{t('leaderboards.points', 'Points')}</p>
+                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-points-${tech.id}`}>{tech.points}</p>
                             </div>
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.jobs', 'Jobs')}</p>
-                              <p className="font-semibold text-gray-900 dark:text-white" data-testid={`text-jobs-${tech.id}`}>{tech.jobsCompleted}</p>
+                              <p className="text-[#64748B]">{t('leaderboards.jobs', 'Jobs')}</p>
+                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-jobs-${tech.id}`}>{tech.jobsCompleted}</p>
                             </div>
                             <div>
-                              <p className="text-gray-600 dark:text-gray-400">{t('leaderboards.revenue', 'Revenue')}</p>
+                              <p className="text-[#64748B]">{t('leaderboards.revenue', 'Revenue')}</p>
                               <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>${tech.revenue.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('leaderboards.efficiency', 'Efficiency')}</p>
+                          <p className="text-sm text-[#64748B] mb-1">{t('leaderboards.efficiency', 'Efficiency')}</p>
                           <div className="flex items-center gap-2">
                             <Progress value={tech.efficiency} className="w-24" />
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <span className="text-sm font-semibold text-[#0B1F3B] dark:text-white">
                               {tech.efficiency.toFixed(0)}%
                             </span>
                           </div>
@@ -130,12 +129,11 @@ export default function TechnicianLeaderboards() {
           </Card>
         </div>
 
-        {/* Badges & Challenges */}
         <div className="space-y-6">
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Award className="h-5 w-5 text-purple-600" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Award className="h-5 w-5 text-[#0A5ED7]" />
                 {t('leaderboards.achievementBadges', 'Achievement Badges')}
               </CardTitle>
             </CardHeader>
@@ -146,16 +144,16 @@ export default function TechnicianLeaderboards() {
                   return (
                     <div
                       key={badge.name}
-                      className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                      className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]"
                       data-testid={`badge-${badge.name}`}
                     >
                       <div className="flex items-start gap-3">
                         <BadgeIcon className={`h-6 w-6 ${badge.color} flex-shrink-0`} />
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                          <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-1">
                             {badge.name}
                           </h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-[#64748B]">
                             {badge.description}
                           </p>
                         </div>
@@ -167,35 +165,35 @@ export default function TechnicianLeaderboards() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-salis-black">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-orange-600" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Target className="h-5 w-5 text-[#F97316]" />
                 {t('leaderboards.activeChallenges', 'Active Challenges')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                <div className="p-3 bg-[#F97316]/10 dark:bg-[#F97316]/20 rounded-lg border border-[#F97316]/20 dark:border-[#F97316]/30">
+                  <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">
                     {t('leaderboards.challenges.weekendWarrior', 'Weekend Warrior')}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-sm text-[#64748B] mb-2">
                     {t('leaderboards.challenges.weekendWarriorDesc', 'Complete 10 jobs this weekend')}
                   </p>
                   <Progress value={60} className="mb-1" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('leaderboards.challenges.jobsCompleted', '6/10 jobs completed')}</p>
+                  <p className="text-xs text-[#64748B]">{t('leaderboards.challenges.jobsCompleted', '6/10 jobs completed')}</p>
                 </div>
 
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+                <div className="p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30">
+                  <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">
                     {t('leaderboards.challenges.customerSatisfaction', 'Customer Satisfaction')}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-sm text-[#64748B] mb-2">
                     {t('leaderboards.challenges.customerSatisfactionDesc', 'Maintain 4.8+ star rating for 7 days')}
                   </p>
                   <Progress value={85} className="mb-1" />
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('leaderboards.challenges.dayProgress', 'Day 6/7')}</p>
+                  <p className="text-xs text-[#64748B]">{t('leaderboards.challenges.dayProgress', 'Day 6/7')}</p>
                 </div>
               </div>
             </CardContent>

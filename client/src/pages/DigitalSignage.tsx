@@ -75,47 +75,47 @@ export default function DigitalSignage() {
 
   const statsContent = (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.totalDisplays', 'Total Displays')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-displays">{stats.totalDisplays}</h3>
+              <p className="text-sm text-[#64748B]">{t('signage.totalDisplays', 'Total Displays')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-total-displays">{stats.totalDisplays}</h3>
             </div>
-            <Monitor className="h-12 w-12 text-blue-600" />
+            <Monitor className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('common.active', 'Active')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-displays">{stats.activeDisplays}</h3>
+              <p className="text-sm text-[#64748B]">{t('common.active', 'Active')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-active-displays">{stats.activeDisplays}</h3>
             </div>
             <Play className="h-12 w-12 text-green-600" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.totalContent', 'Total Content')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-content">{stats.totalContent}</h3>
+              <p className="text-sm text-[#64748B]">{t('signage.totalContent', 'Total Content')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-total-content">{stats.totalContent}</h3>
             </div>
             <Monitor className="h-12 w-12 text-purple-600" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('signage.activeContent', 'Active Content')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-content">{stats.activeContent}</h3>
+              <p className="text-sm text-[#64748B]">{t('signage.activeContent', 'Active Content')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-active-content">{stats.activeContent}</h3>
             </div>
-            <Play className="h-12 w-12 text-yellow-600" />
+            <Play className="h-12 w-12 text-[#F97316]" />
           </div>
         </CardContent>
       </Card>
@@ -123,32 +123,32 @@ export default function DigitalSignage() {
   );
 
   const displaysTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('signage.displays', 'Displays')}</CardTitle>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('signage.displays', 'Displays')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loadingDisplays ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">{t('signage.loadingDisplays', 'Loading displays...')}</p>
+            <p className="text-[#64748B]">{t('signage.loadingDisplays', 'Loading displays...')}</p>
           </div>
         ) : displays.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">{t('signage.noDisplaysConfigured', 'No displays configured yet. Add a display to get started.')}</p>
+            <p className="text-[#64748B]">{t('signage.noDisplaysConfigured', 'No displays configured yet. Add a display to get started.')}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {displays.map((display: any) => (
-              <div key={display.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`display-${display.id}`}>
+              <div key={display.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`display-${display.id}`}>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{display.displayName}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{display.displayName}</h3>
+                  <p className="text-sm text-[#64748B]">
                     {display.location}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Badge>{display.displayType?.replace("_", " ")}</Badge>
-                  <Badge variant={display.isActive ? "default" : "secondary"}>
+                  <Badge className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white">{display.displayType?.replace("_", " ")}</Badge>
+                  <Badge className={display.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]"}>
                     {display.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
@@ -161,30 +161,30 @@ export default function DigitalSignage() {
   );
 
   const contentTab = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader>
-        <CardTitle>{t('signage.content', 'Content')}</CardTitle>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('signage.content', 'Content')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loadingContent ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">{t('signage.loadingContent', 'Loading content...')}</p>
+            <p className="text-[#64748B]">{t('signage.loadingContent', 'Loading content...')}</p>
           </div>
         ) : content.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 dark:text-gray-400">{t('signage.noContentCreated', 'No content created yet. Add content to your displays.')}</p>
+            <p className="text-[#64748B]">{t('signage.noContentCreated', 'No content created yet. Add content to your displays.')}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {content.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`content-${item.id}`}>
+              <div key={item.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`content-${item.id}`}>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{item.title || t('signage.untitledContent', 'Untitled Content')}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{item.title || t('signage.untitledContent', 'Untitled Content')}</h3>
+                  <p className="text-sm text-[#64748B]">
                     {item.displayName} • {item.duration}{t('signage.secondsDuration', 's duration')}
                   </p>
                 </div>
-                <Badge>{item.contentType?.replace("_", " ")}</Badge>
+                <Badge className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white">{item.contentType?.replace("_", " ")}</Badge>
               </div>
             ))}
           </div>
@@ -223,8 +223,8 @@ export default function DigitalSignage() {
           label: t('common.settings', 'Settings'),
           icon: Settings,
           content: (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-              <CardContent className="p-6 text-center text-gray-600 dark:text-gray-400">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <CardContent className="p-6 text-center text-[#64748B]">
                 {t('common.comingSoon', 'Settings coming soon')}
               </CardContent>
             </Card>
@@ -234,26 +234,26 @@ export default function DigitalSignage() {
       defaultTab="displays"
     >
       <Dialog open={openDisplayDialog} onOpenChange={setOpenDisplayDialog}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('signage.addNewDisplay', 'Add New Display')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('signage.addNewDisplay', 'Add New Display')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateDisplay} className="space-y-4">
             <div>
-              <Label htmlFor="name">{t('signage.displayName', 'Display Name')}</Label>
-              <Input id="name" name="name" required placeholder={t('signage.waitingRoomMain', 'Waiting Room Main')} />
+              <Label htmlFor="name" className="text-[#0B1F3B] dark:text-white">{t('signage.displayName', 'Display Name')}</Label>
+              <Input id="name" name="name" required placeholder={t('signage.waitingRoomMain', 'Waiting Room Main')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
             </div>
             <div>
-              <Label htmlFor="location">{t('signage.location', 'Location')}</Label>
-              <Input id="location" name="location" required placeholder={t('signage.waitingRoom', 'Waiting Room')} />
+              <Label htmlFor="location" className="text-[#0B1F3B] dark:text-white">{t('signage.location', 'Location')}</Label>
+              <Input id="location" name="location" required placeholder={t('signage.waitingRoom', 'Waiting Room')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
             </div>
             <div>
-              <Label htmlFor="displayType">{t('signage.displayType', 'Display Type')}</Label>
+              <Label htmlFor="displayType" className="text-[#0B1F3B] dark:text-white">{t('signage.displayType', 'Display Type')}</Label>
               <Select name="displayType" required>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue placeholder={t('signage.selectType', 'Select type')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="mixed">{t('signage.mixedContent', 'Mixed Content')}</SelectItem>
                   <SelectItem value="service_status">{t('signage.serviceStatus', 'Service Status')}</SelectItem>
                   <SelectItem value="promotions">{t('signage.promotions', 'Promotions')}</SelectItem>
@@ -261,10 +261,10 @@ export default function DigitalSignage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="resolution">{t('signage.resolution', 'Resolution')}</Label>
-              <Input id="resolution" name="resolution" required placeholder="1920x1080" />
+              <Label htmlFor="resolution" className="text-[#0B1F3B] dark:text-white">{t('signage.resolution', 'Resolution')}</Label>
+              <Input id="resolution" name="resolution" required placeholder="1920x1080" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
             </div>
-            <Button type="submit" disabled={createDisplayMutation.isPending} className="w-full">
+            <Button type="submit" disabled={createDisplayMutation.isPending} className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
               {t('signage.createDisplay', 'Create Display')}
             </Button>
           </form>

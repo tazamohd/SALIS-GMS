@@ -14,12 +14,10 @@ export default function BarcodeScanner() {
   const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
 
-  // Fetch barcode scan history
   const { data: scans = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/barcode/scans"],
   });
 
-  // Record barcode scan mutation
   const recordScanMutation = useMutation({
     mutationFn: async (scanData: {
       barcodeData: string;
@@ -47,7 +45,6 @@ export default function BarcodeScanner() {
     },
   });
 
-  // Calculate KPIs from real data
   const stats = {
     todayScans: scans.length || 0,
     partsScanned: scans.filter((s: any) => s.scanType === "part_inventory").length || 0,
@@ -56,9 +53,9 @@ export default function BarcodeScanner() {
   };
 
   const getTypeIcon = (type: string) => {
-    if (type === "part_inventory") return <Package className="h-5 w-5 text-blue-600" />;
-    if (type === "vehicle_checkin") return <Car className="h-5 w-5 text-green-600" />;
-    return <Wrench className="h-5 w-5 text-purple-600" />;
+    if (type === "part_inventory") return <Package className="h-5 w-5 text-[#0A5ED7]" />;
+    if (type === "vehicle_checkin") return <Car className="h-5 w-5 text-[#0BB3FF]" />;
+    return <Wrench className="h-5 w-5 text-[#64748B]" />;
   };
 
   const getItemName = (scan: any) => {
@@ -68,7 +65,6 @@ export default function BarcodeScanner() {
     return scan.barcodeData;
   };
 
-  // Simulate scan for testing (in real implementation, this would use camera/scanner hardware)
   const simulateScan = () => {
     const scanTypes = ["part_inventory", "vehicle_checkin", "tool_tracking"];
     const randomType = scanTypes[Math.floor(Math.random() * scanTypes.length)];
@@ -101,96 +97,106 @@ export default function BarcodeScanner() {
         },
       ]}
     >
-      <div className="space-y-6">
+      <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] p-6 rounded-lg">
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.todaysScans', "Today's Scans")}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
+                <p className="text-sm text-[#64748B]">{t('inventory.todaysScans', "Today's Scans")}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
               </div>
-              <Scan className="h-12 w-12 text-blue-600" />
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <Scan className="h-6 w-6 text-white" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.partsScanned', 'Parts Scanned')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-parts-scanned">{stats.partsScanned}</h3>
+                <p className="text-sm text-[#64748B]">{t('inventory.partsScanned', 'Parts Scanned')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-parts-scanned">{stats.partsScanned}</h3>
               </div>
-              <Package className="h-12 w-12 text-green-600" />
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <Package className="h-6 w-6 text-white" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.vehicleCheckIns', 'Vehicle Check-Ins')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-vehicle-checkins">{stats.vehicleCheckIns}</h3>
+                <p className="text-sm text-[#64748B]">{t('inventory.vehicleCheckIns', 'Vehicle Check-Ins')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-vehicle-checkins">{stats.vehicleCheckIns}</h3>
               </div>
-              <Car className="h-12 w-12 text-purple-600" />
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <Car className="h-6 w-6 text-white" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.toolsTracked', 'Tools Tracked')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-tools-tracked">{stats.toolsTracked}</h3>
+                <p className="text-sm text-[#64748B]">{t('inventory.toolsTracked', 'Tools Tracked')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-tools-tracked">{stats.toolsTracked}</h3>
               </div>
-              <Wrench className="h-12 w-12 text-yellow-600" />
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                <Wrench className="h-6 w-6 text-white" />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {scanning && (
-        <Card className="bg-blue-50 dark:bg-blue-900 border-blue-200 dark:border-blue-800">
+        <Card className="bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 border-[#0A5ED7] dark:border-[#0BB3FF]">
           <CardContent className="p-8">
             <div className="flex flex-col items-center justify-center gap-4">
-              <Scan className="h-24 w-24 text-blue-600 animate-pulse" />
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{t('inventory.scannerActive', 'Scanner Active')}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.pointCameraAtBarcode', 'Point camera at barcode or QR code')}</p>
+              <div className="h-24 w-24 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center animate-pulse">
+                <Scan className="h-12 w-12 text-white" />
+              </div>
+              <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('inventory.scannerActive', 'Scanner Active')}</p>
+              <p className="text-sm text-[#64748B]">{t('inventory.pointCameraAtBarcode', 'Point camera at barcode or QR code')}</p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('inventory.recentScans', 'Recent Scans')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.recentScans', 'Recent Scans')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('inventory.loadingScanHistory', 'Loading scan history...')}</p>
+              <p className="text-[#64748B]">{t('inventory.loadingScanHistory', 'Loading scan history...')}</p>
             </div>
           ) : scans.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('inventory.noScansRecorded', 'No scans recorded yet. Start scanning to see results here.')}</p>
+              <p className="text-[#64748B]">{t('inventory.noScansRecorded', 'No scans recorded yet. Start scanning to see results here.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {scans.map((scan: any) => (
-                <div key={scan.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`scan-${scan.id}`}>
+                <div key={scan.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`scan-${scan.id}`}>
                   <div className="flex items-center gap-3">
                     {getTypeIcon(scan.scanType)}
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{getItemName(scan)}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{getItemName(scan)}</h3>
+                      <p className="text-sm text-[#64748B]">
                         {scan.barcodeData} • {scan.location || "Unknown location"}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{scan.scannedBy || "Unknown"}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-[#64748B]">{scan.scannedBy || "Unknown"}</p>
+                    <p className="text-xs text-[#64748B]">
                       {scan.createdAt ? new Date(scan.createdAt).toLocaleTimeString() : ""}
                     </p>
                   </div>

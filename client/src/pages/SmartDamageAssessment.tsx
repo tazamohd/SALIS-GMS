@@ -42,7 +42,6 @@ export default function SmartDamageAssessment() {
   const analyzeImage = async () => {
     setAnalyzing(true);
     
-    // Simulate AI analysis
     await new Promise(resolve => setTimeout(resolve, 2500));
     
     const mockDetections: DamageDetection[] = [
@@ -89,10 +88,10 @@ export default function SmartDamageAssessment() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "minor": return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
-      case "moderate": return "bg-orange-500/10 text-orange-700 dark:text-orange-400";
-      case "severe": return "bg-red-500/10 text-red-700 dark:text-red-400";
-      default: return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+      case "minor": return "bg-[#F97316]/10 text-[#F97316]";
+      case "moderate": return "bg-[#F97316]/10 text-[#F97316]";
+      case "severe": return "bg-red-500/10 text-red-600 dark:text-red-400";
+      default: return "bg-[#64748B]/10 text-[#64748B]";
     }
   };
 
@@ -104,19 +103,18 @@ export default function SmartDamageAssessment() {
       content: (
         <>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Upload Section */}
-        <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
+        <Card className="lg:col-span-2 border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Camera className="w-5 h-5 text-[#0A5ED7]" />
               {t('smartDamage.uploadVehicleImage', 'Upload Vehicle Image')}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {t('smartDamage.uploadPhotoForAnalysis', 'Upload a photo of the damaged vehicle for AI analysis')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
+            <div className="border-2 border-dashed border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-8 text-center bg-[#F8FAFC] dark:bg-[#0E1117]">
               {selectedImage ? (
                 <div className="space-y-4">
                   <img 
@@ -125,7 +123,7 @@ export default function SmartDamageAssessment() {
                     className="max-h-96 mx-auto rounded-lg shadow-lg"
                   />
                   {analyzing && (
-                    <div className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400">
+                    <div className="flex items-center justify-center gap-2 text-[#0A5ED7]">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       <span>{t('smartDamage.aiAnalyzing', 'AI analyzing damage patterns...')}</span>
                     </div>
@@ -133,12 +131,14 @@ export default function SmartDamageAssessment() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <Upload className="w-16 h-16 mx-auto text-gray-400" />
+                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                    <Upload className="w-8 h-8 text-white" />
+                  </div>
                   <div>
-                    <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-[#0B1F3B] dark:text-white mb-2">
                       {t('smartDamage.dragAndDrop', 'Drag and drop or click to upload')}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-[#64748B]">
                       {t('smartDamage.supportsFormats', 'Supports: JPG, PNG (max 10MB)')}
                     </p>
                   </div>
@@ -157,7 +157,7 @@ export default function SmartDamageAssessment() {
             
             <Button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
               data-testid="button-upload-image"
             >
               <Upload className="w-4 h-4 mr-2" />
@@ -166,37 +166,36 @@ export default function SmartDamageAssessment() {
           </CardContent>
         </Card>
 
-        {/* Summary Card */}
-        <Card className="border-gray-200 dark:border-gray-800" data-testid="card-summary">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]" data-testid="card-summary">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-500" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Zap className="w-5 h-5 text-[#F97316]" />
               {t('smartDamage.aiSummary', 'AI Summary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{t('smartDamage.detections', 'Detections')}</span>
-                <span className="font-semibold text-gray-900 dark:text-white" data-testid="text-detections-count">{detections.length}</span>
+                <span className="text-[#64748B]">{t('smartDamage.detections', 'Detections')}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-detections-count">{detections.length}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{t('smartDamage.totalCost', 'Total Cost')}</span>
-                <span className="font-semibold text-gray-900 dark:text-white" data-testid="text-total-cost">
+                <span className="text-[#64748B]">{t('smartDamage.totalCost', 'Total Cost')}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-total-cost">
                   ${totalCost.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{t('smartDamage.repairTime', 'Repair Time')}</span>
-                <span className="font-semibold text-gray-900 dark:text-white" data-testid="text-repair-time">
+                <span className="text-[#64748B]">{t('smartDamage.repairTime', 'Repair Time')}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-repair-time">
                   {totalTime.toFixed(1)} {t('smartDamage.hrs', 'hrs')}
                 </span>
               </div>
             </div>
 
             {detections.length > 0 && (
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-                <h4 className="font-semibold mb-2 text-sm text-gray-900 dark:text-white">{t('smartDamage.severityBreakdown', 'Severity Breakdown')}</h4>
+              <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
+                <h4 className="font-semibold mb-2 text-sm text-[#0B1F3B] dark:text-white">{t('smartDamage.severityBreakdown', 'Severity Breakdown')}</h4>
                 <div className="space-y-2">
                   {["severe", "moderate", "minor"].map(severity => {
                     const count = detections.filter(d => d.severity === severity).length;
@@ -206,7 +205,7 @@ export default function SmartDamageAssessment() {
                         <Badge variant="outline" className={getSeverityColor(severity)} data-testid={`badge-severity-${severity}`}>
                           {t(`smartDamage.${severity}`, severity)}
                         </Badge>
-                        <span className="text-gray-600 dark:text-gray-400" data-testid={`text-severity-count-${severity}`}>{count} {t('smartDamage.found', 'found')}</span>
+                        <span className="text-[#64748B]" data-testid={`text-severity-count-${severity}`}>{count} {t('smartDamage.found', 'found')}</span>
                       </div>
                     );
                   })}
@@ -215,7 +214,7 @@ export default function SmartDamageAssessment() {
             )}
 
             {detections.length > 0 && (
-              <Button className="w-full mt-4" data-testid="button-generate-estimate">
+              <Button className="w-full mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-generate-estimate">
                 <DollarSign className="w-4 h-4 mr-2" />
                 {t('smartDamage.generateFullEstimate', 'Generate Full Estimate')}
               </Button>
@@ -224,18 +223,17 @@ export default function SmartDamageAssessment() {
         </Card>
       </div>
 
-      {/* Detections List */}
       {detections.length > 0 && (
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle>{t('smartDamage.detectedDamageAreas', 'Detected Damage Areas')}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartDamage.detectedDamageAreas', 'Detected Damage Areas')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('smartDamage.aiIdentifiedDamage', 'AI-identified damage with confidence scores and repair estimates')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-4 bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <TabsTrigger value="all" data-testid="tab-all">{t('common.all', 'All')} ({detections.length})</TabsTrigger>
                 <TabsTrigger value="severe" data-testid="tab-severe">{t('smartDamage.severe', 'Severe')}</TabsTrigger>
                 <TabsTrigger value="moderate" data-testid="tab-moderate">{t('smartDamage.moderate', 'Moderate')}</TabsTrigger>
@@ -247,27 +245,27 @@ export default function SmartDamageAssessment() {
                   {detections
                     .filter(d => tab === "all" || d.severity === tab)
                     .map((detection, idx) => (
-                      <Card key={idx} className="border-gray-200 dark:border-gray-700" data-testid={`card-detection-${idx}`}>
+                      <Card key={idx} className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]" data-testid={`card-detection-${idx}`}>
                         <CardContent className="pt-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
-                                <h3 className="font-semibold text-gray-900 dark:text-white" data-testid={`text-detection-type-${idx}`}>
+                                <h3 className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-detection-type-${idx}`}>
                                   {detection.type}
                                 </h3>
                                 <Badge variant="outline" className={getSeverityColor(detection.severity)} data-testid={`badge-detection-severity-${idx}`}>
                                   {t(`smartDamage.${detection.severity}`, detection.severity)}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`text-detection-location-${idx}`}>
+                              <p className="text-sm text-[#64748B]" data-testid={`text-detection-location-${idx}`}>
                                 {detection.location}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid={`text-detection-cost-${idx}`}>
+                              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid={`text-detection-cost-${idx}`}>
                                 ${detection.estimatedCost}
                               </p>
-                              <p className="text-sm text-gray-500" data-testid={`text-detection-time-${idx}`}>
+                              <p className="text-sm text-[#64748B]" data-testid={`text-detection-time-${idx}`}>
                                 {detection.repairTime} {t('smartDamage.hrs', 'hrs')}
                               </p>
                             </div>
@@ -276,8 +274,8 @@ export default function SmartDamageAssessment() {
                           <div className="space-y-3">
                             <div>
                               <div className="flex justify-between text-sm mb-1">
-                                <span className="text-gray-600 dark:text-gray-400">{t('smartDamage.aiConfidence', 'AI Confidence')}</span>
-                                <span className="font-medium text-gray-900 dark:text-white" data-testid={`text-detection-confidence-${idx}`}>
+                                <span className="text-[#64748B]">{t('smartDamage.aiConfidence', 'AI Confidence')}</span>
+                                <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-detection-confidence-${idx}`}>
                                   {detection.confidence}%
                                 </span>
                               </div>
@@ -285,12 +283,12 @@ export default function SmartDamageAssessment() {
                             </div>
 
                             <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                              <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-2">
                                 {t('smartDamage.requiredParts', 'Required Parts')}:
                               </p>
                               <div className="flex flex-wrap gap-2">
                                 {detection.parts.map((part, i) => (
-                                  <Badge key={i} variant="secondary" data-testid={`badge-part-${idx}-${i}`}>
+                                  <Badge key={i} variant="secondary" className="bg-[#0A5ED7]/10 text-[#0A5ED7]" data-testid={`badge-part-${idx}-${i}`}>
                                     {part}
                                   </Badge>
                                 ))}
@@ -318,13 +316,14 @@ export default function SmartDamageAssessment() {
         <>
           {detections.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20" data-testid="card-average-confidence">
+              <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 dark:from-emerald-500/10 dark:to-emerald-500/5 relative overflow-hidden" data-testid="card-average-confidence">
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-emerald-500/10 -mr-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                    <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartDamage.averageConfidence', 'Average Confidence')}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-average-confidence">
+                      <p className="text-sm text-[#64748B]">{t('smartDamage.averageConfidence', 'Average Confidence')}</p>
+                      <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-average-confidence">
                         {(detections.reduce((sum, d) => sum + d.confidence, 0) / detections.length).toFixed(1)}%
                       </p>
                     </div>
@@ -332,13 +331,14 @@ export default function SmartDamageAssessment() {
                 </CardContent>
               </Card>
 
-              <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20" data-testid="card-labor-parts">
+              <Card className="border-[#0A5ED7]/20 bg-gradient-to-br from-[#0A5ED7]/5 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/10 dark:to-[#0BB3FF]/5 relative overflow-hidden" data-testid="card-labor-parts">
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#0A5ED7]/10 -mr-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <DollarSign className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    <DollarSign className="w-8 h-8 text-[#0A5ED7]" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartDamage.laborParts', 'Labor + Parts')}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-labor-parts-total">
+                      <p className="text-sm text-[#64748B]">{t('smartDamage.laborParts', 'Labor + Parts')}</p>
+                      <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-labor-parts-total">
                         ${totalCost.toFixed(2)}
                       </p>
                     </div>
@@ -346,13 +346,14 @@ export default function SmartDamageAssessment() {
                 </CardContent>
               </Card>
 
-              <Card className="border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-950/20" data-testid="card-priority-items">
+              <Card className="border-[#F97316]/20 bg-gradient-to-br from-[#F97316]/5 to-[#F97316]/10 dark:from-[#F97316]/10 dark:to-[#F97316]/5 relative overflow-hidden" data-testid="card-priority-items">
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#F97316]/10 -mr-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+                    <AlertTriangle className="w-8 h-8 text-[#F97316]" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('smartDamage.priorityItems', 'Priority Items')}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white" data-testid="text-priority-items-count">
+                      <p className="text-sm text-[#64748B]">{t('smartDamage.priorityItems', 'Priority Items')}</p>
+                      <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-priority-items-count">
                         {detections.filter(d => d.severity === "severe").length}
                       </p>
                     </div>
@@ -361,10 +362,12 @@ export default function SmartDamageAssessment() {
               </Card>
             </div>
           ) : (
-            <Card className="border-gray-200 dark:border-gray-800">
-              <CardContent className="pt-6 text-center text-gray-500 dark:text-gray-400">
-                <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>{t('smartDamage.noAnalysisData', 'No analysis data available. Upload and analyze a vehicle image in the Detection tab.')}</p>
+            <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardContent className="pt-6 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                  <BarChart3 className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-[#64748B]">{t('smartDamage.noAnalysisData', 'No analysis data available. Upload and analyze a vehicle image in the Detection tab.')}</p>
               </CardContent>
             </Card>
           )}
@@ -376,16 +379,18 @@ export default function SmartDamageAssessment() {
       label: t('smartDamage.reports', 'Reports'),
       icon: FileText,
       content: (
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle>{t('smartDamage.damageAssessmentReports', 'Damage Assessment Reports')}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartDamage.damageAssessmentReports', 'Damage Assessment Reports')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('smartDamage.historicalAssessments', 'Historical damage assessments and generated reports')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center text-gray-500 dark:text-gray-400 py-8">
-            <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>{t('smartDamage.noReportsYet', 'No reports available yet. Complete damage assessments to generate reports.')}</p>
+          <CardContent className="text-center py-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+              <FileText className="w-8 h-8 text-white" />
+            </div>
+            <p className="text-[#64748B]">{t('smartDamage.noReportsYet', 'No reports available yet. Complete damage assessments to generate reports.')}</p>
           </CardContent>
         </Card>
       ),

@@ -63,35 +63,35 @@ export default function VRShowroom() {
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>{selectedVehicle.name}</CardTitle>
-                  <CardDescription>{selectedVehicle.category} • {selectedVehicle.color}</CardDescription>
+                  <CardTitle className="text-[#0B1F3B] dark:text-white">{selectedVehicle.name}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{selectedVehicle.category} • {selectedVehicle.color}</CardDescription>
                 </div>
-                <Badge className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-0">
+                <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white border border-[#E2E8F0] dark:border-[#232A36]">
                   {selectedVehicle.price}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex items-center justify-center">
+              <div className="relative aspect-video bg-gradient-to-br from-[#F8FAFC] to-[#E2E8F0] dark:from-[#0E1117] dark:to-[#151A23] rounded-lg flex items-center justify-center border border-[#E2E8F0] dark:border-[#232A36]">
                 <div className="text-center">
-                  <Glasses className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
-                  <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                  <Glasses className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
+                  <p className="text-lg font-medium text-[#0B1F3B] dark:text-white">
                     {t('vrShowroom.3dModelViewer', '3D Model Viewer')}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-[#64748B]">
                     {t('vrShowroom.interactive360View', 'Interactive 360° view')}
                   </p>
                 </div>
               </div>
 
               <Tabs value={viewMode} onValueChange={setViewMode}>
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-3 bg-[#F8FAFC] dark:bg-[#0E1117]">
                   {viewModes.map(mode => (
-                    <TabsTrigger key={mode.id} value={mode.id} data-testid={`tab-${mode.id}`}>
+                    <TabsTrigger key={mode.id} value={mode.id} data-testid={`tab-${mode.id}`} className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23]">
                       <mode.icon className="w-4 h-4 mr-2" />
                       {mode.label}
                     </TabsTrigger>
@@ -104,6 +104,7 @@ export default function VRShowroom() {
                   variant="outline"
                   size="icon"
                   onClick={() => setIsPlaying(!isPlaying)}
+                  className="border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="button-play"
                 >
                   {isPlaying ? (
@@ -112,22 +113,22 @@ export default function VRShowroom() {
                     <Play className="w-4 h-4" />
                   )}
                 </Button>
-                <Button variant="outline" size="icon" data-testid="button-reset">
+                <Button variant="outline" size="icon" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-reset">
                   <RotateCw className="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="icon" data-testid="button-zoom-out">
+                <Button variant="outline" size="icon" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-zoom-out">
                   <ZoomOut className="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="icon" data-testid="button-zoom-in">
+                <Button variant="outline" size="icon" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-zoom-in">
                   <ZoomIn className="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="icon" data-testid="button-fullscreen">
+                <Button variant="outline" size="icon" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-fullscreen">
                   <Maximize className="w-4 h-4" />
                 </Button>
               </div>
 
               <div className="space-y-2">
-                <Label>{t('vrShowroom.rotation', 'Rotation')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('vrShowroom.rotation', 'Rotation')}</Label>
                 <Slider
                   value={rotation}
                   onValueChange={setRotation}
@@ -135,11 +136,11 @@ export default function VRShowroom() {
                   step={1}
                   data-testid="slider-rotation"
                 />
-                <p className="text-sm text-gray-600 dark:text-gray-400">{rotation[0]}°</p>
+                <p className="text-sm text-[#64748B]">{rotation[0]}°</p>
               </div>
 
               <div className="space-y-2">
-                <Label>{t('vrShowroom.zoom', 'Zoom')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('vrShowroom.zoom', 'Zoom')}</Label>
                 <Slider
                   value={zoom}
                   onValueChange={setZoom}
@@ -148,25 +149,25 @@ export default function VRShowroom() {
                   step={0.1}
                   data-testid="slider-zoom"
                 />
-                <p className="text-sm text-gray-600 dark:text-gray-400">{zoom[0].toFixed(1)}x</p>
+                <p className="text-sm text-[#64748B]">{zoom[0].toFixed(1)}x</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('vrShowroom.featuresAndSpecs', 'Features & Specifications')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vrShowroom.featuresAndSpecs', 'Features & Specifications')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {selectedVehicle.features.map((feature, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    className="flex items-center gap-2 p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`feature-${index}`}
                   >
-                    <div className="w-2 h-2 rounded-full bg-gray-900 dark:bg-white" />
-                    <span className="text-sm text-gray-900 dark:text-white">{feature}</span>
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]" />
+                    <span className="text-sm text-[#0B1F3B] dark:text-white">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -175,10 +176,10 @@ export default function VRShowroom() {
         </div>
 
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('vrShowroom.availableVehicles', 'Available Vehicles')}</CardTitle>
-              <CardDescription>{t('vrShowroom.selectVehicleToView', 'Select a vehicle to view')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vrShowroom.availableVehicles', 'Available Vehicles')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('vrShowroom.selectVehicleToView', 'Select a vehicle to view')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -188,23 +189,23 @@ export default function VRShowroom() {
                     onClick={() => setSelectedVehicle(vehicle)}
                     className={`w-full text-left p-4 border rounded-lg transition-colors ${
                       selectedVehicle.id === vehicle.id
-                        ? 'border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ? 'border-[#0A5ED7] bg-[#0A5ED7]/10'
+                        : 'border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0BB3FF]'
                     }`}
                     data-testid={`vehicle-${vehicle.id}`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">{vehicle.name}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{vehicle.category}</p>
+                        <p className="font-semibold text-[#0B1F3B] dark:text-white">{vehicle.name}</p>
+                        <p className="text-sm text-[#64748B]">{vehicle.category}</p>
                       </div>
                       <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
                         {t('vrShowroom.available', 'available')}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{vehicle.color}</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{vehicle.price}</span>
+                      <span className="text-sm text-[#64748B]">{vehicle.color}</span>
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white">{vehicle.price}</span>
                     </div>
                   </button>
                 ))}
@@ -212,51 +213,51 @@ export default function VRShowroom() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Glasses className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Glasses className="w-5 h-5 text-[#0A5ED7]" />
                 {t('vrShowroom.vrEquipment', 'VR Equipment')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.headsetStatus', 'Headset Status')}</span>
+                <span className="text-sm text-[#64748B]">{t('vrShowroom.headsetStatus', 'Headset Status')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
                   {t('vrShowroom.connected', 'Connected')}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.controllers', 'Controllers')}</span>
+                <span className="text-sm text-[#64748B]">{t('vrShowroom.controllers', 'Controllers')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
                   {t('vrShowroom.twoActive', '2 Active')}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">{t('vrShowroom.tracking', 'Tracking')}</span>
+                <span className="text-sm text-[#64748B]">{t('vrShowroom.tracking', 'Tracking')}</span>
                 <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0">
                   {t('vrShowroom.optimal', 'Optimal')}
                 </Badge>
               </div>
-              <Button className="w-full" variant="outline" data-testid="button-launch-vr">
+              <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-launch-vr">
                 <Glasses className="w-4 h-4 mr-2" />
                 {t('vrShowroom.launchVRMode', 'Launch VR Mode')}
               </Button>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle>{t('common.actions', 'Actions')}</CardTitle>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button className="w-full" data-testid="button-schedule">
+              <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-schedule">
                 {t('vrShowroom.scheduleTestDrive', 'Schedule Test Drive')}
               </Button>
-              <Button className="w-full" variant="outline" data-testid="button-share">
+              <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-share">
                 {t('vrShowroom.shareVRExperience', 'Share VR Experience')}
               </Button>
-              <Button className="w-full" variant="outline" data-testid="button-save">
+              <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-save">
                 {t('vrShowroom.saveToFavorites', 'Save to Favorites')}
               </Button>
             </CardContent>

@@ -21,11 +21,11 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 
 const COLORS = {
-  success: "#10b981",
-  warning: "#f59e0b",
+  success: "#10B981",
+  warning: "#F97316",
   error: "#ef4444",
-  info: "#3b82f6",
-  primary: "#8b5cf6"
+  info: "#0A5ED7",
+  primary: "#0BB3FF"
 };
 
 export default function ContractManagement() {
@@ -159,57 +159,57 @@ export default function ContractManagement() {
   const headerContent = (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card data-testid="card-total-contracts">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-contracts">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.contracts.totalContracts', 'Total Contracts')}</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.totalContracts', 'Total Contracts')}</CardTitle>
+            <FileText className="h-4 w-4 text-[#0A5ED7]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-contracts">{dashboardMetrics.totalContracts}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-contracts">{dashboardMetrics.totalContracts}</div>
+            <p className="text-xs text-[#64748B]">
               {dashboardMetrics.activeContracts} {t('payments.contracts.active', 'active')}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-contract-value">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-contract-value">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.contracts.totalContractValue', 'Total Contract Value')}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.totalContractValue', 'Total Contract Value')}</CardTitle>
+            <DollarSign className="h-4 w-4 text-[#0BB3FF]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-contract-value">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-contract-value">
               ${dashboardMetrics.totalValue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#64748B]">
               ${dashboardMetrics.totalUtilized.toLocaleString()} {t('payments.contracts.utilized', 'utilized')}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-avg-utilization">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-utilization">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.contracts.avgUtilization', 'Avg Utilization')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.avgUtilization', 'Avg Utilization')}</CardTitle>
+            <TrendingUp className="h-4 w-4 text-[#10B981]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-avg-utilization">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-utilization">
               {dashboardMetrics.avgUtilization.toFixed(1)}%
             </div>
             <Progress value={dashboardMetrics.avgUtilization} className="mt-2" />
           </CardContent>
         </Card>
 
-        <Card data-testid="card-sla-compliance">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-sla-compliance">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.contracts.slaCompliance', 'SLA Compliance')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.slaCompliance', 'SLA Compliance')}</CardTitle>
+            <CheckCircle className="h-4 w-4 text-[#10B981]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-sla-compliance">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-sla-compliance">
               {dashboardMetrics.slaCompliance.toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#64748B]">
               {dashboardMetrics.totalBreach} {t('payments.contracts.breaches', 'breaches')}
             </p>
           </CardContent>
@@ -217,23 +217,23 @@ export default function ContractManagement() {
       </div>
 
       {dashboardMetrics.expiringContracts > 0 && (
-        <Card className="border-orange-500" data-testid="card-expiring-alert">
+        <Card className="bg-white dark:bg-[#151A23] border-[#F97316]" data-testid="card-expiring-alert">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <AlertTriangle className="h-5 w-5 text-[#F97316]" />
               {t('payments.contracts.contractsRequiringAttention', 'Contracts Requiring Attention')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-sm">
+              <p className="text-sm text-[#0B1F3B] dark:text-white">
                 {dashboardMetrics.expiringContracts} {t('payments.contracts.contractsExpiringWithin', 'contracts expiring within renewal notice period')}
               </p>
               <div className="space-y-1">
                 {expiringContractsData.slice(0, 5).map((contract) => (
                   <div key={contract.id} className="flex justify-between items-center text-sm" data-testid={`contract-expiring-${contract.id}`}>
-                    <span className="font-medium">{contract.contractNumber}</span>
-                    <span className="text-muted-foreground">
+                    <span className="font-medium text-[#0B1F3B] dark:text-white">{contract.contractNumber}</span>
+                    <span className="text-[#64748B]">
                       {contract.daysUntilExpiry} {t('payments.contracts.daysRemaining', 'days remaining')}
                     </span>
                     <Button 
@@ -263,10 +263,10 @@ export default function ContractManagement() {
       content: (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card data-testid="card-utilization-chart">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-utilization-chart">
               <CardHeader>
-                <CardTitle>{t('payments.contracts.contractUtilizationOverview', 'Contract Utilization Overview')}</CardTitle>
-                <CardDescription>{t('payments.contracts.serviceSpendingVsCap', 'Service spending vs. contract cap')}</CardDescription>
+                <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.contracts.contractUtilizationOverview', 'Contract Utilization Overview')}</CardTitle>
+                <CardDescription className="text-[#64748B]">{t('payments.contracts.serviceSpendingVsCap', 'Service spending vs. contract cap')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -283,10 +283,10 @@ export default function ContractManagement() {
               </CardContent>
             </Card>
 
-            <Card data-testid="card-sla-chart">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-sla-chart">
               <CardHeader>
-                <CardTitle>{t('payments.contracts.slaPerformance', 'SLA Performance')}</CardTitle>
-                <CardDescription>{t('payments.contracts.complianceByContract', 'Compliance status by contract')}</CardDescription>
+                <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.contracts.slaPerformance', 'SLA Performance')}</CardTitle>
+                <CardDescription className="text-[#64748B]">{t('payments.contracts.complianceByContract', 'Compliance status by contract')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -305,10 +305,10 @@ export default function ContractManagement() {
             </Card>
           </div>
 
-          <Card data-testid="card-contracts-list">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-contracts-list">
             <CardHeader>
-              <CardTitle>{t('payments.contracts.allContracts', 'All Contracts')}</CardTitle>
-              <CardDescription>{t('payments.contracts.clickToViewDetails', 'Click on a contract to view details')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.contracts.allContracts', 'All Contracts')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('payments.contracts.clickToViewDetails', 'Click on a contract to view details')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -322,14 +322,14 @@ export default function ContractManagement() {
                   return (
                     <div
                       key={contract.id}
-                      className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                      className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] cursor-pointer transition-colors"
                       onClick={() => setSelectedContractId(contract.id)}
                       data-testid={`contract-item-${contract.id}`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold" data-testid={`text-contract-number-${contract.id}`}>
+                            <h3 className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-contract-number-${contract.id}`}>
                               {contract.contractNumber}
                             </h3>
                             <Badge
@@ -343,23 +343,23 @@ export default function ContractManagement() {
                               {contract.status}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-[#64748B]">
                             {contract.fleetGroup?.companyName || t('payments.contracts.unknownFleet', 'Unknown Fleet')}
                           </p>
-                          <div className="flex gap-4 text-sm">
+                          <div className="flex gap-4 text-sm text-[#0B1F3B] dark:text-white">
                             <span>{t('common.type', 'Type')}: {contract.contractType}</span>
                             <span>{t('payments.contracts.expires', 'Expires')}: {format(new Date(contract.endDate), "MMM dd, yyyy")}</span>
-                            <span className={daysUntilExpiry <= 30 ? "text-orange-500 font-medium" : ""}>
+                            <span className={daysUntilExpiry <= 30 ? "text-[#F97316] font-medium" : ""}>
                               ({daysUntilExpiry} {t('payments.contracts.days', 'days')})
                             </span>
                           </div>
                         </div>
                         <div className="text-right space-y-2">
-                          <div className="text-sm font-medium">
+                          <div className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                             {t('payments.contracts.utilization', 'Utilization')}: {utilizationPercentage.toFixed(1)}%
                           </div>
                           <Progress value={utilizationPercentage} className="w-24" />
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-xs text-[#64748B]">
                             ${totalUtilized.toLocaleString()} / ${serviceCap.toLocaleString()}
                           </div>
                         </div>

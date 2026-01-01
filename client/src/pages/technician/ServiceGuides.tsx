@@ -175,36 +175,36 @@ export default function ServiceGuides() {
   const getTypeBadge = (type: ServiceGuide["type"]) => {
     switch (type) {
       case "manual":
-        return <Badge className="bg-blue-600">Manual</Badge>;
+        return <Badge className="bg-[#0A5ED7]">Manual</Badge>;
       case "guide":
         return <Badge className="bg-green-600">Guide</Badge>;
       case "bulletin":
-        return <Badge className="bg-yellow-600">TSB</Badge>;
+        return <Badge className="bg-[#F97316]">TSB</Badge>;
       case "video":
         return <Badge className="bg-purple-600">Video</Badge>;
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Service Guides & Manuals</h1>
-        <p className="text-gray-500 dark:text-gray-400">Access technical documentation for all vehicle brands</p>
+        <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">Service Guides & Manuals</h1>
+        <p className="text-[#64748B]">Access technical documentation for all vehicle brands</p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search guides, manuals, bulletins..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-guides"
           />
         </div>
         <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-          <SelectTrigger className="w-full md:w-48" data-testid="select-brand">
+          <SelectTrigger className="w-full md:w-48 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-brand">
             <SelectValue placeholder="Select Brand" />
           </SelectTrigger>
           <SelectContent>
@@ -217,7 +217,7 @@ export default function ServiceGuides() {
           </SelectContent>
         </Select>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full md:w-48" data-testid="select-category">
+          <SelectTrigger className="w-full md:w-48 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
@@ -229,7 +229,7 @@ export default function ServiceGuides() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="guides" data-testid="tab-guides">
             <BookOpen className="h-4 w-4 mr-2" />
             Guides
@@ -253,7 +253,7 @@ export default function ServiceGuides() {
             {filteredGuides.map((guide) => (
               <Card 
                 key={guide.id} 
-                className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray hover:border-blue-500 transition-colors cursor-pointer"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition-colors cursor-pointer"
                 data-testid={`card-guide-${guide.id}`}
               >
                 <CardContent className="p-4">
@@ -261,12 +261,12 @@ export default function ServiceGuides() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         {getTypeBadge(guide.type)}
-                        <span className="text-sm text-gray-500">{guide.brand}</span>
-                        {guide.model && <span className="text-sm text-gray-400">• {guide.model}</span>}
-                        {guide.year && <span className="text-sm text-gray-400">• {guide.year}</span>}
+                        <span className="text-sm text-[#64748B]">{guide.brand}</span>
+                        {guide.model && <span className="text-sm text-[#64748B]">• {guide.model}</span>}
+                        {guide.year && <span className="text-sm text-[#64748B]">• {guide.year}</span>}
                       </div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{guide.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{guide.title}</h3>
+                      <div className="flex items-center gap-4 text-sm text-[#64748B]">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           Updated {guide.lastUpdated}
@@ -303,16 +303,16 @@ export default function ServiceGuides() {
             {filteredGuides.filter(g => g.type === "manual").map((guide) => (
               <Card 
                 key={guide.id} 
-                className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`card-manual-${guide.id}`}
               >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{guide.title}</h3>
-                      <p className="text-sm text-gray-500">{guide.brand} {guide.model} ({guide.year})</p>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{guide.title}</h3>
+                      <p className="text-sm text-[#64748B]">{guide.brand} {guide.model} ({guide.year})</p>
                     </div>
-                    <Button data-testid={`button-view-manual-${guide.id}`}>
+                    <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" data-testid={`button-view-manual-${guide.id}`}>
                       <FileText className="h-4 w-4 mr-2" />
                       View Manual
                     </Button>
@@ -328,7 +328,7 @@ export default function ServiceGuides() {
             {carBrands.map((brand) => (
               <Card 
                 key={brand.name}
-                className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray hover:border-blue-500 transition-colors cursor-pointer"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition-colors cursor-pointer"
                 onClick={() => {
                   setSelectedBrand(brand.name);
                   setActiveTab("guides");
@@ -339,11 +339,11 @@ export default function ServiceGuides() {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{brand.logo}</span>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{brand.name}</h3>
-                      <p className="text-sm text-gray-500">{brand.count} documents</p>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{brand.name}</h3>
+                      <p className="text-sm text-[#64748B]">{brand.count} documents</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-gray-400" />
+                  <ChevronRight className="h-5 w-5 text-[#64748B]" />
                 </CardContent>
               </Card>
             ))}
@@ -351,20 +351,20 @@ export default function ServiceGuides() {
         </TabsContent>
 
         <TabsContent value="favorites" className="mt-6">
-          <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
-              <Bookmark className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">No favorites yet</h3>
-              <p className="text-gray-500">Bookmark guides and manuals for quick access</p>
+              <Bookmark className="h-12 w-12 mx-auto text-[#64748B] mb-4" />
+              <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">No favorites yet</h3>
+              <p className="text-[#64748B]">Bookmark guides and manuals for quick access</p>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <Wrench className="h-5 w-5 text-orange-500" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Wrench className="h-5 w-5 text-[#F97316]" />
             Quick Access - Popular Procedures
           </CardTitle>
         </CardHeader>
@@ -384,7 +384,7 @@ export default function ServiceGuides() {
               <Button
                 key={index}
                 variant="outline"
-                className="justify-start"
+                className="justify-start border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`button-procedure-${index}`}
               >
                 <ChevronRight className="h-4 w-4 mr-2" />

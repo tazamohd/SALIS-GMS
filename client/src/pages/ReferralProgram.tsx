@@ -67,7 +67,7 @@ export default function ReferralProgram() {
       accessorKey: "referralCode",
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <code className="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+          <code className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] px-2 py-1 rounded text-sm text-[#0B1F3B] dark:text-white">
             {row.referralCode || t('common.notAvailable', 'N/A')}
           </code>
           {row.referralCode && (
@@ -138,23 +138,23 @@ export default function ReferralProgram() {
       />
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('referral.generateReferralCode', 'Generate Referral Code')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('referral.generateReferralCode', 'Generate Referral Code')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">{t('customers.customerId', 'Customer ID')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('customers.customerId', 'Customer ID')}</label>
               <Input
                 placeholder={t('referral.enterCustomerId', 'Enter customer ID...')}
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
-                className="mt-1"
+                className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-customer-id"
               />
             </div>
             <Button
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               onClick={() => createReferral.mutate({ customerId })}
               disabled={!customerId}
               data-testid="button-generate"

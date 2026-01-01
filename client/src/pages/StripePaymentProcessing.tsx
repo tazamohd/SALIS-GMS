@@ -62,7 +62,6 @@ export default function StripePaymentProcessing() {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [statusPaymentId, setStatusPaymentId] = useState("");
 
-  // Create payment intent mutation
   const createPaymentMutation = useMutation({
     mutationFn: async ({ amount, currency }: { amount: number; currency: string }) => {
       return apiRequest('POST', '/api/stripe/create-payment-intent', { amount, currency });
@@ -85,7 +84,6 @@ export default function StripePaymentProcessing() {
     },
   });
 
-  // Process refund mutation
   const refundMutation = useMutation({
     mutationFn: async ({ paymentIntentId, amount }: { paymentIntentId: string; amount?: number }) => {
       return apiRequest('POST', '/api/stripe/refund', { paymentIntentId, amount });
@@ -108,7 +106,6 @@ export default function StripePaymentProcessing() {
     },
   });
 
-  // Get payment status query
   const { data: paymentStatus, refetch: refetchStatus } = useQuery<any>({
     queryKey: ['/api/stripe/payment-status', statusPaymentId],
     queryFn: async () => {
@@ -136,7 +133,7 @@ export default function StripePaymentProcessing() {
     }
 
     createPaymentMutation.mutate({
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: Math.round(amount * 100),
       currency: paymentCurrency,
     });
   };
@@ -172,14 +169,14 @@ export default function StripePaymentProcessing() {
       case 'succeeded':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'processing':
-        return <Clock className="w-5 h-5 text-blue-500" />;
+        return <Clock className="w-5 h-5 text-[#0A5ED7]" />;
       case 'failed':
         return <XCircle className="w-5 h-5 text-red-500" />;
       case 'requires_payment_method':
       case 'requires_confirmation':
-        return <AlertCircle className="w-5 h-5 text-yellow-500" />;
+        return <AlertCircle className="w-5 h-5 text-[#F97316]" />;
       default:
-        return <AlertCircle className="w-5 h-5 text-gray-500" />;
+        return <AlertCircle className="w-5 h-5 text-[#64748B]" />;
     }
   };
 
@@ -215,335 +212,331 @@ export default function StripePaymentProcessing() {
       ]}
     >
       <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" onClick={() => setCreatePaymentOpen(true)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</CardTitle>
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <DollarSign className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-[#64748B]">{t('payments.stripe.startNewTransaction', 'Start a new payment transaction')}</p>
+            </CardContent>
+          </Card>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCreatePaymentOpen(true)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</CardTitle>
-            <DollarSign className="h-5 w-5 text-green-500" />
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" onClick={() => setStatusDialogOpen(true)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</CardTitle>
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <CheckCircle className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-[#64748B]">{t('payments.stripe.trackPaymentStatus', 'Track payment intent status')}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" onClick={() => setRefundDialogOpen(true)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.stripe.processRefund', 'Process Refund')}</CardTitle>
+              <div className="p-2 rounded-lg bg-[#F97316]">
+                <Banknote className="h-5 w-5 text-white" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-[#64748B]">{t('payments.stripe.refundCompletedPayment', 'Refund a completed payment')}</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <CreditCard className="h-5 w-5 text-[#0A5ED7]" />
+              {t('payments.stripe.acceptedPaymentMethods', 'Accepted Payment Methods')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-gray-500">{t('payments.stripe.startNewTransaction', 'Start a new payment transaction')}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#004D8D] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">mada</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mada</p>
+                <p className="text-xs text-[#64748B]">مدى</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">STC Pay</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Pay</p>
+                <p className="text-xs text-[#64748B]">إس تي سي باي</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">STC</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Bank</p>
+                <p className="text-xs text-[#64748B]">بنك إس تي سي</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#1A1F71] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">VISA</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Visa</p>
+                <p className="text-xs text-[#64748B]">فيزا</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-[#EB001B] to-[#F79E1B] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">MC</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mastercard</p>
+                <p className="text-xs text-[#64748B]">ماستركارد</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#006FCF] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">AMEX</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">American Express</p>
+                <p className="text-xs text-[#64748B]">أمريكان إكسبريس</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-black rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">Pay</span>
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Apple Pay</p>
+                <p className="text-xs text-[#64748B]">آبل باي</p>
+              </div>
+
+              <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
+                <div className="w-12 h-12 mx-auto mb-2 bg-[#64748B] rounded-lg flex items-center justify-center">
+                  <Banknote className="w-6 h-6 text-white" />
+                </div>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.bankTransfer', 'Bank Transfer')}</p>
+                <p className="text-xs text-[#64748B]">تحويل بنكي</p>
+              </div>
+            </div>
+
+            <div className="mt-4 p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <p className="text-sm text-[#64748B]">
+                <strong className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.defaultCurrency', 'Default Currency')}:</strong> Saudi Riyal (SAR) ر.س
+                <span className="mx-2">|</span>
+                <strong className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.supported', 'Supported')}:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
+              </p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setStatusDialogOpen(true)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</CardTitle>
-            <CheckCircle className="h-5 w-5 text-blue-500" />
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.integrationGuide', 'Payment Integration Guide')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-xs text-gray-500">{t('payments.stripe.trackPaymentStatus', 'Track payment intent status')}</p>
+          <CardContent className="space-y-4">
+            <div>
+              <h3 className="font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('payments.stripe.setupInstructions', 'Setup Instructions')}</h3>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-[#64748B]">
+                <li>{t('payments.stripe.step1', 'Add your Stripe Secret Key to environment secrets')}</li>
+                <li>{t('payments.stripe.step2', 'Configure webhook endpoints for payment confirmations')}</li>
+                <li>{t('payments.stripe.step3', 'Test with Stripe test mode before going live')}</li>
+                <li>{t('payments.stripe.step4', 'Review Stripe dashboard for transaction details')}</li>
+              </ol>
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('payments.stripe.paymentStatuses', 'Payment Statuses')}</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-[#64748B]">{t('payments.stripe.status.succeeded', 'Succeeded - Payment complete')}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-[#0A5ED7]" />
+                  <span className="text-[#64748B]">{t('payments.stripe.status.processing', 'Processing - In progress')}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <XCircle className="w-4 h-4 text-red-500" />
+                  <span className="text-[#64748B]">{t('payments.stripe.status.failed', 'Failed - Payment failed')}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 text-[#F97316]" />
+                  <span className="text-[#64748B]">{t('payments.stripe.status.requiresAction', 'Requires Action - User input needed')}</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setRefundDialogOpen(true)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('payments.stripe.processRefund', 'Process Refund')}</CardTitle>
-            <Banknote className="h-5 w-5 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-gray-500">{t('payments.stripe.refundCompletedPayment', 'Refund a completed payment')}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Accepted Payment Methods */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            {t('payments.stripe.acceptedPaymentMethods', 'Accepted Payment Methods')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Local Saudi Payment Methods */}
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-[#004D8D] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">mada</span>
+        <Dialog open={createPaymentOpen} onOpenChange={setCreatePaymentOpen}>
+          <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <DialogHeader>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</DialogTitle>
+              <DialogDescription className="text-[#64748B]">
+                {t('payments.stripe.createPaymentDescription', 'Create a new Stripe payment intent for processing')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="amount" className="text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  data-testid="input-payment-amount"
+                />
               </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">Mada</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">مدى</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">STC Pay</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">STC Pay</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">إس تي سي باي</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">STC</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">STC Bank</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">بنك إس تي سي</p>
-            </div>
-
-            {/* International Cards */}
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-[#1A1F71] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">VISA</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">Visa</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">فيزا</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-[#EB001B] to-[#F79E1B] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">MC</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">Mastercard</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">ماستركارد</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-[#006FCF] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">AMEX</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">American Express</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">أمريكان إكسبريس</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-black rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">Pay</span>
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">Apple Pay</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">آبل باي</p>
-            </div>
-
-            <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-              <div className="w-12 h-12 mx-auto mb-2 bg-gray-600 rounded-lg flex items-center justify-center">
-                <Banknote className="w-6 h-6 text-white" />
-              </div>
-              <p className="font-medium text-sm text-gray-900 dark:text-white">{t('payments.methods.bankTransfer', 'Bank Transfer')}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">تحويل بنكي</p>
-            </div>
-          </div>
-
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <strong className="text-gray-900 dark:text-white">{t('payments.stripe.defaultCurrency', 'Default Currency')}:</strong> Saudi Riyal (SAR) ر.س
-              <span className="mx-2">|</span>
-              <strong className="text-gray-900 dark:text-white">{t('payments.stripe.supported', 'Supported')}:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment Processing Guide */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('payments.stripe.integrationGuide', 'Payment Integration Guide')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-medium mb-2 dark:text-white">{t('payments.stripe.setupInstructions', 'Setup Instructions')}</h3>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <li>{t('payments.stripe.step1', 'Add your Stripe Secret Key to environment secrets')}</li>
-              <li>{t('payments.stripe.step2', 'Configure webhook endpoints for payment confirmations')}</li>
-              <li>{t('payments.stripe.step3', 'Test with Stripe test mode before going live')}</li>
-              <li>{t('payments.stripe.step4', 'Review Stripe dashboard for transaction details')}</li>
-            </ol>
-          </div>
-
-          <div>
-            <h3 className="font-medium mb-2 dark:text-white">{t('payments.stripe.paymentStatuses', 'Payment Statuses')}</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.succeeded', 'Succeeded - Payment complete')}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-blue-500" />
-                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.processing', 'Processing - In progress')}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <XCircle className="w-4 h-4 text-red-500" />
-                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.failed', 'Failed - Payment failed')}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4 text-yellow-500" />
-                <span className="text-gray-600 dark:text-gray-400">{t('payments.stripe.status.requiresAction', 'Requires Action - User input needed')}</span>
+              <div>
+                <Label htmlFor="currency" className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.currency', 'Currency')}</Label>
+                <Select value={paymentCurrency} onValueChange={setPaymentCurrency}>
+                  <SelectTrigger id="currency" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-currency">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                    {CURRENCIES.map(currency => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.symbol} {currency.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreatePaymentOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                onClick={handleCreatePayment}
+                disabled={createPaymentMutation.isPending}
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
+                data-testid="button-confirm-payment"
+              >
+                {createPaymentMutation.isPending ? t('common.creating', 'Creating...') : t('payments.stripe.createPayment', 'Create Payment')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* Create Payment Dialog */}
-      <Dialog open={createPaymentOpen} onOpenChange={setCreatePaymentOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('payments.stripe.createPaymentIntent', 'Create Payment Intent')}</DialogTitle>
-            <DialogDescription>
-              {t('payments.stripe.createPaymentDescription', 'Create a new Stripe payment intent for processing')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="amount">{t('common.amount', 'Amount')}</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={paymentAmount}
-                onChange={(e) => setPaymentAmount(e.target.value)}
-                data-testid="input-payment-amount"
-              />
+        <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+          <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <DialogHeader>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.processRefund', 'Process Refund')}</DialogTitle>
+              <DialogDescription className="text-[#64748B]">
+                {t('payments.stripe.refundDescription', 'Refund a completed payment. Leave amount empty for full refund.')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="paymentIntentId" className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
+                <Input
+                  id="paymentIntentId"
+                  placeholder="pi_..."
+                  value={selectedPaymentId}
+                  onChange={(e) => setSelectedPaymentId(e.target.value)}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  data-testid="input-payment-intent-id"
+                />
+              </div>
+              <div>
+                <Label htmlFor="refundAmount" className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.refundAmountOptional', 'Refund Amount (optional)')}</Label>
+                <Input
+                  id="refundAmount"
+                  type="number"
+                  step="0.01"
+                  placeholder={t('payments.stripe.leaveEmptyForFullRefund', 'Leave empty for full refund')}
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  data-testid="input-refund-amount"
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="currency">{t('payments.stripe.currency', 'Currency')}</Label>
-              <Select value={paymentCurrency} onValueChange={setPaymentCurrency}>
-                <SelectTrigger id="currency" data-testid="select-currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map(currency => (
-                    <SelectItem key={currency.code} value={currency.code}>
-                      {currency.symbol} {currency.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCreatePaymentOpen(false)}>
-              {t('common.cancel', 'Cancel')}
-            </Button>
-            <Button
-              onClick={handleCreatePayment}
-              disabled={createPaymentMutation.isPending}
-              data-testid="button-confirm-payment"
-            >
-              {createPaymentMutation.isPending ? t('common.creating', 'Creating...') : t('payments.stripe.createPayment', 'Create Payment')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRefundDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                onClick={handleProcessRefund}
+                disabled={refundMutation.isPending}
+                className="bg-[#F97316] hover:bg-[#F97316]/90"
+                data-testid="button-confirm-refund"
+              >
+                {refundMutation.isPending ? t('common.processing', 'Processing...') : t('payments.stripe.processRefund', 'Process Refund')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* Refund Dialog */}
-      <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('payments.stripe.processRefund', 'Process Refund')}</DialogTitle>
-            <DialogDescription>
-              {t('payments.stripe.refundDescription', 'Refund a completed payment. Leave amount empty for full refund.')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="paymentIntentId">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
-              <Input
-                id="paymentIntentId"
-                placeholder="pi_..."
-                value={selectedPaymentId}
-                onChange={(e) => setSelectedPaymentId(e.target.value)}
-                data-testid="input-payment-intent-id"
-              />
-            </div>
-            <div>
-              <Label htmlFor="refundAmount">{t('payments.stripe.refundAmountOptional', 'Refund Amount (optional)')}</Label>
-              <Input
-                id="refundAmount"
-                type="number"
-                step="0.01"
-                placeholder={t('payments.stripe.leaveEmptyForFullRefund', 'Leave empty for full refund')}
-                value={refundAmount}
-                onChange={(e) => setRefundAmount(e.target.value)}
-                data-testid="input-refund-amount"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
-              {t('common.cancel', 'Cancel')}
-            </Button>
-            <Button
-              onClick={handleProcessRefund}
-              disabled={refundMutation.isPending}
-              variant="destructive"
-              data-testid="button-confirm-refund"
-            >
-              {refundMutation.isPending ? t('common.processing', 'Processing...') : t('payments.stripe.processRefund', 'Process Refund')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+          <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <DialogHeader>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</DialogTitle>
+              <DialogDescription className="text-[#64748B]">
+                {t('payments.stripe.retrievePaymentStatus', 'Retrieve the current status of a payment intent')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="statusPaymentId" className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
+                <Input
+                  id="statusPaymentId"
+                  placeholder="pi_..."
+                  value={statusPaymentId}
+                  onChange={(e) => setStatusPaymentId(e.target.value)}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  data-testid="input-status-payment-id"
+                />
+              </div>
 
-      {/* Status Check Dialog */}
-      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('payments.stripe.checkPaymentStatus', 'Check Payment Status')}</DialogTitle>
-            <DialogDescription>
-              {t('payments.stripe.retrievePaymentStatus', 'Retrieve the current status of a payment intent')}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="statusPaymentId">{t('payments.stripe.paymentIntentId', 'Payment Intent ID')}</Label>
-              <Input
-                id="statusPaymentId"
-                placeholder="pi_..."
-                value={statusPaymentId}
-                onChange={(e) => setStatusPaymentId(e.target.value)}
-                data-testid="input-status-payment-id"
-              />
-            </div>
-
-            {paymentStatus && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center space-x-2">
-                    {getStatusIcon(paymentStatus.status)}
-                    <span>{t('payments.stripe.paymentStatus', 'Payment Status')}</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">{t('common.status', 'Status')}:</span>
-                    <Badge variant={getStatusBadgeVariant(paymentStatus.status)} data-testid="badge-payment-status">
-                      {paymentStatus.status}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">{t('common.amount', 'Amount')}:</span>
-                    <span className="font-medium" data-testid="text-payment-amount">
-                      {paymentStatus.currency?.toUpperCase()} {(paymentStatus.amount / 100).toFixed(2)}
-                    </span>
-                  </div>
-                  {paymentStatus.created && (
+              {paymentStatus && (
+                <Card className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center space-x-2 text-[#0B1F3B] dark:text-white">
+                      {getStatusIcon(paymentStatus.status)}
+                      <span>{t('payments.stripe.paymentStatus', 'Payment Status')}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-500">{t('common.created', 'Created')}:</span>
-                      <span className="text-sm">{new Date(paymentStatus.created * 1000).toLocaleString()}</span>
+                      <span className="text-sm text-[#64748B]">{t('common.status', 'Status')}:</span>
+                      <Badge variant={getStatusBadgeVariant(paymentStatus.status)}>
+                        {paymentStatus.status}
+                      </Badge>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
-              {t('common.close', 'Close')}
-            </Button>
-            <Button
-              onClick={() => refetchStatus()}
-              disabled={!statusPaymentId}
-              data-testid="button-check-status"
-            >
-              {t('payments.stripe.checkStatus', 'Check Status')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-[#64748B]">{t('common.amount', 'Amount')}:</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                        {paymentStatus.currency?.toUpperCase()} {(paymentStatus.amount / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStatusDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
+                {t('common.close', 'Close')}
+              </Button>
+              <Button
+                onClick={() => refetchStatus()}
+                disabled={!statusPaymentId}
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
+              >
+                {t('payments.stripe.checkStatus', 'Check Status')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </StandardPageLayout>
   );

@@ -179,9 +179,9 @@ export default function ServiceTemplates() {
 
   const getCategoryBadge = (category: string) => {
     const variants: Record<string, string> = {
-      maintenance: "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
-      repair: "bg-gray-300 text-gray-900 dark:bg-gray-600 dark:text-gray-100",
-      diagnostic: "bg-gray-400 text-gray-950 dark:bg-gray-500 dark:text-gray-50",
+      maintenance: "bg-[#0A5ED7]/10 text-[#0A5ED7]",
+      repair: "bg-[#F97316]/10 text-[#F97316]",
+      diagnostic: "bg-[#0BB3FF]/10 text-[#0BB3FF]",
     };
     return variants[category] || variants.maintenance;
   };
@@ -195,14 +195,14 @@ export default function ServiceTemplates() {
       <>
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogTrigger asChild>
-          <Button data-testid="button-create-template">
+          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-template">
             <Plus className="mr-2 h-4 w-4" /> {t('serviceTemplates.createTemplate', 'Create Template')}
           </Button>
         </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <DialogHeader>
-              <DialogTitle>{t('serviceTemplates.createServiceTemplate', 'Create Service Template')}</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.createServiceTemplate', 'Create Service Template')}</DialogTitle>
+              <DialogDescription className="text-[#64748B]">
                 {t('serviceTemplates.createReusableTemplate', 'Create a reusable service template with predefined steps')}
               </DialogDescription>
             </DialogHeader>
@@ -213,10 +213,10 @@ export default function ServiceTemplates() {
                   name="garageId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('serviceTemplates.garage', 'Garage')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.garage', 'Garage')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-garage">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
                             <SelectValue placeholder={t('serviceTemplates.selectGarage', 'Select garage')} />
                           </SelectTrigger>
                         </FormControl>
@@ -228,7 +228,7 @@ export default function ServiceTemplates() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage className="text-[#F97316]" />
                     </FormItem>
                   )}
                 />
@@ -238,11 +238,11 @@ export default function ServiceTemplates() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('serviceTemplates.templateName', 'Template Name')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.templateName', 'Template Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('serviceTemplates.templateNamePlaceholder', 'e.g., Oil Change Service')} data-testid="input-name" />
+                        <Input {...field} placeholder={t('serviceTemplates.templateNamePlaceholder', 'e.g., Oil Change Service')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-name" />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[#F97316]" />
                     </FormItem>
                   )}
                 />
@@ -252,10 +252,10 @@ export default function ServiceTemplates() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.category', 'Category')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-category">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category">
                             <SelectValue placeholder={t('serviceTemplates.selectCategory', 'Select category')} />
                           </SelectTrigger>
                         </FormControl>
@@ -265,7 +265,7 @@ export default function ServiceTemplates() {
                           <SelectItem value="diagnostic">{t('serviceTemplates.diagnostic', 'Diagnostic')}</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage className="text-[#F97316]" />
                     </FormItem>
                   )}
                 />
@@ -275,11 +275,11 @@ export default function ServiceTemplates() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder={t('serviceTemplates.describeTemplate', 'Describe this service template...')} data-testid="input-description" />
+                        <Textarea {...field} value={field.value || ""} placeholder={t('serviceTemplates.describeTemplate', 'Describe this service template...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-description" />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[#F97316]" />
                     </FormItem>
                   )}
                 />
@@ -290,11 +290,11 @@ export default function ServiceTemplates() {
                     name="estimatedHours"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.25" {...field} value={field.value || ""} data-testid="input-estimated-hours" />
+                          <Input type="number" step="0.25" {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-estimated-hours" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#F97316]" />
                       </FormItem>
                     )}
                   />
@@ -304,11 +304,11 @@ export default function ServiceTemplates() {
                     name="standardCost"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('serviceTemplates.standardCost', 'Standard Cost')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.standardCost', 'Standard Cost')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" {...field} value={field.value || ""} data-testid="input-standard-cost" />
+                          <Input type="number" step="0.01" {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-standard-cost" />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[#F97316]" />
                       </FormItem>
                     )}
                   />
@@ -316,19 +316,20 @@ export default function ServiceTemplates() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <FormLabel>{t('serviceTemplates.taskSteps', 'Task Steps')}</FormLabel>
-                    <Button type="button" variant="outline" size="sm" onClick={addTaskStep} data-testid="button-add-step">
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.taskSteps', 'Task Steps')}</FormLabel>
+                    <Button type="button" variant="outline" size="sm" onClick={addTaskStep} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid="button-add-step">
                       <Plus className="h-3 w-3 mr-1" /> {t('serviceTemplates.addStep', 'Add Step')}
                     </Button>
                   </div>
                   {taskSteps.map((step, index) => (
-                    <Card key={index} className="p-3">
+                    <Card key={index} className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                       <div className="space-y-2">
                         <div className="flex justify-between items-start gap-2">
                           <Input
                             placeholder={t('serviceTemplates.stepName', 'Step name')}
                             value={step.stepName}
                             onChange={(e) => updateTaskStep(index, "stepName", e.target.value)}
+                            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`input-step-name-${index}`}
                           />
                           {taskSteps.length > 1 && (
@@ -337,6 +338,7 @@ export default function ServiceTemplates() {
                               variant="ghost"
                               size="sm"
                               onClick={() => removeTaskStep(index)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
                               data-testid={`button-remove-step-${index}`}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -347,6 +349,7 @@ export default function ServiceTemplates() {
                           placeholder={t('serviceTemplates.descriptionOptional', 'Description (optional)')}
                           value={step.description || ""}
                           onChange={(e) => updateTaskStep(index, "description", e.target.value)}
+                          className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
                           data-testid={`input-step-description-${index}`}
                         />
                         <Input
@@ -354,6 +357,7 @@ export default function ServiceTemplates() {
                           placeholder={t('serviceTemplates.estimatedMinutes', 'Estimated minutes')}
                           value={step.estimatedMinutes || 0}
                           onChange={(e) => updateTaskStep(index, "estimatedMinutes", parseInt(e.target.value))}
+                          className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
                           data-testid={`input-step-minutes-${index}`}
                         />
                       </div>
@@ -366,11 +370,12 @@ export default function ServiceTemplates() {
                     type="button"
                     variant="outline"
                     onClick={() => setCreateDialogOpen(false)}
+                    className="border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="button-cancel-create"
                   >
                     {t('common.cancel', 'Cancel')}
                   </Button>
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-create">
+                  <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-submit-create">
                     {createMutation.isPending ? t('common.creating', 'Creating...') : t('serviceTemplates.createTemplate', 'Create Template')}
                   </Button>
                 </DialogFooter>
@@ -381,7 +386,7 @@ export default function ServiceTemplates() {
 
       <div className="flex gap-4">
         <Select value={selectedGarage} onValueChange={setSelectedGarage}>
-          <SelectTrigger className="w-[200px]" data-testid="filter-garage">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="filter-garage">
             <SelectValue placeholder={t('serviceTemplates.allGarages', 'All Garages')} />
           </SelectTrigger>
           <SelectContent>
@@ -395,7 +400,7 @@ export default function ServiceTemplates() {
         </Select>
 
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-[200px]" data-testid="filter-category">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="filter-category">
             <SelectValue placeholder={t('serviceTemplates.allCategories', 'All Categories')} />
           </SelectTrigger>
           <SelectContent>
@@ -409,40 +414,41 @@ export default function ServiceTemplates() {
 
       {activeLoading ? (
         <div className="text-center py-12">
-          <p className="text-gray-900 dark:text-white/60">{t('serviceTemplates.loadingTemplates', 'Loading templates...')}</p>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[#64748B]">{t('serviceTemplates.loadingTemplates', 'Loading templates...')}</p>
         </div>
       ) : filteredTemplates && filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTemplates.map((template) => (
-            <Card key={template.id} className="cursor-pointer hover:shadow-lg transition-shadow" data-testid={`card-template-${template.id}`}>
+            <Card key={template.id} className="cursor-pointer bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-lg hover:border-[#0A5ED7]/30 transition-all" data-testid={`card-template-${template.id}`}>
               <CardContent className="p-6" onClick={() => openDetailsDialog(template)}>
                 <div className="space-y-3">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-lg" data-testid={`text-template-name-${template.id}`}>{template.name}</h3>
+                    <h3 className="font-semibold text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-template-name-${template.id}`}>{template.name}</h3>
                     <Badge className={getCategoryBadge(template.category)} data-testid={`badge-category-${template.id}`}>
                       {template.category}
                     </Badge>
                   </div>
                   {template.description && (
-                    <p className="text-sm text-gray-900 dark:text-white/60 line-clamp-2">{template.description}</p>
+                    <p className="text-sm text-[#64748B] line-clamp-2">{template.description}</p>
                   )}
-                  <div className="flex gap-4 text-sm text-gray-900 dark:text-white/60">
+                  <div className="flex gap-4 text-sm text-[#64748B]">
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
+                      <Clock className="h-4 w-4 text-[#0A5ED7]" />
                       <span>{template.estimatedHours || 0}{t('serviceTemplates.hoursAbbrev', 'h')}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4" />
+                      <DollarSign className="h-4 w-4 text-[#0A5ED7]" />
                       <span>${template.standardCost || 0}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {template.isActive ? (
-                      <Badge variant="outline" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                      <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                         <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
+                      <Badge className="bg-[#64748B]/10 text-[#64748B]">
                         <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
                       </Badge>
                     )}
@@ -453,53 +459,64 @@ export default function ServiceTemplates() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-900 dark:text-white/60">{t('serviceTemplates.noTemplatesFound', 'No service templates found')}</p>
-          <p className="text-sm text-gray-900 dark:text-white/60 mt-2">{t('serviceTemplates.createFirstTemplate', 'Create your first template to get started')}</p>
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative mb-6">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+              <Wrench className="w-10 h-10 text-white" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#0A5ED7]/20" />
+            <div className="absolute -bottom-1 -left-3 w-6 h-6 rounded-full bg-[#0BB3FF]/20" />
+          </div>
+          <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-2">
+            {t('serviceTemplates.noTemplatesFound', 'No service templates found')}
+          </h3>
+          <p className="text-[#64748B] mb-6 text-center max-w-md">
+            {t('serviceTemplates.createFirstTemplate', 'Create your first template to get started')}
+          </p>
         </div>
       )}
 
       <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{selectedTemplate?.name}</DialogTitle>
-            <DialogDescription>{t('serviceTemplates.templateDetails', 'Service template details')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedTemplate?.name}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('serviceTemplates.templateDetails', 'Service template details')}</DialogDescription>
           </DialogHeader>
           {selectedTemplate && (
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2">{t('common.category', 'Category')}</h4>
+                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</h4>
                 <Badge className={getCategoryBadge(selectedTemplate.category)}>{selectedTemplate.category}</Badge>
               </div>
               {selectedTemplate.description && (
                 <div>
-                  <h4 className="font-semibold mb-2">{t('common.description', 'Description')}</h4>
-                  <p className="text-sm text-gray-900 dark:text-white/60">{selectedTemplate.description}</p>
+                  <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</h4>
+                  <p className="text-sm text-[#64748B]">{selectedTemplate.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold mb-2">{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</h4>
-                  <p className="text-sm">{selectedTemplate.estimatedHours || 0} {t('serviceTemplates.hours', 'hours')}</p>
+                  <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('serviceTemplates.estimatedHours', 'Estimated Hours')}</h4>
+                  <p className="text-sm text-[#64748B]">{selectedTemplate.estimatedHours || 0} {t('serviceTemplates.hours', 'hours')}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">{t('serviceTemplates.standardCost', 'Standard Cost')}</h4>
-                  <p className="text-sm">${selectedTemplate.standardCost || 0}</p>
+                  <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('serviceTemplates.standardCost', 'Standard Cost')}</h4>
+                  <p className="text-sm text-[#64748B]">${selectedTemplate.standardCost || 0}</p>
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">{t('serviceTemplates.taskSteps', 'Task Steps')}</h4>
+                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('serviceTemplates.taskSteps', 'Task Steps')}</h4>
                 <div className="space-y-2">
                   {Array.isArray(selectedTemplate.taskSteps) && selectedTemplate.taskSteps.length > 0 ? (
                     (selectedTemplate.taskSteps as any[]).map((step: any, index: number) => (
-                      <Card key={index} className="p-3">
-                        <p className="font-medium">{index + 1}. {step.stepName}</p>
-                        {step.description && <p className="text-sm text-gray-900 dark:text-white/60 mt-1">{step.description}</p>}
-                        {step.estimatedMinutes && <p className="text-xs text-gray-900 dark:text-white/60 mt-1">~{step.estimatedMinutes} {t('serviceTemplates.minutes', 'minutes')}</p>}
+                      <Card key={index} className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                        <p className="font-medium text-[#0B1F3B] dark:text-white">{index + 1}. {step.stepName}</p>
+                        {step.description && <p className="text-sm text-[#64748B] mt-1">{step.description}</p>}
+                        {step.estimatedMinutes && <p className="text-xs text-[#64748B] mt-1">~{step.estimatedMinutes} {t('serviceTemplates.minutes', 'minutes')}</p>}
                       </Card>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-900 dark:text-white/60">{t('serviceTemplates.noTaskStepsDefined', 'No task steps defined')}</p>
+                    <p className="text-sm text-[#64748B]">{t('serviceTemplates.noTaskStepsDefined', 'No task steps defined')}</p>
                   )}
                 </div>
               </div>
@@ -508,6 +525,7 @@ export default function ServiceTemplates() {
                   variant="destructive"
                   onClick={() => selectedTemplate && deleteMutation.mutate(selectedTemplate.id)}
                   disabled={deleteMutation.isPending}
+                  className="bg-red-500 hover:bg-red-600"
                   data-testid="button-delete-template"
                 >
                   {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('serviceTemplates.deleteTemplate', 'Delete Template')}

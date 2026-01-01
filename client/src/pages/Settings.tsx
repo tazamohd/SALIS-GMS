@@ -39,10 +39,10 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
-          <p className="mt-4 text-gray-900 dark:text-white/60">{t('settings.loadingSettings', 'Loading settings...')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+          <p className="mt-4 text-[#64748B]">{t('settings.loadingSettings', 'Loading settings...')}</p>
         </div>
       </div>
     );
@@ -50,14 +50,14 @@ export default function Settings() {
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="text-gray-700 dark:text-gray-300 text-5xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('settings.failedToLoad', 'Failed to Load Settings')}</h2>
-          <p className="text-gray-900 dark:text-white/60 mb-4">
+          <div className="text-[#F97316] text-5xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white mb-2">{t('settings.failedToLoad', 'Failed to Load Settings')}</h2>
+          <p className="text-[#64748B] mb-4">
             {error instanceof Error ? error.message : t('settings.unableToConnect', 'Unable to connect to server')}
           </p>
-          <Button onClick={() => window.location.reload()} data-testid="button-retry">
+          <Button onClick={() => window.location.reload()} data-testid="button-retry" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
             {t('common.retry', 'Retry')}
           </Button>
         </div>
@@ -123,23 +123,23 @@ export default function Settings() {
 function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
   const { t } = useTranslation();
   return (
-    <Card data-testid="card-general">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-general">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.generalSettings', 'General Settings')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.configureBasicPreferences', 'Configure your basic preferences')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.generalSettings', 'General Settings')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.configureBasicPreferences', 'Configure your basic preferences')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>{t('settings.timezone', 'Timezone')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.timezone', 'Timezone')}</Label>
             <Select 
               value={settings.timezone || "UTC"} 
               onValueChange={(value) => onUpdate({ timezone: value })}
             >
-              <SelectTrigger data-testid="select-timezone">
+              <SelectTrigger data-testid="select-timezone" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="UTC">UTC</SelectItem>
                 <SelectItem value="America/New_York">{t('settings.easternTime', 'Eastern Time')}</SelectItem>
                 <SelectItem value="America/Chicago">{t('settings.centralTime', 'Central Time')}</SelectItem>
@@ -153,15 +153,15 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
           </div>
 
           <div className="space-y-2">
-            <Label>{t('settings.dateFormat', 'Date Format')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.dateFormat', 'Date Format')}</Label>
             <Select 
               value={settings.dateFormat || "MM/DD/YYYY"} 
               onValueChange={(value) => onUpdate({ dateFormat: value })}
             >
-              <SelectTrigger data-testid="select-date-format">
+              <SelectTrigger data-testid="select-date-format" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
                 <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
                 <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
@@ -170,15 +170,15 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
           </div>
 
           <div className="space-y-2">
-            <Label>{t('settings.timeFormat', 'Time Format')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.timeFormat', 'Time Format')}</Label>
             <Select 
               value={settings.timeFormat || "12h"} 
               onValueChange={(value) => onUpdate({ timeFormat: value })}
             >
-              <SelectTrigger data-testid="select-time-format">
+              <SelectTrigger data-testid="select-time-format" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="12h">{t('settings.12hour', '12-hour')}</SelectItem>
                 <SelectItem value="24h">{t('settings.24hour', '24-hour')}</SelectItem>
               </SelectContent>
@@ -187,8 +187,8 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.notifications', 'Notifications')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.receiveSystemNotifications', 'Receive system notifications')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.notifications', 'Notifications')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.receiveSystemNotifications', 'Receive system notifications')}</p>
             </div>
             <Switch 
               checked={settings.enableNotifications ?? true}
@@ -199,8 +199,8 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.soundEffects', 'Sound Effects')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.playSoundsForNotifications', 'Play sounds for notifications')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.soundEffects', 'Sound Effects')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.playSoundsForNotifications', 'Play sounds for notifications')}</p>
             </div>
             <Switch 
               checked={settings.enableSounds ?? true}
@@ -217,22 +217,22 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
 function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
   const { t } = useTranslation();
   return (
-    <Card data-testid="card-language">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-language">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.languageRegion', 'Language & Region')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.choosePreferredLanguage', 'Choose your preferred language')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.languageRegion', 'Language & Region')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.choosePreferredLanguage', 'Choose your preferred language')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>{t('settings.language', 'Language')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('settings.language', 'Language')}</Label>
           <Select 
             value={settings.language || "en"} 
             onValueChange={(value) => onUpdate({ language: value })}
           >
-            <SelectTrigger data-testid="select-language">
+            <SelectTrigger data-testid="select-language" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="en">English</SelectItem>
               <SelectItem value="ar">العربية</SelectItem>
               <SelectItem value="es">Español</SelectItem>
@@ -244,7 +244,7 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectItem value="ja">日本語</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-sm text-gray-900 dark:text-white/60">
+          <p className="text-sm text-[#64748B]">
             {t('settings.languageSupportNote', 'Language support is coming soon. Currently only English is available.')}
           </p>
         </div>
@@ -256,22 +256,22 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
 function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
   const { t } = useTranslation();
   return (
-    <Card data-testid="card-currency">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-currency">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.currencySettings', 'Currency Settings')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.setPreferredCurrency', 'Set your preferred currency')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.currencySettings', 'Currency Settings')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.setPreferredCurrency', 'Set your preferred currency')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>{t('settings.currency', 'Currency')}</Label>
+          <Label className="text-[#0B1F3B] dark:text-white">{t('settings.currency', 'Currency')}</Label>
           <Select 
             value={settings.currency || "USD"} 
             onValueChange={(value) => onUpdate({ currency: value })}
           >
-            <SelectTrigger data-testid="select-currency">
+            <SelectTrigger data-testid="select-currency" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="USD">USD - {t('settings.usDollar', 'US Dollar')} ($)</SelectItem>
               <SelectItem value="EUR">EUR - {t('settings.euro', 'Euro')} (€)</SelectItem>
               <SelectItem value="GBP">GBP - {t('settings.britishPound', 'British Pound')} (£)</SelectItem>
@@ -294,15 +294,15 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
 function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUpdate: (data: Partial<UserSettings>) => void }) {
   const { t } = useTranslation();
   return (
-    <Card data-testid="card-appearance">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-appearance">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.appearance', 'Appearance')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.customizeLookAndFeel', 'Customize the look and feel')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.appearance', 'Appearance')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.customizeLookAndFeel', 'Customize the look and feel')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>{t('settings.theme', 'Theme')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.theme', 'Theme')}</Label>
             <Select 
               value={settings.theme || "light"} 
               onValueChange={(value) => {
@@ -314,10 +314,10 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
                 }
               }}
             >
-              <SelectTrigger data-testid="select-theme">
+              <SelectTrigger data-testid="select-theme" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="light">{t('settings.light', 'Light')}</SelectItem>
                 <SelectItem value="dark">{t('settings.dark', 'Dark')}</SelectItem>
                 <SelectItem value="auto">{t('settings.system', 'System')}</SelectItem>
@@ -326,15 +326,15 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
           </div>
 
           <div className="space-y-2">
-            <Label>{t('settings.fontSize', 'Font Size')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.fontSize', 'Font Size')}</Label>
             <Select 
               value={settings.fontSize || "medium"} 
               onValueChange={(value) => onUpdate({ fontSize: value })}
             >
-              <SelectTrigger data-testid="select-font-size">
+              <SelectTrigger data-testid="select-font-size" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="small">{t('settings.small', 'Small')}</SelectItem>
                 <SelectItem value="medium">{t('settings.medium', 'Medium')}</SelectItem>
                 <SelectItem value="large">{t('settings.large', 'Large')}</SelectItem>
@@ -344,8 +344,8 @@ function AppearanceSettingsTab({ settings, onUpdate }: { settings: UserSettings;
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.compactMode', 'Compact Mode')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.reduceSpacingAndPadding', 'Reduce spacing and padding')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.compactMode', 'Compact Mode')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.reduceSpacingAndPadding', 'Reduce spacing and padding')}</p>
             </div>
             <Switch 
               checked={settings.compactMode ?? false}
@@ -375,23 +375,23 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
   };
 
   return (
-    <Card data-testid="card-print">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-print">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.printSettings', 'Print Settings')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.configurePrintLayout', 'Configure print layout and options')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.printSettings', 'Print Settings')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.configurePrintLayout', 'Configure print layout and options')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>{t('settings.paperSize', 'Paper Size')}</Label>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.paperSize', 'Paper Size')}</Label>
             <Select 
               value={printSettings.paperSize} 
               onValueChange={(value) => updatePrintSettings({ paperSize: value })}
             >
-              <SelectTrigger data-testid="select-paper-size">
+              <SelectTrigger data-testid="select-paper-size" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="A4">A4</SelectItem>
                 <SelectItem value="Letter">{t('settings.letter', 'Letter')}</SelectItem>
                 <SelectItem value="Legal">{t('settings.legal', 'Legal')}</SelectItem>
@@ -401,8 +401,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.includeHeader', 'Include Header')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.showHeaderOnPrintedPages', 'Show header on printed pages')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.includeHeader', 'Include Header')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.showHeaderOnPrintedPages', 'Show header on printed pages')}</p>
             </div>
             <Switch 
               checked={printSettings.includeHeader}
@@ -413,8 +413,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.includeFooter', 'Include Footer')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.showFooterOnPrintedPages', 'Show footer on printed pages')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.includeFooter', 'Include Footer')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.showFooterOnPrintedPages', 'Show footer on printed pages')}</p>
             </div>
             <Switch 
               checked={printSettings.includeFooter}
@@ -425,8 +425,8 @@ function PrintSettingsTab({ settings, onUpdate }: { settings: UserSettings; onUp
 
           <div className="flex items-center justify-between">
             <div>
-              <Label>{t('settings.showLogo', 'Show Logo')}</Label>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.displayCompanyLogoOnPrints', 'Display company logo on prints')}</p>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('settings.showLogo', 'Show Logo')}</Label>
+              <p className="text-sm text-[#64748B]">{t('settings.displayCompanyLogoOnPrints', 'Display company logo on prints')}</p>
             </div>
             <Switch 
               checked={printSettings.showLogo}
@@ -453,16 +453,16 @@ function KeyboardShortcutsTab({ settings, onUpdate }: { settings: UserSettings; 
   ];
 
   return (
-    <Card data-testid="card-shortcuts">
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-shortcuts">
       <CardHeader>
-        <CardTitle className="text-gray-900 dark:text-white">{t('settings.keyboardShortcuts', 'Keyboard Shortcuts')}</CardTitle>
-        <CardDescription className="text-gray-900 dark:text-white/60">{t('settings.availableKeyboardShortcuts', 'Available keyboard shortcuts')}</CardDescription>
+        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('settings.keyboardShortcuts', 'Keyboard Shortcuts')}</CardTitle>
+        <CardDescription className="text-[#64748B]">{t('settings.availableKeyboardShortcuts', 'Available keyboard shortcuts')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <Label>{t('settings.enableKeyboardShortcuts', 'Enable Keyboard Shortcuts')}</Label>
-            <p className="text-sm text-gray-900 dark:text-white/60">{t('settings.useKeyboardShortcutsForQuickActions', 'Use keyboard shortcuts for quick actions')}</p>
+            <Label className="text-[#0B1F3B] dark:text-white">{t('settings.enableKeyboardShortcuts', 'Enable Keyboard Shortcuts')}</Label>
+            <p className="text-sm text-[#64748B]">{t('settings.useKeyboardShortcutsForQuickActions', 'Use keyboard shortcuts for quick actions')}</p>
           </div>
           <Switch 
             checked={settings.enableKeyboardShortcuts ?? true}
@@ -475,11 +475,11 @@ function KeyboardShortcutsTab({ settings, onUpdate }: { settings: UserSettings; 
           {shortcuts.map((shortcut, index) => (
             <div 
               key={index}
-              className="flex items-center justify-between p-3 bg-muted rounded-lg"
+              className="flex items-center justify-between p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]"
               data-testid={`shortcut-${index}`}
             >
-              <span className="text-sm text-gray-900 dark:text-white/60">{shortcut.description}</span>
-              <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg dark:text-gray-100">
+              <span className="text-sm text-[#64748B]">{shortcut.description}</span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-[#0B1F3B] bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg dark:text-white">
                 {shortcut.key}
               </kbd>
             </div>

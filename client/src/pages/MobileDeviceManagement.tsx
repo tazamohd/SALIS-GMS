@@ -87,8 +87,8 @@ export default function MobileDeviceManagement() {
       label: t('mdm.deviceName', 'Device Name'),
       render: (device) => (
         <div className="flex items-center gap-2">
-          <Smartphone className="h-4 w-4 text-primary" />
-          <span className="font-medium">{device.deviceName}</span>
+          <Smartphone className="h-4 w-4 text-[#0A5ED7]" />
+          <span className="font-medium text-[#0B1F3B] dark:text-white">{device.deviceName}</span>
         </div>
       ),
     },
@@ -96,7 +96,7 @@ export default function MobileDeviceManagement() {
       key: "deviceType",
       label: t('common.type', 'Type'),
       render: (device) => (
-        <Badge variant="outline" className="capitalize">
+        <Badge variant="outline" className="capitalize border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
           {device.deviceType === 'tablet' ? t('mdm.tablet', 'Tablet') : 
            device.deviceType === 'phone' ? t('mdm.phone', 'Phone') : 
            t('mdm.scanner', 'Scanner')}
@@ -106,7 +106,11 @@ export default function MobileDeviceManagement() {
     {
       key: "assignedTo",
       label: t('mdm.assignedTo', 'Assigned To'),
-      render: (device) => device.assignedTo || t('mdm.unassigned', 'Unassigned'),
+      render: (device) => (
+        <span className="text-[#64748B]">
+          {device.assignedTo || t('mdm.unassigned', 'Unassigned')}
+        </span>
+      ),
     },
     {
       key: "status",
@@ -115,10 +119,10 @@ export default function MobileDeviceManagement() {
         <Badge
           className={
             device.status === "active"
-              ? "bg-green-100 text-green-700 dark:bg-green-900/30"
+              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
               : device.status === "maintenance"
-              ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30"
-              : "bg-gray-100 text-gray-700 dark:bg-gray-900/30"
+              ? "bg-[#F97316]/10 text-[#F97316] dark:bg-[#F97316]/20"
+              : "bg-[#F8FAFC] text-[#64748B] dark:bg-[#232A36]"
           }
         >
           {device.status === 'active' ? t('common.active', 'Active') : 
@@ -132,12 +136,12 @@ export default function MobileDeviceManagement() {
       label: t('mdm.battery', 'Battery'),
       render: (device) =>
         device.batteryLevel ? (
-          <div className="flex items-center gap-2">
-            <Battery className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Battery className="h-4 w-4 text-[#64748B]" />
             <span>{device.batteryLevel}%</span>
           </div>
         ) : (
-          t('drone.na', 'N/A')
+          <span className="text-[#64748B]">{t('drone.na', 'N/A')}</span>
         ),
     },
     {
@@ -149,6 +153,7 @@ export default function MobileDeviceManagement() {
             size="sm"
             variant="outline"
             onClick={() => setSelectedDevice(device)}
+            className="border-[#E2E8F0] dark:border-[#232A36]"
             data-testid={`button-edit-${device.id}`}
           >
             <Edit className="h-4 w-4" />
@@ -198,10 +203,10 @@ export default function MobileDeviceManagement() {
       />
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('mdm.addNewDevice', 'Add New Device')}</DialogTitle>
-            <DialogDescription>{t('mdm.registerNewDevice', 'Register a new mobile device')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('mdm.addNewDevice', 'Add New Device')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('mdm.registerNewDevice', 'Register a new mobile device')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit((data) => createDeviceMutation.mutate(data))} className="space-y-4">
@@ -210,9 +215,9 @@ export default function MobileDeviceManagement() {
                 name="deviceName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('mdm.deviceName', 'Device Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('mdm.deviceName', 'Device Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Tablet-001" data-testid="input-device-name" />
+                      <Input {...field} placeholder="Tablet-001" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-device-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -223,14 +228,14 @@ export default function MobileDeviceManagement() {
                 name="deviceType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('mdm.deviceType', 'Device Type')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('mdm.deviceType', 'Device Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-device-type">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-device-type">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="tablet">{t('mdm.tablet', 'Tablet')}</SelectItem>
                         <SelectItem value="phone">{t('mdm.phone', 'Phone')}</SelectItem>
                         <SelectItem value="scanner">{t('mdm.scanner', 'Scanner')}</SelectItem>
@@ -245,9 +250,9 @@ export default function MobileDeviceManagement() {
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('mdm.assignedTo', 'Assigned To')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('mdm.assignedTo', 'Assigned To')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('mdm.technicianName', 'Technician name')} data-testid="input-assigned-to" />
+                      <Input {...field} placeholder={t('mdm.technicianName', 'Technician name')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-assigned-to" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,14 +263,14 @@ export default function MobileDeviceManagement() {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.status', 'Status')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-status">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="active">{t('common.active', 'Active')}</SelectItem>
                         <SelectItem value="inactive">{t('common.inactive', 'Inactive')}</SelectItem>
                         <SelectItem value="maintenance">{t('mdm.maintenance', 'Maintenance')}</SelectItem>
@@ -276,10 +281,10 @@ export default function MobileDeviceManagement() {
                 )}
               />
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} data-testid="button-cancel">
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-cancel">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-submit">
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit">
                   {t('mdm.addDevice', 'Add Device')}
                 </Button>
               </div>

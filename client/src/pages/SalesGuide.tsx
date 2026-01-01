@@ -243,12 +243,12 @@ export default function SalesGuide() {
   const processTab = (
     <div className="space-y-6">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
         <Input
           placeholder={t('salesGuide.searchProcesses', 'Search processes...')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
           data-testid="input-search-process"
         />
       </div>
@@ -263,42 +263,42 @@ export default function SalesGuide() {
           .map((process, index) => {
             const Icon = process.icon;
             return (
-              <Card key={process.id} data-testid={`card-process-${process.id}`}>
+              <Card key={process.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-process-${process.id}`}>
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900">
-                      <span className="text-xl font-bold">{index + 1}</span>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                      <span className="text-xl font-bold text-white">{index + 1}</span>
                     </div>
                     <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Icon className="h-5 w-5" />
+                      <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                        <Icon className="h-5 w-5 text-[#0A5ED7]" />
                         {process.title}
                       </CardTitle>
-                      <CardDescription className="text-right font-arabic">{process.titleAr}</CardDescription>
+                      <CardDescription className="text-right font-arabic text-[#64748B]">{process.titleAr}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">{process.description}</p>
+                  <p className="text-[#64748B] mb-4">{process.description}</p>
                   
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                      <h4 className="font-medium mb-2 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         {t('salesGuide.steps', 'Steps')}
                       </h4>
-                      <ol className="list-decimal list-inside space-y-1 text-sm">
+                      <ol className="list-decimal list-inside space-y-1 text-sm text-[#64748B]">
                         {process.steps.map((step, i) => (
                           <li key={i}>{step}</li>
                         ))}
                       </ol>
                     </div>
                     <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <Lightbulb className="h-4 w-4 text-yellow-500" />
+                      <h4 className="font-medium mb-2 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                        <Lightbulb className="h-4 w-4 text-amber-500" />
                         {t('salesGuide.proTips', 'Pro Tips')}
                       </h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm">
+                      <ul className="list-disc list-inside space-y-1 text-sm text-[#64748B]">
                         {process.tips.map((tip, i) => (
                           <li key={i}>{tip}</li>
                         ))}
@@ -317,32 +317,32 @@ export default function SalesGuide() {
     <div className="space-y-6">
       <Accordion type="single" collapsible className="space-y-4">
         {salesScripts.map((script) => (
-          <AccordionItem key={script.id} value={script.id} className="border rounded-lg px-4" data-testid={`accordion-script-${script.id}`}>
+          <AccordionItem key={script.id} value={script.id} className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg px-4 bg-white dark:bg-[#151A23]" data-testid={`accordion-script-${script.id}`}>
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
                 <div className="text-left">
-                  <p className="font-medium">{script.scenario}</p>
-                  <p className="text-sm text-gray-500">{script.scenarioAr}</p>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{script.scenario}</p>
+                  <p className="text-sm text-[#64748B]">{script.scenarioAr}</p>
                 </div>
               </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4 pt-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <PlayCircle className="h-4 w-4" />
+                <div className="bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2 flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                    <PlayCircle className="h-4 w-4 text-[#0A5ED7]" />
                     {t('salesGuide.openingScript', 'Opening Script')}
                   </h4>
-                  <p className="italic">"{script.script}"</p>
+                  <p className="italic text-[#64748B]">"{script.script}"</p>
                 </div>
                 
                 <div>
-                  <h4 className="font-medium mb-3">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
+                  <h4 className="font-medium mb-3 text-[#0B1F3B] dark:text-white">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
                   <div className="space-y-3">
                     {script.objections.map((obj, i) => (
-                      <div key={i} className="border-l-4 border-gray-300 pl-4">
-                        <p className="font-medium text-red-600 dark:text-red-400">❝ {obj.objection}</p>
+                      <div key={i} className="border-l-4 border-[#E2E8F0] dark:border-[#232A36] pl-4">
+                        <p className="font-medium text-[#F97316]">❝ {obj.objection}</p>
                         <p className="mt-1 text-green-600 dark:text-green-400">
                           <ArrowRight className="h-4 w-4 inline mr-1" />
                           {obj.response}
@@ -363,12 +363,12 @@ export default function SalesGuide() {
     <div className="space-y-6">
       <div className="grid md:grid-cols-3 gap-6">
         {performanceTips.map((category, i) => (
-          <Card key={i} data-testid={`card-tips-${i}`}>
+          <Card key={i} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-tips-${i}`}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {i === 0 ? <Clock className="h-5 w-5" /> : 
-                 i === 1 ? <Users className="h-5 w-5" /> : 
-                 <BookOpen className="h-5 w-5" />}
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                {i === 0 ? <Clock className="h-5 w-5 text-[#0A5ED7]" /> : 
+                 i === 1 ? <Users className="h-5 w-5 text-[#0A5ED7]" /> : 
+                 <BookOpen className="h-5 w-5 text-[#0A5ED7]" />}
                 {category.category}
               </CardTitle>
             </CardHeader>
@@ -377,7 +377,7 @@ export default function SalesGuide() {
                 {category.tips.map((tip, j) => (
                   <li key={j} className="flex items-start gap-2">
                     <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{tip}</span>
+                    <span className="text-sm text-[#64748B]">{tip}</span>
                   </li>
                 ))}
               </ul>
@@ -386,34 +386,34 @@ export default function SalesGuide() {
         ))}
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Award className="h-5 w-5 text-[#0A5ED7]" />
             {t('salesGuide.salesExcellenceMetrics', 'Sales Excellence Metrics')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
               <DollarSign className="h-8 w-8 mx-auto text-green-500" />
-              <p className="mt-2 text-2xl font-bold">85%</p>
-              <p className="text-sm text-gray-500">{t('salesGuide.quoteConversionTarget', 'Quote Conversion Target')}</p>
+              <p className="mt-2 text-2xl font-bold text-[#0B1F3B] dark:text-white">85%</p>
+              <p className="text-sm text-[#64748B]">{t('salesGuide.quoteConversionTarget', 'Quote Conversion Target')}</p>
             </div>
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Phone className="h-8 w-8 mx-auto text-blue-500" />
-              <p className="mt-2 text-2xl font-bold">2 {t('salesGuide.hrs', 'hrs')}</p>
-              <p className="text-sm text-gray-500">{t('salesGuide.maxResponseTime', 'Max Response Time')}</p>
+            <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <Phone className="h-8 w-8 mx-auto text-[#0A5ED7]" />
+              <p className="mt-2 text-2xl font-bold text-[#0B1F3B] dark:text-white">2 {t('salesGuide.hrs', 'hrs')}</p>
+              <p className="text-sm text-[#64748B]">{t('salesGuide.maxResponseTime', 'Max Response Time')}</p>
             </div>
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Star className="h-8 w-8 mx-auto text-yellow-500" />
-              <p className="mt-2 text-2xl font-bold">4.5+</p>
-              <p className="text-sm text-gray-500">{t('salesGuide.customerRatingTarget', 'Customer Rating Target')}</p>
+            <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <Star className="h-8 w-8 mx-auto text-amber-500" />
+              <p className="mt-2 text-2xl font-bold text-[#0B1F3B] dark:text-white">4.5+</p>
+              <p className="text-sm text-[#64748B]">{t('salesGuide.customerRatingTarget', 'Customer Rating Target')}</p>
             </div>
-            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
               <TrendingUp className="h-8 w-8 mx-auto text-purple-500" />
-              <p className="mt-2 text-2xl font-bold">20%</p>
-              <p className="text-sm text-gray-500">{t('salesGuide.upsellRateTarget', 'Upsell Rate Target')}</p>
+              <p className="mt-2 text-2xl font-bold text-[#0B1F3B] dark:text-white">20%</p>
+              <p className="text-sm text-[#64748B]">{t('salesGuide.upsellRateTarget', 'Upsell Rate Target')}</p>
             </div>
           </div>
         </CardContent>
@@ -424,54 +424,54 @@ export default function SalesGuide() {
   const resourcesTab = (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('salesGuide.quickReferenceCards', 'Quick Reference Cards')}</CardTitle>
-            <CardDescription>{t('salesGuide.printableGuides', 'Printable guides for common scenarios')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesGuide.quickReferenceCards', 'Quick Reference Cards')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('salesGuide.printableGuides', 'Printable guides for common scenarios')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" data-testid="button-pricing-guide">
-                <FileText className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-pricing-guide">
+                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.servicePricingGuide', 'Service Pricing Guide')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-comparison-chart">
-                <FileText className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-comparison-chart">
+                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.packageComparisonChart', 'Package Comparison Chart')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-warranty-info">
-                <FileText className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-warranty-info">
+                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.warrantyInformation', 'Warranty Information')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-promotions">
-                <FileText className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-promotions">
+                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.currentPromotions', 'Current Promotions')}
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('salesGuide.trainingVideos', 'Training Videos')}</CardTitle>
-            <CardDescription>{t('salesGuide.watchAndLearn', 'Watch and learn from the best')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesGuide.trainingVideos', 'Training Videos')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('salesGuide.watchAndLearn', 'Watch and learn from the best')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" data-testid="button-video-greeting">
-                <PlayCircle className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-greeting">
+                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.customerGreetingTechniques', 'Customer Greeting Techniques')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-video-objections">
-                <PlayCircle className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-objections">
+                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.handlingPriceObjections', 'Handling Price Objections')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-video-upselling">
-                <PlayCircle className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-upselling">
+                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.effectiveUpselling', 'Effective Upselling')}
               </Button>
-              <Button variant="outline" className="w-full justify-start" data-testid="button-video-closing">
-                <PlayCircle className="h-4 w-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-closing">
+                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
                 {t('salesGuide.closingTechniques', 'Closing Techniques')}
               </Button>
             </div>
@@ -479,19 +479,19 @@ export default function SalesGuide() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('salesGuide.contactSupport', 'Contact Support')}</CardTitle>
-          <CardDescription>{t('salesGuide.needHelp', 'Need help? Reach out to the sales team lead')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesGuide.contactSupport', 'Contact Support')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('salesGuide.needHelp', 'Need help? Reach out to the sales team lead')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button variant="outline" data-testid="button-call-support">
-              <Phone className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-call-support">
+              <Phone className="h-4 w-4 mr-2 text-[#0A5ED7]" />
               {t('salesGuide.callSalesManager', 'Call Sales Manager')}
             </Button>
-            <Button variant="outline" data-testid="button-email-support">
-              <Mail className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-email-support">
+              <Mail className="h-4 w-4 mr-2 text-[#0A5ED7]" />
               {t('salesGuide.emailSupport', 'Email Support')}
             </Button>
           </div>
@@ -501,7 +501,7 @@ export default function SalesGuide() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('salesGuide.title', 'Sales Guide')}
         description={t('salesGuide.description', 'دليل المبيعات - Comprehensive sales training and resources for service advisors')}

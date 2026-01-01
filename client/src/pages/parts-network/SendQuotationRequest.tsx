@@ -133,13 +133,13 @@ export default function SendQuotationRequest() {
             {/* Main Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Part Information */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-blue-400" />
-                    <CardTitle>Part Information</CardTitle>
+                    <Package className="h-5 w-5 text-[#0A5ED7]" />
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">Part Information</CardTitle>
                   </div>
-                  <CardDescription>معلومات القطعة المطلوبة</CardDescription>
+                  <CardDescription className="text-[#64748B]">معلومات القطعة المطلوبة</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,12 +148,12 @@ export default function SendQuotationRequest() {
                       name="partNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Part Number (OEM)</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Part Number (OEM)</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               placeholder="e.g. 04465-33450"
-                              className="bg-gray-700 border-gray-600"
+                              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                               data-testid="input-part-number"
                             />
                           </FormControl>
@@ -166,13 +166,13 @@ export default function SendQuotationRequest() {
                       name="quantity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Quantity</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Quantity</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               min={1}
-                              className="bg-gray-700 border-gray-600"
+                              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                               data-testid="input-quantity"
                             />
                           </FormControl>
@@ -187,12 +187,12 @@ export default function SendQuotationRequest() {
                     name="partName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Part Name *</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">Part Name *</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             placeholder="e.g. Front Brake Pads Set"
-                            className="bg-gray-700 border-gray-600"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                             data-testid="input-part-name"
                           />
                         </FormControl>
@@ -206,12 +206,12 @@ export default function SendQuotationRequest() {
                     name="partNameAr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Part Name (Arabic)</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">Part Name (Arabic)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             placeholder="مثال: طقم فحمات فرامل أمامي"
-                            className="bg-gray-700 border-gray-600 text-right"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right text-[#0B1F3B] dark:text-white"
                             dir="rtl"
                             data-testid="input-part-name-ar"
                           />
@@ -226,10 +226,10 @@ export default function SendQuotationRequest() {
                     name="brand"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Preferred Brand</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">Preferred Brand</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger className="bg-gray-700 border-gray-600" data-testid="select-brand">
+                            <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-brand">
                               <SelectValue placeholder="Select brand" />
                             </SelectTrigger>
                           </FormControl>
@@ -248,26 +248,26 @@ export default function SendQuotationRequest() {
 
                   {/* Alternative Brands */}
                   <div>
-                    <Label>Alternative Brands Accepted</Label>
+                    <Label className="text-[#0B1F3B] dark:text-white">Alternative Brands Accepted</Label>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {alternativeBrands.map((brand) => (
                         <Badge
                           key={brand}
                           variant="secondary"
-                          className="flex items-center gap-1"
+                          className="flex items-center gap-1 bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                         >
                           {brand}
                           <button
                             type="button"
                             onClick={() => removeAlternativeBrand(brand)}
-                            className="ml-1 hover:text-red-400"
+                            className="ml-1 hover:text-red-500"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         </Badge>
                       ))}
                       <Select onValueChange={addAlternativeBrand}>
-                        <SelectTrigger className="w-32 h-7 bg-gray-700 border-gray-600 text-sm">
+                        <SelectTrigger className="w-32 h-7 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-sm">
                           <Plus className="h-3 w-3 mr-1" />
                           Add
                         </SelectTrigger>
@@ -287,13 +287,13 @@ export default function SendQuotationRequest() {
               </Card>
 
               {/* Vehicle Information */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <Car className="h-5 w-5 text-green-400" />
-                    <CardTitle>Vehicle Information</CardTitle>
+                    <Car className="h-5 w-5 text-green-500" />
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">Vehicle Information</CardTitle>
                   </div>
-                  <CardDescription>معلومات المركبة (للتوافق)</CardDescription>
+                  <CardDescription className="text-[#64748B]">معلومات المركبة (للتوافق)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -302,12 +302,12 @@ export default function SendQuotationRequest() {
                       name="vehicleMake"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Make</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Make</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               placeholder="e.g. Toyota"
-                              className="bg-gray-700 border-gray-600"
+                              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                               data-testid="input-vehicle-make"
                             />
                           </FormControl>
@@ -319,12 +319,12 @@ export default function SendQuotationRequest() {
                       name="vehicleModel"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Model</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Model</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               placeholder="e.g. Camry"
-                              className="bg-gray-700 border-gray-600"
+                              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                               data-testid="input-vehicle-model"
                             />
                           </FormControl>
@@ -336,13 +336,13 @@ export default function SendQuotationRequest() {
                       name="vehicleYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Year</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Year</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               type="number"
                               placeholder="e.g. 2022"
-                              className="bg-gray-700 border-gray-600"
+                              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                               data-testid="input-vehicle-year"
                             />
                           </FormControl>
@@ -355,16 +355,16 @@ export default function SendQuotationRequest() {
                     name="vehicleVin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>VIN (Optional)</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">VIN (Optional)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             placeholder="Vehicle Identification Number"
-                            className="bg-gray-700 border-gray-600"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                             data-testid="input-vin"
                           />
                         </FormControl>
-                        <FormDescription>
+                        <FormDescription className="text-[#64748B]">
                           For exact part matching
                         </FormDescription>
                       </FormItem>
@@ -374,11 +374,11 @@ export default function SendQuotationRequest() {
               </Card>
 
               {/* Delivery & Notes */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-orange-400" />
-                    <CardTitle>Delivery & Notes</CardTitle>
+                    <MapPin className="h-5 w-5 text-[#F97316]" />
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">Delivery & Notes</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -388,10 +388,10 @@ export default function SendQuotationRequest() {
                       name="urgency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Urgency</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Urgency</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-700 border-gray-600" data-testid="select-urgency">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-urgency">
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -409,10 +409,10 @@ export default function SendQuotationRequest() {
                       name="deliveryPreference"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Delivery Preference</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">Delivery Preference</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger className="bg-gray-700 border-gray-600" data-testid="select-delivery">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-delivery">
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -432,12 +432,12 @@ export default function SendQuotationRequest() {
                     name="preferredDeliveryLocation"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Delivery Location</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">Delivery Location</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             placeholder="Address for delivery"
-                            className="bg-gray-700 border-gray-600"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                             data-testid="input-delivery-location"
                           />
                         </FormControl>
@@ -450,12 +450,12 @@ export default function SendQuotationRequest() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Additional Notes</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">Additional Notes</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
                             placeholder="Any special requirements or notes for suppliers..."
-                            className="bg-gray-700 border-gray-600 min-h-24"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] min-h-24 text-[#0B1F3B] dark:text-white"
                             data-testid="input-notes"
                           />
                         </FormControl>
@@ -469,10 +469,10 @@ export default function SendQuotationRequest() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Target Regions */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="text-base">Target Regions</CardTitle>
-                  <CardDescription>المناطق المستهدفة</CardDescription>
+                  <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Target Regions</CardTitle>
+                  <CardDescription className="text-[#64748B]">المناطق المستهدفة</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -489,7 +489,7 @@ export default function SendQuotationRequest() {
                             }
                           }}
                         />
-                        <Label htmlFor={region} className="text-sm cursor-pointer">
+                        <Label htmlFor={region} className="text-sm cursor-pointer text-[#0B1F3B] dark:text-white">
                           {region}
                         </Label>
                       </div>
@@ -499,11 +499,11 @@ export default function SendQuotationRequest() {
               </Card>
 
               {/* Submit Button */}
-              <Card className="bg-blue-900/30 border-blue-700/50">
+              <Card className="bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 border-[#0A5ED7]/30">
                 <CardContent className="p-6">
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                     size="lg"
                     disabled={createRequest.isPending}
                     data-testid="btn-submit-request"
@@ -517,7 +517,7 @@ export default function SendQuotationRequest() {
                       </>
                     )}
                   </Button>
-                  <p className="text-xs text-gray-400 mt-3 text-center">
+                  <p className="text-xs text-[#64748B] mt-3 text-center">
                     Your request will be sent to all matching suppliers in selected regions
                   </p>
                 </CardContent>

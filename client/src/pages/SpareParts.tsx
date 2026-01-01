@@ -186,22 +186,22 @@ export default function SpareParts() {
 
   const getCategoryBadgeColor = (category: string) => {
     const colors: Record<string, string> = {
-      engine: "bg-gray-300 text-gray-800",
-      brakes: "bg-gray-200 text-gray-700",
-      electrical: "bg-gray-300 text-gray-800",
-      fluids: "bg-gray-400 text-gray-900",
-      filters: "bg-gray-200 text-gray-700",
+      engine: "bg-[#0A5ED7] text-white",
+      brakes: "bg-[#0BB3FF] text-white",
+      electrical: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      fluids: "bg-[#64748B] text-white",
+      filters: "bg-[#0B1F3B] dark:bg-white text-white dark:text-[#0B1F3B]",
     };
-    return colors[category] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
+    return colors[category] || "bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white";
   };
 
   const getPartTypeBadgeColor = (partType: string) => {
     const colors: Record<string, string> = {
-      oem: "bg-gray-300 text-gray-800",
-      generic: "bg-gray-200 text-gray-700",
-      consumable: "bg-gray-400 text-gray-900",
+      oem: "bg-[#0A5ED7] text-white",
+      generic: "bg-[#64748B] text-white",
+      consumable: "bg-[#0BB3FF] text-white",
     };
-    return colors[partType] || "bg-gray-100 dark:bg-salis-gray-dark text-gray-800 dark:text-gray-200";
+    return colors[partType] || "bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white";
   };
 
   return (
@@ -223,15 +223,15 @@ export default function SpareParts() {
             placeholder={t('inventory.searchByNameSku', 'Search by name, SKU, or brand...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-3"
+            className="pl-3 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[200px]" data-testid="select-category-filter">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-category-filter">
             <SelectValue placeholder={t('inventory.filterByCategory', 'Filter by category')} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <SelectItem value="all">{t('inventory.allCategories', 'All Categories')}</SelectItem>
             {CATEGORIES.map((cat) => (
               <SelectItem key={cat.value} value={cat.value}>
@@ -243,14 +243,18 @@ export default function SpareParts() {
       </div>
 
       {error ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Package className="h-12 w-12 text-destructive mb-4" />
-            <p className="text-lg font-medium mb-2">{t('inventory.failedToLoadSpareParts', 'Failed to load spare parts')}</p>
-            <p className="text-gray-900 dark:text-white/60 mb-4">
+            <Package className="h-12 w-12 text-[#F97316] mb-4" />
+            <p className="text-lg font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.failedToLoadSpareParts', 'Failed to load spare parts')}</p>
+            <p className="text-[#64748B] mb-4">
               {error instanceof Error ? error.message : "An error occurred"}
             </p>
-            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} data-testid="button-retry">
+            <Button 
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] })} 
+              data-testid="button-retry"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+            >
               {t('common.retry', 'Retry')}
             </Button>
           </CardContent>
@@ -258,33 +262,37 @@ export default function SpareParts() {
       ) : isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse" data-testid={`skeleton-card-${i}`}>
+            <Card key={i} className="animate-pulse bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`skeleton-card-${i}`}>
               <CardHeader className="pb-3">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/2"></div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-2">
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
                 </div>
-                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
               </CardContent>
             </Card>
           ))}
         </div>
       ) : filteredParts.length === 0 ? (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Package className="h-12 w-12 text-gray-900 dark:text-white/60 mb-4" />
-            <p className="text-lg font-medium mb-2">{t('inventory.noSparePartsFound', 'No spare parts found')}</p>
-            <p className="text-gray-900 dark:text-white/60 mb-4">
+            <Package className="h-12 w-12 text-[#64748B] mb-4" />
+            <p className="text-lg font-medium mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.noSparePartsFound', 'No spare parts found')}</p>
+            <p className="text-[#64748B] mb-4">
               {searchQuery || categoryFilter !== "all" 
                 ? t('inventory.tryAdjustingFilters', 'Try adjusting your filters') 
                 : t('inventory.getStartedAddingSparePart', 'Get started by adding your first spare part')}
             </p>
             {!searchQuery && categoryFilter === "all" && (
-              <Button onClick={() => setIsCreateOpen(true)} data-testid="button-create-first">
+              <Button 
+                onClick={() => setIsCreateOpen(true)} 
+                data-testid="button-create-first"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 {t('inventory.addSparePart', 'Add Spare Part')}
               </Button>
@@ -296,7 +304,7 @@ export default function SpareParts() {
           {filteredParts.map((part) => (
             <Card 
               key={part.id} 
-              className="hover:shadow-md transition-shadow cursor-pointer"
+              className="hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
               onClick={() => {
                 setSelectedPart(part);
                 setIsDetailsOpen(true);
@@ -306,30 +314,33 @@ export default function SpareParts() {
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg" data-testid={`text-name-${part.id}`}>
+                    <CardTitle className="text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-name-${part.id}`}>
                       {part.name}
                     </CardTitle>
-                    <CardDescription data-testid={`text-sku-${part.id}`}>
+                    <CardDescription className="text-[#64748B]" data-testid={`text-sku-${part.id}`}>
                       SKU: {part.sku}
                     </CardDescription>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="sm" data-testid={`button-menu-${part.id}`}>
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className="h-4 w-4 text-[#64748B]" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPart(part);
-                        setIsDetailsOpen(true);
-                      }}>
+                    <DropdownMenuContent align="end" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                      <DropdownMenuItem 
+                        className="text-[#0B1F3B] dark:text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPart(part);
+                          setIsDetailsOpen(true);
+                        }}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         {t('common.view', 'View Details')}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className="text-gray-800 dark:text-gray-200"
+                        className="text-[#F97316]"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(part.id);
@@ -353,11 +364,11 @@ export default function SpareParts() {
                   </Badge>
                 </div>
                 {part.description && (
-                  <p className="text-sm text-gray-900 dark:text-white/60 line-clamp-2">
+                  <p className="text-sm text-[#64748B] line-clamp-2">
                     {part.description}
                   </p>
                 )}
-                <div className="flex items-center gap-4 text-sm text-gray-900 dark:text-white/60">
+                <div className="flex items-center gap-4 text-sm text-[#64748B]">
                   {part.brand && (
                     <div className="flex items-center gap-1">
                       <Package className="h-3 w-3" />
@@ -376,10 +387,10 @@ export default function SpareParts() {
       )}
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('inventory.addSparePart', 'Add Spare Part')}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.addSparePart', 'Add Spare Part')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('inventory.createSparePartDesc', 'Create a new spare part for your inventory')}
             </DialogDescription>
           </DialogHeader>
@@ -391,9 +402,9 @@ export default function SpareParts() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.partName', 'Part Name')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.partName', 'Part Name')} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Oil Filter" {...field} data-testid="input-name" />
+                        <Input placeholder="Oil Filter" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -404,9 +415,9 @@ export default function SpareParts() {
                   name="sku"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.sku', 'SKU')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.sku', 'SKU')} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="OF-12345" {...field} data-testid="input-sku" />
+                        <Input placeholder="OF-12345" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-sku" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -419,12 +430,13 @@ export default function SpareParts() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Describe the spare part..." 
                         {...field} 
                         value={field.value ?? ""}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-description"
                       />
                     </FormControl>
@@ -439,14 +451,14 @@ export default function SpareParts() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('common.category', 'Category')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')} *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-category">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-category">
                             <SelectValue placeholder={t('inventory.selectCategory', 'Select category')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           {CATEGORIES.map((cat) => (
                             <SelectItem key={cat.value} value={cat.value}>
                               {cat.label}
@@ -463,12 +475,13 @@ export default function SpareParts() {
                   name="subcategory"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.subcategory', 'Subcategory')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.subcategory', 'Subcategory')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter subcategory" 
                           {...field} 
                           value={field.value ?? ""}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-subcategory"
                         />
                       </FormControl>
@@ -484,14 +497,14 @@ export default function SpareParts() {
                   name="partType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.partType', 'Part Type')} *</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.partType', 'Part Type')} *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-part-type">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-part-type">
                             <SelectValue placeholder={t('inventory.selectType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           {PART_TYPES.map((type) => (
                             <SelectItem key={type.value} value={type.value}>
                               {type.label}
@@ -508,14 +521,14 @@ export default function SpareParts() {
                   name="unitOfMeasure"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.unitOfMeasure', 'Unit of Measure')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.unitOfMeasure', 'Unit of Measure')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-unit">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-unit">
                             <SelectValue placeholder={t('inventory.selectUnit', 'Select unit')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="pcs">{t('inventory.pieces', 'Pieces')}</SelectItem>
                           <SelectItem value="liters">{t('inventory.liters', 'Liters')}</SelectItem>
                           <SelectItem value="kg">{t('inventory.kilograms', 'Kilograms')}</SelectItem>
@@ -534,12 +547,13 @@ export default function SpareParts() {
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.brand', 'Brand')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter brand" 
                           {...field} 
                           value={field.value || ""}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-brand"
                         />
                       </FormControl>
@@ -552,12 +566,13 @@ export default function SpareParts() {
                   name="manufacturer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('inventory.manufacturer', 'Manufacturer')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.manufacturer', 'Manufacturer')}</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter manufacturer" 
                           {...field} 
                           value={field.value || ""}
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                           data-testid="input-manufacturer"
                         />
                       </FormControl>
@@ -572,12 +587,13 @@ export default function SpareParts() {
                 name="barcode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('inventory.barcode', 'Barcode')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.barcode', 'Barcode')}</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="Enter barcode" 
                         {...field} 
                         value={field.value || ""}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-barcode"
                       />
                     </FormControl>
@@ -591,12 +607,13 @@ export default function SpareParts() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Additional notes..." 
                         {...field} 
-                        value={field.value || ""}
+                        value={field.value ?? ""}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-notes"
                       />
                     </FormControl>
@@ -606,17 +623,13 @@ export default function SpareParts() {
               />
 
               <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateOpen(false)}
-                  data-testid="button-cancel"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-cancel">
                   {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={createMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                   data-testid="button-submit"
                 >
                   {createMutation.isPending ? t('common.creating', 'Creating...') : t('inventory.createSparePart', 'Create Spare Part')}
@@ -628,90 +641,58 @@ export default function SpareParts() {
       </Dialog>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle data-testid="dialog-details-title">Spare Part Details</DialogTitle>
-            <DialogDescription>View detailed information about this spare part</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedPart?.name}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('inventory.sparePartDetails', 'Spare Part Details')}</DialogDescription>
           </DialogHeader>
           {selectedPart && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Name</p>
-                  <p className="text-sm" data-testid="detail-name">{selectedPart.name}</p>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.sku', 'SKU')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedPart.sku}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">SKU</p>
-                  <p className="text-sm" data-testid="detail-sku">{selectedPart.sku}</p>
+                  <p className="text-sm font-medium text-[#64748B]">{t('common.category', 'Category')}</p>
+                  <Badge className={getCategoryBadgeColor(selectedPart.category)}>{selectedPart.category}</Badge>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Category</p>
-                  <Badge className={getCategoryBadgeColor(selectedPart.category)}>
-                    {selectedPart.category}
-                  </Badge>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.partType', 'Part Type')}</p>
+                  <Badge className={getPartTypeBadgeColor(selectedPart.partType)}>{selectedPart.partType}</Badge>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Part Type</p>
-                  <Badge className={getPartTypeBadgeColor(selectedPart.partType)}>
-                    {selectedPart.partType}
-                  </Badge>
+                  <p className="text-sm font-medium text-[#64748B]">{t('inventory.unitOfMeasure', 'Unit')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedPart.unitOfMeasure}</p>
                 </div>
-              </div>
-
-              {selectedPart.description && (
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Description</p>
-                  <p className="text-sm" data-testid="detail-description">{selectedPart.description}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4">
                 {selectedPart.brand && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Brand</p>
-                    <p className="text-sm">{selectedPart.brand}</p>
+                    <p className="text-sm font-medium text-[#64748B]">{t('inventory.brand', 'Brand')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{selectedPart.brand}</p>
                   </div>
                 )}
                 {selectedPart.manufacturer && (
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Manufacturer</p>
-                    <p className="text-sm">{selectedPart.manufacturer}</p>
+                    <p className="text-sm font-medium text-[#64748B]">{t('inventory.manufacturer', 'Manufacturer')}</p>
+                    <p className="text-[#0B1F3B] dark:text-white">{selectedPart.manufacturer}</p>
                   </div>
                 )}
-                {selectedPart.barcode && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white/60">Barcode</p>
-                    <p className="text-sm">{selectedPart.barcode}</p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Unit of Measure</p>
-                  <p className="text-sm">{selectedPart.unitOfMeasure}</p>
-                </div>
               </div>
-
-              {selectedPart.notes && (
+              {selectedPart.description && (
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white/60">Notes</p>
-                  <p className="text-sm">{selectedPart.notes}</p>
+                  <p className="text-sm font-medium text-[#64748B]">{t('common.description', 'Description')}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{selectedPart.description}</p>
                 </div>
               )}
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDetailsOpen(false)}
-                  data-testid="button-close-details"
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleDelete(selectedPart.id)} 
+                  className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
+                  data-testid="button-details-delete"
                 >
-                  Close
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDelete(selectedPart.id)}
-                  disabled={deleteMutation.isPending}
-                  data-testid="button-delete-details"
-                >
-                  {deleteMutation.isPending ? "Deleting..." : "Delete Part"}
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('common.delete', 'Delete')}
                 </Button>
               </div>
             </div>

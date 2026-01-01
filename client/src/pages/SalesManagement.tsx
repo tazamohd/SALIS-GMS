@@ -194,69 +194,69 @@ export default function SalesManagement() {
   const overviewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-revenue">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-revenue">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.totalRevenue', 'Total Revenue')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('salesManagement.totalRevenue', 'Total Revenue')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               SAR {totalRevenue.toLocaleString()}
             </div>
-            <div className="flex items-center text-xs text-green-600 mt-1">
+            <div className="flex items-center text-xs text-green-600 dark:text-green-400 mt-1">
               <ArrowUpRight className="h-3 w-3 mr-1" />
               {t('salesManagement.fromLastMonth', '+12.5% from last month')}
             </div>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-service-revenue">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-service-revenue">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.serviceRevenue', 'Service Revenue')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('salesManagement.serviceRevenue', 'Service Revenue')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-[#0A5ED7] dark:text-[#0BB3FF]">
               SAR {serviceRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.serviceRevenueAr', 'إيرادات الخدمات')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.serviceRevenueAr', 'إيرادات الخدمات')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-parts-revenue">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-parts-revenue">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.partsRevenue', 'Parts Revenue')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('salesManagement.partsRevenue', 'Parts Revenue')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               SAR {partsRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.partsRevenueAr', 'إيرادات قطع الغيار')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.partsRevenueAr', 'إيرادات قطع الغيار')}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-transactions">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-transactions">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.transactions', 'Transactions')}</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#64748B]">{t('salesManagement.transactions', 'Transactions')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sampleSales.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.thisWeek', 'This week')}</p>
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{sampleSales.length}</div>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.thisWeek', 'This week')}</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('salesManagement.monthlySalesTrend', 'Monthly Sales Trend')}</CardTitle>
-            <CardDescription>{t('salesManagement.monthlySalesTrendDesc', 'اتجاه المبيعات الشهرية - Last 6 months')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.monthlySalesTrend', 'Monthly Sales Trend')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.monthlySalesTrendDesc', 'اتجاه المبيعات الشهرية - Last 6 months')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {monthlySales.map((month, index) => (
                 <div key={index} data-testid={`bar-month-${index}`}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{month.month}</span>
-                    <span className="text-sm text-muted-foreground">SAR {month.total.toLocaleString()}</span>
+                    <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{month.month}</span>
+                    <span className="text-sm text-[#64748B]">SAR {month.total.toLocaleString()}</span>
                   </div>
                   <Progress value={(month.total / 350000) * 100} className="h-3" />
                 </div>
@@ -265,30 +265,30 @@ export default function SalesManagement() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('salesManagement.topSellingProducts', 'Top Selling Products')}</CardTitle>
-            <CardDescription>{t('salesManagement.topSellingProductsAr', 'أفضل المنتجات مبيعاً')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.topSellingProducts', 'Top Selling Products')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.topSellingProductsAr', 'أفضل المنتجات مبيعاً')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>{t('salesManagement.product', 'Product')}</TableHead>
-                  <TableHead>{t('salesManagement.category', 'Category')}</TableHead>
-                  <TableHead>{t('salesManagement.revenue', 'Revenue')}</TableHead>
+                <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#64748B]">{t('salesManagement.product', 'Product')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('salesManagement.category', 'Category')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('salesManagement.revenue', 'Revenue')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {topProducts.map((product, index) => (
-                  <TableRow key={index} data-testid={`row-top-product-${index}`}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableRow key={index} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-top-product-${index}`}>
+                    <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{product.name}</TableCell>
                     <TableCell>
-                      <Badge variant={product.category === "Service" ? "default" : "secondary"}>
+                      <Badge variant={product.category === "Service" ? "default" : "secondary"} className={product.category === "Service" ? "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF] border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}>
                         {product.category}
                       </Badge>
                     </TableCell>
-                    <TableCell>SAR {product.revenue.toLocaleString()}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {product.revenue.toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -297,41 +297,41 @@ export default function SalesManagement() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('salesManagement.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription>{t('salesManagement.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to related accounting')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('salesManagement.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to related accounting')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link href="/expenses-management">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-expenses-management">
+              <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-expenses-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <Receipt className="h-8 w-8 text-red-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <Receipt className="h-8 w-8 text-[#F97316]" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('salesManagement.expensesManagement', 'Expenses Management')}</CardTitle>
-                  <CardDescription>{t('salesManagement.expensesManagementAr', 'المصروفات')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.expensesManagement', 'Expenses Management')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.expensesManagementAr', 'المصروفات')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{t('salesManagement.expensesManagementDesc', 'Track and manage all business expenses and budgets')}</p>
+                  <p className="text-sm text-[#64748B]">{t('salesManagement.expensesManagementDesc', 'Track and manage all business expenses and budgets')}</p>
                 </CardContent>
               </Card>
             </Link>
 
             <Link href="/invoices">
-              <Card className="cursor-pointer hover:border-primary transition-colors h-full" data-testid="link-invoices">
+              <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors h-full bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-invoices">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <FileText className="h-8 w-8 text-blue-600" />
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    <FileText className="h-8 w-8 text-[#0A5ED7]" />
+                    <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
-                  <CardTitle className="text-lg">{t('salesManagement.invoices', 'Invoices')}</CardTitle>
-                  <CardDescription>{t('salesManagement.invoicesAr', 'الفواتير')}</CardDescription>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.invoices', 'Invoices')}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.invoicesAr', 'الفواتير')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">{t('salesManagement.invoicesDesc', 'Manage customer invoices and payment tracking')}</p>
+                  <p className="text-sm text-[#64748B]">{t('salesManagement.invoicesDesc', 'Manage customer invoices and payment tracking')}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -343,24 +343,24 @@ export default function SalesManagement() {
 
   const transactionsTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{t('salesManagement.salesTransactions', 'Sales Transactions')}</CardTitle>
-              <CardDescription>{t('salesManagement.salesTransactionsDesc', 'معاملات المبيعات - All sales records')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.salesTransactions', 'Sales Transactions')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('salesManagement.salesTransactionsDesc', 'معاملات المبيعات - All sales records')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-sale">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-add-sale">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('salesManagement.newSale', 'New Sale')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl" data-testid="modal-add-sale">
+              <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-sale">
                 <DialogHeader>
-                  <DialogTitle>{t('salesManagement.recordNewSale', 'Record New Sale')}</DialogTitle>
-                  <DialogDescription>{t('salesManagement.recordNewSaleAr', 'تسجيل عملية بيع جديدة')}</DialogDescription>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.recordNewSale', 'Record New Sale')}</DialogTitle>
+                  <DialogDescription className="text-[#64748B]">{t('salesManagement.recordNewSaleAr', 'تسجيل عملية بيع جديدة')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -370,9 +370,9 @@ export default function SalesManagement() {
                         name="invoiceNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('salesManagement.invoiceNumber', 'Invoice Number')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('salesManagement.invoiceNumber', 'Invoice Number')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="INV-2024-XXXX" data-testid="input-invoice-number" />
+                              <Input {...field} placeholder="INV-2024-XXXX" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-invoice-number" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -383,9 +383,9 @@ export default function SalesManagement() {
                         name="customer"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('salesManagement.customer', 'Customer')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('salesManagement.customer', 'Customer')}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder={t('salesManagement.customerNamePlaceholder', 'Customer name')} data-testid="input-customer" />
+                              <Input {...field} placeholder={t('salesManagement.customerNamePlaceholder', 'Customer name')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-customer" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -396,14 +396,14 @@ export default function SalesManagement() {
                         name="type"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('salesManagement.saleType', 'Sale Type')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('salesManagement.saleType', 'Sale Type')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger data-testid="select-sale-type">
+                                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-sale-type">
                                   <SelectValue placeholder={t('salesManagement.selectType', 'Select type')} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectItem value="Service">{t('salesManagement.service', 'Service')}</SelectItem>
                                 <SelectItem value="Parts">{t('salesManagement.parts', 'Parts')}</SelectItem>
                                 <SelectItem value="Package">{t('salesManagement.packageDeal', 'Package Deal')}</SelectItem>
@@ -418,9 +418,9 @@ export default function SalesManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('salesManagement.amountSAR', 'Amount (SAR)')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('salesManagement.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
-                              <Input {...field} type="number" placeholder="0.00" data-testid="input-amount" />
+                              <Input {...field} type="number" placeholder="0.00" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-amount" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -431,9 +431,9 @@ export default function SalesManagement() {
                         name="date"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('common.date', 'Date')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</FormLabel>
                             <FormControl>
-                              <Input {...field} type="date" data-testid="input-date" />
+                              <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-date" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -444,14 +444,14 @@ export default function SalesManagement() {
                         name="paymentMethod"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('salesManagement.paymentMethod', 'Payment Method')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('salesManagement.paymentMethod', 'Payment Method')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger data-testid="select-payment-method">
+                                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-payment-method">
                                   <SelectValue placeholder={t('salesManagement.selectMethod', 'Select method')} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectItem value="Cash">{t('salesManagement.cash', 'Cash')}</SelectItem>
                                 <SelectItem value="Card">{t('salesManagement.card', 'Card')}</SelectItem>
                                 <SelectItem value="Transfer">{t('salesManagement.bankTransfer', 'Bank Transfer')}</SelectItem>
@@ -467,14 +467,14 @@ export default function SalesManagement() {
                         name="status"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('common.status', 'Status')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger data-testid="select-status">
+                                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status">
                                   <SelectValue placeholder={t('salesManagement.selectStatus', 'Select status')} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                 <SelectItem value="Completed">{t('common.completed', 'Completed')}</SelectItem>
                                 <SelectItem value="Pending">{t('common.pending', 'Pending')}</SelectItem>
                                 <SelectItem value="Refunded">{t('salesManagement.refunded', 'Refunded')}</SelectItem>
@@ -486,10 +486,10 @@ export default function SalesManagement() {
                       />
                     </div>
                     <div className="flex justify-end gap-2">
-                      <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                      <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                         {t('common.cancel', 'Cancel')}
                       </Button>
-                      <Button type="submit" data-testid="button-save-sale">{t('salesManagement.saveSale', 'Save Sale')}</Button>
+                      <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-save-sale">{t('salesManagement.saveSale', 'Save Sale')}</Button>
                     </div>
                   </form>
                 </Form>
@@ -500,26 +500,26 @@ export default function SalesManagement() {
         <CardContent>
           <div className="flex gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder={t('salesManagement.searchByCustomerOrInvoice', 'Search by customer or invoice...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-sales"
               />
             </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-48" data-testid="select-filter-type">
+              <SelectTrigger className="w-48 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-type">
                 <SelectValue placeholder={t('salesManagement.filterByType', 'Filter by type')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <SelectItem value="all">{t('salesManagement.allTypes', 'All Types')}</SelectItem>
                 <SelectItem value="Service">{t('salesManagement.service', 'Service')}</SelectItem>
                 <SelectItem value="Parts">{t('salesManagement.parts', 'Parts')}</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" data-testid="button-export-sales">
+            <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-sales">
               <Download className="h-4 w-4 mr-2" />
               {t('common.export', 'Export')}
             </Button>
@@ -527,38 +527,31 @@ export default function SalesManagement() {
 
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('salesManagement.invoice', 'Invoice')}</TableHead>
-                <TableHead>{t('salesManagement.customer', 'Customer')}</TableHead>
-                <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('common.amount', 'Amount')}</TableHead>
-                <TableHead>{t('salesManagement.payment', 'Payment')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('salesManagement.invoice', 'Invoice')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('salesManagement.customer', 'Customer')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('salesManagement.payment', 'Payment')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredSales.map((sale) => (
-                <TableRow key={sale.id} data-testid={`row-sale-${sale.id}`}>
-                  <TableCell className="font-medium">{sale.invoiceNumber}</TableCell>
-                  <TableCell>{sale.customer}</TableCell>
-                  <TableCell className="max-w-xs truncate">{sale.description}</TableCell>
+                <TableRow key={sale.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-sale-${sale.id}`}>
+                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{sale.invoiceNumber}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{sale.customer}</TableCell>
+                  <TableCell className="text-[#64748B]">{sale.description}</TableCell>
                   <TableCell>
-                    <Badge variant={sale.type === "Service" ? "default" : "secondary"}>
-                      {sale.type === "Service" ? (
-                        <Wrench className="h-3 w-3 mr-1" />
-                      ) : (
-                        <Package className="h-3 w-3 mr-1" />
-                      )}
+                    <Badge className={sale.type === "Service" ? "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF] border-0" : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-0"}>
                       {sale.type}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-medium text-green-600">
-                    SAR {sale.amount.toLocaleString()}
-                  </TableCell>
-                  <TableCell>{sale.paymentMethod}</TableCell>
+                  <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">SAR {sale.amount.toLocaleString()}</TableCell>
+                  <TableCell className="text-[#64748B]">{sale.paymentMethod}</TableCell>
                   <TableCell>
-                    <Badge variant={sale.status === "Completed" ? "default" : "secondary"}>
+                    <Badge className={sale.status === "Completed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-0"}>
                       {sale.status}
                     </Badge>
                   </TableCell>
@@ -571,72 +564,16 @@ export default function SalesManagement() {
     </div>
   );
 
-  const targetsTab = (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card data-testid="card-monthly-target">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.monthlyTarget', 'Monthly Target')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">SAR 350,000</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.monthlyTargetAr', 'الهدف الشهري')}</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-achieved">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.achieved', 'Achieved')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">SAR 303,000</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.achievedAr', 'المحقق')}</p>
-          </CardContent>
-        </Card>
-
-        <Card data-testid="card-remaining">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">{t('salesManagement.remaining', 'Remaining')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">SAR 47,000</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('salesManagement.remainingAr', 'المتبقي')}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('salesManagement.targetProgress', 'Target Progress')}</CardTitle>
-          <CardDescription>{t('salesManagement.targetProgressDesc', 'تقدم الهدف - Current month achievement')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">{t('salesManagement.overallProgress', 'Overall Progress')}</span>
-                <span className="text-sm font-medium">86.6%</span>
-              </div>
-              <Progress value={86.6} className="h-4" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
   return (
-    <div className="p-6 space-y-6">
-      <TabsPageLayout
-        title={t('salesManagement.title', 'Sales Management')}
-        description={t('salesManagement.description', 'إدارة المبيعات - Comprehensive sales tracking and analytics')}
-        defaultTab="overview"
-        tabs={[
-          { id: "overview", label: t('salesManagement.overview', 'Overview'), icon: BarChart3, content: overviewTab },
-          { id: "transactions", label: t('salesManagement.transactionsTab', 'Transactions'), icon: ShoppingCart, content: transactionsTab },
-          { id: "targets", label: t('salesManagement.targets', 'Targets'), icon: Target, content: targetsTab },
-        ]}
-      />
-    </div>
+    <TabsPageLayout
+      title={t('salesManagement.title', 'Sales Management')}
+      description={t('salesManagement.description', 'إدارة المبيعات - Track sales, revenue, and performance')}
+      icon={ShoppingCart}
+      defaultTab="overview"
+      tabs={[
+        { id: "overview", label: t('salesManagement.overview', 'Overview'), icon: BarChart3, content: overviewTab },
+        { id: "transactions", label: t('salesManagement.transactions', 'Transactions'), icon: Receipt, content: transactionsTab },
+      ]}
+    />
   );
 }

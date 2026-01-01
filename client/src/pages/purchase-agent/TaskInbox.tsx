@@ -157,7 +157,7 @@ export default function TaskInbox() {
 
   const getPriorityBadge = (priority: string) => {
     const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; className: string }> = {
-      low: { variant: "outline", className: "text-gray-600 border-gray-400" },
+      low: { variant: "outline", className: "text-[#64748B] border-[#E2E8F0] dark:border-[#232A36]" },
       medium: { variant: "secondary", className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
       high: { variant: "default", className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400" },
       urgent: { variant: "destructive", className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" },
@@ -179,7 +179,7 @@ export default function TaskInbox() {
 
   const getSourceIcon = (sourceType: string) => {
     return sourceType === "procurement" ? (
-      <Building2 className="h-4 w-4 text-blue-500" />
+      <Building2 className="h-4 w-4 text-[#0A5ED7]" />
     ) : (
       <Package className="h-4 w-4 text-green-500" />
     );
@@ -193,8 +193,8 @@ export default function TaskInbox() {
   };
 
   const stats = [
-    { label: "Pending Tasks", value: tasks.filter(t => t.status === "pending").length, icon: Clock, color: "text-orange-500" },
-    { label: "In Progress", value: tasks.filter(t => t.status === "in_progress").length, icon: ArrowRight, color: "text-blue-500" },
+    { label: "Pending Tasks", value: tasks.filter(t => t.status === "pending").length, icon: Clock, color: "text-[#F97316]" },
+    { label: "In Progress", value: tasks.filter(t => t.status === "in_progress").length, icon: ArrowRight, color: "text-[#0A5ED7]" },
     { label: "Completed Today", value: tasks.filter(t => t.status === "completed").length, icon: CheckCircle, color: "text-green-500" },
     { label: "Urgent", value: tasks.filter(t => t.priority === "urgent").length, icon: AlertTriangle, color: "text-red-500" },
   ];
@@ -202,25 +202,25 @@ export default function TaskInbox() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
           Task Inbox
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-[#64748B] mt-1">
           Receive and manage procurement tasks from Procurement Department and Store Keepers
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.label} data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+          <Card key={stat.label} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-800`}>
+                <div className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{stat.value}</p>
+                  <p className="text-sm text-[#64748B]">{stat.label}</p>
                 </div>
               </div>
             </CardContent>
@@ -228,29 +228,29 @@ export default function TaskInbox() {
         ))}
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <Inbox className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Inbox className="h-5 w-5 text-[#0A5ED7]" />
                 Incoming Tasks
               </CardTitle>
-              <CardDescription>Tasks assigned to you for procurement</CardDescription>
+              <CardDescription className="text-[#64748B]">Tasks assigned to you for procurement</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
                   placeholder="Search tasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64"
+                  className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-tasks"
                 />
               </div>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-32" data-testid="select-priority-filter">
+                <SelectTrigger className="w-32 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-priority-filter">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
@@ -277,51 +277,51 @@ export default function TaskInbox() {
             <TabsContent value={activeTab} className="space-y-4">
               {filteredTasks.length === 0 ? (
                 <div className="text-center py-12">
-                  <Inbox className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No tasks found</p>
+                  <Inbox className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
+                  <p className="text-[#64748B]">No tasks found</p>
                 </div>
               ) : (
                 filteredTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="border rounded-lg p-4 hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+                    className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`task-${task.id}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-mono text-sm text-gray-500">{task.taskNumber}</span>
+                          <span className="font-mono text-sm text-[#64748B]">{task.taskNumber}</span>
                           {getPriorityBadge(task.priority)}
                           {getStatusBadge(task.status)}
                         </div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{task.title}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{task.description}</p>
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{task.title}</h3>
+                        <p className="text-sm text-[#64748B] mt-1">{task.description}</p>
                         
                         <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-[#64748B]">
                             {getSourceIcon(task.sourceType)}
                             <span>{task.sourceType === "procurement" ? "Procurement" : "Store Keeper"}: {task.sourceName}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-[#64748B]">
                             <Building2 className="h-4 w-4" />
                             <span>{task.storeLocation}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-[#64748B]">
                             <Calendar className="h-4 w-4" />
                             <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                           </div>
                         </div>
 
                         <div className="mt-3">
-                          <p className="text-xs text-gray-500 mb-2">Parts Required ({task.partsRequired.length}):</p>
+                          <p className="text-xs text-[#64748B] mb-2">Parts Required ({task.partsRequired.length}):</p>
                           <div className="flex flex-wrap gap-2">
                             {task.partsRequired.slice(0, 3).map((part, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
+                              <Badge key={idx} variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                                 {part.partName} x{part.quantity}
                               </Badge>
                             ))}
                             {task.partsRequired.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                                 +{task.partsRequired.length - 3} more
                               </Badge>
                             )}
@@ -331,10 +331,10 @@ export default function TaskInbox() {
                         {task.guidanceNotes && (
                           <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm">
                             <div className="flex items-start gap-2">
-                              <MessageSquare className="h-4 w-4 text-blue-500 mt-0.5" />
+                              <MessageSquare className="h-4 w-4 text-[#0A5ED7] mt-0.5" />
                               <div>
-                                <p className="text-xs font-medium text-blue-700 dark:text-blue-400">Guidance Notes:</p>
-                                <p className="text-blue-600 dark:text-blue-300">{task.guidanceNotes}</p>
+                                <p className="text-xs font-medium text-[#0A5ED7]">Guidance Notes:</p>
+                                <p className="text-[#0A5ED7]">{task.guidanceNotes}</p>
                               </div>
                             </div>
                           </div>
@@ -347,6 +347,7 @@ export default function TaskInbox() {
                             <Button
                               variant="outline"
                               size="sm"
+                              className="border-[#E2E8F0] dark:border-[#232A36]"
                               onClick={() => setSelectedTask(task)}
                               data-testid={`button-view-task-${task.id}`}
                             >
@@ -354,52 +355,52 @@ export default function TaskInbox() {
                               View
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23]">
                             <DialogHeader>
-                              <DialogTitle>Task Details - {task.taskNumber}</DialogTitle>
-                              <DialogDescription>{task.title}</DialogDescription>
+                              <DialogTitle className="text-[#0B1F3B] dark:text-white">Task Details - {task.taskNumber}</DialogTitle>
+                              <DialogDescription className="text-[#64748B]">{task.title}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <p className="text-sm text-gray-500">Source</p>
-                                  <p className="font-medium">{task.sourceType === "procurement" ? "Procurement Department" : "Store Keeper"}</p>
-                                  <p className="text-sm text-gray-600">{task.sourceName}</p>
+                                  <p className="text-sm text-[#64748B]">Source</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">{task.sourceType === "procurement" ? "Procurement Department" : "Store Keeper"}</p>
+                                  <p className="text-sm text-[#64748B]">{task.sourceName}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">Store Location</p>
-                                  <p className="font-medium">{task.storeLocation}</p>
+                                  <p className="text-sm text-[#64748B]">Store Location</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">{task.storeLocation}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">Due Date</p>
-                                  <p className="font-medium">{new Date(task.dueDate).toLocaleDateString()}</p>
+                                  <p className="text-sm text-[#64748B]">Due Date</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">{new Date(task.dueDate).toLocaleDateString()}</p>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-gray-500">Priority</p>
+                                  <p className="text-sm text-[#64748B]">Priority</p>
                                   {getPriorityBadge(task.priority)}
                                 </div>
                               </div>
                               
                               <div>
-                                <p className="text-sm text-gray-500 mb-2">Parts Required</p>
-                                <div className="border rounded-lg overflow-hidden">
+                                <p className="text-sm text-[#64748B] mb-2">Parts Required</p>
+                                <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden">
                                   <table className="w-full text-sm">
-                                    <thead className="bg-gray-50 dark:bg-gray-800">
+                                    <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                                       <tr>
-                                        <th className="px-3 py-2 text-left">Part Number</th>
-                                        <th className="px-3 py-2 text-left">Part Name</th>
-                                        <th className="px-3 py-2 text-center">Qty</th>
-                                        <th className="px-3 py-2 text-center">Urgency</th>
+                                        <th className="px-3 py-2 text-left text-[#0B1F3B] dark:text-white">Part Number</th>
+                                        <th className="px-3 py-2 text-left text-[#0B1F3B] dark:text-white">Part Name</th>
+                                        <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Qty</th>
+                                        <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Urgency</th>
                                       </tr>
                                     </thead>
                                     <tbody>
                                       {task.partsRequired.map((part, idx) => (
-                                        <tr key={idx} className="border-t">
-                                          <td className="px-3 py-2 font-mono">{part.partNumber}</td>
-                                          <td className="px-3 py-2">{part.partName}</td>
-                                          <td className="px-3 py-2 text-center">{part.quantity}</td>
+                                        <tr key={idx} className="border-t border-[#E2E8F0] dark:border-[#232A36]">
+                                          <td className="px-3 py-2 font-mono text-[#0B1F3B] dark:text-white">{part.partNumber}</td>
+                                          <td className="px-3 py-2 text-[#0B1F3B] dark:text-white">{part.partName}</td>
+                                          <td className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">{part.quantity}</td>
                                           <td className="px-3 py-2 text-center">
-                                            <Badge variant="outline" className="text-xs">{part.urgency}</Badge>
+                                            <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">{part.urgency}</Badge>
                                           </td>
                                         </tr>
                                       ))}
@@ -410,21 +411,25 @@ export default function TaskInbox() {
 
                               {task.notes && (
                                 <div>
-                                  <p className="text-sm text-gray-500 mb-1">Notes</p>
-                                  <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded">{task.notes}</p>
+                                  <p className="text-sm text-[#64748B] mb-1">Notes</p>
+                                  <p className="text-sm bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded text-[#0B1F3B] dark:text-white">{task.notes}</p>
                                 </div>
                               )}
 
                               {task.guidanceNotes && (
                                 <div>
-                                  <p className="text-sm text-gray-500 mb-1">Guidance Notes</p>
-                                  <p className="text-sm bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-blue-700 dark:text-blue-300">{task.guidanceNotes}</p>
+                                  <p className="text-sm text-[#64748B] mb-1">Guidance Notes</p>
+                                  <p className="text-sm bg-blue-50 dark:bg-blue-900/20 p-3 rounded text-[#0A5ED7]">{task.guidanceNotes}</p>
                                 </div>
                               )}
 
                               <div className="flex justify-end gap-2 pt-4">
                                 {task.status === "pending" && (
-                                  <Button onClick={() => handleAcceptTask(task)} data-testid="button-accept-task">
+                                  <Button
+                                    onClick={() => handleAcceptTask(task)}
+                                    className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+                                    data-testid="button-accept-task"
+                                  >
                                     Accept & Start Quotation
                                   </Button>
                                 )}
@@ -437,6 +442,7 @@ export default function TaskInbox() {
                           <Button
                             size="sm"
                             onClick={() => handleAcceptTask(task)}
+                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                             data-testid={`button-accept-${task.id}`}
                           >
                             Accept

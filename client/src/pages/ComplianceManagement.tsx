@@ -162,40 +162,40 @@ export default function ComplianceManagement() {
       label: t('compliance.policies', 'Policies'),
       icon: Shield,
       content: (
-        <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.compliancePolicies', 'Compliance Policies')}</CardTitle>
-            <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.compliancePolicies', 'Compliance Policies')}</CardTitle>
+            <CardDescription className="text-[#64748B]">
               {t('compliance.policiesDescription', 'Regulatory and internal compliance policies')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {policiesLoading ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-loading">{t('common.loading', 'Loading')}...</p>
+              <p className="text-[#64748B]" data-testid="text-loading">{t('common.loading', 'Loading')}...</p>
             ) : policies.length === 0 ? (
-              <p className="text-salis-gray font-poppins" data-testid="text-no-policies">{t('compliance.noPolicies', 'No policies found')}</p>
+              <p className="text-[#64748B]" data-testid="text-no-policies">{t('compliance.noPolicies', 'No policies found')}</p>
             ) : (
               <div className="grid gap-4">
                 {policies.map((policy: any) => (
-                  <Card key={policy.id} className="border-salis-gray-light dark:border-salis-gray-dark" data-testid={`card-policy-${policy.id}`}>
+                  <Card key={policy.id} className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-policy-${policy.id}`}>
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-montserrat font-medium text-salis-black dark:text-white" data-testid={`text-policy-name-${policy.id}`}>
+                            <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-policy-name-${policy.id}`}>
                               {policy.policyName}
                             </h3>
-                            <Badge className={policy.status === "active" ? "bg-green-500 text-white" : policy.status === "draft" ? "bg-yellow-500 text-white" : "bg-salis-gray text-white"} data-testid={`badge-policy-status-${policy.id}`}>
+                            <Badge className={policy.status === "active" ? "bg-green-500 text-white" : policy.status === "draft" ? "bg-[#F97316] text-white" : "bg-[#64748B] text-white"} data-testid={`badge-policy-status-${policy.id}`}>
                               {String(t(`common.${policy.status}`, policy.status))}
                             </Badge>
                           </div>
-                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-category-${policy.id}`}>
+                          <p className="text-sm text-[#64748B] mb-2" data-testid={`text-policy-category-${policy.id}`}>
                             {t('common.category', 'Category')}: {policy.category}
                           </p>
-                          <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mb-2" data-testid={`text-policy-description-${policy.id}`}>
+                          <p className="text-sm text-[#64748B] mb-2" data-testid={`text-policy-description-${policy.id}`}>
                             {policy.description || t('common.noDescription', 'No description')}
                           </p>
-                          <div className="flex gap-4 text-sm text-salis-gray dark:text-salis-gray-light">
+                          <div className="flex gap-4 text-sm text-[#64748B]">
                             <span data-testid={`text-effective-date-${policy.id}`}>
                               {t('compliance.effective', 'Effective')}: {new Date(policy.effectiveDate).toLocaleDateString()}
                             </span>
@@ -225,52 +225,52 @@ export default function ComplianceManagement() {
           <div className="flex justify-end mb-4">
             <Button
               onClick={() => setIsAuditDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-schedule-audit"
             >
               <ClipboardCheck className="mr-2 h-4 w-4" />
               {t('compliance.scheduleAudit', 'Schedule Audit')}
             </Button>
           </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.complianceAudits', 'Compliance Audits')}</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.complianceAudits', 'Compliance Audits')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('compliance.auditsDescription', 'Scheduled and completed compliance audits')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {auditsLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-audits">{t('compliance.loadingAudits', 'Loading audits')}...</p>
+                <p className="text-[#64748B]" data-testid="text-loading-audits">{t('compliance.loadingAudits', 'Loading audits')}...</p>
               ) : audits.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-audits">{t('compliance.noAudits', 'No audits found')}</p>
+                <p className="text-[#64748B]" data-testid="text-no-audits">{t('compliance.noAudits', 'No audits found')}</p>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('compliance.auditDate', 'Audit Date')}</TableHead>
-                      <TableHead>{t('compliance.auditor', 'Auditor')}</TableHead>
-                      <TableHead>{t('compliance.score', 'Score')}</TableHead>
-                      <TableHead>{t('common.status', 'Status')}</TableHead>
-                      <TableHead>{t('compliance.findings', 'Findings')}</TableHead>
+                    <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.auditDate', 'Audit Date')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.auditor', 'Auditor')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.score', 'Score')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.findings', 'Findings')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {audits.map((audit: any) => (
-                      <TableRow key={audit.id} data-testid={`row-audit-${audit.id}`}>
-                        <TableCell data-testid={`text-audit-date-${audit.id}`}>
+                      <TableRow key={audit.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-audit-${audit.id}`}>
+                        <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-audit-date-${audit.id}`}>
                           {new Date(audit.auditDate).toLocaleDateString()}
                         </TableCell>
-                        <TableCell className="font-medium" data-testid={`text-auditor-${audit.id}`}>{audit.auditorName}</TableCell>
-                        <TableCell data-testid={`text-score-${audit.id}`}>
+                        <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-auditor-${audit.id}`}>{audit.auditorName}</TableCell>
+                        <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-score-${audit.id}`}>
                           {audit.complianceScore !== null && audit.complianceScore !== undefined ? `${audit.complianceScore}%` : t('common.na', 'N/A')}
                         </TableCell>
                         <TableCell>
-                          <Badge className={audit.status === "completed" ? "bg-green-500 text-white" : audit.status === "failed" ? "bg-red-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-audit-status-${audit.id}`}>
+                          <Badge className={audit.status === "completed" ? "bg-green-500 text-white" : audit.status === "failed" ? "bg-red-500 text-white" : "bg-[#F97316] text-white"} data-testid={`badge-audit-status-${audit.id}`}>
                             {String(t(`common.${audit.status}`, audit.status))}
                           </Badge>
                         </TableCell>
-                        <TableCell className="max-w-xs truncate" data-testid={`text-findings-${audit.id}`}>
+                        <TableCell className="max-w-xs truncate text-[#64748B]" data-testid={`text-findings-${audit.id}`}>
                           {audit.findings || t('compliance.noFindings', 'No findings')}
                         </TableCell>
                       </TableRow>
@@ -292,52 +292,52 @@ export default function ComplianceManagement() {
           <div className="flex justify-end mb-4">
             <Button
               onClick={() => setIsTaskDialogOpen(true)}
-              className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-create-task"
             >
               <FileText className="mr-2 h-4 w-4" />
               {t('compliance.createTask', 'Create Task')}
             </Button>
           </div>
-          <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.complianceTasks', 'Compliance Tasks')}</CardTitle>
-              <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.complianceTasks', 'Compliance Tasks')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('compliance.tasksDescription', 'Ongoing compliance tasks and action items')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {tasksLoading ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-loading-tasks">{t('compliance.loadingTasks', 'Loading tasks')}...</p>
+                <p className="text-[#64748B]" data-testid="text-loading-tasks">{t('compliance.loadingTasks', 'Loading tasks')}...</p>
               ) : tasks.length === 0 ? (
-                <p className="text-salis-gray font-poppins" data-testid="text-no-tasks">{t('compliance.noTasks', 'No tasks found')}</p>
+                <p className="text-[#64748B]" data-testid="text-no-tasks">{t('compliance.noTasks', 'No tasks found')}</p>
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('compliance.taskName', 'Task Name')}</TableHead>
-                      <TableHead>{t('compliance.assignedTo', 'Assigned To')}</TableHead>
-                      <TableHead>{t('compliance.dueDate', 'Due Date')}</TableHead>
-                      <TableHead>{t('compliance.priority', 'Priority')}</TableHead>
-                      <TableHead>{t('common.status', 'Status')}</TableHead>
-                      <TableHead>{t('common.actions', 'Actions')}</TableHead>
+                    <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.taskName', 'Task Name')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.assignedTo', 'Assigned To')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.dueDate', 'Due Date')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('compliance.priority', 'Priority')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                      <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {tasks.map((task: any) => (
-                      <TableRow key={task.id} data-testid={`row-task-${task.id}`}>
-                        <TableCell className="font-medium" data-testid={`text-task-name-${task.id}`}>{task.taskName}</TableCell>
-                        <TableCell data-testid={`text-assigned-to-${task.id}`}>{task.assignedTo || t('compliance.unassigned', 'Unassigned')}</TableCell>
-                        <TableCell data-testid={`text-due-date-${task.id}`}>
+                      <TableRow key={task.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-task-${task.id}`}>
+                        <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-task-name-${task.id}`}>{task.taskName}</TableCell>
+                        <TableCell className="text-[#64748B]" data-testid={`text-assigned-to-${task.id}`}>{task.assignedTo || t('compliance.unassigned', 'Unassigned')}</TableCell>
+                        <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-due-date-${task.id}`}>
                           {new Date(task.dueDate).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Badge className={task.priority === "critical" ? "bg-red-600 text-white" : task.priority === "high" ? "bg-orange-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-priority-${task.id}`}>
+                          <Badge className={task.priority === "critical" ? "bg-red-600 text-white" : task.priority === "high" ? "bg-[#F97316] text-white" : "bg-[#64748B] text-white"} data-testid={`badge-priority-${task.id}`}>
                             {String(t(`compliance.priority_${task.priority}`, task.priority))}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge className={task.status === "completed" ? "bg-green-500 text-white" : task.status === "overdue" ? "bg-red-500 text-white" : "bg-yellow-500 text-white"} data-testid={`badge-task-status-${task.id}`}>
+                          <Badge className={task.status === "completed" ? "bg-green-500 text-white" : task.status === "overdue" ? "bg-red-500 text-white" : "bg-[#0A5ED7] text-white"} data-testid={`badge-task-status-${task.id}`}>
                             {String(t(`common.${task.status}`, task.status))}
                           </Badge>
                         </TableCell>
@@ -383,10 +383,10 @@ export default function ComplianceManagement() {
       />
 
       <Dialog open={isPolicyDialogOpen} onOpenChange={setIsPolicyDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.createCompliancePolicy', 'Create Compliance Policy')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.createCompliancePolicy', 'Create Compliance Policy')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('compliance.addNewPolicy', 'Add a new compliance policy')}
             </DialogDescription>
           </DialogHeader>
@@ -397,9 +397,9 @@ export default function ComplianceManagement() {
                 name="policyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.policyName', 'Policy Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.policyName', 'Policy Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('compliance.policyNamePlaceholder', 'OSHA Compliance')} data-testid="input-policy-name" />
+                      <Input {...field} placeholder={t('compliance.policyNamePlaceholder', 'OSHA Compliance')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-policy-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -410,9 +410,9 @@ export default function ComplianceManagement() {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.category', 'Category')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('compliance.categoryPlaceholder', 'Safety')} data-testid="input-category" />
+                      <Input {...field} placeholder={t('compliance.categoryPlaceholder', 'Safety')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-category" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -423,9 +423,9 @@ export default function ComplianceManagement() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('compliance.descriptionPlaceholder', 'Policy description...')} data-testid="input-policy-description" />
+                      <Textarea {...field} placeholder={t('compliance.descriptionPlaceholder', 'Policy description...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-policy-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -437,9 +437,9 @@ export default function ComplianceManagement() {
                   name="effectiveDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('compliance.effectiveDate', 'Effective Date')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.effectiveDate', 'Effective Date')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="date" data-testid="input-effective-date" />
+                        <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-effective-date" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -450,9 +450,9 @@ export default function ComplianceManagement() {
                   name="expirationDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('compliance.expirationDateOptional', 'Expiration Date (optional)')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.expirationDateOptional', 'Expiration Date (optional)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="date" data-testid="input-expiration-date" />
+                        <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-expiration-date" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -460,7 +460,7 @@ export default function ComplianceManagement() {
                 />
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={createPolicyMutation.isPending} data-testid="button-submit-policy">
+                <Button type="submit" disabled={createPolicyMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-policy">
                   {createPolicyMutation.isPending ? t('common.creating', 'Creating...') : t('compliance.createPolicy', 'Create Policy')}
                 </Button>
               </DialogFooter>
@@ -470,10 +470,10 @@ export default function ComplianceManagement() {
       </Dialog>
 
       <Dialog open={isAuditDialogOpen} onOpenChange={setIsAuditDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.scheduleComplianceAudit', 'Schedule Compliance Audit')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.scheduleComplianceAudit', 'Schedule Compliance Audit')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('compliance.scheduleNewAudit', 'Schedule a new compliance audit')}
             </DialogDescription>
           </DialogHeader>
@@ -484,34 +484,19 @@ export default function ComplianceManagement() {
                 name="policyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.policy', 'Policy')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.selectPolicy', 'Select Policy')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-audit-policy">
-                          <SelectValue placeholder={t('compliance.selectPolicy', 'Select policy')} />
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectValue placeholder={t('compliance.selectPolicy', 'Select Policy')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         {policies.map((policy: any) => (
-                          <SelectItem key={policy.id} value={policy.id}>
-                            {policy.policyName}
-                          </SelectItem>
+                          <SelectItem key={policy.id} value={policy.id}>{policy.policyName}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={auditForm.control}
-                name="auditorName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('compliance.auditorName', 'Auditor Name')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('compliance.auditorPlaceholder', 'John Doe')} data-testid="input-auditor-name" />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -521,16 +506,29 @@ export default function ComplianceManagement() {
                 name="auditDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.auditDate', 'Audit Date')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.auditDate', 'Audit Date')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="date" data-testid="input-audit-date" />
+                      <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={auditForm.control}
+                name="auditorName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.auditorName', 'Auditor Name')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" disabled={createAuditMutation.isPending} data-testid="button-submit-audit">
+                <Button type="submit" disabled={createAuditMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                   {createAuditMutation.isPending ? t('common.scheduling', 'Scheduling...') : t('compliance.scheduleAudit', 'Schedule Audit')}
                 </Button>
               </DialogFooter>
@@ -540,10 +538,10 @@ export default function ComplianceManagement() {
       </Dialog>
 
       <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('compliance.createComplianceTask', 'Create Compliance Task')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('compliance.createComplianceTask', 'Create Compliance Task')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">
               {t('compliance.createNewTask', 'Create a new compliance task')}
             </DialogDescription>
           </DialogHeader>
@@ -551,21 +549,32 @@ export default function ComplianceManagement() {
             <form onSubmit={taskForm.handleSubmit((data) => createTaskMutation.mutate(data))} className="space-y-4">
               <FormField
                 control={taskForm.control}
+                name="taskName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.taskName', 'Task Name')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={taskForm.control}
                 name="policyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.policy', 'Policy')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.relatedPolicy', 'Related Policy')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-task-policy">
-                          <SelectValue placeholder={t('compliance.selectPolicy', 'Select policy')} />
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectValue placeholder={t('compliance.selectPolicy', 'Select Policy')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         {policies.map((policy: any) => (
-                          <SelectItem key={policy.id} value={policy.id}>
-                            {policy.policyName}
-                          </SelectItem>
+                          <SelectItem key={policy.id} value={policy.id}>{policy.policyName}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -575,12 +584,12 @@ export default function ComplianceManagement() {
               />
               <FormField
                 control={taskForm.control}
-                name="taskName"
+                name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.taskName', 'Task Name')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.dueDate', 'Due Date')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('compliance.taskNamePlaceholder', 'Review policy')} data-testid="input-task-name" />
+                      <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -588,19 +597,29 @@ export default function ComplianceManagement() {
               />
               <FormField
                 control={taskForm.control}
-                name="dueDate"
+                name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('compliance.dueDate', 'Due Date')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" data-testid="input-due-date" />
-                    </FormControl>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('compliance.priority', 'Priority')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        <SelectItem value="low">{t('common.low', 'Low')}</SelectItem>
+                        <SelectItem value="medium">{t('common.medium', 'Medium')}</SelectItem>
+                        <SelectItem value="high">{t('common.high', 'High')}</SelectItem>
+                        <SelectItem value="critical">{t('common.critical', 'Critical')}</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" disabled={createTaskMutation.isPending} data-testid="button-submit-task">
+                <Button type="submit" disabled={createTaskMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                   {createTaskMutation.isPending ? t('common.creating', 'Creating...') : t('compliance.createTask', 'Create Task')}
                 </Button>
               </DialogFooter>

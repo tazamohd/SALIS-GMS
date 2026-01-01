@@ -78,16 +78,16 @@ export default function PartsNetworkLayout({ children, title, description }: Par
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white">
       {/* Mobile Header */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <Link href="/">
-          <Button variant="ghost" size="sm" className="gap-2 text-gray-600 dark:text-gray-400">
+          <Button variant="ghost" size="sm" className="gap-2 text-[#64748B] dark:text-[#64748B]">
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
         </Link>
-        <h1 className="font-bold text-gray-900 dark:text-white">Parts Network</h1>
+        <h1 className="font-bold text-[#0B1F3B] dark:text-white">Parts Network</h1>
         <Button
           variant="ghost"
           size="icon"
@@ -104,7 +104,7 @@ export default function PartsNetworkLayout({ children, title, description }: Par
           className={`
             fixed lg:sticky top-0 left-0 z-40 h-screen w-64 
             transform transition-transform duration-200 ease-in-out
-            lg:transform-none bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800
+            lg:transform-none bg-white dark:bg-[#151A23] border-r border-[#E2E8F0] dark:border-[#232A36]
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
           `}
         >
@@ -112,7 +112,7 @@ export default function PartsNetworkLayout({ children, title, description }: Par
             {/* Logo / Back */}
             <div className="px-4 mb-6 hidden lg:block">
               <Link href="/">
-                <Button variant="ghost" className="w-full justify-start gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Button variant="ghost" className="w-full justify-start gap-2 text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
                   <ArrowLeft className="h-4 w-4" />
                   Back to Dashboard
                 </Button>
@@ -122,17 +122,17 @@ export default function PartsNetworkLayout({ children, title, description }: Par
             {/* Network Title */}
             <div className="px-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-900 dark:bg-white rounded-lg">
-                  <Package className="h-5 w-5 text-white dark:text-gray-900" />
+                <div className="p-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-lg">
+                  <Package className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg text-gray-900 dark:text-white">Parts Network</h2>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">شبكة قطع الغيار B2B</p>
+                  <h2 className="font-bold text-lg text-[#0B1F3B] dark:text-white">Parts Network</h2>
+                  <p className="text-xs text-[#64748B]">شبكة قطع الغيار B2B</p>
                 </div>
               </div>
             </div>
 
-            <Separator className="bg-gray-200 dark:bg-gray-800 mb-4" />
+            <Separator className="bg-[#E2E8F0] dark:bg-[#232A36] mb-4" />
 
             {/* Navigation */}
             <nav className="px-3 space-y-1">
@@ -145,8 +145,8 @@ export default function PartsNetworkLayout({ children, title, description }: Par
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start gap-3 ${
                         isActive
-                          ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 shadow-sm"
-                          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-sm"
+                          : "text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                       }`}
                       onClick={() => setSidebarOpen(false)}
                       data-testid={`nav-${item.href.split("/").pop()}`}
@@ -164,19 +164,19 @@ export default function PartsNetworkLayout({ children, title, description }: Par
               })}
             </nav>
 
-            <Separator className="bg-gray-200 dark:bg-gray-800 my-4" />
+            <Separator className="bg-[#E2E8F0] dark:bg-[#232A36] my-4" />
 
             {/* Quick Stats */}
             <div className="px-4 space-y-3">
-              <h3 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Quick Stats</h3>
+              <h3 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-2">
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">12</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Open Requests</p>
+                <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3 text-center border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">12</p>
+                  <p className="text-xs text-[#64748B]">Open Requests</p>
                 </div>
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">8</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">New Quotes</p>
+                <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3 text-center border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">8</p>
+                  <p className="text-xs text-[#64748B]">New Quotes</p>
                 </div>
               </div>
             </div>
@@ -192,12 +192,12 @@ export default function PartsNetworkLayout({ children, title, description }: Par
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-h-screen bg-gray-50 dark:bg-gray-950">
+        <main className="flex-1 min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
           <div className="p-4 lg:p-6 max-w-7xl mx-auto">
             {/* Page Header */}
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
-              {description && <p className="text-gray-500 dark:text-gray-400 mt-1">{description}</p>}
+              <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{title}</h1>
+              {description && <p className="text-[#64748B] mt-1">{description}</p>}
             </div>
 
             {/* Page Content */}

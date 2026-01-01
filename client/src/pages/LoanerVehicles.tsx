@@ -303,30 +303,30 @@ export default function LoanerVehicles() {
 
   const getLoanerStatusBadge = (status: string, loanerId: string) => {
     const statusColors: Record<string, string> = {
-      available: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      reserved: "bg-salis-50-black text-white",
-      on_loan: "bg-salis-gray text-white",
-      maintenance: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
-      retired: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      available: "bg-[#10B981] text-white",
+      reserved: "bg-[#0BB3FF] text-white",
+      on_loan: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      maintenance: "bg-[#F97316] text-white",
+      retired: "bg-[#64748B] text-white",
     };
     
     return (
-      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-loaner-status-${loanerId}`}>
-        {status}
+      <Badge className={statusColors[status] || "bg-[#64748B] text-white"} data-testid={`badge-loaner-status-${loanerId}`}>
+        {status?.replace('_', ' ')}
       </Badge>
     );
   };
 
   const getConditionBadge = (condition: string, loanerId: string) => {
     const conditionColors: Record<string, string> = {
-      excellent: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      good: "bg-salis-50-black text-white",
-      fair: "bg-salis-gray text-white",
-      poor: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      excellent: "bg-[#10B981] text-white",
+      good: "bg-[#0A5ED7] text-white",
+      fair: "bg-[#64748B] text-white",
+      poor: "bg-[#F97316] text-white",
     };
     
     return (
-      <Badge className={conditionColors[condition] || "bg-salis-gray text-white"} data-testid={`badge-condition-${loanerId}`}>
+      <Badge className={conditionColors[condition] || "bg-[#64748B] text-white"} data-testid={`badge-condition-${loanerId}`}>
         {condition}
       </Badge>
     );
@@ -334,15 +334,15 @@ export default function LoanerVehicles() {
 
   const getReservationStatusBadge = (status: string, reservationId: string) => {
     const statusColors: Record<string, string> = {
-      reserved: "bg-salis-50-black text-white",
-      active: "bg-salis-gray text-white",
-      returned: "bg-salis-black text-white dark:bg-white dark:text-salis-black",
-      late: "bg-salis-gray text-white",
-      cancelled: "bg-salis-gray-light text-salis-black dark:bg-salis-gray-dark dark:text-white",
+      reserved: "bg-[#0BB3FF] text-white",
+      active: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      returned: "bg-[#10B981] text-white",
+      late: "bg-[#F97316] text-white",
+      cancelled: "bg-[#64748B] text-white",
     };
     
     return (
-      <Badge className={statusColors[status] || "bg-salis-gray text-white"} data-testid={`badge-reservation-status-${reservationId}`}>
+      <Badge className={statusColors[status] || "bg-[#64748B] text-white"} data-testid={`badge-reservation-status-${reservationId}`}>
         {status}
       </Badge>
     );
@@ -357,7 +357,7 @@ export default function LoanerVehicles() {
             loanerForm.reset();
             setIsLoanerDialogOpen(true);
           }}
-          className="bg-salis-blue hover:bg-salis-blue/90 dark:bg-salis-blue dark:hover:bg-salis-blue/90"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-loaner"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -366,23 +366,27 @@ export default function LoanerVehicles() {
       </div>
 
       {loanersLoading ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.loadingLoanerVehicles', 'Loading loaner vehicles...')}</div>
+        <div className="text-center py-8 text-[#64748B]">{t('vehicles.loadingLoanerVehicles', 'Loading loaner vehicles...')}</div>
       ) : loanerVehicles.length === 0 ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.noLoanerVehiclesFound', 'No loaner vehicles found')}</div>
+        <div className="text-center py-12">
+          <Car className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
+          <p className="text-[#0B1F3B] dark:text-white font-medium">{t('vehicles.noLoanerVehiclesFound', 'No loaner vehicles found')}</p>
+          <p className="text-sm text-[#64748B] mt-1">{t('vehicles.addFirstLoaner', 'Add your first loaner vehicle to get started')}</p>
+        </div>
       ) : (
-        <div className="border border-gray-200 dark:border-salis-gray-light rounded-lg overflow-hidden">
+        <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light">
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.loanerNumber', 'Loaner #')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.makeModelYear', 'Make/Model/Year')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.condition', 'Condition')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.dailyRate', 'Daily Rate')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.deposit', 'Deposit')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.lastService', 'Last Service')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.loanerNumber', 'Loaner #')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.makeModelYear', 'Make/Model/Year')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.condition', 'Condition')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.dailyRate', 'Daily Rate')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.deposit', 'Deposit')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.lastService', 'Last Service')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -390,22 +394,22 @@ export default function LoanerVehicles() {
                 <TableRow
                   key={loaner.id}
                   data-testid={`row-loaner-${loaner.id}`}
-                  className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light"
+                  className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                 >
-                  <TableCell className="text-gray-900 dark:text-white">{loaner.loanerNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{loaner.loanerNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {loaner.make} {loaner.model} {loaner.year}
                   </TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">{loaner.licensePlate ?? t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{loaner.licensePlate ?? t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
                     {getConditionBadge(loaner.condition ?? "good", loaner.id)}
                   </TableCell>
                   <TableCell>
                     {getLoanerStatusBadge(loaner.status ?? "available", loaner.id)}
                   </TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">${loaner.dailyRate ?? "0.00"}</TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">${loaner.depositAmount ?? "0.00"}</TableCell>
-                  <TableCell className="text-gray-900 dark:text-white">
+                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.dailyRate ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.depositAmount ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
                     {loaner.lastServiceDate
                       ? format(new Date(loaner.lastServiceDate), "MMM dd, yyyy")
                       : t('common.notAvailable', 'N/A')}
@@ -416,6 +420,7 @@ export default function LoanerVehicles() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditLoaner(loaner)}
+                        className="text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-edit-loaner-${loaner.id}`}
                       >
                         <Pencil className="w-4 h-4" />
@@ -424,6 +429,7 @@ export default function LoanerVehicles() {
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteLoanerMutation.mutate(loaner.id)}
+                        className="text-[#F97316] hover:bg-[#F97316]/10"
                         data-testid={`button-delete-loaner-${loaner.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -448,7 +454,7 @@ export default function LoanerVehicles() {
             reservationForm.reset();
             setIsReservationDialogOpen(true);
           }}
-          className="bg-salis-blue hover:bg-salis-blue/90 dark:bg-salis-blue dark:hover:bg-salis-blue/90"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-reservation"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -457,24 +463,28 @@ export default function LoanerVehicles() {
       </div>
 
       {reservationsLoading ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.loadingReservations', 'Loading reservations...')}</div>
+        <div className="text-center py-8 text-[#64748B]">{t('vehicles.loadingReservations', 'Loading reservations...')}</div>
       ) : reservations.length === 0 ? (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-400">{t('vehicles.noReservationsFound', 'No reservations found')}</div>
+        <div className="text-center py-12">
+          <Key className="w-12 h-12 mx-auto text-[#64748B] mb-4" />
+          <p className="text-[#0B1F3B] dark:text-white font-medium">{t('vehicles.noReservationsFound', 'No reservations found')}</p>
+          <p className="text-sm text-[#64748B] mt-1">{t('vehicles.createFirstReservation', 'Create your first reservation to get started')}</p>
+        </div>
       ) : (
-        <div className="border border-gray-200 dark:border-salis-gray-light rounded-lg overflow-hidden">
+        <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light">
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.reservationNumber', 'Reservation #')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.customer', 'Customer')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.startDate', 'Start Date')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.endDate', 'End Date')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.status', 'Status')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.depositPaid', 'Deposit Paid')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.totalCost', 'Total Cost')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('vehicles.damageReported', 'Damage Reported')}</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.reservationNumber', 'Reservation #')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.customer', 'Customer')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.startDate', 'Start Date')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.endDate', 'End Date')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.depositPaid', 'Deposit Paid')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.totalCost', 'Total Cost')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('vehicles.damageReported', 'Damage Reported')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -485,19 +495,19 @@ export default function LoanerVehicles() {
                   <TableRow
                     key={reservation.id}
                     data-testid={`row-reservation-${reservation.id}`}
-                    className="hover:bg-gray-50 dark:hover:bg-salis-gray border-b border-gray-200 dark:border-salis-gray-light"
+                    className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                   >
-                    <TableCell className="text-gray-900 dark:text-white">{reservation.reservationNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{reservation.reservationNumber ?? t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">
                       {loaner ? `${loaner.make} ${loaner.model}` : t('common.notAvailable', 'N/A')}
                     </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">{customer?.fullName ?? t('common.notAvailable', 'N/A')}</TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
+                    <TableCell className="text-[#0B1F3B] dark:text-white">{customer?.fullName ?? t('common.notAvailable', 'N/A')}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">
                       {reservation.startDate
                         ? format(new Date(reservation.startDate), "MMM dd, yyyy")
                         : t('common.notAvailable', 'N/A')}
                     </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">
+                    <TableCell className="text-[#0B1F3B] dark:text-white">
                       {reservation.endDate
                         ? format(new Date(reservation.endDate), "MMM dd, yyyy")
                         : t('common.notAvailable', 'N/A')}
@@ -505,13 +515,13 @@ export default function LoanerVehicles() {
                     <TableCell>
                       {getReservationStatusBadge(reservation.status ?? "reserved", reservation.id)}
                     </TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">${reservation.depositPaid ?? "0.00"}</TableCell>
-                    <TableCell className="text-gray-900 dark:text-white">${reservation.totalCost ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.depositPaid ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.totalCost ?? "0.00"}</TableCell>
                     <TableCell>
                       {reservation.damageReported ? (
-                        <Badge variant="destructive">{t('common.yes', 'Yes')}</Badge>
+                        <Badge className="bg-[#F97316] text-white">{t('common.yes', 'Yes')}</Badge>
                       ) : (
-                        <Badge variant="outline">{t('common.no', 'No')}</Badge>
+                        <Badge className="bg-[#10B981] text-white">{t('common.no', 'No')}</Badge>
                       )}
                     </TableCell>
                     <TableCell>
@@ -520,6 +530,7 @@ export default function LoanerVehicles() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditReservation(reservation)}
+                          className="text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                           data-testid={`button-edit-reservation-${reservation.id}`}
                         >
                           <Pencil className="w-4 h-4" />
@@ -528,6 +539,7 @@ export default function LoanerVehicles() {
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteReservationMutation.mutate(reservation.id)}
+                          className="text-[#F97316] hover:bg-[#F97316]/10"
                           data-testid={`button-delete-reservation-${reservation.id}`}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -569,9 +581,9 @@ export default function LoanerVehicles() {
       />
 
       <Dialog open={isLoanerDialogOpen} onOpenChange={setIsLoanerDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingLoanerId ? t('vehicles.editLoanerVehicle', 'Edit Loaner Vehicle') : t('vehicles.addLoanerVehicle', 'Add Loaner Vehicle')}
             </DialogTitle>
           </DialogHeader>
@@ -583,9 +595,9 @@ export default function LoanerVehicles() {
                   name="make"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.make', 'Make')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input {...field} data-testid="input-make" />
+                        <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -596,9 +608,9 @@ export default function LoanerVehicles() {
                   name="model"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.model', 'Model')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.model', 'Model')}</FormLabel>
                       <FormControl>
-                        <Input {...field} data-testid="input-model" />
+                        <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-model" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -611,9 +623,9 @@ export default function LoanerVehicles() {
                   name="year"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.year', 'Year')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.year', 'Year')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" data-testid="input-year" />
+                        <Input {...field} type="number" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-year" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -624,9 +636,9 @@ export default function LoanerVehicles() {
                   name="licensePlate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.licensePlate', 'License Plate')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value ?? ""} data-testid="input-license" />
+                        <Input {...field} value={field.value ?? ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-license" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -639,9 +651,9 @@ export default function LoanerVehicles() {
                   name="dailyRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.dailyRate', 'Daily Rate')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.dailyRate', 'Daily Rate')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" step="0.01" data-testid="input-daily-rate" />
+                        <Input {...field} type="number" step="0.01" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-daily-rate" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -652,9 +664,9 @@ export default function LoanerVehicles() {
                   name="depositAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.depositAmount', 'Deposit Amount')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.depositAmount', 'Deposit Amount')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" step="0.01" data-testid="input-deposit" />
+                        <Input {...field} type="number" step="0.01" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-deposit" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -662,10 +674,10 @@ export default function LoanerVehicles() {
                 />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsLoanerDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsLoanerDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={loanerMutation.isPending}>
+                <Button type="submit" disabled={loanerMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90">
                   {loanerMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>
@@ -675,9 +687,9 @@ export default function LoanerVehicles() {
       </Dialog>
 
       <Dialog open={isReservationDialogOpen} onOpenChange={setIsReservationDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
               {editingReservationId ? t('vehicles.editReservation', 'Edit Reservation') : t('vehicles.createReservation', 'Create Reservation')}
             </DialogTitle>
           </DialogHeader>
@@ -688,16 +700,16 @@ export default function LoanerVehicles() {
                 name="loanerVehicleId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.loanerVehicle', 'Loaner Vehicle')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-loaner">
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-loaner">
                           <SelectValue placeholder={t('vehicles.selectLoanerVehicle', 'Select loaner vehicle')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         {loanerVehicles.map((loaner) => (
-                          <SelectItem key={loaner.id} value={loaner.id}>
+                          <SelectItem key={loaner.id} value={loaner.id} className="text-[#0B1F3B] dark:text-white">
                             {loaner.make} {loaner.model} - {loaner.licensePlate}
                           </SelectItem>
                         ))}
@@ -713,9 +725,9 @@ export default function LoanerVehicles() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.startDate', 'Start Date')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.startDate', 'Start Date')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="datetime-local" data-testid="input-start-date" />
+                        <Input {...field} type="datetime-local" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-start-date" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -726,9 +738,9 @@ export default function LoanerVehicles() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('vehicles.endDate', 'End Date')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.endDate', 'End Date')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="datetime-local" data-testid="input-end-date" />
+                        <Input {...field} type="datetime-local" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-end-date" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -736,10 +748,10 @@ export default function LoanerVehicles() {
                 />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsReservationDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsReservationDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" disabled={reservationMutation.isPending}>
+                <Button type="submit" disabled={reservationMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90">
                   {reservationMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
                 </Button>
               </DialogFooter>

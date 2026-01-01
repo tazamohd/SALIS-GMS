@@ -145,45 +145,45 @@ export default function CapitalManagement() {
       content: (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.totalCapital', 'Total Capital')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-total-capital">SAR 1,000,000</p>
+                    <p className="text-sm text-[#64748B]">{t('capital.totalCapital', 'Total Capital')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-capital">SAR 1,000,000</p>
                   </div>
                   <DollarSign className="h-8 w-8 text-green-600" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.totalShareholders', 'Total Shareholders')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-total-shareholders">3</p>
+                    <p className="text-sm text-[#64748B]">{t('capital.totalShareholders', 'Total Shareholders')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-shareholders">3</p>
                   </div>
                   <Users className="h-8 w-8 text-blue-600" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.issuedShares', 'Issued Shares')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-issued-shares">100,000</p>
+                    <p className="text-sm text-[#64748B]">{t('capital.issuedShares', 'Issued Shares')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-issued-shares">100,000</p>
                   </div>
                   <PieChart className="h-8 w-8 text-purple-600" />
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('capital.parValue', 'Par Value')}</p>
-                    <p className="text-2xl font-bold font-montserrat" data-testid="text-par-value">SAR 10</p>
+                    <p className="text-sm text-[#64748B]">{t('capital.parValue', 'Par Value')}</p>
+                    <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-par-value">SAR 10</p>
                   </div>
                   <Landmark className="h-8 w-8 text-amber-600" />
                 </div>
@@ -191,9 +191,9 @@ export default function CapitalManagement() {
             </Card>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                 <PieChart className="h-5 w-5" />
                 {t('capital.ownershipDistribution', 'Ownership Distribution')}
               </CardTitle>
@@ -203,8 +203,8 @@ export default function CapitalManagement() {
                 {shareholders.map((shareholder) => (
                   <div key={shareholder.id} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">{shareholder.name}</span>
-                      <span className="text-sm text-gray-500">{shareholder.percentage}%</span>
+                      <span className="font-medium text-[#0B1F3B] dark:text-white">{shareholder.name}</span>
+                      <span className="text-sm text-[#64748B]">{shareholder.percentage}%</span>
                     </div>
                     <Progress value={shareholder.percentage} className="h-2" />
                   </div>
@@ -222,17 +222,17 @@ export default function CapitalManagement() {
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{t('capital.shareholderRegistry', 'Shareholder Registry')}</h3>
+            <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('capital.shareholderRegistry', 'Shareholder Registry')}</h3>
             <Dialog open={isContributionDialogOpen} onOpenChange={setIsContributionDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-contribution">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-contribution">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('capital.addContribution', 'Add Contribution')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <DialogHeader>
-                  <DialogTitle>{t('capital.addCapitalContribution', 'Add Capital Contribution')}</DialogTitle>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('capital.addCapitalContribution', 'Add Capital Contribution')}</DialogTitle>
                 </DialogHeader>
                 <Form {...contributionForm}>
                   <form onSubmit={contributionForm.handleSubmit(onContributionSubmit)} className="space-y-4">
@@ -241,9 +241,9 @@ export default function CapitalManagement() {
                       name="shareholderName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.shareholderName', 'Shareholder Name')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.shareholderName', 'Shareholder Name')}</FormLabel>
                           <FormControl>
-                            <Input {...field} data-testid="input-shareholder-name" />
+                            <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-shareholder-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -254,14 +254,14 @@ export default function CapitalManagement() {
                       name="contributionType"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.contributionType', 'Contribution Type')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.contributionType', 'Contribution Type')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-contribution-type">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-contribution-type">
                                 <SelectValue placeholder={t('capital.selectType', 'Select type')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="cash">{t('capital.cash', 'Cash')}</SelectItem>
                               <SelectItem value="equipment">{t('capital.equipment', 'Equipment')}</SelectItem>
                               <SelectItem value="property">{t('capital.property', 'Property')}</SelectItem>
@@ -278,9 +278,9 @@ export default function CapitalManagement() {
                         name="amount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('capital.amountSAR', 'Amount (SAR)')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.amountSAR', 'Amount (SAR)')}</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-contribution-amount" />
+                              <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-contribution-amount" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -291,9 +291,9 @@ export default function CapitalManagement() {
                         name="sharePercentage"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('capital.sharePercent', 'Share %')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.sharePercent', 'Share %')}</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-share-percentage" />
+                              <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-share-percentage" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -305,9 +305,9 @@ export default function CapitalManagement() {
                       name="contributionDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('common.date', 'Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-contribution-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-contribution-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -318,14 +318,14 @@ export default function CapitalManagement() {
                       name="paymentMethod"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.paymentMethod', 'Payment Method')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.paymentMethod', 'Payment Method')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-payment-method">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-payment-method">
                                 <SelectValue placeholder={t('capital.selectMethod', 'Select method')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="bank_transfer">{t('capital.bankTransfer', 'Bank Transfer')}</SelectItem>
                               <SelectItem value="cash">{t('capital.cash', 'Cash')}</SelectItem>
                               <SelectItem value="check">{t('capital.check', 'Check')}</SelectItem>
@@ -335,7 +335,7 @@ export default function CapitalManagement() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" data-testid="button-submit-contribution">
+                    <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-contribution">
                       {t('capital.addContribution', 'Add Contribution')}
                     </Button>
                   </form>
@@ -344,31 +344,31 @@ export default function CapitalManagement() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('capital.shareholder', 'Shareholder')}</TableHead>
-                    <TableHead>{t('common.type', 'Type')}</TableHead>
-                    <TableHead className="text-right">{t('capital.shares', 'Shares')}</TableHead>
-                    <TableHead className="text-right">{t('capital.ownershipPercent', 'Ownership %')}</TableHead>
-                    <TableHead className="text-right">{t('capital.contribution', 'Contribution')}</TableHead>
-                    <TableHead>{t('common.status', 'Status')}</TableHead>
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareholder', 'Shareholder')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.shares', 'Shares')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.ownershipPercent', 'Ownership %')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.contribution', 'Contribution')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {shareholders.map((shareholder) => (
-                    <TableRow key={shareholder.id} data-testid={`row-shareholder-${shareholder.id}`}>
-                      <TableCell className="font-medium">{shareholder.name}</TableCell>
+                    <TableRow key={shareholder.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-shareholder-${shareholder.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{shareholder.name}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{shareholder.type}</Badge>
+                        <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">{shareholder.type}</Badge>
                       </TableCell>
-                      <TableCell className="text-right font-montserrat">{shareholder.shares.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">{shareholder.percentage}%</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {shareholder.contribution.toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{shareholder.shares.toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{shareholder.percentage}%</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">SAR {shareholder.contribution.toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                        <Badge className="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200">
                           {t('common.active', 'Active')}
                         </Badge>
                       </TableCell>
@@ -388,17 +388,17 @@ export default function CapitalManagement() {
       content: (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{t('capital.shareClasses', 'Share Classes')}</h3>
+            <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('capital.shareClasses', 'Share Classes')}</h3>
             <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-share-class">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-share-class">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('capital.addShareClass', 'Add Share Class')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <DialogHeader>
-                  <DialogTitle>{t('capital.addShareClass', 'Add Share Class')}</DialogTitle>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('capital.addShareClass', 'Add Share Class')}</DialogTitle>
                 </DialogHeader>
                 <Form {...structureForm}>
                   <form onSubmit={structureForm.handleSubmit(onStructureSubmit)} className="space-y-4">
@@ -407,9 +407,9 @@ export default function CapitalManagement() {
                       name="shareClass"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.shareClassName', 'Share Class Name')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.shareClassName', 'Share Class Name')}</FormLabel>
                           <FormControl>
-                            <Input {...field} data-testid="input-share-class" />
+                            <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-share-class" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -421,9 +421,9 @@ export default function CapitalManagement() {
                         name="authorizedShares"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('capital.authorizedShares', 'Authorized Shares')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.authorizedShares', 'Authorized Shares')}</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-authorized-shares" />
+                              <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-authorized-shares" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -434,9 +434,9 @@ export default function CapitalManagement() {
                         name="issuedShares"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('capital.issuedShares', 'Issued Shares')}</FormLabel>
+                            <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.issuedShares', 'Issued Shares')}</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} data-testid="input-issued-shares" />
+                              <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-issued-shares" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -448,9 +448,9 @@ export default function CapitalManagement() {
                       name="parValue"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.parValueSAR', 'Par Value (SAR)')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.parValueSAR', 'Par Value (SAR)')}</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} data-testid="input-par-value" />
+                            <Input type="number" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-par-value" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -461,14 +461,14 @@ export default function CapitalManagement() {
                       name="votingRights"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('capital.votingRights', 'Voting Rights')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('capital.votingRights', 'Voting Rights')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-voting-rights">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-voting-rights">
                                 <SelectValue placeholder={t('capital.selectVotingRights', 'Select voting rights')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="1_vote">{t('capital.oneVotePerShare', '1 Vote Per Share')}</SelectItem>
                               <SelectItem value="no_vote">{t('capital.noVotingRights', 'No Voting Rights')}</SelectItem>
                               <SelectItem value="2_votes">{t('capital.twoVotesPerShare', '2 Votes Per Share')}</SelectItem>
@@ -478,7 +478,7 @@ export default function CapitalManagement() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" data-testid="button-submit-share-class">
+                    <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-share-class">
                       {t('capital.addShareClass', 'Add Share Class')}
                     </Button>
                   </form>
@@ -487,28 +487,28 @@ export default function CapitalManagement() {
             </Dialog>
           </div>
 
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('capital.shareClass', 'Share Class')}</TableHead>
-                    <TableHead className="text-right">{t('capital.authorized', 'Authorized')}</TableHead>
-                    <TableHead className="text-right">{t('capital.issued', 'Issued')}</TableHead>
-                    <TableHead className="text-right">{t('capital.available', 'Available')}</TableHead>
-                    <TableHead className="text-right">{t('capital.parValue', 'Par Value')}</TableHead>
-                    <TableHead>{t('capital.votingRights', 'Voting Rights')}</TableHead>
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareClass', 'Share Class')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.authorized', 'Authorized')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.issued', 'Issued')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.available', 'Available')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.parValue', 'Par Value')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.votingRights', 'Voting Rights')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {shareClasses.map((sc) => (
-                    <TableRow key={sc.id} data-testid={`row-share-class-${sc.id}`}>
-                      <TableCell className="font-medium">{sc.class}</TableCell>
-                      <TableCell className="text-right font-montserrat">{sc.authorized.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">{sc.issued.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">{(sc.authorized - sc.issued).toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {sc.parValue}</TableCell>
-                      <TableCell>{sc.votingRights}</TableCell>
+                    <TableRow key={sc.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-share-class-${sc.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{sc.class}</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{sc.authorized.toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{sc.issued.toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-mono text-green-600 dark:text-green-400">{(sc.authorized - sc.issued).toLocaleString()}</TableCell>
+                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">SAR {sc.parValue}</TableCell>
+                      <TableCell className="text-[#64748B]">{sc.votingRights}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -520,39 +520,78 @@ export default function CapitalManagement() {
     },
     {
       id: "history",
-      label: t('capital.capitalHistory', 'Capital History'),
+      label: t('capital.history', 'History'),
       icon: Calendar,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">{t('capital.capitalTransactionHistory', 'Capital Transaction History')}</h3>
-          <Card className="bg-gray-50 dark:bg-salis-gray-dark/30">
+          <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('capital.capitalTransactionHistory', 'Capital Transaction History')}</h3>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.date', 'Date')}</TableHead>
-                    <TableHead>{t('capital.transactionType', 'Transaction Type')}</TableHead>
-                    <TableHead>{t('capital.shareholder', 'Shareholder')}</TableHead>
-                    <TableHead>{t('capital.paymentMethod', 'Payment Method')}</TableHead>
-                    <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
+                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareholder', 'Shareholder')}</TableHead>
+                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.method', 'Method')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {capitalHistory.map((transaction) => (
-                    <TableRow key={transaction.id} data-testid={`row-capital-history-${transaction.id}`}>
-                      <TableCell className="font-montserrat">{transaction.date}</TableCell>
+                  {capitalHistory.map((tx) => (
+                    <TableRow key={tx.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-history-${tx.id}`}>
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{tx.date}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{transaction.type}</Badge>
+                        <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{tx.type}</Badge>
                       </TableCell>
-                      <TableCell>{transaction.shareholder}</TableCell>
-                      <TableCell>{transaction.method}</TableCell>
-                      <TableCell className="text-right font-montserrat text-green-600">
-                        +SAR {transaction.amount.toLocaleString()}
+                      <TableCell className="text-[#0B1F3B] dark:text-white">{tx.shareholder}</TableCell>
+                      <TableCell className="text-right font-mono font-bold text-green-600 dark:text-green-400">
+                        SAR {tx.amount.toLocaleString()}
                       </TableCell>
+                      <TableCell className="text-[#64748B]">{tx.method}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardHeader>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('capital.relatedModules', 'Related Modules')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('capital.navigateToRelated', 'Navigate to related pages')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Link href="/equity-management">
+                  <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-equity">
+                    <Wallet className="h-4 w-4 mr-2" />
+                    {t('capital.equity', 'Equity')}
+                    <ExternalLink className="h-3 w-3 ml-auto" />
+                  </Button>
+                </Link>
+                <Link href="/retained-earnings">
+                  <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-retained-earnings">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    {t('capital.retainedEarnings', 'Retained Earnings')}
+                    <ExternalLink className="h-3 w-3 ml-auto" />
+                  </Button>
+                </Link>
+                <Link href="/balance-sheet">
+                  <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-balance-sheet">
+                    <FileText className="h-4 w-4 mr-2" />
+                    {t('capital.balanceSheet', 'Balance Sheet')}
+                    <ExternalLink className="h-3 w-3 ml-auto" />
+                  </Button>
+                </Link>
+                <Link href="/general-ledger">
+                  <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
+                    <FileText className="h-4 w-4 mr-2" />
+                    {t('capital.generalLedger', 'General Ledger')}
+                    <ExternalLink className="h-3 w-3 ml-auto" />
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -561,13 +600,12 @@ export default function CapitalManagement() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <TabsPageLayout
-        title={t('capital.title', 'Capital Management')}
-        description={t('capital.description', 'إدارة رأس المال - Manage shareholders, equity, and capital structure')}
-        defaultTab="overview"
-        tabs={tabs}
-      />
-    </div>
+    <TabsPageLayout
+      title={t('capital.capitalManagementTitle', 'Capital Management - إدارة رأس المال')}
+      description={t('capital.capitalManagementDescription', 'Manage shareholders, capital structure, and contributions')}
+      icon={Landmark}
+      tabs={tabs}
+      defaultTab="overview"
+    />
   );
 }

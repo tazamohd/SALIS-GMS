@@ -145,12 +145,12 @@ export default function NetworkMembers() {
 
   const getMemberTypeColor = (type: string) => {
     switch (type) {
-      case "supplier": return "bg-blue-500/20 text-blue-400";
-      case "dealer": return "bg-purple-500/20 text-purple-400";
-      case "store": return "bg-green-500/20 text-green-400";
-      case "authorized_seller": return "bg-orange-500/20 text-orange-400";
-      case "garage_keeper": return "bg-cyan-500/20 text-cyan-400";
-      default: return "bg-gray-500/20 text-gray-400";
+      case "supplier": return "bg-[#0A5ED7]/20 text-[#0A5ED7]";
+      case "dealer": return "bg-purple-500/20 text-purple-500";
+      case "store": return "bg-green-500/20 text-green-500";
+      case "authorized_seller": return "bg-[#F97316]/20 text-[#F97316]";
+      case "garage_keeper": return "bg-cyan-500/20 text-cyan-500";
+      default: return "bg-[#64748B]/20 text-[#64748B]";
     }
   };
 
@@ -174,18 +174,18 @@ export default function NetworkMembers() {
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search by company name or contact..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800 border-gray-700"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <div className="flex gap-2">
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-40 bg-gray-800 border-gray-700" data-testid="select-type-filter">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-type-filter">
               <SelectValue placeholder="Member Type" />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +198,7 @@ export default function NetworkMembers() {
             </SelectContent>
           </Select>
           <Select value={regionFilter} onValueChange={setRegionFilter}>
-            <SelectTrigger className="w-40 bg-gray-800 border-gray-700" data-testid="select-region-filter">
+            <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-region-filter">
               <SelectValue placeholder="Region" />
             </SelectTrigger>
             <SelectContent>
@@ -213,36 +213,36 @@ export default function NetworkMembers() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-blue-900/20 border-blue-700/30">
+        <Card className="bg-[#0A5ED7]/10 border-[#0A5ED7]/30 dark:bg-[#0A5ED7]/10 dark:border-[#0A5ED7]/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-blue-400">
+            <p className="text-3xl font-bold text-[#0A5ED7]">
               {displayMembers.filter(m => m.memberType === "supplier").length}
             </p>
-            <p className="text-sm text-gray-400">Suppliers</p>
+            <p className="text-sm text-[#64748B]">Suppliers</p>
           </CardContent>
         </Card>
-        <Card className="bg-purple-900/20 border-purple-700/30">
+        <Card className="bg-purple-500/10 border-purple-500/30 dark:bg-purple-500/10 dark:border-purple-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-purple-400">
+            <p className="text-3xl font-bold text-purple-500">
               {displayMembers.filter(m => m.memberType === "dealer").length}
             </p>
-            <p className="text-sm text-gray-400">Dealers</p>
+            <p className="text-sm text-[#64748B]">Dealers</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-900/20 border-green-700/30">
+        <Card className="bg-green-500/10 border-green-500/30 dark:bg-green-500/10 dark:border-green-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-green-400">
+            <p className="text-3xl font-bold text-green-500">
               {displayMembers.filter(m => m.memberType === "store").length}
             </p>
-            <p className="text-sm text-gray-400">Stores</p>
+            <p className="text-sm text-[#64748B]">Stores</p>
           </CardContent>
         </Card>
-        <Card className="bg-cyan-900/20 border-cyan-700/30">
+        <Card className="bg-cyan-500/10 border-cyan-500/30 dark:bg-cyan-500/10 dark:border-cyan-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-cyan-400">
+            <p className="text-3xl font-bold text-cyan-500">
               {displayMembers.filter(m => m.memberType === "garage_keeper").length}
             </p>
-            <p className="text-sm text-gray-400">Garages</p>
+            <p className="text-sm text-[#64748B]">Garages</p>
           </CardContent>
         </Card>
       </div>
@@ -252,25 +252,25 @@ export default function NetworkMembers() {
         {filteredMembers.map((member) => (
           <Card 
             key={member.id} 
-            className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors"
             data-testid={`member-card-${member.id}`}
           >
             <CardHeader className="pb-3">
               <div className="flex items-start gap-3">
-                <Avatar className="h-12 w-12 bg-gray-700">
-                  <AvatarFallback className="bg-gray-700 text-white">
+                <Avatar className="h-12 w-12 bg-[#F8FAFC] dark:bg-[#0E1117]">
+                  <AvatarFallback className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                     {member.companyName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-base truncate">{member.companyName}</CardTitle>
+                    <CardTitle className="text-base text-[#0B1F3B] dark:text-white truncate">{member.companyName}</CardTitle>
                     {member.isVerified && (
-                      <CheckCircle className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-[#0A5ED7] flex-shrink-0" />
                     )}
                   </div>
                   {member.companyNameAr && (
-                    <p className="text-sm text-gray-400 truncate" dir="rtl">{member.companyNameAr}</p>
+                    <p className="text-sm text-[#64748B] truncate" dir="rtl">{member.companyNameAr}</p>
                   )}
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function NetworkMembers() {
                   {getMemberTypeIcon(member.memberType)}
                   {getMemberTypeLabel(member.memberType)}
                 </Badge>
-                <span className="flex items-center gap-1 text-sm text-gray-400">
+                <span className="flex items-center gap-1 text-sm text-[#64748B]">
                   <MapPin className="h-3 w-3" />
                   {member.city}
                 </span>
@@ -292,13 +292,13 @@ export default function NetworkMembers() {
               <div className="flex items-center justify-between mb-3 text-sm">
                 <span className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                  <span className="font-medium">{member.rating}</span>
+                  <span className="font-medium text-[#0B1F3B] dark:text-white">{member.rating}</span>
                 </span>
-                <span className="text-gray-400">
+                <span className="text-[#64748B]">
                   {member.totalQuotations} quotes
                 </span>
                 {member.responseRate > 0 && (
-                  <span className="text-green-400">
+                  <span className="text-green-500">
                     {member.responseRate}% response
                   </span>
                 )}
@@ -308,12 +308,12 @@ export default function NetworkMembers() {
               {member.specializedBrands.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {member.specializedBrands.slice(0, 3).map((brand) => (
-                    <Badge key={brand} variant="outline" className="text-xs border-gray-600">
+                    <Badge key={brand} variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                       {brand}
                     </Badge>
                   ))}
                   {member.specializedBrands.length > 3 && (
-                    <Badge variant="outline" className="text-xs border-gray-600">
+                    <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                       +{member.specializedBrands.length - 3}
                     </Badge>
                   )}
@@ -321,7 +321,7 @@ export default function NetworkMembers() {
               )}
 
               {/* Contact */}
-              <div className="flex items-center gap-3 text-sm text-gray-400 mb-4">
+              <div className="flex items-center gap-3 text-sm text-[#64748B] mb-4">
                 {member.phone && (
                   <span className="flex items-center gap-1">
                     <Phone className="h-3 w-3" />
@@ -332,10 +332,10 @@ export default function NetworkMembers() {
 
               {/* Actions */}
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1 border-gray-600" size="sm">
+                <Button variant="outline" className="flex-1 border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]" size="sm">
                   View Profile
                 </Button>
-                <Button className="flex-1 bg-blue-600 hover:bg-blue-700" size="sm">
+                <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" size="sm">
                   Contact
                 </Button>
               </div>
@@ -344,11 +344,11 @@ export default function NetworkMembers() {
         ))}
 
         {filteredMembers.length === 0 && (
-          <Card className="bg-gray-800 border-gray-700 col-span-full">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] col-span-full">
             <CardContent className="p-8 text-center">
-              <Users className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="font-medium text-lg mb-2">No Members Found</h3>
-              <p className="text-gray-400">
+              <Users className="h-12 w-12 mx-auto text-[#64748B] mb-4" />
+              <h3 className="font-medium text-lg mb-2 text-[#0B1F3B] dark:text-white">No Members Found</h3>
+              <p className="text-[#64748B]">
                 Try adjusting your search or filters
               </p>
             </CardContent>

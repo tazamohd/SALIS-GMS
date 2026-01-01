@@ -79,17 +79,17 @@ export default function PartsNetworkDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "open":
-        return <Badge variant="outline" className="border-gray-400 text-gray-600 dark:border-gray-500 dark:text-gray-300">Open</Badge>;
+        return <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] dark:border-[#0BB3FF] dark:text-[#0BB3FF]">Open</Badge>;
       case "reviewing":
-        return <Badge variant="outline" className="border-gray-500 text-gray-700 dark:border-gray-400 dark:text-gray-200">Reviewing</Badge>;
+        return <Badge variant="outline" className="border-[#F97316] text-[#F97316]">Reviewing</Badge>;
       case "ordered":
-        return <Badge className="bg-gray-900 text-white dark:bg-white dark:text-gray-900">Ordered</Badge>;
+        return <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Ordered</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
       case "submitted":
-        return <Badge variant="secondary" className="bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">Submitted</Badge>;
+        return <Badge variant="secondary" className="bg-[#F8FAFC] text-[#64748B] dark:bg-[#232A36] dark:text-[#64748B]">Submitted</Badge>;
       case "selected":
-        return <Badge className="bg-gray-900 text-white dark:bg-white dark:text-gray-900">Selected</Badge>;
+        return <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Selected</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -102,85 +102,85 @@ export default function PartsNetworkDashboard() {
     >
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <Send className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                <Send className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayStats.openRequests}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Open Requests</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{displayStats.openRequests}</p>
+                <p className="text-xs text-[#64748B]">Open Requests</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <Inbox className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                <Inbox className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayStats.pendingQuotes}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Pending Quotes</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{displayStats.pendingQuotes}</p>
+                <p className="text-xs text-[#64748B]">Pending Quotes</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <MessageSquare className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayStats.unreadMessages}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Unread Messages</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{displayStats.unreadMessages}</p>
+                <p className="text-xs text-[#64748B]">Unread Messages</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <ShoppingCart className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                <ShoppingCart className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayStats.activeOrders}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Active Orders</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{displayStats.activeOrders}</p>
+                <p className="text-xs text-[#64748B]">Active Orders</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <Users className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              <div className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                <Users className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayStats.networkMembers}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Network Members</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{displayStats.networkMembers}</p>
+                <p className="text-xs text-[#64748B]">Network Members</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-900 dark:bg-white border-gray-800 dark:border-gray-200 hover:shadow-md transition-shadow">
+        <Card className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-transparent hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-800 dark:bg-gray-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-white dark:text-gray-900" />
+              <div className="p-2 bg-white/20 rounded-lg">
+                <DollarSign className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white dark:text-gray-900">{displayStats.totalSavings}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-600">SAR Saved</p>
+                <p className="text-2xl font-bold text-white">{displayStats.totalSavings}</p>
+                <p className="text-xs text-white/80">SAR Saved</p>
               </div>
             </div>
           </CardContent>
@@ -189,18 +189,18 @@ export default function PartsNetworkDashboard() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:shadow-md transition-all">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
-                <Send className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+              <div className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl">
+                <Send className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">Request Quotation</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Send a new part price request to suppliers</p>
+                <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">Request Quotation</h3>
+                <p className="text-sm text-[#64748B]">Send a new part price request to suppliers</p>
               </div>
               <Link href="/parts-network/send-request">
-                <Button className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900" data-testid="btn-send-request">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-send-request">
                   Send Request
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -209,18 +209,18 @@ export default function PartsNetworkDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:shadow-md transition-all">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl">
-                <Inbox className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+              <div className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl">
+                <Inbox className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">View Incoming Requests</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Respond to quotation requests from garages</p>
+                <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">View Incoming Requests</h3>
+                <p className="text-sm text-[#64748B]">Respond to quotation requests from garages</p>
               </div>
               <Link href="/parts-network/incoming-requests">
-                <Button className="bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900" data-testid="btn-view-incoming">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-view-incoming">
                   View Requests
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -233,15 +233,15 @@ export default function PartsNetworkDashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Requests */}
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg text-gray-900 dark:text-white">Recent Requests</CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">Your latest quotation requests</CardDescription>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">Recent Requests</CardTitle>
+                <CardDescription className="text-[#64748B]">Your latest quotation requests</CardDescription>
               </div>
               <Link href="/parts-network/my-requests">
-                <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0A5ED7]">
                   View All
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
@@ -253,23 +253,23 @@ export default function PartsNetworkDashboard() {
               {displayRecentRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
+                  className="flex items-center justify-between p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors"
                   data-testid={`request-${request.id}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                      <Package className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <div className="p-2 bg-white dark:bg-[#151A23] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                      <Package className="h-5 w-5 text-[#0A5ED7]" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{request.partName}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">{request.partName}</p>
+                      <p className="text-sm text-[#64748B]">
                         {request.requestNumber} • {request.brand}
                       </p>
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1">
                     {getStatusBadge(request.status)}
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {request.responseCount} quotes
                     </p>
                   </div>
@@ -280,15 +280,15 @@ export default function PartsNetworkDashboard() {
         </Card>
 
         {/* Recent Quotations */}
-        <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg text-gray-900 dark:text-white">Recent Quotations</CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">Latest price offers received</CardDescription>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">Recent Quotations</CardTitle>
+                <CardDescription className="text-[#64748B]">Latest price offers received</CardDescription>
               </div>
               <Link href="/parts-network/quotations">
-                <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0A5ED7]">
                   View All
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
@@ -300,22 +300,22 @@ export default function PartsNetworkDashboard() {
               {displayRecentQuotes.map((quote) => (
                 <div
                   key={quote.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
+                  className="flex items-center justify-between p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors"
                   data-testid={`quote-${quote.id}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    <div className="p-2 bg-white dark:bg-[#151A23] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+                      <CheckCircle className="h-5 w-5 text-[#0A5ED7]" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{quote.partName}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">{quote.partName}</p>
+                      <p className="text-sm text-[#64748B]">
                         {quote.supplierName}
                       </p>
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1">
-                    <p className="font-bold text-gray-900 dark:text-white">
+                    <p className="font-bold text-[#0B1F3B] dark:text-white">
                       {quote.unitPrice} {quote.currency}
                     </p>
                     {getStatusBadge(quote.status)}
@@ -328,30 +328,30 @@ export default function PartsNetworkDashboard() {
       </div>
 
       {/* Network Stats Summary */}
-      <Card className="mt-6 bg-gray-900 dark:bg-gray-950 border-gray-800 text-white">
+      <Card className="mt-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-transparent text-white">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/10 rounded-xl">
+              <div className="p-3 bg-white/20 rounded-xl">
                 <TrendingUp className="h-8 w-8 text-white" />
               </div>
               <div>
                 <h3 className="font-bold text-xl">Network Performance</h3>
-                <p className="text-gray-400">Your parts network is performing well this month</p>
+                <p className="text-white/80">Your parts network is performing well this month</p>
               </div>
             </div>
             <div className="flex items-center gap-6">
               <div className="text-center">
                 <p className="text-3xl font-bold">94%</p>
-                <p className="text-sm text-gray-400">Response Rate</p>
+                <p className="text-sm text-white/80">Response Rate</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold">2.4h</p>
-                <p className="text-sm text-gray-400">Avg. Response</p>
+                <p className="text-sm text-white/80">Avg. Response</p>
               </div>
               <div className="text-center">
                 <p className="text-3xl font-bold">18%</p>
-                <p className="text-sm text-gray-400">Cost Savings</p>
+                <p className="text-sm text-white/80">Cost Savings</p>
               </div>
             </div>
           </div>

@@ -60,15 +60,15 @@ export function CustomerDashboard() {
       metrics={metrics}
       metricsClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
     >
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl">Upcoming Appointments</CardTitle>
-              <CardDescription>Your scheduled service appointments</CardDescription>
+              <CardTitle className="text-xl text-[#0B1F3B] dark:text-white">Upcoming Appointments</CardTitle>
+              <CardDescription className="text-[#64748B]">Your scheduled service appointments</CardDescription>
             </div>
             <Link href="/portal/appointments">
-              <Button variant="outline" size="sm" data-testid="button-view-all-appointments">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="button-view-all-appointments">
                 View All
               </Button>
             </Link>
@@ -76,13 +76,13 @@ export function CustomerDashboard() {
         </CardHeader>
         <CardContent>
           {loadingAppointments ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-[#64748B]">Loading...</div>
           ) : upcomingAppointments.length === 0 ? (
             <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No upcoming appointments</p>
+              <Calendar className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
+              <p className="text-[#64748B]">No upcoming appointments</p>
               <Link href="/portal/appointments">
-                <Button className="mt-4" data-testid="button-book-appointment">
+                <Button className="mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90" data-testid="button-book-appointment">
                   Book an Appointment
                 </Button>
               </Link>
@@ -90,22 +90,22 @@ export function CustomerDashboard() {
           ) : (
             <div className="space-y-4">
               {upcomingAppointments.map(apt => (
-                <div key={apt.id} className="flex items-center justify-between p-4 border rounded-lg" data-testid={`card-appointment-${apt.id}`}>
+                <div key={apt.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-appointment-${apt.id}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-gray-100 dark:bg-salis-gray-dark p-3 rounded-lg">
-                      <Calendar className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <div className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] p-3 rounded-lg">
+                      <Calendar className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium" data-testid={`text-appointment-service-${apt.id}`}>{apt.serviceType}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-appointment-service-${apt.id}`}>{apt.serviceType}</p>
+                      <p className="text-sm text-[#64748B]">
                         {format(new Date(apt.appointmentDate), 'PPP p')}
                       </p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     apt.status === 'confirmed' 
-                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                      : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                      ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white'
+                      : 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white'
                   }`} data-testid={`status-appointment-${apt.id}`}>
                     {apt.status}
                   </span>
@@ -117,18 +117,18 @@ export function CustomerDashboard() {
       </Card>
 
       {unpaidInvoices.length > 0 && (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-gray-900 dark:text-white" />
+                <CardTitle className="text-xl flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                  <AlertCircle className="h-5 w-5 text-[#F97316]" />
                   Pending Payments
                 </CardTitle>
-                <CardDescription>Invoices requiring payment</CardDescription>
+                <CardDescription className="text-[#64748B]">Invoices requiring payment</CardDescription>
               </div>
               <Link href="/portal/invoices">
-                <Button variant="outline" size="sm" data-testid="button-view-all-invoices">
+                <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="button-view-all-invoices">
                   View All
                 </Button>
               </Link>
@@ -137,22 +137,22 @@ export function CustomerDashboard() {
           <CardContent>
             <div className="space-y-4">
               {unpaidInvoices.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between p-4 border rounded-lg" data-testid={`card-invoice-${inv.id}`}>
+                <div key={inv.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-invoice-${inv.id}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-gray-400 dark:bg-gray-500 p-3 rounded-lg">
-                      <FileText className="h-5 w-5 text-gray-900 dark:text-white" />
+                    <div className="bg-[#F97316]/20 p-3 rounded-lg">
+                      <FileText className="h-5 w-5 text-[#F97316]" />
                     </div>
                     <div>
-                      <p className="font-medium" data-testid={`text-invoice-number-${inv.id}`}>{inv.invoiceNumber}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-number-${inv.id}`}>{inv.invoiceNumber}</p>
+                      <p className="text-sm text-[#64748B]">
                         Due: {format(new Date(inv.dueDate), 'PPP')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold" data-testid={`text-invoice-amount-${inv.id}`}>${Number(inv.balanceAmount).toFixed(2)}</p>
+                    <p className="font-bold text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-amount-${inv.id}`}>${Number(inv.balanceAmount).toFixed(2)}</p>
                     <Link href="/portal/invoices">
-                      <Button size="sm" className="mt-2" data-testid={`button-pay-invoice-${inv.id}`}>
+                      <Button size="sm" className="mt-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90" data-testid={`button-pay-invoice-${inv.id}`}>
                         Pay Now
                       </Button>
                     </Link>
@@ -164,15 +164,15 @@ export function CustomerDashboard() {
         </Card>
       )}
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl">My Vehicles</CardTitle>
-              <CardDescription>Your registered vehicles</CardDescription>
+              <CardTitle className="text-xl text-[#0B1F3B] dark:text-white">My Vehicles</CardTitle>
+              <CardDescription className="text-[#64748B]">Your registered vehicles</CardDescription>
             </div>
             <Link href="/portal/vehicles">
-              <Button variant="outline" size="sm" data-testid="button-view-all-vehicles">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="button-view-all-vehicles">
                 View All
               </Button>
             </Link>
@@ -180,23 +180,23 @@ export function CustomerDashboard() {
         </CardHeader>
         <CardContent>
           {loadingVehicles ? (
-            <div className="text-center py-8 text-gray-500">Loading...</div>
+            <div className="text-center py-8 text-[#64748B]">Loading...</div>
           ) : vehicles.length === 0 ? (
             <div className="text-center py-8">
-              <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No vehicles registered</p>
+              <Car className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
+              <p className="text-[#64748B]">No vehicles registered</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {vehicles.filter(v => v.isActive).slice(0, 3).map(vehicle => (
-                <div key={vehicle.id} className="p-4 border rounded-lg" data-testid={`card-vehicle-${vehicle.id}`}>
+                <div key={vehicle.id} className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`card-vehicle-${vehicle.id}`}>
                   <div className="flex items-center gap-3 mb-2">
-                    <Car className="h-5 w-5 text-gray-400" />
-                    <h3 className="font-medium" data-testid={`text-vehicle-name-${vehicle.id}`}>
+                    <Car className="h-5 w-5 text-[#0A5ED7]" />
+                    <h3 className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-vehicle-name-${vehicle.id}`}>
                       {vehicle.make} {vehicle.model}
                     </h3>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                  <div className="text-sm text-[#64748B] space-y-1">
                     <p>Year: {vehicle.year}</p>
                     <p>License: {vehicle.licensePlate}</p>
                     {vehicle.mileage && <p>Mileage: {vehicle.mileage.toLocaleString()} mi</p>}

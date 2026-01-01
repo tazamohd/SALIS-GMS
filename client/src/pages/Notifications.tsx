@@ -69,29 +69,29 @@ export default function Notifications() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'email':
-        return <Mail className="h-5 w-5 text-gray-700 dark:text-gray-300" />;
+        return <Mail className="h-5 w-5 text-[#0A5ED7]" />;
       case 'sms':
-        return <MessageSquare className="h-5 w-5 text-gray-600 dark:text-gray-400" />;
+        return <MessageSquare className="h-5 w-5 text-[#64748B]" />;
       case 'in-app':
-        return <Bell className="h-5 w-5 text-gray-800 dark:text-gray-200" />;
+        return <Bell className="h-5 w-5 text-[#0BB3FF]" />;
       default:
-        return <Bell className="h-5 w-5 text-gray-900 dark:text-white/60" />;
+        return <Bell className="h-5 w-5 text-[#64748B]" />;
     }
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === 'read') return <CheckCircle className="h-4 w-4 text-gray-700 dark:text-gray-300" />;
-    if (status === 'failed') return <XCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />;
+    if (status === 'read') return <CheckCircle className="h-4 w-4 text-green-600" />;
+    if (status === 'failed') return <XCircle className="h-4 w-4 text-[#F97316]" />;
     return null;
   };
 
   const getCategoryBadge = (category: string) => {
     const colors: Record<string, string> = {
-      appointment: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
-      invoice: 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100',
-      job_completed: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
-      feedback_request: 'bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100',
-      general: 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300',
+      appointment: 'bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20',
+      invoice: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      job_completed: 'bg-[#0BB3FF]/10 text-[#0BB3FF] dark:bg-[#0BB3FF]/20',
+      feedback_request: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      general: 'bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]',
     };
 
     return (
@@ -105,17 +105,17 @@ export default function Notifications() {
     if (isLoading) {
       return (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A5ED7]"></div>
         </div>
       );
     }
 
     if (filteredNotifications.length === 0) {
       return (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Bell className="h-12 w-12 text-gray-300 mb-4" />
-            <p className="text-gray-900 dark:text-white/60">{t('notifications.noNotificationsToDisplay', 'No notifications to display')}</p>
+            <Bell className="h-12 w-12 text-[#64748B] mb-4" />
+            <p className="text-[#64748B]">{t('notifications.noNotificationsToDisplay', 'No notifications to display')}</p>
           </CardContent>
         </Card>
       );
@@ -126,8 +126,8 @@ export default function Notifications() {
         {filteredNotifications.map((notification) => (
           <Card
             key={notification.id}
-            className={`${
-              notification.status !== 'read' ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' : ''
+            className={`bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] ${
+              notification.status !== 'read' ? 'ring-1 ring-[#0A5ED7]/20' : ''
             }`}
             data-testid={`notification-card-${notification.id}`}
           >
@@ -137,14 +137,14 @@ export default function Notifications() {
                   {getNotificationIcon(notification.type)}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <CardTitle className="text-base">
+                      <CardTitle className="text-base text-[#0B1F3B] dark:text-white">
                         {notification.title}
                       </CardTitle>
                       {getStatusIcon(notification.status)}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       {getCategoryBadge(notification.category)}
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
                         {notification.type}
                       </Badge>
                     </div>
@@ -156,6 +156,7 @@ export default function Notifications() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleMarkAsRead(notification.id)}
+                      className="text-[#0A5ED7] hover:text-[#0A5ED7]/80"
                       data-testid={`button-mark-read-${notification.id}`}
                     >
                       {t('notifications.markAsRead', 'Mark as read')}
@@ -165,18 +166,19 @@ export default function Notifications() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(notification.id)}
+                    className="text-[#64748B] hover:text-red-600"
                     data-testid={`button-delete-${notification.id}`}
                   >
-                    <Trash2 className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-sm whitespace-pre-wrap">
+              <CardDescription className="text-sm whitespace-pre-wrap text-[#64748B]">
                 {notification.message}
               </CardDescription>
-              <div className="mt-3 flex items-center gap-4 text-xs text-gray-900 dark:text-white/60">
+              <div className="mt-3 flex items-center gap-4 text-xs text-[#64748B]">
                 <span>
                   {notification.createdAt &&
                     formatDistanceToNow(new Date(notification.createdAt), {
@@ -189,7 +191,7 @@ export default function Notifications() {
                   </span>
                 )}
                 {notification.status === 'failed' && notification.failureReason && (
-                  <span className="text-gray-700 dark:text-gray-300">{t('common.failed', 'Failed')}: {notification.failureReason}</span>
+                  <span className="text-[#F97316]">{t('common.failed', 'Failed')}: {notification.failureReason}</span>
                 )}
               </div>
             </CardContent>
@@ -201,11 +203,11 @@ export default function Notifications() {
 
   if (showPreferences) {
     return (
-      <div className="p-8 bg-gray-50 dark:bg-salis-black min-h-screen">
+      <div className="p-8 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
         <Button
           variant="ghost"
           onClick={() => setShowPreferences(false)}
-          className="mb-4"
+          className="mb-4 text-[#0B1F3B] dark:text-white"
           data-testid="button-back-to-notifications"
         >
           ← {t('notifications.backToNotifications', 'Back to Notifications')}

@@ -318,10 +318,10 @@ export default function TechnicianMobilePortal() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#E6E9ED] dark:bg-[#0E1117] p-4">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117] p-4">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-32 bg-[#C9D1DA] dark:bg-[#232A36] rounded-xl" />
+            <div key={i} className="h-32 bg-[#E2E8F0] dark:bg-[#232A36] rounded-xl" />
           ))}
         </div>
       </div>
@@ -329,7 +329,7 @@ export default function TechnicianMobilePortal() {
   }
 
   return (
-    <div className="min-h-screen bg-[#E6E9ED] dark:bg-[#0E1117] pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117] pb-20">
       <div className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white p-4 pb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -383,7 +383,7 @@ export default function TechnicianMobilePortal() {
       <div className="px-4 -mt-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <ScrollArea className="w-full whitespace-nowrap">
-            <TabsList className="inline-flex w-max bg-white dark:bg-[#151A23] rounded-xl shadow-lg border border-[#C9D1DA] dark:border-[#232A36] p-1">
+            <TabsList className="inline-flex w-max bg-white dark:bg-[#151A23] rounded-xl shadow-lg border border-[#E2E8F0] dark:border-[#232A36] p-1">
               <TabsTrigger value="home" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
                 <Home className="h-3.5 w-3.5 mr-1" />
                 Home
@@ -436,9 +436,9 @@ export default function TechnicianMobilePortal() {
           </ScrollArea>
 
           <TabsContent value="home" className="mt-4 pb-20">
-            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36] mb-4">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-4">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-[#2A2F3A] dark:text-[#E6EAF0]">
+                <CardTitle className="text-base flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                   <Menu className="h-5 w-5 text-[#0A5ED7]" />
                   {t('technician.quickAccess', 'Quick Access')}
                 </CardTitle>
@@ -449,11 +449,11 @@ export default function TechnicianMobilePortal() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className="flex flex-col items-center p-3 rounded-lg bg-[#E6E9ED] dark:bg-[#0E1117] hover:bg-[#0A5ED7]/10 transition-colors"
+                      className="flex flex-col items-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] hover:bg-[#0A5ED7]/10 transition-colors"
                       data-testid={`menu-${item.id}`}
                     >
                       <item.icon className="h-6 w-6 mb-1" style={{ color: item.color }} />
-                      <span className="text-[10px] text-center text-[#2A2F3A] dark:text-[#E6EAF0] leading-tight">
+                      <span className="text-[10px] text-center text-[#0B1F3B] dark:text-white leading-tight">
                         {item.label}
                       </span>
                     </button>
@@ -462,9 +462,9 @@ export default function TechnicianMobilePortal() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36] mb-4">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-4">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-[#2A2F3A] dark:text-[#E6EAF0]">
+                <CardTitle className="text-base flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                   <Target className="h-5 w-5 text-[#0A5ED7]" />
                   {t('technician.specialty', 'Specialty & Expertise')}
                 </CardTitle>
@@ -472,7 +472,7 @@ export default function TechnicianMobilePortal() {
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg border border-[#0A5ED7]/30">
                   <div>
-                    <p className="text-xs text-[#6B7280] uppercase">Primary Specialty</p>
+                    <p className="text-xs text-[#64748B] uppercase">Primary Specialty</p>
                     <p className="font-bold text-[#0A5ED7]">{technicianProfile?.speciality || 'General Mechanic'}</p>
                   </div>
                   <Award className="h-8 w-8 text-[#0A5ED7]" />
@@ -484,19 +484,19 @@ export default function TechnicianMobilePortal() {
                     { area: 'Electrical', level: 72 },
                     { area: 'Transmission', level: 65 },
                   ].map((exp, i) => (
-                    <div key={i} className="p-2 bg-[#E6E9ED] dark:bg-[#0E1117] rounded-lg">
-                      <p className="text-xs font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">{exp.area}</p>
+                    <div key={i} className="p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
+                      <p className="text-xs font-medium text-[#0B1F3B] dark:text-white">{exp.area}</p>
                       <Progress value={exp.level} className="h-1.5 mt-1" />
-                      <p className="text-xs text-[#6B7280] mt-0.5">{exp.level}%</p>
+                      <p className="text-xs text-[#64748B] mt-0.5">{exp.level}%</p>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white dark:bg-[#151A23] border-[#C9D1DA] dark:border-[#232A36]">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-[#2A2F3A] dark:text-[#E6EAF0]">
+                <CardTitle className="text-base flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                   <Trophy className="h-5 w-5 text-[#0A5ED7]" />
                   {t('technician.recentAchievements', 'Recent Achievements')}
                 </CardTitle>
@@ -504,13 +504,13 @@ export default function TechnicianMobilePortal() {
               <CardContent>
                 <div className="space-y-2">
                   {sampleAchievements.slice(0, 3).map((ach) => (
-                    <div key={ach.id} className="flex items-center gap-3 p-2 bg-[#E6E9ED] dark:bg-[#0E1117] rounded-lg">
+                    <div key={ach.id} className="flex items-center gap-3 p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getAchievementColor(ach.level)}`}>
                         <Award className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">{ach.name}</p>
-                        <p className="text-xs text-[#6B7280]">{ach.category} • {ach.jobsCompleted} jobs</p>
+                        <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">{ach.name}</p>
+                        <p className="text-xs text-[#64748B]">{ach.category} • {ach.jobsCompleted} jobs</p>
                       </div>
                       <Badge className={getAchievementColor(ach.level)}>{ach.level}</Badge>
                     </div>
@@ -523,7 +523,7 @@ export default function TechnicianMobilePortal() {
           <TabsContent value="jobs" className="mt-4 space-y-4 pb-20">
             {activeJobs.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-[#6B7280] dark:text-[#9BA4B0] mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-[#64748B] mb-2 flex items-center gap-2">
                   <Zap className="h-4 w-4 text-[#0A5ED7]" />
                   Active Jobs ({activeJobs.length})
                 </h3>
@@ -536,8 +536,8 @@ export default function TechnicianMobilePortal() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h4 className="font-semibold text-[#2A2F3A] dark:text-[#E6EAF0]">{job.jobNumber}</h4>
-                          <p className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">{job.serviceType}</p>
+                          <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{job.jobNumber}</h4>
+                          <p className="text-sm text-[#64748B]">{job.serviceType}</p>
                         </div>
                         <Badge className={getStatusColor('in_progress')}>In Progress</Badge>
                       </div>
@@ -622,7 +622,7 @@ export default function TechnicianMobilePortal() {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <h4 className="font-semibold text-[#2A2F3A] dark:text-[#E6EAF0]">{job.jobNumber}</h4>
-                          <p className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">{job.serviceType}</p>
+                          <p className="text-sm text-[#64748B]">{job.serviceType}</p>
                         </div>
                         <Badge className={getStatusColor('assigned')}>Assigned</Badge>
                       </div>

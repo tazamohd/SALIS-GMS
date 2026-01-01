@@ -93,10 +93,10 @@ export default function VehicleHistory() {
   const getStatusBadge = (status: string) => {
     const statusColors: { [key: string]: string } = {
       'completed': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-      'in_progress': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+      'in_progress': 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF]',
       'cancelled': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
     };
-    return statusColors[status] || 'bg-gray-100 dark:bg-gray-800';
+    return statusColors[status] || 'bg-[#64748B]/10 dark:bg-[#64748B]/20 text-[#64748B]';
   };
 
   const getStatusLabel = (status: string) => {
@@ -119,10 +119,10 @@ export default function VehicleHistory() {
       render: (row: VehicleHistoryRecord) => (
         <div data-testid={`vehicle-${row.id}`}>
           <div className="flex items-center gap-2">
-            <Car className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            <span className="font-medium">{row.vehicleMake} {row.vehicleModel}</span>
+            <Car className="w-4 h-4 text-[#0A5ED7]" />
+            <span className="font-medium text-[#0B1F3B] dark:text-white">{row.vehicleMake} {row.vehicleModel}</span>
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">{row.licensePlate}</div>
+          <div className="text-sm text-[#64748B]">{row.licensePlate}</div>
         </div>
       ),
     },
@@ -131,8 +131,8 @@ export default function VehicleHistory() {
       label: t('vehicles.serviceType', 'Service Type'),
       render: (row: VehicleHistoryRecord) => (
         <div className="flex items-center gap-2" data-testid={`service-${row.id}`}>
-          <Wrench className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span>{row.serviceType}</span>
+          <Wrench className="w-4 h-4 text-[#64748B]" />
+          <span className="text-[#0B1F3B] dark:text-white">{row.serviceType}</span>
         </div>
       ),
     },
@@ -141,8 +141,8 @@ export default function VehicleHistory() {
       label: t('common.date', 'Date'),
       render: (row: VehicleHistoryRecord) => (
         <div className="flex items-center gap-2" data-testid={`date-${row.id}`}>
-          <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span>{new Date(row.serviceDate).toLocaleDateString()}</span>
+          <Calendar className="w-4 h-4 text-[#64748B]" />
+          <span className="text-[#0B1F3B] dark:text-white">{new Date(row.serviceDate).toLocaleDateString()}</span>
         </div>
       ),
     },
@@ -150,7 +150,7 @@ export default function VehicleHistory() {
       key: "mileage",
       label: t('vehicles.mileage', 'Mileage'),
       render: (row: VehicleHistoryRecord) => (
-        <span className="font-medium" data-testid={`mileage-${row.id}`}>
+        <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`mileage-${row.id}`}>
           {row.mileage.toLocaleString()} km
         </span>
       ),
@@ -159,14 +159,14 @@ export default function VehicleHistory() {
       key: "technician",
       label: t('vehicles.technician', 'Technician'),
       render: (row: VehicleHistoryRecord) => (
-        <span data-testid={`tech-${row.id}`}>{row.technician}</span>
+        <span className="text-[#64748B]" data-testid={`tech-${row.id}`}>{row.technician}</span>
       ),
     },
     {
       key: "cost",
       label: t('vehicles.cost', 'Cost'),
       render: (row: VehicleHistoryRecord) => (
-        <span className="font-semibold" data-testid={`cost-${row.id}`}>
+        <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`cost-${row.id}`}>
           ${row.cost.toFixed(2)}
         </span>
       ),
@@ -188,9 +188,10 @@ export default function VehicleHistory() {
           size="sm"
           variant="outline"
           onClick={() => handleViewDetails(row.id)}
+          className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
           data-testid={`button-view-${row.id}`}
         >
-          <FileText className="w-4 h-4 mr-1" />
+          <FileText className="w-4 h-4 mr-1 text-[#0A5ED7]" />
           {t('common.view', 'View')}
         </Button>
       ),

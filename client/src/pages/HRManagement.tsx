@@ -161,87 +161,87 @@ function EmployeesTab({ garageId }: { garageId: string }) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active": return "bg-green-500/10 text-green-600 dark:text-green-400";
-      case "on_leave": return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400";
+      case "on_leave": return "bg-[#F97316]/10 text-[#F97316] dark:text-[#F97316]";
       case "suspended": return "bg-red-500/10 text-red-600 dark:text-red-400";
-      default: return "bg-gray-500/10 text-gray-600 dark:text-gray-400";
+      default: return "bg-[#64748B]/10 text-[#64748B]";
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 rounded-lg bg-[#0A5ED7]/10">
+                <Users className="h-5 w-5 text-[#0A5ED7]" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-total-employees">43</p>
-                <p className="text-sm text-muted-foreground">{t('hr.totalEmployees', 'Total Employees')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-employees">43</p>
+                <p className="text-sm text-[#64748B]">{t('hr.totalEmployees', 'Total Employees')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-green-500/10">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-active-employees">38</p>
-                <p className="text-sm text-muted-foreground">{t('common.active', 'Active')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-active-employees">38</p>
+                <p className="text-sm text-[#64748B]">{t('common.active', 'Active')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
-                <Clock4 className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              <div className="p-2 rounded-lg bg-[#F97316]/10">
+                <Clock4 className="h-5 w-5 text-[#F97316]" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-on-leave">3</p>
-                <p className="text-sm text-muted-foreground">{t('hr.onLeave', 'On Leave')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-on-leave">3</p>
+                <p className="text-sm text-[#64748B]">{t('hr.onLeave', 'On Leave')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/10">
-                <UserPlus className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 rounded-lg bg-[#0BB3FF]/10">
+                <UserPlus className="h-5 w-5 text-[#0BB3FF]" />
               </div>
               <div>
-                <p className="text-2xl font-bold" data-testid="text-new-hires">2</p>
-                <p className="text-sm text-muted-foreground">{t('hr.newThisMonth', 'New This Month')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-new-hires">2</p>
+                <p className="text-sm text-[#64748B]">{t('hr.newThisMonth', 'New This Month')}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <CardTitle>{t('hr.employeeDirectory', 'Employee Directory')}</CardTitle>
-              <CardDescription>{t('hr.manageAllEmployees', 'Manage all employees in your organization')}</CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('hr.employeeDirectory', 'Employee Directory')}</CardTitle>
+              <CardDescription className="text-[#64748B]">{t('hr.manageAllEmployees', 'Manage all employees in your organization')}</CardDescription>
             </div>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-employee">
+                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-employee">
                   <Plus className="h-4 w-4 mr-2" />
                   {t('hr.addEmployee', 'Add Employee')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <DialogHeader>
-                  <DialogTitle>{t('hr.addNewEmployee', 'Add New Employee')}</DialogTitle>
-                  <DialogDescription>{t('hr.enterEmployeeDetails', 'Enter the employee details to add them to the system')}</DialogDescription>
+                  <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('hr.addNewEmployee', 'Add New Employee')}</DialogTitle>
+                  <DialogDescription className="text-[#64748B]">{t('hr.enterEmployeeDetails', 'Enter the employee details to add them to the system')}</DialogDescription>
                 </DialogHeader>
                 <EmployeeForm onSuccess={() => setShowAddDialog(false)} />
               </DialogContent>
@@ -251,17 +251,17 @@ function EmployeesTab({ garageId }: { garageId: string }) {
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder={t('hr.searchEmployees', 'Search employees...')}
-                className="pl-9"
+                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 data-testid="input-search-employees"
               />
             </div>
             <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-              <SelectTrigger className="w-[180px]" data-testid="select-department-filter">
+              <SelectTrigger className="w-[180px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-department-filter">
                 <SelectValue placeholder={t('hr.allDepartments', 'All Departments')} />
               </SelectTrigger>
               <SelectContent>
@@ -273,32 +273,32 @@ function EmployeesTab({ garageId }: { garageId: string }) {
             </Select>
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>{t('hr.employee', 'Employee')}</TableHead>
-                  <TableHead>{t('hr.department', 'Department')}</TableHead>
-                  <TableHead>{t('hr.position', 'Position')}</TableHead>
-                  <TableHead>{t('common.status', 'Status')}</TableHead>
-                  <TableHead>{t('hr.hireDate', 'Hire Date')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+                <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#64748B]">{t('hr.employee', 'Employee')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('hr.department', 'Department')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('hr.position', 'Position')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
+                  <TableHead className="text-[#64748B]">{t('hr.hireDate', 'Hire Date')}</TableHead>
+                  <TableHead className="text-right text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredEmployees.map((emp) => (
-                  <TableRow key={emp.id} data-testid={`employee-row-${emp.id}`}>
+                  <TableRow key={emp.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`employee-row-${emp.id}`}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={emp.avatar || undefined} />
-                          <AvatarFallback className="text-xs">
+                          <AvatarFallback className="text-xs bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
                             {emp.firstName[0]}{emp.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{emp.firstName} {emp.lastName}</div>
-                          <div className="text-sm text-muted-foreground">{emp.employeeNumber}</div>
+                          <div className="font-medium text-[#0B1F3B] dark:text-white">{emp.firstName} {emp.lastName}</div>
+                          <div className="text-sm text-[#64748B]">{emp.employeeNumber}</div>
                         </div>
                       </div>
                     </TableCell>
@@ -377,7 +377,7 @@ function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
         <Input id="salary" type="number" placeholder="0.00" data-testid="input-salary" />
       </div>
       <div className="col-span-2">
-        <Button className="w-full" onClick={onSuccess} data-testid="button-submit-employee">
+        <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" onClick={onSuccess} data-testid="button-submit-employee">
           {t('hr.addEmployee', 'Add Employee')}
         </Button>
       </div>

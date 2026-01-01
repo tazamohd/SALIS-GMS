@@ -59,45 +59,42 @@ export default function OEMSoftwareSubscriptions() {
   });
 
   const getVendorBadge = (vendorName: string) => {
-    const vendors: { [key: string]: { bg: string; text: string; icon: string } } = {
-      BMW: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🚗' },
-      Mercedes: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '⭐' },
-      Toyota: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', icon: '🔴' },
+    const vendors: { [key: string]: { bg: string; text: string } } = {
+      BMW: { bg: 'bg-[#0A5ED7]/10', text: 'text-[#0A5ED7]' },
+      Mercedes: { bg: 'bg-[#64748B]/10', text: 'text-[#64748B]' },
+      Toyota: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400' },
     };
-    const config = vendors[vendorName] || { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', icon: '🏭' };
+    const config = vendors[vendorName] || { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400' };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-        <span>{config.icon}</span>
         {vendorName}
       </span>
     );
   };
 
   const getProductTypeBadge = (type: string) => {
-    const types: { [key: string]: { bg: string; text: string; icon: string } } = {
-      diagnostic_software: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', icon: '🔧' },
-      calibration_tool: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '⚙️' },
-      programming_module: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300', icon: '💻' },
+    const types: { [key: string]: { bg: string; text: string } } = {
+      diagnostic_software: { bg: 'bg-[#0A5ED7]/10', text: 'text-[#0A5ED7]' },
+      calibration_tool: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+      programming_module: { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400' },
     };
-    const config = types[type] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '📦' };
+    const config = types[type] || { bg: 'bg-[#64748B]/10', text: 'text-[#64748B]' };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-        <span>{config.icon}</span>
         {type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
       </span>
     );
   };
 
   const getLicenseStatusBadge = (status: string) => {
-    const statusColors: { [key: string]: { bg: string; text: string; icon: string } } = {
-      active: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '✅' },
-      expired: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', icon: '❌' },
-      suspended: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', icon: '⏸️' },
+    const statusColors: { [key: string]: { bg: string; text: string } } = {
+      active: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+      expired: { bg: 'bg-red-500/10', text: 'text-red-600 dark:text-red-400' },
+      suspended: { bg: 'bg-[#F97316]/10', text: 'text-[#F97316]' },
     };
-    const config = statusColors[status] || { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', icon: '○' };
+    const config = statusColors[status] || { bg: 'bg-[#64748B]/10', text: 'text-[#64748B]' };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-        <span>{config.icon}</span>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -106,33 +103,37 @@ export default function OEMSoftwareSubscriptions() {
   const catalogsContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.vendorCatalogs', 'Vendor Catalogs')}</h2>
-        <Button onClick={() => { catalogForm.reset(); setShowCatalogDialog(true); }} data-testid="button-add-catalog">
+        <h2 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">{t('oem.vendorCatalogs', 'Vendor Catalogs')}</h2>
+        <Button 
+          onClick={() => { catalogForm.reset(); setShowCatalogDialog(true); }} 
+          data-testid="button-add-catalog"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
+        >
           <Plus className="h-4 w-4 mr-2" />
           {t('oem.addVendor', 'Add Vendor')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('oem.vendor', 'Vendor')}</TableHead>
-                <TableHead>{t('oem.code', 'Code')}</TableHead>
-                <TableHead>{t('oem.contact', 'Contact')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('oem.vendor', 'Vendor')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.code', 'Code')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.contact', 'Contact')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {catalogs.map((catalog) => (
-                <TableRow key={catalog.id}>
+                <TableRow key={catalog.id} className="border-[#E2E8F0] dark:border-[#232A36]">
                   <TableCell>{getVendorBadge(catalog.vendorName)}</TableCell>
-                  <TableCell className="font-mono">{catalog.vendorCode}</TableCell>
-                  <TableCell>{catalog.supportEmail || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="font-mono text-[#0B1F3B] dark:text-white">{catalog.vendorCode}</TableCell>
+                  <TableCell className="text-[#64748B]">{catalog.supportEmail || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {catalog.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${catalog.isActive ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-[#64748B]/10 text-[#64748B]'}`}>
+                      {catalog.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -147,35 +148,39 @@ export default function OEMSoftwareSubscriptions() {
   const productsContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.oemProducts', 'OEM Products')}</h2>
-        <Button onClick={() => { productForm.reset(); setShowProductDialog(true); }} data-testid="button-add-product">
+        <h2 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">{t('oem.oemProducts', 'OEM Products')}</h2>
+        <Button 
+          onClick={() => { productForm.reset(); setShowProductDialog(true); }} 
+          data-testid="button-add-product"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
+        >
           <Plus className="h-4 w-4 mr-2" />
           {t('oem.addProduct', 'Add Product')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('oem.productName', 'Product Name')}</TableHead>
-                <TableHead>{t('oem.vendor', 'Vendor')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('oem.version', 'Version')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('oem.productName', 'Product Name')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.vendor', 'Vendor')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.version', 'Version')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-semibold">{product.productName}</TableCell>
-                  <TableCell>{catalogs.find(c => c.id === product.vendorCatalogId)?.vendorName || t('common.notAvailable', 'N/A')}</TableCell>
+                <TableRow key={product.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">{product.productName}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{catalogs.find(c => c.id === product.vendorCatalogId)?.vendorName || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>{getProductTypeBadge(product.softwareType || '')}</TableCell>
-                  <TableCell className="font-mono text-xs">{product.version || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="font-mono text-xs text-[#64748B]">{product.version || t('common.notAvailable', 'N/A')}</TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'}`}>
-                      {product.isActive ? `✅ ${t('common.active', 'Active')}` : `○ ${t('common.inactive', 'Inactive')}`}
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-[#64748B]/10 text-[#64748B]'}`}>
+                      {product.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </span>
                   </TableCell>
                 </TableRow>
@@ -190,30 +195,34 @@ export default function OEMSoftwareSubscriptions() {
   const licensesContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.softwareLicenses', 'Software Licenses')}</h2>
-        <Button onClick={() => { licenseForm.reset(); setShowLicenseDialog(true); }} data-testid="button-add-license">
+        <h2 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">{t('oem.softwareLicenses', 'Software Licenses')}</h2>
+        <Button 
+          onClick={() => { licenseForm.reset(); setShowLicenseDialog(true); }} 
+          data-testid="button-add-license"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
+        >
           <Plus className="h-4 w-4 mr-2" />
           {t('oem.addLicense', 'Add License')}
         </Button>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('oem.licenseKey', 'License Key')}</TableHead>
-                <TableHead>{t('oem.product', 'Product')}</TableHead>
-                <TableHead>{t('oem.expires', 'Expires')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('oem.licenseKey', 'License Key')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.product', 'Product')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.expires', 'Expires')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {licenses.map((license) => (
-                <TableRow key={license.id}>
-                  <TableCell className="font-mono text-xs">{license.licenseKey.substring(0, 16)}...</TableCell>
-                  <TableCell>{products.find(p => p.id === license.oemProductId)?.productName || t('common.notAvailable', 'N/A')}</TableCell>
-                  <TableCell>{new Date(license.endDate).toLocaleDateString()}</TableCell>
+                <TableRow key={license.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono text-xs text-[#0B1F3B] dark:text-white">{license.licenseKey.substring(0, 16)}...</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{products.find(p => p.id === license.oemProductId)?.productName || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="text-[#64748B]">{new Date(license.endDate).toLocaleDateString()}</TableCell>
                   <TableCell>{getLicenseStatusBadge(license.status || '')}</TableCell>
                 </TableRow>
               ))}
@@ -227,27 +236,27 @@ export default function OEMSoftwareSubscriptions() {
   const auditContent = (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('oem.licenseAuditLogs', 'License Audit Logs')}</h2>
+        <h2 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">{t('oem.licenseAuditLogs', 'License Audit Logs')}</h2>
       </div>
 
-      <Card className="border border-gray-200 dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('oem.license', 'License')}</TableHead>
-                <TableHead>{t('oem.event', 'Event')}</TableHead>
-                <TableHead>{t('oem.user', 'User')}</TableHead>
-                <TableHead>{t('oem.timestamp', 'Timestamp')}</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">{t('oem.license', 'License')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.event', 'Event')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.user', 'User')}</TableHead>
+                <TableHead className="text-[#64748B]">{t('oem.timestamp', 'Timestamp')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {auditLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="font-mono text-xs">{licenses.find(l => l.id === log.licenseId)?.licenseKey.substring(0, 12) || t('common.notAvailable', 'N/A')}</TableCell>
-                  <TableCell>{log.eventType}</TableCell>
-                  <TableCell>{log.userId || t('oem.system', 'System')}</TableCell>
-                  <TableCell>{log.timestamp ? new Date(log.timestamp).toLocaleString() : t('common.notAvailable', 'N/A')}</TableCell>
+                <TableRow key={log.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableCell className="font-mono text-xs text-[#0B1F3B] dark:text-white">{licenses.find(l => l.id === log.licenseId)?.licenseKey.substring(0, 12) || t('common.notAvailable', 'N/A')}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{log.eventType}</TableCell>
+                  <TableCell className="text-[#64748B]">{log.userId || t('oem.system', 'System')}</TableCell>
+                  <TableCell className="text-[#64748B]">{log.timestamp ? new Date(log.timestamp).toLocaleString() : t('common.notAvailable', 'N/A')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -294,31 +303,31 @@ export default function OEMSoftwareSubscriptions() {
       />
 
       <Dialog open={showCatalogDialog} onOpenChange={setShowCatalogDialog}>
-        <DialogContent>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('oem.addVendorCatalog', 'Add Vendor Catalog')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('oem.addVendorCatalog', 'Add Vendor Catalog')}</DialogTitle>
           </DialogHeader>
           <Form {...catalogForm}>
             <form onSubmit={catalogForm.handleSubmit((data) => createCatalogMutation.mutate(data))} className="space-y-4">
               <FormField control={catalogForm.control} name="vendorName" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('oem.vendorName', 'Vendor Name')}</FormLabel>
-                  <FormControl><Input {...field} placeholder="BMW" /></FormControl>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('oem.vendorName', 'Vendor Name')}</FormLabel>
+                  <FormControl><Input {...field} placeholder="BMW" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={catalogForm.control} name="vendorCode" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('oem.vendorCode', 'Vendor Code')}</FormLabel>
-                  <FormControl><Input {...field} placeholder="BMW-001" /></FormControl>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('oem.vendorCode', 'Vendor Code')}</FormLabel>
+                  <FormControl><Input {...field} placeholder="BMW-001" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={catalogForm.control} name="isActive" render={({ field }) => (
                 <FormItem className="flex items-center justify-between">
-                  <FormLabel>{t('common.active', 'Active')}</FormLabel>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.active', 'Active')}</FormLabel>
                   <FormControl><Switch checked={field.value ?? false} onCheckedChange={field.onChange} /></FormControl>
                 </FormItem>
               )} />
-              <Button type="submit" className="w-full" disabled={createCatalogMutation.isPending}>
+              <Button type="submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" disabled={createCatalogMutation.isPending}>
                 {createCatalogMutation.isPending ? t('oem.creating', 'Creating...') : t('oem.createVendor', 'Create Vendor')}
               </Button>
             </form>

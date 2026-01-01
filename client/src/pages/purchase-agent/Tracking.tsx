@@ -61,8 +61,8 @@ export default function PurchaseAgentTracking() {
 
   const getStatusDetails = (status: string) => {
     const config: Record<string, { label: string; icon: any; color: string }> = {
-      pending: { label: "Pending Confirmation", icon: Clock, color: "text-orange-500" },
-      ordered: { label: "Order Placed", icon: Package, color: "text-blue-500" },
+      pending: { label: "Pending Confirmation", icon: Clock, color: "text-[#F97316]" },
+      ordered: { label: "Order Placed", icon: Package, color: "text-[#0A5ED7]" },
       shipped: { label: "In Transit", icon: Truck, color: "text-purple-500" },
       received: { label: "Delivered", icon: CheckCircle, color: "text-green-500" },
     };
@@ -91,45 +91,45 @@ export default function PurchaseAgentTracking() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
             Order Tracking
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-[#64748B] mt-1">
             Track the status of all active purchase orders
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-blue-50 dark:bg-blue-900/20">
-                <Package className="h-6 w-6 text-blue-500" />
+                <Package className="h-6 w-6 text-[#0A5ED7]" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{activeOrders.length}</div>
-                <p className="text-sm text-gray-500">Active Orders</p>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{activeOrders.length}</div>
+                <p className="text-sm text-[#64748B]">Active Orders</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-orange-50 dark:bg-orange-900/20">
-                <Clock className="h-6 w-6 text-orange-500" />
+                <Clock className="h-6 w-6 text-[#F97316]" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-orange-500">
+                <div className="text-2xl font-bold text-[#F97316]">
                   {purchaseOrders.filter((o) => o.status === "pending").length}
                 </div>
-                <p className="text-sm text-gray-500">Pending</p>
+                <p className="text-sm text-[#64748B]">Pending</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-purple-50 dark:bg-purple-900/20">
@@ -139,12 +139,12 @@ export default function PurchaseAgentTracking() {
                 <div className="text-2xl font-bold text-purple-500">
                   {purchaseOrders.filter((o) => o.status === "ordered").length}
                 </div>
-                <p className="text-sm text-gray-500">In Transit</p>
+                <p className="text-sm text-[#64748B]">In Transit</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className={overdueOrders.length > 0 ? "border-red-200 dark:border-red-800" : ""}>
+        <Card className={`bg-white dark:bg-[#151A23] ${overdueOrders.length > 0 ? "border-red-200 dark:border-red-800" : "border-[#E2E8F0] dark:border-[#232A36]"}`}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-full bg-red-50 dark:bg-red-900/20">
@@ -152,7 +152,7 @@ export default function PurchaseAgentTracking() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-500">{overdueOrders.length}</div>
-                <p className="text-sm text-gray-500">Overdue</p>
+                <p className="text-sm text-[#64748B]">Overdue</p>
               </div>
             </div>
           </CardContent>
@@ -160,7 +160,7 @@ export default function PurchaseAgentTracking() {
       </div>
 
       {dueSoonOrders.length > 0 && (
-        <Card className="border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/10">
+        <Card className="bg-white dark:bg-[#151A23] border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/10">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-yellow-600" />
@@ -168,7 +168,7 @@ export default function PurchaseAgentTracking() {
                 Arriving Soon
               </CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-[#64748B]">
               {dueSoonOrders.length} order{dueSoonOrders.length !== 1 ? "s" : ""} expected within 3 days
             </CardDescription>
           </CardHeader>
@@ -179,13 +179,13 @@ export default function PurchaseAgentTracking() {
                 return (
                   <div
                     key={order.id}
-                    className="p-3 bg-white dark:bg-salis-gray-dark rounded-lg border"
+                    className="p-3 bg-white dark:bg-[#151A23] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`arriving-soon-${order.id}`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <p className="font-medium">{order.poNumber}</p>
-                        <p className="text-sm text-gray-500">{getSupplierName(order.supplierId)}</p>
+                        <p className="font-medium text-[#0B1F3B] dark:text-white">{order.poNumber}</p>
+                        <p className="text-sm text-[#64748B]">{getSupplierName(order.supplierId)}</p>
                       </div>
                       <Badge variant="secondary">
                         {days === 0 ? "Today" : `${days} day${days !== 1 ? "s" : ""}`}
@@ -200,16 +200,16 @@ export default function PurchaseAgentTracking() {
         </Card>
       )}
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex flex-col sm:flex-row gap-4 justify-between">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder="Search orders..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search"
               />
             </div>
@@ -217,9 +217,9 @@ export default function PurchaseAgentTracking() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8">Loading orders...</div>
+            <div className="text-center py-8 text-[#64748B]">Loading orders...</div>
           ) : filteredOrders.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-[#64748B]">
               No active orders to track
             </div>
           ) : (
@@ -232,25 +232,25 @@ export default function PurchaseAgentTracking() {
                 return (
                   <div
                     key={order.id}
-                    className="border rounded-lg p-4"
+                    className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`tracking-order-${order.id}`}
                   >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-full bg-gray-100 dark:bg-salis-gray ${statusDetails.color}`}>
+                        <div className={`p-3 rounded-full bg-white dark:bg-[#151A23] ${statusDetails.color}`}>
                           <StatusIcon className="h-6 w-6" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-lg">{order.poNumber}</h3>
-                          <p className="text-sm text-gray-500">
+                          <h3 className="font-semibold text-lg text-[#0B1F3B] dark:text-white">{order.poNumber}</h3>
+                          <p className="text-sm text-[#64748B]">
                             {getSupplierName(order.supplierId)}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-lg">${order.totalAmount}</p>
+                        <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">${order.totalAmount}</p>
                         {order.expectedDeliveryDate && (
-                          <p className="text-sm text-gray-500 flex items-center justify-end gap-1">
+                          <p className="text-sm text-[#64748B] flex items-center justify-end gap-1">
                             <MapPin className="h-3 w-3" />
                             Expected: {new Date(order.expectedDeliveryDate).toLocaleDateString()}
                             {daysUntil !== null && (
@@ -273,11 +273,11 @@ export default function PurchaseAgentTracking() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className={statusDetails.color}>{statusDetails.label}</span>
-                        <span className="text-gray-500">{getOrderProgress(order.status)}% Complete</span>
+                        <span className="text-[#64748B]">{getOrderProgress(order.status)}% Complete</span>
                       </div>
                       <div className="relative">
                         <Progress value={getOrderProgress(order.status)} className="h-2" />
-                        <div className="flex justify-between mt-1 text-xs text-gray-400">
+                        <div className="flex justify-between mt-1 text-xs text-[#64748B]">
                           <span>Placed</span>
                           <span>Confirmed</span>
                           <span>Shipped</span>
@@ -287,10 +287,10 @@ export default function PurchaseAgentTracking() {
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                      <Button variant="outline" size="sm" data-testid={`button-details-${order.id}`}>
+                      <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-details-${order.id}`}>
                         View Details
                       </Button>
-                      <Button variant="outline" size="sm" data-testid={`button-contact-${order.id}`}>
+                      <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-contact-${order.id}`}>
                         Contact Supplier
                       </Button>
                     </div>

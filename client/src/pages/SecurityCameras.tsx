@@ -59,7 +59,7 @@ export default function SecurityCameras() {
 
   return (
     <StandardPageLayout
-      title={t('cameras.title', '📹 Security Cameras')}
+      title={t('cameras.title', 'Security Cameras')}
       description={t('cameras.description', 'Monitor and manage security camera system')}
       icon={Camera}
       actions={[
@@ -77,75 +77,75 @@ export default function SecurityCameras() {
       ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.activeCameras', 'Active Cameras')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-active-cameras">{stats.activeCameras}</h3>
+                <p className="text-sm text-[#64748B]">{t('cameras.activeCameras', 'Active Cameras')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-active-cameras">{stats.activeCameras}</h3>
               </div>
-              <Camera className="h-12 w-12 text-blue-600" />
+              <Camera className="h-12 w-12 text-[#0A5ED7]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.recordings', 'Recordings')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-total-recordings">{stats.totalRecordings}</h3>
+                <p className="text-sm text-[#64748B]">{t('cameras.recordings', 'Recordings')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-total-recordings">{stats.totalRecordings}</h3>
               </div>
               <Video className="h-12 w-12 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.storageGB', 'Storage (GB)')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-storage-used">{stats.storageUsed.toFixed(1)}</h3>
+                <p className="text-sm text-[#64748B]">{t('cameras.storageGB', 'Storage (GB)')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-storage-used">{stats.storageUsed.toFixed(1)}</h3>
               </div>
               <Video className="h-12 w-12 text-purple-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('cameras.motionEvents', 'Motion Events')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-motion-events">{stats.motionEvents}</h3>
+                <p className="text-sm text-[#64748B]">{t('cameras.motionEvents', 'Motion Events')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-motion-events">{stats.motionEvents}</h3>
               </div>
-              <Circle className="h-12 w-12 text-red-600" />
+              <Circle className="h-12 w-12 text-[#F97316]" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('cameras.cameraFeeds', 'Camera Feeds')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('cameras.cameraFeeds', 'Camera Feeds')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingCameras ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('cameras.loadingCameras', 'Loading cameras...')}</p>
+              <p className="text-[#64748B]">{t('cameras.loadingCameras', 'Loading cameras...')}</p>
             </div>
           ) : cameras.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('cameras.noCamerasConfigured', 'No cameras configured yet. Add a camera to get started.')}</p>
+              <p className="text-[#64748B]">{t('cameras.noCamerasConfigured', 'No cameras configured yet. Add a camera to get started.')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {cameras.map((camera: any) => (
                 <div 
                   key={camera.id} 
-                  className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden cursor-pointer hover:border-blue-500"
+                  className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg overflow-hidden cursor-pointer hover:border-[#0A5ED7] transition-colors"
                   onClick={() => setSelectedCamera(camera.id)}
                   data-testid={`camera-${camera.id}`}
                 >
-                  <div className="bg-black aspect-video flex items-center justify-center relative">
+                  <div className="bg-[#0E1117] aspect-video flex items-center justify-center relative">
                     {camera.isActive ? (
                       <>
                         <Play className="h-16 w-16 text-white opacity-50" />
@@ -160,15 +160,15 @@ export default function SecurityCameras() {
                       <p className="text-white">{t('cameras.cameraOffline', 'Camera Offline')}</p>
                     )}
                   </div>
-                  <div className="p-3 bg-gray-50 dark:bg-gray-900">
+                  <div className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{camera.cameraName}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{camera.location} • {camera.cameraType}</p>
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{camera.cameraName}</h3>
+                        <p className="text-sm text-[#64748B]">{camera.location} • {camera.cameraType}</p>
                       </div>
                       <div className="flex gap-2">
-                        {camera.recordingEnabled && <Badge variant="secondary">{t('cameras.recording', 'Recording')}</Badge>}
-                        {camera.motionDetection && <Badge>{t('cameras.motion', 'Motion')}</Badge>}
+                        {camera.recordingEnabled && <Badge variant="secondary" className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]">{t('cameras.recording', 'Recording')}</Badge>}
+                        {camera.motionDetection && <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t('cameras.motion', 'Motion')}</Badge>}
                       </div>
                     </div>
                   </div>
@@ -179,33 +179,33 @@ export default function SecurityCameras() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('cameras.recentRecordings', 'Recent Recordings')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('cameras.recentRecordings', 'Recent Recordings')}</CardTitle>
         </CardHeader>
         <CardContent>
           {recordings.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-[#64748B]">
                 {selectedCamera ? t('cameras.noRecordingsForCamera', 'No recordings found for this camera.') : t('cameras.selectCameraToView', 'Select a camera to view recordings.')}
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {recordings.map((recording: any) => (
-                <div key={recording.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`recording-${recording.id}`}>
+                <div key={recording.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`recording-${recording.id}`}>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                       {recording.vehiclePlate || t('cameras.recording', 'Recording')}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {recording.recordingStart ? new Date(recording.recordingStart).toLocaleString() : ""} - 
                       {recording.recordingEnd ? new Date(recording.recordingEnd).toLocaleTimeString() : ""}
                     </p>
                   </div>
                   <div className="text-right">
-                    <Badge>{recording.eventType}</Badge>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <Badge className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white">{recording.eventType}</Badge>
+                    <p className="text-sm text-[#64748B] mt-1">
                       {recording.fileSize ? `${(recording.fileSize / 1000).toFixed(1)} MB` : t('drone.na', 'N/A')}
                     </p>
                   </div>

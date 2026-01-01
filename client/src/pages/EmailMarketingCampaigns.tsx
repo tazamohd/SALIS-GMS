@@ -84,21 +84,21 @@ export default function EmailMarketingCampaigns() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, any> = {
-      draft: "secondary",
-      scheduled: "default",
-      sending: "default",
-      sent: "default",
-      failed: "destructive",
+    const statusColors: Record<string, string> = {
+      draft: "bg-[#64748B] text-white",
+      scheduled: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      sending: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+      sent: "bg-green-600 text-white",
+      failed: "bg-[#F97316] text-white",
     };
-    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
+    return <Badge className={statusColors[status] || "bg-[#64748B] text-white"}>{status}</Badge>;
   };
 
   const metrics = [
-    { label: t('emailMarketing.totalCampaigns', 'Total Campaigns'), value: stats.totalCampaigns, icon: Mail, color: "text-blue-600" },
+    { label: t('emailMarketing.totalCampaigns', 'Total Campaigns'), value: stats.totalCampaigns, icon: Mail, color: "text-[#0A5ED7]" },
     { label: t('emailMarketing.sentThisMonth', 'Sent This Month'), value: stats.sentThisMonth, icon: Send, color: "text-green-600" },
-    { label: t('emailMarketing.avgOpenRate', 'Avg Open Rate'), value: `${stats.averageOpenRate}%`, icon: Eye, color: "text-purple-600" },
-    { label: t('emailMarketing.avgClickRate', 'Avg Click Rate'), value: `${stats.averageClickRate}%`, icon: MousePointer, color: "text-orange-600" },
+    { label: t('emailMarketing.avgOpenRate', 'Avg Open Rate'), value: `${stats.averageOpenRate}%`, icon: Eye, color: "text-[#0BB3FF]" },
+    { label: t('emailMarketing.avgClickRate', 'Avg Click Rate'), value: `${stats.averageClickRate}%`, icon: MousePointer, color: "text-[#F97316]" },
   ];
 
   return (
@@ -110,31 +110,31 @@ export default function EmailMarketingCampaigns() {
     >
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogTrigger asChild>
-          <Button data-testid="button-create-campaign" className="mb-6">
+          <Button data-testid="button-create-campaign" className="mb-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
             <Plus className="h-4 w-4 mr-2" />
             {t('emailMarketing.createCampaign', 'Create Campaign')}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('emailMarketing.createEmailCampaign', 'Create Email Campaign')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('emailMarketing.createEmailCampaign', 'Create Email Campaign')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">{t('emailMarketing.campaignName', 'Campaign Name')}</label>
-              <Input placeholder={t('emailMarketing.campaignNamePlaceholder', 'e.g., Spring Promotion')} className="mt-1" data-testid="input-campaign-name" />
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('emailMarketing.campaignName', 'Campaign Name')}</label>
+              <Input placeholder={t('emailMarketing.campaignNamePlaceholder', 'e.g., Spring Promotion')} className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-campaign-name" />
             </div>
             <div>
-              <label className="text-sm font-medium">{t('emailMarketing.subjectLine', 'Subject Line')}</label>
-              <Input placeholder={t('emailMarketing.subjectPlaceholder', 'e.g., Get 20% Off All Services')} className="mt-1" data-testid="input-subject" />
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('emailMarketing.subjectLine', 'Subject Line')}</label>
+              <Input placeholder={t('emailMarketing.subjectPlaceholder', 'e.g., Get 20% Off All Services')} className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-subject" />
             </div>
             <div>
-              <label className="text-sm font-medium">{t('emailMarketing.targetAudience', 'Target Audience')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('emailMarketing.targetAudience', 'Target Audience')}</label>
               <Select>
-                <SelectTrigger className="mt-1" data-testid="select-audience">
+                <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-audience">
                   <SelectValue placeholder={t('emailMarketing.selectAudience', 'Select audience')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="all">{t('emailMarketing.allCustomers', 'All Customers')}</SelectItem>
                   <SelectItem value="new_customers">{t('emailMarketing.newCustomers', 'New Customers')}</SelectItem>
                   <SelectItem value="inactive">{t('emailMarketing.inactiveCustomers', 'Inactive Customers')}</SelectItem>
@@ -143,14 +143,14 @@ export default function EmailMarketingCampaigns() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">{t('emailMarketing.message', 'Message')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('emailMarketing.message', 'Message')}</label>
               <Textarea
                 placeholder={t('emailMarketing.messagePlaceholder', 'Write your email content...')}
-                className="mt-1 h-32"
+                className="mt-1 h-32 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="textarea-message"
               />
             </div>
-            <Button className="w-full" onClick={() => {
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white" onClick={() => {
               createCampaign.mutate({
                 name: "New Campaign",
                 subject: "Test Subject",
@@ -163,45 +163,45 @@ export default function EmailMarketingCampaigns() {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('emailMarketing.campaigns', 'Campaigns')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('emailMarketing.campaigns', 'Campaigns')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {mockCampaigns.map((campaign) => (
               <div
                 key={campaign.id}
-                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
                 data-testid={`campaign-${campaign.id}`}
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{campaign.name}</h3>
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{campaign.name}</h3>
                     {getStatusBadge(campaign.status)}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{campaign.subject}</p>
+                  <p className="text-sm text-[#64748B]">{campaign.subject}</p>
                   {campaign.status === "sent" && (
-                    <div className="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex gap-4 mt-2 text-sm text-[#64748B]">
                       <span>{t('emailMarketing.sent', 'Sent')}: {campaign.emailsSent}</span>
                       <span>{t('emailMarketing.opened', 'Opened')}: {campaign.emailsOpened} ({((campaign.emailsOpened! / campaign.emailsSent!) * 100).toFixed(1)}%)</span>
                       <span>{t('emailMarketing.clicks', 'Clicks')}: {campaign.clickThroughs}</span>
                     </div>
                   )}
                   {campaign.status === "scheduled" && (
-                    <p className="text-sm text-blue-600 mt-1">
+                    <p className="text-sm text-[#0A5ED7] mt-1">
                       {t('emailMarketing.scheduledFor', 'Scheduled for')}: {new Date(campaign.scheduledAt!).toLocaleString()}
                     </p>
                   )}
                 </div>
                 <div className="flex gap-2">
                   {campaign.status === "draft" && (
-                    <Button size="sm" onClick={() => sendCampaign.mutate(campaign.id)} data-testid={`button-send-${campaign.id}`}>
+                    <Button size="sm" onClick={() => sendCampaign.mutate(campaign.id)} data-testid={`button-send-${campaign.id}`} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
                       <Send className="h-4 w-4 mr-2" />
                       {t('emailMarketing.send', 'Send')}
                     </Button>
                   )}
-                  <Button size="sm" variant="outline" data-testid={`button-view-${campaign.id}`}>
+                  <Button size="sm" variant="outline" data-testid={`button-view-${campaign.id}`} className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
                     {t('emailMarketing.viewStats', 'View Stats')}
                   </Button>
                 </div>

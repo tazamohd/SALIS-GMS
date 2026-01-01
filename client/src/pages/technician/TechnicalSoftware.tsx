@@ -222,18 +222,18 @@ export default function TechnicalSoftware() {
       case "active":
         return <Badge className="bg-green-600">Active</Badge>;
       case "subscription":
-        return <Badge className="bg-blue-600">Subscription</Badge>;
+        return <Badge className="bg-[#0A5ED7]">Subscription</Badge>;
       case "trial":
-        return <Badge className="bg-yellow-600">Trial</Badge>;
+        return <Badge className="bg-[#F97316]">Trial</Badge>;
     }
   };
 
   const getCategoryIcon = (category: TechnicalSoftware["category"]) => {
     switch (category) {
       case "diagnostic":
-        return <Cpu className="h-5 w-5 text-blue-500" />;
+        return <Cpu className="h-5 w-5 text-[#0A5ED7]" />;
       case "wiring":
-        return <Cable className="h-5 w-5 text-orange-500" />;
+        return <Cable className="h-5 w-5 text-[#F97316]" />;
       case "epc":
         return <Database className="h-5 w-5 text-green-500" />;
       case "programming":
@@ -244,14 +244,14 @@ export default function TechnicalSoftware() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Technical Software Hub</h1>
-        <p className="text-gray-500 dark:text-gray-400">Access diagnostic tools, wiring diagrams, EPC, and more</p>
+        <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">Technical Software Hub</h1>
+        <p className="text-[#64748B]">Access diagnostic tools, wiring diagrams, EPC, and more</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+        <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -262,7 +262,7 @@ export default function TechnicalSoftware() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -273,7 +273,7 @@ export default function TechnicalSoftware() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -284,7 +284,7 @@ export default function TechnicalSoftware() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+        <Card className="bg-gradient-to-br from-[#F97316] to-orange-600 text-white border-0">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -299,19 +299,19 @@ export default function TechnicalSoftware() {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search software, tools, or brands..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-software"
           />
         </div>
       </div>
 
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-        <TabsList className="flex flex-wrap h-auto gap-2">
+        <TabsList className="flex flex-wrap h-auto gap-2 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-2">
           {categories.map((cat) => (
             <TabsTrigger 
               key={cat.value} 
@@ -330,7 +330,7 @@ export default function TechnicalSoftware() {
             {filteredSoftware.map((software) => (
               <Card 
                 key={software.id}
-                className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray hover:border-blue-500 transition-colors"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition-colors"
                 data-testid={`card-software-${software.id}`}
               >
                 <CardHeader className="pb-2">
@@ -338,26 +338,26 @@ export default function TechnicalSoftware() {
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{software.icon}</span>
                       <div>
-                        <CardTitle className="text-lg text-gray-900 dark:text-white">{software.shortName}</CardTitle>
-                        <CardDescription className="text-xs">{software.name}</CardDescription>
+                        <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{software.shortName}</CardTitle>
+                        <CardDescription className="text-xs text-[#64748B]">{software.name}</CardDescription>
                       </div>
                     </div>
                     {getStatusBadge(software.status)}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{software.description}</p>
+                  <p className="text-sm text-[#64748B] line-clamp-2">{software.description}</p>
                   
                   <div className="flex flex-wrap gap-1">
                     {software.brands.slice(0, 3).map((brand) => (
-                      <Badge key={brand} variant="outline" className="text-xs">{brand}</Badge>
+                      <Badge key={brand} variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">{brand}</Badge>
                     ))}
                     {software.brands.length > 3 && (
-                      <Badge variant="outline" className="text-xs">+{software.brands.length - 3}</Badge>
+                      <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">+{software.brands.length - 3}</Badge>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center justify-between text-xs text-[#64748B]">
                     <span className="flex items-center gap-1">
                       <Star className="h-3 w-3 text-yellow-500" />
                       {software.rating}
@@ -370,11 +370,11 @@ export default function TechnicalSoftware() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button className="flex-1" size="sm" data-testid={`button-launch-${software.id}`}>
+                    <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" size="sm" data-testid={`button-launch-${software.id}`}>
                       <ExternalLink className="h-4 w-4 mr-2" />
                       Launch
                     </Button>
-                    <Button variant="outline" size="sm" data-testid={`button-info-${software.id}`}>
+                    <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-info-${software.id}`}>
                       <Info className="h-4 w-4" />
                     </Button>
                   </div>
@@ -385,9 +385,9 @@ export default function TechnicalSoftware() {
         </TabsContent>
       </Tabs>
 
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
             <Zap className="h-5 w-5 text-yellow-500" />
             Quick Launch - Most Used
           </CardTitle>
@@ -398,7 +398,7 @@ export default function TechnicalSoftware() {
               <Button
                 key={sw.id}
                 variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
+                className="h-auto py-4 flex flex-col items-center gap-2 border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`button-quick-launch-${sw.id}`}
               >
                 <span className="text-2xl">{sw.icon}</span>
@@ -409,36 +409,36 @@ export default function TechnicalSoftware() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <HardDrive className="h-5 w-5 text-gray-500" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <HardDrive className="h-5 w-5 text-[#64748B]" />
             System Requirements
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3 text-sm">
-            <div className="p-4 rounded-lg bg-gray-50 dark:bg-salis-gray">
-              <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Hardware</h4>
-              <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+            <div className="p-4 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <h4 className="font-medium mb-2 text-[#0B1F3B] dark:text-white">Hardware</h4>
+              <ul className="space-y-1 text-[#64748B]">
                 <li>• Intel i5 or higher</li>
                 <li>• 16GB RAM minimum</li>
                 <li>• 500GB SSD storage</li>
                 <li>• USB 3.0 ports</li>
               </ul>
             </div>
-            <div className="p-4 rounded-lg bg-gray-50 dark:bg-salis-gray">
-              <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Connectivity</h4>
-              <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+            <div className="p-4 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <h4 className="font-medium mb-2 text-[#0B1F3B] dark:text-white">Connectivity</h4>
+              <ul className="space-y-1 text-[#64748B]">
                 <li>• Stable internet connection</li>
                 <li>• VCI/PassThru device</li>
                 <li>• J2534 compatible interface</li>
                 <li>• OBD-II diagnostic cable</li>
               </ul>
             </div>
-            <div className="p-4 rounded-lg bg-gray-50 dark:bg-salis-gray">
-              <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Software</h4>
-              <ul className="space-y-1 text-gray-600 dark:text-gray-400">
+            <div className="p-4 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <h4 className="font-medium mb-2 text-[#0B1F3B] dark:text-white">Software</h4>
+              <ul className="space-y-1 text-[#64748B]">
                 <li>• Windows 10/11 64-bit</li>
                 <li>• .NET Framework 4.8</li>
                 <li>• Java Runtime 8+</li>

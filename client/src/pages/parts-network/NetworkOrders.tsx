@@ -130,13 +130,13 @@ export default function NetworkOrders() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "bg-gray-500/20 text-gray-400";
-      case "confirmed": return "bg-blue-500/20 text-blue-400";
-      case "processing": return "bg-yellow-500/20 text-yellow-400";
-      case "shipped": return "bg-purple-500/20 text-purple-400";
-      case "delivered": return "bg-green-500/20 text-green-400";
-      case "cancelled": return "bg-red-500/20 text-red-400";
-      default: return "bg-gray-500/20 text-gray-400";
+      case "pending": return "bg-[#64748B]/20 text-[#64748B]";
+      case "confirmed": return "bg-[#0A5ED7]/20 text-[#0A5ED7]";
+      case "processing": return "bg-[#F97316]/20 text-[#F97316]";
+      case "shipped": return "bg-purple-500/20 text-purple-500";
+      case "delivered": return "bg-green-500/20 text-green-500";
+      case "cancelled": return "bg-red-500/20 text-red-500";
+      default: return "bg-[#64748B]/20 text-[#64748B]";
     }
   };
 
@@ -154,11 +154,11 @@ export default function NetworkOrders() {
 
   const getPaymentColor = (status: string) => {
     switch (status) {
-      case "paid": return "text-green-400";
-      case "pending": return "text-yellow-400";
-      case "partial": return "text-orange-400";
-      case "refunded": return "text-red-400";
-      default: return "text-gray-400";
+      case "paid": return "text-green-500";
+      case "pending": return "text-[#F97316]";
+      case "partial": return "text-[#F97316]";
+      case "refunded": return "text-red-500";
+      default: return "text-[#64748B]";
     }
   };
 
@@ -170,17 +170,17 @@ export default function NetworkOrders() {
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
           <Input
             placeholder="Search by order number, part, or seller..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800 border-gray-700"
+            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40 bg-gray-800 border-gray-700" data-testid="select-status-filter">
+          <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -197,36 +197,36 @@ export default function NetworkOrders() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-purple-900/20 border-purple-700/30">
+        <Card className="bg-purple-500/10 border-purple-500/30 dark:bg-purple-500/10 dark:border-purple-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-purple-400">
+            <p className="text-3xl font-bold text-purple-500">
               {displayOrders.filter(o => o.status === "shipped").length}
             </p>
-            <p className="text-sm text-gray-400">In Transit</p>
+            <p className="text-sm text-[#64748B]">In Transit</p>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-900/20 border-yellow-700/30">
+        <Card className="bg-[#F97316]/10 border-[#F97316]/30 dark:bg-[#F97316]/10 dark:border-[#F97316]/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-yellow-400">
+            <p className="text-3xl font-bold text-[#F97316]">
               {displayOrders.filter(o => o.status === "processing").length}
             </p>
-            <p className="text-sm text-gray-400">Processing</p>
+            <p className="text-sm text-[#64748B]">Processing</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-900/20 border-green-700/30">
+        <Card className="bg-green-500/10 border-green-500/30 dark:bg-green-500/10 dark:border-green-500/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-green-400">
+            <p className="text-3xl font-bold text-green-500">
               {displayOrders.filter(o => o.status === "delivered").length}
             </p>
-            <p className="text-sm text-gray-400">Delivered</p>
+            <p className="text-sm text-[#64748B]">Delivered</p>
           </CardContent>
         </Card>
-        <Card className="bg-blue-900/20 border-blue-700/30">
+        <Card className="bg-[#0A5ED7]/10 border-[#0A5ED7]/30 dark:bg-[#0A5ED7]/10 dark:border-[#0A5ED7]/30">
           <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-blue-400">
+            <p className="text-3xl font-bold text-[#0A5ED7]">
               {displayOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount), 0).toLocaleString()} SAR
             </p>
-            <p className="text-sm text-gray-400">Total Value</p>
+            <p className="text-sm text-[#64748B]">Total Value</p>
           </CardContent>
         </Card>
       </div>
@@ -236,7 +236,7 @@ export default function NetworkOrders() {
         {filteredOrders.map((order) => (
           <Card 
             key={order.id} 
-            className="bg-gray-800 border-gray-700 hover:border-gray-600 transition-colors"
+            className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors"
             data-testid={`order-card-${order.id}`}
           >
             <CardContent className="p-4">
@@ -245,22 +245,22 @@ export default function NetworkOrders() {
                 <div className="flex items-start gap-4 flex-1">
                   <div className={`p-3 rounded-lg ${
                     order.status === "shipped" ? "bg-purple-500/20" : 
-                    order.status === "delivered" ? "bg-green-500/20" : "bg-gray-700"
+                    order.status === "delivered" ? "bg-green-500/20" : "bg-[#F8FAFC] dark:bg-[#0E1117]"
                   }`}>
                     {getStatusIcon(order.status)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold">{order.partName}</h3>
+                      <h3 className="font-bold text-[#0B1F3B] dark:text-white">{order.partName}</h3>
                       <Badge className={getStatusColor(order.status)}>
                         {order.status}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {order.orderNumber}
                       {order.partNumber && ` • ${order.partNumber}`}
                     </p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-4 mt-2 text-sm text-[#64748B]">
                       <span className="flex items-center gap-1">
                         <Building2 className="h-4 w-4" />
                         {order.sellerName}
@@ -276,16 +276,16 @@ export default function NetworkOrders() {
                 {/* Delivery Info */}
                 <div className="flex flex-col items-start lg:items-center gap-1 min-w-40">
                   <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm capitalize">{order.deliveryMethod}</span>
+                    <Truck className="h-4 w-4 text-[#64748B]" />
+                    <span className="text-sm capitalize text-[#0B1F3B] dark:text-white">{order.deliveryMethod}</span>
                   </div>
                   {order.status === "shipped" && order.expectedDeliveryDate && (
-                    <p className="text-sm text-blue-400">
+                    <p className="text-sm text-[#0A5ED7]">
                       Expected: {format(new Date(order.expectedDeliveryDate), "MMM d")}
                     </p>
                   )}
                   {order.status === "delivered" && order.actualDeliveryDate && (
-                    <p className="text-sm text-green-400">
+                    <p className="text-sm text-green-500">
                       Delivered: {format(new Date(order.actualDeliveryDate), "MMM d")}
                     </p>
                   )}
@@ -294,7 +294,7 @@ export default function NetworkOrders() {
                       href={order.trackingUrl || "#"} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-sm text-blue-400 hover:underline"
+                      className="flex items-center gap-1 text-sm text-[#0A5ED7] hover:underline"
                     >
                       Track: {order.trackingNumber}
                       <ExternalLink className="h-3 w-3" />
@@ -304,10 +304,10 @@ export default function NetworkOrders() {
 
                 {/* Price & Payment */}
                 <div className="flex flex-col items-end gap-1 min-w-32">
-                  <p className="text-xl font-bold">
-                    {order.totalAmount} <span className="text-sm text-gray-400">{order.currency}</span>
+                  <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">
+                    {order.totalAmount} <span className="text-sm text-[#64748B]">{order.currency}</span>
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-[#64748B]">
                     {order.quantity} x {order.unitPrice}
                   </p>
                   <p className={`text-sm ${getPaymentColor(order.paymentStatus)}`}>
@@ -317,11 +317,11 @@ export default function NetworkOrders() {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-2">
-                  <Button variant="outline" size="sm" className="border-gray-600">
+                  <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]">
                     View Details
                   </Button>
                   {order.status === "delivered" && (
-                    <Button variant="outline" size="sm" className="border-gray-600">
+                    <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]">
                       Leave Review
                     </Button>
                   )}
@@ -332,11 +332,11 @@ export default function NetworkOrders() {
         ))}
 
         {filteredOrders.length === 0 && (
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
-              <Package className="h-12 w-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="font-medium text-lg mb-2">No Orders Found</h3>
-              <p className="text-gray-400">
+              <Package className="h-12 w-12 mx-auto text-[#64748B] mb-4" />
+              <h3 className="font-medium text-lg mb-2 text-[#0B1F3B] dark:text-white">No Orders Found</h3>
+              <p className="text-[#64748B]">
                 Your orders will appear here once you place them
               </p>
             </CardContent>

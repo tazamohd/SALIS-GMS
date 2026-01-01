@@ -198,32 +198,32 @@ export default function BankAccountManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="grid grid-cols-3 gap-4">
-          <Card data-testid="card-total-balance">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-balance">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.totalBalance', 'Total Balance')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('bankAccounts.totalBalance', 'Total Balance')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">SAR {totalBalance.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalBalance.toLocaleString()}</div>
             </CardContent>
           </Card>
-          <Card data-testid="card-active-accounts">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-active-accounts">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.activeAccounts', 'Active Accounts')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('bankAccounts.activeAccounts', 'Active Accounts')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{activeAccounts}</div>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{activeAccounts}</div>
             </CardContent>
           </Card>
-          <Card data-testid="card-total-accounts">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-accounts">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">{t('bankAccounts.totalAccounts', 'Total Accounts')}</CardTitle>
+              <CardTitle className="text-sm font-medium text-[#64748B]">{t('bankAccounts.totalAccounts', 'Total Accounts')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{bankAccounts.length}</div>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{bankAccounts.length}</div>
             </CardContent>
           </Card>
         </div>
-        <Button onClick={() => setIsAccountDialogOpen(true)} data-testid="button-add-account">
+        <Button onClick={() => setIsAccountDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-account">
           <Plus className="h-4 w-4 mr-2" />
           {t('bankAccounts.addBankAccount', 'Add Bank Account')}
         </Button>
@@ -231,28 +231,28 @@ export default function BankAccountManagement() {
 
       <div className="grid gap-4">
         {accountsLoading ? (
-          <Card>
-            <CardContent className="py-8 text-center">{t('common.loading', 'Loading...')}</CardContent>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardContent className="py-8 text-center text-[#64748B]">{t('common.loading', 'Loading...')}</CardContent>
           </Card>
         ) : bankAccounts.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-gray-500">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardContent className="py-8 text-center text-[#64748B]">
               {t('bankAccounts.noAccountsConfigured', 'No bank accounts configured. Add your first account to get started.')}
             </CardContent>
           </Card>
         ) : (
           bankAccounts.map((account) => (
-            <Card key={account.id} data-testid={`card-account-${account.id}`}>
+            <Card key={account.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-account-${account.id}`}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                       <Building2 className="h-5 w-5" />
                       {account.accountName}
                     </CardTitle>
-                    <CardDescription>{account.bankName} - {account.accountNumber}</CardDescription>
+                    <CardDescription className="text-[#64748B]">{account.bankName} - {account.accountNumber}</CardDescription>
                   </div>
-                  <Badge variant={account.isActive ? "default" : "secondary"}>
+                  <Badge className={account.isActive ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"}>
                     {account.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
@@ -260,31 +260,32 @@ export default function BankAccountManagement() {
               <CardContent>
                 <div className="grid grid-cols-4 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">{t('bankAccounts.accountType', 'Account Type')}</p>
-                    <p className="font-medium capitalize">{account.accountType}</p>
+                    <p className="text-sm text-[#64748B]">{t('bankAccounts.accountType', 'Account Type')}</p>
+                    <p className="font-medium capitalize text-[#0B1F3B] dark:text-white">{account.accountType}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">{t('bankAccounts.currency', 'Currency')}</p>
-                    <p className="font-medium">{account.currency}</p>
+                    <p className="text-sm text-[#64748B]">{t('bankAccounts.currency', 'Currency')}</p>
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{account.currency}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">{t('bankAccounts.openingBalance', 'Opening Balance')}</p>
-                    <p className="font-medium">{account.currency} {parseFloat(account.openingBalance).toLocaleString()}</p>
+                    <p className="text-sm text-[#64748B]">{t('bankAccounts.openingBalance', 'Opening Balance')}</p>
+                    <p className="font-medium text-[#0B1F3B] dark:text-white">{account.currency} {parseFloat(account.openingBalance).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
-                    <p className="font-medium text-lg">{account.currency} {parseFloat(account.currentBalance).toLocaleString()}</p>
+                    <p className="text-sm text-[#64748B]">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
+                    <p className="font-medium text-lg text-[#0B1F3B] dark:text-white">{account.currency} {parseFloat(account.currentBalance).toLocaleString()}</p>
                   </div>
                 </div>
                 {account.iban && (
                   <div className="mt-4">
-                    <p className="text-sm text-gray-500">{t('bankAccounts.iban', 'IBAN')}: {account.iban}</p>
+                    <p className="text-sm text-[#64748B]">{t('bankAccounts.iban', 'IBAN')}: {account.iban}</p>
                   </div>
                 )}
                 <div className="flex gap-2 mt-4">
                   <Button
                     variant="outline"
                     size="sm"
+                    className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                     onClick={() => {
                       setSelectedAccountId(account.id);
                       transactionForm.setValue("bankAccountId", account.id);
@@ -298,6 +299,7 @@ export default function BankAccountManagement() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                     onClick={() => setSelectedAccountId(account.id)}
                     data-testid={`button-view-transactions-${account.id}`}
                   >
@@ -306,6 +308,7 @@ export default function BankAccountManagement() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                     onClick={() => {
                       reconcileForm.setValue("bankAccountId", account.id);
                       setIsReconcileDialogOpen(true);
@@ -329,10 +332,10 @@ export default function BankAccountManagement() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
-            <SelectTrigger className="w-64" data-testid="select-account-filter">
+            <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-account-filter">
               <SelectValue placeholder={t('bankAccounts.selectAccountToView', 'Select account to view transactions')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               {bankAccounts.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
                   {account.accountName} - {account.bankName}
@@ -344,6 +347,7 @@ export default function BankAccountManagement() {
         <Button 
           onClick={() => setIsTransactionDialogOpen(true)}
           disabled={!selectedAccountId}
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90 disabled:opacity-50"
           data-testid="button-new-transaction"
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -352,40 +356,40 @@ export default function BankAccountManagement() {
       </div>
 
       {!selectedAccountId ? (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardContent className="py-8 text-center text-[#64748B]">
             {t('bankAccounts.selectAccountPrompt', 'Select a bank account to view transactions')}
           </CardContent>
         </Card>
       ) : transactionsLoading ? (
-        <Card>
-          <CardContent className="py-8 text-center">{t('common.loading', 'Loading...')}</CardContent>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardContent className="py-8 text-center text-[#64748B]">{t('common.loading', 'Loading...')}</CardContent>
         </Card>
       ) : transactions.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-500">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardContent className="py-8 text-center text-[#64748B]">
             {t('bankAccounts.noTransactionsFound', 'No transactions found for this account')}
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('common.date', 'Date')}</TableHead>
-                <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead>{t('bankAccounts.reference', 'Reference')}</TableHead>
-                <TableHead className="text-right">{t('common.amount', 'Amount')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.reference', 'Reference')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {transactions.map((tx) => (
-                <TableRow key={tx.id} data-testid={`row-transaction-${tx.id}`}>
-                  <TableCell>{format(new Date(tx.transactionDate), "dd/MM/yyyy")}</TableCell>
+                <TableRow key={tx.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-transaction-${tx.id}`}>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(tx.transactionDate), "dd/MM/yyyy")}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
                       {tx.transactionType === "deposit" ? (
                         <ArrowDownLeft className="h-4 w-4 text-green-500" />
                       ) : tx.transactionType === "withdrawal" ? (
@@ -396,24 +400,24 @@ export default function BankAccountManagement() {
                       <span className="capitalize">{tx.transactionType}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{tx.description}</TableCell>
-                  <TableCell>{tx.referenceNumber || "-"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">{tx.description}</TableCell>
+                  <TableCell className="text-[#64748B]">{tx.referenceNumber || "-"}</TableCell>
                   <TableCell className={`text-right font-medium ${
                     tx.transactionType === "deposit" || tx.transactionType === "interest" 
-                      ? "text-green-600" 
-                      : "text-red-600"
+                      ? "text-green-600 dark:text-green-400" 
+                      : "text-red-600 dark:text-red-400"
                   }`}>
                     {tx.transactionType === "deposit" || tx.transactionType === "interest" ? "+" : "-"}
                     SAR {parseFloat(tx.amount).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     {tx.reconciled ? (
-                      <Badge variant="default" className="bg-green-100 text-green-800">
+                      <Badge className="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t('bankAccounts.reconciled', 'Reconciled')}
                       </Badge>
                     ) : (
-                      <Badge variant="secondary">
+                      <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border border-[#E2E8F0] dark:border-[#232A36]">
                         <Clock className="h-3 w-3 mr-1" />
                         {t('common.pending', 'Pending')}
                       </Badge>
@@ -430,27 +434,28 @@ export default function BankAccountManagement() {
 
   const reconciliationTab = (
     <div className="space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('bankAccounts.bankReconciliation', 'Bank Reconciliation')}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.bankReconciliation', 'Bank Reconciliation')}</CardTitle>
+          <CardDescription className="text-[#64748B]">
             {t('bankAccounts.reconciliationDescription', 'Match your bank statements with recorded transactions to ensure accuracy')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             {bankAccounts.map((account) => (
-              <div key={account.id} className="flex justify-between items-center p-4 border rounded-lg" data-testid={`reconcile-row-${account.id}`}>
+              <div key={account.id} className="flex justify-between items-center p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`reconcile-row-${account.id}`}>
                 <div>
-                  <p className="font-medium">{account.accountName}</p>
-                  <p className="text-sm text-gray-500">{account.bankName}</p>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{account.accountName}</p>
+                  <p className="text-sm text-[#64748B]">{account.bankName}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">SAR {parseFloat(account.currentBalance).toLocaleString()}</p>
-                  <p className="text-sm text-gray-500">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {parseFloat(account.currentBalance).toLocaleString()}</p>
+                  <p className="text-sm text-[#64748B]">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
                 </div>
                 <Button
                   variant="outline"
+                  className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-white dark:hover:bg-[#151A23]"
                   onClick={() => {
                     reconcileForm.setValue("bankAccountId", account.id);
                     setIsReconcileDialogOpen(true);
@@ -469,7 +474,7 @@ export default function BankAccountManagement() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('bankAccounts.title', 'Bank Account Management')}
         description={t('bankAccounts.description', 'إدارة الحسابات البنكية - Manage bank accounts, transactions, and reconciliation')}
@@ -482,10 +487,10 @@ export default function BankAccountManagement() {
       />
 
       <Dialog open={isAccountDialogOpen} onOpenChange={setIsAccountDialogOpen}>
-        <DialogContent className="max-w-2xl" data-testid="modal-bank-account">
+        <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-bank-account">
           <DialogHeader>
-            <DialogTitle>{editingAccountId ? t('bankAccounts.editBankAccount', 'Edit Bank Account') : t('bankAccounts.addBankAccount', 'Add Bank Account')}</DialogTitle>
-            <DialogDescription>{t('bankAccounts.configureAccountDetails', 'Configure bank account details')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{editingAccountId ? t('bankAccounts.editBankAccount', 'Edit Bank Account') : t('bankAccounts.addBankAccount', 'Add Bank Account')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('bankAccounts.configureAccountDetails', 'Configure bank account details')}</DialogDescription>
           </DialogHeader>
           <Form {...accountForm}>
             <form onSubmit={accountForm.handleSubmit((data) => accountMutation.mutate(data))} className="space-y-4">
@@ -495,9 +500,9 @@ export default function BankAccountManagement() {
                   name="accountName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.accountName', 'Account Name')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.accountName', 'Account Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('bankAccounts.accountNamePlaceholder', 'Main Business Account')} data-testid="input-account-name" />
+                        <Input {...field} placeholder={t('bankAccounts.accountNamePlaceholder', 'Main Business Account')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-account-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -508,9 +513,9 @@ export default function BankAccountManagement() {
                   name="bankName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.bankName', 'Bank Name')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.bankName', 'Bank Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('bankAccounts.bankNamePlaceholder', 'Al Rajhi Bank')} data-testid="input-bank-name" />
+                        <Input {...field} placeholder={t('bankAccounts.bankNamePlaceholder', 'Al Rajhi Bank')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-bank-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -521,9 +526,9 @@ export default function BankAccountManagement() {
                   name="accountNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.accountNumber', 'Account Number')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.accountNumber', 'Account Number')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="1234567890" data-testid="input-account-number" />
+                        <Input {...field} placeholder="1234567890" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-account-number" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -534,9 +539,9 @@ export default function BankAccountManagement() {
                   name="iban"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.iban', 'IBAN')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.iban', 'IBAN')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="SA..." data-testid="input-iban" />
+                        <Input {...field} placeholder="SA..." className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-iban" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -547,14 +552,14 @@ export default function BankAccountManagement() {
                   name="accountType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.accountType', 'Account Type')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.accountType', 'Account Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-account-type">
-                            <SelectValue placeholder={t('bankAccounts.selectType', 'Select type')} />
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-account-type">
+                            <SelectValue placeholder={t('bankAccounts.selectAccountType', 'Select type')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="checking">{t('bankAccounts.checking', 'Checking')}</SelectItem>
                           <SelectItem value="savings">{t('bankAccounts.savings', 'Savings')}</SelectItem>
                           <SelectItem value="business">{t('bankAccounts.business', 'Business')}</SelectItem>
@@ -570,17 +575,17 @@ export default function BankAccountManagement() {
                   name="currency"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.currency', 'Currency')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.currency', 'Currency')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger data-testid="select-currency">
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-currency">
                             <SelectValue placeholder={t('bankAccounts.selectCurrency', 'Select currency')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="SAR">{t('bankAccounts.sarCurrency', 'SAR - Saudi Riyal')}</SelectItem>
-                          <SelectItem value="USD">{t('bankAccounts.usdCurrency', 'USD - US Dollar')}</SelectItem>
-                          <SelectItem value="EUR">{t('bankAccounts.eurCurrency', 'EUR - Euro')}</SelectItem>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="SAR">SAR</SelectItem>
+                          <SelectItem value="USD">USD</SelectItem>
+                          <SelectItem value="EUR">EUR</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -592,34 +597,34 @@ export default function BankAccountManagement() {
                   name="openingBalance"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('bankAccounts.openingBalance', 'Opening Balance')}</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.openingBalance', 'Opening Balance')}</FormLabel>
                       <FormControl>
-                        <Input {...field} type="number" placeholder="0" data-testid="input-opening-balance" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={accountForm.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} placeholder={t('bankAccounts.notesPlaceholder', 'Additional notes...')} data-testid="input-notes" />
+                        <Input {...field} type="number" placeholder="0" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-opening-balance" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+              <FormField
+                control={accountForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder={t('bankAccounts.notesPlaceholder', 'Additional notes...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-notes" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsAccountDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsAccountDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-save-account">
-                  {editingAccountId ? t('common.update', 'Update') : t('common.save', 'Save')}
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-account">
+                  {editingAccountId ? t('common.save', 'Save') : t('bankAccounts.addAccount', 'Add Account')}
                 </Button>
               </DialogFooter>
             </form>
@@ -628,10 +633,10 @@ export default function BankAccountManagement() {
       </Dialog>
 
       <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
-        <DialogContent className="max-w-lg" data-testid="modal-transaction">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-transaction">
           <DialogHeader>
-            <DialogTitle>{t('bankAccounts.recordTransaction', 'Record Transaction')}</DialogTitle>
-            <DialogDescription>{t('bankAccounts.recordTransactionDescription', 'Add a new bank transaction')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.recordTransaction', 'Record Transaction')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('bankAccounts.recordNewTransaction', 'Record a new bank transaction')}</DialogDescription>
           </DialogHeader>
           <Form {...transactionForm}>
             <form onSubmit={transactionForm.handleSubmit((data) => transactionMutation.mutate(data))} className="space-y-4">
@@ -640,14 +645,14 @@ export default function BankAccountManagement() {
                 name="transactionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('bankAccounts.transactionType', 'Transaction Type')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-transaction-type">
-                          <SelectValue placeholder={t('bankAccounts.selectTransactionType', 'Select type')} />
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-transaction-type">
+                          <SelectValue placeholder={t('bankAccounts.selectType', 'Select type')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                         <SelectItem value="deposit">{t('bankAccounts.deposit', 'Deposit')}</SelectItem>
                         <SelectItem value="withdrawal">{t('bankAccounts.withdrawal', 'Withdrawal')}</SelectItem>
                         <SelectItem value="transfer">{t('bankAccounts.transfer', 'Transfer')}</SelectItem>
@@ -659,40 +664,42 @@ export default function BankAccountManagement() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={transactionForm.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.amount', 'Amount')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" placeholder="0.00" data-testid="input-transaction-amount" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={transactionForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="number" placeholder="0.00" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-transaction-amount" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={transactionForm.control}
+                  name="transactionDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-transaction-date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={transactionForm.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('bankAccounts.transactionDescriptionPlaceholder', 'Transaction description')} data-testid="input-transaction-description" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={transactionForm.control}
-                name="transactionDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.date', 'Date')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" data-testid="input-transaction-date" />
+                      <Input {...field} placeholder={t('bankAccounts.descriptionPlaceholder', 'Transaction description')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-transaction-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -703,19 +710,19 @@ export default function BankAccountManagement() {
                 name="referenceNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('bankAccounts.referenceNumber', 'Reference Number')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.referenceOptional', 'Reference (Optional)')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('common.optional', 'Optional')} data-testid="input-reference-number" />
+                      <Input {...field} placeholder={t('bankAccounts.referencePlaceholder', 'Check #, Transfer ID, etc.')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-transaction-reference" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsTransactionDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsTransactionDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="submit" data-testid="button-save-transaction">
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-transaction">
                   {t('bankAccounts.recordTransaction', 'Record Transaction')}
                 </Button>
               </DialogFooter>
@@ -725,21 +732,21 @@ export default function BankAccountManagement() {
       </Dialog>
 
       <Dialog open={isReconcileDialogOpen} onOpenChange={setIsReconcileDialogOpen}>
-        <DialogContent className="max-w-lg" data-testid="modal-reconcile">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-reconcile">
           <DialogHeader>
-            <DialogTitle>{t('bankAccounts.reconcileAccount', 'Reconcile Account')}</DialogTitle>
-            <DialogDescription>{t('bankAccounts.reconcileAccountDescription', 'Match bank statement with recorded balance')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.bankReconciliation', 'Bank Reconciliation')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('bankAccounts.enterStatementDetails', 'Enter your bank statement details')}</DialogDescription>
           </DialogHeader>
           <Form {...reconcileForm}>
-            <form className="space-y-4">
+            <form onSubmit={reconcileForm.handleSubmit((data) => console.log(data))} className="space-y-4">
               <FormField
                 control={reconcileForm.control}
                 name="statementDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('bankAccounts.statementDate', 'Statement Date')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.statementDate', 'Statement Date')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="date" data-testid="input-statement-date" />
+                      <Input {...field} type="date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-statement-date" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -750,9 +757,9 @@ export default function BankAccountManagement() {
                 name="statementBalance"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('bankAccounts.statementBalance', 'Statement Balance')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.statementBalance', 'Statement Balance')}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="number" placeholder="0.00" data-testid="input-statement-balance" />
+                      <Input {...field} type="number" placeholder="0.00" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-statement-balance" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -763,20 +770,20 @@ export default function BankAccountManagement() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.notes', 'Notes')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('bankAccounts.reconciliationNotes', 'Reconciliation notes...')} data-testid="input-reconcile-notes" />
+                      <Textarea {...field} placeholder={t('bankAccounts.reconciliationNotes', 'Reconciliation notes...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-reconcile-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsReconcileDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => setIsReconcileDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   {t('common.cancel', 'Cancel')}
                 </Button>
-                <Button type="button" data-testid="button-complete-reconciliation">
-                  {t('bankAccounts.completeReconciliation', 'Complete Reconciliation')}
+                <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-start-reconcile">
+                  {t('bankAccounts.startReconciliation', 'Start Reconciliation')}
                 </Button>
               </DialogFooter>
             </form>

@@ -415,15 +415,15 @@ export default function Chat() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'text-blue-500';
+        return 'text-[#0A5ED7]';
       case 'in_progress':
-        return 'text-yellow-500';
+        return 'text-[#F97316]';
       case 'resolved':
         return 'text-green-500';
       case 'closed':
-        return 'text-gray-500';
+        return 'text-[#64748B]';
       default:
-        return 'text-gray-400';
+        return 'text-[#64748B]';
     }
   };
 
@@ -432,13 +432,13 @@ export default function Chat() {
       case 'urgent':
         return 'bg-red-500';
       case 'high':
-        return 'bg-orange-500';
+        return 'bg-[#F97316]';
       case 'medium':
         return 'bg-yellow-500';
       case 'low':
         return 'bg-green-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-[#64748B]';
     }
   };
 
@@ -459,44 +459,45 @@ export default function Chat() {
       contentClassName="!p-0 !h-[calc(100vh-4rem)]"
     >
       <div className="h-full flex">
-        <Card className="w-80 flex flex-col border-r rounded-none bg-white dark:bg-salis-black">
-          <div className="p-4 border-b dark:border-salis-gray-dark">
+        <Card className="w-80 flex flex-col border-r rounded-none bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="p-4 border-b border-[#E2E8F0] dark:border-[#232A36]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-montserrat font-semibold text-salis-black dark:text-salis-white">
+              <h2 className="text-lg font-montserrat font-semibold text-[#0B1F3B] dark:text-white">
                 {t('chat.messages', 'Messages')}
               </h2>
               <Dialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="ghost" data-testid="button-new-ticket">
+                  <Button size="sm" variant="ghost" className="text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="button-new-ticket">
                     <Ticket className="h-4 w-4 mr-1" />
                     {t('chat.newTicket', 'New Ticket')}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <DialogHeader>
-                    <DialogTitle>{t('chat.createSupportTicket', 'Create Support Ticket')}</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('chat.createSupportTicket', 'Create Support Ticket')}</DialogTitle>
+                    <DialogDescription className="text-[#64748B]">
                       {t('chat.supportTicketDesc', 'Submit a support request and our team will assist you shortly.')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="subject">{t('chat.subject', 'Subject')} *</Label>
+                      <Label htmlFor="subject" className="text-[#0B1F3B] dark:text-white">{t('chat.subject', 'Subject')} *</Label>
                       <Input
                         id="subject"
                         value={ticketSubject}
                         onChange={(e) => setTicketSubject(e.target.value)}
                         placeholder={t('chat.subjectPlaceholder', 'Brief description of your issue')}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="input-ticket-subject"
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="category">{t('chat.category', 'Category')} *</Label>
+                      <Label htmlFor="category" className="text-[#0B1F3B] dark:text-white">{t('chat.category', 'Category')} *</Label>
                       <Select value={ticketCategory} onValueChange={setTicketCategory}>
-                        <SelectTrigger data-testid="select-ticket-category">
+                        <SelectTrigger data-testid="select-ticket-category" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                           <SelectValue placeholder={t('chat.selectCategory', 'Select category')} />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="technical">{t('chat.technicalSupport', 'Technical Support')}</SelectItem>
                           <SelectItem value="billing">{t('chat.billing', 'Billing')}</SelectItem>
                           <SelectItem value="feature">{t('chat.featureRequest', 'Feature Request')}</SelectItem>
@@ -507,12 +508,12 @@ export default function Chat() {
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="priority">{t('chat.priority', 'Priority')}</Label>
+                      <Label htmlFor="priority" className="text-[#0B1F3B] dark:text-white">{t('chat.priority', 'Priority')}</Label>
                       <Select value={ticketPriority} onValueChange={setTicketPriority}>
-                        <SelectTrigger data-testid="select-ticket-priority">
+                        <SelectTrigger data-testid="select-ticket-priority" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="low">{t('chat.low', 'Low')}</SelectItem>
                           <SelectItem value="medium">{t('chat.medium', 'Medium')}</SelectItem>
                           <SelectItem value="high">{t('chat.high', 'High')}</SelectItem>
@@ -521,13 +522,14 @@ export default function Chat() {
                       </Select>
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="description">{t('chat.description', 'Description')} *</Label>
+                      <Label htmlFor="description" className="text-[#0B1F3B] dark:text-white">{t('chat.description', 'Description')} *</Label>
                       <Textarea
                         id="description"
                         value={ticketDescription}
                         onChange={(e) => setTicketDescription(e.target.value)}
                         placeholder={t('chat.descriptionPlaceholder', 'Provide detailed information about your issue')}
                         rows={4}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                         data-testid="textarea-ticket-description"
                       />
                     </div>
@@ -536,6 +538,7 @@ export default function Chat() {
                     <Button
                       onClick={handleCreateTicket}
                       disabled={createTicketMutation.isPending}
+                      className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                       data-testid="button-submit-ticket"
                     >
                       {createTicketMutation.isPending ? t('chat.creating', 'Creating...') : t('chat.createTicket', 'Create Ticket')}
@@ -545,12 +548,12 @@ export default function Chat() {
               </Dialog>
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-salis-gray dark:text-salis-gray-light" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder={t('chat.searchConversations', 'Search conversations...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-conversations"
               />
             </div>
@@ -558,32 +561,32 @@ export default function Chat() {
 
           <ScrollArea className="flex-1">
             {tickets.length > 0 && (
-              <div className="p-2 border-b dark:border-salis-gray-dark">
-                <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
+              <div className="p-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <h3 className="text-xs font-semibold text-[#64748B] px-3 py-2 mb-1">
                   {t('chat.supportTickets', 'Support Tickets')}
                 </h3>
                 {tickets.slice(0, 3).map((ticket) => (
                   <div
                     key={ticket.id}
-                    className="p-3 rounded-lg hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20 mb-1 cursor-pointer"
+                    className="p-3 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] mb-1 cursor-pointer"
                     data-testid={`ticket-${ticket.id}`}
                   >
                     <div className="flex items-start justify-between mb-1">
-                      <span className="text-xs font-mono text-salis-gray dark:text-salis-gray-light">
+                      <span className="text-xs font-mono text-[#64748B]">
                         {ticket.ticketNumber}
                       </span>
                       <div className={cn("text-xs", getStatusColor(ticket.status))}>
                         {getStatusIcon(ticket.status)}
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-salis-black dark:text-salis-white truncate mb-1">
+                    <p className="text-sm font-medium text-[#0B1F3B] dark:text-white truncate mb-1">
                       {ticket.subject}
                     </p>
                     <div className="flex items-center gap-2">
-                      <Badge className={cn("text-xs", getPriorityColor(ticket.priority))}>
+                      <Badge className={cn("text-xs text-white", getPriorityColor(ticket.priority))}>
                         {ticket.priority}
                       </Badge>
-                      <span className="text-xs text-salis-gray dark:text-salis-gray-light">
+                      <span className="text-xs text-[#64748B]">
                         {ticket.category}
                       </span>
                     </div>
@@ -593,13 +596,13 @@ export default function Chat() {
             )}
 
             <div className="p-2">
-              <h3 className="text-xs font-semibold text-salis-gray dark:text-salis-gray-light px-3 py-2 mb-1">
+              <h3 className="text-xs font-semibold text-[#64748B] px-3 py-2 mb-1">
                 {t('chat.conversations', 'Conversations')}
               </h3>
               {filteredConversations.length === 0 ? (
                 <div className="text-center py-8">
-                  <MessageCircle className="h-12 w-12 mx-auto text-salis-gray dark:text-salis-gray-light mb-3" />
-                  <p className="text-sm text-salis-gray dark:text-salis-gray-light">{t('chat.noConversations', 'No conversations yet')}</p>
+                  <MessageCircle className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+                  <p className="text-sm text-[#64748B]">{t('chat.noConversations', 'No conversations yet')}</p>
                 </div>
               ) : (
                 filteredConversations.map((conversation) => (
@@ -609,15 +612,20 @@ export default function Chat() {
                     className={cn(
                       "w-full p-3 rounded-lg text-left transition-colors mb-1",
                       selectedConversationId === conversation.id
-                        ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
-                        : "hover:bg-salis-gray-light/20 dark:hover:bg-salis-gray-dark/20"
+                        ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                        : "hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                     )}
                     data-testid={`button-conversation-${conversation.id}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <Avatar className="h-10 w-10 flex-shrink-0">
-                          <AvatarFallback className="bg-salis-gray dark:bg-salis-gray-dark text-salis-white font-medium">
+                          <AvatarFallback className={cn(
+                            "font-medium",
+                            selectedConversationId === conversation.id
+                              ? "bg-white/20 text-white"
+                              : "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                          )}>
                             {conversation.title?.charAt(0) || '?'}
                           </AvatarFallback>
                         </Avatar>
@@ -626,7 +634,12 @@ export default function Chat() {
                             {conversation.title || t('chat.untitledConversation', 'Untitled Conversation')}
                           </p>
                           {conversation.lastMessageAt && (
-                            <p className="text-xs text-salis-gray dark:text-salis-gray-light">
+                            <p className={cn(
+                              "text-xs",
+                              selectedConversationId === conversation.id
+                                ? "text-white/70"
+                                : "text-[#64748B]"
+                            )}>
                               {formatDistanceToNow(new Date(conversation.lastMessageAt), {
                                 addSuffix: true,
                               })}
@@ -642,29 +655,29 @@ export default function Chat() {
           </ScrollArea>
         </Card>
 
-        <div className="flex-1 flex flex-col bg-salis-gray-light/10 dark:bg-salis-gray-dark/10">
+        <div className="flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#0E1117]">
           {selectedConversation ? (
             <>
-              <div className="p-4 border-b dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+              <div className="p-4 border-b border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-salis-gray dark:bg-salis-gray-dark text-salis-white font-medium">
+                      <AvatarFallback className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white font-medium">
                         {selectedConversation.title?.charAt(0) || '?'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-salis-black dark:text-salis-white">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                         {selectedConversation.title || t('chat.untitledConversation', 'Untitled Conversation')}
                       </h3>
                       {conversationTypingUsers.length > 0 && (
-                        <p className="text-sm text-salis-gray dark:text-salis-gray-light">
+                        <p className="text-sm text-[#64748B]">
                           {conversationTypingUsers.map(u => u.userName).join(', ')} {t('chat.isTyping', 'is typing...')}
                         </p>
                       )}
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white">
                     <MoreVertical className="h-5 w-5" />
                   </Button>
                 </div>
@@ -684,12 +697,15 @@ export default function Chat() {
                         className={cn(
                           "max-w-[70%] rounded-lg p-3",
                           message.senderId === user?.id
-                            ? "bg-salis-black dark:bg-salis-white text-salis-white dark:text-salis-black"
-                            : "bg-white dark:bg-salis-gray-dark text-salis-black dark:text-salis-white"
+                            ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                            : "bg-white dark:bg-[#151A23] text-[#0B1F3B] dark:text-white border border-[#E2E8F0] dark:border-[#232A36]"
                         )}
                       >
                         <p className="text-sm">{message.content}</p>
-                        <p className="text-xs opacity-60 mt-1">
+                        <p className={cn(
+                          "text-xs mt-1",
+                          message.senderId === user?.id ? "text-white/60" : "text-[#64748B]"
+                        )}>
                           {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
                         </p>
                       </div>
@@ -699,16 +715,16 @@ export default function Chat() {
                 </div>
               </ScrollArea>
 
-              <div className="p-4 border-t dark:border-salis-gray-dark bg-white dark:bg-salis-black">
+              <div className="p-4 border-t border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
                 {uploadingFiles.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {uploadingFiles.map((file, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 bg-salis-gray-light/20 dark:bg-salis-gray-dark/20 px-3 py-1 rounded-full"
+                        className="flex items-center gap-2 bg-[#F8FAFC] dark:bg-[#0E1117] px-3 py-1 rounded-full border border-[#E2E8F0] dark:border-[#232A36]"
                       >
-                        <span className="text-sm truncate max-w-[150px]">{file.name}</span>
-                        <button onClick={() => removeFile(index)}>
+                        <span className="text-sm truncate max-w-[150px] text-[#0B1F3B] dark:text-white">{file.name}</span>
+                        <button onClick={() => removeFile(index)} className="text-[#64748B] hover:text-red-500">
                           <X className="h-3 w-3" />
                         </button>
                       </div>
@@ -727,6 +743,7 @@ export default function Chat() {
                     variant="ghost"
                     size="icon"
                     onClick={() => fileInputRef.current?.click()}
+                    className="text-[#64748B] hover:text-[#0A5ED7]"
                     data-testid="button-attach-file"
                   >
                     <Paperclip className="h-5 w-5" />
@@ -739,12 +756,13 @@ export default function Chat() {
                       handleTyping();
                     }}
                     onKeyDown={handleKeyPress}
-                    className="flex-1"
+                    className="flex-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                     data-testid="input-message"
                   />
                   <Button
                     onClick={handleSendMessage}
                     disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                    className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                     data-testid="button-send-message"
                   >
                     <Send className="h-5 w-5" />
@@ -755,11 +773,11 @@ export default function Chat() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <MessageCircle className="h-16 w-16 mx-auto text-salis-gray dark:text-salis-gray-light mb-4" />
-                <h3 className="text-xl font-semibold text-salis-black dark:text-salis-white mb-2">
+                <MessageCircle className="h-16 w-16 mx-auto text-[#64748B] mb-4" />
+                <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white mb-2">
                   {t('chat.selectConversation', 'Select a conversation')}
                 </h3>
-                <p className="text-salis-gray dark:text-salis-gray-light">
+                <p className="text-[#64748B]">
                   {t('chat.selectConversationDesc', 'Choose a conversation from the sidebar to start chatting')}
                 </p>
               </div>

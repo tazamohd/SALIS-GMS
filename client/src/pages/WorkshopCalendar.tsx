@@ -56,11 +56,11 @@ export default function WorkshopCalendar() {
   const [isDragMode, setIsDragMode] = useState(false);
 
   const resources: WorkshopResource[] = [
-    { id: "bay-1", name: t('workshopCalendar.bay1General', 'Bay 1 - General'), type: "bay", color: "#3b82f6" },
-    { id: "bay-2", name: t('workshopCalendar.bay2Alignment', 'Bay 2 - Alignment'), type: "bay", color: "#10b981" },
-    { id: "bay-3", name: t('workshopCalendar.bay3Paint', 'Bay 3 - Paint'), type: "bay", color: "#f59e0b" },
-    { id: "bay-4", name: t('workshopCalendar.bay4QuickService', 'Bay 4 - Quick Service'), type: "bay", color: "#8b5cf6" },
-    { id: "tech-1", name: t('workshopCalendar.ahmedSeniorTech', 'Ahmed (Senior Tech)'), type: "technician", color: "#ec4899" },
+    { id: "bay-1", name: t('workshopCalendar.bay1General', 'Bay 1 - General'), type: "bay", color: "#0A5ED7" },
+    { id: "bay-2", name: t('workshopCalendar.bay2Alignment', 'Bay 2 - Alignment'), type: "bay", color: "#0BB3FF" },
+    { id: "bay-3", name: t('workshopCalendar.bay3Paint', 'Bay 3 - Paint'), type: "bay", color: "#F97316" },
+    { id: "bay-4", name: t('workshopCalendar.bay4QuickService', 'Bay 4 - Quick Service'), type: "bay", color: "#10b981" },
+    { id: "tech-1", name: t('workshopCalendar.ahmedSeniorTech', 'Ahmed (Senior Tech)'), type: "technician", color: "#8b5cf6" },
     { id: "tech-2", name: t('workshopCalendar.mohammedTech', 'Mohammed (Tech)'), type: "technician", color: "#06b6d4" },
   ];
 
@@ -117,11 +117,21 @@ export default function WorkshopCalendar() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-500";
-      case "in-progress": return "bg-blue-500";
-      case "scheduled": return "bg-gray-400";
+      case "completed": return "bg-emerald-500";
+      case "in-progress": return "bg-[#0A5ED7]";
+      case "scheduled": return "bg-[#64748B]";
       case "cancelled": return "bg-red-500";
-      default: return "bg-gray-400";
+      default: return "bg-[#64748B]";
+    }
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case "completed": return "bg-emerald-500/10 text-emerald-600";
+      case "in-progress": return "bg-[#0A5ED7]/10 text-[#0A5ED7]";
+      case "scheduled": return "bg-[#64748B]/10 text-[#64748B]";
+      case "cancelled": return "bg-red-500/10 text-red-600";
+      default: return "bg-[#64748B]/10 text-[#64748B]";
     }
   };
 
@@ -140,10 +150,10 @@ export default function WorkshopCalendar() {
   const utilizationRate = Math.round((events.length / (resources.length * 7 * 8)) * 100);
 
   const metrics = [
-    { label: t('workshopCalendar.scheduled', 'Scheduled'), value: totalScheduled, icon: CalendarIcon, color: "text-blue-500" },
-    { label: t('common.inProgress', 'In Progress'), value: totalInProgress, icon: Clock, color: "text-yellow-500" },
-    { label: t('common.completed', 'Completed'), value: totalCompleted, icon: CheckCircle2, color: "text-green-500" },
-    { label: t('workshopCalendar.utilization', 'Utilization'), value: `${utilizationRate}%`, icon: Users, color: "text-purple-500" },
+    { label: t('workshopCalendar.scheduled', 'Scheduled'), value: totalScheduled, icon: CalendarIcon, color: "text-[#0A5ED7]" },
+    { label: t('common.inProgress', 'In Progress'), value: totalInProgress, icon: Clock, color: "text-[#0BB3FF]" },
+    { label: t('common.completed', 'Completed'), value: totalCompleted, icon: CheckCircle2, color: "text-emerald-500" },
+    { label: t('workshopCalendar.utilization', 'Utilization'), value: `${utilizationRate}%`, icon: Users, color: "text-[#8b5cf6]" },
   ];
 
   return (
@@ -156,43 +166,43 @@ export default function WorkshopCalendar() {
       <div className="space-y-4" data-testid="workshop-calendar">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => navigateWeek(-1)} data-testid="button-prev-week">
+            <Button variant="outline" size="icon" onClick={() => navigateWeek(-1)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-prev-week">
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
               {format(weekStart, "MMM d")} - {format(addDays(weekStart, 6), "MMM d, yyyy")}
             </h2>
-            <Button variant="outline" size="icon" onClick={() => navigateWeek(1)} data-testid="button-next-week">
+            <Button variant="outline" size="icon" onClick={() => navigateWeek(1)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-next-week">
               <ChevronRight className="w-4 h-4" />
             </Button>
-            <Button variant="outline" onClick={() => setCurrentDate(new Date())} data-testid="button-today">
+            <Button variant="outline" onClick={() => setCurrentDate(new Date())} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid="button-today">
               {t('workshopCalendar.today', 'Today')}
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setIsDragMode(!isDragMode)} data-testid="button-toggle-drag">
+            <Button variant="outline" onClick={() => setIsDragMode(!isDragMode)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-toggle-drag">
               <GripVertical className="w-4 h-4 mr-2" />
               {isDragMode ? t('workshopCalendar.exitDragMode', 'Exit Drag Mode') : t('workshopCalendar.enableDrag', 'Enable Drag')}
             </Button>
-            <Button data-testid="button-new-appointment">
+            <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-new-appointment">
               <Plus className="w-4 h-4 mr-2" />
               {t('workshopCalendar.newAppointment', 'New Appointment')}
             </Button>
           </div>
         </div>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-0 overflow-x-auto">
             <div className="min-w-[1200px]">
               <div className="grid" style={{ gridTemplateColumns: "150px repeat(7, 1fr)" }}>
-                <div className="p-3 border-b border-r font-medium bg-muted">{t('workshopCalendar.resource', 'Resource')}</div>
+                <div className="p-3 border-b border-r border-[#E2E8F0] dark:border-[#232A36] font-medium bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white">{t('workshopCalendar.resource', 'Resource')}</div>
                 {weekDays.map((day, idx) => (
                   <div 
                     key={idx} 
-                    className={`p-3 border-b text-center font-medium ${isSameDay(day, new Date()) ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-muted'}`}
+                    className={`p-3 border-b border-[#E2E8F0] dark:border-[#232A36] text-center font-medium ${isSameDay(day, new Date()) ? 'bg-[#0A5ED7]/10' : 'bg-[#F8FAFC] dark:bg-[#0E1117]'}`}
                   >
-                    <div className="text-sm text-muted-foreground">{format(day, "EEE")}</div>
-                    <div className={`text-lg ${isSameDay(day, new Date()) ? 'text-blue-600 font-bold' : ''}`}>
+                    <div className="text-sm text-[#64748B]">{format(day, "EEE")}</div>
+                    <div className={`text-lg ${isSameDay(day, new Date()) ? 'text-[#0A5ED7] font-bold' : 'text-[#0B1F3B] dark:text-white'}`}>
                       {format(day, "d")}
                     </div>
                   </div>
@@ -206,16 +216,16 @@ export default function WorkshopCalendar() {
                   style={{ gridTemplateColumns: "150px repeat(7, 1fr)" }}
                   data-testid={`calendar-row-${resource.id}`}
                 >
-                  <div className="p-3 border-b border-r flex items-center gap-2">
+                  <div className="p-3 border-b border-r border-[#E2E8F0] dark:border-[#232A36] flex items-center gap-2 bg-white dark:bg-[#151A23]">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: resource.color }} />
-                    <span className="text-sm font-medium truncate">{resource.name}</span>
+                    <span className="text-sm font-medium truncate text-[#0B1F3B] dark:text-white">{resource.name}</span>
                   </div>
                   {weekDays.map((day, dayIdx) => {
                     const dayEvents = getEventsForDayAndResource(day, resource.id);
                     return (
                       <div 
                         key={dayIdx} 
-                        className={`p-1 border-b min-h-[100px] relative ${isSameDay(day, new Date()) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                        className={`p-1 border-b border-[#E2E8F0] dark:border-[#232A36] min-h-[100px] relative ${isSameDay(day, new Date()) ? 'bg-[#0A5ED7]/5' : 'bg-white dark:bg-[#151A23]'}`}
                       >
                         {dayEvents.map((event) => (
                           <div
@@ -237,7 +247,7 @@ export default function WorkshopCalendar() {
                           </div>
                         ))}
                         {dayEvents.length === 0 && isDragMode && (
-                          <div className="absolute inset-1 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-xs">
+                          <div className="absolute inset-1 border-2 border-dashed border-[#0A5ED7]/30 rounded flex items-center justify-center text-[#64748B] text-xs">
                             {t('workshopCalendar.dropHere', 'Drop here')}
                           </div>
                         )}
@@ -251,39 +261,39 @@ export default function WorkshopCalendar() {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+              <CardTitle className="text-sm font-medium flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <AlertTriangle className="w-4 h-4 text-[#F97316]" />
                 {t('workshopCalendar.schedulingConflicts', 'Scheduling Conflicts')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{t('workshopCalendar.noConflicts', 'No conflicts detected')}</p>
+              <p className="text-sm text-[#64748B]">{t('workshopCalendar.noConflicts', 'No conflicts detected')}</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-500" />
+              <CardTitle className="text-sm font-medium flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Users className="w-4 h-4 text-[#0A5ED7]" />
                 {t('workshopCalendar.technicianAvailability', 'Technician Availability')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {resources.filter(r => r.type === "technician").map(tech => (
                 <div key={tech.id} className="flex items-center justify-between text-sm">
-                  <span>{tech.name}</span>
-                  <Badge variant="outline" className="text-green-600" data-testid={`badge-tech-status-${tech.id}`}>{t('workshopCalendar.available', 'Available')}</Badge>
+                  <span className="text-[#0B1F3B] dark:text-white">{tech.name}</span>
+                  <Badge className="bg-emerald-500/10 text-emerald-600" data-testid={`badge-tech-status-${tech.id}`}>{t('workshopCalendar.available', 'Available')}</Badge>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-purple-500" />
+              <CardTitle className="text-sm font-medium flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Wrench className="w-4 h-4 text-[#0BB3FF]" />
                 {t('workshopCalendar.bayStatus', 'Bay Status')}
               </CardTitle>
             </CardHeader>
@@ -292,8 +302,8 @@ export default function WorkshopCalendar() {
                 const bayEvents = events.filter(e => e.resourceId === bay.id && e.status === "in-progress");
                 return (
                   <div key={bay.id} className="flex items-center justify-between text-sm">
-                    <span>{bay.name}</span>
-                    <Badge variant={bayEvents.length > 0 ? "default" : "outline"} data-testid={`badge-bay-status-${bay.id}`}>
+                    <span className="text-[#0B1F3B] dark:text-white">{bay.name}</span>
+                    <Badge className={bayEvents.length > 0 ? "bg-[#0A5ED7]/10 text-[#0A5ED7]" : "bg-emerald-500/10 text-emerald-600"} data-testid={`badge-bay-status-${bay.id}`}>
                       {bayEvents.length > 0 ? t('workshopCalendar.occupied', 'Occupied') : t('workshopCalendar.available', 'Available')}
                     </Badge>
                   </div>
@@ -305,47 +315,47 @@ export default function WorkshopCalendar() {
       </div>
 
       <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{selectedEvent?.title}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedEvent?.title}</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.customer', 'Customer')}</Label>
-                  <p className="font-medium">{selectedEvent.customerName}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.customer', 'Customer')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedEvent.customerName}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.vehicle', 'Vehicle')}</Label>
-                  <p className="font-medium">{selectedEvent.vehicleInfo}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.vehicle', 'Vehicle')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedEvent.vehicleInfo}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.serviceType', 'Service Type')}</Label>
-                  <p className="font-medium">{selectedEvent.serviceType}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.serviceType', 'Service Type')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedEvent.serviceType}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.resource', 'Resource')}</Label>
-                  <p className="font-medium">{selectedEvent.resourceName}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.resource', 'Resource')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{selectedEvent.resourceName}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.startTime', 'Start Time')}</Label>
-                  <p className="font-medium">{format(selectedEvent.startTime, "MMM d, HH:mm")}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.startTime', 'Start Time')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{format(selectedEvent.startTime, "MMM d, HH:mm")}</p>
                 </div>
                 <div>
-                  <Label className="text-muted-foreground">{t('workshopCalendar.endTime', 'End Time')}</Label>
-                  <p className="font-medium">{format(selectedEvent.endTime, "MMM d, HH:mm")}</p>
+                  <Label className="text-[#64748B]">{t('workshopCalendar.endTime', 'End Time')}</Label>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">{format(selectedEvent.endTime, "MMM d, HH:mm")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Label className="text-muted-foreground">{t('common.status', 'Status')}:</Label>
-                <Badge className={getStatusColor(selectedEvent.status)} data-testid="badge-event-status">{selectedEvent.status}</Badge>
+                <Label className="text-[#64748B]">{t('common.status', 'Status')}:</Label>
+                <Badge className={getStatusBadgeColor(selectedEvent.status)} data-testid="badge-event-status">{selectedEvent.status}</Badge>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)} data-testid="button-close-event">{t('common.close', 'Close')}</Button>
-            <Button data-testid="button-edit-appointment">{t('workshopCalendar.editAppointment', 'Edit Appointment')}</Button>
+            <Button variant="outline" onClick={() => setIsEventDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-close-event">{t('common.close', 'Close')}</Button>
+            <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-edit-appointment">{t('workshopCalendar.editAppointment', 'Edit Appointment')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

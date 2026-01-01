@@ -66,10 +66,19 @@ export default function SmartInventoryForecasting() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "critical": return "bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900";
-      case "warning": return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-900";
-      case "healthy": return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-900";
-      default: return "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-200 dark:border-gray-800";
+      case "critical": return "bg-red-500/10 text-red-700 dark:text-red-400 border-0";
+      case "warning": return "bg-[#F97316]/10 text-[#F97316] border-0";
+      case "healthy": return "bg-green-500/10 text-green-700 dark:text-green-400 border-0";
+      default: return "bg-[#64748B]/10 text-[#64748B] border-0";
+    }
+  };
+
+  const getStatusBorderColor = (status: string) => {
+    switch (status) {
+      case "critical": return "border-red-200 dark:border-red-900/50";
+      case "warning": return "border-[#F97316]/30 dark:border-[#F97316]/20";
+      case "healthy": return "border-green-200 dark:border-green-900/50";
+      default: return "border-[#E2E8F0] dark:border-[#232A36]";
     }
   };
 
@@ -99,7 +108,7 @@ export default function SmartInventoryForecasting() {
       label: t('smartInventory.autoOrders', 'Auto Orders'),
       value: "12",
       icon: Package,
-      color: "text-blue-600 dark:text-blue-400",
+      color: "text-[#0A5ED7] dark:text-[#0BB3FF]",
     },
     {
       label: t('smartInventory.costSavings', 'Cost Savings'),
@@ -117,39 +126,40 @@ export default function SmartInventoryForecasting() {
       metrics={metrics}
     >
 
-      <Card className="border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('smartInventory.eightWeekDemandForecast', '8-Week Demand Forecast')}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartInventory.eightWeekDemandForecast', '8-Week Demand Forecast')}</CardTitle>
+          <CardDescription className="text-[#64748B]">
             {t('smartInventory.mlPredictedDemand', 'ML-predicted demand vs. actual consumption with confidence intervals')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={350}>
             <AreaChart data={forecastData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="week" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:stroke-[#232A36]" />
+              <XAxis dataKey="week" stroke="#64748B" />
+              <YAxis stroke="#64748B" />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: '#1F2937', 
-                  border: '1px solid #374151',
+                  backgroundColor: '#FFFFFF', 
+                  border: '1px solid #E2E8F0',
                   borderRadius: '8px'
                 }}
+                labelStyle={{ color: '#0B1F3B' }}
               />
               <Legend />
               <Area 
                 type="monotone" 
                 dataKey="demand" 
-                stroke="#93C5FD" 
-                fill="#DBEAFE" 
-                fillOpacity={0.3}
+                stroke="#0BB3FF" 
+                fill="#0BB3FF" 
+                fillOpacity={0.15}
                 name={t('smartInventory.expectedDemand', 'Expected Demand')}
               />
               <Line 
                 type="monotone" 
                 dataKey="actual" 
-                stroke="#6B7280" 
+                stroke="#64748B" 
                 strokeWidth={2}
                 name={t('smartInventory.actualUsage', 'Actual Usage')}
                 dot={{ r: 4 }}
@@ -157,7 +167,7 @@ export default function SmartInventoryForecasting() {
               <Line 
                 type="monotone" 
                 dataKey="predicted" 
-                stroke="#3B82F6" 
+                stroke="#0A5ED7" 
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 name={t('smartInventory.aiPrediction', 'AI Prediction')}
@@ -167,16 +177,16 @@ export default function SmartInventoryForecasting() {
         </CardContent>
       </Card>
 
-      <Card className="border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>{t('smartInventory.inventoryAlertsRecommendations', 'Inventory Alerts & Recommendations')}</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">{t('smartInventory.inventoryAlertsRecommendations', 'Inventory Alerts & Recommendations')}</CardTitle>
+              <CardDescription className="text-[#64748B]">
                 {t('smartInventory.aiPoweredReordering', 'AI-powered reordering suggestions based on demand forecasts')}
               </CardDescription>
             </div>
-            <Button variant="outline" size="sm" data-testid="button-refresh-forecast">
+            <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="button-refresh-forecast">
               <RefreshCw className="w-4 h-4 mr-2" />
               {t('common.refresh', 'Refresh')}
             </Button>
@@ -185,24 +195,25 @@ export default function SmartInventoryForecasting() {
         <CardContent>
           <div className="space-y-4">
             {partForecast.map((item, idx) => (
-              <Card key={idx} className={`border ${getStatusColor(item.status)}`} data-testid={`card-part-${idx}`}>
+              <Card key={idx} className={`bg-white dark:bg-[#151A23] border ${getStatusBorderColor(item.status)}`} data-testid={`card-part-${idx}`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white" data-testid={`text-part-name-${idx}`}>
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-part-name-${idx}`}>
                           {item.part}
                         </h3>
-                        <Badge variant="outline" className={getStatusColor(item.status)} data-testid={`badge-part-status-${idx}`}>
+                        <Badge className={getStatusColor(item.status)} data-testid={`badge-part-status-${idx}`}>
                           {t(`smartInventory.${item.status}`, item.status)}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400" data-testid={`text-part-sku-${idx}`}>
+                      <p className="text-sm text-[#64748B]" data-testid={`text-part-sku-${idx}`}>
                         {t('smartInventory.sku', 'SKU')}: {item.sku}
                       </p>
                     </div>
                     <Button 
                       size="sm"
+                      className={item.status === "critical" ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" : "border-[#E2E8F0] dark:border-[#232A36]"}
                       variant={item.status === "critical" ? "default" : "outline"}
                       data-testid={`button-action-${idx}`}
                     >
@@ -212,26 +223,26 @@ export default function SmartInventoryForecasting() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">{t('smartInventory.currentStock', 'Current Stock')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid={`text-current-stock-${idx}`}>
+                      <p className="text-xs text-[#64748B] mb-1">{t('smartInventory.currentStock', 'Current Stock')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-current-stock-${idx}`}>
                         {item.current} {t('smartInventory.units', 'units')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">{t('smartInventory.eightWeekForecast', '8-Week Forecast')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid={`text-forecasted-stock-${idx}`}>
+                      <p className="text-xs text-[#64748B] mb-1">{t('smartInventory.eightWeekForecast', '8-Week Forecast')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-forecasted-stock-${idx}`}>
                         {item.forecasted} {t('smartInventory.units', 'units')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">{t('smartInventory.reorderPoint', 'Reorder Point')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid={`text-reorder-point-${idx}`}>
+                      <p className="text-xs text-[#64748B] mb-1">{t('smartInventory.reorderPoint', 'Reorder Point')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-reorder-point-${idx}`}>
                         {item.reorderPoint} {t('smartInventory.units', 'units')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">{t('smartInventory.leadTime', 'Lead Time')}</p>
-                      <p className="text-lg font-semibold text-gray-900 dark:text-white" data-testid={`text-lead-time-${idx}`}>
+                      <p className="text-xs text-[#64748B] mb-1">{t('smartInventory.leadTime', 'Lead Time')}</p>
+                      <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-lead-time-${idx}`}>
                         {item.leadTime} {t('smartInventory.days', 'days')}
                       </p>
                     </div>
@@ -239,8 +250,8 @@ export default function SmartInventoryForecasting() {
 
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600 dark:text-gray-400">{t('smartInventory.mlConfidence', 'ML Confidence')}</span>
-                      <span className="font-medium text-gray-900 dark:text-white" data-testid={`text-confidence-${idx}`}>
+                      <span className="text-[#64748B]">{t('smartInventory.mlConfidence', 'ML Confidence')}</span>
+                      <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-confidence-${idx}`}>
                         {item.confidence}%
                       </span>
                     </div>
@@ -248,14 +259,14 @@ export default function SmartInventoryForecasting() {
                   </div>
 
                   {item.current < item.reorderPoint && (
-                    <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
+                    <div className="mt-4 p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30">
                       <div className="flex items-start gap-2">
-                        <Brain className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                        <Brain className="w-4 h-4 text-[#0A5ED7] dark:text-[#0BB3FF] mt-0.5" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                          <p className="text-sm font-medium text-[#0A5ED7] dark:text-[#0BB3FF]">
                             {t('smartInventory.aiRecommendation', 'AI Recommendation')}
                           </p>
-                          <p className="text-sm text-blue-700 dark:text-blue-300">
+                          <p className="text-sm text-[#0B1F3B] dark:text-white">
                             {t('smartInventory.orderUnitsNow', `Order ${Math.max(item.forecasted - item.current + item.reorderPoint, 0)} units now to avoid stockout. Next peak demand in 2 weeks.`)}
                           </p>
                         </div>
@@ -270,42 +281,42 @@ export default function SmartInventoryForecasting() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-lg">{t('smartInventory.optimizationInsights', 'Optimization Insights')}</CardTitle>
+            <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('smartInventory.optimizationInsights', 'Optimization Insights')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-green-500/10 rounded-lg border border-green-200 dark:border-green-900/50">
               <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">
                   {t('smartInventory.reducedWaste', 'Reduced Waste')}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#64748B]">
                   {t('smartInventory.preventedObsolete', 'Prevented $2.1K in obsolete inventory last month')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <div className="flex items-start gap-3 p-3 bg-[#0A5ED7]/10 rounded-lg border border-[#0A5ED7]/20">
+              <TrendingUp className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF] mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">
                   {t('smartInventory.improvedTurnover', 'Improved Turnover')}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#64748B]">
                   {t('smartInventory.inventoryTurnsIncreased', 'Inventory turns increased by 18% with ML forecasting')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-purple-500/10 rounded-lg border border-purple-200 dark:border-purple-900/50">
               <Brain className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
               <div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm">
+                <p className="font-medium text-[#0B1F3B] dark:text-white text-sm">
                   {t('smartInventory.seasonalPatterns', 'Seasonal Patterns')}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-[#64748B]">
                   {t('smartInventory.aiDetectedTrends', 'AI detected 3 seasonal trends affecting brake pad demand')}
                 </p>
               </div>
@@ -313,56 +324,56 @@ export default function SmartInventoryForecasting() {
           </CardContent>
         </Card>
 
-        <Card className="border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="text-lg">{t('smartInventory.automatedActions', 'Automated Actions')}</CardTitle>
+            <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('smartInventory.automatedActions', 'Automated Actions')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex justify-between items-center py-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                     {t('smartInventory.autoReorderRules', 'Auto-Reorder Rules')}
                   </p>
-                  <p className="text-xs text-gray-500">{t('smartInventory.triggeredBelowThreshold', 'Triggered when below threshold')}</p>
+                  <p className="text-xs text-[#64748B]">{t('smartInventory.triggeredBelowThreshold', 'Triggered when below threshold')}</p>
                 </div>
-                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400" data-testid="badge-auto-reorder">
+                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-auto-reorder">
                   {t('common.active', 'Active')}
                 </Badge>
               </div>
 
-              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex justify-between items-center py-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                     {t('smartInventory.supplierAlerts', 'Supplier Alerts')}
                   </p>
-                  <p className="text-xs text-gray-500">{t('smartInventory.notifyLongLeadTimes', 'Notify on long lead times')}</p>
+                  <p className="text-xs text-[#64748B]">{t('smartInventory.notifyLongLeadTimes', 'Notify on long lead times')}</p>
                 </div>
-                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400" data-testid="badge-supplier-alerts">
+                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-supplier-alerts">
                   {t('common.active', 'Active')}
                 </Badge>
               </div>
 
-              <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex justify-between items-center py-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                     {t('smartInventory.priceMonitoring', 'Price Monitoring')}
                   </p>
-                  <p className="text-xs text-gray-500">{t('smartInventory.trackPriceChanges', 'Track supplier price changes')}</p>
+                  <p className="text-xs text-[#64748B]">{t('smartInventory.trackPriceChanges', 'Track supplier price changes')}</p>
                 </div>
-                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400" data-testid="badge-price-monitoring">
+                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-price-monitoring">
                   {t('common.active', 'Active')}
                 </Badge>
               </div>
 
               <div className="flex justify-between items-center py-2">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                     {t('smartInventory.demandAlerts', 'Demand Alerts')}
                   </p>
-                  <p className="text-xs text-gray-500">{t('smartInventory.notifyUnusualSpikes', 'Notify on unusual spikes')}</p>
+                  <p className="text-xs text-[#64748B]">{t('smartInventory.notifyUnusualSpikes', 'Notify on unusual spikes')}</p>
                 </div>
-                <Badge variant="outline" className="bg-green-500/10 text-green-700 dark:text-green-400" data-testid="badge-demand-alerts">
+                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-demand-alerts">
                   {t('common.active', 'Active')}
                 </Badge>
               </div>

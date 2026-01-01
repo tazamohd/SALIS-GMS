@@ -49,11 +49,11 @@ export default function ClientInvoices() {
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case "pending":
       case "sent":
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+        return <AlertCircle className="h-5 w-5 text-[#F97316]" />;
       case "overdue":
         return <AlertCircle className="h-5 w-5 text-red-500" />;
       default:
-        return <Clock className="h-5 w-5 text-muted-foreground" />;
+        return <Clock className="h-5 w-5 text-[#64748B]" />;
     }
   };
 
@@ -68,106 +68,104 @@ export default function ClientInvoices() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold" data-testid="text-page-title">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
           Invoices & Payments
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-[#64748B] mt-1">
           View and manage your service invoices
         </p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card data-testid="card-stat-pending">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-pending">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-500" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Pending Payments</CardTitle>
+            <AlertCircle className="h-4 w-4 text-[#F97316]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-pending-amount">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-pending-amount">
               ${totalPending.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-[#64748B] mt-1">
               {pendingInvoices.length} invoice{pendingInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-stat-paid">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-paid">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Paid</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Total Paid</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-paid-amount">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-paid-amount">
               ${totalPaid.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-[#64748B] mt-1">
               {paidInvoices.length} invoice{paidInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-stat-total">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-total">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">All Time Total</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">All Time Total</CardTitle>
+            <FileText className="h-4 w-4 text-[#64748B]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" data-testid="text-total-amount">
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-total-amount">
               ${myInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.totalAmount || "0"), 0).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-[#64748B] mt-1">
               {myInvoices.length} total invoice{myInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Pending Invoices */}
       {pendingInvoices.length > 0 && (
-        <Card data-testid="card-pending-invoices">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-pending-invoices">
           <CardHeader>
-            <CardTitle>Pending Invoices</CardTitle>
-            <CardDescription>Invoices awaiting payment</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Pending Invoices</CardTitle>
+            <CardDescription className="text-[#64748B]">Invoices awaiting payment</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {pendingInvoices.map((invoice: any) => (
               <div
                 key={invoice.id}
-                className="flex items-start gap-4 p-4 rounded-lg border"
+                className="flex items-start gap-4 p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`pending-invoice-${invoice.id}`}
               >
                 {getStatusIcon(invoice.status)}
                 <div className="flex-1 space-y-2">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium">Invoice #{invoice.invoiceNumber}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">Invoice #{invoice.invoiceNumber}</p>
+                      <p className="text-sm text-[#64748B]">
                         {getVehicleInfo(invoice.vehicleId)}
                       </p>
                     </div>
-                    <Badge variant="destructive">{invoice.status}</Badge>
+                    <Badge className="bg-[#F97316] text-white">{invoice.status}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-[#64748B]">
                       Issued: {new Date(invoice.issueDate).toLocaleDateString()}
                       {invoice.dueDate && (
                         <> • Due: {new Date(invoice.dueDate).toLocaleDateString()}</>
                       )}
                     </div>
-                    <div className="text-xl font-bold">
+                    <div className="text-xl font-bold text-[#0B1F3B] dark:text-white">
                       ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" data-testid={`button-pay-${invoice.id}`}>
+                    <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid={`button-pay-${invoice.id}`}>
                       <CreditCard className="h-4 w-4 mr-2" />
                       Pay Now
                     </Button>
-                    <Button variant="outline" size="sm" data-testid={`button-download-${invoice.id}`}>
+                    <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid={`button-download-${invoice.id}`}>
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
@@ -179,21 +177,20 @@ export default function ClientInvoices() {
         </Card>
       )}
 
-      {/* All Invoices */}
-      <Card data-testid="card-all-invoices">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-all-invoices">
         <CardHeader>
-          <CardTitle>All Invoices</CardTitle>
-          <CardDescription>Complete invoice history</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">All Invoices</CardTitle>
+          <CardDescription className="text-[#64748B]">Complete invoice history</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-4">
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
-              <Skeleton className="h-24" />
+              <Skeleton className="h-24 bg-[#E2E8F0] dark:bg-[#232A36]" />
+              <Skeleton className="h-24 bg-[#E2E8F0] dark:bg-[#232A36]" />
+              <Skeleton className="h-24 bg-[#E2E8F0] dark:bg-[#232A36]" />
             </div>
           ) : myInvoices.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12 text-[#64748B]">
               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>No invoices yet</p>
             </div>
@@ -208,31 +205,31 @@ export default function ClientInvoices() {
                   return (
                     <div
                       key={invoice.id}
-                      className="flex items-center justify-between p-4 rounded-lg border"
+                      className="flex items-center justify-between p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]"
                       data-testid={`invoice-${invoice.id}`}
                     >
                       <div className="flex items-center gap-4">
                         {getStatusIcon(invoice.status)}
                         <div>
-                          <p className="font-medium">Invoice #{invoice.invoiceNumber}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">Invoice #{invoice.invoiceNumber}</p>
+                          <p className="text-sm text-[#64748B]">
                             {getVehicleInfo(invoice.vehicleId)}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-[#64748B]">
                             {new Date(invoice.issueDate).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="text-lg font-bold">
+                          <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                             ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                           </div>
-                          <Badge variant={isPaid ? "default" : "destructive"}>
+                          <Badge className={isPaid ? "bg-green-500 text-white" : "bg-[#F97316] text-white"}>
                             {invoice.status}
                           </Badge>
                         </div>
-                        <Button variant="ghost" size="icon" data-testid={`button-view-${invoice.id}`}>
+                        <Button variant="ghost" size="icon" className="text-[#64748B] hover:text-[#0A5ED7]" data-testid={`button-view-${invoice.id}`}>
                           <Download className="h-4 w-4" />
                         </Button>
                       </div>

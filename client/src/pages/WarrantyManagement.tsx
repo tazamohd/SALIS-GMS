@@ -65,15 +65,12 @@ import {
   type User,
 } from "@shared/schema";
 import { useAuth } from "@/hooks/useAuth";
-import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-// Interface for warranty claims with warranty data
 interface WarrantyClaimWithWarranty {
   claim: WarrantyClaim;
   warranty: Warranty;
 }
 
-// Extend insert schemas for form handling
 const warrantyFormSchema = insertWarrantySchema.extend({
   startDate: z.string().min(1, "Start date required"),
   endDate: z.string().min(1, "End date required"),
@@ -101,48 +98,40 @@ export default function WarrantyManagement() {
   const [editingWarrantyId, setEditingWarrantyId] = useState<string | null>(null);
   const [editingClaimId, setEditingClaimId] = useState<string | null>(null);
 
-  // Fetch active warranties
   const { data: activeWarranties = [], isLoading: activeLoading } = useQuery<Warranty[]>({
     queryKey: ["/api/warranties/active"],
     enabled: selectedTab === "active",
   });
 
-  // Fetch expired warranties
   const { data: expiredWarranties = [], isLoading: expiredLoading } = useQuery<Warranty[]>({
     queryKey: ["/api/warranties/expired"],
     enabled: selectedTab === "expired",
   });
 
-  // Fetch expiring warranties (within 30 days)
   const { data: expiringWarranties = [] } = useQuery<Warranty[]>({
     queryKey: ["/api/warranties/expiring?days=30"],
   });
 
-  // Fetch warranty claims
   const { data: claims = [], isLoading: claimsLoading } = useQuery<WarrantyClaimWithWarranty[]>({
     queryKey: ["/api/warranty-claims"],
     enabled: selectedTab === "claims",
   });
 
-  // Fetch vehicles for dropdown
   const { data: vehicles = [] } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
     enabled: isWarrantyDialogOpen,
   });
 
-  // Fetch customers for dropdown
   const { data: customers = [] } = useQuery<User[]>({
     queryKey: ["/api/customers"],
     enabled: isWarrantyDialogOpen,
   });
 
-  // Fetch all warranties for claim creation
   const { data: allWarranties = [] } = useQuery<Warranty[]>({
     queryKey: ["/api/warranties"],
     enabled: isClaimDialogOpen,
   });
 
-  // Warranty Form
   const warrantyForm = useForm<WarrantyFormData>({
     resolver: zodResolver(warrantyFormSchema),
     defaultValues: {
@@ -166,7 +155,6 @@ export default function WarrantyManagement() {
     },
   });
 
-  // Claim Form
   const claimForm = useForm<ClaimFormData>({
     resolver: zodResolver(claimFormSchema),
     defaultValues: {
@@ -183,7 +171,6 @@ export default function WarrantyManagement() {
     },
   });
 
-  // Create/Update Warranty Mutation
   const warrantyMutation = useMutation({
     mutationFn: async (data: WarrantyFormData) => {
       const parsed = warrantyFormSchema.parse(data);
@@ -207,7 +194,6 @@ export default function WarrantyManagement() {
     },
   });
 
-  // Create/Update Claim Mutation
   const claimMutation = useMutation({
     mutationFn: async (data: ClaimFormData) => {
       const parsed = claimFormSchema.parse(data);
@@ -228,7 +214,6 @@ export default function WarrantyManagement() {
     },
   });
 
-  // Delete Mutations
   const deleteWarrantyMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/warranties/${id}`),
     onSuccess: () => {
@@ -292,45 +277,45 @@ export default function WarrantyManagement() {
     const daysUntilExpiry = differenceInDays(new Date(warranty.endDate), new Date());
     
     if (warranty.status === "expired" || daysUntilExpiry < 0) {
-      return <Badge variant="secondary" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expired', 'Expired')}</Badge>;
+      return <Badge variant="secondary" className="bg-gray-100 text-[#64748B] dark:bg-gray-800 dark:text-gray-400" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expired', 'Expired')}</Badge>;
     }
     if (daysUntilExpiry <= 30) {
-      return <Badge className="bg-salis-gray dark:bg-salis-gray-light text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expiringSoon', 'Expiring Soon')}</Badge>;
+      return <Badge className="bg-[#F97316] text-white" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.expiringSoon', 'Expiring Soon')}</Badge>;
     }
-    return <Badge className="bg-salis-black dark:bg-white text-white dark:text-salis-black" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.active', 'Active')}</Badge>;
+    return <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid={`badge-warranty-status-${warranty.id}`}>{t('payments.warranty.active', 'Active')}</Badge>;
   };
 
   const getClaimStatusBadge = (status: string, claimId: string) => {
     const statusColors: Record<string, string> = {
-      submitted: "bg-salis-gray dark:bg-salis-gray-light",
-      under_review: "bg-salis-gray-dark dark:bg-salis-gray",
-      approved: "bg-salis-black dark:bg-white",
-      rejected: "bg-salis-gray dark:bg-salis-gray-light",
-      paid: "bg-salis-black dark:bg-white",
+      submitted: "bg-[#64748B] text-white",
+      under_review: "bg-[#F97316] text-white",
+      approved: "bg-[#0A5ED7] text-white",
+      rejected: "bg-red-500 text-white",
+      paid: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
     };
     
     return (
-      <Badge className={`${statusColors[status] || "bg-salis-gray"} text-white dark:text-salis-black`} data-testid={`badge-claim-status-${claimId}`}>
+      <Badge className={statusColors[status] || "bg-[#64748B] text-white"} data-testid={`badge-claim-status-${claimId}`}>
         {status.replace("_", " ").toUpperCase()}
       </Badge>
     );
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-white dark:bg-salis-black min-h-screen">
+    <div className="flex flex-col gap-6 p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-montserrat font-semibold text-salis-black dark:text-white">
+          <h1 className="text-3xl font-semibold text-[#0B1F3B] dark:text-white">
             Warranty Management
           </h1>
-          <p className="text-sm text-salis-gray mt-1">
+          <p className="text-sm text-[#64748B] mt-1">
             Track parts & labor warranties, process claims, and monitor expiration dates
           </p>
         </div>
         {expiringWarranties.length > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-salis-gray-light dark:bg-salis-gray-dark rounded-lg">
-            <AlertTriangle className="h-5 w-5 text-salis-black dark:text-white" />
-            <span className="text-sm text-salis-black dark:text-white">
+          <div className="flex items-center gap-2 px-4 py-2 bg-[#F97316]/10 border border-[#F97316]/20 rounded-lg">
+            <AlertTriangle className="h-5 w-5 text-[#F97316]" />
+            <span className="text-sm text-[#F97316]">
               {expiringWarranties.length} {expiringWarranties.length === 1 ? "warranty" : "warranties"} expiring within 30 days
             </span>
           </div>
@@ -338,25 +323,24 @@ export default function WarrantyManagement() {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-salis-gray-light dark:bg-salis-gray-dark">
-          <TabsTrigger value="active" className="flex items-center gap-2" data-testid="tab-active-warranties">
+        <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
+          <TabsTrigger value="active" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-active-warranties">
             <Shield className="h-4 w-4" />
             Active Warranties
           </TabsTrigger>
-          <TabsTrigger value="expired" className="flex items-center gap-2" data-testid="tab-expired-warranties">
+          <TabsTrigger value="expired" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-expired-warranties">
             <AlertTriangle className="h-4 w-4" />
             Expired
           </TabsTrigger>
-          <TabsTrigger value="claims" className="flex items-center gap-2" data-testid="tab-claims">
+          <TabsTrigger value="claims" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-claims">
             <FileText className="h-4 w-4" />
             Claims
           </TabsTrigger>
         </TabsList>
 
-        {/* Active Warranties Tab */}
         <TabsContent value="active" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+            <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
               Active Warranties
             </h2>
             <Button
@@ -365,7 +349,7 @@ export default function WarrantyManagement() {
                 warrantyForm.reset();
                 setIsWarrantyDialogOpen(true);
               }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
               data-testid="button-create-warranty"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -373,46 +357,46 @@ export default function WarrantyManagement() {
             </Button>
           </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+          <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
             <Table>
               <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Warranty #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Coverage</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Provider</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Start Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">End Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+                <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Warranty #</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Type</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Coverage</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Provider</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Start Date</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">End Date</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {activeLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-salis-gray">
+                    <TableCell colSpan={8} className="text-center text-[#64748B]">
                       Loading warranties...
                     </TableCell>
                   </TableRow>
                 ) : activeWarranties.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-salis-gray">
+                    <TableCell colSpan={8} className="text-center text-[#64748B]">
                       No active warranties found. Create one to get started.
                     </TableCell>
                   </TableRow>
                 ) : (
                   activeWarranties.map((warranty) => (
-                    <TableRow key={warranty.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-warranty-${warranty.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white" data-testid={`text-warranty-number-${warranty.id}`}>
+                    <TableRow key={warranty.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-warranty-${warranty.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-warranty-number-${warranty.id}`}>
                         {warranty.warrantyNumber || "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray capitalize" data-testid={`text-warranty-type-${warranty.id}`}>{warranty.warrantyType}</TableCell>
-                      <TableCell className="text-salis-gray max-w-xs truncate" data-testid={`text-warranty-coverage-${warranty.id}`}>{warranty.coverageDescription}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-warranty-provider-${warranty.id}`}>{warranty.providerName || warranty.provider}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-warranty-start-date-${warranty.id}`}>
+                      <TableCell className="text-[#64748B] capitalize" data-testid={`text-warranty-type-${warranty.id}`}>{warranty.warrantyType}</TableCell>
+                      <TableCell className="text-[#64748B] max-w-xs truncate" data-testid={`text-warranty-coverage-${warranty.id}`}>{warranty.coverageDescription}</TableCell>
+                      <TableCell className="text-[#64748B]" data-testid={`text-warranty-provider-${warranty.id}`}>{warranty.providerName || warranty.provider}</TableCell>
+                      <TableCell className="text-[#64748B]" data-testid={`text-warranty-start-date-${warranty.id}`}>
                         {warranty.startDate ? format(new Date(warranty.startDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-warranty-end-date-${warranty.id}`}>
+                      <TableCell className="text-[#64748B]" data-testid={`text-warranty-end-date-${warranty.id}`}>
                         {warranty.endDate ? format(new Date(warranty.endDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
                       <TableCell>{getStatusBadge(warranty)}</TableCell>
@@ -422,6 +406,7 @@ export default function WarrantyManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditWarranty(warranty)}
+                            className="border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`button-edit-warranty-${warranty.id}`}
                           >
                             <Pencil className="h-4 w-4" />
@@ -430,6 +415,7 @@ export default function WarrantyManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => deleteWarrantyMutation.mutate(warranty.id)}
+                            className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20"
                             data-testid={`button-delete-warranty-${warranty.id}`}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -444,49 +430,48 @@ export default function WarrantyManagement() {
           </div>
         </TabsContent>
 
-        {/* Expired Warranties Tab */}
         <TabsContent value="expired" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+            <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
               Expired Warranties
             </h2>
           </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+          <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
             <Table>
               <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Warranty #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Type</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Coverage</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Provider</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Expired On</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+                <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Warranty #</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Type</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Coverage</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Provider</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Expired On</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {expiredLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-salis-gray">
+                    <TableCell colSpan={6} className="text-center text-[#64748B]">
                       Loading expired warranties...
                     </TableCell>
                   </TableRow>
                 ) : expiredWarranties.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-salis-gray">
+                    <TableCell colSpan={6} className="text-center text-[#64748B]">
                       No expired warranties found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   expiredWarranties.map((warranty) => (
-                    <TableRow key={warranty.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-expired-warranty-${warranty.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white" data-testid={`text-expired-warranty-number-${warranty.id}`}>
+                    <TableRow key={warranty.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-expired-warranty-${warranty.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-expired-warranty-number-${warranty.id}`}>
                         {warranty.warrantyNumber || "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray capitalize" data-testid={`text-expired-warranty-type-${warranty.id}`}>{warranty.warrantyType}</TableCell>
-                      <TableCell className="text-salis-gray max-w-xs truncate" data-testid={`text-expired-warranty-coverage-${warranty.id}`}>{warranty.coverageDescription}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-expired-warranty-provider-${warranty.id}`}>{warranty.providerName || warranty.provider}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-expired-warranty-end-date-${warranty.id}`}>
+                      <TableCell className="text-[#64748B] capitalize" data-testid={`text-expired-warranty-type-${warranty.id}`}>{warranty.warrantyType}</TableCell>
+                      <TableCell className="text-[#64748B] max-w-xs truncate" data-testid={`text-expired-warranty-coverage-${warranty.id}`}>{warranty.coverageDescription}</TableCell>
+                      <TableCell className="text-[#64748B]" data-testid={`text-expired-warranty-provider-${warranty.id}`}>{warranty.providerName || warranty.provider}</TableCell>
+                      <TableCell className="text-[#64748B]" data-testid={`text-expired-warranty-end-date-${warranty.id}`}>
                         {warranty.endDate ? format(new Date(warranty.endDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
                       <TableCell className="text-right">
@@ -494,6 +479,7 @@ export default function WarrantyManagement() {
                           variant="outline"
                           size="sm"
                           onClick={() => deleteWarrantyMutation.mutate(warranty.id)}
+                          className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20"
                           data-testid={`button-delete-expired-warranty-${warranty.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -507,10 +493,9 @@ export default function WarrantyManagement() {
           </div>
         </TabsContent>
 
-        {/* Claims Tab */}
         <TabsContent value="claims" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-salis-black dark:text-white">
+            <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
               Warranty Claims
             </h2>
             <Button
@@ -519,7 +504,7 @@ export default function WarrantyManagement() {
                 claimForm.reset();
                 setIsClaimDialogOpen(true);
               }}
-              className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
+              className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
               data-testid="button-create-claim"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -527,46 +512,50 @@ export default function WarrantyManagement() {
             </Button>
           </div>
 
-          <div className="border border-salis-gray-light dark:border-salis-gray-dark rounded-lg">
+          <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
             <Table>
               <TableHeader>
-                <TableRow className="bg-salis-gray-light dark:bg-salis-gray-dark">
-                  <TableHead className="text-salis-black dark:text-white">Claim #</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Warranty</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Issue</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Claim Date</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Claim Amount</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Approved Amount</TableHead>
-                  <TableHead className="text-salis-black dark:text-white">Status</TableHead>
-                  <TableHead className="text-salis-black dark:text-white text-right">Actions</TableHead>
+                <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Claim #</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Warranty</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Issue</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Claim Date</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Amount</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {claimsLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-salis-gray">
+                    <TableCell colSpan={7} className="text-center text-[#64748B]">
                       Loading claims...
                     </TableCell>
                   </TableRow>
                 ) : claims.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-salis-gray">
-                      No claims submitted yet.
+                    <TableCell colSpan={7} className="text-center text-[#64748B]">
+                      No warranty claims found. Submit one to get started.
                     </TableCell>
                   </TableRow>
                 ) : (
                   claims.map((item) => (
-                    <TableRow key={item.claim.id} className="border-b border-salis-gray-light dark:border-salis-gray-dark" data-testid={`row-claim-${item.claim.id}`}>
-                      <TableCell className="font-medium text-salis-black dark:text-white" data-testid={`text-claim-number-${item.claim.id}`}>
+                    <TableRow key={item.claim.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-claim-${item.claim.id}`}>
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-claim-number-${item.claim.id}`}>
                         {item.claim.claimNumber || "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-claim-warranty-number-${item.claim.id}`}>{item.warranty?.warrantyNumber || "—"}</TableCell>
-                      <TableCell className="text-salis-gray max-w-xs truncate" data-testid={`text-claim-issue-${item.claim.id}`}>{item.claim.issueDescription}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-claim-date-${item.claim.id}`}>
+                      <TableCell className="text-[#64748B]" data-testid={`text-claim-warranty-${item.claim.id}`}>
+                        {item.warranty?.warrantyNumber || "—"}
+                      </TableCell>
+                      <TableCell className="text-[#64748B] max-w-xs truncate" data-testid={`text-claim-issue-${item.claim.id}`}>
+                        {item.claim.issueDescription}
+                      </TableCell>
+                      <TableCell className="text-[#64748B]" data-testid={`text-claim-date-${item.claim.id}`}>
                         {item.claim.claimDate ? format(new Date(item.claim.claimDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-claim-amount-${item.claim.id}`}>${item.claim.claimAmount || "0.00"}</TableCell>
-                      <TableCell className="text-salis-gray" data-testid={`text-approved-amount-${item.claim.id}`}>${item.claim.approvedAmount || "—"}</TableCell>
+                      <TableCell className="text-[#0B1F3B] dark:text-white font-medium" data-testid={`text-claim-amount-${item.claim.id}`}>
+                        ${item.claim.claimAmount?.toLocaleString() || "—"}
+                      </TableCell>
                       <TableCell>{getClaimStatusBadge(item.claim.status || "submitted", item.claim.id)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
@@ -574,6 +563,7 @@ export default function WarrantyManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditClaim(item)}
+                            className="border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`button-edit-claim-${item.claim.id}`}
                           >
                             <Pencil className="h-4 w-4" />
@@ -582,6 +572,7 @@ export default function WarrantyManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => deleteClaimMutation.mutate(item.claim.id)}
+                            className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20"
                             data-testid={`button-delete-claim-${item.claim.id}`}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -597,53 +588,27 @@ export default function WarrantyManagement() {
         </TabsContent>
       </Tabs>
 
-      {/* Warranty Dialog */}
       <Dialog open={isWarrantyDialogOpen} onOpenChange={setIsWarrantyDialogOpen}>
-        <DialogContent className="max-w-3xl bg-white dark:bg-salis-black max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingWarrantyId ? "Edit Warranty" : "Create Warranty"}
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
+              {editingWarrantyId ? "Edit Warranty" : "Add New Warranty"}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray">
-              {editingWarrantyId ? "Update warranty details" : "Add a new warranty record"}
+            <DialogDescription className="text-[#64748B]">
+              {editingWarrantyId ? "Update warranty details" : "Create a new warranty record"}
             </DialogDescription>
           </DialogHeader>
           <Form {...warrantyForm}>
-            <form
-              onSubmit={warrantyForm.handleSubmit((data) => warrantyMutation.mutate(data))}
-              className="space-y-4"
-            >
+            <form onSubmit={warrantyForm.handleSubmit((data) => warrantyMutation.mutate(data))} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={warrantyForm.control}
-                  name="warrantyType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Warranty Type *</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-warranty-type">
-                            <SelectValue placeholder="Select type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="parts">Parts</SelectItem>
-                            <SelectItem value="labor">Labor</SelectItem>
-                            <SelectItem value="combined">Combined</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={warrantyForm.control}
                   name="warrantyNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Warranty Number</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Warranty Number</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="WRT-2024-001" data-testid="input-warranty-number" />
+                        <Input placeholder="WRN-001" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -651,135 +616,22 @@ export default function WarrantyManagement() {
                 />
                 <FormField
                   control={warrantyForm.control}
-                  name="provider"
+                  name="warrantyType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Provider *</FormLabel>
-                      <FormControl>
-                        <Select value={field.value || ""} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-provider">
-                            <SelectValue placeholder="Select provider" />
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Warranty Type</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                            <SelectValue placeholder="Select type" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                            <SelectItem value="garage">Garage</SelectItem>
-                            <SelectItem value="third_party">Third Party</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="providerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Provider Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="ACME Parts Co." data-testid="input-provider-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="vehicleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Vehicle</FormLabel>
-                      <FormControl>
-                        <Select value={field.value || ""} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-vehicle">
-                            <SelectValue placeholder="Select vehicle" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {vehicles.map((vehicle: any) => (
-                              <SelectItem key={vehicle.id} value={vehicle.id}>
-                                {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="customerId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Customer</FormLabel>
-                      <FormControl>
-                        <Select value={field.value || ""} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-customer">
-                            <SelectValue placeholder="Select customer" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {customers.map((customer: any) => (
-                              <SelectItem key={customer.id} value={customer.id}>
-                                {customer.fullName} - {customer.email}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Start Date *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-start-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">End Date *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-end-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="mileageLimit"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Mileage Limit (km)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="100000" data-testid="input-mileage-limit" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={warrantyForm.control}
-                  name="currentMileage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Current Mileage (km)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" placeholder="50000" data-testid="input-current-mileage" />
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          <SelectItem value="parts">Parts</SelectItem>
+                          <SelectItem value="labor">Labor</SelectItem>
+                          <SelectItem value="full">Full Coverage</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -790,9 +642,9 @@ export default function WarrantyManagement() {
                 name="coverageDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Coverage Description *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">Coverage Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Describe what is covered..." data-testid="input-coverage-description" />
+                      <Textarea placeholder="Describe what is covered..." {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -801,12 +653,12 @@ export default function WarrantyManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={warrantyForm.control}
-                  name="terms"
+                  name="startDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Terms</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Start Date</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder="Warranty terms..." data-testid="input-terms" />
+                        <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -814,12 +666,12 @@ export default function WarrantyManagement() {
                 />
                 <FormField
                   control={warrantyForm.control}
-                  name="exclusions"
+                  name="endDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Exclusions</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">End Date</FormLabel>
                       <FormControl>
-                        <Textarea {...field} value={field.value || ""} placeholder="What is not covered..." data-testid="input-exclusions" />
+                        <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -827,21 +679,11 @@ export default function WarrantyManagement() {
                 />
               </div>
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsWarrantyDialogOpen(false)}
-                  data-testid="button-cancel-warranty"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsWarrantyDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={warrantyMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-warranty"
-                >
-                  {warrantyMutation.isPending ? "Saving..." : editingWarrantyId ? "Update" : "Create"}
+                <Button type="submit" disabled={warrantyMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90">
+                  {warrantyMutation.isPending ? "Saving..." : editingWarrantyId ? "Update Warranty" : "Create Warranty"}
                 </Button>
               </DialogFooter>
             </form>
@@ -849,55 +691,27 @@ export default function WarrantyManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Claim Dialog */}
       <Dialog open={isClaimDialogOpen} onOpenChange={setIsClaimDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-salis-black">
+        <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-salis-black dark:text-white">
-              {editingClaimId ? "Edit Claim" : "Submit Warranty Claim"}
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">
+              {editingClaimId ? "Edit Claim" : "Submit New Claim"}
             </DialogTitle>
-            <DialogDescription className="text-salis-gray">
+            <DialogDescription className="text-[#64748B]">
               {editingClaimId ? "Update claim details" : "Submit a new warranty claim"}
             </DialogDescription>
           </DialogHeader>
           <Form {...claimForm}>
-            <form
-              onSubmit={claimForm.handleSubmit((data) => claimMutation.mutate(data))}
-              className="space-y-4"
-            >
+            <form onSubmit={claimForm.handleSubmit((data) => claimMutation.mutate(data))} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={claimForm.control}
-                  name="warrantyId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Warranty *</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger data-testid="select-warranty-for-claim">
-                            <SelectValue placeholder="Select warranty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {allWarranties.map((warranty: Warranty) => (
-                              <SelectItem key={warranty.id} value={warranty.id}>
-                                {warranty.warrantyNumber || warranty.id.substring(0, 8)} - {warranty.coverageDescription.substring(0, 30)}...
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={claimForm.control}
                   name="claimNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Claim Number</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Claim Number</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="CLM-2024-001" data-testid="input-claim-number" />
+                        <Input placeholder="CLM-001" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -905,26 +719,24 @@ export default function WarrantyManagement() {
                 />
                 <FormField
                   control={claimForm.control}
-                  name="claimDate"
+                  name="warrantyId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Claim Date *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="date" data-testid="input-claim-date" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={claimForm.control}
-                  name="claimAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-salis-black dark:text-white">Claim Amount</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" step="0.01" placeholder="500.00" data-testid="input-claim-amount" />
-                      </FormControl>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Warranty</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                            <SelectValue placeholder="Select warranty" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                          {allWarranties.map((w) => (
+                            <SelectItem key={w.id} value={w.id}>
+                              {w.warrantyNumber || w.id}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -935,30 +747,48 @@ export default function WarrantyManagement() {
                 name="issueDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-salis-black dark:text-white">Issue Description *</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">Issue Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Describe the issue..." data-testid="input-issue-description" />
+                      <Textarea placeholder="Describe the issue..." {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={claimForm.control}
+                  name="claimDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Claim Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={claimForm.control}
+                  name="claimAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">Claim Amount</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0.00" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsClaimDialogOpen(false)}
-                  data-testid="button-cancel-claim"
-                >
+                <Button type="button" variant="outline" onClick={() => setIsClaimDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={claimMutation.isPending}
-                  className="bg-salis-black dark:bg-white text-white dark:text-salis-black"
-                  data-testid="button-submit-claim"
-                >
-                  {claimMutation.isPending ? "Submitting..." : editingClaimId ? "Update" : "Submit"}
+                <Button type="submit" disabled={claimMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90">
+                  {claimMutation.isPending ? "Saving..." : editingClaimId ? "Update Claim" : "Submit Claim"}
                 </Button>
               </DialogFooter>
             </form>

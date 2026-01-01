@@ -80,7 +80,7 @@ export default function EmergingTechnologies() {
       id: 'blockchain',
       name: t('emergingTech.blockchainVehicleHistory', 'Blockchain Vehicle History'),
       icon: Shield,
-      color: 'text-blue-500',
+      color: 'text-[#0A5ED7]',
       description: t('emergingTech.blockchainDesc', 'Immutable vehicle service records on blockchain for tamper-proof history verification'),
       features: [
         t('emergingTech.ethereumPolygon', 'Ethereum/Polygon integration'),
@@ -95,7 +95,7 @@ export default function EmergingTechnologies() {
       id: 'ar-guides',
       name: t('emergingTech.arRepairGuides', 'AR Repair Guides'),
       icon: Glasses,
-      color: 'text-purple-500',
+      color: 'text-[#0BB3FF]',
       description: t('emergingTech.arDesc', 'Augmented reality step-by-step repair instructions with 3D overlays'),
       features: [
         t('emergingTech.interactiveARModels', 'Interactive AR models'),
@@ -125,7 +125,7 @@ export default function EmergingTechnologies() {
       id: '3d-parts',
       name: t('emergingTech.3dPartsVisualization', '3D Parts Visualization'),
       icon: Box,
-      color: 'text-orange-500',
+      color: 'text-[#F97316]',
       description: t('emergingTech.3dDesc', 'Interactive 3D models of parts for customer approval and technician training'),
       features: [
         t('emergingTech.360PartViews', '360° part views'),
@@ -140,7 +140,7 @@ export default function EmergingTechnologies() {
       id: 'drone-inspection',
       name: t('emergingTech.droneInspectionServices', 'Drone Inspection Services'),
       icon: Plane,
-      color: 'text-indigo-500',
+      color: 'text-[#0A5ED7]',
       description: t('emergingTech.droneDesc', 'Aerial vehicle inspections using drones with AI damage detection'),
       features: [
         t('emergingTech.automatedFlightPaths', 'Automated flight paths'),
@@ -155,7 +155,7 @@ export default function EmergingTechnologies() {
       id: 'ai-video',
       name: t('emergingTech.aiVideoAnalysis', 'AI Video Analysis'),
       icon: Video,
-      color: 'text-pink-500',
+      color: 'text-[#0BB3FF]',
       description: t('emergingTech.aiVideoDesc', 'AI-powered video analysis for damage detection and cost estimation'),
       features: [
         t('emergingTech.gpt5Integration', 'GPT-5 integration'),
@@ -170,7 +170,7 @@ export default function EmergingTechnologies() {
       id: 'digital-twin',
       name: t('emergingTech.digitalTwinTechnology', 'Digital Twin Technology'),
       icon: Binary,
-      color: 'text-cyan-500',
+      color: 'text-[#0A5ED7]',
       description: t('emergingTech.digitalTwinDesc', 'Real-time digital replicas of vehicles for predictive maintenance'),
       features: [
         t('emergingTech.liveSynchronization', 'Live synchronization'),
@@ -185,7 +185,7 @@ export default function EmergingTechnologies() {
       id: 'fraud-detection',
       name: t('emergingTech.mlFraudDetection', 'ML Fraud Detection'),
       icon: Brain,
-      color: 'text-red-500',
+      color: 'text-[#F97316]',
       description: t('emergingTech.fraudDesc', 'Machine learning algorithms to detect fraudulent transactions and claims'),
       features: [
         t('emergingTech.riskScoring', 'Risk scoring'),
@@ -200,7 +200,7 @@ export default function EmergingTechnologies() {
       id: 'biometric-auth',
       name: t('emergingTech.biometricAuthentication', 'Biometric Authentication'),
       icon: Fingerprint,
-      color: 'text-yellow-500',
+      color: 'text-[#0BB3FF]',
       description: t('emergingTech.biometricDesc', 'Multi-factor biometric authentication with fingerprint and face recognition'),
       features: [
         t('emergingTech.fingerprintEnrollment', 'Fingerprint enrollment'),
@@ -215,7 +215,7 @@ export default function EmergingTechnologies() {
       id: '5g-collaboration',
       name: t('emergingTech.5gRemoteCollaboration', '5G Remote Collaboration'),
       icon: Signal,
-      color: 'text-emerald-500',
+      color: 'text-green-500',
       description: t('emergingTech.5gDesc', 'Real-time expert collaboration via 5G with AR annotations and video streaming'),
       features: [
         t('emergingTech.hdVideoStreaming', 'HD video streaming'),
@@ -230,7 +230,7 @@ export default function EmergingTechnologies() {
       id: 'edge-computing',
       name: t('emergingTech.edgeComputingDiagnostics', 'Edge Computing Diagnostics'),
       icon: Cpu,
-      color: 'text-violet-500',
+      color: 'text-[#0A5ED7]',
       description: t('emergingTech.edgeDesc', 'Local edge processing for instant OBD diagnostics with offline capability'),
       features: [
         t('emergingTech.instantAnalysis', 'Instant analysis'),
@@ -245,7 +245,7 @@ export default function EmergingTechnologies() {
       id: 'quantum-pricing',
       name: t('emergingTech.quantumPricingOptimization', 'Quantum Pricing Optimization'),
       icon: Zap,
-      color: 'text-amber-500',
+      color: 'text-[#0BB3FF]',
       description: t('emergingTech.quantumPricingDesc', 'Quantum-inspired algorithms for dynamic pricing and profit maximization'),
       features: [
         t('emergingTech.dynamicPricing', 'Dynamic pricing'),
@@ -262,10 +262,10 @@ export default function EmergingTechnologies() {
 
   if (isLoading) {
     return (
-      <div className="p-6 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+      <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">{t('emergingTech.loadingTechnologies', 'Loading emerging technologies...')}</p>
+          <Loader2 className="w-12 h-12 animate-spin text-[#0A5ED7] mx-auto mb-4" />
+          <p className="text-[#64748B]">{t('emergingTech.loadingTechnologies', 'Loading emerging technologies...')}</p>
         </div>
       </div>
     );
@@ -300,22 +300,22 @@ export default function EmergingTechnologies() {
           return (
             <Card
               key={tech.id}
-              className={`cursor-pointer transition-all hover:shadow-lg dark:bg-gray-800 ${
-                activeTab === tech.id ? 'ring-2 ring-primary' : ''
+              className={`cursor-pointer transition-all hover:shadow-lg bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] ${
+                activeTab === tech.id ? 'ring-2 ring-[#0A5ED7]' : ''
               }`}
               onClick={() => setActiveTab(tech.id)}
               data-testid={`tech-card-${tech.id}`}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-700`}>
+                  <div className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <Icon className={`w-6 h-6 ${tech.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-sm font-semibold truncate dark:text-white">
+                    <CardTitle className="text-sm font-semibold truncate text-[#0B1F3B] dark:text-white">
                       {tech.name}
                     </CardTitle>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-[#64748B] mt-1">
                       {tech.count} {tech.count === 1 ? t('emergingTech.record', 'record') : t('emergingTech.records', 'records')}
                     </p>
                   </div>
@@ -327,20 +327,20 @@ export default function EmergingTechnologies() {
       </div>
 
       {selectedTech && (
-        <Card className="dark:bg-gray-800 mb-6">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
           <CardHeader>
             <div className="flex items-center gap-4">
               {(() => {
                 const Icon = selectedTech.icon;
                 return (
-                  <div className="p-3 rounded-xl bg-gray-100 dark:bg-gray-700">
+                  <div className="p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <Icon className={`w-8 h-8 ${selectedTech.color}`} />
                   </div>
                 );
               })()}
               <div className="flex-1">
-                <CardTitle className="text-2xl dark:text-white">{selectedTech.name}</CardTitle>
-                <CardDescription className="mt-1 dark:text-gray-400">
+                <CardTitle className="text-2xl text-[#0B1F3B] dark:text-white">{selectedTech.name}</CardTitle>
+                <CardDescription className="mt-1 text-[#64748B]">
                   {selectedTech.description}
                 </CardDescription>
               </div>
@@ -351,38 +351,38 @@ export default function EmergingTechnologies() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-3 dark:text-white">{t('emergingTech.keyFeatures', 'Key Features')}</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#0B1F3B] dark:text-white">{t('emergingTech.keyFeatures', 'Key Features')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {selectedTech.features.map((feature, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-700"
+                    className="flex items-center gap-2 p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`feature-${idx}`}
                   >
                     <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                    <span className="text-sm text-[#0B1F3B] dark:text-white">{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="flex gap-3">
-              <Button className="flex-1" data-testid="button-configure">
+              <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-configure">
                 {t('emergingTech.configureModule', 'Configure Module')}
               </Button>
-              <Button variant="outline" className="flex-1" data-testid="button-view-documentation">
+              <Button variant="outline" className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-view-documentation">
                 {t('emergingTech.viewDocumentation', 'View Documentation')}
               </Button>
-              <Button variant="outline" data-testid="button-test-integration">
+              <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-test-integration">
                 {t('emergingTech.testIntegration', 'Test Integration')}
               </Button>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+            <div className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4">
+              <h4 className="font-semibold text-[#0A5ED7] mb-2">
                 {t('emergingTech.moduleStatusIntegration', 'Module Status & Integration')}
               </h4>
-              <p className="text-sm text-blue-800 dark:text-blue-400">
+              <p className="text-sm text-[#64748B]">
                 {t('emergingTech.moduleIntegrationDesc', 'This module is fully integrated with the SALIS AUTO platform. All database schemas, API routes, and storage interfaces are configured and ready for deployment. Advanced features and customization options are available through the configuration panel.')}
               </p>
             </div>
@@ -390,18 +390,18 @@ export default function EmergingTechnologies() {
         </Card>
       )}
 
-      <Card className="dark:bg-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="dark:text-white">{t('emergingTech.technologyStackOverview', 'Technology Stack Overview')}</CardTitle>
-          <CardDescription className="dark:text-gray-400">
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('emergingTech.technologyStackOverview', 'Technology Stack Overview')}</CardTitle>
+          <CardDescription className="text-[#64748B]">
             {t('emergingTech.enterpriseGradeInfrastructure', 'Enterprise-grade infrastructure powering all 12 emerging technology modules')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <h4 className="font-semibold text-gray-900 dark:text-white">{t('emergingTech.blockchainDistributed', 'Blockchain & Distributed')}</h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{t('emergingTech.blockchainDistributed', 'Blockchain & Distributed')}</h4>
+              <ul className="text-sm text-[#64748B] space-y-1">
                 <li>• {t('emergingTech.ethereumPolygonNetworks', 'Ethereum & Polygon Networks')}</li>
                 <li>• {t('emergingTech.smartContractIntegration', 'Smart Contract Integration')}</li>
                 <li>• {t('emergingTech.ipfsStorage', 'IPFS Decentralized Storage')}</li>
@@ -409,8 +409,8 @@ export default function EmergingTechnologies() {
               </ul>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-gray-900 dark:text-white">{t('emergingTech.aiMachineLearning', 'AI & Machine Learning')}</h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{t('emergingTech.aiMachineLearning', 'AI & Machine Learning')}</h4>
+              <ul className="text-sm text-[#64748B] space-y-1">
                 <li>• {t('emergingTech.openaiGpt5', 'OpenAI GPT-5 Integration')}</li>
                 <li>• {t('emergingTech.tensorflowModels', 'TensorFlow ML Models')}</li>
                 <li>• {t('emergingTech.computerVisionApis', 'Computer Vision APIs')}</li>
@@ -418,8 +418,8 @@ export default function EmergingTechnologies() {
               </ul>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-gray-900 dark:text-white">{t('emergingTech.hardwareIot', 'Hardware & IoT')}</h4>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{t('emergingTech.hardwareIot', 'Hardware & IoT')}</h4>
+              <ul className="text-sm text-[#64748B] space-y-1">
                 <li>• {t('emergingTech.industrialIotSensors', 'Industrial IoT Sensors')}</li>
                 <li>• {t('emergingTech.4kDroneSystems', '4K Drone Systems')}</li>
                 <li>• {t('emergingTech.edgeComputingDevices', 'Edge Computing Devices')}</li>

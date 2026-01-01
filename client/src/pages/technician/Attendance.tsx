@@ -178,33 +178,33 @@ export default function TechnicianAttendance() {
       case "present":
         return <Badge className="bg-green-600">Present</Badge>;
       case "late":
-        return <Badge className="bg-yellow-600">Late</Badge>;
+        return <Badge className="bg-[#F97316]">Late</Badge>;
       case "absent":
         return <Badge className="bg-red-600">Absent</Badge>;
       case "half-day":
-        return <Badge className="bg-orange-600">Half Day</Badge>;
+        return <Badge className="bg-[#F97316]">Half Day</Badge>;
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Attendance</h1>
-        <p className="text-gray-500 dark:text-gray-400">Track your attendance with GPS verification</p>
+        <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">Attendance</h1>
+        <p className="text-[#64748B]">Track your attendance with GPS verification</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-              <MapPin className="h-5 w-5 text-blue-500" />
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <MapPin className="h-5 w-5 text-[#0A5ED7]" />
               Current Location
             </CardTitle>
-            <CardDescription>GPS-verified attendance tracking</CardDescription>
+            <CardDescription className="text-[#64748B]">GPS-verified attendance tracking</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoadingLocation ? (
-              <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-2 text-[#64748B]">
                 <Navigation className="h-5 w-5 animate-pulse" />
                 <span>Getting your location...</span>
               </div>
@@ -217,16 +217,16 @@ export default function TechnicianAttendance() {
               <>
                 <div className="flex items-center gap-2">
                   <Wifi className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-[#64748B]">
                     Location: {currentLocation?.lat.toFixed(4)}, {currentLocation?.lng.toFixed(4)}
                   </span>
                 </div>
                 
                 {nearestGarage && (
-                  <div className="p-4 rounded-lg bg-gray-50 dark:bg-salis-gray">
+                  <div className="p-4 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <div className="flex items-center gap-2 mb-2">
-                      <Building2 className="h-5 w-5 text-blue-500" />
-                      <span className="font-medium text-gray-900 dark:text-white">{nearestGarage.name}</span>
+                      <Building2 className="h-5 w-5 text-[#0A5ED7]" />
+                      <span className="font-medium text-[#0B1F3B] dark:text-white">{nearestGarage.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isWithinRange ? (
@@ -250,7 +250,7 @@ export default function TechnicianAttendance() {
               onClick={getCurrentLocation} 
               variant="outline" 
               size="sm"
-              className="w-full"
+              className="w-full border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="button-refresh-location"
             >
               <Navigation className="h-4 w-4 mr-2" />
@@ -259,25 +259,25 @@ export default function TechnicianAttendance() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Clock className="h-5 w-5 text-green-500" />
               Today's Status
             </CardTitle>
-            <CardDescription>{format(new Date(), "EEEE, MMMM d, yyyy")}</CardDescription>
+            <CardDescription className="text-[#64748B]">{format(new Date(), "EEEE, MMMM d, yyyy")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center py-4">
               {isCheckedIn ? (
                 <div className="space-y-2">
                   <Badge className="bg-green-600 text-lg px-4 py-2">Checked In</Badge>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-[#64748B]">
                     Since {checkInTime ? format(checkInTime, "HH:mm") : "--:--"}
                   </p>
                 </div>
               ) : (
-                <Badge variant="outline" className="text-lg px-4 py-2">Not Checked In</Badge>
+                <Badge variant="outline" className="text-lg px-4 py-2 border-[#E2E8F0] dark:border-[#232A36]">Not Checked In</Badge>
               )}
             </div>
 
@@ -285,7 +285,7 @@ export default function TechnicianAttendance() {
               <Button
                 onClick={handleCheckIn}
                 disabled={isCheckedIn || !isWithinRange}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                 data-testid="button-check-in"
               >
                 <LogIn className="h-4 w-4 mr-2" />
@@ -303,7 +303,7 @@ export default function TechnicianAttendance() {
             </div>
 
             {!isWithinRange && !isLoadingLocation && (
-              <p className="text-xs text-center text-yellow-600 dark:text-yellow-400">
+              <p className="text-xs text-center text-[#F97316]">
                 You must be at the garage to check in/out
               </p>
             )}
@@ -311,32 +311,32 @@ export default function TechnicianAttendance() {
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <Calendar className="h-5 w-5 text-purple-500" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Calendar className="h-5 w-5 text-[#0A5ED7]" />
             Attendance History
           </CardTitle>
-          <CardDescription>Your recent attendance records</CardDescription>
+          <CardDescription className="text-[#64748B]">Your recent attendance records</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Check In</TableHead>
-                <TableHead>Check Out</TableHead>
-                <TableHead>Hours Worked</TableHead>
-                <TableHead>Status</TableHead>
+              <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#64748B]">Date</TableHead>
+                <TableHead className="text-[#64748B]">Check In</TableHead>
+                <TableHead className="text-[#64748B]">Check Out</TableHead>
+                <TableHead className="text-[#64748B]">Hours Worked</TableHead>
+                <TableHead className="text-[#64748B]">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {mockAttendanceHistory.map((record) => (
-                <TableRow key={record.id} data-testid={`row-attendance-${record.id}`}>
-                  <TableCell className="font-medium">{format(new Date(record.date), "MMM d, yyyy")}</TableCell>
-                  <TableCell>{record.checkIn || "-"}</TableCell>
-                  <TableCell>{record.checkOut || "-"}</TableCell>
-                  <TableCell>{record.hoursWorked}</TableCell>
+                <TableRow key={record.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-attendance-${record.id}`}>
+                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{format(new Date(record.date), "MMM d, yyyy")}</TableCell>
+                  <TableCell className="text-[#64748B]">{record.checkIn || "-"}</TableCell>
+                  <TableCell className="text-[#64748B]">{record.checkOut || "-"}</TableCell>
+                  <TableCell className="text-[#64748B]">{record.hoursWorked}</TableCell>
                   <TableCell>{getStatusBadge(record.status)}</TableCell>
                 </TableRow>
               ))}
@@ -345,27 +345,27 @@ export default function TechnicianAttendance() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <Building2 className="h-5 w-5 text-blue-500" />
+          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+            <Building2 className="h-5 w-5 text-[#0A5ED7]" />
             Garage Locations
           </CardTitle>
-          <CardDescription>Authorized check-in locations</CardDescription>
+          <CardDescription className="text-[#64748B]">Authorized check-in locations</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             {GARAGE_LOCATIONS.map((garage, index) => (
               <div 
                 key={index} 
-                className="p-4 rounded-lg border border-gray-200 dark:border-salis-gray"
+                className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]"
                 data-testid={`card-garage-${index}`}
               >
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">{garage.name}</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <h4 className="font-medium text-[#0B1F3B] dark:text-white mb-2">{garage.name}</h4>
+                <p className="text-xs text-[#64748B]">
                   Coordinates: {garage.lat.toFixed(4)}, {garage.lng.toFixed(4)}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-[#64748B]">
                   Range: {garage.radius}m
                 </p>
               </div>

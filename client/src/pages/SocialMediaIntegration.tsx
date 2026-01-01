@@ -106,65 +106,65 @@ export default function SocialMediaIntegration() {
   };
 
   const getPlatformIcon = (platform: string) => {
-    return <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-xs font-bold">
+    return <div className="h-8 w-8 rounded-full bg-[#F8FAFC] dark:bg-[#0E1117] flex items-center justify-center text-xs font-bold text-[#0B1F3B] dark:text-white border border-[#E2E8F0] dark:border-[#232A36]">
       {platform.substring(0, 1).toUpperCase()}
     </div>;
   };
 
   const statsContent = (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-posts">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-posts">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.totalPosts', 'Total Posts')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalPosts}</h3>
+              <p className="text-sm text-[#64748B]">{t('social.totalPosts', 'Total Posts')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">{stats.totalPosts}</h3>
             </div>
-            <MessageCircle className="h-12 w-12 text-blue-600" />
+            <MessageCircle className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-total-reviews">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-reviews">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.totalReviews', 'Total Reviews')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalReviews}</h3>
+              <p className="text-sm text-[#64748B]">{t('social.totalReviews', 'Total Reviews')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">{stats.totalReviews}</h3>
             </div>
             <Star className="h-12 w-12 text-yellow-500" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-avg-rating">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-rating">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.avgRating', 'Avg Rating')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.averageRating} ⭐</h3>
+              <p className="text-sm text-[#64748B]">{t('social.avgRating', 'Avg Rating')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">{stats.averageRating} ⭐</h3>
             </div>
             <ThumbsUp className="h-12 w-12 text-green-600" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-response-rate">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-response-rate">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.responseRate', 'Response Rate')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.responseRate}%</h3>
+              <p className="text-sm text-[#64748B]">{t('social.responseRate', 'Response Rate')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">{stats.responseRate}%</h3>
             </div>
-            <MessageCircle className="h-12 w-12 text-purple-600" />
+            <MessageCircle className="h-12 w-12 text-[#0BB3FF]" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800" data-testid="card-followers">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-followers">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('social.followers', 'Followers')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">{stats.totalFollowers}</h3>
+              <p className="text-sm text-[#64748B]">{t('social.followers', 'Followers')}</p>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">{stats.totalFollowers}</h3>
             </div>
-            <Users className="h-12 w-12 text-indigo-600" />
+            <Users className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
@@ -172,26 +172,26 @@ export default function SocialMediaIntegration() {
   );
 
   const postsContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>{t('social.socialMediaPosts', 'Social Media Posts')}</CardTitle></CardHeader>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+      <CardHeader><CardTitle className="text-[#0B1F3B] dark:text-white">{t('social.socialMediaPosts', 'Social Media Posts')}</CardTitle></CardHeader>
       <CardContent>
         <div className="space-y-3">
           {mockPosts.map((post) => (
             <div
               key={post.id}
-              className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+              className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
               data-testid={`post-${post.id}`}
             >
               <div className="flex items-start gap-3 mb-3">
                 {getPlatformIcon(post.platform)}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-semibold capitalize text-gray-900 dark:text-white">{post.platform}</span>
-                    <Badge>{post.status}</Badge>
+                    <span className="font-semibold capitalize text-[#0B1F3B] dark:text-white">{post.platform}</span>
+                    <Badge className={post.status === "published" ? "bg-green-600 text-white" : "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"}>{post.status}</Badge>
                   </div>
-                  <p className="text-gray-900 dark:text-white">{post.content}</p>
+                  <p className="text-[#0B1F3B] dark:text-white">{post.content}</p>
                   {post.status === "published" && post.likes !== undefined && (
-                    <div className="flex gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex gap-4 mt-3 text-sm text-[#64748B]">
                       <span className="flex items-center gap-1"><ThumbsUp className="h-4 w-4" /> {post.likes}</span>
                       <span className="flex items-center gap-1"><Share2 className="h-4 w-4" /> {post.shares}</span>
                       <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {post.comments}</span>
@@ -199,7 +199,7 @@ export default function SocialMediaIntegration() {
                     </div>
                   )}
                   {post.status === "scheduled" && (
-                    <p className="text-sm text-blue-600 mt-2 flex items-center gap-1">
+                    <p className="text-sm text-[#0A5ED7] mt-2 flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       {t('social.scheduledFor', 'Scheduled for')}: {new Date(post.scheduledAt!).toLocaleString()}
                     </p>
@@ -214,45 +214,45 @@ export default function SocialMediaIntegration() {
   );
 
   const reviewsContent = (
-    <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
-      <CardHeader><CardTitle>{t('social.customerReviews', 'Customer Reviews')}</CardTitle></CardHeader>
+    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+      <CardHeader><CardTitle className="text-[#0B1F3B] dark:text-white">{t('social.customerReviews', 'Customer Reviews')}</CardTitle></CardHeader>
       <CardContent>
         <div className="space-y-3">
           {mockReviews.map((review) => (
             <div
               key={review.id}
-              className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg"
+              className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
               data-testid={`review-${review.id}`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
                   {getPlatformIcon(review.platform)}
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{review.customerName}</h3>
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{review.customerName}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                            className={`h-4 w-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-[#E2E8F0] dark:text-[#232A36]"}`}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-[#64748B]">
                         {new Date(review.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                 </div>
                 {review.responded ? (
-                  <Badge variant="default">{t('social.responded', 'Responded')}</Badge>
+                  <Badge className="bg-green-600 text-white">{t('social.responded', 'Responded')}</Badge>
                 ) : (
-                  <Button size="sm" variant="outline" data-testid={`button-respond-${review.id}`}>
+                  <Button size="sm" variant="outline" data-testid={`button-respond-${review.id}`} className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
                     {t('social.respond', 'Respond')}
                   </Button>
                 )}
               </div>
-              <p className="text-gray-900 dark:text-white mt-2">{review.comment}</p>
+              <p className="text-[#0B1F3B] dark:text-white mt-2">{review.comment}</p>
             </div>
           ))}
         </div>
@@ -293,18 +293,18 @@ export default function SocialMediaIntegration() {
       defaultTab="posts"
     >
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('social.createSocialMediaPost', 'Create Social Media Post')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('social.createSocialMediaPost', 'Create Social Media Post')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium">{t('social.platform', 'Platform')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('social.platform', 'Platform')}</label>
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                <SelectTrigger className="mt-1" data-testid="select-platform">
+                <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-platform">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="facebook">Facebook</SelectItem>
                   <SelectItem value="instagram">Instagram</SelectItem>
                   <SelectItem value="google">{t('social.googleBusiness', 'Google Business')}</SelectItem>
@@ -313,20 +313,20 @@ export default function SocialMediaIntegration() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">{t('social.content', 'Content')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('social.content', 'Content')}</label>
               <Textarea
                 placeholder={t('social.writeYourPost', 'Write your post...')}
-                className="mt-1 h-32"
+                className="mt-1 h-32 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="textarea-content"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">{t('social.scheduleOptional', 'Schedule (Optional)')}</label>
+              <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('social.scheduleOptional', 'Schedule (Optional)')}</label>
               <div className="flex gap-2">
-                <Input type="datetime-local" className="mt-1" data-testid="input-schedule" />
+                <Input type="datetime-local" className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-schedule" />
               </div>
             </div>
-            <Button className="w-full" onClick={() => {
+            <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white" onClick={() => {
               createPost.mutate({
                 platform: selectedPlatform,
                 content: "Test post",

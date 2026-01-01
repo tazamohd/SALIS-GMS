@@ -104,12 +104,12 @@ export function PartsAvailability() {
 
   const getStatusBadge = (status: string, quantity: number) => {
     if (status === 'backordered' || quantity === 0) {
-      return <Badge variant="destructive" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 mr-1" />{t('partsAvailability.outOfStock', 'Out of Stock')}</Badge>;
+      return <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-0" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 mr-1" />{t('partsAvailability.outOfStock', 'Out of Stock')}</Badge>;
     }
     if (quantity < 5) {
-      return <Badge variant="outline" className="text-yellow-600 border-yellow-600" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 mr-1" />{t('partsAvailability.lowStock', 'Low Stock')}</Badge>;
+      return <Badge className="bg-[#F97316]/10 text-[#F97316] border-0" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 mr-1" />{t('partsAvailability.lowStock', 'Low Stock')}</Badge>;
     }
-    return <Badge variant="default" className="bg-green-600" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 mr-1" />{t('partsAvailability.inStock', 'In Stock')}</Badge>;
+    return <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 mr-1" />{t('partsAvailability.inStock', 'In Stock')}</Badge>;
   };
 
   return (
@@ -126,10 +126,10 @@ export function PartsAvailability() {
         },
       ]}
     >
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('partsAvailability.searchParts', 'Search Parts')}</CardTitle>
-          <CardDescription>{t('partsAvailability.searchDescription', 'Search for parts across all suppliers')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('partsAvailability.searchParts', 'Search Parts')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('partsAvailability.searchDescription', 'Search for parts across all suppliers')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
@@ -138,9 +138,10 @@ export function PartsAvailability() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-search-parts"
             />
-            <Button onClick={handleSearch} data-testid="button-search">
+            <Button onClick={handleSearch} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-search">
               <Search className="w-4 h-4 mr-2" />
               {t('common.search', 'Search')}
             </Button>
@@ -151,7 +152,7 @@ export function PartsAvailability() {
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i}>
+            <Card key={i} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
@@ -164,24 +165,26 @@ export function PartsAvailability() {
           ))}
         </div>
       ) : availability.length === 0 ? (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="py-12 text-center">
-            <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-lg font-medium" data-testid="text-no-results">{t('partsAvailability.noPartsFound', 'No parts availability found')}</p>
-            <p className="text-sm text-muted-foreground">{t('partsAvailability.trySearching', 'Try searching or syncing supplier data')}</p>
+            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+              <Package className="w-10 h-10 text-white" />
+            </div>
+            <p className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid="text-no-results">{t('partsAvailability.noPartsFound', 'No parts availability found')}</p>
+            <p className="text-sm text-[#64748B]">{t('partsAvailability.trySearching', 'Try searching or syncing supplier data')}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {availability.map((item) => (
-            <Card key={item.id} data-testid={`card-availability-${item.id}`}>
+            <Card key={item.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-availability-${item.id}`}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-lg" data-testid={`text-part-number-${item.id}`}>
+                    <CardTitle className="text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-part-number-${item.id}`}>
                       {item.externalPartNumber || t('partsAvailability.unknownPart', 'Unknown Part')}
                     </CardTitle>
-                    <CardDescription data-testid={`text-sku-${item.id}`}>
+                    <CardDescription className="text-[#64748B]" data-testid={`text-sku-${item.id}`}>
                       {t('partsAvailability.sku', 'SKU')}: {item.externalSku || t('common.na', 'N/A')}
                     </CardDescription>
                   </div>
@@ -190,34 +193,34 @@ export function PartsAvailability() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center text-sm">
-                  <Package className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span data-testid={`text-quantity-${item.id}`}>
+                  <Package className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-quantity-${item.id}`}>
                     <strong>{t('partsAvailability.quantity', 'Quantity')}:</strong> {item.quantityAvailable || 0} {t('partsAvailability.units', 'units')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
-                  <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span data-testid={`text-price-${item.id}`}>
+                  <DollarSign className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-price-${item.id}`}>
                     <strong>{t('partsAvailability.price', 'Price')}:</strong> {item.pricePerUnit ? `${item.pricePerUnit} ${item.currency}` : t('common.na', 'N/A')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
-                  <Clock className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span data-testid={`text-lead-time-${item.id}`}>
+                  <Clock className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-lead-time-${item.id}`}>
                     <strong>{t('partsAvailability.leadTime', 'Lead Time')}:</strong> {item.leadTimeDays ? `${item.leadTimeDays} ${t('partsAvailability.days', 'days')}` : t('common.na', 'N/A')}
                   </span>
                 </div>
 
                 {item.notes && (
-                  <p className="text-xs text-muted-foreground pt-2 border-t" data-testid={`text-notes-${item.id}`}>
+                  <p className="text-xs text-[#64748B] pt-2 border-t border-[#E2E8F0] dark:border-[#232A36]" data-testid={`text-notes-${item.id}`}>
                     {item.notes}
                   </p>
                 )}
 
                 {item.lastSyncedAt && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[#64748B]">
                     <strong>{t('partsAvailability.lastSynced', 'Last synced')}:</strong> {formatDistanceToNow(new Date(item.lastSyncedAt), { addSuffix: true })}
                   </p>
                 )}

@@ -56,9 +56,9 @@ export default function TechnicianMyJobs() {
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       assigned: { label: "Assigned", className: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" },
-      in_progress: { label: "In Progress", className: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300" },
+      in_progress: { label: "In Progress", className: "bg-orange-100 dark:bg-orange-900 text-[#F97316]" },
       completed: { label: "Completed", className: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300" },
-      pending: { label: "Pending", className: "bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300" },
+      pending: { label: "Pending", className: "bg-gray-100 dark:bg-gray-900 text-[#64748B]" },
     };
     const variant = variants[status] || variants.pending;
     return <Badge className={variant.className}>{variant.label}</Badge>;
@@ -74,12 +74,12 @@ export default function TechnicianMyJobs() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/4"></div>
-        <div className="h-12 bg-gray-200 dark:bg-gray-800 rounded"></div>
+      <div className="animate-pulse space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
+        <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4"></div>
+        <div className="h-12 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
         <div className="grid gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div key={i} className="h-40 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
           ))}
         </div>
       </div>
@@ -91,32 +91,31 @@ export default function TechnicianMyJobs() {
   const completedJobs = filteredJobs.filter((j) => j.status === "completed");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-2">
           My Jobs
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-[#64748B]">
           Manage your assigned job cards
         </p>
       </div>
 
-      {/* Filters */}
-      <Card className="bg-white dark:bg-salis-gray-dark border-gray-200 dark:border-salis-gray">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder="Search by job number or service type..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-jobs"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48" data-testid="select-status-filter">
+              <SelectTrigger className="w-full md:w-48 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -130,9 +129,8 @@ export default function TechnicianMyJobs() {
         </CardContent>
       </Card>
 
-      {/* Jobs Tabs */}
       <Tabs defaultValue="assigned" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="assigned" data-testid="tab-assigned">
             Assigned ({assignedJobs.length})
           </TabsTrigger>
@@ -146,22 +144,22 @@ export default function TechnicianMyJobs() {
 
         <TabsContent value="assigned" className="space-y-4">
           {assignedJobs.length === 0 ? (
-            <Card className="bg-white dark:bg-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="text-center py-12">
-                <Clock className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600 dark:text-gray-400">No assigned jobs</p>
+                <Clock className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+                <p className="text-[#64748B]">No assigned jobs</p>
               </CardContent>
             </Card>
           ) : (
             assignedJobs.map((job) => (
-              <Card key={job.id} className="bg-white dark:bg-salis-gray-dark" data-testid={`job-card-${job.id}`}>
+              <Card key={job.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`job-card-${job.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-gray-900 dark:text-white">
+                      <CardTitle className="text-[#0B1F3B] dark:text-white">
                         Job #{job.jobNumber}
                       </CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-[#64748B] mt-1">
                         {job.serviceType}
                       </p>
                     </div>
@@ -172,20 +170,20 @@ export default function TechnicianMyJobs() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="space-y-2 text-sm">
                       {job.scheduledDate && (
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-[#64748B]">
                           <Clock className="h-4 w-4 inline mr-2" />
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
                       {job.estimatedCost && (
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-[#64748B]">
                           Estimated: SAR {job.estimatedCost}
                         </p>
                       )}
                     </div>
                     <Button
                       onClick={() => handleStartJob(job.id)}
-                      className="bg-orange-600 hover:bg-orange-700"
+                      className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                       data-testid={`button-start-${job.id}`}
                     >
                       <PlayCircle className="h-4 w-4 mr-2" />
@@ -200,22 +198,22 @@ export default function TechnicianMyJobs() {
 
         <TabsContent value="active" className="space-y-4">
           {activeJobs.length === 0 ? (
-            <Card className="bg-white dark:bg-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="text-center py-12">
-                <PauseCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600 dark:text-gray-400">No jobs in progress</p>
+                <PauseCircle className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+                <p className="text-[#64748B]">No jobs in progress</p>
               </CardContent>
             </Card>
           ) : (
             activeJobs.map((job) => (
-              <Card key={job.id} className="bg-white dark:bg-salis-gray-dark border-l-4 border-l-orange-500" data-testid={`job-card-${job.id}`}>
+              <Card key={job.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] border-l-4 border-l-[#F97316]" data-testid={`job-card-${job.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-gray-900 dark:text-white">
+                      <CardTitle className="text-[#0B1F3B] dark:text-white">
                         Job #{job.jobNumber}
                       </CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-[#64748B] mt-1">
                         {job.serviceType}
                       </p>
                     </div>
@@ -226,13 +224,13 @@ export default function TechnicianMyJobs() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="space-y-2 text-sm">
                       {job.scheduledDate && (
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-[#64748B]">
                           <Clock className="h-4 w-4 inline mr-2" />
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
                       {job.actualCost && (
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-[#64748B]">
                           Cost: SAR {job.actualCost}
                         </p>
                       )}
@@ -254,22 +252,22 @@ export default function TechnicianMyJobs() {
 
         <TabsContent value="completed" className="space-y-4">
           {completedJobs.length === 0 ? (
-            <Card className="bg-white dark:bg-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="text-center py-12">
-                <CheckCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600 dark:text-gray-400">No completed jobs</p>
+                <CheckCircle className="h-12 w-12 mx-auto text-[#64748B] mb-3" />
+                <p className="text-[#64748B]">No completed jobs</p>
               </CardContent>
             </Card>
           ) : (
             completedJobs.map((job) => (
-              <Card key={job.id} className="bg-white dark:bg-salis-gray-dark opacity-75" data-testid={`job-card-${job.id}`}>
+              <Card key={job.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] opacity-75" data-testid={`job-card-${job.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-gray-900 dark:text-white">
+                      <CardTitle className="text-[#0B1F3B] dark:text-white">
                         Job #{job.jobNumber}
                       </CardTitle>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-[#64748B] mt-1">
                         {job.serviceType}
                       </p>
                     </div>
@@ -279,12 +277,12 @@ export default function TechnicianMyJobs() {
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     {job.completionDate && (
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-[#64748B]">
                         Completed: {format(new Date(job.completionDate), "MMM d, yyyy")}
                       </p>
                     )}
                     {job.actualCost && (
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-[#64748B]">
                         Final Cost: SAR {job.actualCost}
                       </p>
                     )}

@@ -61,26 +61,27 @@ export default function DigitalVehicleWalkaround() {
   };
 
   const getWalkaroundTypeBadge = (type: string) => {
-    return (
-      <Badge variant={type === "pre_service" ? "secondary" : "default"}>
-        {type === "pre_service" ? t('vehicles.preService', 'Pre-Service') : type === "post_service" ? t('vehicles.postService', 'Post-Service') : type || t('common.unknown', 'Unknown')}
-      </Badge>
-    );
+    if (type === "pre_service") {
+      return <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">{t('vehicles.preService', 'Pre-Service')}</Badge>;
+    } else if (type === "post_service") {
+      return <Badge className="bg-emerald-500/10 text-emerald-600 border-0">{t('vehicles.postService', 'Post-Service')}</Badge>;
+    }
+    return <Badge className="bg-[#64748B]/10 text-[#64748B] border-0">{type || t('common.unknown', 'Unknown')}</Badge>;
   };
 
   const metrics = [
-    { label: t('vehicles.totalWalkarounds', 'Total Walkarounds'), value: stats.totalWalkarounds, icon: Camera, color: "text-blue-600" },
-    { label: t('vehicles.completedToday', 'Completed Today'), value: stats.completedToday, icon: CheckCircle, color: "text-green-600" },
-    { label: t('vehicles.pendingSignature', 'Pending Signature'), value: stats.pendingSignature, icon: FileText, color: "text-yellow-600" },
-    { label: t('vehicles.damageReported', 'Damage Reported'), value: stats.damageReported, icon: AlertTriangle, color: "text-red-600" },
+    { label: t('vehicles.totalWalkarounds', 'Total Walkarounds'), value: stats.totalWalkarounds, icon: Camera, color: "text-[#0A5ED7]" },
+    { label: t('vehicles.completedToday', 'Completed Today'), value: stats.completedToday, icon: CheckCircle, color: "text-emerald-600" },
+    { label: t('vehicles.pendingSignature', 'Pending Signature'), value: stats.pendingSignature, icon: FileText, color: "text-amber-600" },
+    { label: t('vehicles.damageReported', 'Damage Reported'), value: stats.damageReported, icon: AlertTriangle, color: "text-[#F97316]" },
   ];
 
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div className="p-8 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128"></div>
+          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-96"></div>
+          <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-128"></div>
         </div>
       </div>
     );
@@ -95,22 +96,25 @@ export default function DigitalVehicleWalkaround() {
     >
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogTrigger asChild>
-          <Button data-testid="button-create-walkaround" className="mb-6">
+          <Button 
+            data-testid="button-create-walkaround" 
+            className="mb-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+          >
             <Plus className="h-4 w-4 mr-2" />
             {t('vehicles.newWalkaround', 'New Walkaround')}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle>{t('vehicles.createVehicleWalkaround', 'Create Vehicle Walkaround')}</DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.createVehicleWalkaround', 'Create Vehicle Walkaround')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">{t('vehicles.jobCardId', 'Job Card ID')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('vehicles.jobCardId', 'Job Card ID')}</label>
                 <input
                   type="text"
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   placeholder={t('vehicles.enterJobCardId', 'Enter job card ID')}
                   value={formData.jobCardId}
                   onChange={(e) => setFormData({ ...formData, jobCardId: e.target.value })}
@@ -118,10 +122,10 @@ export default function DigitalVehicleWalkaround() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">{t('vehicles.vehicleId', 'Vehicle ID')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('vehicles.vehicleId', 'Vehicle ID')}</label>
                 <input
                   type="text"
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   placeholder={t('vehicles.enterVehicleId', 'Enter vehicle ID')}
                   value={formData.vehicleId}
                   onChange={(e) => setFormData({ ...formData, vehicleId: e.target.value })}
@@ -131,10 +135,10 @@ export default function DigitalVehicleWalkaround() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">{t('vehicles.technicianId', 'Technician ID')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('vehicles.technicianId', 'Technician ID')}</label>
                 <input
                   type="text"
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   placeholder={t('vehicles.enterTechnicianId', 'Enter technician ID')}
                   value={formData.technicianId}
                   onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
@@ -142,9 +146,9 @@ export default function DigitalVehicleWalkaround() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">{t('common.type', 'Type')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</label>
                 <select
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   value={formData.walkaroundType}
                   onChange={(e) => setFormData({ ...formData, walkaroundType: e.target.value })}
                   data-testid="select-type"
@@ -156,10 +160,10 @@ export default function DigitalVehicleWalkaround() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">{t('vehicles.mileage', 'Mileage')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('vehicles.mileage', 'Mileage')}</label>
                 <input
                   type="number"
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   placeholder="0"
                   value={formData.mileageReading}
                   onChange={(e) => setFormData({ ...formData, mileageReading: e.target.value })}
@@ -167,9 +171,9 @@ export default function DigitalVehicleWalkaround() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">{t('vehicles.fuelLevel', 'Fuel Level')}</label>
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('vehicles.fuelLevel', 'Fuel Level')}</label>
                 <select
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md"
+                  className="w-full mt-1 px-3 py-2 border border-[#E2E8F0] dark:border-[#232A36] rounded-md bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white"
                   value={formData.fuelLevel}
                   onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
                   data-testid="select-fuel"
@@ -182,7 +186,7 @@ export default function DigitalVehicleWalkaround() {
               </div>
             </div>
             <Button
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
               onClick={() => {
                 if (!formData.jobCardId || !formData.vehicleId || !formData.technicianId) {
                   toast({ title: t('common.error', 'Validation error'), description: t('vehicles.pleaseFillAllRequiredFields', 'Please fill in all required fields'), variant: "destructive" });
@@ -208,17 +212,23 @@ export default function DigitalVehicleWalkaround() {
       </Dialog>
 
       {walkaroundsArray.length === 0 && !isLoading && (
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-12">
             <div className="text-center">
-              <AlertCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center mx-auto mb-4">
+                <Camera className="h-8 w-8 text-[#0A5ED7]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">
                 {t('vehicles.noVehicleWalkarounds', 'No Vehicle Walkarounds')}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-[#64748B] mb-4">
                 {t('vehicles.noDigitalWalkaroundsFoundCreateFirst', 'No digital walkarounds found. Create your first inspection to get started.')}
               </p>
-              <Button onClick={() => setIsCreateDialogOpen(true)} data-testid="button-create-first">
+              <Button 
+                onClick={() => setIsCreateDialogOpen(true)} 
+                data-testid="button-create-first"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 {t('vehicles.createFirstWalkaround', 'Create First Walkaround')}
               </Button>
@@ -237,40 +247,54 @@ export default function DigitalVehicleWalkaround() {
             return (
               <Card
                 key={`walkaround-${walkaround.id || index}`}
-                className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`walkaround-${walkaround.id || index}`}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                        <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                           {walkaround.jobCardNumber || t('vehicles.jobCardNA', 'Job Card N/A')}
                         </h3>
                         {getWalkaroundTypeBadge(walkaround.walkaroundType)}
                         {walkaround.signedAt && (
-                          <Badge variant="default">
+                          <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
                             <CheckCircle className="h-3 w-3 mr-1" /> {t('vehicles.signed', 'Signed')}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-[#64748B]">
                         {walkaround.customerName || t('vehicles.customerNA', 'Customer N/A')} - {walkaround.vehicle || t('vehicles.vehicleNA', 'Vehicle N/A')}
                       </p>
                     </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-sm text-[#64748B]">
                       {walkaround.createdAt ? new Date(walkaround.createdAt).toLocaleString() : t('vehicles.dateNA', 'Date N/A')}
                     </span>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="photos" className="space-y-4">
-                    <TabsList className="bg-gray-100 dark:bg-salis-gray-dark">
-                      <TabsTrigger value="photos" data-testid={`tab-photos-${walkaround.id || index}`}>
+                    <TabsList className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                      <TabsTrigger 
+                        value="photos" 
+                        data-testid={`tab-photos-${walkaround.id || index}`}
+                        className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white"
+                      >
                         {t('vehicles.photos', 'Photos')} ({photos.length})
                       </TabsTrigger>
-                      <TabsTrigger value="details" data-testid={`tab-details-${walkaround.id || index}`}>{t('common.details', 'Details')}</TabsTrigger>
-                      <TabsTrigger value="damage" data-testid={`tab-damage-${walkaround.id || index}`}>
+                      <TabsTrigger 
+                        value="details" 
+                        data-testid={`tab-details-${walkaround.id || index}`}
+                        className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white"
+                      >
+                        {t('common.details', 'Details')}
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="damage" 
+                        data-testid={`tab-damage-${walkaround.id || index}`}
+                        className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white"
+                      >
                         {t('vehicles.damageReport', 'Damage Report')} ({damagePrevious.length + damageNew.length})
                       </TabsTrigger>
                     </TabsList>
@@ -281,55 +305,55 @@ export default function DigitalVehicleWalkaround() {
                           {photos.map((photo: any, photoIndex: number) => (
                             <div
                               key={`photo-${photoIndex}`}
-                              className="relative group cursor-pointer rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800"
+                              className="relative group cursor-pointer rounded-lg overflow-hidden border border-[#E2E8F0] dark:border-[#232A36]"
                               data-testid={`photo-${photoIndex}`}
                             >
                               {photo.url ? (
                                 <img src={photo.url} alt={photo.angle || t('vehicles.photo', 'Photo')} className="w-full h-32 object-cover" />
                               ) : (
-                                <div className="w-full h-32 bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                                  <Camera className="h-8 w-8 text-gray-400" />
+                                <div className="w-full h-32 bg-[#F8FAFC] dark:bg-[#0E1117] flex items-center justify-center">
+                                  <Camera className="h-8 w-8 text-[#64748B]" />
                                 </div>
                               )}
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <div className="absolute inset-0 bg-gradient-to-r from-[#0A5ED7]/50 to-[#0BB3FF]/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <Image className="h-8 w-8 text-white" />
                               </div>
-                              <div className="absolute bottom-0 left-0 right-0 bg-black/75 text-white text-xs p-1 text-center capitalize">
+                              <div className="absolute bottom-0 left-0 right-0 bg-[#0B1F3B]/75 text-white text-xs p-1 text-center capitalize">
                                 {photo.angle ? photo.angle.replace("_", " ") : t('vehicles.photo', 'Photo')}
                               </div>
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('vehicles.noPhotosAvailable', 'No photos available')}</p>
+                        <p className="text-sm text-[#64748B]">{t('vehicles.noPhotosAvailable', 'No photos available')}</p>
                       )}
                     </TabsContent>
 
                     <TabsContent value="details">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.technician', 'Technician')}:</span>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-[#64748B]">{t('vehicles.technician', 'Technician')}:</span>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">
                             {walkaround.technicianName || t('common.notAvailable', 'Not available')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.mileage', 'Mileage')}:</span>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-[#64748B]">{t('vehicles.mileage', 'Mileage')}:</span>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">
                             {walkaround.mileageReading 
                               ? `${walkaround.mileageReading.toLocaleString()} ${t('vehicles.miles', 'miles')}`
                               : t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.fuelLevel', 'Fuel Level')}:</span>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-[#64748B]">{t('vehicles.fuelLevel', 'Fuel Level')}:</span>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">
                             {walkaround.fuelLevel || t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">{t('vehicles.interior', 'Interior')}:</span>
-                          <p className="font-medium text-gray-900 dark:text-white capitalize">
+                          <span className="text-[#64748B]">{t('vehicles.interior', 'Interior')}:</span>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white capitalize">
                             {walkaround.interiorCondition || t('vehicles.notRecorded', 'Not recorded')}
                           </p>
                         </div>
@@ -340,11 +364,11 @@ export default function DigitalVehicleWalkaround() {
                       <div className="space-y-4">
                         {damagePrevious.length > 0 && (
                           <div>
-                            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{t('vehicles.previouslyNotedDamage', 'Previously Noted Damage')}</h4>
+                            <h4 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('vehicles.previouslyNotedDamage', 'Previously Noted Damage')}</h4>
                             <ul className="space-y-1">
                               {damagePrevious.map((damage: string, dmgIndex: number) => (
-                                <li key={`prev-${dmgIndex}`} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2">
-                                  <span className="text-gray-400">•</span>
+                                <li key={`prev-${dmgIndex}`} className="text-sm text-[#64748B] flex items-start gap-2">
+                                  <span className="text-[#64748B]">•</span>
                                   {damage}
                                 </li>
                               ))}
@@ -353,14 +377,14 @@ export default function DigitalVehicleWalkaround() {
                         )}
                         {damageNew.length > 0 && (
                           <div>
-                            <h4 className="font-semibold text-red-600 mb-2 flex items-center gap-2">
+                            <h4 className="font-semibold text-[#F97316] mb-2 flex items-center gap-2">
                               <AlertTriangle className="h-4 w-4" />
                               {t('vehicles.newDamageIdentified', 'New Damage Identified')}
                             </h4>
                             <ul className="space-y-1">
                               {damageNew.map((damage: string, dmgIndex: number) => (
-                                <li key={`new-${dmgIndex}`} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2">
-                                  <span className="text-red-600">•</span>
+                                <li key={`new-${dmgIndex}`} className="text-sm text-[#64748B] flex items-start gap-2">
+                                  <span className="text-[#F97316]">•</span>
                                   {damage}
                                 </li>
                               ))}
@@ -368,7 +392,7 @@ export default function DigitalVehicleWalkaround() {
                           </div>
                         )}
                         {damagePrevious.length === 0 && damageNew.length === 0 && (
-                          <p className="text-sm text-green-600 flex items-center gap-2">
+                          <p className="text-sm text-emerald-600 flex items-center gap-2">
                             <CheckCircle className="h-4 w-4" />
                             {t('vehicles.noDamageReported', 'No damage reported')}
                           </p>

@@ -64,15 +64,15 @@ export function CustomerInvoices() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+        return 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400';
       case 'sent':
-        return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white';
+        return 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white';
       case 'overdue':
-        return 'bg-salis-black dark:bg-white text-white dark:text-salis-black';
+        return 'bg-[#F97316]/20 text-[#F97316]';
       case 'draft':
-        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
+        return 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#64748B]';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-salis-gray-dark dark:text-gray-300';
+        return 'bg-[#E2E8F0] dark:bg-[#232A36] text-[#64748B]';
     }
   };
 
@@ -83,14 +83,17 @@ export function CustomerInvoices() {
       icon={FileText}
     >
       <div className="flex items-center gap-4 mb-6">
-        <Filter className="h-4 w-4 text-gray-500" />
-        <div className="flex gap-2">
+        <Filter className="h-4 w-4 text-[#64748B]" />
+        <div className="flex gap-2 flex-wrap">
           {statusOptions.map(option => (
             <Button
               key={option.value}
               variant={statusFilter === option.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => setStatusFilter(option.value)}
+              className={statusFilter === option.value 
+                ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90' 
+                : 'border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#151A23]'}
               data-testid={`button-filter-${option.value}`}
             >
               {option.label}
@@ -100,15 +103,15 @@ export function CustomerInvoices() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12 text-gray-500">Loading invoices...</div>
+        <div className="text-center py-12 text-[#64748B]">Loading invoices...</div>
       ) : filteredInvoices.length === 0 ? (
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="text-center py-12">
-            <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <FileText className="h-16 w-16 text-[#64748B] mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white mb-2">
               No invoices found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[#64748B]">
               {statusFilter === 'all' 
                 ? "You don't have any invoices yet."
                 : `No ${statusFilter} invoices.`}
@@ -118,14 +121,14 @@ export function CustomerInvoices() {
       ) : (
         <div className="grid gap-4">
           {filteredInvoices.map(inv => (
-            <Card key={inv.id} data-testid={`card-invoice-${inv.id}`}>
+            <Card key={inv.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-invoice-${inv.id}`}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-xl" data-testid={`text-invoice-number-${inv.id}`}>
+                    <CardTitle className="text-xl text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-number-${inv.id}`}>
                       Invoice #{inv.invoiceNumber}
                     </CardTitle>
-                    <CardDescription className="mt-1">
+                    <CardDescription className="mt-1 text-[#64748B]">
                       Issued: {format(new Date(inv.invoiceDate), 'PPP')}
                     </CardDescription>
                   </div>
@@ -141,20 +144,20 @@ export function CustomerInvoices() {
                 <div className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-3">
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Due Date</p>
-                      <p className="font-medium mt-1" data-testid={`text-invoice-duedate-${inv.id}`}>
+                      <p className="text-sm text-[#64748B]">Due Date</p>
+                      <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-duedate-${inv.id}`}>
                         {format(new Date(inv.dueDate), 'PPP')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
-                      <p className="font-medium mt-1 text-lg" data-testid={`text-invoice-total-${inv.id}`}>
+                      <p className="text-sm text-[#64748B]">Total Amount</p>
+                      <p className="font-medium mt-1 text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-total-${inv.id}`}>
                         ${Number(inv.totalAmount).toFixed(2)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Balance Due</p>
-                      <p className="font-medium mt-1 text-lg" data-testid={`text-invoice-balance-${inv.id}`}>
+                      <p className="text-sm text-[#64748B]">Balance Due</p>
+                      <p className="font-medium mt-1 text-lg text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-balance-${inv.id}`}>
                         ${Number(inv.balanceAmount).toFixed(2)}
                       </p>
                     </div>
@@ -162,15 +165,15 @@ export function CustomerInvoices() {
 
                   {inv.notes && (
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Notes</p>
-                      <p className="mt-1">{inv.notes}</p>
+                      <p className="text-sm text-[#64748B]">Notes</p>
+                      <p className="mt-1 text-[#0B1F3B] dark:text-white">{inv.notes}</p>
                     </div>
                   )}
 
                   {inv.status !== 'paid' && Number(inv.balanceAmount) > 0 && (
-                    <div className="flex gap-2 pt-4 border-t">
+                    <div className="flex gap-2 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
                       <Button 
-                        className="flex-1" 
+                        className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90" 
                         onClick={() => handlePayInvoice(inv)}
                         disabled={createPaymentIntentMutation.isPending}
                         data-testid={`button-pay-invoice-${inv.id}`}
@@ -180,7 +183,7 @@ export function CustomerInvoices() {
                           ? 'Loading...' 
                           : `Pay $${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
-                      <Button variant="outline" disabled data-testid={`button-download-invoice-${inv.id}`}>
+                      <Button variant="outline" disabled className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]" data-testid={`button-download-invoice-${inv.id}`}>
                         <FileText className="h-4 w-4 mr-2" />
                         Download
                       </Button>
@@ -188,7 +191,7 @@ export function CustomerInvoices() {
                   )}
 
                   {inv.status === 'paid' && (
-                    <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 pt-4 border-t">
+                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
                       <DollarSign className="h-4 w-4" />
                       <span className="text-sm font-medium">Paid on {inv.paidAt ? format(new Date(inv.paidAt), 'PPP') : 'N/A'}</span>
                     </div>

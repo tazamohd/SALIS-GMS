@@ -189,9 +189,9 @@ export default function BudgetManagement() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, { className: string; icon: typeof CheckCircle }> = {
-      "On Track": { className: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200", icon: CheckCircle },
-      "Near Limit": { className: "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200", icon: AlertTriangle },
-      "Over Budget": { className: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200", icon: AlertTriangle },
+      "On Track": { className: "bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200", icon: CheckCircle },
+      "Near Limit": { className: "bg-[#F97316]/20 text-[#F97316] dark:bg-[#F97316]/30 dark:text-orange-200", icon: AlertTriangle },
+      "Over Budget": { className: "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200", icon: AlertTriangle },
     };
     const style = styles[status] || styles["On Track"];
     const Icon = style.icon;
@@ -211,54 +211,54 @@ export default function BudgetManagement() {
   const overviewTab = (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card data-testid="card-total-budget">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-budget">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               {t('budget.totalBudget', 'Total Budget')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">SAR {totalBudget.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">{t('budget.fiscalYear', 'FY')} {selectedYear}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalBudget.toLocaleString()}</p>
+            <p className="text-xs text-[#64748B]">{t('budget.fiscalYear', 'FY')} {selectedYear}</p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-total-spent">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-total-spent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               {t('budget.totalSpent', 'Total Spent')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">SAR {totalActual.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalActual.toLocaleString()}</p>
+            <p className="text-xs text-[#64748B]">
               {overallUtilization.toFixed(1)}% {t('budget.utilized', 'utilized')}
             </p>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-remaining">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-remaining">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               {t('budget.remaining', 'Remaining')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={`text-2xl font-bold ${totalRemaining >= 0 ? "text-green-600" : "text-red-600"}`}>
+            <p className={`text-2xl font-bold ${totalRemaining >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
               SAR {Math.abs(totalRemaining).toLocaleString()}
             </p>
-            <Badge variant={totalRemaining >= 0 ? "default" : "destructive"}>
+            <Badge className={totalRemaining >= 0 ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200"}>
               {totalRemaining >= 0 ? t('budget.available', 'Available') : t('budget.overspent', 'Overspent')}
             </Badge>
           </CardContent>
         </Card>
 
-        <Card data-testid="card-budget-health">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-budget-health">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-sm font-medium text-[#64748B] flex items-center gap-2">
               <Target className="h-4 w-4" />
               {t('budget.budgetHealth', 'Budget Health')}
             </CardTitle>
@@ -266,22 +266,22 @@ export default function BudgetManagement() {
           <CardContent>
             <div className="flex gap-4">
               <div className="text-center">
-                <p className="text-lg font-bold text-green-600">
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">
                   {budgets.filter((b) => b.status === "On Track").length}
                 </p>
-                <p className="text-xs text-muted-foreground">{t('budget.onTrack', 'On Track')}</p>
+                <p className="text-xs text-[#64748B]">{t('budget.onTrack', 'On Track')}</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-bold text-yellow-600">
+                <p className="text-lg font-bold text-[#F97316]">
                   {budgets.filter((b) => b.status === "Near Limit").length}
                 </p>
-                <p className="text-xs text-muted-foreground">{t('budget.nearLimit', 'Near Limit')}</p>
+                <p className="text-xs text-[#64748B]">{t('budget.nearLimit', 'Near Limit')}</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-bold text-red-600">
+                <p className="text-lg font-bold text-red-600 dark:text-red-400">
                   {budgets.filter((b) => b.status === "Over Budget").length}
                 </p>
-                <p className="text-xs text-muted-foreground">{t('budget.over', 'Over')}</p>
+                <p className="text-xs text-[#64748B]">{t('budget.over', 'Over')}</p>
               </div>
             </div>
           </CardContent>
@@ -289,22 +289,22 @@ export default function BudgetManagement() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('budget.utilizationByCategory', 'Budget Utilization by Category')}</CardTitle>
-            <CardDescription>{t('budget.spendingProgress', 'Spending progress across categories')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('budget.utilizationByCategory', 'Budget Utilization by Category')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('budget.spendingProgress', 'Spending progress across categories')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {budgets.map((budget) => (
                 <div key={budget.id}>
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium">{budget.name}</span>
-                    <span className="text-sm">{budget.utilizationRate.toFixed(0)}%</span>
+                    <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{budget.name}</span>
+                    <span className="text-sm text-[#64748B]">{budget.utilizationRate.toFixed(0)}%</span>
                   </div>
                   <Progress
                     value={Math.min(budget.utilizationRate, 100)}
-                    className={`h-2 ${budget.utilizationRate > 100 ? "[&>div]:bg-red-500" : budget.utilizationRate > 80 ? "[&>div]:bg-yellow-500" : ""}`}
+                    className={`h-2 ${budget.utilizationRate > 100 ? "[&>div]:bg-red-500" : budget.utilizationRate > 80 ? "[&>div]:bg-[#F97316]" : ""}`}
                   />
                 </div>
               ))}
@@ -312,29 +312,29 @@ export default function BudgetManagement() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
-            <CardTitle>{t('budget.monthlyBudgetVsActual', 'Monthly Budget vs Actual')}</CardTitle>
-            <CardDescription>{t('budget.yearToDateComparison', 'Year-to-date spending comparison')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('budget.monthlyBudgetVsActual', 'Monthly Budget vs Actual')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('budget.yearToDateComparison', 'Year-to-date spending comparison')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {monthlyBudgetData.slice(0, 3).map((item, index) => (
-                <div key={index} className="p-3 border rounded-lg">
+                <div key={index} className="p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium">{item.month}</span>
-                    <Badge variant={item.actual <= item.budget ? "default" : "destructive"}>
+                    <span className="font-medium text-[#0B1F3B] dark:text-white">{item.month}</span>
+                    <Badge className={item.actual <= item.budget ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200"}>
                       {item.actual <= item.budget ? t('budget.under', 'Under') : t('budget.over', 'Over')}
                     </Badge>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-muted-foreground">{t('budget.budget', 'Budget')}</p>
-                      <p className="font-mono font-bold">SAR {item.budget.toLocaleString()}</p>
+                      <p className="text-[#64748B]">{t('budget.budget', 'Budget')}</p>
+                      <p className="font-mono font-bold text-[#0B1F3B] dark:text-white">SAR {item.budget.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">{t('budget.actual', 'Actual')}</p>
-                      <p className={`font-mono font-bold ${item.actual > item.budget ? "text-red-600" : "text-green-600"}`}>
+                      <p className="text-[#64748B]">{t('budget.actual', 'Actual')}</p>
+                      <p className={`font-mono font-bold ${item.actual > item.budget ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
                         SAR {item.actual.toLocaleString()}
                       </p>
                     </div>
@@ -346,36 +346,36 @@ export default function BudgetManagement() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('budget.relatedModules', 'Related Modules')}</CardTitle>
-          <CardDescription>{t('budget.navigateToRelated', 'Navigate to related pages')}</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('budget.relatedModules', 'Related Modules')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('budget.navigateToRelated', 'Navigate to related pages')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/cost-centers">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-cost-centers">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-cost-centers">
                 <Target className="h-4 w-4 mr-2" />
                 {t('budget.costCenters', 'Cost Centers')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/expenses-management">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-expenses">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-expenses">
                 <DollarSign className="h-4 w-4 mr-2" />
                 {t('budget.expenses', 'Expenses')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-income">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-income">
                 <TrendingUp className="h-4 w-4 mr-2" />
                 {t('budget.incomeStatement', 'Income Statement')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
-              <Button variant="outline" className="w-full justify-start" data-testid="link-ledger">
+              <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-ledger">
                 <FileText className="h-4 w-4 mr-2" />
                 {t('budget.generalLedger', 'General Ledger')}
                 <ExternalLink className="h-3 w-3 ml-auto" />
@@ -392,20 +392,20 @@ export default function BudgetManagement() {
       <div className="flex flex-col md:flex-row gap-4 justify-between">
         <div className="flex gap-4">
           <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-[150px]" data-testid="select-year">
+            <SelectTrigger className="w-[150px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-year">
               <SelectValue placeholder={t('budget.year', 'Year')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="2024">{t('budget.fiscalYear', 'FY')} 2024</SelectItem>
               <SelectItem value="2023">{t('budget.fiscalYear', 'FY')} 2023</SelectItem>
               <SelectItem value="2022">{t('budget.fiscalYear', 'FY')} 2022</SelectItem>
             </SelectContent>
           </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[180px]" data-testid="select-category">
+            <SelectTrigger className="w-[180px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category">
               <SelectValue placeholder={t('common.category', 'Category')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <SelectItem value="all">{t('budget.allCategories', 'All Categories')}</SelectItem>
               <SelectItem value="operating">{t('budget.operating', 'Operating')}</SelectItem>
               <SelectItem value="marketing">{t('budget.marketing', 'Marketing')}</SelectItem>
@@ -417,21 +417,21 @@ export default function BudgetManagement() {
           </Select>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" data-testid="button-export">
+          <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
             <Download className="h-4 w-4 mr-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-create-budget">
+              <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-create-budget">
                 <Plus className="h-4 w-4 mr-2" />
                 {t('budget.createBudget', 'Create Budget')}
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <DialogHeader>
-                <DialogTitle>{t('budget.createBudget', 'Create Budget')}</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('budget.createBudget', 'Create Budget')}</DialogTitle>
+                <DialogDescription className="text-[#64748B]">
                   {t('budget.setUpNewBudget', 'Set up a new budget for expense tracking')}
                 </DialogDescription>
               </DialogHeader>
@@ -443,9 +443,9 @@ export default function BudgetManagement() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('budget.budgetName', 'Budget Name')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.budgetName', 'Budget Name')}</FormLabel>
                           <FormControl>
-                            <Input placeholder={t('budget.budgetNamePlaceholder', 'e.g., Marketing Q2 2024')} {...field} data-testid="input-name" />
+                            <Input placeholder={t('budget.budgetNamePlaceholder', 'e.g., Marketing Q2 2024')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-name" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -456,14 +456,14 @@ export default function BudgetManagement() {
                       name="category"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('common.category', 'Category')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-budget-category">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-budget-category">
                                 <SelectValue placeholder={t('budget.selectCategory', 'Select category')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="Operating">{t('budget.operating', 'Operating')}</SelectItem>
                               <SelectItem value="Marketing">{t('budget.marketing', 'Marketing')}</SelectItem>
                               <SelectItem value="Maintenance">{t('budget.maintenance', 'Maintenance')}</SelectItem>
@@ -483,14 +483,14 @@ export default function BudgetManagement() {
                       name="fiscalYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('budget.fiscalYear', 'Fiscal Year')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.fiscalYear', 'Fiscal Year')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
-                              <SelectTrigger data-testid="select-fiscal-year">
+                              <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-fiscal-year">
                                 <SelectValue placeholder={t('budget.selectYear', 'Select year')} />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                               <SelectItem value="2024">2024</SelectItem>
                               <SelectItem value="2025">2025</SelectItem>
                             </SelectContent>
@@ -504,9 +504,9 @@ export default function BudgetManagement() {
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('budget.budgetAmountSAR', 'Budget Amount (SAR)')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.budgetAmountSAR', 'Budget Amount (SAR)')}</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="0" {...field} data-testid="input-amount" />
+                            <Input type="number" placeholder="0" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-amount" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -519,9 +519,9 @@ export default function BudgetManagement() {
                       name="startDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('budget.startDate', 'Start Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.startDate', 'Start Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-start-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-start-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -532,9 +532,9 @@ export default function BudgetManagement() {
                       name="endDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('budget.endDate', 'End Date')}</FormLabel>
+                          <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.endDate', 'End Date')}</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} data-testid="input-end-date" />
+                            <Input type="date" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-end-date" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -546,19 +546,19 @@ export default function BudgetManagement() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('budget.notesOptional', 'Notes (Optional)')}</FormLabel>
+                        <FormLabel className="text-[#0B1F3B] dark:text-white">{t('budget.notesOptional', 'Notes (Optional)')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder={t('budget.budgetNotes', 'Budget notes...')} {...field} data-testid="input-notes" />
+                          <Textarea placeholder={t('budget.budgetNotes', 'Budget notes...')} {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
                       {t('common.cancel', 'Cancel')}
                     </Button>
-                    <Button type="submit" data-testid="button-save-budget">
+                    <Button type="submit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-budget">
                       {t('budget.createBudget', 'Create Budget')}
                     </Button>
                   </div>
@@ -569,59 +569,48 @@ export default function BudgetManagement() {
         </div>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>{t('budget.budgetName', 'Budget Name')}</TableHead>
-                <TableHead>{t('common.category', 'Category')}</TableHead>
-                <TableHead>{t('budget.period', 'Period')}</TableHead>
-                <TableHead className="text-right">{t('budget.budget', 'Budget')}</TableHead>
-                <TableHead className="text-right">{t('budget.actual', 'Actual')}</TableHead>
-                <TableHead className="text-right">{t('budget.remaining', 'Remaining')}</TableHead>
-                <TableHead>{t('budget.utilization', 'Utilization')}</TableHead>
-                <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead>{t('common.actions', 'Actions')}</TableHead>
+              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.budgetName', 'Budget Name')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.period', 'Period')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.budget', 'Budget')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.actual', 'Actual')}</TableHead>
+                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.remaining', 'Remaining')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.utilization', 'Utilization')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {budgets.map((budget) => (
-                <TableRow key={budget.id} data-testid={`row-budget-${budget.id}`}>
-                  <TableCell className="font-medium">{budget.name}</TableCell>
+                <TableRow key={budget.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-budget-${budget.id}`}>
+                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{budget.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{budget.category}</Badge>
+                    <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">{budget.category}</Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {budget.period}
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {budget.budgetAmount.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {budget.actualSpend.toLocaleString()}
-                  </TableCell>
-                  <TableCell className={`text-right font-mono ${budget.remainingBudget >= 0 ? "text-green-600" : "text-red-600"}`}>
-                    {budget.remainingBudget.toLocaleString()}
+                  <TableCell className="text-[#64748B]">{budget.period}</TableCell>
+                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{budget.budgetAmount.toLocaleString()}</TableCell>
+                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{budget.actualSpend.toLocaleString()}</TableCell>
+                  <TableCell className={`text-right font-mono font-bold ${budget.remainingBudget >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                    {budget.remainingBudget >= 0 ? budget.remainingBudget.toLocaleString() : `(${Math.abs(budget.remainingBudget).toLocaleString()})`}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Progress
-                        value={Math.min(budget.utilizationRate, 100)}
-                        className="h-2"
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {budget.utilizationRate.toFixed(0)}%
-                      </span>
+                      <Progress value={Math.min(budget.utilizationRate, 100)} className="w-16 h-2" />
+                      <span className="text-sm text-[#64748B]">{budget.utilizationRate.toFixed(0)}%</span>
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(budget.status)}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" data-testid={`button-edit-${budget.id}`}>
+                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-edit-${budget.id}`}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" data-testid={`button-copy-${budget.id}`}>
+                      <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0B1F3B] dark:hover:text-white" data-testid={`button-copy-${budget.id}`}>
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
@@ -635,35 +624,18 @@ export default function BudgetManagement() {
     </div>
   );
 
-  const forecastTab = (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('budget.budgetForecast', 'Budget Forecast')}</CardTitle>
-          <CardDescription>{t('budget.projectedSpending', 'Projected spending based on current trends')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12 text-muted-foreground">
-            <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>{t('budget.forecastChartPlaceholder', 'Forecast chart will be displayed here')}</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const tabs = [
+    { id: "overview", label: t('common.overview', 'Overview'), icon: BarChart3, content: overviewTab },
+    { id: "budgets", label: t('budget.budgets', 'Budgets'), icon: Calculator, content: budgetsTab },
+  ];
 
   return (
-    <div className="p-6 space-y-6">
-      <TabsPageLayout
-        title={t('budget.title', 'Budget Management')}
-        description={t('budget.description', 'إدارة الميزانية - Plan, track, and analyze budgets across departments')}
-        defaultTab="overview"
-        tabs={[
-          { id: "overview", label: t('budget.overview', 'Overview'), icon: PieChart, content: overviewTab },
-          { id: "budgets", label: t('budget.budgets', 'Budgets'), icon: DollarSign, content: budgetsTab },
-          { id: "forecast", label: t('budget.forecast', 'Forecast'), icon: TrendingUp, content: forecastTab },
-        ]}
-      />
-    </div>
+    <TabsPageLayout
+      title={t('budget.budgetManagementTitle', 'Budget Management - إدارة الميزانية')}
+      description={t('budget.budgetManagementDescription', 'Plan, track, and manage budgets')}
+      icon={Calculator}
+      tabs={tabs}
+      defaultTab="overview"
+    />
   );
 }

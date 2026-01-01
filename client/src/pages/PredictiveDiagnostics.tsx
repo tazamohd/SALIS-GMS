@@ -102,10 +102,10 @@ export default function PredictiveDiagnostics() {
 
   const getSeverityBadge = (severity: string) => {
     const variants: Record<string, { label: string; className: string; icon: any }> = {
-      low: { label: t('predictiveDiagnostics.lowRisk', 'Low Risk'), className: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300", icon: CheckCircle },
-      medium: { label: t('predictiveDiagnostics.mediumRisk', 'Medium Risk'), className: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300", icon: AlertCircle },
-      high: { label: t('predictiveDiagnostics.highRisk', 'High Risk'), className: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300", icon: AlertTriangle },
-      critical: { label: t('predictiveDiagnostics.critical', 'Critical'), className: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300", icon: AlertCircle },
+      low: { label: t('predictiveDiagnostics.lowRisk', 'Low Risk'), className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", icon: CheckCircle },
+      medium: { label: t('predictiveDiagnostics.mediumRisk', 'Medium Risk'), className: "bg-[#F97316]/10 text-[#F97316]", icon: AlertCircle },
+      high: { label: t('predictiveDiagnostics.highRisk', 'High Risk'), className: "bg-[#F97316]/10 text-[#F97316]", icon: AlertTriangle },
+      critical: { label: t('predictiveDiagnostics.critical', 'Critical'), className: "bg-red-500/10 text-red-600 dark:text-red-400", icon: AlertCircle },
     };
     const variant = variants[severity?.toLowerCase()] || variants.medium;
     const Icon = variant.icon;
@@ -124,19 +124,19 @@ export default function PredictiveDiagnostics() {
       icon={Brain}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" data-testid="predictive-diagnostics-page">
-        <Card>
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
           <CardHeader>
-            <CardTitle>{t('predictiveDiagnostics.vehicleDataInput', 'Vehicle Data Input')}</CardTitle>
-            <CardDescription>{t('predictiveDiagnostics.vehicleDataInputDesc', 'Enter vehicle parameters for AI analysis')}</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.vehicleDataInput', 'Vehicle Data Input')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('predictiveDiagnostics.vehicleDataInputDesc', 'Enter vehicle parameters for AI analysis')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>{t('predictiveDiagnostics.selectVehicle', 'Select Vehicle')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.selectVehicle', 'Select Vehicle')}</Label>
               <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
-                <SelectTrigger data-testid="select-vehicle">
+                <SelectTrigger data-testid="select-vehicle" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue placeholder={t('predictiveDiagnostics.chooseVehicle', 'Choose a vehicle')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   {vehicles?.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={vehicle.id}>
                       {vehicle.year} {vehicle.make} {vehicle.model} - {vehicle.licensePlate}
@@ -147,8 +147,8 @@ export default function PredictiveDiagnostics() {
             </div>
 
             <div>
-              <Label className="flex items-center gap-2">
-                <Gauge className="w-4 h-4" />
+              <Label className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Gauge className="w-4 h-4 text-[#0A5ED7]" />
                 {t('predictiveDiagnostics.mileage', 'Mileage (miles)')} *
               </Label>
               <Input
@@ -157,12 +157,13 @@ export default function PredictiveDiagnostics() {
                 placeholder={t('predictiveDiagnostics.mileagePlaceholder', 'e.g., 75000')}
                 value={formData.mileage}
                 onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label className="flex items-center gap-2">
-                <Thermometer className="w-4 h-4" />
+              <Label className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Thermometer className="w-4 h-4 text-[#0A5ED7]" />
                 {t('predictiveDiagnostics.engineTemperature', 'Engine Temperature (°F)')}
               </Label>
               <Input
@@ -171,12 +172,13 @@ export default function PredictiveDiagnostics() {
                 placeholder={t('predictiveDiagnostics.engineTempPlaceholder', 'e.g., 195')}
                 value={formData.engineTemperature}
                 onChange={(e) => setFormData({ ...formData, engineTemperature: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label className="flex items-center gap-2">
-                <Droplet className="w-4 h-4" />
+              <Label className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Droplet className="w-4 h-4 text-[#0A5ED7]" />
                 {t('predictiveDiagnostics.oilPressure', 'Oil Pressure (PSI)')}
               </Label>
               <Input
@@ -185,23 +187,25 @@ export default function PredictiveDiagnostics() {
                 placeholder={t('predictiveDiagnostics.oilPressurePlaceholder', 'e.g., 40')}
                 value={formData.oilPressure}
                 onChange={(e) => setFormData({ ...formData, oilPressure: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.brakePadWear', 'Brake Pad Wear (%)')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.brakePadWear', 'Brake Pad Wear (%)')}</Label>
               <Input
                 type="number"
                 data-testid="input-brake-wear"
                 placeholder={t('predictiveDiagnostics.brakePadWearPlaceholder', 'e.g., 60')}
                 value={formData.brakePadWear}
                 onChange={(e) => setFormData({ ...formData, brakePadWear: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label className="flex items-center gap-2">
-                <Battery className="w-4 h-4" />
+              <Label className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Battery className="w-4 h-4 text-[#0A5ED7]" />
                 {t('predictiveDiagnostics.batteryVoltage', 'Battery Voltage (V)')}
               </Label>
               <Input
@@ -211,27 +215,29 @@ export default function PredictiveDiagnostics() {
                 placeholder={t('predictiveDiagnostics.batteryVoltagePlaceholder', 'e.g., 12.6')}
                 value={formData.batteryVoltage}
                 onChange={(e) => setFormData({ ...formData, batteryVoltage: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.fuelLevel', 'Fuel Level (%)')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.fuelLevel', 'Fuel Level (%)')}</Label>
               <Input
                 type="number"
                 data-testid="input-fuel"
                 placeholder={t('predictiveDiagnostics.fuelLevelPlaceholder', 'e.g., 75')}
                 value={formData.fuelLevel}
                 onChange={(e) => setFormData({ ...formData, fuelLevel: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.tireCondition', 'Tire Condition')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.tireCondition', 'Tire Condition')}</Label>
               <Select value={formData.tireCondition} onValueChange={(val) => setFormData({ ...formData, tireCondition: val })}>
-                <SelectTrigger data-testid="select-tire-condition">
+                <SelectTrigger data-testid="select-tire-condition" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectValue placeholder={t('predictiveDiagnostics.selectCondition', 'Select condition')} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <SelectItem value="excellent">{t('predictiveDiagnostics.excellent', 'Excellent')}</SelectItem>
                   <SelectItem value="good">{t('predictiveDiagnostics.good', 'Good')}</SelectItem>
                   <SelectItem value="fair">{t('predictiveDiagnostics.fair', 'Fair')}</SelectItem>
@@ -241,12 +247,13 @@ export default function PredictiveDiagnostics() {
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.lastServiceDate', 'Last Service Date')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.lastServiceDate', 'Last Service Date')}</Label>
               <Input
                 type="date"
                 data-testid="input-last-service"
                 value={formData.lastServiceDate}
                 onChange={(e) => setFormData({ ...formData, lastServiceDate: e.target.value })}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
@@ -257,30 +264,32 @@ export default function PredictiveDiagnostics() {
                 data-testid="checkbox-engine-light"
                 checked={formData.checkEngineLightOn}
                 onChange={(e) => setFormData({ ...formData, checkEngineLightOn: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4 rounded border-[#E2E8F0] dark:border-[#232A36] text-[#0A5ED7]"
               />
-              <Label htmlFor="check-engine">{t('predictiveDiagnostics.checkEngineLightOn', 'Check Engine Light On')}</Label>
+              <Label htmlFor="check-engine" className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.checkEngineLightOn', 'Check Engine Light On')}</Label>
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.unusualNoises', 'Unusual Noises or Vibrations')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.unusualNoises', 'Unusual Noises or Vibrations')}</Label>
               <Textarea
                 data-testid="textarea-noises"
                 placeholder={t('predictiveDiagnostics.unusualNoisesPlaceholder', 'Describe any unusual sounds, vibrations, or smells...')}
                 value={formData.unusualNoises}
                 onChange={(e) => setFormData({ ...formData, unusualNoises: e.target.value })}
                 rows={2}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
             <div>
-              <Label>{t('predictiveDiagnostics.additionalSymptoms', 'Additional Symptoms')}</Label>
+              <Label className="text-[#0B1F3B] dark:text-white">{t('predictiveDiagnostics.additionalSymptoms', 'Additional Symptoms')}</Label>
               <Textarea
                 data-testid="textarea-symptoms"
                 placeholder={t('predictiveDiagnostics.additionalSymptomsPlaceholder', 'Any other issues or observations...')}
                 value={formData.additionalSymptoms}
                 onChange={(e) => setFormData({ ...formData, additionalSymptoms: e.target.value })}
                 rows={2}
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               />
             </div>
 
@@ -288,7 +297,7 @@ export default function PredictiveDiagnostics() {
               onClick={handleAnalyze} 
               disabled={predictMutation.isPending || !selectedVehicleId}
               data-testid="button-analyze"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
             >
               {predictMutation.isPending ? (
                 <>
@@ -307,54 +316,54 @@ export default function PredictiveDiagnostics() {
 
         <div className="space-y-6">
           {prediction && (
-            <Card className="border-2 border-blue-500 dark:border-blue-700" data-testid="prediction-result">
+            <Card className="border-2 border-[#0A5ED7] dark:border-[#0BB3FF] bg-white dark:bg-[#151A23]" data-testid="prediction-result">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-6 h-6 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                  <Brain className="w-6 h-6 text-[#0A5ED7]" />
                   {t('predictiveDiagnostics.aiPredictionResults', 'AI Prediction Results')}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-[#64748B]">
                   {t('predictiveDiagnostics.confidence', 'Confidence')}: {(prediction.confidence * 100).toFixed(0)}%
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.severity', 'Severity')}</Label>
+                  <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.severity', 'Severity')}</Label>
                   <div className="mt-1">{getSeverityBadge(prediction.severity)}</div>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.predictedIssue', 'Predicted Issue')}</Label>
-                  <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                  <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.predictedIssue', 'Predicted Issue')}</Label>
+                  <p className="mt-1 text-lg font-semibold text-[#0B1F3B] dark:text-white">
                     {prediction.predictedIssue}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.riskLevel', 'Risk Level')}</Label>
-                  <p className="mt-1 text-gray-900 dark:text-white">
+                  <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.riskLevel', 'Risk Level')}</Label>
+                  <p className="mt-1 text-[#0B1F3B] dark:text-white">
                     {prediction.riskLevel}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.recommendedAction', 'Recommended Action')}</Label>
-                  <p className="mt-1 text-gray-900 dark:text-white">
+                  <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.recommendedAction', 'Recommended Action')}</Label>
+                  <p className="mt-1 text-[#0B1F3B] dark:text-white">
                     {prediction.recommendedAction}
                   </p>
                 </div>
 
                 <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.timeframe', 'Timeframe')}</Label>
-                  <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                  <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.timeframe', 'Timeframe')}</Label>
+                  <p className="mt-1 font-medium text-[#0B1F3B] dark:text-white">
                     {prediction.estimatedTimeframe}
                   </p>
                 </div>
 
                 {prediction.additionalDetails && (
                   <div>
-                    <Label className="text-sm text-gray-600 dark:text-gray-400">{t('predictiveDiagnostics.additionalDetails', 'Additional Details')}</Label>
-                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                    <Label className="text-sm text-[#64748B]">{t('predictiveDiagnostics.additionalDetails', 'Additional Details')}</Label>
+                    <p className="mt-1 text-sm text-[#64748B]">
                       {prediction.additionalDetails}
                     </p>
                   </div>
@@ -363,24 +372,24 @@ export default function PredictiveDiagnostics() {
             </Card>
           )}
 
-          <Card>
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Car className="w-5 h-5 text-[#0A5ED7]" />
                 {t('predictiveDiagnostics.recentPredictions', 'Recent Predictions')}
               </CardTitle>
-              <CardDescription>{t('predictiveDiagnostics.recentPredictionsDesc', 'AI-generated maintenance predictions')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('predictiveDiagnostics.recentPredictionsDesc', 'AI-generated maintenance predictions')}</CardDescription>
             </CardHeader>
             <CardContent>
               {predictions && predictions.length > 0 ? (
                 <div className="space-y-3" data-testid="predictions-list">
                   {predictions.slice(0, 5).map((pred) => (
-                    <div key={pred.id} className="p-3 border rounded-lg dark:border-gray-700">
+                    <div key={pred.id} className="p-3 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white">{pred.predictedIssue}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{pred.recommendedAction}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">{pred.predictedIssue}</p>
+                          <p className="text-sm text-[#64748B] mt-1">{pred.recommendedAction}</p>
+                          <p className="text-xs text-[#64748B] mt-1">
                             {new Date(pred.createdAt).toLocaleDateString()}
                           </p>
                         </div>
@@ -390,9 +399,14 @@ export default function PredictiveDiagnostics() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                  {t('predictiveDiagnostics.noPredictionsYet', 'No predictions yet. Analyze a vehicle to get started.')}
-                </p>
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                    <Brain className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="text-[#64748B]">
+                    {t('predictiveDiagnostics.noPredictionsYet', 'No predictions yet. Analyze a vehicle to get started.')}
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>

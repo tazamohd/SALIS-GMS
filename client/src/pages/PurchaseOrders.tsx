@@ -59,7 +59,6 @@ export function PurchaseOrders() {
     queryKey: ['/api/suppliers'],
   });
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       return apiRequest("DELETE", `/api/purchase-orders/${id}`);
@@ -86,7 +85,6 @@ export function PurchaseOrders() {
     },
   });
 
-  // Status update mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       return apiRequest("PATCH", `/api/purchase-orders/${id}`, { status });
@@ -113,13 +111,13 @@ export function PurchaseOrders() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'draft': return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
-      case 'sent': return 'bg-gray-200 text-gray-700';
-      case 'confirmed': return 'bg-gray-300 text-gray-800';
-      case 'partial': return 'bg-gray-400 text-gray-900';
-      case 'received': return 'bg-gray-500 text-white';
-      case 'cancelled': return 'bg-gray-300 text-gray-700';
-      default: return 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
+      case 'draft': return 'bg-[#64748B]/10 text-[#64748B] dark:bg-[#64748B]/20';
+      case 'sent': return 'bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF]';
+      case 'confirmed': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+      case 'partial': return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+      case 'received': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+      case 'cancelled': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300';
+      default: return 'bg-[#64748B]/10 text-[#64748B] dark:bg-[#64748B]/20';
     }
   };
 
@@ -142,7 +140,7 @@ export function PurchaseOrders() {
       key: "poNumber",
       label: t('inventory.poNumber', 'PO Number'),
       render: (po: PurchaseOrder) => (
-        <span className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
+        <span className="font-['Poppins',Helvetica] font-medium text-sm text-[#0B1F3B] dark:text-white">
           {po.poNumber}
         </span>
       ),
@@ -151,7 +149,7 @@ export function PurchaseOrders() {
       key: "supplier",
       label: t('inventory.supplier', 'Supplier'),
       render: (po: PurchaseOrder) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-[#64748B]">
           {getSupplierName(po.supplierId)}
         </span>
       ),
@@ -160,7 +158,7 @@ export function PurchaseOrders() {
       key: "orderDate",
       label: t('inventory.orderDate', 'Order Date'),
       render: (po: PurchaseOrder) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-[#64748B]">
           {new Date(po.orderDate).toLocaleDateString()}
         </span>
       ),
@@ -169,7 +167,7 @@ export function PurchaseOrders() {
       key: "expectedDelivery",
       label: t('inventory.expectedDelivery', 'Expected Delivery'),
       render: (po: PurchaseOrder) => (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-[#64748B]">
           {po.expectedDeliveryDate ? new Date(po.expectedDeliveryDate).toLocaleDateString() : 'N/A'}
         </span>
       ),
@@ -178,7 +176,7 @@ export function PurchaseOrders() {
       key: "totalAmount",
       label: t('inventory.totalAmount', 'Total Amount'),
       render: (po: PurchaseOrder) => (
-        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
           ${parseFloat(po.totalAmount).toFixed(2)}
         </span>
       ),
@@ -187,7 +185,7 @@ export function PurchaseOrders() {
       key: "status",
       label: t('common.status', 'Status'),
       render: (po: PurchaseOrder) => (
-        <Badge className={`${getStatusColor(po.status)} capitalize`}>
+        <Badge className={`${getStatusColor(po.status)} capitalize border-0`}>
           {po.status}
         </Badge>
       ),
@@ -211,7 +209,7 @@ export function PurchaseOrders() {
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               {po.status === 'draft' && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'sent')}>
@@ -264,7 +262,7 @@ export function PurchaseOrders() {
               {po.status === 'draft' && (
                 <DropdownMenuItem 
                   onClick={() => handleDelete(po)}
-                  className="text-gray-800 dark:text-gray-200"
+                  className="text-[#F97316]"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   {t('common.delete', 'Delete')}
@@ -279,53 +277,53 @@ export function PurchaseOrders() {
 
   const summaryCards = !isLoading && purchaseOrders && purchaseOrders.length > 0 && (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.totalOrders', 'Total Orders')}</p>
-              <p className="text-2xl font-bold text-gray-900">{purchaseOrders.length}</p>
+              <p className="text-sm text-[#64748B]">{t('inventory.totalOrders', 'Total Orders')}</p>
+              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{purchaseOrders.length}</p>
             </div>
-            <ShoppingCart className="w-8 h-8 text-gray-700" />
+            <ShoppingCart className="w-8 h-8 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('common.pending', 'Pending')}</p>
-              <p className="text-2xl font-bold text-gray-700">
+              <p className="text-sm text-[#64748B]">{t('common.pending', 'Pending')}</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                 {purchaseOrders.filter(po => ['draft', 'sent'].includes(po.status)).length}
               </p>
             </div>
-            <PackageIcon className="w-8 h-8 text-gray-700" />
+            <PackageIcon className="w-8 h-8 text-amber-500" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.confirmed', 'Confirmed')}</p>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="text-sm text-[#64748B]">{t('inventory.confirmed', 'Confirmed')}</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {purchaseOrders.filter(po => po.status === 'confirmed').length}
               </p>
             </div>
-            <CheckCircle className="w-8 h-8 text-gray-800" />
+            <CheckCircle className="w-8 h-8 text-green-500" />
           </div>
         </CardContent>
       </Card>
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-900 dark:text-white/60">{t('inventory.totalValue', 'Total Value')}</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm text-[#64748B]">{t('inventory.totalValue', 'Total Value')}</p>
+              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                 ${purchaseOrders.reduce((sum, po) => sum + parseFloat(po.totalAmount), 0).toFixed(2)}
               </p>
             </div>
-            <Building2 className="w-8 h-8 text-gray-900" />
+            <Building2 className="w-8 h-8 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
@@ -383,18 +381,18 @@ export function PurchaseOrders() {
       />
       
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('inventory.deletePurchaseOrder', 'Delete Purchase Order')}</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.deletePurchaseOrder', 'Delete Purchase Order')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#64748B]">
               {t('inventory.confirmDeletePO', 'Are you sure you want to delete PO {{poNumber}}? This action cannot be undone.', { poNumber: poToDelete?.poNumber })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => poToDelete && deleteMutation.mutate(poToDelete.id)}
-              className="bg-salis-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200"
+              className="bg-[#F97316] hover:bg-[#F97316]/90 text-white"
             >
               {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </AlertDialogAction>

@@ -123,19 +123,19 @@ export default function ExpenseTracking() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      pending: "bg-yellow-500 text-white",
-      approved: "bg-green-500 text-white",
+      pending: "bg-[#F97316] text-white",
+      approved: "bg-[#22c55e] text-white",
       rejected: "bg-red-500 text-white",
-      paid: "bg-salis-black text-white",
+      paid: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
     };
-    return colors[status] || "bg-salis-gray text-white";
+    return colors[status] || "bg-[#64748B] text-white";
   };
 
   const expensesTab = (
-    <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+    <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
       <CardHeader>
-        <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.allExpenses', 'All Expenses')}</CardTitle>
-        <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+        <CardTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('payments.expenses.allExpenses', 'All Expenses')}</CardTitle>
+        <CardDescription className="font-poppins text-[#64748B]">
           {t('payments.expenses.viewAndManage', 'View and manage all business expenses')}
         </CardDescription>
       </CardHeader>
@@ -208,17 +208,17 @@ export default function ExpenseTracking() {
       <div className="flex justify-end mb-4">
         <Button
           onClick={() => setIsCategoryDialogOpen(true)}
-          className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white font-poppins"
           data-testid="button-create-category"
         >
           <FolderPlus className="mr-2 h-4 w-4" />
           {t('payments.expenses.createCategory', 'Create Category')}
         </Button>
       </div>
-      <Card className="border-salis-gray-light dark:border-salis-gray-dark bg-white dark:bg-[#010101]">
+      <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardHeader>
-          <CardTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.expenseCategories', 'Expense Categories')}</CardTitle>
-          <CardDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+          <CardTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('payments.expenses.expenseCategories', 'Expense Categories')}</CardTitle>
+          <CardDescription className="font-poppins text-[#64748B]">
             {t('payments.expenses.manageCategoriesAndBudgets', 'Manage expense categories and budgets')}
           </CardDescription>
         </CardHeader>
@@ -254,7 +254,7 @@ export default function ExpenseTracking() {
                           </div>
                         )}
                         {category.requiresApproval && (
-                          <Badge className="mt-2 bg-salis-black text-white" data-testid={`badge-approval-${category.id}`}>
+                          <Badge className="mt-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid={`badge-approval-${category.id}`}>
                             {t('payments.expenses.requiresApproval', 'Requires Approval')}
                           </Badge>
                         )}
@@ -301,10 +301,10 @@ export default function ExpenseTracking() {
       />
 
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.createExpenseCategory', 'Create Expense Category')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('payments.expenses.createExpenseCategory', 'Create Expense Category')}</DialogTitle>
+            <DialogDescription className="font-poppins text-[#64748B]">
               {t('payments.expenses.addNewCategory', 'Add a new expense category')}
             </DialogDescription>
           </DialogHeader>
@@ -379,10 +379,10 @@ export default function ExpenseTracking() {
       </Dialog>
 
       <Dialog open={isExpenseDialogOpen} onOpenChange={setIsExpenseDialogOpen}>
-        <DialogContent className="bg-white dark:bg-salis-black">
+        <DialogContent className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="font-montserrat text-salis-black dark:text-white">{t('payments.expenses.createExpense', 'Create Expense')}</DialogTitle>
-            <DialogDescription className="font-poppins text-salis-gray dark:text-salis-gray-light">
+            <DialogTitle className="font-montserrat text-[#0B1F3B] dark:text-white">{t('payments.expenses.createExpense', 'Create Expense')}</DialogTitle>
+            <DialogDescription className="font-poppins text-[#64748B]">
               {t('payments.expenses.recordNewExpense', 'Record a new business expense')}
             </DialogDescription>
           </DialogHeader>

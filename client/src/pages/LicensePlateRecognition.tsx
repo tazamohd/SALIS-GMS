@@ -70,7 +70,7 @@ export default function LicensePlateRecognition() {
 
   return (
     <StandardPageLayout
-      title={t('licensePlate.title', '🚗 License Plate Recognition')}
+      title={t('licensePlate.title', 'License Plate Recognition')}
       description={t('licensePlate.description', 'Automatic vehicle identification and entry tracking')}
       icon={Camera}
       actions={[
@@ -81,45 +81,45 @@ export default function LicensePlateRecognition() {
       ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.todaysScans', "Today's Scans")}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
+                <p className="text-sm text-[#64748B]">{t('licensePlate.todaysScans', "Today's Scans")}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-today-scans">{stats.todayScans}</h3>
               </div>
-              <Camera className="h-12 w-12 text-blue-600" />
+              <Camera className="h-12 w-12 text-[#0A5ED7]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.autoMatched', 'Auto-Matched')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-auto-matched">{stats.autoMatched}</h3>
+                <p className="text-sm text-[#64748B]">{t('licensePlate.autoMatched', 'Auto-Matched')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-auto-matched">{stats.autoMatched}</h3>
               </div>
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.manualReview', 'Manual Review')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-manual-review">{stats.manualReview}</h3>
+                <p className="text-sm text-[#64748B]">{t('licensePlate.manualReview', 'Manual Review')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-manual-review">{stats.manualReview}</h3>
               </div>
-              <Clock className="h-12 w-12 text-yellow-600" />
+              <Clock className="h-12 w-12 text-[#F97316]" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('licensePlate.avgConfidence', 'Avg Confidence')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white" data-testid="stat-avg-confidence">{stats.avgConfidence}%</h3>
+                <p className="text-sm text-[#64748B]">{t('licensePlate.avgConfidence', 'Avg Confidence')}</p>
+                <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white" data-testid="stat-avg-confidence">{stats.avgConfidence}%</h3>
               </div>
               <Car className="h-12 w-12 text-purple-600" />
             </div>
@@ -127,46 +127,46 @@ export default function LicensePlateRecognition() {
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('licensePlate.recentPlateScans', 'Recent Plate Scans')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('licensePlate.recentPlateScans', 'Recent Plate Scans')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingScans ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.loadingScans', 'Loading scans...')}</p>
+              <p className="text-[#64748B]">{t('licensePlate.loadingScans', 'Loading scans...')}</p>
             </div>
           ) : scans.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.noScansYet', 'No license plate scans recorded yet. Scans will appear here automatically.')}</p>
+              <p className="text-[#64748B]">{t('licensePlate.noScansYet', 'No license plate scans recorded yet. Scans will appear here automatically.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {scans.map((scan: any) => (
-                <div key={scan.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`scan-${scan.id}`}>
+                <div key={scan.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`scan-${scan.id}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded font-mono font-bold text-gray-900 dark:text-white">
+                    <div className="bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 px-4 py-2 rounded font-mono font-bold text-[#0B1F3B] dark:text-white">
                       {scan.plateNumber}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                         {scan.vehicleMake && scan.vehicleModel 
                           ? `${scan.vehicleMake} ${scan.vehicleModel}` 
                           : t('licensePlate.unknownVehicle', 'Unknown Vehicle')}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-[#64748B]">
                         {scan.customerName || t('licensePlate.noMatchFound', 'No match found')} • {t('licensePlate.confidence', 'Confidence')}: {parseFloat(scan.confidence).toFixed(1)}%
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant={scan.scanType === "entry" ? "default" : "secondary"}>
+                    <Badge className={scan.scanType === "entry" ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : "bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]"}>
                       {scan.scanType === "entry" ? t('licensePlate.entry', 'entry') : t('licensePlate.exit', 'exit')}
                     </Badge>
                     {scan.matchedAutomatically ? (
                       <CheckCircle className="h-5 w-5 text-green-600" />
                     ) : (
-                      <Button size="sm" variant="outline">{t('licensePlate.matchManually', 'Match Manually')}</Button>
+                      <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('licensePlate.matchManually', 'Match Manually')}</Button>
                     )}
                   </div>
                 </div>
@@ -176,46 +176,46 @@ export default function LicensePlateRecognition() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('licensePlate.vehicleEntryLog', 'Vehicle Entry Log')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('licensePlate.vehicleEntryLog', 'Vehicle Entry Log')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingLogs ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.loadingEntryLogs', 'Loading entry logs...')}</p>
+              <p className="text-[#64748B]">{t('licensePlate.loadingEntryLogs', 'Loading entry logs...')}</p>
             </div>
           ) : entryLogs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('licensePlate.noEntryLogsYet', 'No entry logs recorded yet.')}</p>
+              <p className="text-[#64748B]">{t('licensePlate.noEntryLogsYet', 'No entry logs recorded yet.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {entryLogs.map((log: any) => (
-                <div key={log.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`entry-log-${log.id}`}>
+                <div key={log.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg" data-testid={`entry-log-${log.id}`}>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
                       {log.vehicleMake && log.vehicleModel 
                         ? `${log.vehicleMake} ${log.vehicleModel} (${log.plateNumber})` 
                         : log.plateNumber}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{log.customerName || t('licensePlate.unknown', 'Unknown')}</p>
+                    <p className="text-sm text-[#64748B]">{log.customerName || t('licensePlate.unknown', 'Unknown')}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-[#64748B]">
                       {t('licensePlate.entryTime', 'Entry')}: {log.entryTime ? new Date(log.entryTime).toLocaleTimeString() : ""}
                     </p>
                     {log.exitTime ? (
                       <>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[#64748B]">
                           {t('licensePlate.exitTime', 'Exit')}: {new Date(log.exitTime).toLocaleTimeString()}
                         </p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">
                           {t('licensePlate.duration', 'Duration')}: {log.duration} {t('licensePlate.min', 'min')}
                         </p>
                       </>
                     ) : (
-                      <Badge variant="secondary">{t('common.inProgress', 'In Progress')}</Badge>
+                      <Badge className="bg-[#F97316]/10 text-[#F97316]">{t('common.inProgress', 'In Progress')}</Badge>
                     )}
                   </div>
                 </div>
