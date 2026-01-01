@@ -57,44 +57,60 @@ export function Customers() {
     enabled: !!selectedCustomerId,
   });
 
-  const { data: customerVehicles } = useQuery<Vehicle[]>({
+  const { data: customerVehicles, isLoading: vehiclesLoading, error: vehiclesError } = useQuery<Vehicle[]>({
     queryKey: ['/api/customers', selectedCustomerId, 'vehicles'],
     queryFn: async () => {
       const res = await fetch(`/api/customers/${selectedCustomerId}/vehicles`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch vehicles');
+      if (!res.ok) {
+        console.error('Failed to fetch vehicles:', res.status, res.statusText);
+        throw new Error('Failed to fetch vehicles');
+      }
       return res.json();
     },
     enabled: !!selectedCustomerId,
+    retry: 1,
   });
 
-  const { data: customerNotes } = useQuery<CustomerNote[]>({
+  const { data: customerNotes, isLoading: notesLoading, error: notesError } = useQuery<CustomerNote[]>({
     queryKey: ['/api/customers', selectedCustomerId, 'notes'],
     queryFn: async () => {
       const res = await fetch(`/api/customers/${selectedCustomerId}/notes`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch notes');
+      if (!res.ok) {
+        console.error('Failed to fetch notes:', res.status, res.statusText);
+        throw new Error('Failed to fetch notes');
+      }
       return res.json();
     },
     enabled: !!selectedCustomerId,
+    retry: 1,
   });
 
-  const { data: customerJobCards } = useQuery<any[]>({
+  const { data: customerJobCards, isLoading: jobsLoading, error: jobsError } = useQuery<any[]>({
     queryKey: ['/api/customers', selectedCustomerId, 'job-cards'],
     queryFn: async () => {
       const res = await fetch(`/api/customers/${selectedCustomerId}/job-cards`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch job cards');
+      if (!res.ok) {
+        console.error('Failed to fetch job cards:', res.status, res.statusText);
+        throw new Error('Failed to fetch job cards');
+      }
       return res.json();
     },
     enabled: !!selectedCustomerId,
+    retry: 1,
   });
 
-  const { data: customerInvoices } = useQuery<any[]>({
+  const { data: customerInvoices, isLoading: invoicesLoading, error: invoicesError } = useQuery<any[]>({
     queryKey: ['/api/customers', selectedCustomerId, 'invoices'],
     queryFn: async () => {
       const res = await fetch(`/api/customers/${selectedCustomerId}/invoices`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch invoices');
+      if (!res.ok) {
+        console.error('Failed to fetch invoices:', res.status, res.statusText);
+        throw new Error('Failed to fetch invoices');
+      }
       return res.json();
     },
     enabled: !!selectedCustomerId,
+    retry: 1,
   });
 
   const outstandingJobs = (customerJobCards ?? []).filter((job: any) => 
@@ -445,7 +461,7 @@ export function Customers() {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
-                          {t('customers.tabs.vehicles', 'Vehicles')}
+                          {t('customers.tabs.vehicles', 'Vehicles')} {customerVehicles ? `(${customerVehicles.length})` : ''}
                         </CardTitle>
                         {selectedCustomer?.garageId && (
                           <AddVehicleDialog 
@@ -456,7 +472,17 @@ export function Customers() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {(customerVehicles ?? []).length === 0 ? (
+                      {vehiclesLoading ? (
+                        <div className="text-center py-8">
+                          <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('common.loading', 'Loading...')}</p>
+                        </div>
+                      ) : vehiclesError ? (
+                        <div className="text-center py-8">
+                          <AlertCircle className="w-12 h-12 text-[#F97316] mx-auto mb-2" />
+                          <p className="text-sm text-[#F97316]">{t('common.errorLoading', 'Error loading data')}</p>
+                        </div>
+                      ) : (customerVehicles ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <Car className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noVehiclesRegistered', 'No vehicles registered')}</p>
@@ -520,7 +546,17 @@ export function Customers() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {(customerJobCards ?? []).length === 0 ? (
+                      {jobsLoading ? (
+                        <div className="text-center py-8">
+                          <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('common.loading', 'Loading...')}</p>
+                        </div>
+                      ) : jobsError ? (
+                        <div className="text-center py-8">
+                          <AlertCircle className="w-12 h-12 text-[#F97316] mx-auto mb-2" />
+                          <p className="text-sm text-[#F97316]">{t('common.errorLoading', 'Error loading data')}</p>
+                        </div>
+                      ) : (customerJobCards ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <ClipboardList className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noJobHistory', 'No job history available')}</p>
@@ -579,7 +615,17 @@ export function Customers() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {(customerInvoices ?? []).length === 0 ? (
+                      {invoicesLoading ? (
+                        <div className="text-center py-8">
+                          <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('common.loading', 'Loading...')}</p>
+                        </div>
+                      ) : invoicesError ? (
+                        <div className="text-center py-8">
+                          <AlertCircle className="w-12 h-12 text-[#F97316] mx-auto mb-2" />
+                          <p className="text-sm text-[#F97316]">{t('common.errorLoading', 'Error loading data')}</p>
+                        </div>
+                      ) : (customerInvoices ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <FileText className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noInvoices', 'No invoices available')}</p>
@@ -662,7 +708,17 @@ export function Customers() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {(customerNotes ?? []).length === 0 ? (
+                      {notesLoading ? (
+                        <div className="text-center py-8">
+                          <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('common.loading', 'Loading...')}</p>
+                        </div>
+                      ) : notesError ? (
+                        <div className="text-center py-8">
+                          <AlertCircle className="w-12 h-12 text-[#F97316] mx-auto mb-2" />
+                          <p className="text-sm text-[#F97316]">{t('common.errorLoading', 'Error loading data')}</p>
+                        </div>
+                      ) : (customerNotes ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <MessageSquare className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noNotes', 'No notes available')}</p>
