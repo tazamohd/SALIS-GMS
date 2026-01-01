@@ -80,7 +80,10 @@ export default function LoyaltyProgram() {
   const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
   const [viewingMember, setViewingMember] = useState<LoyaltyMember | null>(null);
   const [editingOffer, setEditingOffer] = useState<LoyaltyOffer | null>(null);
+  const [viewingOffer, setViewingOffer] = useState<LoyaltyOffer | null>(null);
   const [offerStates, setOfferStates] = useState<Record<string, boolean>>({});
+  const [offerEdits, setOfferEdits] = useState<Record<string, Partial<LoyaltyOffer>>>({});
+  const [editOfferForm, setEditOfferForm] = useState({ name: '', description: '', pointsCost: '', value: '', tier: '' });
   const [newOfferForm, setNewOfferForm] = useState({ name: '', description: '', pointsCost: '', value: '', tier: '' });
 
   const tierColors = {
@@ -509,38 +512,40 @@ export default function LoyaltyProgram() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {offers.map((offer) => {
           const isActive = offerStates[offer.id] !== undefined ? offerStates[offer.id] : offer.isActive;
+          const edits = offerEdits[offer.id] || {};
+          const displayOffer = { ...offer, ...edits };
           return (
             <Card key={offer.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden" data-testid={`offer-card-${offer.id}`}>
               <div className={`h-2 ${isActive ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]' : 'bg-[#64748B]'}`} />
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{offer.offerName}</CardTitle>
+                  <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{displayOffer.offerName}</CardTitle>
                   <Switch
                     checked={isActive}
-                    onCheckedChange={() => handleToggleOffer(offer.id, offer.offerName, isActive)}
+                    onCheckedChange={() => handleToggleOffer(offer.id, displayOffer.offerName, isActive)}
                     className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-[#0A5ED7] data-[state=checked]:to-[#0BB3FF]"
                     data-testid={`switch-offer-${offer.id}`}
                   />
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-[#64748B] mb-4">{offer.description}</p>
+                <p className="text-sm text-[#64748B] mb-4">{displayOffer.description}</p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.pointsCost', 'Points Cost')}</span>
-                    <span className="font-bold text-[#0A5ED7]">{offer.pointsCost.toLocaleString()}</span>
+                    <span className="font-bold text-[#0A5ED7]">{displayOffer.pointsCost.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.value', 'Value')}</span>
-                    <span className="font-bold text-[#10B981]">{t('common.sar', 'SAR')} {offer.discountValue}</span>
+                    <span className="font-bold text-[#10B981]">{t('common.sar', 'SAR')} {displayOffer.discountValue}</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.tierRequired', 'Tier Required')}</span>
-                    <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">{offer.tierRequired}+</Badge>
+                    <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">{displayOffer.tierRequired}+</Badge>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.redemptions', 'Redemptions')}</span>
-                    <span className="font-medium text-[#0B1F3B] dark:text-white">{offer.redemptionCount}</span>
+                    <span className="font-medium text-[#0B1F3B] dark:text-white">{displayOffer.redemptionCount}</span>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-4">
@@ -548,7 +553,17 @@ export default function LoyaltyProgram() {
                     variant="outline" 
                     size="sm" 
                     className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" 
-                    onClick={() => setEditingOffer(offer)}
+                    onClick={() => {
+                      const currentData = { ...offer, ...(offerEdits[offer.id] || {}) };
+                      setEditOfferForm({
+                        name: currentData.offerName,
+                        description: currentData.description,
+                        pointsCost: String(currentData.pointsCost),
+                        value: String(currentData.discountValue),
+                        tier: currentData.tierRequired.toLowerCase()
+                      });
+                      setEditingOffer(offer);
+                    }}
                     data-testid={`button-edit-offer-${offer.id}`}
                   >
                     <Edit className="w-4 h-4 mr-1" />
@@ -557,7 +572,8 @@ export default function LoyaltyProgram() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="flex-1 border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]" 
+                    className="flex-1 border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
+                    onClick={() => setViewingOffer({ ...offer, ...(offerEdits[offer.id] || {}) })}
                     data-testid={`button-view-offer-${offer.id}`}
                   >
                     <Eye className="w-4 h-4 mr-1" />
@@ -668,7 +684,7 @@ export default function LoyaltyProgram() {
               <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
                 <Edit className="w-4 h-4 text-white" />
               </div>
-              {t('loyalty.editOffer', 'Edit Offer')}: {editingOffer?.offerName}
+              {t('loyalty.editOffer', 'Edit Offer')}
             </DialogTitle>
             <DialogDescription className="text-[#64748B]">{t('loyalty.modifyReward', 'Modify reward details')}</DialogDescription>
           </DialogHeader>
@@ -683,9 +699,19 @@ export default function LoyaltyProgram() {
               <div className="space-y-2">
                 <Label className="text-[#0B1F3B] dark:text-white">{t('loyalty.offerName', 'Offer Name')}</Label>
                 <Input 
-                  defaultValue={editingOffer.offerName}
+                  value={editOfferForm.name}
+                  onChange={(e) => setEditOfferForm(prev => ({ ...prev, name: e.target.value }))}
                   className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-edit-offer-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</Label>
+                <Input 
+                  value={editOfferForm.description}
+                  onChange={(e) => setEditOfferForm(prev => ({ ...prev, description: e.target.value }))}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  data-testid="input-edit-offer-description"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -693,7 +719,8 @@ export default function LoyaltyProgram() {
                   <Label className="text-[#0B1F3B] dark:text-white">{t('loyalty.pointsCost', 'Points Cost')}</Label>
                   <Input 
                     type="number" 
-                    defaultValue={editingOffer.pointsCost}
+                    value={editOfferForm.pointsCost}
+                    onChange={(e) => setEditOfferForm(prev => ({ ...prev, pointsCost: e.target.value }))}
                     className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-edit-points-cost"
                   />
@@ -702,11 +729,26 @@ export default function LoyaltyProgram() {
                   <Label className="text-[#0B1F3B] dark:text-white">{t('loyalty.valueSar', 'Value (SAR)')}</Label>
                   <Input 
                     type="number" 
-                    defaultValue={editingOffer.discountValue}
+                    value={editOfferForm.value}
+                    onChange={(e) => setEditOfferForm(prev => ({ ...prev, value: e.target.value }))}
                     className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-edit-value"
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#0B1F3B] dark:text-white">{t('loyalty.minimumTier', 'Minimum Tier')}</Label>
+                <Select value={editOfferForm.tier} onValueChange={(value) => setEditOfferForm(prev => ({ ...prev, tier: value }))}>
+                  <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-edit-offer-tier">
+                    <SelectValue placeholder={t('loyalty.selectTier', 'Select minimum tier')} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-[#151A23]">
+                    <SelectItem value="bronze">{t('loyalty.tierBronze', 'Bronze')}</SelectItem>
+                    <SelectItem value="silver">{t('loyalty.tierSilver', 'Silver')}</SelectItem>
+                    <SelectItem value="gold">{t('loyalty.tierGold', 'Gold')}</SelectItem>
+                    <SelectItem value="platinum">{t('loyalty.tierPlatinum', 'Platinum')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button 
@@ -720,9 +762,27 @@ export default function LoyaltyProgram() {
                 <Button 
                   className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   onClick={() => {
+                    if (!editOfferForm.name) {
+                      toast({ title: t('loyalty.validationError', 'Validation Error'), description: t('loyalty.offerNameRequired', 'Please enter an offer name'), variant: 'destructive' });
+                      return;
+                    }
+                    if (!editOfferForm.pointsCost || parseInt(editOfferForm.pointsCost) <= 0) {
+                      toast({ title: t('loyalty.validationError', 'Validation Error'), description: t('loyalty.pointsCostRequired', 'Please enter a valid points cost'), variant: 'destructive' });
+                      return;
+                    }
+                    setOfferEdits(prev => ({
+                      ...prev,
+                      [editingOffer.id]: {
+                        offerName: editOfferForm.name,
+                        description: editOfferForm.description,
+                        pointsCost: parseInt(editOfferForm.pointsCost),
+                        discountValue: parseInt(editOfferForm.value) || 0,
+                        tierRequired: editOfferForm.tier.charAt(0).toUpperCase() + editOfferForm.tier.slice(1)
+                      }
+                    }));
                     toast({
                       title: t('loyalty.offerUpdatedSuccess', 'Offer Updated'),
-                      description: t('loyalty.offerUpdatedDesc', '{{offer}} has been updated successfully', { offer: editingOffer.offerName })
+                      description: t('loyalty.offerUpdatedDesc', '{{offer}} has been updated successfully', { offer: editOfferForm.name })
                     });
                     setEditingOffer(null);
                   }}
@@ -731,6 +791,72 @@ export default function LoyaltyProgram() {
                   {t('common.save', 'Save Changes')}
                 </Button>
               </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewingOffer} onOpenChange={(open) => !open && setViewingOffer(null)}>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <Gift className="w-4 h-4 text-white" />
+              </div>
+              {t('loyalty.offerDetails', 'Offer Details')}
+            </DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('loyalty.viewOfferInfo', 'View reward offer information')}</DialogDescription>
+          </DialogHeader>
+          {viewingOffer && (
+            <div className="space-y-4 py-4">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 border border-[#0A5ED7]/20">
+                <h3 className="text-lg font-bold text-[#0B1F3B] dark:text-white mb-1">{viewingOffer.offerName}</h3>
+                <p className="text-sm text-[#64748B]">{viewingOffer.description}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('loyalty.pointsCost', 'Points Cost')}</p>
+                  <p className="text-xl font-bold text-[#0A5ED7]">{viewingOffer.pointsCost.toLocaleString()}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('loyalty.value', 'Value')}</p>
+                  <p className="text-xl font-bold text-[#10B981]">{t('common.sar', 'SAR')} {viewingOffer.discountValue}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('loyalty.tierRequired', 'Tier Required')}</p>
+                  <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">{viewingOffer.tierRequired}+</Badge>
+                </div>
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('loyalty.redemptions', 'Redemptions')}</p>
+                  <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">{viewingOffer.redemptionCount}</p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                <p className="text-xs text-[#64748B] mb-1">{t('loyalty.expiresAt', 'Expires At')}</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">{new Date(viewingOffer.expiresAt).toLocaleDateString()}</p>
+              </div>
+
+              <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-[#64748B]">{t('loyalty.status', 'Status')}</p>
+                  <Badge className={viewingOffer.isActive ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
+                    {viewingOffer.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                  </Badge>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                onClick={() => setViewingOffer(null)}
+                data-testid="button-close-offer-details"
+              >
+                {t('common.close', 'Close')}
+              </Button>
             </div>
           )}
         </DialogContent>
