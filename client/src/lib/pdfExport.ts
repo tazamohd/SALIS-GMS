@@ -315,3 +315,149 @@ export function exportInvoicesBatchToPDF(invoices: Invoice[]) {
 
   doc.save(`Invoice-Report-${new Date().toISOString().split("T")[0]}.pdf`);
 }
+
+/**
+ * Export payment receipt to PDF
+ */
+export function exportPaymentReceiptToPDF(
+  payment: {
+    id: string;
+    invoiceId: string;
+    paymentDate: string;
+    amount: string;
+    paymentMethod: string;
+    referenceNumber: string | null;
+    notes: string | null;
+    invoiceNumber: string;
+    customerName: string | null;
+  },
+  companyInfo?: {
+    name: string;
+    vatNumber?: string;
+    address?: string;
+    phone?: string;
+  }
+) {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // Header - Company Info
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text(companyInfo?.name || "SALIS AUTO", 14, 20);
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  if (companyInfo?.vatNumber) {
+    doc.text(`VAT/TRN: ${companyInfo.vatNumber}`, 14, 28);
+  }
+  if (companyInfo?.address) {
+    doc.text(companyInfo.address, 14, 34);
+  }
+  if (companyInfo?.phone) {
+    doc.text(companyInfo.phone, 14, 40);
+  }
+
+  // Receipt Title
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  doc.text("PAYMENT RECEIPT", pageWidth - 14, 20, { align: "right" });
+
+  // Receipt Number
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Receipt #: ${payment.id.slice(0, 8).toUpperCase()}`, pageWidth - 14, 28, {
+    align: "right",
+  });
+  doc.text(
+    `Date: ${new Date(payment.paymentDate).toLocaleDateString()}`,
+    pageWidth - 14,
+    34,
+    { align: "right" }
+  );
+
+  // Received From
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Received From:", 14, 55);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(payment.customerName || "Customer", 14, 62);
+
+  // Payment Details Box
+  const boxY = 75;
+  doc.setDrawColor(200, 200, 200);
+  doc.setFillColor(248, 248, 248);
+  doc.roundedRect(14, boxY, pageWidth - 28, 60, 3, 3, 'FD');
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("Payment Details", 20, boxY + 12);
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  
+  // Invoice Reference
+  doc.text("Invoice Reference:", 20, boxY + 24);
+  doc.text(payment.invoiceNumber, 80, boxY + 24);
+
+  // Payment Method
+  doc.text("Payment Method:", 20, boxY + 34);
+  const methodLabels: Record<string, string> = {
+    cash: "Cash",
+    card: "Credit/Debit Card",
+    transfer: "Bank Transfer",
+    check: "Check",
+    bank_transfer: "Bank Transfer",
+  };
+  doc.text(methodLabels[payment.paymentMethod] || payment.paymentMethod, 80, boxY + 34);
+
+  // Reference Number (if any)
+  if (payment.referenceNumber) {
+    doc.text("Reference #:", 20, boxY + 44);
+    doc.text(payment.referenceNumber, 80, boxY + 44);
+  }
+
+  // Amount (large and prominent)
+  const amountY = boxY + 80;
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Amount Received:", 14, amountY);
+  
+  doc.setFontSize(24);
+  doc.setTextColor(10, 94, 215); // Brand blue color
+  doc.text(`$${parseFloat(payment.amount).toFixed(2)}`, pageWidth - 14, amountY, {
+    align: "right",
+  });
+  doc.setTextColor(0, 0, 0);
+
+  // Notes (if any)
+  if (payment.notes) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("Notes:", 14, amountY + 20);
+    doc.setFont("helvetica", "normal");
+    doc.text(payment.notes, 14, amountY + 28, { maxWidth: pageWidth - 28 });
+  }
+
+  // Footer
+  const footerY = doc.internal.pageSize.getHeight() - 30;
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "italic");
+  doc.text(
+    "Thank you for your payment!",
+    pageWidth / 2,
+    footerY,
+    { align: "center" }
+  );
+  doc.setFontSize(8);
+  doc.text(
+    "This receipt serves as confirmation of payment received.",
+    pageWidth / 2,
+    footerY + 8,
+    { align: "center" }
+  );
+
+  // Save PDF
+  doc.save(`Receipt-${payment.invoiceNumber}-${new Date(payment.paymentDate).toISOString().split('T')[0]}.pdf`);
+}

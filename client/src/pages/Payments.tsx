@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { exportPaymentReceiptToPDF } from "@/lib/pdfExport";
 import type { Invoice } from "@shared/schema";
 
 type PaymentWithDetails = {
@@ -370,6 +371,7 @@ export default function Payments() {
           variant="outline"
           className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent"
           data-testid={`button-receipt-${payment.id}`}
+          onClick={() => exportPaymentReceiptToPDF(payment)}
         >
           <Download className="h-4 w-4 mr-1" />
           {t('payments.receipt', 'Receipt')}

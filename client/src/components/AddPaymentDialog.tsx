@@ -175,9 +175,8 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
                     <SelectContent>
                       <SelectItem value="cash">Cash</SelectItem>
                       <SelectItem value="card">Card</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="transfer">Bank Transfer</SelectItem>
                       <SelectItem value="check">Check</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
