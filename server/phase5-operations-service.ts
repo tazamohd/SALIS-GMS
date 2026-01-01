@@ -15,7 +15,8 @@ import {
   calibrationReminders,
   spareParts,
   users,
-  tools
+  tools,
+  appointments
 } from "@shared/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 
@@ -78,6 +79,118 @@ export async function getSchedulingHistory(garageId: string, limit: number = 30)
   } catch (error) {
     console.error('Error fetching scheduling history:', error);
     return [];
+  }
+}
+
+export async function runSchedulingOptimization(garageId: string) {
+  try {
+    if (!garageId) {
+      throw new Error('Garage ID is required for scheduling optimization');
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    const garageAppointments = await db.select().from(appointments).where(eq(appointments.garageId, garageId));
+    
+    const upcomingAppointments = garageAppointments.filter(apt => {
+      const aptDate = new Date(apt.appointmentDate);
+      return aptDate >= today && aptDate < nextWeek && 
+             apt.status !== 'completed' && apt.status !== 'cancelled';
+    });
+    
+    const technicians = await db.select().from(users).where(and(eq(users.role, 'technician'), eq(users.garageId, garageId)));
+    
+    if (technicians.length === 0) {
+      const noTechOptimization = await createSchedulingOptimization({
+        garageId: garageId,
+        optimizationDate: new Date(),
+        appointmentsOptimized: upcomingAppointments.length,
+        efficiencyGain: 0,
+        technicianUtilization: {},
+        suggestions: ['No technicians found. Add technicians to enable scheduling optimization.'],
+      });
+      return noTechOptimization;
+    }
+    
+    const technicianWorkload: Record<string, number> = {};
+    const technicianNames: Record<string, string> = {};
+    
+    technicians.forEach(tech => {
+      technicianWorkload[tech.id] = 0;
+      technicianNames[tech.id] = tech.fullName || tech.email;
+    });
+    
+    upcomingAppointments.forEach(apt => {
+      if (apt.assignedTo && technicianWorkload[apt.assignedTo] !== undefined) {
+        technicianWorkload[apt.assignedTo] += apt.duration || 60;
+      }
+    });
+    
+    const totalWorkMinutes = Object.values(technicianWorkload).reduce((a, b) => a + b, 0);
+    const avgWorkMinutes = technicians.length > 0 ? totalWorkMinutes / technicians.length : 0;
+    
+    const suggestions: string[] = [];
+    const technicianUtilization: Record<string, string> = {};
+    
+    const maxWorkMinutesPerWeek = 40 * 60;
+    
+    Object.entries(technicianWorkload).forEach(([techId, minutes]) => {
+      const utilization = (minutes / maxWorkMinutesPerWeek) * 100;
+      technicianUtilization[technicianNames[techId] || techId] = utilization.toFixed(1);
+      
+      if (utilization < 50) {
+        suggestions.push(`${technicianNames[techId]} has low utilization (${utilization.toFixed(0)}%). Consider assigning more appointments.`);
+      } else if (utilization > 90) {
+        suggestions.push(`${technicianNames[techId]} is overloaded (${utilization.toFixed(0)}%). Consider redistributing workload.`);
+      }
+    });
+    
+    const unassignedCount = upcomingAppointments.filter(apt => !apt.assignedTo).length;
+    if (unassignedCount > 0) {
+      suggestions.push(`${unassignedCount} appointments are unassigned. Assign technicians to improve efficiency.`);
+    }
+    
+    const morningAppointments = upcomingAppointments.filter(apt => {
+      const hour = new Date(apt.appointmentDate).getHours();
+      return hour >= 8 && hour < 12;
+    });
+    const afternoonAppointments = upcomingAppointments.filter(apt => {
+      const hour = new Date(apt.appointmentDate).getHours();
+      return hour >= 12 && hour < 17;
+    });
+    
+    if (morningAppointments.length > afternoonAppointments.length * 2) {
+      suggestions.push('Morning schedule is heavy. Consider shifting some appointments to afternoon for better balance.');
+    }
+    
+    if (suggestions.length === 0) {
+      suggestions.push('Schedule looks well-optimized! All technicians have balanced workloads.');
+    }
+    
+    const avgUtilization = Object.values(technicianUtilization)
+      .map(v => parseFloat(v))
+      .reduce((a, b) => a + b, 0) / (technicians.length || 1);
+    
+    const efficiencyGain = Math.min(15, Math.max(0, 100 - avgUtilization) / 5);
+    
+    const optimization = await createSchedulingOptimization({
+      garageId: garageId,
+      optimizationDate: new Date(),
+      appointmentsOptimized: upcomingAppointments.length,
+      efficiencyGain,
+      technicianUtilization,
+      suggestions,
+    });
+    
+    return optimization;
+  } catch (error) {
+    console.error('Error running scheduling optimization:', error);
+    throw new Error('Failed to run scheduling optimization');
   }
 }
 

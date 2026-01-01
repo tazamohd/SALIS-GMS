@@ -15018,25 +15018,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/scheduling/optimize', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      
-      const validated = schedulingOptimizationSchema.parse(req.body);
-      
-      const optimizationData = {
-        garageId,
-        optimizationDate: new Date(validated.optimizationDate),
-        appointmentsOptimized: validated.appointmentsOptimized,
-        efficiencyGain: validated.efficiencyGain,
-        technicianUtilization: validated.technicianUtilization,
-        suggestions: validated.suggestions,
-      };
-      const optimization = await phase5Service.createSchedulingOptimization(optimizationData);
+      if (!garageId) {
+        return res.status(400).json({ message: "Garage ID is required. Please ensure you are associated with a garage." });
+      }
+      const optimization = await phase5Service.runSchedulingOptimization(garageId);
       res.status(201).json(optimization);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating scheduling optimization:", error);
-      res.status(500).json({ message: "Failed to create scheduling optimization" });
+      console.error("Error running scheduling optimization:", error);
+      res.status(500).json({ message: "Failed to run scheduling optimization" });
     }
   });
 

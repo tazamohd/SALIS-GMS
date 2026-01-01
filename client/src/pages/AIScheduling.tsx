@@ -24,13 +24,7 @@ export default function AIScheduling() {
 
   const optimizeMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('POST', '/api/scheduling/optimize', {
-        optimizationDate: new Date().toISOString(),
-        appointmentsOptimized: 10,
-        efficiencyGain: "12.5",
-        technicianUtilization: { tech1: "85", tech2: "90" },
-        suggestions: [t('aiScheduling.optimizeMorningSchedule', 'Optimize morning schedule'), t('aiScheduling.balanceWorkload', 'Balance workload across technicians')],
-      });
+      return apiRequest('POST', '/api/scheduling/optimize', {});
     },
     onSuccess: () => {
       toast({
