@@ -431,14 +431,46 @@ export default function AutomatedReordering() {
   const [ruleStates, setRuleStates] = useState<Record<number, boolean>>({});
   const [editingRule, setEditingRule] = useState<{ idx: number; item: typeof stockLevelData[0] } | null>(null);
   const [editFormData, setEditFormData] = useState({ reorderPoint: 0, orderQuantity: 0 });
+  const [showAddRuleDialog, setShowAddRuleDialog] = useState(false);
+  const [newRuleForm, setNewRuleForm] = useState({ part: '', reorderPoint: '', orderQuantity: '', supplier: '' });
+
+  const availableParts = [
+    { value: 'oil-filter', label: t('parts.oilFilter', 'Oil Filter'), category: t('parts.filters', 'Filters') },
+    { value: 'air-filter', label: t('parts.airFilter', 'Air Filter'), category: t('parts.filters', 'Filters') },
+    { value: 'fuel-filter', label: t('parts.fuelFilter', 'Fuel Filter'), category: t('parts.filters', 'Filters') },
+    { value: 'cabin-filter', label: t('parts.cabinFilter', 'Cabin Air Filter'), category: t('parts.filters', 'Filters') },
+    { value: 'brake-pads', label: t('parts.brakePads', 'Brake Pads'), category: t('parts.brakes', 'Brakes') },
+    { value: 'brake-rotors', label: t('parts.brakeRotors', 'Brake Rotors'), category: t('parts.brakes', 'Brakes') },
+    { value: 'brake-fluid', label: t('parts.brakeFluid', 'Brake Fluid'), category: t('parts.brakes', 'Brakes') },
+    { value: 'spark-plugs', label: t('parts.sparkPlugs', 'Spark Plugs'), category: t('parts.engine', 'Engine') },
+    { value: 'engine-oil', label: t('parts.engineOil', 'Engine Oil'), category: t('parts.engine', 'Engine') },
+    { value: 'coolant', label: t('parts.coolant', 'Coolant'), category: t('parts.engine', 'Engine') },
+    { value: 'timing-belt', label: t('parts.timingBelt', 'Timing Belt'), category: t('parts.engine', 'Engine') },
+    { value: 'battery', label: t('parts.battery', 'Battery'), category: t('parts.electrical', 'Electrical') },
+    { value: 'alternator', label: t('parts.alternator', 'Alternator'), category: t('parts.electrical', 'Electrical') },
+    { value: 'wiper-blades', label: t('parts.wiperBlades', 'Wiper Blades'), category: t('parts.exterior', 'Exterior') },
+    { value: 'headlight-bulb', label: t('parts.headlightBulb', 'Headlight Bulb'), category: t('parts.electrical', 'Electrical') },
+  ];
+
+  const suppliers = [
+    { value: 'supplier-a', label: t('suppliers.autoPartsPlus', 'Auto Parts Plus') },
+    { value: 'supplier-b', label: t('suppliers.motorcraft', 'Motorcraft') },
+    { value: 'supplier-c', label: t('suppliers.bosch', 'Bosch Parts') },
+    { value: 'supplier-d', label: t('suppliers.denso', 'Denso') },
+  ];
 
   const toggleRule = (idx: number) => {
     const wasActive = ruleStates[idx] ?? true;
     const newActive = !wasActive;
     setRuleStates(prev => ({ ...prev, [idx]: newActive }));
+    const partName = stockLevelData[idx]?.name;
     toast({ 
-      title: t('autoReorder.ruleUpdated', 'Rule Updated'), 
-      description: `${stockLevelData[idx]?.name} rule ${newActive ? 'enabled' : 'disabled'}` 
+      title: newActive 
+        ? t('autoReorder.ruleActivated', 'Rule Activated') 
+        : t('autoReorder.ruleDeactivated', 'Rule Deactivated'),
+      description: newActive 
+        ? t('autoReorder.ruleActivatedDesc', '{{part}} reorder rule is now active. Auto-ordering will resume.', { part: partName })
+        : t('autoReorder.ruleDeactivatedDesc', '{{part}} reorder rule has been disabled. Auto-ordering paused.', { part: partName })
     });
   };
 
@@ -450,11 +482,54 @@ export default function AutomatedReordering() {
   const saveEditedRule = () => {
     if (editingRule) {
       toast({ 
-        title: t('autoReorder.ruleSaved', 'Rule Saved'), 
-        description: `${editingRule.item.name}: Reorder at ${editFormData.reorderPoint}, Order ${editFormData.orderQuantity} units` 
+        title: t('autoReorder.ruleUpdatedSuccess', 'Rule Updated Successfully'),
+        description: t('autoReorder.ruleUpdatedDesc', '{{part}}: Reorder point set to {{point}} units, order quantity set to {{qty}} units', { 
+          part: editingRule.item.name, 
+          point: editFormData.reorderPoint, 
+          qty: editFormData.orderQuantity 
+        })
       });
       setEditingRule(null);
     }
+  };
+
+  const handleCreateRule = () => {
+    if (!newRuleForm.part) {
+      toast({ 
+        title: t('autoReorder.validationError', 'Validation Error'),
+        description: t('autoReorder.selectPartRequired', 'Please select a part to create a reorder rule'),
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (!newRuleForm.reorderPoint || parseInt(newRuleForm.reorderPoint) <= 0) {
+      toast({ 
+        title: t('autoReorder.validationError', 'Validation Error'),
+        description: t('autoReorder.reorderPointRequired', 'Please enter a valid reorder point greater than 0'),
+        variant: 'destructive'
+      });
+      return;
+    }
+    if (!newRuleForm.orderQuantity || parseInt(newRuleForm.orderQuantity) <= 0) {
+      toast({ 
+        title: t('autoReorder.validationError', 'Validation Error'),
+        description: t('autoReorder.orderQuantityRequired', 'Please enter a valid order quantity greater than 0'),
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    const selectedPart = availableParts.find(p => p.value === newRuleForm.part);
+    toast({ 
+      title: t('autoReorder.ruleCreatedSuccess', 'Reorder Rule Created'),
+      description: t('autoReorder.ruleCreatedSuccessDesc', '{{part}}: Auto-reorder {{qty}} units when stock falls below {{point}} units', { 
+        part: selectedPart?.label || newRuleForm.part, 
+        qty: newRuleForm.orderQuantity, 
+        point: newRuleForm.reorderPoint 
+      })
+    });
+    setNewRuleForm({ part: '', reorderPoint: '', orderQuantity: '', supplier: '' });
+    setShowAddRuleDialog(false);
   };
 
   const rulesTab = (
@@ -468,7 +543,7 @@ export default function AutomatedReordering() {
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('autoReorder.configureRulesDescription', 'Configure automatic reordering rules for inventory items')}</CardDescription>
           </div>
-          <Dialog>
+          <Dialog open={showAddRuleDialog} onOpenChange={setShowAddRuleDialog}>
             <DialogTrigger asChild>
               <Button 
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
@@ -478,41 +553,102 @@ export default function AutomatedReordering() {
                 {t('autoReorder.addRule', 'Add Rule')}
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-w-lg">
               <DialogHeader>
-                <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('autoReorder.addNewRule', 'Add New Reorder Rule')}</DialogTitle>
+                <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                    <Settings className="w-4 h-4 text-white" />
+                  </div>
+                  {t('autoReorder.addNewRule', 'Add New Reorder Rule')}
+                </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
+                <div className="p-3 rounded-lg bg-[#0A5ED7]/5 border border-[#0A5ED7]/20">
+                  <p className="text-sm text-[#64748B]">{t('autoReorder.addRuleHint', 'Configure automatic reordering when stock falls below a threshold')}</p>
+                </div>
                 <div className="space-y-2">
-                  <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.selectPart', 'Select Part')}</Label>
-                  <Select>
-                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.selectPart', 'Select Part')} <span className="text-[#F97316]">*</span></Label>
+                  <Select value={newRuleForm.part} onValueChange={(value) => setNewRuleForm(prev => ({ ...prev, part: value }))}>
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-part">
                       <SelectValue placeholder={t('autoReorder.choosePart', 'Choose a part...')} />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-[#151A23]">
-                      <SelectItem value="oil">Oil Filter</SelectItem>
-                      <SelectItem value="brake">Brake Pads</SelectItem>
-                      <SelectItem value="air">Air Filter</SelectItem>
+                    <SelectContent className="bg-white dark:bg-[#151A23] max-h-60">
+                      {['Filters', 'Brakes', 'Engine', 'Electrical', 'Exterior'].map(category => (
+                        <div key={category}>
+                          <div className="px-2 py-1.5 text-xs font-semibold text-[#64748B] bg-[#F8FAFC] dark:bg-[#0E1117]">
+                            {t(`parts.${category.toLowerCase()}`, category)}
+                          </div>
+                          {availableParts.filter(p => p.category === t(`parts.${category.toLowerCase()}`, category)).map(part => (
+                            <SelectItem key={part.value} value={part.value}>
+                              {part.label}
+                            </SelectItem>
+                          ))}
+                        </div>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')}</Label>
-                    <Input type="number" placeholder="20" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')} <span className="text-[#F97316]">*</span></Label>
+                    <Input 
+                      type="number" 
+                      placeholder="20" 
+                      value={newRuleForm.reorderPoint}
+                      onChange={(e) => setNewRuleForm(prev => ({ ...prev, reorderPoint: e.target.value }))}
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
+                      data-testid="input-new-reorder-point"
+                    />
+                    <p className="text-xs text-[#64748B]">{t('autoReorder.reorderPointHint', 'Trigger reorder when stock falls below this level')}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')}</Label>
-                    <Input type="number" placeholder="50" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                    <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')} <span className="text-[#F97316]">*</span></Label>
+                    <Input 
+                      type="number" 
+                      placeholder="50" 
+                      value={newRuleForm.orderQuantity}
+                      onChange={(e) => setNewRuleForm(prev => ({ ...prev, orderQuantity: e.target.value }))}
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
+                      data-testid="input-new-order-quantity"
+                    />
+                    <p className="text-xs text-[#64748B]">{t('autoReorder.orderQuantityHint', 'Number of units to order automatically')}</p>
                   </div>
                 </div>
-                <Button 
-                  className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
-                  onClick={() => toast({ title: t('autoReorder.ruleCreated', 'Rule Created'), description: t('autoReorder.ruleCreatedDesc', 'New reorder rule has been added') })}
-                  data-testid="button-create-rule"
-                >
-                  {t('autoReorder.createRule', 'Create Rule')}
-                </Button>
+                <div className="space-y-2">
+                  <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.preferredSupplier', 'Preferred Supplier')}</Label>
+                  <Select value={newRuleForm.supplier} onValueChange={(value) => setNewRuleForm(prev => ({ ...prev, supplier: value }))}>
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-supplier">
+                      <SelectValue placeholder={t('autoReorder.selectSupplier', 'Select supplier (optional)')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#151A23]">
+                      {suppliers.map(supplier => (
+                        <SelectItem key={supplier.value} value={supplier.value}>
+                          {supplier.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button 
+                    variant="outline"
+                    className="flex-1 border-[#E2E8F0] dark:border-[#232A36]"
+                    onClick={() => {
+                      setNewRuleForm({ part: '', reorderPoint: '', orderQuantity: '', supplier: '' });
+                      setShowAddRuleDialog(false);
+                    }}
+                    data-testid="button-cancel-create-rule"
+                  >
+                    {t('common.cancel', 'Cancel')}
+                  </Button>
+                  <Button 
+                    className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                    onClick={handleCreateRule}
+                    data-testid="button-create-rule"
+                  >
+                    {t('autoReorder.createRule', 'Create Rule')}
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
