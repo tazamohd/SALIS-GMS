@@ -423,6 +423,8 @@ export default function AutomatedReordering() {
   );
 
   const [ruleStates, setRuleStates] = useState<Record<number, boolean>>({});
+  const [editingRule, setEditingRule] = useState<{ idx: number; item: typeof stockLevelData[0] } | null>(null);
+  const [editFormData, setEditFormData] = useState({ reorderPoint: 0, orderQuantity: 0 });
 
   const toggleRule = (idx: number) => {
     const wasActive = ruleStates[idx] ?? true;
@@ -432,6 +434,21 @@ export default function AutomatedReordering() {
       title: t('autoReorder.ruleUpdated', 'Rule Updated'), 
       description: `${stockLevelData[idx]?.name} rule ${newActive ? 'enabled' : 'disabled'}` 
     });
+  };
+
+  const openEditDialog = (idx: number, item: typeof stockLevelData[0]) => {
+    setEditFormData({ reorderPoint: item.reorder, orderQuantity: item.reorder * 2 });
+    setEditingRule({ idx, item });
+  };
+
+  const saveEditedRule = () => {
+    if (editingRule) {
+      toast({ 
+        title: t('autoReorder.ruleSaved', 'Rule Saved'), 
+        description: `${editingRule.item.name}: Reorder at ${editFormData.reorderPoint}, Order ${editFormData.orderQuantity} units` 
+      });
+      setEditingRule(null);
+    }
   };
 
   const rulesTab = (
@@ -541,7 +558,7 @@ export default function AutomatedReordering() {
                         variant="outline" 
                         size="sm" 
                         className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
-                        onClick={() => toast({ title: t('autoReorder.editRule', 'Edit Rule'), description: item.name })}
+                        onClick={() => openEditDialog(idx, item)}
                         data-testid={`button-edit-rule-${idx}`}
                       >
                         {t('common.edit', 'Edit')}
@@ -554,6 +571,62 @@ export default function AutomatedReordering() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!editingRule} onOpenChange={(open) => !open && setEditingRule(null)}>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <Settings className="w-5 h-5 text-[#0A5ED7]" />
+              {t('autoReorder.editRule', 'Edit Rule')}: {editingRule?.item.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-4 rounded-xl bg-[#0A5ED7]/5 border border-[#0A5ED7]/20">
+              <p className="text-sm text-[#64748B] mb-1">{t('autoReorder.currentStock', 'Current Stock')}</p>
+              <p className="text-2xl font-bold text-[#0A5ED7]">{editingRule?.item.current} {t('autoReorder.units', 'units')}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')}</Label>
+                <Input 
+                  type="number" 
+                  value={editFormData.reorderPoint}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, reorderPoint: parseInt(e.target.value) || 0 }))}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
+                  data-testid="input-edit-reorder-point"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')}</Label>
+                <Input 
+                  type="number" 
+                  value={editFormData.orderQuantity}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, orderQuantity: parseInt(e.target.value) || 0 }))}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
+                  data-testid="input-edit-order-quantity"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button 
+                variant="outline"
+                className="flex-1 border-[#E2E8F0] dark:border-[#232A36]"
+                onClick={() => setEditingRule(null)}
+                data-testid="button-cancel-edit"
+              >
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button 
+                className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                onClick={saveEditedRule}
+                data-testid="button-save-rule"
+              >
+                {t('common.save', 'Save Changes')}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
