@@ -391,17 +391,17 @@ export function Customers() {
                   {(outstandingJobs.length > 0 || unpaidInvoices.length > 0) && (
                     <div className="mt-6 space-y-3">
                       {unpaidInvoices.length > 0 && (
-                        <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-                          <AlertCircle className="h-4 w-4 text-red-600" />
-                          <AlertDescription className="text-sm text-gray-900 dark:text-white">
+                        <Alert className="bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 dark:border-[#F97316]/40">
+                          <AlertCircle className="h-4 w-4 text-[#F97316]" />
+                          <AlertDescription className="text-sm text-[#0B1F3B] dark:text-white">
                             <strong>{t('customers.outstandingPayments', 'Outstanding Payments')}:</strong> ${unpaidInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount || 0), 0).toFixed(2)} {t('customers.dueAcross', 'due across')} {unpaidInvoices.length} {t('customers.invoices', 'invoice(s)')}
                           </AlertDescription>
                         </Alert>
                       )}
                       {outstandingJobs.length > 0 && (
-                        <Alert className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
-                          <ClipboardList className="h-4 w-4 text-yellow-600" />
-                          <AlertDescription className="text-sm text-gray-900 dark:text-white">
+                        <Alert className="bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7]/30 dark:border-[#0A5ED7]/40">
+                          <ClipboardList className="h-4 w-4 text-[#0A5ED7]" />
+                          <AlertDescription className="text-sm text-[#0B1F3B] dark:text-white">
                             <strong>{t('customers.activeService', 'Active Service')}:</strong> {outstandingJobs.length} {t('customers.jobsInProgress', 'job(s) currently in progress')}
                           </AlertDescription>
                         </Alert>
@@ -412,7 +412,7 @@ export function Customers() {
               </Card>
 
               <Tabs defaultValue="vehicles" className="space-y-4" data-testid="tabs-customer-history">
-                <TabsList className="bg-white dark:bg-salis-black">
+                <TabsList className="bg-white dark:bg-[#151A23]">
                   <TabsTrigger value="vehicles" data-testid="tab-vehicles">
                     <Car className="w-4 h-4 mr-2" />
                     {t('customers.tabs.vehicles', 'Vehicles')}
@@ -432,10 +432,10 @@ export function Customers() {
                 </TabsList>
 
                 <TabsContent value="vehicles">
-                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
                           {t('customers.tabs.vehicles', 'Vehicles')}
                         </CardTitle>
                         {selectedCustomer?.garageId && (
@@ -449,36 +449,36 @@ export function Customers() {
                     <CardContent>
                       {(customerVehicles ?? []).length === 0 ? (
                         <div className="text-center py-8">
-                          <Car className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                          <p className="text-sm text-gray-900 dark:text-white/60">{t('customers.noVehiclesRegistered', 'No vehicles registered')}</p>
+                          <Car className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('customers.noVehiclesRegistered', 'No vehicles registered')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {customerVehicles?.map((vehicle) => (
                             <div
                               key={vehicle.id}
-                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
                               data-testid={`vehicle-item-${vehicle.id}`}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex items-start gap-3 flex-1">
-                                  <Car className="w-5 h-5 text-gray-900 dark:text-white/50 mt-1" />
+                                  <Car className="w-5 h-5 text-[#0A5ED7] mt-1" />
                                   <div className="flex-1">
-                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
                                       {vehicle.year} {vehicle.make} {vehicle.model}
                                     </h4>
-                                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-900 dark:text-white/60">
+                                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-[#64748B]">
                                       <span>{t('customers.license', 'License')}: {vehicle.licensePlate}</span>
                                       {vehicle.color && <span>{t('customers.color', 'Color')}: {vehicle.color}</span>}
                                       {vehicle.mileage && <span>{t('customers.mileage', 'Mileage')}: {vehicle.mileage.toLocaleString()} {t('customers.km', 'km')}</span>}
                                     </div>
                                     {vehicle.engineType && (
                                       <div className="mt-2 flex items-center gap-2">
-                                        <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
+                                        <span className="px-2 py-1 bg-[#F8FAFC] dark:bg-[#0E1117] rounded text-xs capitalize text-[#0B1F3B] dark:text-white">
                                           {vehicle.engineType}
                                         </span>
                                         {vehicle.transmissionType && (
-                                          <span className="px-2 py-1 bg-gray-100 dark:bg-salis-gray-dark rounded text-xs capitalize">
+                                          <span className="px-2 py-1 bg-[#F8FAFC] dark:bg-[#0E1117] rounded text-xs capitalize text-[#0B1F3B] dark:text-white">
                                             {vehicle.transmissionType}
                                           </span>
                                         )}
@@ -504,39 +504,39 @@ export function Customers() {
                 </TabsContent>
 
                 <TabsContent value="jobs">
-                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
-                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
                         {t('customers.tabs.jobHistory', 'Job History')} ({customerJobCards.length} {t('common.total', 'total')})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {customerJobCards.length === 0 ? (
                         <div className="text-center py-8">
-                          <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                          <p className="text-sm text-gray-900 dark:text-white/60">{t('customers.noJobHistory', 'No job history available')}</p>
+                          <ClipboardList className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('customers.noJobHistory', 'No job history available')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {customerJobCards.map((job: any) => (
                             <div
                               key={job.id}
-                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
                               data-testid={`job-item-${job.id}`}
                             >
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
                                       {job.jobNumber}
                                     </h4>
                                     <Badge 
                                       variant="outline" 
                                       className={
-                                        job.status === 'completed' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' :
-                                        job.status === 'in_progress' ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' :
-                                        job.status === 'cancelled' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
-                                        'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                                        job.status === 'completed' ? 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7]/30 text-[#0A5ED7]' :
+                                        job.status === 'in_progress' ? 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20 border-[#0BB3FF]/30 text-[#0BB3FF]' :
+                                        job.status === 'cancelled' ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 text-[#F97316]' :
+                                        'bg-[#64748B]/10 dark:bg-[#64748B]/20 border-[#64748B]/30 text-[#64748B]'
                                       }
                                     >
                                       {job.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1" />}
@@ -545,12 +545,12 @@ export function Customers() {
                                       {job.status}
                                     </Badge>
                                   </div>
-                                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{job.description}</p>
-                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-900 dark:text-white/60">
+                                  <p className="text-sm text-[#64748B] mb-2">{job.description}</p>
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#64748B]">
                                     <span>{t('customers.service', 'Service')}: {job.serviceType}</span>
                                     <span>{t('customers.vehicle', 'Vehicle')}: {job.vehicleInfo?.make} {job.vehicleInfo?.model}</span>
                                     {job.completedAt && <span>{t('common.completed', 'Completed')}: {new Date(job.completedAt).toLocaleDateString()}</span>}
-                                    {job.totalCost && <span className="font-semibold text-gray-900 dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
+                                    {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
                                   </div>
                                 </div>
                               </div>
@@ -563,56 +563,56 @@ export function Customers() {
                 </TabsContent>
 
                 <TabsContent value="invoices">
-                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
-                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
                         {t('customers.tabs.invoicesPayments', 'Invoices & Payments')} ({customerInvoices.length} {t('common.total', 'total')})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {customerInvoices.length === 0 ? (
                         <div className="text-center py-8">
-                          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                          <p className="text-sm text-gray-900 dark:text-white/60">{t('customers.noInvoices', 'No invoices available')}</p>
+                          <FileText className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('customers.noInvoices', 'No invoices available')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {customerInvoices.map((invoice: any) => (
                             <div
                               key={invoice.id}
-                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
                               data-testid={`invoice-item-${invoice.id}`}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
                                       Invoice #{invoice.invoiceNumber}
                                     </h4>
                                     <Badge 
                                       variant="outline" 
                                       className={
-                                        invoice.status === 'paid' ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' :
-                                        invoice.status === 'pending' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' :
-                                        'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                                        invoice.status === 'paid' ? 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7]/30 text-[#0A5ED7]' :
+                                        invoice.status === 'pending' ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 text-[#F97316]' :
+                                        'bg-[#64748B]/10 dark:bg-[#64748B]/20 border-[#64748B]/30 text-[#64748B]'
                                       }
                                     >
                                       {invoice.status}
                                     </Badge>
                                   </div>
-                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-900 dark:text-white/60 mb-2">
+                                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#64748B] mb-2">
                                     <span>{t('common.date', 'Date')}: {invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'N/A'}</span>
                                     {invoice.dueDate && <span>{t('customers.due', 'Due')}: {new Date(invoice.dueDate).toLocaleDateString()}</span>}
                                   </div>
                                   <div className="flex items-center justify-between">
-                                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                    <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                                       ${Number(invoice.totalAmount || 0).toFixed(2)}
                                     </span>
                                     {invoice.status === 'pending' && (
                                       selectedCustomer?.phone && selectedCustomer.phone.trim().length > 0 ? (
                                         <Button
                                           size="sm"
-                                          variant="outline"
+                                          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                                           onClick={() => sendReminderMutation.mutate({ 
                                             invoiceId: invoice.id, 
                                             amount: Number(invoice.totalAmount) 
@@ -624,7 +624,7 @@ export function Customers() {
                                           {t('customers.sendReminder', 'Send Reminder')}
                                         </Button>
                                       ) : (
-                                        <span className="text-xs text-gray-500 dark:text-gray-400" data-testid="text-no-phone">
+                                        <span className="text-xs text-[#64748B]" data-testid="text-no-phone">
                                           {t('customers.noPhoneNumber', 'No phone number')}
                                         </span>
                                       )
@@ -641,10 +641,10 @@ export function Customers() {
                 </TabsContent>
 
                 <TabsContent value="notes">
-                  <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+                  <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-900 dark:text-white">
+                        <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
                           {t('customers.tabs.notes', 'Notes')} & {t('customers.communication', 'Communication')}
                         </CardTitle>
                         <AddCustomerNoteDialog customerId={selectedCustomerId} />
@@ -653,30 +653,30 @@ export function Customers() {
                     <CardContent>
                       {(customerNotes ?? []).length === 0 ? (
                         <div className="text-center py-8">
-                          <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                          <p className="text-sm text-gray-900 dark:text-white/60">{t('customers.noNotes', 'No notes available')}</p>
+                          <MessageSquare className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('customers.noNotes', 'No notes available')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {customerNotes?.map((note) => (
                             <div
                               key={note.id}
-                              className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-salis-gray-dark transition-colors"
+                              className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
                               data-testid={`note-item-${note.id}`}
                             >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                   {note.subject && (
-                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white mb-1">
+                                    <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white mb-1">
                                       {note.subject}
                                     </h4>
                                   )}
-                                  <p className="text-sm text-gray-700 mb-2">{note.content}</p>
+                                  <p className="text-sm text-[#64748B] mb-2">{note.content}</p>
                                   <div className="flex items-center gap-2">
-                                    <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded text-xs capitalize">
+                                    <span className="px-2 py-1 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 text-[#0A5ED7] rounded text-xs capitalize">
                                       {note.noteType}
                                     </span>
-                                    <span className="text-xs text-gray-900 dark:text-white/60">
+                                    <span className="text-xs text-[#64748B]">
                                       {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}
                                     </span>
                                   </div>
@@ -685,6 +685,7 @@ export function Customers() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => deleteNoteMutation.mutate(note.id)}
+                                  className="text-[#F97316] hover:bg-[#F97316]/10"
                                   data-testid={`button-delete-note-${note.id}`}
                                 >
                                   <Trash2 className="w-4 h-4" />
