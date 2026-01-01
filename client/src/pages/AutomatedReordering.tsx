@@ -28,9 +28,16 @@ import {
   Package,
   ShoppingCart,
   ArrowUpCircle,
-  ArrowDownCircle
+  ArrowDownCircle,
+  Target,
+  Activity,
+  LineChart as LineChartIcon,
+  Sparkles,
+  Award,
+  Gauge,
+  ArrowRight
 } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, BarChart, Bar } from "recharts";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, BarChart, Bar, ComposedChart, RadialBarChart, RadialBar, PieChart, Pie, Cell } from "recharts";
 
 interface InventoryForecast {
   id: string;
@@ -700,48 +707,89 @@ export default function AutomatedReordering() {
     </div>
   );
 
+  const accuracyGaugeData = [
+    { name: 'Accuracy', value: 94.2, fill: '#0A5ED7' }
+  ];
+
+  const monthlyAccuracyData = [
+    { month: t('months.jan', 'Jan'), accuracy: 91, predictions: 45 },
+    { month: t('months.feb', 'Feb'), accuracy: 93, predictions: 52 },
+    { month: t('months.mar', 'Mar'), accuracy: 92, predictions: 48 },
+    { month: t('months.apr', 'Apr'), accuracy: 95, predictions: 56 },
+    { month: t('months.may', 'May'), accuracy: 94, predictions: 61 },
+    { month: t('months.jun', 'Jun'), accuracy: 96, predictions: 58 },
+  ];
+
+  const categoryPerformance = [
+    { name: t('autoReorder.oilFilters', 'Oil Filters'), accuracy: 97, color: '#0A5ED7' },
+    { name: t('autoReorder.brakePads', 'Brake Pads'), accuracy: 94, color: '#0BB3FF' },
+    { name: t('autoReorder.airFilters', 'Air Filters'), accuracy: 92, color: '#0B1F3B' },
+    { name: t('autoReorder.sparkPlugs', 'Spark Plugs'), accuracy: 96, color: '#0A5ED7' },
+    { name: t('autoReorder.coolant', 'Coolant'), accuracy: 89, color: '#0BB3FF' },
+  ];
+
   const analyticsTab = (
     <div className="space-y-6" data-testid="auto-reorder-analytics">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
-          <CardContent className="pt-6">
+        <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] border-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="pt-6 relative">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/70">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
                 <p className="text-3xl font-bold">94.2%</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="text-xs text-white/80">+2.3% {t('common.vsLastMonth', 'vs last month')}</span>
+                </div>
               </div>
               <Brain className="w-10 h-10 text-white/50" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-[#10B981] to-[#0BB3FF] border-0 text-white">
-          <CardContent className="pt-6">
+        <Card className="bg-gradient-to-br from-[#0B1F3B] to-[#0A5ED7] border-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="pt-6 relative">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/70">{t('autoReorder.costSavings', 'Cost Savings')}</p>
                 <p className="text-3xl font-bold">SAR 12.4K</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="text-xs text-white/80">+18% {t('common.thisQuarter', 'this quarter')}</span>
+                </div>
               </div>
               <TrendingUp className="w-10 h-10 text-white/50" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-[#6366F1] to-[#0A5ED7] border-0 text-white">
-          <CardContent className="pt-6">
+        <Card className="bg-gradient-to-br from-[#0BB3FF] to-[#0A5ED7] border-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="pt-6 relative">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/70">{t('autoReorder.stockoutsPrevented', 'Stockouts Prevented')}</p>
                 <p className="text-3xl font-bold">23</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span className="text-xs text-white/80">{t('common.last30Days', 'Last 30 days')}</span>
+                </div>
               </div>
-              <CheckCircle2 className="w-10 h-10 text-white/50" />
+              <Target className="w-10 h-10 text-white/50" />
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-[#0B1F3B] to-[#0A5ED7] border-0 text-white">
-          <CardContent className="pt-6">
+        <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0B1F3B] border-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="pt-6 relative">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-white/70">{t('autoReorder.inventoryTurnover', 'Inventory Turnover')}</p>
                 <p className="text-3xl font-bold">4.8x</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <RefreshCw className="w-3 h-3" />
+                  <span className="text-xs text-white/80">{t('common.optimal', 'Optimal range')}</span>
+                </div>
               </div>
               <RefreshCw className="w-10 h-10 text-white/50" />
             </div>
@@ -750,35 +798,207 @@ export default function AutomatedReordering() {
       </div>
 
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
-        <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-            <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
-              <BarChart3 className="w-4 h-4 text-white" />
+        <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-gradient-to-r from-[#0A5ED7]/5 to-[#0BB3FF]/5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-lg shadow-[#0A5ED7]/25">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-lg text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                  {t('autoReorder.forecastPerformance', 'Forecast Performance')}
+                  <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">
+                    <Activity className="w-3 h-3 mr-1" />
+                    {t('common.live', 'Live')}
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-[#64748B]">{t('autoReorder.trackAccuracy', 'AI prediction accuracy and performance metrics')}</CardDescription>
+              </div>
             </div>
-            {t('autoReorder.forecastPerformance', 'Forecast Performance')}
-          </CardTitle>
-          <CardDescription className="text-[#64748B]">{t('autoReorder.trackAccuracy', 'Track accuracy of AI predictions over time')}</CardDescription>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-analytics">
+                {t('common.export', 'Export')}
+              </Button>
+              <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-refresh-analytics">
+                <RefreshCw className="w-4 h-4 mr-1" />
+                {t('common.refresh', 'Refresh')}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <ResponsiveContainer width="100%" height={350}>
-            <AreaChart data={demandTrendData}>
-              <defs>
-                <linearGradient id="varianceGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F97316" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.3} />
-              <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
-              <YAxis tick={{ fill: '#64748B', fontSize: 12 }} axisLine={{ stroke: '#232A36' }} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'rgba(21, 26, 35, 0.95)', border: '1px solid #232A36', borderRadius: '12px', color: '#fff' }}
-                labelStyle={{ color: '#0BB3FF', fontWeight: 'bold' }}
-              />
-              <Legend wrapperStyle={{ color: '#64748B' }} />
-              <Area type="monotone" dataKey="variance" fill="url(#varianceGrad)" stroke="#F97316" strokeWidth={3} name={t('autoReorder.variancePercent', 'Variance %')} />
-            </AreaChart>
-          </ResponsiveContainer>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl p-4 border border-[#E2E8F0] dark:border-[#232A36]">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-[#0B1F3B] dark:text-white flex items-center gap-2">
+                    <LineChartIcon className="w-4 h-4 text-[#0A5ED7]" />
+                    {t('autoReorder.predictionVsActual', 'Prediction vs Actual')}
+                  </h4>
+                  <div className="flex gap-4 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-[#0A5ED7]" />
+                      <span className="text-[#64748B]">{t('common.actual', 'Actual')}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-[#0BB3FF]" />
+                      <span className="text-[#64748B]">{t('common.predicted', 'Predicted')}</span>
+                    </div>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={280}>
+                  <ComposedChart data={demandTrendData}>
+                    <defs>
+                      <linearGradient id="actualGradAnalytics" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0A5ED7" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#0A5ED7" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.2} />
+                    <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={{ stroke: '#232A36' }} />
+                    <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={{ stroke: '#232A36' }} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'rgba(11, 31, 59, 0.95)', border: '1px solid #0A5ED7', borderRadius: '12px', color: '#fff', boxShadow: '0 4px 20px rgba(10, 94, 215, 0.3)' }}
+                      labelStyle={{ color: '#0BB3FF', fontWeight: 'bold' }}
+                    />
+                    <Area type="monotone" dataKey="actual" fill="url(#actualGradAnalytics)" stroke="#0A5ED7" strokeWidth={2} name={t('common.actual', 'Actual')} />
+                    <Line type="monotone" dataKey="predicted" stroke="#0BB3FF" strokeWidth={3} strokeDasharray="5 5" dot={{ fill: '#0BB3FF', strokeWidth: 2, r: 4 }} name={t('common.predicted', 'Predicted')} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl p-4 border border-[#E2E8F0] dark:border-[#232A36]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-[#0B1F3B] dark:text-white text-sm flex items-center gap-2">
+                      <Gauge className="w-4 h-4 text-[#0A5ED7]" />
+                      {t('autoReorder.monthlyAccuracy', 'Monthly Accuracy')}
+                    </h4>
+                  </div>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart data={monthlyAccuracyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.2} />
+                      <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} />
+                      <YAxis domain={[85, 100]} tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(11, 31, 59, 0.95)', border: '1px solid #0A5ED7', borderRadius: '8px', color: '#fff' }}
+                        formatter={(value: number) => [`${value}%`, t('common.accuracy', 'Accuracy')]}
+                      />
+                      <Bar dataKey="accuracy" fill="#0A5ED7" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl p-4 border border-[#E2E8F0] dark:border-[#232A36]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-[#0B1F3B] dark:text-white text-sm flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-[#0BB3FF]" />
+                      {t('autoReorder.varianceTrend', 'Variance Trend')}
+                    </h4>
+                  </div>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <AreaChart data={demandTrendData}>
+                      <defs>
+                        <linearGradient id="varianceGradNew" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#F97316" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#F97316" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#232A36" opacity={0.2} />
+                      <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} />
+                      <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'rgba(11, 31, 59, 0.95)', border: '1px solid #F97316', borderRadius: '8px', color: '#fff' }}
+                        formatter={(value: number) => [`${value}%`, t('common.variance', 'Variance')]}
+                      />
+                      <Area type="monotone" dataKey="variance" fill="url(#varianceGradNew)" stroke="#F97316" strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] rounded-xl p-5 text-white relative overflow-hidden">
+                <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full" />
+                <div className="absolute top-2 right-2">
+                  <Award className="w-6 h-6 text-white/30" />
+                </div>
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  {t('autoReorder.overallScore', 'Overall AI Score')}
+                </h4>
+                <div className="flex items-center justify-center py-4">
+                  <div className="relative">
+                    <svg className="w-28 h-28">
+                      <circle cx="56" cy="56" r="48" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
+                      <circle 
+                        cx="56" cy="56" r="48" 
+                        fill="none" 
+                        stroke="white" 
+                        strokeWidth="8" 
+                        strokeLinecap="round"
+                        strokeDasharray={`${94.2 * 3.02} 302`}
+                        transform="rotate(-90 56 56)"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center flex-col">
+                      <span className="text-3xl font-bold">94.2</span>
+                      <span className="text-xs text-white/70">{t('common.percent', '%')}</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-sm text-white/80">{t('autoReorder.excellentPerformance', 'Excellent Performance')}</p>
+              </div>
+
+              <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl p-4 border border-[#E2E8F0] dark:border-[#232A36]">
+                <h4 className="font-semibold text-[#0B1F3B] dark:text-white text-sm mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-[#0A5ED7]" />
+                  {t('autoReorder.categoryPerformance', 'By Category')}
+                </h4>
+                <div className="space-y-3">
+                  {categoryPerformance.map((cat, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[#64748B] truncate max-w-[120px]">{cat.name}</span>
+                        <span className="font-semibold text-[#0B1F3B] dark:text-white">{cat.accuracy}%</span>
+                      </div>
+                      <div className="h-2 bg-[#E2E8F0] dark:bg-[#232A36] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ 
+                            width: `${cat.accuracy}%`,
+                            background: `linear-gradient(to right, ${cat.color}, #0BB3FF)`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-xl p-4 border border-[#E2E8F0] dark:border-[#232A36]">
+                <h4 className="font-semibold text-[#0B1F3B] dark:text-white text-sm mb-3 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#0BB3FF]" />
+                  {t('autoReorder.quickInsights', 'Quick Insights')}
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[#0A5ED7]/5 border border-[#0A5ED7]/20">
+                    <TrendingUp className="w-4 h-4 text-[#0A5ED7]" />
+                    <span className="text-xs text-[#0B1F3B] dark:text-white">{t('autoReorder.insightAccuracy', 'Accuracy up 2.3% this month')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[#0BB3FF]/5 border border-[#0BB3FF]/20">
+                    <Brain className="w-4 h-4 text-[#0BB3FF]" />
+                    <span className="text-xs text-[#0B1F3B] dark:text-white">{t('autoReorder.insightPredictions', '320 predictions made')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[#0B1F3B]/5 border border-[#0B1F3B]/20">
+                    <CheckCircle2 className="w-4 h-4 text-[#0B1F3B] dark:text-[#64748B]" />
+                    <span className="text-xs text-[#0B1F3B] dark:text-white">{t('autoReorder.insightOptimal', 'Optimal stock levels maintained')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
