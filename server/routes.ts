@@ -9732,8 +9732,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Chat Support Enhancements - Support Tickets
   app.get('/api/support/tickets', isAuthenticated, async (req: any, res) => {
     try {
-      const userGarageId = req.user?.garageId;
-      const { status, priority, assignedTo, category } = req.query;
+      const { status, priority, assignedTo, category, garageId } = req.query;
+      // Use garageId from query or user context, with fallback for dev mode
+      const userGarageId = req.user?.garageId || garageId;
       
       const tickets = await storage.getSupportTickets(userGarageId, {
         status: status as string,
@@ -9767,7 +9768,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/support/tickets', isAuthenticated, async (req: any, res) => {
     try {
-      const userGarageId = req.user?.garageId;
       const userId = req.user?.id || 'default-user';
       const { 
         conversationId, 
@@ -9775,8 +9775,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         priority, 
         subject,
         createConversation,
-        participantIds
+        participantIds,
+        garageId
       } = req.body;
+      // Use garageId from request body as fallback for development mode
+      const userGarageId = req.user?.garageId || garageId || 1;
       
       // Validate required fields
       if (!subject || !category) {
