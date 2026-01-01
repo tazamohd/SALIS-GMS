@@ -421,6 +421,60 @@ export class ChatWebSocketServer {
       }
     });
   }
+
+  public broadcastSupportChatMessage(garageId: string, conversationId: string, message: any, participantIds: string[]) {
+    const payload = {
+      type: 'support_chat.new_message',
+      data: {
+        conversationId,
+        message,
+      },
+    };
+
+    participantIds.forEach(userId => {
+      const userClients = this.clients.get(userId);
+      if (userClients) {
+        userClients.forEach(ws => {
+          this.send(ws, payload);
+        });
+      }
+    });
+
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === garageId && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
+  }
+
+  public broadcastSupportTicketUpdate(garageId: string, ticket: any) {
+    const payload = {
+      type: 'support_chat.ticket_updated',
+      data: { ticket },
+    };
+    
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === garageId && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
+  }
+
+  public broadcastNewSupportTicket(garageId: string, ticket: any) {
+    const payload = {
+      type: 'support_chat.new_ticket',
+      data: { ticket },
+    };
+    
+    this.wss.clients.forEach((client: WebSocket) => {
+      const authClient = client as AuthenticatedWebSocket;
+      if (authClient.garageId === garageId && authClient.userId) {
+        this.send(authClient, payload);
+      }
+    });
+  }
 }
 
 let chatWebSocketServer: ChatWebSocketServer | null = null;
