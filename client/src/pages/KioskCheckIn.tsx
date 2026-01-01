@@ -6,16 +6,51 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TabletSmartphone, User, Car, Calendar, CheckCircle } from "lucide-react";
+import { TabletSmartphone, User, Car, Calendar, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { DashboardPage } from "@/components/layouts";
+
+interface CustomerLookupResult {
+  found: boolean;
+  customer?: { id: string; fullName: string; phone: string; email: string };
+  vehicles?: { id: string; make: string; model: string; year: number; plateNumber: string }[];
+  todayAppointments?: { id: string; appointmentNumber: string; serviceType: string; appointmentDate: string; status: string; vehicleId?: string | null }[];
+}
 
 export default function KioskCheckIn() {
   const { t } = useTranslation();
-  const [checkInStep, setCheckInStep] = useState<"idle" | "phone" | "vehicle" | "confirm" | "complete">("idle");
+  const [checkInStep, setCheckInStep] = useState<"idle" | "phone" | "searching" | "notfound" | "vehicle" | "appointment" | "confirm" | "complete">("idle");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [customerData, setCustomerData] = useState<CustomerLookupResult | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [vehicleAppointments, setVehicleAppointments] = useState<any[]>([]);
   const { toast } = useToast();
 
   const { data: sessions = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/kiosk/sessions"],
+  });
+
+  // Lookup customer by phone
+  const lookupMutation = useMutation({
+    mutationFn: async (phone: string) => {
+      const res = await fetch(`/api/kiosk/lookup-customer?phone=${encodeURIComponent(phone)}`, { credentials: 'include' });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Customer not found');
+      }
+      return res.json() as Promise<CustomerLookupResult>;
+    },
+    onSuccess: (data) => {
+      if (data.found) {
+        setCustomerData(data);
+        setCheckInStep("vehicle");
+      } else {
+        setCheckInStep("notfound");
+      }
+    },
+    onError: () => {
+      setCheckInStep("notfound");
+    },
   });
 
   const checkInMutation = useMutation({
@@ -26,10 +61,18 @@ export default function KioskCheckIn() {
       phoneNumber: string;
       checkInMethod: string;
     }) => {
+      // First validate the check-in
+      await apiRequest("POST", "/api/kiosk/validate-checkin", {
+        customerId: checkInData.customerId,
+        vehicleId: checkInData.vehicleId,
+        appointmentId: checkInData.appointmentId,
+      });
+      // Then create the session
       return await apiRequest("POST", "/api/kiosk/checkin", checkInData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/kiosk/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/appointments"] });
       toast({
         title: t('common.success', 'Success'),
         description: t('kiosk.checkInCompleted', 'Check-in completed successfully'),
@@ -61,13 +104,68 @@ export default function KioskCheckIn() {
     avgCheckInTime: avgDuration,
   };
 
-  const simulateCheckIn = () => {
+  const handlePhoneLookup = () => {
+    if (phoneNumber.trim().length >= 7) {
+      setCheckInStep("searching");
+      lookupMutation.mutate(phoneNumber);
+    } else {
+      toast({
+        variant: "destructive",
+        title: t('common.error', 'Error'),
+        description: t('kiosk.invalidPhone', 'Please enter a valid phone number'),
+      });
+    }
+  };
+
+  const handleVehicleSelect = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
+    
+    // Filter appointments for this specific vehicle only (match by vehicleId)
+    // If appointment has no vehicleId, it won't match any vehicle to avoid ambiguity
+    const filteredAppointments = customerData?.todayAppointments?.filter(
+      (apt: any) => apt.vehicleId === vehicle.id
+    ) || [];
+    
+    setVehicleAppointments(filteredAppointments);
+    
+    if (filteredAppointments.length === 1) {
+      // Auto-select single appointment
+      setSelectedAppointment(filteredAppointments[0]);
+      setCheckInStep("confirm");
+    } else if (filteredAppointments.length > 1) {
+      // Multiple appointments - show selection step
+      setCheckInStep("appointment");
+    } else {
+      // No appointment for this vehicle - proceed as walk-in
+      setSelectedAppointment(null);
+      setCheckInStep("confirm");
+    }
+  };
+  
+  const handleAppointmentSelect = (appointment: any | null) => {
+    setSelectedAppointment(appointment);
+    setCheckInStep("confirm");
+  };
+
+  const handleConfirmCheckIn = () => {
+    if (!customerData?.customer || !selectedVehicle) return;
+    
     checkInMutation.mutate({
-      customerId: "demo-customer",
-      vehicleId: "demo-vehicle",
-      phoneNumber: "(555) 123-4567",
+      customerId: customerData.customer.id,
+      vehicleId: selectedVehicle.id,
+      appointmentId: selectedAppointment?.id,
+      phoneNumber: phoneNumber,
       checkInMethod: "kiosk",
     });
+  };
+
+  const resetCheckIn = () => {
+    setCheckInStep("idle");
+    setPhoneNumber("");
+    setCustomerData(null);
+    setSelectedVehicle(null);
+    setSelectedAppointment(null);
+    setVehicleAppointments([]);
   };
 
   const metrics = [
@@ -125,41 +223,158 @@ export default function KioskCheckIn() {
             {checkInStep === "phone" && (
               <div className="text-center space-y-6 w-full max-w-md">
                 <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.enterPhoneNumber', 'Enter Phone Number')}</h2>
-                <Input type="tel" placeholder="(555) 123-4567" className="text-xl text-center bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-phone" />
-                <Button size="lg" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" onClick={() => setCheckInStep("vehicle")}>
+                <Input 
+                  type="tel" 
+                  placeholder="(555) 123-4567" 
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="text-xl text-center bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
+                  data-testid="input-phone" 
+                />
+                <Button size="lg" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" onClick={handlePhoneLookup}>
                   {t('common.next', 'Continue')}
+                </Button>
+                <Button variant="ghost" className="text-[#64748B]" onClick={resetCheckIn}>
+                  {t('common.cancel', 'Cancel')}
                 </Button>
               </div>
             )}
-            {checkInStep === "vehicle" && (
+            {checkInStep === "searching" && (
+              <div className="text-center space-y-6">
+                <Loader2 className="w-16 h-16 mx-auto animate-spin text-[#0A5ED7]" />
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.lookingUp', 'Looking up your information...')}</h2>
+              </div>
+            )}
+            {checkInStep === "notfound" && (
               <div className="text-center space-y-6 w-full max-w-md">
-                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.selectVehicle', 'Select Vehicle')}</h2>
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" onClick={() => setCheckInStep("confirm")}>
-                    <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
-                    2020 Honda Civic (ABC 123)
+                <div className="w-24 h-24 mx-auto rounded-full bg-[#F97316]/20 flex items-center justify-center">
+                  <AlertCircle className="h-12 w-12 text-[#F97316]" />
+                </div>
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.customerNotFound', 'Customer Not Found')}</h2>
+                <p className="text-[#64748B]">{t('kiosk.pleaseCheckPhone', 'Please check your phone number or speak with our front desk.')}</p>
+                <div className="flex gap-3">
+                  <Button variant="outline" className="flex-1 border-[#0A5ED7] text-[#0A5ED7]" onClick={() => setCheckInStep("phone")}>
+                    {t('kiosk.tryAgain', 'Try Again')}
                   </Button>
-                  <Button variant="outline" className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]">
-                    <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
-                    2019 Toyota Camry (XYZ 789)
+                  <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" onClick={resetCheckIn}>
+                    {t('common.cancel', 'Cancel')}
                   </Button>
                 </div>
               </div>
             )}
-            {checkInStep === "confirm" && (
+            {checkInStep === "vehicle" && customerData && (
+              <div className="text-center space-y-6 w-full max-w-md">
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg">
+                  <User className="h-8 w-8 text-[#0A5ED7]" />
+                  <div className="text-left">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('kiosk.welcomeBack', 'Welcome back')}, {customerData.customer?.fullName}!</p>
+                    <p className="text-sm text-[#64748B]">{customerData.customer?.phone}</p>
+                  </div>
+                </div>
+                {customerData.todayAppointments && customerData.todayAppointments.length > 0 && (
+                  <div className="p-3 bg-[#0A5ED7]/10 rounded-lg border border-[#0A5ED7]/30">
+                    <div className="flex items-center gap-2 text-[#0A5ED7]">
+                      <Calendar className="h-5 w-5" />
+                      <span className="font-medium">{t('kiosk.appointmentToday', 'You have an appointment today!')}</span>
+                    </div>
+                    <p className="text-sm text-[#64748B] mt-1">{customerData.todayAppointments[0].serviceType}</p>
+                  </div>
+                )}
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.selectVehicle', 'Select Vehicle')}</h2>
+                <div className="space-y-3">
+                  {customerData.vehicles && customerData.vehicles.length > 0 ? (
+                    customerData.vehicles.map((vehicle) => (
+                      <Button 
+                        key={vehicle.id}
+                        variant="outline" 
+                        className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" 
+                        onClick={() => handleVehicleSelect(vehicle)}
+                      >
+                        <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
+                        {vehicle.year} {vehicle.make} {vehicle.model} ({vehicle.plateNumber})
+                      </Button>
+                    ))
+                  ) : (
+                    <p className="text-[#64748B]">{t('kiosk.noVehicles', 'No vehicles registered. Please speak with front desk.')}</p>
+                  )}
+                </div>
+                <Button variant="ghost" className="text-[#64748B]" onClick={resetCheckIn}>
+                  {t('common.cancel', 'Cancel')}
+                </Button>
+              </div>
+            )}
+            {checkInStep === "appointment" && customerData && selectedVehicle && (
+              <div className="text-center space-y-6 w-full max-w-md">
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg">
+                  <Car className="h-8 w-8 text-[#0A5ED7]" />
+                  <div className="text-left">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</p>
+                    <p className="text-sm text-[#64748B]">{selectedVehicle.plateNumber}</p>
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.selectAppointment', 'Select Your Appointment')}</h2>
+                <div className="space-y-3">
+                  {vehicleAppointments.map((apt) => (
+                    <Button 
+                      key={apt.id}
+                      variant="outline" 
+                      className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" 
+                      onClick={() => handleAppointmentSelect(apt)}
+                    >
+                      <Calendar className="h-6 w-6 mr-3 text-[#0A5ED7]" />
+                      <div className="text-left">
+                        <div className="font-semibold">{apt.serviceType}</div>
+                        <div className="text-sm text-[#64748B]">#{apt.appointmentNumber}</div>
+                      </div>
+                    </Button>
+                  ))}
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start text-lg p-6 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10" 
+                    onClick={() => handleAppointmentSelect(null)}
+                  >
+                    <User className="h-6 w-6 mr-3" />
+                    {t('kiosk.walkInService', 'Walk-in Service (No Appointment)')}
+                  </Button>
+                </div>
+                <Button variant="ghost" className="text-[#64748B]" onClick={() => setCheckInStep("vehicle")}>
+                  {t('common.back', 'Back')}
+                </Button>
+              </div>
+            )}
+            {checkInStep === "confirm" && customerData && selectedVehicle && (
               <div className="text-center space-y-6 w-full max-w-md">
                 <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.confirmCheckIn', 'Confirm Check-In')}</h2>
-                <div className="bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 p-6 rounded-lg border border-[#0A5ED7]/30">
-                  <p className="font-semibold text-[#0B1F3B] dark:text-white">2020 Honda Civic</p>
-                  <p className="text-sm text-[#64748B]">{t('kiosk.oilChangeInspection', 'Oil Change & Inspection')}</p>
+                <div className="bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 p-6 rounded-lg border border-[#0A5ED7]/30 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-[#0A5ED7]" />
+                    <span className="font-semibold text-[#0B1F3B] dark:text-white">{customerData.customer?.fullName}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Car className="h-5 w-5 text-[#0A5ED7]" />
+                    <span className="text-[#0B1F3B] dark:text-white">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</span>
+                  </div>
+                  {selectedAppointment && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-[#0A5ED7]" />
+                      <span className="text-[#0B1F3B] dark:text-white">{t('kiosk.appointment', 'Appointment')}: {selectedAppointment.serviceType}</span>
+                    </div>
+                  )}
+                  {!selectedAppointment && (
+                    <div className="text-sm text-[#F97316] mt-2">{t('kiosk.walkInService', 'Walk-in Service')}</div>
+                  )}
                 </div>
                 <Button 
                   size="lg" 
-                  onClick={simulateCheckIn} 
+                  onClick={handleConfirmCheckIn} 
                   disabled={checkInMutation.isPending}
                   className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white"
                 >
+                  {checkInMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                   {t('kiosk.confirmCheckIn', 'Confirm Check-In')}
+                </Button>
+                <Button variant="ghost" className="text-[#64748B]" onClick={() => setCheckInStep("vehicle")}>
+                  {t('common.back', 'Back')}
                 </Button>
               </div>
             )}
@@ -170,7 +385,7 @@ export default function KioskCheckIn() {
                 </div>
                 <h2 className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.checkInComplete', 'Check-In Complete!')}</h2>
                 <p className="text-lg text-[#64748B]">{t('kiosk.pleaseHaveASeat', 'Please have a seat. A technician will be with you shortly.')}</p>
-                <Button size="lg" variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" onClick={() => setCheckInStep("idle")}>
+                <Button size="lg" variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" onClick={resetCheckIn}>
                   {t('kiosk.newCheckIn', 'New Check-In')}
                 </Button>
               </div>

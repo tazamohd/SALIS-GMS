@@ -546,7 +546,7 @@ export default function AppointmentReminders() {
       icon={Bell}
       tabs={tabs}
       defaultTab="overview"
-      statsCards={statsCards}
+      headerContent={statsCards}
     />
   );
 }

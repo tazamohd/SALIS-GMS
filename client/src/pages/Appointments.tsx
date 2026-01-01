@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Calendar, Clock, Plus, Search, User, Phone, Car } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Calendar, Clock, Plus, Search, User, Phone, Car, MoreHorizontal, CheckCircle, XCircle, PlayCircle, AlertTriangle } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Appointment } from "@shared/schema";
 import { format } from "date-fns";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
@@ -19,11 +22,50 @@ export function Appointments() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { toast } = useToast();
 
   const { data: appointments, isLoading } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments'],
     retry: false,
   });
+
+  // Status transition mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status, reason }: { id: string; status: string; reason?: string }) => {
+      return await apiRequest("POST", `/api/appointments/${id}/status`, { status, reason });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      toast({
+        title: t('common.success', 'Success'),
+        description: t('appointments.statusUpdated', 'Appointment status updated to {{status}}', { status: variables.status }),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: t('common.error', 'Error'),
+        description: error.message || t('appointments.statusUpdateFailed', 'Failed to update appointment status'),
+      });
+    },
+  });
+
+  const handleStatusChange = (appointmentId: string, newStatus: string) => {
+    updateStatusMutation.mutate({ id: appointmentId, status: newStatus });
+  };
+
+  // Get valid next statuses for an appointment
+  const getNextStatuses = (currentStatus: string) => {
+    const transitions: Record<string, string[]> = {
+      scheduled: ['confirmed', 'cancelled'],
+      confirmed: ['in_progress', 'cancelled', 'no_show'],
+      in_progress: ['completed', 'cancelled'],
+      completed: [],
+      cancelled: ['scheduled'],
+      no_show: ['scheduled'],
+    };
+    return transitions[currentStatus] || [];
+  };
 
   const filteredAppointments = (appointments ?? []).filter(apt => {
     const matchesStatus = statusFilter === "all" || apt.status === statusFilter;
@@ -251,15 +293,88 @@ export function Appointments() {
                             </Badge>
                           </td>
                           <td className="py-3 px-4">
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="h-7 px-3 text-xs border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
-                              onClick={() => navigate(`/calendar?appointmentId=${apt.id}`)}
-                              data-testid={`button-view-${apt.id}`}
-                            >
-                              {t('common.view', 'View')}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="h-7 px-3 text-xs border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                                onClick={() => navigate(`/calendar?appointmentId=${apt.id}`)}
+                                data-testid={`button-view-${apt.id}`}
+                              >
+                                {t('common.view', 'View')}
+                              </Button>
+                              {getNextStatuses(apt.status).length > 0 && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="ghost" 
+                                      className="h-7 w-7 p-0"
+                                      data-testid={`button-actions-${apt.id}`}
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="bg-white dark:bg-[#151A23]">
+                                    {getNextStatuses(apt.status).includes('confirmed') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'confirmed')}
+                                        className="text-[#0A5ED7]"
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        {t('appointments.confirm', 'Confirm')}
+                                      </DropdownMenuItem>
+                                    )}
+                                    {getNextStatuses(apt.status).includes('in_progress') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'in_progress')}
+                                        className="text-[#0A5ED7]"
+                                      >
+                                        <PlayCircle className="h-4 w-4 mr-2" />
+                                        {t('appointments.startService', 'Start Service')}
+                                      </DropdownMenuItem>
+                                    )}
+                                    {getNextStatuses(apt.status).includes('completed') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'completed')}
+                                        className="text-[#0A5ED7]"
+                                      >
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        {t('appointments.markComplete', 'Mark Complete')}
+                                      </DropdownMenuItem>
+                                    )}
+                                    {getNextStatuses(apt.status).includes('scheduled') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'scheduled')}
+                                        className="text-[#0A5ED7]"
+                                      >
+                                        <Calendar className="h-4 w-4 mr-2" />
+                                        {t('appointments.reschedule', 'Reschedule')}
+                                      </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuSeparator />
+                                    {getNextStatuses(apt.status).includes('no_show') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'no_show')}
+                                        className="text-[#F97316]"
+                                      >
+                                        <AlertTriangle className="h-4 w-4 mr-2" />
+                                        {t('appointments.markNoShow', 'Mark No-Show')}
+                                      </DropdownMenuItem>
+                                    )}
+                                    {getNextStatuses(apt.status).includes('cancelled') && (
+                                      <DropdownMenuItem 
+                                        onClick={() => handleStatusChange(apt.id, 'cancelled')}
+                                        className="text-[#F97316]"
+                                      >
+                                        <XCircle className="h-4 w-4 mr-2" />
+                                        {t('appointments.cancel', 'Cancel')}
+                                      </DropdownMenuItem>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
