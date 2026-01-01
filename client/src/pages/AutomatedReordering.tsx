@@ -252,9 +252,8 @@ export default function AutomatedReordering() {
         </Card>
       </div>
 
-      <Card className="relative overflow-hidden bg-gradient-to-br from-[#0B1F3B] via-[#0A5ED7]/20 to-[#0BB3FF]/10 border-[#0A5ED7]/30">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOCAxOC04LjA1OSAxOC0xOC04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNCAxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9IiMwQTVFRDciIGZpbGwtb3BhY2l0eT0iLjA1Ii8+PC9nPjwvc3ZnPg==')] opacity-30" />
-        <CardHeader className="relative flex flex-row items-center justify-between border-b border-[#0A5ED7]/20">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-[#E2E8F0] dark:border-[#232A36]">
           <div className="flex items-center gap-4">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-2xl blur-lg opacity-50 animate-pulse" />
@@ -263,11 +262,11 @@ export default function AutomatedReordering() {
               </div>
             </div>
             <div>
-              <CardTitle className="flex items-center gap-2 text-white text-xl">
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white text-xl">
                 {t('autoReorder.aiDemandPredictions', 'AI Demand Predictions')}
                 <span className="px-2 py-0.5 text-xs bg-[#0BB3FF]/20 text-[#0BB3FF] rounded-full border border-[#0BB3FF]/30">AI</span>
               </CardTitle>
-              <CardDescription className="text-[#94A3B8]">{t('autoReorder.mlBasedForecasting', 'Machine learning based demand forecasting')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('autoReorder.mlBasedForecasting', 'Machine learning based demand forecasting')}</CardDescription>
             </div>
           </div>
           <Button 
@@ -283,36 +282,36 @@ export default function AutomatedReordering() {
             {t('autoReorder.runForecast', 'Run Forecast')}
           </Button>
         </CardHeader>
-        <CardContent className="relative pt-6">
+        <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10" data-testid="card-model-accuracy">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-model-accuracy">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#10B981]/20">
                   <TrendingUp className="w-4 h-4 text-[#10B981]" />
                 </div>
-                <span className="text-sm text-[#94A3B8]">{t('autoReorder.modelAccuracy', 'Model Accuracy')}</span>
+                <span className="text-sm text-[#64748B]">{t('autoReorder.modelAccuracy', 'Model Accuracy')}</span>
               </div>
-              <p className="text-3xl font-bold text-white" data-testid="text-model-accuracy">94.7%</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-model-accuracy">94.7%</p>
               <p className="text-xs text-[#10B981] mt-1">↑ 2.3% vs last month</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10" data-testid="card-predictions-today">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-predictions-today">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#0BB3FF]/20">
                   <Zap className="w-4 h-4 text-[#0BB3FF]" />
                 </div>
-                <span className="text-sm text-[#94A3B8]">{t('autoReorder.predictionsToday', 'Predictions Today')}</span>
+                <span className="text-sm text-[#64748B]">{t('autoReorder.predictionsToday', 'Predictions Today')}</span>
               </div>
-              <p className="text-3xl font-bold text-white" data-testid="text-predictions-today">247</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-predictions-today">247</p>
               <p className="text-xs text-[#0BB3FF] mt-1">Processing in real-time</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10" data-testid="card-avg-lead-time">
+            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-lead-time">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 rounded-lg bg-[#6366F1]/20">
                   <Clock className="w-4 h-4 text-[#6366F1]" />
                 </div>
-                <span className="text-sm text-[#94A3B8]">{t('autoReorder.avgLeadTime', 'Avg Lead Time')}</span>
+                <span className="text-sm text-[#64748B]">{t('autoReorder.avgLeadTime', 'Avg Lead Time')}</span>
               </div>
-              <p className="text-3xl font-bold text-white" data-testid="text-avg-lead-time">3.2d</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-lead-time">3.2d</p>
               <p className="text-xs text-[#6366F1] mt-1">Optimized delivery</p>
             </div>
           </div>
@@ -334,7 +333,7 @@ export default function AutomatedReordering() {
                       ? 'bg-[#F97316]/10 border-[#F97316]/40' 
                       : isLow 
                         ? 'bg-[#0BB3FF]/10 border-[#0BB3FF]/30' 
-                        : 'bg-white/5 border-white/10'
+                        : 'bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]'
                   }`}
                   data-testid={`forecast-item-${idx}`}
                 >
@@ -349,16 +348,16 @@ export default function AutomatedReordering() {
                         }`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-white">{item.name}</p>
-                        <p className="text-sm text-[#94A3B8]">
+                        <p className="font-semibold text-[#0B1F3B] dark:text-white">{item.name}</p>
+                        <p className="text-sm text-[#64748B]">
                           {item.current} {t('autoReorder.units', 'units')} • {daysUntilStockout} {t('autoReorder.daysSupply', 'days supply')}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-xs text-[#94A3B8]">{t('autoReorder.aiConfidence', 'AI Confidence')}</p>
-                        <p className="text-sm font-semibold text-white">{confidence}%</p>
+                        <p className="text-xs text-[#64748B]">{t('autoReorder.aiConfidence', 'AI Confidence')}</p>
+                        <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{confidence}%</p>
                       </div>
                       <div 
                         className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
