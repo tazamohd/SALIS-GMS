@@ -104,41 +104,43 @@ export default function KioskCheckIn() {
       icon={TabletSmartphone}
       metrics={metrics}
     >
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('kiosk.interfaceDemo', 'Kiosk Interface Demo')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('kiosk.interfaceDemo', 'Kiosk Interface Demo')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="min-h-[400px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
+          <div className="min-h-[400px] flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-8">
             {checkInStep === "idle" && (
               <div className="text-center space-y-6">
-                <TabletSmartphone className="h-24 w-24 mx-auto text-blue-600" />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{t('kiosk.welcomeToSalis', 'Welcome to SALIS AUTO')}</h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">{t('kiosk.tapToBegin', 'Tap to begin check-in')}</p>
-                <Button size="lg" onClick={() => setCheckInStep("phone")} data-testid="button-start-checkin">
+                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                  <TabletSmartphone className="h-12 w-12 text-white" />
+                </div>
+                <h2 className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.welcomeToSalis', 'Welcome to SALIS AUTO')}</h2>
+                <p className="text-lg text-[#64748B]">{t('kiosk.tapToBegin', 'Tap to begin check-in')}</p>
+                <Button size="lg" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" onClick={() => setCheckInStep("phone")} data-testid="button-start-checkin">
                   {t('kiosk.startCheckIn', 'Start Check-In')}
                 </Button>
               </div>
             )}
             {checkInStep === "phone" && (
               <div className="text-center space-y-6 w-full max-w-md">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('kiosk.enterPhoneNumber', 'Enter Phone Number')}</h2>
-                <Input type="tel" placeholder="(555) 123-4567" className="text-xl text-center" data-testid="input-phone" />
-                <Button size="lg" onClick={() => setCheckInStep("vehicle")} className="w-full">
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.enterPhoneNumber', 'Enter Phone Number')}</h2>
+                <Input type="tel" placeholder="(555) 123-4567" className="text-xl text-center bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-phone" />
+                <Button size="lg" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" onClick={() => setCheckInStep("vehicle")}>
                   {t('common.next', 'Continue')}
                 </Button>
               </div>
             )}
             {checkInStep === "vehicle" && (
               <div className="text-center space-y-6 w-full max-w-md">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('kiosk.selectVehicle', 'Select Vehicle')}</h2>
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.selectVehicle', 'Select Vehicle')}</h2>
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start text-lg p-6" onClick={() => setCheckInStep("confirm")}>
-                    <Car className="h-6 w-6 mr-3" />
+                  <Button variant="outline" className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" onClick={() => setCheckInStep("confirm")}>
+                    <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
                     2020 Honda Civic (ABC 123)
                   </Button>
-                  <Button variant="outline" className="w-full justify-start text-lg p-6">
-                    <Car className="h-6 w-6 mr-3" />
+                  <Button variant="outline" className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]">
+                    <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
                     2019 Toyota Camry (XYZ 789)
                   </Button>
                 </div>
@@ -146,16 +148,16 @@ export default function KioskCheckIn() {
             )}
             {checkInStep === "confirm" && (
               <div className="text-center space-y-6 w-full max-w-md">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('kiosk.confirmCheckIn', 'Confirm Check-In')}</h2>
-                <div className="bg-blue-50 dark:bg-blue-900 p-6 rounded-lg">
-                  <p className="font-semibold text-gray-900 dark:text-white">2020 Honda Civic</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('kiosk.oilChangeInspection', 'Oil Change & Inspection')}</p>
+                <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.confirmCheckIn', 'Confirm Check-In')}</h2>
+                <div className="bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 p-6 rounded-lg border border-[#0A5ED7]/30">
+                  <p className="font-semibold text-[#0B1F3B] dark:text-white">2020 Honda Civic</p>
+                  <p className="text-sm text-[#64748B]">{t('kiosk.oilChangeInspection', 'Oil Change & Inspection')}</p>
                 </div>
                 <Button 
                   size="lg" 
                   onClick={simulateCheckIn} 
                   disabled={checkInMutation.isPending}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white"
                 >
                   {t('kiosk.confirmCheckIn', 'Confirm Check-In')}
                 </Button>
@@ -163,10 +165,12 @@ export default function KioskCheckIn() {
             )}
             {checkInStep === "complete" && (
               <div className="text-center space-y-6">
-                <CheckCircle className="h-24 w-24 mx-auto text-green-600" />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{t('kiosk.checkInComplete', 'Check-In Complete!')}</h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">{t('kiosk.pleaseHaveASeat', 'Please have a seat. A technician will be with you shortly.')}</p>
-                <Button size="lg" variant="outline" onClick={() => setCheckInStep("idle")}>
+                <div className="w-24 h-24 mx-auto rounded-full bg-[#10B981]/20 flex items-center justify-center">
+                  <CheckCircle className="h-12 w-12 text-[#10B981]" />
+                </div>
+                <h2 className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.checkInComplete', 'Check-In Complete!')}</h2>
+                <p className="text-lg text-[#64748B]">{t('kiosk.pleaseHaveASeat', 'Please have a seat. A technician will be with you shortly.')}</p>
+                <Button size="lg" variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" onClick={() => setCheckInStep("idle")}>
                   {t('kiosk.newCheckIn', 'New Check-In')}
                 </Button>
               </div>
@@ -175,34 +179,37 @@ export default function KioskCheckIn() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
-          <CardTitle>{t('kiosk.recentCheckIns', 'Recent Check-Ins')}</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('kiosk.recentCheckIns', 'Recent Check-Ins')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('kiosk.loadingCheckIns', 'Loading check-ins...')}</p>
+              <p className="text-[#64748B]">{t('kiosk.loadingCheckIns', 'Loading check-ins...')}</p>
             </div>
           ) : sessions.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">{t('kiosk.noCheckInsYet', 'No check-ins recorded yet.')}</p>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center">
+                <TabletSmartphone className="h-8 w-8 text-[#0A5ED7]" />
+              </div>
+              <p className="text-[#64748B]">{t('kiosk.noCheckInsYet', 'No check-ins recorded yet.')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {sessions.map((session: any) => (
-                <div key={session.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg" data-testid={`session-${session.id}`}>
+                <div key={session.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`session-${session.id}`}>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{session.customerName || t('kiosk.unknownCustomer', 'Unknown Customer')}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{session.customerName || t('kiosk.unknownCustomer', 'Unknown Customer')}</h3>
+                    <p className="text-sm text-[#64748B]">
                       {session.vehicleMake} {session.vehicleModel} - {session.vehiclePlate}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-[#0A5ED7]">
                       {session.appointmentId ? t('kiosk.appointment', 'Appointment') : t('kiosk.walkIn', 'Walk-In')}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[#64748B]">
                       {session.checkInTime ? new Date(session.checkInTime).toLocaleTimeString() : ""}
                     </p>
                   </div>

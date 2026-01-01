@@ -193,11 +193,11 @@ export function Customers() {
           testId: "select-garage-filter",
           customRender: (
             <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-              <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
+              <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage-filter">
                 <Building2 className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="All Garages" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-[#151A23]">
                 <SelectItem value="all">{t('customers.allGarages', 'All Garages')}</SelectItem>
                 {(garages ?? []).map((garage) => (
                   <SelectItem key={garage.id} value={garage.id}>
@@ -218,29 +218,67 @@ export function Customers() {
         } as any,
       ]}
     >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] p-4 text-white">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10" />
+          <div className="absolute -right-2 -bottom-6 h-20 w-20 rounded-full bg-white/10" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-5 h-5" />
+              <span className="text-sm font-medium text-white/80">{t('customers.totalCustomers', 'Total Customers')}</span>
+            </div>
+            <p className="text-3xl font-bold">{filteredCustomers.length}</p>
+          </div>
+        </div>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <Car className="w-5 h-5 text-[#0A5ED7]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('customers.totalVehicles', 'Total Vehicles')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{customerVehicles?.length || 0}</p>
+        </div>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#10B981]/5 dark:bg-[#10B981]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <ClipboardList className="w-5 h-5 text-[#10B981]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('customers.activeJobs', 'Active Jobs')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{outstandingJobs.length}</p>
+        </div>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#F97316]/5 dark:bg-[#F97316]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="w-5 h-5 text-[#F97316]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('customers.unpaidInvoices', 'Unpaid Invoices')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{unpaidInvoices.length}</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-4">
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/50" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#64748B]" />
                 <Input
                   type="text"
                   placeholder={t('customers.searchPlaceholder', 'Search customers...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-customers"
                 />
               </div>
 
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {isLoading ? (
-                  <div className="text-center py-8 text-gray-900 dark:text-white/60">{t('customers.loading', 'Loading customers...')}</div>
+                  <div className="text-center py-8 text-[#64748B]">{t('customers.loading', 'Loading customers...')}</div>
                 ) : filteredCustomers.length === 0 ? (
                   <div className="text-center py-8">
-                    <Users className="w-12 h-12 text-gray-900 dark:text-white/50 mx-auto mb-2" />
-                    <p className="text-gray-900 dark:text-white/60 text-sm">{t('customers.noCustomersFound', 'No customers found')}</p>
+                    <Users className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                    <p className="text-[#64748B] text-sm">{t('customers.noCustomersFound', 'No customers found')}</p>
                   </div>
                 ) : (
                   filteredCustomers.map((customer) => (
@@ -249,24 +287,24 @@ export function Customers() {
                       onClick={() => setSelectedCustomerId(customer.id)}
                       className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedCustomerId === customer.id
-                          ? 'bg-gray-100 dark:bg-salis-gray-dark border-gray-300 dark:border-salis-gray'
-                          : 'hover:bg-gray-50 dark:hover:bg-salis-gray-dark border-gray-200 dark:border-gray-700'
+                          ? 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7] dark:border-[#0A5ED7]'
+                          : 'hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]'
                       }`}
                       data-testid={`customer-item-${customer.id}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-salis-gray-dark flex items-center justify-center flex-shrink-0">
-                          <Users className="w-5 h-5 text-gray-900 dark:text-white" />
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center flex-shrink-0">
+                          <Users className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-['Poppins',Helvetica] font-semibold text-sm text-gray-900 dark:text-white truncate">
+                          <h3 className="font-semibold text-sm text-[#0B1F3B] dark:text-white truncate">
                             {customer.fullName || t('customers.unnamedCustomer', 'Unnamed Customer')}
                           </h3>
                           {customer.email && (
-                            <p className="text-xs text-gray-900 dark:text-white/60 truncate">{customer.email}</p>
+                            <p className="text-xs text-[#64748B] truncate">{customer.email}</p>
                           )}
                           {customer.phone && (
-                            <p className="text-xs text-gray-900 dark:text-white/60">{customer.phone}</p>
+                            <p className="text-xs text-[#64748B]">{customer.phone}</p>
                           )}
                         </div>
                       </div>
@@ -280,42 +318,44 @@ export function Customers() {
 
         <div className="lg:col-span-2">
           {!selectedCustomerId ? (
-            <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="p-12 text-center">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-gray-600 mb-2">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center">
+                  <Users className="w-10 h-10 text-[#0A5ED7]" />
+                </div>
+                <h3 className="font-semibold text-lg text-[#0B1F3B] dark:text-white mb-2">
                   {t('customers.noCustomerSelected', 'No Customer Selected')}
                 </h3>
-                <p className="text-sm text-gray-900 dark:text-white/50">
+                <p className="text-sm text-[#64748B]">
                   {t('customers.selectCustomerPrompt', 'Select a customer from the list to view their details')}
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-6">
-              <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark">
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-salis-gray-dark flex items-center justify-center">
-                        <Users className="w-8 h-8 text-gray-900 dark:text-white" />
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center">
+                        <Users className="w-8 h-8 text-white" />
                       </div>
                       <div>
-                        <h2 className="font-['Poppins',Helvetica] font-bold text-2xl text-gray-900 dark:text-white">
+                        <h2 className="font-bold text-2xl text-[#0B1F3B] dark:text-white">
                           {selectedCustomer?.fullName || t('customers.unnamedCustomer', 'Unnamed Customer')}
                         </h2>
-                        <p className="text-sm text-gray-900 dark:text-white/60 mt-1">{t('customers.customerId', 'Customer ID')}: {selectedCustomer?.id}</p>
+                        <p className="text-sm text-[#64748B] mt-1">{t('customers.customerId', 'Customer ID')}: {selectedCustomer?.id}</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 items-end">
                       {outstandingJobs.length > 0 && (
-                        <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                        <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">
                           <AlertCircle className="w-3 h-3 mr-1" />
                           {outstandingJobs.length} {t('customers.activeJobs', 'Active Jobs')}
                         </Badge>
                       )}
                       {unpaidInvoices.length > 0 && (
-                        <Badge variant="outline" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+                        <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30">
                           <DollarSign className="w-3 h-3 mr-1" />
                           {unpaidInvoices.length} {t('customers.unpaid', 'Unpaid')}
                         </Badge>
@@ -325,22 +365,22 @@ export function Customers() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedCustomer?.email && (
-                      <div className="flex items-center gap-3">
-                        <Mail className="w-5 h-5 text-gray-900 dark:text-white/50" />
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                        <Mail className="w-5 h-5 text-[#0A5ED7]" />
                         <div>
-                          <p className="text-xs text-gray-900 dark:text-white/60">{t('table.email', 'Email')}</p>
-                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
+                          <p className="text-xs text-[#64748B]">{t('table.email', 'Email')}</p>
+                          <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">
                             {selectedCustomer.email}
                           </p>
                         </div>
                       </div>
                     )}
                     {selectedCustomer?.phone && (
-                      <div className="flex items-center gap-3">
-                        <Phone className="w-5 h-5 text-gray-900 dark:text-white/50" />
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                        <Phone className="w-5 h-5 text-[#0A5ED7]" />
                         <div>
-                          <p className="text-xs text-gray-900 dark:text-white/60">{t('table.phone', 'Phone')}</p>
-                          <p className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
+                          <p className="text-xs text-[#64748B]">{t('table.phone', 'Phone')}</p>
+                          <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">
                             {selectedCustomer.phone}
                           </p>
                         </div>

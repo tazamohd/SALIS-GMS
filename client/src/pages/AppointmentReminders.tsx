@@ -158,113 +158,101 @@ export default function AppointmentReminders() {
   const statsCards = (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <Card className="bg-white dark:bg-salis-black">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.remindersSent', 'Reminders Sent')}</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{recentReminders.length}</p>
-              </div>
-              <Send className="h-12 w-12 text-blue-600 opacity-20" />
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] p-4 text-white">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10" />
+          <div className="absolute -right-2 -bottom-6 h-20 w-20 rounded-full bg-white/10" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-2">
+              <Send className="w-5 h-5" />
+              <span className="text-sm font-medium text-white/80">{t('reminders.remindersSent', 'Reminders Sent')}</span>
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-3xl font-bold">{recentReminders.length}</p>
+          </div>
+        </div>
 
-        <Card className="bg-white dark:bg-salis-black">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.deliveryRate', 'Delivery Rate')}</p>
-                <p className="text-3xl font-bold text-green-600 mt-2">{deliveryRate.toFixed(1)}%</p>
-              </div>
-              <CheckCircle className="h-12 w-12 text-green-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#10B981]/5 dark:bg-[#10B981]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="w-5 h-5 text-[#10B981]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('reminders.deliveryRate', 'Delivery Rate')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#10B981]">{deliveryRate.toFixed(1)}%</p>
+        </div>
 
-        <Card className="bg-white dark:bg-salis-black">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.confirmationRate', 'Confirmation Rate')}</p>
-                <p className="text-3xl font-bold text-purple-600 mt-2">{confirmationRate.toFixed(1)}%</p>
-              </div>
-              <TrendingUp className="h-12 w-12 text-purple-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('reminders.confirmationRate', 'Confirmation Rate')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#0A5ED7]">{confirmationRate.toFixed(1)}%</p>
+        </div>
 
-        <Card className="bg-white dark:bg-salis-black">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.noShowRate', 'No-Show Rate')}</p>
-                <p className="text-3xl font-bold text-red-600 mt-2">{noShowRate.toFixed(1)}%</p>
-              </div>
-              <UserX className="h-12 w-12 text-red-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#F97316]/5 dark:bg-[#F97316]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <UserX className="w-5 h-5 text-[#F97316]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('reminders.noShowRate', 'No-Show Rate')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#F97316]">{noShowRate.toFixed(1)}%</p>
+        </div>
 
-        <Card className="bg-white dark:bg-salis-black">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.revenueLoss', 'Revenue Loss')}</p>
-                <p className="text-3xl font-bold text-orange-600 mt-2">${totalRevenueLoss.toFixed(0)}</p>
-              </div>
-              <DollarSign className="h-12 w-12 text-orange-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#F97316]/5 dark:bg-[#F97316]/10" />
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="w-5 h-5 text-[#F97316]" />
+            <span className="text-sm font-medium text-[#64748B]">{t('reminders.revenueLoss', 'Revenue Loss')}</span>
+          </div>
+          <p className="text-3xl font-bold text-[#F97316]">${totalRevenueLoss.toFixed(0)}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
-                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.sms', 'SMS')}</span>
+                <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
+                <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.sms', 'SMS')}</span>
               </div>
-              <Badge className={reminderSettings.smsEnabled ? 'bg-green-500' : 'bg-gray-500'}>
+              <Badge className={reminderSettings.smsEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.smsEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{smsReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.messagesSent', 'messages sent')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{smsReminders}</p>
+            <p className="text-sm text-[#64748B]">{t('reminders.messagesSent', 'messages sent')}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-green-600" />
-                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.email', 'Email')}</span>
+                <Mail className="h-5 w-5 text-[#10B981]" />
+                <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.email', 'Email')}</span>
               </div>
-              <Badge className={reminderSettings.emailEnabled ? 'bg-green-500' : 'bg-gray-500'}>
+              <Badge className={reminderSettings.emailEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.emailEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{emailReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.emailsSent', 'emails sent')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{emailReminders}</p>
+            <p className="text-sm text-[#64748B]">{t('reminders.emailsSent', 'emails sent')}</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <SiWhatsapp className="h-5 w-5 text-green-500" />
-                <span className="font-semibold text-gray-900 dark:text-white">{t('reminders.whatsapp', 'WhatsApp')}</span>
+                <SiWhatsapp className="h-5 w-5 text-[#25D366]" />
+                <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.whatsapp', 'WhatsApp')}</span>
               </div>
-              <Badge className={reminderSettings.whatsappEnabled ? 'bg-green-500' : 'bg-gray-500'}>
+              <Badge className={reminderSettings.whatsappEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.whatsappEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{whatsappReminders}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.messagesSent', 'messages sent')}</p>
+            <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{whatsappReminders}</p>
+            <p className="text-sm text-[#64748B]">{t('reminders.messagesSent', 'messages sent')}</p>
           </CardContent>
         </Card>
       </div>
@@ -277,14 +265,14 @@ export default function AppointmentReminders() {
       label: t('reminders.reminderLogs', 'Reminder Logs'),
       icon: Send,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <Send className="h-5 w-5 text-blue-600" />
-                {t('reminders.recentReminderActivity', 'Recent Reminder Activity')}
+                <Send className="h-5 w-5 text-[#0A5ED7]" />
+                <span className="text-[#0B1F3B] dark:text-white">{t('reminders.recentReminderActivity', 'Recent Reminder Activity')}</span>
               </span>
-              <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-send-manual-reminder">
+              <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white" data-testid="button-send-manual-reminder">
                 {t('reminders.sendManualReminder', 'Send Manual Reminder')}
               </Button>
             </CardTitle>
@@ -292,44 +280,46 @@ export default function AppointmentReminders() {
           <CardContent>
             {recentReminders.length === 0 ? (
               <div className="text-center py-12">
-                <Bell className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-500 dark:text-gray-400">{t('reminders.noRemindersSent', 'No reminders sent yet')}</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center">
+                  <Bell className="h-8 w-8 text-[#0A5ED7]" />
+                </div>
+                <p className="text-[#64748B]">{t('reminders.noRemindersSent', 'No reminders sent yet')}</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {recentReminders.slice(0, 10).map((log: any) => (
                   <div
                     key={log.id}
-                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
                     data-testid={`reminder-${log.id}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {log.reminderType === 'sms' && <MessageSquare className="h-4 w-4 text-blue-600" />}
-                          {log.reminderType === 'email' && <Mail className="h-4 w-4 text-green-600" />}
-                          {log.reminderType === 'whatsapp' && <SiWhatsapp className="h-4 w-4 text-green-500" />}
-                          <span className="font-semibold text-gray-900 dark:text-white">
+                          {log.reminderType === 'sms' && <MessageSquare className="h-4 w-4 text-[#0A5ED7]" />}
+                          {log.reminderType === 'email' && <Mail className="h-4 w-4 text-[#10B981]" />}
+                          {log.reminderType === 'whatsapp' && <SiWhatsapp className="h-4 w-4 text-[#25D366]" />}
+                          <span className="font-semibold text-[#0B1F3B] dark:text-white">
                             {log.reminderTiming} {t('reminders.reminder', 'reminder')}
                           </span>
                           <Badge className={
-                            log.deliveryStatus === 'delivered' ? 'bg-green-500' :
-                            log.deliveryStatus === 'failed' ? 'bg-red-500' :
-                            'bg-yellow-500'
+                            log.deliveryStatus === 'delivered' ? 'bg-[#10B981]/10 text-[#10B981]' :
+                            log.deliveryStatus === 'failed' ? 'bg-[#F97316]/10 text-[#F97316]' :
+                            'bg-[#EAB308]/10 text-[#EAB308]'
                           }>
                             {log.deliveryStatus}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        <p className="text-sm text-[#64748B] mb-1">
                           {t('reminders.to', 'To')}: {log.recipientPhone || log.recipientEmail}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-[#64748B]">
                           {t('reminders.sent', 'Sent')}: {new Date(log.sentAt).toLocaleString()}
                         </p>
                         {log.responseAction && (
                           <div className="mt-2 flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-semibold text-green-600">
+                            <CheckCircle className="h-4 w-4 text-[#10B981]" />
+                            <span className="text-sm font-semibold text-[#10B981]">
                               {t('reminders.customerAction', 'Customer {{action}}ed', { action: log.responseAction })}
                             </span>
                           </div>
@@ -349,15 +339,15 @@ export default function AppointmentReminders() {
       label: t('reminders.noShowTracking', 'No-Show Tracking'),
       icon: UserX,
       content: (
-        <Card className="bg-white dark:bg-salis-black">
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-red-600" />
-                {t('reminders.noShowHistory', 'No-Show History')}
+                <UserX className="h-5 w-5 text-[#F97316]" />
+                <span className="text-[#0B1F3B] dark:text-white">{t('reminders.noShowHistory', 'No-Show History')}</span>
               </span>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={exportNoShowsToCSV} data-testid="button-export-noshows">
+                <Button variant="outline" onClick={exportNoShowsToCSV} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid="button-export-noshows">
                   {t('reminders.exportReport', 'Export Report')}
                 </Button>
                 <Button className="bg-red-600 hover:bg-red-700" data-testid="button-mark-noshow">
