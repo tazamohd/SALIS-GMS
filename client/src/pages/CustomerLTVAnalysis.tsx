@@ -125,11 +125,11 @@ export default function CustomerLTVAnalysis() {
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "low":
-        return "text-[#10B981]";
+        return "text-[#0A5ED7]";
       case "medium":
         return "text-[#F97316]";
       case "high":
-        return "text-[#ef4444]";
+        return "text-[#F97316]";
       default:
         return "text-[#64748B]";
     }
@@ -156,7 +156,7 @@ export default function CustomerLTVAnalysis() {
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.totalCustomers', 'Total Customers')}</p>
               <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">604</h3>
-              <p className="text-sm text-[#10B981] mt-1">+23 this month</p>
+              <p className="text-sm text-[#0A5ED7] mt-1">+23 this month</p>
             </div>
             <Users className="h-12 w-12 text-[#0A5ED7]" />
           </div>
@@ -169,9 +169,9 @@ export default function CustomerLTVAnalysis() {
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
               <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">$51,600</h3>
-              <p className="text-sm text-[#10B981] mt-1">+8.5% vs last year</p>
+              <p className="text-sm text-[#0A5ED7] mt-1">+8.5% vs last year</p>
             </div>
-            <DollarSign className="h-12 w-12 text-[#10B981]" />
+            <DollarSign className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
@@ -195,9 +195,9 @@ export default function CustomerLTVAnalysis() {
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.retentionRate', 'Retention Rate')}</p>
               <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">87.3%</h3>
-              <p className="text-sm text-[#10B981] mt-1">+2.1% improvement</p>
+              <p className="text-sm text-[#0A5ED7] mt-1">+2.1% improvement</p>
             </div>
-            <CheckCircle className="h-12 w-12 text-[#10B981]" />
+            <CheckCircle className="h-12 w-12 text-[#0A5ED7]" />
           </div>
         </CardContent>
       </Card>
@@ -301,7 +301,7 @@ export default function CustomerLTVAnalysis() {
           {customers.filter(c => c.predictedLTV > 150000).map((customer) => (
             <div
               key={customer.id}
-              className="p-4 border-2 border-[#10B981]/30 rounded-lg bg-[#10B981]/5 dark:bg-[#10B981]/10"
+              className="p-4 border-2 border-[#0A5ED7]/30 rounded-lg bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10"
               data-testid={`high-value-${customer.id}`}
             >
               <div className="flex justify-between items-start">
@@ -310,7 +310,7 @@ export default function CustomerLTVAnalysis() {
                   <p className="text-sm text-[#64748B] mt-1">
                     LTV: ${customer.predictedLTV.toLocaleString()} | {customer.visits} visits
                   </p>
-                  <p className="text-sm text-[#10B981] mt-2 font-medium">
+                  <p className="text-sm text-[#0A5ED7] mt-2 font-medium">
                     ✓ {customer.recommendedAction}
                   </p>
                 </div>

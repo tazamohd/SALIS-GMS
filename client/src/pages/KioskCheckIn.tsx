@@ -81,7 +81,7 @@ export default function KioskCheckIn() {
       label: t('kiosk.withAppointment', 'With Appointment'),
       value: stats.withAppointment,
       icon: Calendar,
-      color: "text-green-600",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('kiosk.walkIns', 'Walk-Ins'),
@@ -165,8 +165,8 @@ export default function KioskCheckIn() {
             )}
             {checkInStep === "complete" && (
               <div className="text-center space-y-6">
-                <div className="w-24 h-24 mx-auto rounded-full bg-[#10B981]/20 flex items-center justify-center">
-                  <CheckCircle className="h-12 w-12 text-[#10B981]" />
+                <div className="w-24 h-24 mx-auto rounded-full bg-[#0A5ED7]/20 flex items-center justify-center">
+                  <CheckCircle className="h-12 w-12 text-[#0A5ED7]" />
                 </div>
                 <h2 className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{t('kiosk.checkInComplete', 'Check-In Complete!')}</h2>
                 <p className="text-lg text-[#64748B]">{t('kiosk.pleaseHaveASeat', 'Please have a seat. A technician will be with you shortly.')}</p>

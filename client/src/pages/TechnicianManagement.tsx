@@ -275,7 +275,7 @@ export default function TechnicianManagement() {
                       </Badge>
                     )}
                     {profile?.isLead && (
-                      <Badge className="bg-[#10B981] text-white border-0" data-testid={`badge-lead-${technician.id}`}>{t('technician.lead', 'Lead')}</Badge>
+                      <Badge className="bg-[#0A5ED7] text-white border-0" data-testid={`badge-lead-${technician.id}`}>{t('technician.lead', 'Lead')}</Badge>
                     )}
                   </div>
                 </CardHeader>

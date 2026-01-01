@@ -171,12 +171,12 @@ export default function AppointmentReminders() {
         </div>
 
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#10B981]/5 dark:bg-[#10B981]/10" />
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-[#10B981]" />
+            <CheckCircle className="w-5 h-5 text-[#0A5ED7]" />
             <span className="text-sm font-medium text-[#64748B]">{t('reminders.deliveryRate', 'Delivery Rate')}</span>
           </div>
-          <p className="text-3xl font-bold text-[#10B981]">{deliveryRate.toFixed(1)}%</p>
+          <p className="text-3xl font-bold text-[#0A5ED7]">{deliveryRate.toFixed(1)}%</p>
         </div>
 
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
@@ -215,7 +215,7 @@ export default function AppointmentReminders() {
                 <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
                 <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.sms', 'SMS')}</span>
               </div>
-              <Badge className={reminderSettings.smsEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
+              <Badge className={reminderSettings.smsEnabled ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.smsEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
@@ -228,10 +228,10 @@ export default function AppointmentReminders() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-[#10B981]" />
+                <Mail className="h-5 w-5 text-[#0A5ED7]" />
                 <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.email', 'Email')}</span>
               </div>
-              <Badge className={reminderSettings.emailEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
+              <Badge className={reminderSettings.emailEnabled ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.emailEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
@@ -247,7 +247,7 @@ export default function AppointmentReminders() {
                 <SiWhatsapp className="h-5 w-5 text-[#25D366]" />
                 <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('reminders.whatsapp', 'WhatsApp')}</span>
               </div>
-              <Badge className={reminderSettings.whatsappEnabled ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
+              <Badge className={reminderSettings.whatsappEnabled ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                 {reminderSettings.whatsappEnabled ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
               </Badge>
             </div>
@@ -297,13 +297,13 @@ export default function AppointmentReminders() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           {log.reminderType === 'sms' && <MessageSquare className="h-4 w-4 text-[#0A5ED7]" />}
-                          {log.reminderType === 'email' && <Mail className="h-4 w-4 text-[#10B981]" />}
+                          {log.reminderType === 'email' && <Mail className="h-4 w-4 text-[#0A5ED7]" />}
                           {log.reminderType === 'whatsapp' && <SiWhatsapp className="h-4 w-4 text-[#25D366]" />}
                           <span className="font-semibold text-[#0B1F3B] dark:text-white">
                             {log.reminderTiming} {t('reminders.reminder', 'reminder')}
                           </span>
                           <Badge className={
-                            log.deliveryStatus === 'delivered' ? 'bg-[#10B981]/10 text-[#10B981]' :
+                            log.deliveryStatus === 'delivered' ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' :
                             log.deliveryStatus === 'failed' ? 'bg-[#F97316]/10 text-[#F97316]' :
                             'bg-[#EAB308]/10 text-[#EAB308]'
                           }>
@@ -318,8 +318,8 @@ export default function AppointmentReminders() {
                         </p>
                         {log.responseAction && (
                           <div className="mt-2 flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-[#10B981]" />
-                            <span className="text-sm font-semibold text-[#10B981]">
+                            <CheckCircle className="h-4 w-4 text-[#0A5ED7]" />
+                            <span className="text-sm font-semibold text-[#0A5ED7]">
                               {t('reminders.customerAction', 'Customer {{action}}ed', { action: log.responseAction })}
                             </span>
                           </div>

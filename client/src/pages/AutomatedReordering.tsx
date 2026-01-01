@@ -166,15 +166,15 @@ export default function AutomatedReordering() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-[#10B981]/10 to-[#0BB3FF]/5 dark:from-[#10B981]/20 dark:to-[#0BB3FF]/10 border-[#10B981]/30" data-testid="card-forecast-accuracy">
+        <Card className="bg-gradient-to-br from-[#0A5ED7]/10 to-[#0BB3FF]/5 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/10 border-[#0A5ED7]/30" data-testid="card-forecast-accuracy">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#64748B]">{t('autoReorder.forecastAccuracy', 'Forecast Accuracy')}</p>
-                <p className="text-3xl font-bold text-[#10B981]" data-testid="text-accuracy">94%</p>
+                <p className="text-3xl font-bold text-[#0A5ED7]" data-testid="text-accuracy">94%</p>
               </div>
-              <div className="p-3 rounded-xl bg-[#10B981]/20">
-                <Brain className="w-6 h-6 text-[#10B981]" />
+              <div className="p-3 rounded-xl bg-[#0A5ED7]/20">
+                <Brain className="w-6 h-6 text-[#0A5ED7]" />
               </div>
             </div>
           </CardContent>
@@ -223,7 +223,7 @@ export default function AutomatedReordering() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
           <CardHeader className="border-b border-[#E2E8F0] dark:border-[#232A36]">
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-              <div className="p-2 rounded-lg bg-gradient-to-r from-[#10B981] to-[#0BB3FF]">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
                 <BarChart3 className="w-4 h-4 text-white" />
               </div>
               {t('autoReorder.stockLevels', 'Stock Levels')}
@@ -293,13 +293,13 @@ export default function AutomatedReordering() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-model-accuracy">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-[#10B981]/20">
-                  <TrendingUp className="w-4 h-4 text-[#10B981]" />
+                <div className="p-2 rounded-lg bg-[#0A5ED7]/20">
+                  <TrendingUp className="w-4 h-4 text-[#0A5ED7]" />
                 </div>
                 <span className="text-sm text-[#64748B]">{t('autoReorder.modelAccuracy', 'Model Accuracy')}</span>
               </div>
               <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-model-accuracy">94.7%</p>
-              <p className="text-xs text-[#10B981] mt-1">↑ 2.3% vs last month</p>
+              <p className="text-xs text-[#0A5ED7] mt-1">↑ 2.3% vs last month</p>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-predictions-today">
               <div className="flex items-center gap-3 mb-2">
@@ -347,11 +347,11 @@ export default function AutomatedReordering() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-4">
                       <div className={`relative p-2.5 rounded-xl ${
-                        isCritical ? 'bg-[#F97316]/20' : isLow ? 'bg-[#0BB3FF]/20' : 'bg-[#10B981]/20'
+                        isCritical ? 'bg-[#F97316]/20' : isLow ? 'bg-[#0BB3FF]/20' : 'bg-[#0A5ED7]/20'
                       }`}>
                         {isCritical && <div className="absolute inset-0 rounded-xl bg-[#F97316]/30 animate-ping" />}
                         <Package className={`relative w-5 h-5 ${
-                          isCritical ? 'text-[#F97316]' : isLow ? 'text-[#0BB3FF]' : 'text-[#10B981]'
+                          isCritical ? 'text-[#F97316]' : isLow ? 'text-[#0BB3FF]' : 'text-[#0A5ED7]'
                         }`} />
                       </div>
                       <div>
@@ -369,7 +369,7 @@ export default function AutomatedReordering() {
                       <div 
                         className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 ${
                           demandChange >= 0 
-                            ? 'bg-[#10B981]/20 text-[#10B981]' 
+                            ? 'bg-[#0A5ED7]/20 text-[#0A5ED7]' 
                             : 'bg-[#0BB3FF]/20 text-[#0BB3FF]'
                         }`}
                         data-testid={`badge-demand-change-${idx}`}
@@ -387,14 +387,14 @@ export default function AutomatedReordering() {
                   </div>
                   
                   <div className="relative h-3 bg-[#0B1F3B] rounded-full overflow-hidden">
-                    <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#F97316] via-[#0BB3FF] to-[#10B981] opacity-20 w-full" />
+                    <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#F97316] via-[#0BB3FF] to-[#0A5ED7] opacity-20 w-full" />
                     <div 
                       className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
                         isCritical 
                           ? 'bg-gradient-to-r from-[#F97316] to-[#FB923C]' 
                           : isLow 
                             ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]' 
-                            : 'bg-gradient-to-r from-[#10B981] to-[#0BB3FF]'
+                            : 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]'
                       }`}
                       style={{ width: `${stockPercent}%` }}
                     />
@@ -415,7 +415,7 @@ export default function AutomatedReordering() {
                       {t('autoReorder.reorder', 'Reorder')}: {item.reorder}
                     </span>
                     <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                      <div className="w-2 h-2 rounded-full bg-[#0A5ED7]" />
                       {t('autoReorder.max', 'Max')}: {item.max}
                     </span>
                   </div>
@@ -869,7 +869,7 @@ export default function AutomatedReordering() {
                       <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
                       <Badge 
                         className={currentStatus === 'approved' 
-                          ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
+                          ? 'bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30' 
                           : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
                         }
                       >
@@ -922,7 +922,7 @@ export default function AutomatedReordering() {
                   <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{viewingOrder.partName}</p>
                   <Badge 
                     className={(orderStates[viewingOrder.idx] || viewingOrder.status) === 'approved' 
-                      ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
+                      ? 'bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30' 
                       : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
                     }
                   >

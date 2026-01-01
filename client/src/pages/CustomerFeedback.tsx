@@ -38,13 +38,13 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { format } from "date-fns";
 
 const SENTIMENT_COLORS = {
-  positive: "#22c55e",
+  positive: "#0A5ED7",
   neutral: "#eab308",
-  negative: "#ef4444",
+  negative: "#F97316",
   unanalyzed: "#6b7280",
 };
 
-const RATING_COLORS = ["#ef4444", "#f97316", "#eab308", "#84cc16", "#22c55e"];
+const RATING_COLORS = ["#F97316", "#f97316", "#eab308", "#84cc16", "#0A5ED7"];
 
 function StarRating({ rating }: { rating: number }) {
   return (

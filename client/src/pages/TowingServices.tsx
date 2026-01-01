@@ -89,7 +89,7 @@ export default function TowingServices() {
       requested: "bg-[#64748B] text-white",
       dispatched: "bg-[#0A5ED7] text-white",
       in_progress: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
-      completed: "bg-[#10B981] text-white",
+      completed: "bg-[#0A5ED7] text-white",
       cancelled: "bg-[#F97316] text-white",
     };
     return colors[status] || "bg-[#64748B] text-white";
@@ -100,7 +100,7 @@ export default function TowingServices() {
       low: "bg-[#64748B] text-white",
       medium: "bg-[#0A5ED7] text-white",
       high: "bg-[#F97316] text-white",
-      emergency: "bg-[#EF4444] text-white",
+      emergency: "bg-[#F97316] text-white",
     };
     return colors[priority] || "bg-[#64748B] text-white";
   };
@@ -214,7 +214,7 @@ export default function TowingServices() {
                           <Button
                             size="sm"
                             onClick={() => updateStatusMutation.mutate({ id: job.id, status: "completed" })}
-                            className="bg-[#10B981] text-white hover:bg-[#10B981]/90"
+                            className="bg-[#0A5ED7] text-white hover:bg-[#0A5ED7]/90"
                             data-testid={`button-complete-${job.id}`}
                           >
                             {t('towing.complete', 'Complete')}

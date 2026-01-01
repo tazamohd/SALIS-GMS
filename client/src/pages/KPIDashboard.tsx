@@ -27,7 +27,7 @@ const BRAND_COLORS = {
   secondary: '#0BB3FF',
   navy: '#0B1F3B',
   orange: '#F97316',
-  success: '#10B981',
+  success: '#0A5ED7',
   accent: '#6366F1',
   darkBg: '#0E1117',
   darkSurface: '#151A23',
@@ -230,7 +230,7 @@ export default function KPIDashboard() {
       label: t('analytics.jobsCompleted', 'Jobs Completed'),
       value: completedJobs,
       icon: CheckCircle,
-      color: "text-[#10B981]",
+      color: "text-[#0A5ED7]",
       trend: { 
         value: `${jobsChange >= 0 ? '+' : ''}${jobsChange.toFixed(1)}%`, 
         isPositive: jobsChange >= 0 
@@ -306,7 +306,7 @@ export default function KPIDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-[#0B1F3B] dark:text-gray-300">{t('analytics.npsScore', 'NPS Score')}</p>
-              <Award className="h-5 w-5 text-[#10B981]" />
+              <Award className="h-5 w-5 text-[#0A5ED7]" />
             </div>
             <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
               {npsScore}
@@ -394,7 +394,7 @@ export default function KPIDashboard() {
           <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] mt-6" data-testid="card-month-over-month">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-                <TrendingUp className="h-5 w-5 text-[#10B981]" />
+                <TrendingUp className="h-5 w-5 text-[#0A5ED7]" />
                 {t('analytics.monthOverMonthComparison', 'Month-over-Month Comparison')}
               </CardTitle>
             </CardHeader>
@@ -430,13 +430,13 @@ export default function KPIDashboard() {
                   <div className="grid grid-cols-3 gap-4 mt-4">
                     <div className="text-center p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-revenue-change">
                       <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.revenueChange', 'Revenue Change')}</p>
-                      <p className={`text-lg font-bold ${revenueChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-revenue-change">
+                      <p className={`text-lg font-bold ${revenueChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-revenue-change">
                         {revenueChange >= 0 ? '+' : ''}{revenueChange.toFixed(1)}%
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-[#10B981]/10 dark:bg-[#10B981]/20 rounded-lg border border-[#10B981]/20" data-testid="card-jobs-change">
+                    <div className="text-center p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-jobs-change">
                       <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.jobsChange', 'Jobs Change')}</p>
-                      <p className={`text-lg font-bold ${jobsChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-jobs-change">
+                      <p className={`text-lg font-bold ${jobsChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-jobs-change">
                         {jobsChange >= 0 ? '+' : ''}{jobsChange.toFixed(1)}%
                       </p>
                     </div>
@@ -458,7 +458,7 @@ export default function KPIDashboard() {
             <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-                  <PieChart className="h-5 w-5 text-[#10B981]" />
+                  <PieChart className="h-5 w-5 text-[#0A5ED7]" />
                   {t('analytics.serviceTypeDistribution', 'Service Type Distribution')}
                 </CardTitle>
               </CardHeader>
@@ -569,10 +569,10 @@ export default function KPIDashboard() {
                   <p className="text-xs text-[#64748B] dark:text-gray-400">{t('analytics.totalLaborRevenueInPeriod', 'Total labor revenue in period')}</p>
                 </div>
 
-                <div className="p-4 bg-[#10B981]/10 dark:bg-[#10B981]/20 rounded-lg border border-[#10B981]/30">
+                <div className="p-4 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/30">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-[#0B1F3B] dark:text-gray-300">{t('analytics.laborGrossProfit', 'Labor Gross Profit')}</span>
-                    <span className="text-lg font-bold text-[#10B981]">68%</span>
+                    <span className="text-lg font-bold text-[#0A5ED7]">68%</span>
                   </div>
                   <p className="text-xs text-[#64748B] dark:text-gray-400">{t('analytics.averageMarginOnLabor', 'Average margin on labor')}</p>
                 </div>

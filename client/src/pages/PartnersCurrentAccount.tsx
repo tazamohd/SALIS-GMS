@@ -164,10 +164,10 @@ export default function PartnersCurrentAccount() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-[#64748B]">{t('partners.totalCredits', 'Total Credits')}</p>
-                    <p className="text-2xl font-bold font-montserrat text-[#22c55e]" data-testid="text-total-credits">SAR 260,000</p>
+                    <p className="text-2xl font-bold font-montserrat text-[#0A5ED7]" data-testid="text-total-credits">SAR 260,000</p>
                   </div>
-                  <div className="p-2 rounded-xl bg-[#22c55e]/10">
-                    <TrendingUp className="h-6 w-6 text-[#22c55e]" />
+                  <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
+                    <TrendingUp className="h-6 w-6 text-[#0A5ED7]" />
                   </div>
                 </div>
               </CardContent>
@@ -593,16 +593,16 @@ export default function PartnersCurrentAccount() {
               </CardContent>
             </Card>
 
-            <Card className="cursor-pointer hover:border-[#22c55e] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-profit">
+            <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-profit">
               <CardHeader className="pb-2">
-                <div className="p-2 rounded-xl bg-[#22c55e]/10 w-fit mb-2">
-                  <TrendingUp className="h-6 w-6 text-[#22c55e]" />
+                <div className="p-2 rounded-xl bg-[#0A5ED7]/10 w-fit mb-2">
+                  <TrendingUp className="h-6 w-6 text-[#0A5ED7]" />
                 </div>
                 <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('partners.profitDistribution', 'Profit Distribution')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-[#64748B] mb-4">{t('partners.profitDistributionDesc', 'Profit sharing analysis by partner')}</p>
-                <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#22c55e]/5">
+                <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5">
                   {t('partners.generateReport', 'Generate Report')}
                 </Button>
               </CardContent>

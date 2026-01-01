@@ -208,10 +208,10 @@ export default function LoyaltyProgram() {
               <div>
                 <p className="text-sm text-[#64748B]">{t('loyalty.redemptions', 'Redemptions')}</p>
                 <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-redemptions-count">{totalRedemptions}</p>
-                <p className="text-xs text-[#10B981] mt-1">+8 {t('common.thisWeek', 'this week')}</p>
+                <p className="text-xs text-[#0A5ED7] mt-1">+8 {t('common.thisWeek', 'this week')}</p>
               </div>
-              <div className="p-3 bg-[#10B981]/10 rounded-xl">
-                <Ticket className="w-6 h-6 text-[#10B981]" />
+              <div className="p-3 bg-[#0A5ED7]/10 rounded-xl">
+                <Ticket className="w-6 h-6 text-[#0A5ED7]" />
               </div>
             </div>
           </CardContent>
@@ -329,8 +329,8 @@ export default function LoyaltyProgram() {
                       <p className="text-xs text-[#64748B]">{t('loyalty.multiplier', 'multiplier')}</p>
                     </div>
                     {tier.discountPercentage > 0 && (
-                      <div className="flex-1 p-2 bg-[#10B981]/10 rounded-lg">
-                        <p className="text-[#10B981] font-semibold">{tier.discountPercentage}%</p>
+                      <div className="flex-1 p-2 bg-[#0A5ED7]/10 rounded-lg">
+                        <p className="text-[#0A5ED7] font-semibold">{tier.discountPercentage}%</p>
                         <p className="text-xs text-[#64748B]">{t('common.discount', 'discount')}</p>
                       </div>
                     )}
@@ -537,7 +537,7 @@ export default function LoyaltyProgram() {
                   </div>
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.value', 'Value')}</span>
-                    <span className="font-bold text-[#10B981]">{t('common.sar', 'SAR')} {displayOffer.discountValue}</span>
+                    <span className="font-bold text-[#0A5ED7]">{t('common.sar', 'SAR')} {displayOffer.discountValue}</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg">
                     <span className="text-sm text-[#64748B]">{t('loyalty.tierRequired', 'Tier Required')}</span>
@@ -821,7 +821,7 @@ export default function LoyaltyProgram() {
                 </div>
                 <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
                   <p className="text-xs text-[#64748B] mb-1">{t('loyalty.value', 'Value')}</p>
-                  <p className="text-xl font-bold text-[#10B981]">{t('common.sar', 'SAR')} {viewingOffer.discountValue}</p>
+                  <p className="text-xl font-bold text-[#0A5ED7]">{t('common.sar', 'SAR')} {viewingOffer.discountValue}</p>
                 </div>
               </div>
 
@@ -844,7 +844,7 @@ export default function LoyaltyProgram() {
               <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-[#64748B]">{t('loyalty.status', 'Status')}</p>
-                  <Badge className={viewingOffer.isActive ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-[#64748B]/10 text-[#64748B]'}>
+                  <Badge className={viewingOffer.isActive ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' : 'bg-[#64748B]/10 text-[#64748B]'}>
                     {viewingOffer.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                   </Badge>
                 </div>
@@ -920,8 +920,8 @@ export default function LoyaltyProgram() {
 
           <div className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#10B981]/10">
-                <Users className="w-5 h-5 text-[#10B981]" />
+              <div className="p-2 rounded-lg bg-[#0A5ED7]/10">
+                <Users className="w-5 h-5 text-[#0A5ED7]" />
               </div>
               <div>
                 <p className="font-medium text-[#0B1F3B] dark:text-white">{t('loyalty.referralBonus', 'Referral Bonus')}</p>

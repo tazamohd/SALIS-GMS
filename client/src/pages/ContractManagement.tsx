@@ -21,9 +21,9 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 
 const COLORS = {
-  success: "#10B981",
+  success: "#0A5ED7",
   warning: "#F97316",
-  error: "#ef4444",
+  error: "#F97316",
   info: "#0A5ED7",
   primary: "#0BB3FF"
 };
@@ -190,7 +190,7 @@ export default function ContractManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-utilization">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.avgUtilization', 'Avg Utilization')}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-[#10B981]" />
+            <TrendingUp className="h-4 w-4 text-[#0A5ED7]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-utilization">
@@ -203,7 +203,7 @@ export default function ContractManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-sla-compliance">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('payments.contracts.slaCompliance', 'SLA Compliance')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-[#10B981]" />
+            <CheckCircle className="h-4 w-4 text-[#0A5ED7]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-sla-compliance">

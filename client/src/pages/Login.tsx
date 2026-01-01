@@ -85,7 +85,7 @@ export default function Login() {
               </div>
             </div>
             <div className="text-center space-y-2">
-              <CardTitle className="text-2xl font-montserrat font-bold text-[#0F172A] dark:text-white">
+              <CardTitle className="text-2xl font-montserrat font-bold text-[#0B1F3B] dark:text-white">
                 {t('auth.signIn', 'Sign In')}
               </CardTitle>
               <CardDescription className="font-poppins text-[#64748B] dark:text-[#9BA4B0]">
@@ -96,7 +96,7 @@ export default function Login() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-poppins text-[#0F172A] dark:text-[#E6EAF0] font-medium">
+                <Label htmlFor="email" className="font-poppins text-[#0B1F3B] dark:text-[#E6EAF0] font-medium">
                   {t('auth.email', 'Email')}
                 </Label>
                 <div className="relative">
@@ -109,12 +109,12 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     data-testid="input-email"
-                    className="pl-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
+                    className="pl-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="font-poppins text-[#0F172A] dark:text-[#E6EAF0] font-medium">
+                <Label htmlFor="password" className="font-poppins text-[#0B1F3B] dark:text-[#E6EAF0] font-medium">
                   {t('auth.password', 'Password')}
                 </Label>
                 <div className="relative">
@@ -127,7 +127,7 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     data-testid="input-password"
-                    className="pl-10 pr-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
+                    className="pl-10 pr-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
                   />
                   <button
                     type="button"
@@ -166,7 +166,7 @@ export default function Login() {
           <p className="text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0] text-center mb-2 uppercase tracking-wider">
             {t('auth.demoCredentials', 'Demo Credentials')}
           </p>
-          <div className="space-y-1 text-xs font-mono text-center text-[#0F172A] dark:text-[#E6EAF0]">
+          <div className="space-y-1 text-xs font-mono text-center text-[#0B1F3B] dark:text-[#E6EAF0]">
             <p>admin@salisauto.com / admin123</p>
             <p>tech@salisauto.com / tech123</p>
           </div>

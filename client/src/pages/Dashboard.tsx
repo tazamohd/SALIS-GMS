@@ -67,7 +67,7 @@ export function Dashboard() {
     retry: false,
   });
 
-  const PIE_COLORS = ['#0A5ED7', '#0BB3FF', '#22c55e', '#F97316', '#64748B'];
+  const PIE_COLORS = ['#0A5ED7', '#0BB3FF', '#0A5ED7', '#F97316', '#64748B'];
 
   const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
   const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
@@ -91,7 +91,7 @@ export function Dashboard() {
       'maintenance': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '🔧' },
       'repair': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⚙️' },
       'diagnostic': { bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20', text: 'text-[#0BB3FF]', icon: '🔍' },
-      'inspection': { bg: 'bg-[#22c55e]/10 dark:bg-[#22c55e]/20', text: 'text-[#22c55e]', icon: '✓' },
+      'inspection': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7]', icon: '✓' },
       'body_work': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🎨' },
       'tire_service': { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '⭕' },
     };
@@ -104,9 +104,9 @@ export function Dashboard() {
       'pending': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⏳' },
       'assigned': { bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20', text: 'text-[#0BB3FF]', icon: '👤' },
       'in_progress': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '🔄' },
-      'completed': { bg: 'bg-[#22c55e]/10 dark:bg-[#22c55e]/20', text: 'text-[#22c55e]', icon: '✅' },
+      'completed': { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7]', icon: '✅' },
       'delivered': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🚗' },
-      'cancelled': { bg: 'bg-[#ef4444]/10 dark:bg-[#ef4444]/20', text: 'text-[#ef4444]', icon: '❌' },
+      'cancelled': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '❌' },
     };
     const config = statusColors[status] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '○' };
     return { ...config, label: status };
@@ -114,10 +114,10 @@ export function Dashboard() {
 
   const getPriorityBadge = (priority: string) => {
     const priorityColors: { [key: string]: { bg: string; text: string; icon: string } } = {
-      'urgent': { bg: 'bg-[#ef4444] dark:bg-[#dc2626]', text: 'text-white', icon: '🔥' },
+      'urgent': { bg: 'bg-[#F97316] dark:bg-[#ea580c]', text: 'text-white', icon: '🔥' },
       'high': { bg: 'bg-[#F97316] dark:bg-[#ea580c]', text: 'text-white', icon: '⚡' },
       'medium': { bg: 'bg-[#0BB3FF] dark:bg-[#0891b2]', text: 'text-white', icon: '⭐' },
-      'low': { bg: 'bg-[#22c55e] dark:bg-[#16a34a]', text: 'text-white', icon: '💚' },
+      'low': { bg: 'bg-[#0A5ED7] dark:bg-[#0952C0]', text: 'text-white', icon: '💙' },
     };
     const config = priorityColors[priority] || { bg: 'bg-[#64748B]', text: 'text-white', icon: '○' };
     return { ...config, label: priority };
@@ -166,7 +166,7 @@ export function Dashboard() {
                     {t('dashboard.title', 'Dashboard')}
                   </h1>
                   <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
-                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0F172A] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
+                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
                   </p>
                 </div>
               </div>
@@ -202,10 +202,10 @@ export function Dashboard() {
                     <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">
+                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
                       ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </h3>
-                    <div className="flex items-center gap-1 text-[#22c55e]">
+                    <div className="flex items-center gap-1 text-[#0A5ED7]">
                       <ArrowUpRight className="w-4 h-4" />
                       <span className="text-xs font-medium">+12.5%</span>
                     </div>
@@ -235,7 +235,7 @@ export function Dashboard() {
                     <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.activeJobs', 'Active Jobs')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
+                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
                     <div className="flex gap-2">
                       <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} pending</Badge>
                       <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} active</Badge>
@@ -263,7 +263,7 @@ export function Dashboard() {
                     <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalCustomers', 'Customers')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{activeCustomersCount}</h3>
+                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{activeCustomersCount}</h3>
                     <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
                       <Award className="w-4 h-4" />
                       <span className="text-xs font-medium">+8 this week</span>
@@ -291,7 +291,7 @@ export function Dashboard() {
                     <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.partsInventory', 'Inventory')}</span>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
+                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
                     <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export function Dashboard() {
             { icon: Clock, label: t('dashboard.checkIn', 'Check-In'), value: checkInCount, color: 'from-[#F97316] to-[#FB923C]', bgColor: 'bg-[#F97316]/10' },
             { icon: Wrench, label: t('dashboard.repair', 'In Repair'), value: repairCount, color: 'from-[#0A5ED7] to-[#0BB3FF]', bgColor: 'bg-[#0A5ED7]/10' },
             { icon: AlertCircle, label: t('dashboard.qualityCheck', 'QC'), value: qualityCheckCount, color: 'from-[#0BB3FF] to-[#06B6D4]', bgColor: 'bg-[#0BB3FF]/10' },
-            { icon: CheckCircle, label: t('dashboard.completed', 'Done'), value: completionCount, color: 'from-[#22c55e] to-[#10b981]', bgColor: 'bg-[#22c55e]/10' },
+            { icon: CheckCircle, label: t('dashboard.completed', 'Done'), value: completionCount, color: 'from-[#0A5ED7] to-[#0BB3FF]', bgColor: 'bg-[#0A5ED7]/10' },
             { icon: Car, label: t('dashboard.delivered', 'Delivered'), value: deliveredCount, color: 'from-[#0B1F3B] to-[#1e3a5f]', bgColor: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10' },
             { icon: Activity, label: t('dashboard.totalJobs', 'Total'), value: jobCards?.length || 0, color: 'from-[#64748B] to-[#94A3B8]', bgColor: 'bg-[#64748B]/10' },
           ].map((item, index) => (
@@ -335,7 +335,7 @@ export function Dashboard() {
                     <item.icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="text-2xl font-black text-[#0F172A] dark:text-white font-montserrat">{item.value}</h4>
+                    <h4 className="text-2xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{item.value}</h4>
                     <p className="text-[#64748B] dark:text-[#9BA4B0] text-xs font-medium mt-1">{item.label}</p>
                   </div>
                 </div>
@@ -354,7 +354,7 @@ export function Dashboard() {
                   <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-lg shadow-[#0A5ED7]/25">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.revenuePerMonth', 'Revenue Trend')}</h3>
+                  <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.revenuePerMonth', 'Revenue Trend')}</h3>
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
@@ -374,7 +374,7 @@ export function Dashboard() {
                       <Tooltip 
                         formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                        labelStyle={{ color: '#0F172A' }}
+                        labelStyle={{ color: '#0B1F3B' }}
                       />
                       <Area type="monotone" dataKey="revenue" stroke="#0A5ED7" strokeWidth={3} fill="url(#revenueGrad)" />
                     </AreaChart>
@@ -394,7 +394,7 @@ export function Dashboard() {
                   <div className="p-2 rounded-xl bg-gradient-to-r from-[#0BB3FF] to-[#06B6D4] shadow-lg shadow-[#0BB3FF]/25">
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.jobsByStatus', 'Job Distribution')}</h3>
+                  <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.jobsByStatus', 'Job Distribution')}</h3>
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
@@ -419,7 +419,7 @@ export function Dashboard() {
                       </Pie>
                       <Tooltip 
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                        labelStyle={{ color: '#0F172A' }}
+                        labelStyle={{ color: '#0B1F3B' }}
                       />
                       <Legend wrapperStyle={{ color: '#64748B', fontSize: '12px' }} />
                     </PieChart>
@@ -442,7 +442,7 @@ export function Dashboard() {
                 <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-lg shadow-[#0A5ED7]/25">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.quickStats', 'Performance Overview')}</h3>
+                <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.quickStats', 'Performance Overview')}</h3>
               </div>
               <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30">{t('dashboard.allTime', 'All Time')}</Badge>
             </div>
@@ -450,7 +450,7 @@ export function Dashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: t('dashboard.totalJobs', 'Total Jobs'), value: jobCards?.length || 0, icon: FileText, color: 'from-[#0A5ED7] to-[#0BB3FF]' },
-                { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-[#22c55e] to-[#10b981]' },
+                { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-[#0A5ED7] to-[#0BB3FF]' },
                 { label: t('dashboard.customers', 'Customers'), value: activeCustomersCount, icon: Users, color: 'from-[#0B1F3B] to-[#1e3a5f]' },
                 { label: t('dashboard.partsCatalog', 'Parts'), value: spareParts.length, icon: Package, color: 'from-[#F97316] to-[#FB923C]' },
               ].map((stat, index) => (
@@ -459,7 +459,7 @@ export function Dashboard() {
                     <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg`}>
                       <stat.icon className="w-6 h-6 text-white" />
                     </div>
-                    <h4 className="text-3xl font-black text-[#0F172A] dark:text-white font-montserrat">{stat.value}</h4>
+                    <h4 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{stat.value}</h4>
                     <p className="text-[#64748B] dark:text-[#9BA4B0] text-sm mt-1">{stat.label}</p>
                   </div>
                 </div>
@@ -477,7 +477,7 @@ export function Dashboard() {
                   <div className="p-2 rounded-xl bg-gradient-to-r from-[#F97316] to-[#FB923C] shadow-lg shadow-[#F97316]/25">
                     <Flame className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-white">{t('dashboard.latestTasks', 'Recent Jobs')}</h3>
+                  <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.latestTasks', 'Recent Jobs')}</h3>
                 </div>
                 <Button className="bg-[#0A5ED7]/10 hover:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30" variant="outline" size="sm" asChild>
                   <Link href="/job-cards">
@@ -529,7 +529,7 @@ export function Dashboard() {
                               {serviceConfig.icon} {serviceConfig.label}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6 text-[#0F172A] dark:text-[#E6EAF0] text-sm">
+                          <td className="py-4 px-6 text-[#0B1F3B] dark:text-[#E6EAF0] text-sm">
                             {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
                           </td>
                           <td className="py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-sm">
@@ -570,7 +570,7 @@ export function Dashboard() {
                   size="sm"
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
+                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0B1F3B] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
                 >
                   ← {t('common.previous', 'Prev')}
                 </Button>
@@ -582,7 +582,7 @@ export function Dashboard() {
                       onClick={() => goToPage(page)}
                       className={page === currentPage 
                         ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0' 
-                        : 'bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36]'
+                        : 'bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0B1F3B] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36]'
                       }
                       variant={page === currentPage ? 'default' : 'outline'}
                     >
@@ -595,7 +595,7 @@ export function Dashboard() {
                   size="sm"
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
+                  className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0B1F3B] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30"
                 >
                   {t('common.next', 'Next')} →
                 </Button>

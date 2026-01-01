@@ -184,7 +184,7 @@ export default function BusinessIntelligence() {
                 <Legend />
                 <Bar dataKey="revenue" fill="#0A5ED7" name={t('analytics.revenue', 'Revenue')} />
                 <Bar dataKey="cost" fill="#F97316" name={t('analytics.cost', 'Cost')} />
-                <Bar dataKey="profit" fill="#22c55e" name={t('analytics.profit', 'Profit')} />
+                <Bar dataKey="profit" fill="#0A5ED7" name={t('analytics.profit', 'Profit')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -256,7 +256,7 @@ export default function BusinessIntelligence() {
                 <Tooltip />
                 <Legend />
                 <Bar yAxisId="left" dataKey="count" fill="#0A5ED7" name={t('nav.appointments', 'Appointments')} />
-                <Bar yAxisId="right" dataKey="revenue" fill="#22c55e" name={t('analytics.revenueAmount', 'Revenue ($)')} />
+                <Bar yAxisId="right" dataKey="revenue" fill="#0BB3FF" name={t('analytics.revenueAmount', 'Revenue ($)')} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

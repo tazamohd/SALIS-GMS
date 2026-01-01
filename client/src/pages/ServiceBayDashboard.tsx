@@ -30,7 +30,7 @@ const BRAND_COLORS = {
   secondary: '#0BB3FF',
   navy: '#0B1F3B',
   orange: '#F97316',
-  success: '#10B981',
+  success: '#0A5ED7',
   accent: '#6366F1',
   darkBg: '#0E1117',
   darkSurface: '#151A23',
@@ -168,7 +168,7 @@ export default function ServiceBayDashboard() {
 
   const getBayStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'bg-[#10B981]';
+      case 'available': return 'bg-[#0A5ED7]';
       case 'occupied': return 'bg-[#0A5ED7]';
       case 'maintenance': return 'bg-[#F97316]';
       case 'reserved': return 'bg-[#6366F1]';
@@ -179,7 +179,7 @@ export default function ServiceBayDashboard() {
 
   const getBayStatusIcon = (status: string) => {
     switch (status) {
-      case 'available': return <CheckCircle2 className="w-4 h-4 text-[#10B981]" />;
+      case 'available': return <CheckCircle2 className="w-4 h-4 text-[#0A5ED7]" />;
       case 'occupied': return <Car className="w-4 h-4 text-[#0A5ED7]" />;
       case 'maintenance': return <Wrench className="w-4 h-4 text-[#F97316]" />;
       case 'reserved': return <Clock className="w-4 h-4 text-[#6366F1]" />;
@@ -223,7 +223,7 @@ export default function ServiceBayDashboard() {
       label: t('serviceBay.available', 'Available'),
       value: statistics?.availableBays || 0,
       icon: CheckCircle2,
-      color: "text-[#10B981]",
+      color: "text-[#0A5ED7]",
     },
     {
       label: t('serviceBay.todaySessions', "Today's Sessions"),
@@ -315,8 +315,8 @@ export default function ServiceBayDashboard() {
                 />
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
-                <div className="text-center p-3 rounded-lg bg-[#10B981]/10 dark:bg-[#10B981]/20 border border-[#10B981]/30" data-testid="stat-available">
-                  <div className="flex items-center justify-center gap-1 text-[#10B981] mb-1">
+                <div className="text-center p-3 rounded-lg bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border border-[#0A5ED7]/30" data-testid="stat-available">
+                  <div className="flex items-center justify-center gap-1 text-[#0A5ED7] mb-1">
                     <CheckCircle2 className="w-4 h-4" />
                     <span className="text-sm font-medium">{t('serviceBay.available', 'Available')}</span>
                   </div>
@@ -383,7 +383,7 @@ export default function ServiceBayDashboard() {
                     key={bay.id}
                     className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer bg-white dark:bg-[#151A23] ${
                       bay.status === 'occupied' ? 'border-[#0A5ED7] bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10' :
-                      bay.status === 'available' ? 'border-[#10B981] bg-[#10B981]/5 dark:bg-[#10B981]/10' :
+                      bay.status === 'available' ? 'border-[#0A5ED7] bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10' :
                       bay.status === 'maintenance' ? 'border-[#F97316] bg-[#F97316]/5 dark:bg-[#F97316]/10' :
                       'border-[#64748B] bg-[#64748B]/5 dark:bg-[#64748B]/10'
                     }`}
@@ -450,7 +450,7 @@ export default function ServiceBayDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full h-7 text-xs border-[#10B981] text-[#10B981] hover:bg-[#10B981]/10 dark:border-[#10B981] dark:text-[#10B981]"
+                          className="w-full h-7 text-xs border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 dark:border-[#0A5ED7] dark:text-[#0A5ED7]"
                           onClick={(e) => {
                             e.stopPropagation();
                             updateBayStatusMutation.mutate({ bayId: bay.id, status: 'available' });

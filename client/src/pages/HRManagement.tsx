@@ -65,8 +65,8 @@ const mockDepartments = [
 ];
 
 const mockLeaveTypes = [
-  { id: "1", name: "Annual Leave", nameAr: "إجازة سنوية", defaultDays: 21, color: "#22c55e", isPaid: true },
-  { id: "2", name: "Sick Leave", nameAr: "إجازة مرضية", defaultDays: 15, color: "#ef4444", isPaid: true },
+  { id: "1", name: "Annual Leave", nameAr: "إجازة سنوية", defaultDays: 21, color: "#0A5ED7", isPaid: true },
+  { id: "2", name: "Sick Leave", nameAr: "إجازة مرضية", defaultDays: 15, color: "#F97316", isPaid: true },
   { id: "3", name: "Emergency Leave", nameAr: "إجازة طارئة", defaultDays: 5, color: "#f97316", isPaid: true },
   { id: "4", name: "Unpaid Leave", nameAr: "إجازة بدون راتب", defaultDays: 30, color: "#6b7280", isPaid: false },
   { id: "5", name: "Hajj Leave", nameAr: "إجازة حج", defaultDays: 15, color: "#8b5cf6", isPaid: true },

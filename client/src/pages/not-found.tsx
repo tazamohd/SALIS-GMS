@@ -30,7 +30,7 @@ export default function NotFound() {
               <h1 className="text-6xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
                 404
               </h1>
-              <h2 className="text-xl font-semibold text-[#0F172A] dark:text-white">
+              <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
                 {t('errors.pageNotFound', 'Page Not Found')}
               </h2>
               <p className="text-sm text-[#64748B] dark:text-[#9BA4B0] max-w-xs mx-auto">
@@ -51,7 +51,7 @@ export default function NotFound() {
               <Button 
                 variant="outline"
                 onClick={() => window.history.back()}
-                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] hover:bg-gray-50 dark:hover:bg-[#1a2030]"
+                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:bg-gray-50 dark:hover:bg-[#1a2030]"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t('common.goBack', 'Go Back')}

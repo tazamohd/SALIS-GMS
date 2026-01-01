@@ -239,9 +239,9 @@ export function Customers() {
           <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{customerVehicles?.length || 0}</p>
         </div>
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#10B981]/5 dark:bg-[#10B981]/10" />
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
           <div className="flex items-center gap-2 mb-2">
-            <ClipboardList className="w-5 h-5 text-[#10B981]" />
+            <ClipboardList className="w-5 h-5 text-[#0A5ED7]" />
             <span className="text-sm font-medium text-[#64748B]">{t('customers.activeJobs', 'Active Jobs')}</span>
           </div>
           <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{outstandingJobs.length}</p>

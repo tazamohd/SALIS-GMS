@@ -65,7 +65,7 @@ export function TechnicianPortal() {
       case 'pending': return 'bg-[#64748B] text-white';
       case 'assigned': return 'bg-[#0BB3FF] text-white';
       case 'in_progress': return 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white';
-      case 'completed': return 'bg-[#10B981] text-white';
+      case 'completed': return 'bg-[#0A5ED7] text-white';
       case 'cancelled': return 'bg-[#F97316] text-white';
       default: return 'bg-[#64748B] text-white';
     }
@@ -74,7 +74,7 @@ export function TechnicianPortal() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-[#F97316] text-white';
-      case 'high': return 'bg-[#EF4444] text-white';
+      case 'high': return 'bg-[#F97316] text-white';
       case 'medium': return 'bg-[#0A5ED7] text-white';
       case 'low': return 'bg-[#64748B] text-white';
       default: return 'bg-[#64748B] text-white';
@@ -130,7 +130,7 @@ export function TechnicianPortal() {
                   </Badge>
                 )}
                 {technicianProfile.isLead && (
-                  <Badge variant="default" className="bg-[#10B981] text-white border-0" data-testid="badge-lead">{t('technician.leadTechnician', 'Lead Technician')}</Badge>
+                  <Badge variant="default" className="bg-[#0A5ED7] text-white border-0" data-testid="badge-lead">{t('technician.leadTechnician', 'Lead Technician')}</Badge>
                 )}
               </div>
             </div>
@@ -242,7 +242,7 @@ export function TechnicianPortal() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="stat-completed-jobs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('common.completed', 'Completed')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-[#10B981]" />
+            <CheckCircle className="h-4 w-4 text-[#0A5ED7]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{stats.completed}</div>

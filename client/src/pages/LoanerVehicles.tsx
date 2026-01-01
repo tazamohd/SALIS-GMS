@@ -303,7 +303,7 @@ export default function LoanerVehicles() {
 
   const getLoanerStatusBadge = (status: string, loanerId: string) => {
     const statusColors: Record<string, string> = {
-      available: "bg-[#10B981] text-white",
+      available: "bg-[#0A5ED7] text-white",
       reserved: "bg-[#0BB3FF] text-white",
       on_loan: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
       maintenance: "bg-[#F97316] text-white",
@@ -319,7 +319,7 @@ export default function LoanerVehicles() {
 
   const getConditionBadge = (condition: string, loanerId: string) => {
     const conditionColors: Record<string, string> = {
-      excellent: "bg-[#10B981] text-white",
+      excellent: "bg-[#0A5ED7] text-white",
       good: "bg-[#0A5ED7] text-white",
       fair: "bg-[#64748B] text-white",
       poor: "bg-[#F97316] text-white",
@@ -336,7 +336,7 @@ export default function LoanerVehicles() {
     const statusColors: Record<string, string> = {
       reserved: "bg-[#0BB3FF] text-white",
       active: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
-      returned: "bg-[#10B981] text-white",
+      returned: "bg-[#0A5ED7] text-white",
       late: "bg-[#F97316] text-white",
       cancelled: "bg-[#64748B] text-white",
     };
@@ -521,7 +521,7 @@ export default function LoanerVehicles() {
                       {reservation.damageReported ? (
                         <Badge className="bg-[#F97316] text-white">{t('common.yes', 'Yes')}</Badge>
                       ) : (
-                        <Badge className="bg-[#10B981] text-white">{t('common.no', 'No')}</Badge>
+                        <Badge className="bg-[#0A5ED7] text-white">{t('common.no', 'No')}</Badge>
                       )}
                     </TableCell>
                     <TableCell>

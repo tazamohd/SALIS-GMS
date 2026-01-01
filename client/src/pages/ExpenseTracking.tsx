@@ -124,8 +124,8 @@ export default function ExpenseTracking() {
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
       pending: "bg-[#F97316] text-white",
-      approved: "bg-[#22c55e] text-white",
-      rejected: "bg-red-500 text-white",
+      approved: "bg-[#0A5ED7] text-white",
+      rejected: "bg-[#F97316] text-white",
       paid: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
     };
     return colors[status] || "bg-[#64748B] text-white";

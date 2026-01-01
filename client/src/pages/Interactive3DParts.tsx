@@ -814,7 +814,7 @@ export default function Interactive3DParts() {
       <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
         <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-[#0F172A] dark:text-[#E6EAF0]">
+            <DialogTitle className="text-[#0B1F3B] dark:text-[#E6EAF0]">
               {t("interactive3d.orderPart", "Order Part")}
             </DialogTitle>
             <DialogDescription className="text-[#64748B] dark:text-[#9BA4B0]">
@@ -824,7 +824,7 @@ export default function Interactive3DParts() {
           <div className="space-y-4 py-4">
             <div className="flex items-center justify-between bg-[#F8FAFC] dark:bg-[#0E1117] p-4 rounded-lg">
               <div>
-                <p className="font-medium text-[#0F172A] dark:text-[#E6EAF0]">
+                <p className="font-medium text-[#0B1F3B] dark:text-[#E6EAF0]">
                   {selectedPart?.partName}
                 </p>
                 <p className="text-sm text-[#64748B] dark:text-[#9BA4B0]">
@@ -841,7 +841,7 @@ export default function Interactive3DParts() {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="w-8 text-center font-medium text-[#0F172A] dark:text-[#E6EAF0]">
+                <span className="w-8 text-center font-medium text-[#0B1F3B] dark:text-[#E6EAF0]">
                   {orderQuantity}
                 </span>
                 <Button

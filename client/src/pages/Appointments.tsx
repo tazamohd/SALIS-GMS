@@ -43,9 +43,9 @@ export function Appointments() {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, string> = {
       scheduled: "bg-[#F97316]/10 text-[#F97316] border-0",
-      confirmed: "bg-[#10B981]/10 text-[#10B981] border-0",
+      confirmed: "bg-[#0A5ED7]/10 text-[#0A5ED7] border-0",
       in_progress: "bg-[#0A5ED7]/10 text-[#0A5ED7] border-0",
-      completed: "bg-[#10B981]/10 text-[#10B981] border-0",
+      completed: "bg-[#0A5ED7]/10 text-[#0A5ED7] border-0",
       cancelled: "bg-[#F97316]/10 text-[#F97316] border-0",
       no_show: "bg-[#64748B]/10 text-[#64748B] border-0",
     };
@@ -101,9 +101,9 @@ export function Appointments() {
           </p>
         </div>
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#10B981]/5 dark:bg-[#10B981]/10" />
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
           <div className="flex items-center gap-2 mb-2">
-            <User className="w-5 h-5 text-[#10B981]" />
+            <User className="w-5 h-5 text-[#0A5ED7]" />
             <span className="text-sm font-medium text-[#64748B]">{t('appointments.confirmed', 'Confirmed')}</span>
           </div>
           <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">

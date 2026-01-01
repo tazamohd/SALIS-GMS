@@ -354,11 +354,11 @@ export default function ExpensesManagement() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link href="/sales-management">
-              <Card className="cursor-pointer hover:border-[#22c55e] transition-colors h-full bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-sales-management">
+              <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors h-full bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="link-sales-management">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-xl bg-[#22c55e]/10">
-                      <ShoppingCart className="h-6 w-6 text-[#22c55e]" />
+                    <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
+                      <ShoppingCart className="h-6 w-6 text-[#0A5ED7]" />
                     </div>
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
@@ -688,11 +688,11 @@ export default function ExpensesManagement() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-[#22c55e]">SAR 43,350</div>
+                <div className="text-2xl font-bold text-[#0A5ED7]">SAR 43,350</div>
                 <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.remainingAr', 'المتبقي')}</p>
               </div>
-              <div className="p-2 rounded-xl bg-[#22c55e]/10">
-                <CheckCircle className="h-6 w-6 text-[#22c55e]" />
+              <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
+                <CheckCircle className="h-6 w-6 text-[#0A5ED7]" />
               </div>
             </div>
           </CardContent>
@@ -728,7 +728,7 @@ export default function ExpensesManagement() {
                     </TableCell>
                     <TableCell className="text-[#0B1F3B] dark:text-white">SAR {cat.budget.toLocaleString()}</TableCell>
                     <TableCell className="text-[#F97316]">SAR {cat.spent.toLocaleString()}</TableCell>
-                    <TableCell className="text-[#22c55e]">SAR {remaining.toLocaleString()}</TableCell>
+                    <TableCell className="text-[#0A5ED7]">SAR {remaining.toLocaleString()}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress value={percentage} className="w-20 h-2" />
@@ -737,11 +737,11 @@ export default function ExpensesManagement() {
                     </TableCell>
                     <TableCell>
                       {percentage > 90 ? (
-                        <Badge className="bg-[#ef4444]">{t('payments.expenses.overBudget', 'Over Budget')}</Badge>
+                        <Badge className="bg-[#F97316]">{t('payments.expenses.overBudget', 'Over Budget')}</Badge>
                       ) : percentage > 70 ? (
                         <Badge className="bg-[#F97316]">{t('common.warning', 'Warning')}</Badge>
                       ) : (
-                        <Badge className="bg-[#22c55e]">{t('payments.expenses.onTrack', 'On Track')}</Badge>
+                        <Badge className="bg-[#0A5ED7]">{t('payments.expenses.onTrack', 'On Track')}</Badge>
                       )}
                     </TableCell>
                   </TableRow>
@@ -791,11 +791,11 @@ export default function ExpensesManagement() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-[#22c55e] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-vendor">
+        <Card className="cursor-pointer hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-vendor">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-[#22c55e]/10">
-                <Building2 className="h-4 w-4 text-[#22c55e]" />
+              <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
+                <Building2 className="h-4 w-4 text-[#0A5ED7]" />
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.vendorReport', 'Vendor Report')}</CardTitle>
             </div>
@@ -825,11 +825,11 @@ export default function ExpensesManagement() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:border-[#ef4444] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-tax">
+        <Card className="cursor-pointer hover:border-[#F97316] transition-colors bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-report-tax">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-[#ef4444]/10">
-                <FileText className="h-4 w-4 text-[#ef4444]" />
+              <div className="p-2 rounded-xl bg-[#F97316]/10">
+                <FileText className="h-4 w-4 text-[#F97316]" />
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.taxDeductible', 'Tax Deductible')}</CardTitle>
             </div>

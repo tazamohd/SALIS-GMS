@@ -109,7 +109,7 @@ export default function VehicleHealthMonitoring() {
     switch (status) {
       case "critical": return "text-[#F97316] bg-[#F97316]/10 border-[#F97316]/20";
       case "warning": return "text-[#F97316] bg-[#F97316]/10 border-[#F97316]/20";
-      case "healthy": return "text-green-600 dark:text-green-400 bg-green-500/10 border-green-500/20";
+      case "healthy": return "text-[#0A5ED7] bg-[#0A5ED7]/10 border-[#0A5ED7]/20";
       default: return "text-[#0A5ED7] bg-[#0A5ED7]/10 border-[#0A5ED7]/20";
     }
   };
@@ -152,7 +152,7 @@ export default function VehicleHealthMonitoring() {
                     <p className="text-4xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-health-score">{healthScore}</p>
                     <p className="text-[#64748B]">/100</p>
                   </div>
-                  <p className="text-sm text-green-600 dark:text-green-400 mt-1" data-testid="text-health-trend">
+                  <p className="text-sm text-[#0A5ED7] mt-1" data-testid="text-health-trend">
                     <TrendingUp className="w-4 h-4 inline mr-1" />
                     {t('vehicleHealth.fromLastWeek', '+3 from last week')}
                   </p>
@@ -160,14 +160,14 @@ export default function VehicleHealthMonitoring() {
               </div>
               
               <div className="text-right space-y-2">
-                <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-0" data-testid="badge-health-status">
+                <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0" data-testid="badge-health-status">
                   {t('common.healthy', 'Healthy')}
                 </Badge>
                 <div>
                   <p className="text-xs text-[#64748B]">{t('vehicleHealth.connectedSince', 'Connected Since')}</p>
                   <p className="text-sm font-medium text-[#0B1F3B] dark:text-white" data-testid="text-connection-time">10:00 AM</p>
                 </div>
-                <div className="flex items-center gap-1 text-green-600 dark:text-green-400" data-testid="badge-live-status">
+                <div className="flex items-center gap-1 text-[#0A5ED7]" data-testid="badge-live-status">
                   <Radio className="w-3 h-3 animate-pulse" />
                   <span className="text-xs">{t('common.live', 'Live')}</span>
                 </div>
@@ -208,7 +208,7 @@ export default function VehicleHealthMonitoring() {
                       {sensor.value}
                     </p>
                     <span className={`text-sm ${
-                      sensor.trend.startsWith("+") ? "text-[#F97316]" : "text-green-600"
+                      sensor.trend.startsWith("+") ? "text-[#F97316]" : "text-[#0A5ED7]"
                     }`} data-testid={`text-sensor-trend-${idx}`}>
                       {sensor.trend}
                     </span>
@@ -332,10 +332,10 @@ export default function VehicleHealthMonitoring() {
                     <Line 
                       type="monotone" 
                       dataKey="voltage" 
-                      stroke="#10B981" 
+                      stroke="#0A5ED7" 
                       strokeWidth={2}
                       name={t('vehicleHealth.batteryVoltageV', 'Battery Voltage (V)')}
-                      dot={{ r: 4, fill: '#10B981' }}
+                      dot={{ r: 4, fill: '#0A5ED7' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

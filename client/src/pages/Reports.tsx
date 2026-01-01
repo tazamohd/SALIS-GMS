@@ -16,7 +16,7 @@ import { subDays } from "date-fns";
 import type { Garage } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-const COLORS = ['#0A5ED7', '#0BB3FF', '#10B981', '#6366F1', '#0B1F3B', '#64748B'];
+const COLORS = ['#0A5ED7', '#0BB3FF', '#0A5ED7', '#6366F1', '#0B1F3B', '#64748B'];
 
 const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -276,14 +276,14 @@ export function Reports() {
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousMonth.change >= 0 ? (
-                        <ArrowUp className="w-4 h-4 text-[#10B981]" data-testid="icon-mom-up" />
+                        <ArrowUp className="w-4 h-4 text-[#0A5ED7]" data-testid="icon-mom-up" />
                       ) : (
                         <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-mom-down" />
                       )}
-                      <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-mom-change">
+                      <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-mom-change">
                         {revenueReport.comparison.previousMonth.change >= 0 ? '+' : ''}${revenueReport.comparison.previousMonth.change.toFixed(2)}
                       </span>
-                      <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-mom-percent">
+                      <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-mom-percent">
                         ({revenueReport.comparison.previousMonth.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousMonth.percentChange.toFixed(1)}%)
                       </span>
                     </div>
@@ -303,14 +303,14 @@ export function Reports() {
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousYear.change >= 0 ? (
-                        <ArrowUp className="w-4 h-4 text-[#10B981]" data-testid="icon-yoy-up" />
+                        <ArrowUp className="w-4 h-4 text-[#0A5ED7]" data-testid="icon-yoy-up" />
                       ) : (
                         <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-yoy-down" />
                       )}
-                      <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-yoy-change">
+                      <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-yoy-change">
                         {revenueReport.comparison.previousYear.change >= 0 ? '+' : ''}${revenueReport.comparison.previousYear.change.toFixed(2)}
                       </span>
-                      <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-[#10B981]' : 'text-[#F97316]'}`} data-testid="text-yoy-percent">
+                      <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-yoy-percent">
                         ({revenueReport.comparison.previousYear.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousYear.percentChange.toFixed(1)}%)
                       </span>
                     </div>
