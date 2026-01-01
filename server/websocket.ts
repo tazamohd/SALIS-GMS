@@ -379,6 +379,26 @@ export class ChatWebSocketServer {
     return this.clients.has(userId) && this.clients.get(userId)!.size > 0;
   }
 
+  public broadcastNotification(userId: string, notification: any) {
+    const payload = {
+      type: 'notification',
+      notification,
+    };
+
+    const userClients = this.clients.get(userId);
+    if (userClients) {
+      userClients.forEach(ws => {
+        this.send(ws, payload);
+      });
+    }
+  }
+
+  public broadcastNotificationToUsers(userIds: string[], notification: any) {
+    userIds.forEach(userId => {
+      this.broadcastNotification(userId, notification);
+    });
+  }
+
   private handleJoinCallCenter(ws: AuthenticatedWebSocket) {
     if (!ws.userId || !ws.garageId) {
       this.sendError(ws, 'Not authenticated');

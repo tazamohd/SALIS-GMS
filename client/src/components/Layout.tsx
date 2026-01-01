@@ -93,6 +93,7 @@ import { SmartSearch } from "@/components/SmartSearch";
 import { SkipLink } from "@/components/SkipLink";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { CustomerChatWidget } from "@/components/CustomerChatWidget";
+import { InternalChatSidebar } from "@/components/InternalChatSidebar";
 import {
   Collapsible,
   CollapsibleContent,
@@ -409,6 +410,7 @@ export function Layout({ children }: LayoutProps) {
             <LanguageSwitcher />
             <ThemeToggle />
             <NotificationBell />
+            <InternalChatSidebar />
           </header>
 
           {/* Page Content */}
