@@ -2073,6 +2073,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/customers/:id/job-cards', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const jobCards = await storage.getCustomerJobCards(id);
+      res.json(jobCards);
+    } catch (error) {
+      console.error("Error fetching customer job cards:", error);
+      res.status(500).json({ message: "Failed to fetch customer job cards" });
+    }
+  });
+
+  app.get('/api/customers/:id/invoices', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoices = await storage.getCustomerInvoices(id);
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching customer invoices:", error);
+      res.status(500).json({ message: "Failed to fetch customer invoices" });
+    }
+  });
+
   app.get('/api/vehicles', isAuthenticated, async (req, res) => {
     try {
       const { garageId } = req.query;

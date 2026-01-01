@@ -48,53 +48,60 @@ export function Customers() {
   });
 
   const { data: selectedCustomer } = useQuery<User>({
-    queryKey: [`/api/customers/${selectedCustomerId}`],
+    queryKey: ['/api/customers', selectedCustomerId],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch customer');
+      return res.json();
+    },
     enabled: !!selectedCustomerId,
   });
 
   const { data: customerVehicles } = useQuery<Vehicle[]>({
-    queryKey: [`/api/customers/${selectedCustomerId}/vehicles`],
+    queryKey: ['/api/customers', selectedCustomerId, 'vehicles'],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}/vehicles`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch vehicles');
+      return res.json();
+    },
     enabled: !!selectedCustomerId,
   });
 
   const { data: customerNotes } = useQuery<CustomerNote[]>({
-    queryKey: [`/api/customers/${selectedCustomerId}/notes`],
+    queryKey: ['/api/customers', selectedCustomerId, 'notes'],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}/notes`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch notes');
+      return res.json();
+    },
     enabled: !!selectedCustomerId,
   });
 
-  const { data: allJobCards } = useQuery<any[]>({
-    queryKey: ['/api/job-cards'],
+  const { data: customerJobCards } = useQuery<any[]>({
+    queryKey: ['/api/customers', selectedCustomerId, 'job-cards'],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}/job-cards`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch job cards');
+      return res.json();
+    },
     enabled: !!selectedCustomerId,
   });
 
-  const { data: allInvoices } = useQuery<any[]>({
-    queryKey: ['/api/invoices'],
+  const { data: customerInvoices } = useQuery<any[]>({
+    queryKey: ['/api/customers', selectedCustomerId, 'invoices'],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}/invoices`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch invoices');
+      return res.json();
+    },
     enabled: !!selectedCustomerId,
   });
 
-  const customerJobCards = !customerVehicles ? [] : (allJobCards ?? []).filter((job: any) => {
-    // Match by customer ID directly if available
-    if (job.customerId === selectedCustomerId) {
-      return true;
-    }
-    // Otherwise, match by vehicle info
-    if (job.vehicleInfo) {
-      const vehicle = customerVehicles.find(v => 
-        job.vehicleInfo.licensePlate === v.licensePlate || 
-        job.vehicleInfo.vin === v.vin
-      );
-      return !!vehicle;
-    }
-    return false;
-  });
-
-  const customerInvoices = (allInvoices ?? []).filter((inv: any) => inv.customerId === selectedCustomerId);
-
-  const outstandingJobs = customerJobCards.filter((job: any) => 
+  const outstandingJobs = (customerJobCards ?? []).filter((job: any) => 
     job.status !== 'completed' && job.status !== 'cancelled'
   );
 
-  const unpaidInvoices = customerInvoices.filter((inv: any) => inv.status === 'pending');
+  const unpaidInvoices = (customerInvoices ?? []).filter((inv: any) => inv.status === 'pending');
 
   const { toast } = useToast();
 
@@ -109,7 +116,7 @@ export function Customers() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/customers', selectedCustomerId, 'invoices'] });
       queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
       toast({
         title: t('customers.reminderSent', 'Reminder Sent'),
@@ -130,7 +137,7 @@ export function Customers() {
       return await apiRequest("DELETE", `/api/vehicles/${vehicleId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/customers/${selectedCustomerId}/vehicles`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/customers', selectedCustomerId, 'vehicles'] });
       toast({
         title: t('common.success', 'Success'),
         description: t('customers.vehicleDeleted', 'Vehicle deleted successfully'),
@@ -150,7 +157,7 @@ export function Customers() {
       return await apiRequest("DELETE", `/api/customer-notes/${noteId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/customers/${selectedCustomerId}/notes`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/customers', selectedCustomerId, 'notes'] });
       toast({
         title: t('common.success', 'Success'),
         description: t('customers.noteDeleted', 'Note deleted successfully'),
@@ -507,18 +514,18 @@ export function Customers() {
                   <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
                       <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
-                        {t('customers.tabs.jobHistory', 'Job History')} ({customerJobCards.length} {t('common.total', 'total')})
+                        {t('customers.tabs.jobHistory', 'Job History')} ({(customerJobCards ?? []).length} {t('common.total', 'total')})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {customerJobCards.length === 0 ? (
+                      {(customerJobCards ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <ClipboardList className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noJobHistory', 'No job history available')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {customerJobCards.map((job: any) => (
+                          {(customerJobCards ?? []).map((job: any) => (
                             <div
                               key={job.id}
                               className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
@@ -566,18 +573,18 @@ export function Customers() {
                   <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                     <CardHeader>
                       <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
-                        {t('customers.tabs.invoicesPayments', 'Invoices & Payments')} ({customerInvoices.length} {t('common.total', 'total')})
+                        {t('customers.tabs.invoicesPayments', 'Invoices & Payments')} ({(customerInvoices ?? []).length} {t('common.total', 'total')})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {customerInvoices.length === 0 ? (
+                      {(customerInvoices ?? []).length === 0 ? (
                         <div className="text-center py-8">
                           <FileText className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
                           <p className="text-sm text-[#64748B]">{t('customers.noInvoices', 'No invoices available')}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {customerInvoices.map((invoice: any) => (
+                          {(customerInvoices ?? []).map((invoice: any) => (
                             <div
                               key={invoice.id}
                               className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
