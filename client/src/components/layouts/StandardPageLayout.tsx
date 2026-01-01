@@ -5,10 +5,12 @@ import { SkipLink } from "@/components/SkipLink";
 import { cn } from "@/lib/utils";
 
 interface PageAction {
-  label: string;
+  label: string | ReactNode;
   onClick: () => void;
   icon?: LucideIcon;
   variant?: "default" | "outline" | "secondary" | "destructive";
+  customRender?: ReactNode;
+  testId?: string;
 }
 
 interface StandardPageLayoutProps {
