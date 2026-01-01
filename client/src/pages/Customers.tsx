@@ -101,7 +101,9 @@ export function Customers() {
     job.status !== 'completed' && job.status !== 'cancelled'
   );
 
-  const unpaidInvoices = (customerInvoices ?? []).filter((inv: any) => inv.status === 'pending');
+  const unpaidInvoices = (customerInvoices ?? []).filter((inv: any) => 
+    inv.status === 'sent' || inv.status === 'overdue' || inv.status === 'draft'
+  );
 
   const { toast } = useToast();
 
@@ -600,7 +602,9 @@ export function Customers() {
                                       variant="outline" 
                                       className={
                                         invoice.status === 'paid' ? 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7]/30 text-[#0A5ED7]' :
-                                        invoice.status === 'pending' ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 text-[#F97316]' :
+                                        invoice.status === 'overdue' ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 text-[#F97316]' :
+                                        invoice.status === 'sent' ? 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20 border-[#0BB3FF]/30 text-[#0BB3FF]' :
+                                        invoice.status === 'cancelled' ? 'bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 text-[#F97316]' :
                                         'bg-[#64748B]/10 dark:bg-[#64748B]/20 border-[#64748B]/30 text-[#64748B]'
                                       }
                                     >
@@ -608,14 +612,14 @@ export function Customers() {
                                     </Badge>
                                   </div>
                                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#64748B] mb-2">
-                                    <span>{t('common.date', 'Date')}: {invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'N/A'}</span>
+                                    <span>{t('common.date', 'Date')}: {invoice.invoiceDate ? new Date(invoice.invoiceDate).toLocaleDateString() : 'N/A'}</span>
                                     {invoice.dueDate && <span>{t('customers.due', 'Due')}: {new Date(invoice.dueDate).toLocaleDateString()}</span>}
                                   </div>
                                   <div className="flex items-center justify-between">
                                     <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                                       ${Number(invoice.totalAmount || 0).toFixed(2)}
                                     </span>
-                                    {invoice.status === 'pending' && (
+                                    {(invoice.status === 'sent' || invoice.status === 'overdue') && (
                                       selectedCustomer?.phone && selectedCustomer.phone.trim().length > 0 ? (
                                         <Button
                                           size="sm"
