@@ -28,17 +28,23 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Garage } from "@shared/schema";
 
 const customerFormSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().optional(),
   garageId: z.string().min(1, "Please select a garage"),
   nationalId: z.string().optional(),
+  address: z.string().optional(),
+  nationality: z.string().optional(),
+  preferredLanguage: z.string().optional(),
 });
 
 type CustomerFormValues = z.infer<typeof customerFormSchema>;
@@ -49,6 +55,7 @@ interface AddCustomerDialogProps {
 
 export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
   const [open, setOpen] = useState(false);
+  const [showOptional, setShowOptional] = useState(false);
   const { toast } = useToast();
 
   const { data: garages } = useQuery<Garage[]>({
@@ -59,10 +66,15 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
     resolver: zodResolver(customerFormSchema),
     defaultValues: {
       fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       garageId: defaultGarageId || "",
       nationalId: "",
+      address: "",
+      nationality: "",
+      preferredLanguage: "",
     },
   });
 
@@ -170,24 +182,6 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
 
             <FormField
               control={form.control}
-              name="nationalId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>National ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter national ID (optional)"
-                      {...field}
-                      data-testid="input-customer-national-id"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="garageId"
               render={({ field }) => (
                 <FormItem>
@@ -213,6 +207,135 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                 </FormItem>
               )}
             />
+
+            <Collapsible open={showOptional} onOpenChange={setShowOptional}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full flex items-center justify-between text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                  data-testid="button-toggle-optional"
+                >
+                  <span>Optional Details</span>
+                  {showOptional ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 pt-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="First name"
+                            {...field}
+                            data-testid="input-customer-first-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Last name"
+                            {...field}
+                            data-testid="input-customer-last-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="nationalId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>National ID</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter national ID"
+                          {...field}
+                          data-testid="input-customer-national-id"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter address"
+                          {...field}
+                          data-testid="input-customer-address"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="nationality"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nationality</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g. Saudi Arabia"
+                            {...field}
+                            data-testid="input-customer-nationality"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="preferredLanguage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Preferred Language</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-customer-language">
+                              <SelectValue placeholder="Select language" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                            <SelectItem value="en">English</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button

@@ -2001,7 +2001,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const { fullName, email, phone, garageId, nationalId } = req.body;
+      const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
       
       if (!fullName || !email || !garageId) {
         return res.status(400).json({ message: "Name, email, and garage are required" });
@@ -2017,6 +2017,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const customer = await storage.createUser({
         fullName,
+        firstName: firstName || null,
+        lastName: lastName || null,
         email,
         phone: phone || null,
         password: tempPassword,
@@ -2025,6 +2027,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userType: 'customer',
         isActive: true,
       });
+
+      if (address || nationality || preferredLanguage) {
+        try {
+          await storage.createCustomerProfile({
+            userId: customer.id,
+            address: address || null,
+            nationality: nationality || null,
+            preferredLanguage: preferredLanguage || null,
+          });
+        } catch (profileError) {
+          console.error("Error creating customer profile:", profileError);
+        }
+      }
 
       res.status(201).json(customer);
     } catch (error) {

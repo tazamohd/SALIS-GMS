@@ -4561,6 +4561,15 @@ export class DatabaseStorage implements IStorage {
     return profile || null;
   }
 
+  async createCustomerProfile(data: { userId: string; address?: string | null; nationality?: string | null; preferredLanguage?: string | null }) {
+    const { customerProfiles } = await import("@shared/schema");
+    const [profile] = await db
+      .insert(customerProfiles)
+      .values(data)
+      .returning();
+    return profile;
+  }
+
   // Calendar & Scheduling Methods - Module 26
   // Technician Availability
   async getTechnicianAvailability(technicianId: string, startDate?: Date, endDate?: Date) {
