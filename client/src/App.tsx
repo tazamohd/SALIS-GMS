@@ -68,6 +68,7 @@ import AIAutomation from "@/pages/AIAutomation";
 import Integrations from "@/pages/Integrations";
 import Security from "@/pages/Security";
 import Settings from "@/pages/Settings";
+import RoleManagement from "@/pages/RoleManagement";
 import Chat from "@/pages/Chat";
 import FleetManagement from "@/pages/FleetManagement";
 import FleetTracking from "@/pages/FleetTracking";
@@ -716,6 +717,11 @@ function Router() {
       <Route path="/settings">
         <Layout>
           <Settings />
+        </Layout>
+      </Route>
+      <Route path="/role-management">
+        <Layout>
+          <RoleManagement />
         </Layout>
       </Route>
       <Route path="/data-backup">

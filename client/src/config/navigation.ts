@@ -384,6 +384,7 @@ export const navigationConfig: NavGroup[] = [
     icon: Settings,
     items: [
       { title: "Settings", href: "/settings", icon: Settings },
+      { title: "Role Management", href: "/role-management", icon: Shield },
       { title: "Security", href: "/security", icon: Shield },
       { title: "Data Backup", href: "/data-backup", icon: DatabaseBackup },
       { title: "Dashboard Widgets", href: "/dashboard-widgets", icon: LayoutDashboard },
