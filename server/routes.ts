@@ -4076,9 +4076,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/payments', isAuthenticated, async (req, res) => {
     try {
-      const { invoice_id } = req.query;
-      const payments = await storage.getPayments(invoice_id as string);
-      res.json(payments);
+      const { invoice_id, status, method } = req.query;
+      const { payments, invoices, users } = await import("@shared/schema");
+      
+      // Get payments with invoice and customer info
+      let query = db.select({
+        id: payments.id,
+        invoiceId: payments.invoiceId,
+        paymentDate: payments.paymentDate,
+        amount: payments.amount,
+        paymentMethod: payments.paymentMethod,
+        referenceNumber: payments.referenceNumber,
+        notes: payments.notes,
+        createdBy: payments.createdBy,
+        createdAt: payments.createdAt,
+        invoiceNumber: invoices.invoiceNumber,
+        customerName: users.fullName,
+      })
+      .from(payments)
+      .innerJoin(invoices, eq(payments.invoiceId, invoices.id))
+      .innerJoin(users, eq(invoices.customerId, users.id))
+      .orderBy(desc(payments.paymentDate));
+      
+      let results = await query;
+      
+      // Apply filters
+      if (invoice_id) {
+        results = results.filter(p => p.invoiceId === invoice_id);
+      }
+      if (method && method !== 'all') {
+        results = results.filter(p => p.paymentMethod === method);
+      }
+      
+      res.json(results);
     } catch (error) {
       console.error("Error fetching payments:", error);
       res.status(500).json({ message: "Failed to fetch payments" });
