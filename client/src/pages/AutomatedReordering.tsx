@@ -430,9 +430,11 @@ export default function AutomatedReordering() {
 
   const [ruleStates, setRuleStates] = useState<Record<number, boolean>>({});
   const [editingRule, setEditingRule] = useState<{ idx: number; item: typeof stockLevelData[0] } | null>(null);
-  const [editFormData, setEditFormData] = useState({ reorderPoint: 0, orderQuantity: 0 });
+  const [editFormData, setEditFormData] = useState({ reorderPoint: 0, orderQuantity: 0, supplier: '' });
   const [showAddRuleDialog, setShowAddRuleDialog] = useState(false);
   const [newRuleForm, setNewRuleForm] = useState({ part: '', reorderPoint: '', orderQuantity: '', supplier: '' });
+  const [viewingOrder, setViewingOrder] = useState<any | null>(null);
+  const [orderStates, setOrderStates] = useState<Record<number, string>>({});
 
   const availableParts = [
     { value: 'oil-filter', label: t('parts.oilFilter', 'Oil Filter'), category: t('parts.filters', 'Filters') },
@@ -475,22 +477,56 @@ export default function AutomatedReordering() {
   };
 
   const openEditDialog = (idx: number, item: typeof stockLevelData[0]) => {
-    setEditFormData({ reorderPoint: item.reorder, orderQuantity: item.reorder * 2 });
+    setEditFormData({ reorderPoint: item.reorder, orderQuantity: item.reorder * 2, supplier: 'supplier-a' });
     setEditingRule({ idx, item });
   };
 
   const saveEditedRule = () => {
     if (editingRule) {
+      if (editFormData.reorderPoint <= 0) {
+        toast({ 
+          title: t('autoReorder.validationError', 'Validation Error'),
+          description: t('autoReorder.reorderPointRequired', 'Please enter a valid reorder point greater than 0'),
+          variant: 'destructive'
+        });
+        return;
+      }
+      if (editFormData.orderQuantity <= 0) {
+        toast({ 
+          title: t('autoReorder.validationError', 'Validation Error'),
+          description: t('autoReorder.orderQuantityRequired', 'Please enter a valid order quantity greater than 0'),
+          variant: 'destructive'
+        });
+        return;
+      }
+      const selectedSupplier = suppliers.find(s => s.value === editFormData.supplier);
       toast({ 
         title: t('autoReorder.ruleUpdatedSuccess', 'Rule Updated Successfully'),
-        description: t('autoReorder.ruleUpdatedDesc', '{{part}}: Reorder point set to {{point}} units, order quantity set to {{qty}} units', { 
+        description: t('autoReorder.ruleUpdatedDescFull', '{{part}}: Reorder {{qty}} units when stock falls below {{point}}. Supplier: {{supplier}}', { 
           part: editingRule.item.name, 
           point: editFormData.reorderPoint, 
-          qty: editFormData.orderQuantity 
+          qty: editFormData.orderQuantity,
+          supplier: selectedSupplier?.label || t('common.notSet', 'Not set')
         })
       });
       setEditingRule(null);
     }
+  };
+
+  const handleApproveOrder = (order: any, idx: number) => {
+    setOrderStates(prev => ({ ...prev, [idx]: 'approved' }));
+    toast({ 
+      title: t('autoReorder.orderApprovedSuccess', 'Order Approved'),
+      description: t('autoReorder.orderApprovedDesc', '{{part}}: {{qty}} units from {{supplier}} has been approved for processing', { 
+        part: order.partName, 
+        qty: order.quantity,
+        supplier: order.supplier
+      })
+    });
+  };
+
+  const openOrderDetails = (order: any, idx: number) => {
+    setViewingOrder({ ...order, idx });
   };
 
   const handleCreateRule = () => {
@@ -715,21 +751,29 @@ export default function AutomatedReordering() {
       </Card>
 
       <Dialog open={!!editingRule} onOpenChange={(open) => !open && setEditingRule(null)}>
-        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-              <Settings className="w-5 h-5 text-[#0A5ED7]" />
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <Settings className="w-4 h-4 text-white" />
+              </div>
               {t('autoReorder.editRule', 'Edit Rule')}: {editingRule?.item.name}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="p-4 rounded-xl bg-[#0A5ED7]/5 border border-[#0A5ED7]/20">
-              <p className="text-sm text-[#64748B] mb-1">{t('autoReorder.currentStock', 'Current Stock')}</p>
-              <p className="text-2xl font-bold text-[#0A5ED7]">{editingRule?.item.current} {t('autoReorder.units', 'units')}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-[#0A5ED7]/5 border border-[#0A5ED7]/20">
+                <p className="text-sm text-[#64748B] mb-1">{t('autoReorder.currentStock', 'Current Stock')}</p>
+                <p className="text-2xl font-bold text-[#0A5ED7]">{editingRule?.item.current} {t('autoReorder.units', 'units')}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-[#0B1F3B]/5 border border-[#0B1F3B]/20">
+                <p className="text-sm text-[#64748B] mb-1">{t('autoReorder.maxCapacity', 'Max Capacity')}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{editingRule?.item.max} {t('autoReorder.units', 'units')}</p>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.reorderPoint', 'Reorder Point')} <span className="text-[#F97316]">*</span></Label>
                 <Input 
                   type="number" 
                   value={editFormData.reorderPoint}
@@ -737,9 +781,10 @@ export default function AutomatedReordering() {
                   className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
                   data-testid="input-edit-reorder-point"
                 />
+                <p className="text-xs text-[#64748B]">{t('autoReorder.reorderPointHint', 'Trigger reorder when stock falls below this level')}</p>
               </div>
               <div className="space-y-2">
-                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')}</Label>
+                <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.orderQuantity', 'Order Quantity')} <span className="text-[#F97316]">*</span></Label>
                 <Input 
                   type="number" 
                   value={editFormData.orderQuantity}
@@ -747,7 +792,23 @@ export default function AutomatedReordering() {
                   className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" 
                   data-testid="input-edit-order-quantity"
                 />
+                <p className="text-xs text-[#64748B]">{t('autoReorder.orderQuantityHint', 'Number of units to order automatically')}</p>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[#0B1F3B] dark:text-white">{t('autoReorder.preferredSupplier', 'Preferred Supplier')}</Label>
+              <Select value={editFormData.supplier} onValueChange={(value) => setEditFormData(prev => ({ ...prev, supplier: value }))}>
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-edit-supplier">
+                  <SelectValue placeholder={t('autoReorder.selectSupplier', 'Select supplier (optional)')} />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-[#151A23]">
+                  {suppliers.map(supplier => (
+                    <SelectItem key={supplier.value} value={supplier.value}>
+                      {supplier.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex gap-3 pt-2">
               <Button 
@@ -784,62 +845,140 @@ export default function AutomatedReordering() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {pendingOrders.map((order: any, idx: number) => (
-              <div 
-                key={order.id || idx} 
-                className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded-xl flex items-center justify-between"
-                data-testid={`pending-order-${idx}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
-                    <Package className="w-5 h-5 text-white" />
+            {pendingOrders.map((order: any, idx: number) => {
+              const currentStatus = orderStates[idx] || order.status;
+              return (
+                <div 
+                  key={order.id || idx} 
+                  className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded-xl flex items-center justify-between"
+                  data-testid={`pending-order-${idx}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                      <Package className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#0B1F3B] dark:text-white">{order.partName}</p>
+                      <p className="text-sm text-[#64748B]">
+                        {order.quantity} {t('autoReorder.units', 'units')} • {order.supplier}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{order.partName}</p>
-                    <p className="text-sm text-[#64748B]">
-                      {order.quantity} units • {order.supplier}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
-                    <Badge 
-                      className={order.status === 'approved' 
-                        ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
-                        : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
-                      }
-                    >
-                      {order.status === 'approved' ? t('common.approved', 'Approved') : t('common.pending', 'Pending')}
-                    </Badge>
-                  </div>
-                  <div className="flex gap-2">
-                    {order.status !== 'approved' && (
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
+                      <Badge 
+                        className={currentStatus === 'approved' 
+                          ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
+                          : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
+                        }
+                      >
+                        {currentStatus === 'approved' ? t('common.approved', 'Approved') : t('common.pending', 'Pending')}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      {currentStatus !== 'approved' && (
+                        <Button 
+                          size="sm" 
+                          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                          onClick={() => handleApproveOrder(order, idx)}
+                          data-testid={`button-approve-order-${idx}`}
+                        >
+                          {t('common.approve', 'Approve')}
+                        </Button>
+                      )}
                       <Button 
                         size="sm" 
-                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
-                        onClick={() => toast({ title: t('autoReorder.orderApproved', 'Order approved'), description: order.partName })}
-                        data-testid={`button-approve-order-${idx}`}
+                        variant="outline"
+                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                        onClick={() => openOrderDetails(order, idx)}
+                        data-testid={`button-view-order-${idx}`}
                       >
-                        {t('common.approve', 'Approve')}
+                        {t('common.view', 'View')}
                       </Button>
-                    )}
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
-                      onClick={() => toast({ title: t('common.viewDetails', 'View Details'), description: order.partName })}
-                      data-testid={`button-view-order-${idx}`}
-                    >
-                      {t('common.view', 'View')}
-                    </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!viewingOrder} onOpenChange={(open) => !open && setViewingOrder(null)}>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+              <div className="p-2 rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
+                <ShoppingCart className="w-4 h-4 text-white" />
+              </div>
+              {t('autoReorder.orderDetails', 'Order Details')}
+            </DialogTitle>
+          </DialogHeader>
+          {viewingOrder && (
+            <div className="space-y-4 py-4">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-[#0A5ED7]/5 to-[#0BB3FF]/5 border border-[#0A5ED7]/20">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{viewingOrder.partName}</p>
+                  <Badge 
+                    className={(orderStates[viewingOrder.idx] || viewingOrder.status) === 'approved' 
+                      ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30' 
+                      : 'bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30'
+                    }
+                  >
+                    {(orderStates[viewingOrder.idx] || viewingOrder.status) === 'approved' ? t('common.approved', 'Approved') : t('common.pending', 'Pending')}
+                  </Badge>
+                </div>
+                <p className="text-sm text-[#64748B]">{t('autoReorder.orderGeneratedByAI', 'Auto-generated order based on predictive demand analysis')}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('autoReorder.quantity', 'Quantity')}</p>
+                  <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{viewingOrder.quantity} {t('autoReorder.units', 'units')}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                  <p className="text-xs text-[#64748B] mb-1">{t('autoReorder.estimatedCost', 'Estimated Cost')}</p>
+                  <p className="text-lg font-bold text-[#0A5ED7]">SAR {viewingOrder.estimatedCost?.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                <p className="text-xs text-[#64748B] mb-1">{t('autoReorder.supplier', 'Supplier')}</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">{viewingOrder.supplier}</p>
+              </div>
+
+              <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                <p className="text-xs text-[#64748B] mb-1">{t('autoReorder.triggerReason', 'Trigger Reason')}</p>
+                <p className="text-sm text-[#0B1F3B] dark:text-white">{t('autoReorder.stockBelowThreshold', 'Stock level fell below reorder threshold based on predicted demand')}</p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  variant="outline"
+                  className="flex-1 border-[#E2E8F0] dark:border-[#232A36]"
+                  onClick={() => setViewingOrder(null)}
+                  data-testid="button-close-order-details"
+                >
+                  {t('common.close', 'Close')}
+                </Button>
+                {(orderStates[viewingOrder.idx] || viewingOrder.status) !== 'approved' && (
+                  <Button 
+                    className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+                    onClick={() => {
+                      handleApproveOrder(viewingOrder, viewingOrder.idx);
+                      setViewingOrder(null);
+                    }}
+                    data-testid="button-approve-from-details"
+                  >
+                    {t('common.approve', 'Approve Order')}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
