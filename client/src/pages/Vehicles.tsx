@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { type Vehicle, type InsertVehicle, insertVehicleSchema } from "@shared/schema";
+import { vehicleMakes, getModelsForMake, vehicleYears, nationalities, engineTypes, transmissionTypes, colors } from "@shared/vehicleCatalogs";
 import { StandardPageLayout } from "@/components/layouts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,9 +33,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Car, Plus, Edit, Trash2, Search } from "lucide-react";
+import { Car, Plus, Edit, Trash2, Search, ScanLine, Loader2, Camera, Upload, FileText, CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Vehicles() {
   const { t } = useTranslation();
@@ -43,6 +45,13 @@ export default function Vehicles() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMakeId, setSelectedMakeId] = useState<string>("");
+  const [availableModels, setAvailableModels] = useState<{ id: string; name: string }[]>([]);
+  const [isDecodingVin, setIsDecodingVin] = useState(false);
+  const [vinDecodeResult, setVinDecodeResult] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [scanDialogOpen, setScanDialogOpen] = useState(false);
+  const [scanType, setScanType] = useState<'vin' | 'license' | 'id' | 'driverLicense'>('vin');
 
   const { data: vehicles = [], isLoading } = useQuery<Vehicle[]>({
     queryKey: ['/api/vehicles'],
@@ -70,6 +79,7 @@ export default function Vehicles() {
       mileage: 0,
       engineType: "",
       transmissionType: "",
+      nationality: "",
       notes: "",
       isActive: true,
     },
@@ -151,6 +161,23 @@ export default function Vehicles() {
   const handleEdit = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     form.reset(vehicle);
+    
+    // Hydrate selectedMakeId from vehicle.make using multiple matching strategies
+    const vehicleMakeLower = (vehicle.make || '').toLowerCase().trim();
+    let matchedMake = vehicleMakes.find(m => m.name.toLowerCase() === vehicleMakeLower) // Exact match
+      || vehicleMakes.find(m => m.name.toLowerCase().includes(vehicleMakeLower)) // Contains
+      || vehicleMakes.find(m => vehicleMakeLower.includes(m.name.toLowerCase())); // Reverse contains
+    
+    if (matchedMake) {
+      setSelectedMakeId(matchedMake.id);
+      setAvailableModels(getModelsForMake(matchedMake.id));
+    } else {
+      // Fallback: keep the model dropdown enabled with empty models list
+      // but still allow the user to manually select a make
+      setSelectedMakeId("");
+      setAvailableModels([]);
+    }
+    
     setIsDialogOpen(true);
   };
 
@@ -163,6 +190,9 @@ export default function Vehicles() {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingVehicle(null);
+    setSelectedMakeId("");
+    setAvailableModels([]);
+    setVinDecodeResult(null);
     form.reset({
       customerId: "",
       garageId: garages[0]?.id || "",
@@ -178,6 +208,103 @@ export default function Vehicles() {
       notes: "",
       isActive: true,
     });
+  };
+
+  // Handle make selection and update available models
+  const handleMakeChange = (makeId: string) => {
+    setSelectedMakeId(makeId);
+    const make = vehicleMakes.find(m => m.id === makeId);
+    if (make) {
+      form.setValue("make", make.name);
+      const models = getModelsForMake(makeId);
+      setAvailableModels(models);
+      form.setValue("model", ""); // Reset model when make changes
+    }
+  };
+
+  // VIN Decode function
+  const handleDecodeVin = async () => {
+    const vin = form.getValues("vin");
+    if (!vin || vin.length !== 17) {
+      toast({
+        title: t('common.error', 'Error'),
+        description: t('vehicles.vinMustBe17', 'VIN must be exactly 17 characters'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsDecodingVin(true);
+    try {
+      const response = await fetch(`/api/vin-decode/${vin}`);
+      if (!response.ok) {
+        throw new Error('Failed to decode VIN');
+      }
+      const decoded = await response.json();
+      setVinDecodeResult(decoded);
+
+      // Auto-fill form fields with decoded data
+      if (decoded.make) {
+        const matchedMake = vehicleMakes.find(m => 
+          m.name.toLowerCase() === decoded.make.toLowerCase()
+        );
+        if (matchedMake) {
+          setSelectedMakeId(matchedMake.id);
+          form.setValue("make", matchedMake.name);
+          const models = getModelsForMake(matchedMake.id);
+          setAvailableModels(models);
+          
+          // Try to match model
+          if (decoded.model) {
+            const matchedModel = models.find(m => 
+              m.name.toLowerCase() === decoded.model.toLowerCase()
+            );
+            form.setValue("model", matchedModel ? matchedModel.name : decoded.model);
+          }
+        } else {
+          form.setValue("make", decoded.make);
+        }
+      }
+      if (decoded.year) form.setValue("year", decoded.year);
+      
+      // Match engine type to catalog (graceful fallback to first matching or raw value)
+      if (decoded.engineType) {
+        const matchedEngine = engineTypes.find(e => 
+          e.name.toLowerCase().includes(decoded.engineType.toLowerCase()) ||
+          decoded.engineType.toLowerCase().includes(e.name.toLowerCase())
+        );
+        form.setValue("engineType", matchedEngine ? matchedEngine.name : decoded.engineType);
+      }
+      
+      // Match transmission type to catalog
+      if (decoded.transmissionType) {
+        const matchedTrans = transmissionTypes.find(t => 
+          t.name.toLowerCase().includes(decoded.transmissionType.toLowerCase()) ||
+          decoded.transmissionType.toLowerCase().includes(t.name.toLowerCase())
+        );
+        form.setValue("transmissionType", matchedTrans ? matchedTrans.name : decoded.transmissionType);
+      }
+
+      toast({
+        title: t('common.success', 'Success'),
+        description: t('vehicles.vinDecodedSuccessfully', 'VIN decoded successfully! Vehicle details have been filled in.'),
+      });
+    } catch (error) {
+      console.error('VIN decode error:', error);
+      toast({
+        title: t('common.error', 'Error'),
+        description: t('vehicles.failedToDecodeVin', 'Failed to decode VIN. Please check the VIN and try again.'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsDecodingVin(false);
+    }
+  };
+
+  // Open scan dialog
+  const openScanDialog = (type: 'vin' | 'license' | 'id' | 'driverLicense') => {
+    setScanType(type);
+    setScanDialogOpen(true);
   };
 
   const filteredVehicles = vehicles.filter((vehicle) => {
@@ -206,7 +333,7 @@ export default function Vehicles() {
           {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-vehicle-form">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-vehicle-form">
         <DialogHeader>
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#0B1F3B] dark:text-white">
             {editingVehicle ? t('vehicles.editVehicle', 'Edit Vehicle') : t('vehicles.addNewVehicle', 'Add New Vehicle')}
@@ -240,6 +367,63 @@ export default function Vehicles() {
               )}
             />
 
+            {/* VIN Field with Decode Button */}
+            <FormField
+              control={form.control}
+              name="vin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vin', 'VIN')}</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="1HGBH41JXMN109186"
+                        value={field.value || ""}
+                        maxLength={17}
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white uppercase"
+                        data-testid="input-vin"
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      onClick={handleDecodeVin}
+                      disabled={isDecodingVin}
+                      className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white whitespace-nowrap"
+                      data-testid="button-decode-vin"
+                    >
+                      {isDecodingVin ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <ScanLine className="w-4 h-4 mr-1" />
+                          {t('vehicles.decodeVin', 'Decode')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-[#64748B] mt-1">{t('vehicles.vinHelp', 'Enter 17-character VIN to auto-fill vehicle details')}</p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* VIN Decode Result Display */}
+            {vinDecodeResult && vinDecodeResult.engineCylinders && (
+              <div className="p-3 bg-[#0A5ED7]/5 border border-[#0A5ED7]/20 rounded-lg">
+                <p className="text-sm font-semibold text-[#0A5ED7] mb-2">{t('vehicles.decodedInfo', 'Decoded Vehicle Info')}</p>
+                <div className="grid grid-cols-2 gap-2 text-xs text-[#64748B]">
+                  {vinDecodeResult.engineCylinders && <p>{t('vehicles.cylinders', 'Cylinders')}: {vinDecodeResult.engineCylinders}</p>}
+                  {vinDecodeResult.engineDisplacement && <p>{t('vehicles.displacement', 'Engine Size')}: {vinDecodeResult.engineDisplacement}L</p>}
+                  {vinDecodeResult.driveType && <p>{t('vehicles.driveType', 'Drive Type')}: {vinDecodeResult.driveType}</p>}
+                  {vinDecodeResult.bodyClass && <p>{t('vehicles.bodyType', 'Body Type')}: {vinDecodeResult.bodyClass}</p>}
+                  {vinDecodeResult.manufacturer && <p>{t('vehicles.manufacturer', 'Manufacturer')}: {vinDecodeResult.manufacturer}</p>}
+                  {vinDecodeResult.plantCountry && <p>{t('vehicles.madeIn', 'Made In')}: {vinDecodeResult.plantCountry}</p>}
+                </div>
+              </div>
+            )}
+
+            {/* Make Dropdown with Logos */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -247,39 +431,72 @@ export default function Vehicles() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Toyota"
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-make"
-                      />
-                    </FormControl>
+                    <Select 
+                      onValueChange={(value) => handleMakeChange(value)} 
+                      value={selectedMakeId}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-make">
+                          <SelectValue placeholder={t('vehicles.selectMake', 'Select make')}>
+                            {selectedMakeId && (
+                              <span className="flex items-center gap-2">
+                                {vehicleMakes.find(m => m.id === selectedMakeId)?.logo}
+                                {vehicleMakes.find(m => m.id === selectedMakeId)?.name}
+                              </span>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-h-[300px]">
+                        <ScrollArea className="h-[280px]">
+                          {vehicleMakes.map((make) => (
+                            <SelectItem key={make.id} value={make.id}>
+                              <span className="flex items-center gap-2">
+                                <span>{make.logo}</span>
+                                <span>{make.name}</span>
+                                <span className="text-xs text-[#64748B]">({make.country})</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* Model Dropdown - Dependent on Make */}
               <FormField
                 control={form.control}
                 name="model"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.model', 'Model')} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Camry"
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-model"
-                      />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!selectedMakeId}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-model">
+                          <SelectValue placeholder={selectedMakeId ? t('vehicles.selectModel', 'Select model') : t('vehicles.selectMakeFirst', 'Select make first')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-h-[300px]">
+                        <ScrollArea className="h-[280px]">
+                          {availableModels.map((model) => (
+                            <SelectItem key={model.id} value={model.name}>
+                              {model.name}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="other">{t('vehicles.otherModel', 'Other')}</SelectItem>
+                        </ScrollArea>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Year and Color Dropdowns */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -287,57 +504,25 @@ export default function Vehicles() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.year', 'Year')} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="2024"
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-year"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="licensePlate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="ABC-1234"
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-license-plate"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="vin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vin', 'VIN')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="1HGBH41JXMN109186"
-                        value={field.value || ""}
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-vin"
-                      />
-                    </FormControl>
+                    <Select 
+                      onValueChange={(value) => field.onChange(parseInt(value))} 
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-year">
+                          <SelectValue placeholder={t('vehicles.selectYear', 'Select year')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-h-[300px]">
+                        <ScrollArea className="h-[280px]">
+                          {vehicleYears.map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -349,61 +534,85 @@ export default function Vehicles() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.color', 'Color')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder={t('vehicles.white', 'White')}
-                        value={field.value || ""}
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
-                        data-testid="input-color"
-                      />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-color">
+                          <SelectValue placeholder={t('vehicles.selectColor', 'Select color')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        {colors.map((color) => (
+                          <SelectItem key={color.id} value={color.name}>
+                            <span className="flex items-center gap-2">
+                              <span 
+                                className="w-4 h-4 rounded-full border border-[#E2E8F0]" 
+                                style={{ backgroundColor: color.hex }}
+                              />
+                              {color.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* License Plate with Scan Button and Nationality */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="engineType"
+                name="licensePlate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.engineType', 'Engine Type')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')} *</FormLabel>
+                    <div className="flex gap-2">
                       <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-engine-type">
-                          <SelectValue placeholder={t('vehicles.selectEngineType', 'Select engine type')} />
-                        </SelectTrigger>
+                        <Input
+                          {...field}
+                          placeholder="ABC-1234"
+                          className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white uppercase"
+                          data-testid="input-license-plate"
+                        />
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                        <SelectItem value="gasoline">{t('vehicles.gasoline', 'Gasoline')}</SelectItem>
-                        <SelectItem value="diesel">{t('vehicles.diesel', 'Diesel')}</SelectItem>
-                        <SelectItem value="electric">{t('vehicles.electric', 'Electric')}</SelectItem>
-                        <SelectItem value="hybrid">{t('vehicles.hybrid', 'Hybrid')}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => openScanDialog('license')}
+                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 px-3"
+                        data-testid="button-scan-license"
+                      >
+                        <Camera className="w-4 h-4" />
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* Nationality Dropdown - bound to form */}
               <FormField
                 control={form.control}
-                name="transmissionType"
+                name="nationality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.transmission', 'Transmission')}</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.nationality', 'Nationality')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-transmission">
-                          <SelectValue placeholder={t('vehicles.selectTransmission', 'Select transmission')} />
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-nationality">
+                          <SelectValue placeholder={t('vehicles.selectNationality', 'Select nationality')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                        <SelectItem value="automatic">{t('vehicles.automatic', 'Automatic')}</SelectItem>
-                        <SelectItem value="manual">{t('vehicles.manual', 'Manual')}</SelectItem>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-h-[300px]">
+                        <ScrollArea className="h-[280px]">
+                          {nationalities.map((nat) => (
+                            <SelectItem key={nat.id} value={nat.name}>
+                              {nat.name}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -412,6 +621,7 @@ export default function Vehicles() {
               />
             </div>
 
+            {/* Mileage */}
             <FormField
               control={form.control}
               name="mileage"
@@ -433,6 +643,156 @@ export default function Vehicles() {
                 </FormItem>
               )}
             />
+
+            {/* Engine Type and Transmission Dropdowns - stores names for consistency */}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="engineType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.engineType', 'Engine Type')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-engine-type">
+                          <SelectValue placeholder={t('vehicles.selectEngineType', 'Select engine type')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        {engineTypes.map((engine) => (
+                          <SelectItem key={engine.id} value={engine.name}>
+                            {engine.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="transmissionType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.transmission', 'Transmission')}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-transmission">
+                          <SelectValue placeholder={t('vehicles.selectTransmission', 'Select transmission')} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                        {transmissionTypes.map((trans) => (
+                          <SelectItem key={trans.id} value={trans.name}>
+                            {trans.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Owner ID Number with Scan Button */}
+            <div className="grid grid-cols-2 gap-4">
+              <FormItem>
+                <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.idNum', 'ID Number')}</FormLabel>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={t('vehicles.enterIdNum', 'Enter ID number')}
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                    data-testid="input-id-num"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => openScanDialog('id')}
+                    className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 px-3"
+                    data-testid="button-scan-id"
+                  >
+                    <ScanLine className="w-4 h-4" />
+                  </Button>
+                </div>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.driverLicense', 'Driver License')}</FormLabel>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={t('vehicles.enterDriverLicense', 'Enter license number')}
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                    data-testid="input-driver-license"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => openScanDialog('driverLicense')}
+                    className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10 px-3"
+                    data-testid="button-scan-driver-license"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                  </Button>
+                </div>
+              </FormItem>
+            </div>
+
+            {/* Document Attachments Section */}
+            <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+              <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white mb-3 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                {t('vehicles.documentAttachments', 'Document Attachments')}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
+                  data-testid="button-attach-vehicle-registration"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t('vehicles.vehicleRegistration', 'Vehicle Registration')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
+                  data-testid="button-attach-insurance"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t('vehicles.insuranceDoc', 'Insurance Document')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
+                  data-testid="button-attach-id-photo"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  {t('vehicles.idPhoto', 'ID Photo')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
+                  data-testid="button-attach-vehicle-photo"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  {t('vehicles.vehiclePhotos', 'Vehicle Photos')}
+                </Button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                className="hidden"
+                data-testid="input-file-upload"
+              />
+            </div>
 
             <FormField
               control={form.control}
