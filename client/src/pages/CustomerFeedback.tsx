@@ -681,11 +681,11 @@ export default function CustomerFeedback() {
               {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
-              onClick={() => selectedFeedback && respondMutation.mutate({ 
+              onClick={() => selectedFeedback?.feedback?.id && respondMutation.mutate({ 
                 id: selectedFeedback.feedback.id, 
                 response: responseText 
               })}
-              disabled={!responseText.trim() || respondMutation.isPending}
+              disabled={!responseText.trim() || respondMutation.isPending || !selectedFeedback?.feedback?.id}
               data-testid="button-send-response"
             >
               <Send className="h-4 w-4 mr-2" />
@@ -723,11 +723,11 @@ export default function CustomerFeedback() {
             </Button>
             <Button 
               variant="destructive"
-              onClick={() => selectedFeedback && flagMutation.mutate({ 
+              onClick={() => selectedFeedback?.feedback?.id && flagMutation.mutate({ 
                 id: selectedFeedback.feedback.id, 
                 reason: flagReason 
               })}
-              disabled={!flagReason || flagMutation.isPending}
+              disabled={!flagReason || flagMutation.isPending || !selectedFeedback?.feedback?.id}
               data-testid="button-confirm-flag"
             >
               <Flag className="h-4 w-4 mr-2" />
