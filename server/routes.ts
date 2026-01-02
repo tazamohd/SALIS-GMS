@@ -2095,6 +2095,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/customers/:id/payments', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const payments = await storage.getCustomerPayments(id);
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching customer payments:", error);
+      res.status(500).json({ message: "Failed to fetch customer payments" });
+    }
+  });
+
   app.get('/api/vehicles', isAuthenticated, async (req, res) => {
     try {
       const { garageId } = req.query;

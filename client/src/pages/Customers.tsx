@@ -113,6 +113,20 @@ export function Customers() {
     retry: 1,
   });
 
+  const { data: customerPayments, isLoading: paymentsLoading, error: paymentsError } = useQuery<any[]>({
+    queryKey: ['/api/customers', selectedCustomerId, 'payments'],
+    queryFn: async () => {
+      const res = await fetch(`/api/customers/${selectedCustomerId}/payments`, { credentials: 'include' });
+      if (!res.ok) {
+        console.error('Failed to fetch payments:', res.status, res.statusText);
+        throw new Error('Failed to fetch payments');
+      }
+      return res.json();
+    },
+    enabled: !!selectedCustomerId,
+    retry: 1,
+  });
+
   const outstandingJobs = (customerJobCards ?? []).filter((job: any) => 
     job.status !== 'completed' && job.status !== 'cancelled'
   );
@@ -691,6 +705,70 @@ export function Customers() {
                               </div>
                             </div>
                           ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mt-4">
+                    <CardHeader>
+                      <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
+                        <DollarSign className="w-5 h-5 inline-block mr-2 text-[#0A5ED7]" />
+                        {t('customers.paymentHistory', 'Payment History')} ({(customerPayments ?? []).length} {t('common.total', 'total')})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {paymentsLoading ? (
+                        <div className="text-center py-8">
+                          <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('common.loading', 'Loading...')}</p>
+                        </div>
+                      ) : paymentsError ? (
+                        <div className="text-center py-8">
+                          <AlertCircle className="w-12 h-12 text-[#F97316] mx-auto mb-2" />
+                          <p className="text-sm text-[#F97316]">{t('common.errorLoading', 'Error loading data')}</p>
+                        </div>
+                      ) : (customerPayments ?? []).length === 0 ? (
+                        <div className="text-center py-8">
+                          <DollarSign className="w-12 h-12 text-[#64748B] mx-auto mb-2" />
+                          <p className="text-sm text-[#64748B]">{t('customers.noPayments', 'No payments recorded')}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {(customerPayments ?? []).map((paymentItem: any) => {
+                            const payment = paymentItem.payment || paymentItem;
+                            const invoice = paymentItem.invoice;
+                            return (
+                              <div
+                                key={payment.id}
+                                className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
+                                data-testid={`payment-item-${payment.id}`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <h4 className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
+                                        {invoice ? `Invoice #${invoice.invoiceNumber}` : `Payment #${payment.id.slice(0, 8)}`}
+                                      </h4>
+                                      <Badge 
+                                        variant="outline" 
+                                        className="bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 border-[#0A5ED7]/30 text-[#0A5ED7] capitalize"
+                                      >
+                                        {payment.paymentMethod?.replace('_', ' ') || 'N/A'}
+                                      </Badge>
+                                    </div>
+                                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#64748B] mb-2">
+                                      <span>{t('common.date', 'Date')}: {payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : 'N/A'}</span>
+                                      {payment.reference && <span>{t('common.reference', 'Ref')}: {payment.reference}</span>}
+                                    </div>
+                                    <span className="text-lg font-bold text-[#0A5ED7]">
+                                      ${Number(payment.amount || 0).toFixed(2)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </CardContent>
