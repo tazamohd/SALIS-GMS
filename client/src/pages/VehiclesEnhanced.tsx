@@ -51,17 +51,17 @@ export default function VehiclesEnhanced() {
   });
 
   const { data: serviceHistory = [] } = useQuery<VehicleServiceHistory[]>({
-    queryKey: ['/api/vehicles', selectedVehicle?.id, 'service-history'],
+    queryKey: [`/api/vehicles/${selectedVehicle?.id}/service-history`],
     enabled: !!selectedVehicle,
   });
 
   const { data: maintenanceSchedules = [] } = useQuery<MaintenanceSchedule[]>({
-    queryKey: ['/api/vehicles', selectedVehicle?.id, 'maintenance-schedules'],
+    queryKey: [`/api/vehicles/${selectedVehicle?.id}/maintenance-schedules`],
     enabled: !!selectedVehicle,
   });
 
   const { data: serviceReminders = [] } = useQuery<ServiceReminder[]>({
-    queryKey: ['/api/vehicles', selectedVehicle?.id, 'service-reminders'],
+    queryKey: [`/api/vehicles/${selectedVehicle?.id}/service-reminders`],
     enabled: !!selectedVehicle,
   });
 
