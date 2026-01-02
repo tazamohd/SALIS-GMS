@@ -2120,6 +2120,170 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Vehicle Catalogs endpoints
+  app.get('/api/catalogs/vehicle-makes', isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleMakes } = await import("@shared/vehicleCatalogs");
+      res.json(vehicleMakes);
+    } catch (error) {
+      console.error("Error fetching vehicle makes:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle makes" });
+    }
+  });
+
+  app.get('/api/catalogs/vehicle-models', isAuthenticated, async (req, res) => {
+    try {
+      const { makeId } = req.query;
+      const { vehicleModels, getModelsForMake } = await import("@shared/vehicleCatalogs");
+      if (makeId) {
+        res.json(getModelsForMake(makeId as string));
+      } else {
+        res.json(vehicleModels);
+      }
+    } catch (error) {
+      console.error("Error fetching vehicle models:", error);
+      res.status(500).json({ message: "Failed to fetch vehicle models" });
+    }
+  });
+
+  app.get('/api/catalogs/nationalities', isAuthenticated, async (req, res) => {
+    try {
+      const { nationalities } = await import("@shared/vehicleCatalogs");
+      res.json(nationalities);
+    } catch (error) {
+      console.error("Error fetching nationalities:", error);
+      res.status(500).json({ message: "Failed to fetch nationalities" });
+    }
+  });
+
+  app.get('/api/catalogs/years', isAuthenticated, async (req, res) => {
+    try {
+      const { vehicleYears } = await import("@shared/vehicleCatalogs");
+      res.json(vehicleYears);
+    } catch (error) {
+      console.error("Error fetching years:", error);
+      res.status(500).json({ message: "Failed to fetch years" });
+    }
+  });
+
+  app.get('/api/catalogs/colors', isAuthenticated, async (req, res) => {
+    try {
+      const { colors } = await import("@shared/vehicleCatalogs");
+      res.json(colors);
+    } catch (error) {
+      console.error("Error fetching colors:", error);
+      res.status(500).json({ message: "Failed to fetch colors" });
+    }
+  });
+
+  app.get('/api/catalogs/engine-types', isAuthenticated, async (req, res) => {
+    try {
+      const { engineTypes } = await import("@shared/vehicleCatalogs");
+      res.json(engineTypes);
+    } catch (error) {
+      console.error("Error fetching engine types:", error);
+      res.status(500).json({ message: "Failed to fetch engine types" });
+    }
+  });
+
+  app.get('/api/catalogs/transmission-types', isAuthenticated, async (req, res) => {
+    try {
+      const { transmissionTypes } = await import("@shared/vehicleCatalogs");
+      res.json(transmissionTypes);
+    } catch (error) {
+      console.error("Error fetching transmission types:", error);
+      res.status(500).json({ message: "Failed to fetch transmission types" });
+    }
+  });
+
+  // VIN Decode endpoint using NHTSA API
+  app.get('/api/vin-decode/:vin', isAuthenticated, async (req, res) => {
+    try {
+      const { vin } = req.params;
+      
+      if (!vin || vin.length !== 17) {
+        return res.status(400).json({ message: "Invalid VIN. VIN must be exactly 17 characters." });
+      }
+      
+      // Call NHTSA VIN Decoder API
+      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`);
+      
+      if (!response.ok) {
+        throw new Error("Failed to decode VIN from NHTSA");
+      }
+      
+      const data = await response.json();
+      const results = data.Results || [];
+      
+      // Extract relevant fields from NHTSA response
+      const getValue = (variableId: number) => {
+        const item = results.find((r: any) => r.VariableId === variableId);
+        return item?.Value || null;
+      };
+      
+      const getValueByName = (name: string) => {
+        const item = results.find((r: any) => r.Variable === name);
+        return item?.Value || null;
+      };
+      
+      const decodedVehicle = {
+        vin,
+        make: getValueByName("Make") || "",
+        model: getValueByName("Model") || "",
+        year: parseInt(getValueByName("Model Year") || "0") || null,
+        bodyClass: getValueByName("Body Class") || "",
+        vehicleType: getValueByName("Vehicle Type") || "",
+        engineCylinders: getValueByName("Engine Number of Cylinders") || "",
+        engineDisplacement: getValueByName("Displacement (L)") || "",
+        engineConfiguration: getValueByName("Engine Configuration") || "",
+        fuelType: getValueByName("Fuel Type - Primary") || "",
+        transmissionStyle: getValueByName("Transmission Style") || "",
+        driveType: getValueByName("Drive Type") || "",
+        doors: getValueByName("Doors") || "",
+        manufacturer: getValueByName("Manufacturer Name") || "",
+        plantCountry: getValueByName("Plant Country") || "",
+        plantCity: getValueByName("Plant City") || "",
+        series: getValueByName("Series") || "",
+        trim: getValueByName("Trim") || "",
+        gvwr: getValueByName("Gross Vehicle Weight Rating From") || "",
+        errorCode: getValueByName("Error Code") || "0",
+        errorText: getValueByName("Error Text") || "",
+        // Map to our schema fields
+        engineType: mapFuelType(getValueByName("Fuel Type - Primary")),
+        transmissionType: mapTransmission(getValueByName("Transmission Style")),
+        color: "", // Color cannot be determined from VIN
+      };
+      
+      res.json(decodedVehicle);
+    } catch (error) {
+      console.error("Error decoding VIN:", error);
+      res.status(500).json({ message: "Failed to decode VIN" });
+    }
+  });
+
+  // Helper functions for VIN mapping
+  function mapFuelType(fuelType: string | null): string {
+    if (!fuelType) return "";
+    const lower = fuelType.toLowerCase();
+    if (lower.includes("gasoline") || lower.includes("petrol")) return "gasoline";
+    if (lower.includes("diesel")) return "diesel";
+    if (lower.includes("electric")) return "electric";
+    if (lower.includes("hybrid")) return "hybrid";
+    if (lower.includes("natural gas")) return "natural_gas";
+    if (lower.includes("hydrogen")) return "hydrogen";
+    return "gasoline";
+  }
+  
+  function mapTransmission(transmission: string | null): string {
+    if (!transmission) return "";
+    const lower = transmission.toLowerCase();
+    if (lower.includes("automatic")) return "automatic";
+    if (lower.includes("manual")) return "manual";
+    if (lower.includes("cvt")) return "cvt";
+    if (lower.includes("dual") || lower.includes("dct")) return "dct";
+    return "automatic";
+  }
+
   app.get('/api/vehicles', isAuthenticated, async (req, res) => {
     try {
       const { garageId } = req.query;
