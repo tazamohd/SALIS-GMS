@@ -45,13 +45,15 @@ export default function AppointmentReminders() {
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const ninetyDaysFromNow = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
-  const recentReminders = reminderLogs.filter((log: any) => 
-    new Date(log.sentAt) >= thirtyDaysAgo
-  );
+  const recentReminders = reminderLogs.filter((log: any) => {
+    const scheduleDate = new Date(log.scheduledFor || log.sentAt);
+    return scheduleDate >= thirtyDaysAgo && scheduleDate <= ninetyDaysFromNow;
+  });
 
   const deliveredReminders = recentReminders.filter((log: any) => 
-    log.deliveryStatus === 'delivered'
+    log.deliveryStatus === 'delivered' || log.status === 'sent'
   ).length;
 
   const confirmedAppointments = recentReminders.filter((log: any) => 
@@ -300,22 +302,31 @@ export default function AppointmentReminders() {
                           {log.reminderType === 'email' && <Mail className="h-4 w-4 text-[#0A5ED7]" />}
                           {log.reminderType === 'whatsapp' && <SiWhatsapp className="h-4 w-4 text-[#25D366]" />}
                           <span className="font-semibold text-[#0B1F3B] dark:text-white">
-                            {log.reminderTiming} {t('reminders.reminder', 'reminder')}
+                            {log.customerName || log.reminderTiming || t('reminders.reminder', 'Reminder')}
                           </span>
                           <Badge className={
-                            log.deliveryStatus === 'delivered' ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' :
-                            log.deliveryStatus === 'failed' ? 'bg-[#F97316]/10 text-[#F97316]' :
+                            log.deliveryStatus === 'delivered' || log.status === 'sent' ? 'bg-[#0A5ED7]/10 text-[#0A5ED7]' :
+                            log.deliveryStatus === 'failed' || log.status === 'failed' ? 'bg-[#F97316]/10 text-[#F97316]' :
+                            log.status === 'cancelled' ? 'bg-[#64748B]/10 text-[#64748B]' :
                             'bg-[#EAB308]/10 text-[#EAB308]'
                           }>
-                            {log.deliveryStatus}
+                            {log.status || log.deliveryStatus}
                           </Badge>
                         </div>
                         <p className="text-sm text-[#64748B] mb-1">
-                          {t('reminders.to', 'To')}: {log.recipientPhone || log.recipientEmail}
+                          {t('reminders.to', 'To')}: {log.customerPhone || log.customerEmail || log.recipientPhone || log.recipientEmail}
                         </p>
                         <p className="text-sm text-[#64748B]">
-                          {t('reminders.sent', 'Sent')}: {new Date(log.sentAt).toLocaleString()}
+                          {log.sentAt 
+                            ? `${t('reminders.sent', 'Sent')}: ${new Date(log.sentAt).toLocaleString()}`
+                            : `${t('reminders.scheduledFor', 'Scheduled')}: ${new Date(log.scheduledFor).toLocaleString()}`
+                          }
                         </p>
+                        {log.serviceType && (
+                          <p className="text-sm text-[#64748B]">
+                            {t('common.service', 'Service')}: {log.serviceType}
+                          </p>
+                        )}
                         {log.responseAction && (
                           <div className="mt-2 flex items-center gap-2">
                             <CheckCircle className="h-4 w-4 text-[#0A5ED7]" />
