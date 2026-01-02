@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2, FileText, AlertCircle, DollarSign, ClipboardList, Send, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2, FileText, AlertCircle, DollarSign, ClipboardList, Send, CheckCircle, Clock, XCircle, Eye } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { AddVehicleDialog } from "@/components/AddVehicleDialog";
 import { AddCustomerNoteDialog } from "@/components/AddCustomerNoteDialog";
 import { AddCustomerDialog } from "@/components/AddCustomerDialog";
+import { JobCardDetailsDialog } from "@/components/JobCardDetailsDialog";
+import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
 import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
@@ -611,6 +613,18 @@ export function Customers() {
                                     {job.completedAt && <span>{t('common.completed', 'Completed')}: {new Date(job.completedAt).toLocaleDateString()}</span>}
                                     {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
                                   </div>
+                                  <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
+                                    <JobCardDetailsDialog jobCardId={job.id}>
+                                      <Button
+                                        size="sm"
+                                        className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+                                        data-testid={`button-view-job-details-${job.id}`}
+                                      >
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        {t('common.viewFullDetails', 'View Full Details')}
+                                      </Button>
+                                    </JobCardDetailsDialog>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -679,27 +693,36 @@ export function Customers() {
                                     <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                                       ${Number(invoice.totalAmount || 0).toFixed(2)}
                                     </span>
-                                    {(invoice.status === 'sent' || invoice.status === 'overdue') && (
-                                      selectedCustomer?.phone && selectedCustomer.phone.trim().length > 0 ? (
+                                    <div className="flex items-center gap-2">
+                                      <InvoiceDetailsDialog invoiceId={invoice.id}>
                                         <Button
                                           size="sm"
-                                          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
-                                          onClick={() => sendReminderMutation.mutate({ 
-                                            invoiceId: invoice.id, 
-                                            amount: Number(invoice.totalAmount) 
-                                          })}
-                                          disabled={sendReminderMutation.isPending}
-                                          data-testid={`button-send-reminder-${invoice.id}`}
+                                          variant="outline"
+                                          className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent"
+                                          data-testid={`button-view-invoice-${invoice.id}`}
                                         >
-                                          <Send className="w-3 h-3 mr-2" />
-                                          {t('customers.sendReminder', 'Send Reminder')}
+                                          <Eye className="w-3 h-3 mr-2" />
+                                          {t('common.view', 'View')}
                                         </Button>
-                                      ) : (
-                                        <span className="text-xs text-[#64748B]" data-testid="text-no-phone">
-                                          {t('customers.noPhoneNumber', 'No phone number')}
-                                        </span>
-                                      )
-                                    )}
+                                      </InvoiceDetailsDialog>
+                                      {(invoice.status === 'sent' || invoice.status === 'overdue') && (
+                                        selectedCustomer?.phone && selectedCustomer.phone.trim().length > 0 ? (
+                                          <Button
+                                            size="sm"
+                                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+                                            onClick={() => sendReminderMutation.mutate({ 
+                                              invoiceId: invoice.id, 
+                                              amount: Number(invoice.totalAmount) 
+                                            })}
+                                            disabled={sendReminderMutation.isPending}
+                                            data-testid={`button-send-reminder-${invoice.id}`}
+                                          >
+                                            <Send className="w-3 h-3 mr-2" />
+                                            {t('customers.sendReminder', 'Send Reminder')}
+                                          </Button>
+                                        ) : null
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               </div>

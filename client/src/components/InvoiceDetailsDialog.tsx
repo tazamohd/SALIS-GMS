@@ -34,24 +34,42 @@ import { AddPaymentDialog } from "@/components/AddPaymentDialog";
 import type { Invoice, InvoiceItem, User } from "@shared/schema";
 
 interface InvoiceDetailsDialogProps {
-  invoice: Invoice;
+  invoice?: Invoice;
+  invoiceId?: string;
   customer?: User;
+  children?: React.ReactNode;
 }
 
-export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialogProps) {
+export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer, children }: InvoiceDetailsDialogProps) {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(invoice.status);
   const { toast } = useToast();
 
+  const effectiveInvoiceId = propInvoice?.id || invoiceId;
+
+  const { data: fetchedInvoice } = useQuery<Invoice>({
+    queryKey: ['/api/invoices', effectiveInvoiceId],
+    queryFn: async () => {
+      const res = await fetch(`/api/invoices/${effectiveInvoiceId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch invoice');
+      return res.json();
+    },
+    enabled: open && !!effectiveInvoiceId && !propInvoice,
+  });
+
+  const invoice = propInvoice || fetchedInvoice;
+  const [currentStatus, setCurrentStatus] = useState(invoice?.status || 'draft');
+
   const { data: items } = useQuery<InvoiceItem[]>({
-    queryKey: [`/api/invoices/${invoice.id}/items`],
-    enabled: open,
+    queryKey: [`/api/invoices/${effectiveInvoiceId}/items`],
+    enabled: open && !!effectiveInvoiceId,
   });
 
   useEffect(() => {
-    setCurrentStatus(invoice.status);
-  }, [invoice.status]);
+    if (invoice?.status) {
+      setCurrentStatus(invoice.status);
+    }
+  }, [invoice?.status]);
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
@@ -144,22 +162,33 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  if (!invoice && !effectiveInvoiceId) {
+    return null;
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="sm" data-testid={`button-view-invoice-${invoice.id}`}>
-            <Eye className="w-4 h-4" />
-          </Button>
+          {children || (
+            <Button variant="ghost" size="sm" data-testid={`button-view-invoice-${effectiveInvoiceId}`}>
+              <Eye className="w-4 h-4" />
+            </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Invoice Details - {invoice.invoiceNumber}</DialogTitle>
+            <DialogTitle>Invoice Details - {invoice?.invoiceNumber || 'Loading...'}</DialogTitle>
             <DialogDescription className="sr-only">
               View and manage invoice details, status, items, and payments
             </DialogDescription>
           </DialogHeader>
 
+          {!invoice ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
           <div className="space-y-6">
             {/* Header Information */}
             <div className="grid grid-cols-2 gap-4 p-4 bg-neon-blue/20/30 rounded">
@@ -313,10 +342,12 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
               </div>
             </div>
           </div>
+          )}
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
+      {invoice && (
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -338,6 +369,7 @@ export function InvoiceDetailsDialog({ invoice, customer }: InvoiceDetailsDialog
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
     </>
   );
 }

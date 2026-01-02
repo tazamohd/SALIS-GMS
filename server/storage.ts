@@ -764,6 +764,7 @@ export interface IStorage {
   // Job Card operations - Module 8
   getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]>;
   getJobCard(id: string): Promise<JobCard | undefined>;
+  getJobCardWithDetails(id: string): Promise<any>;
   createJobCard(data: any): Promise<JobCard>;
   updateJobCard(id: string, data: any): Promise<JobCard>;
   
@@ -2187,6 +2188,45 @@ export class DatabaseStorage implements IStorage {
   async getJobCard(id: string): Promise<JobCard | undefined> {
     const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
     return jobCard;
+  }
+
+  async getJobCardWithDetails(id: string): Promise<any> {
+    const { diagnosticReports, maintenanceRecommendations, invoices, invoiceItems, payments, vehicles, users, jobTrackingEvents } = await import("@shared/schema");
+    
+    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    if (!jobCard) return null;
+
+    const [vehicle] = jobCard.vehicleId 
+      ? await db.select().from(vehicles).where(eq(vehicles.id, jobCard.vehicleId))
+      : [null];
+
+    const [technician] = jobCard.assignedTo
+      ? await db.select().from(users).where(eq(users.id, jobCard.assignedTo))
+      : [null];
+
+    const diagnostics = await db.select().from(diagnosticReports).where(eq(diagnosticReports.jobCardId, id));
+
+    const recommendations = await db.select().from(maintenanceRecommendations).where(eq(maintenanceRecommendations.jobCardId, id));
+
+    const trackingEvents = await db.select().from(jobTrackingEvents).where(eq(jobTrackingEvents.jobCardId, id)).orderBy(desc(jobTrackingEvents.createdAt));
+
+    const jobInvoices = await db.select().from(invoices).where(eq(invoices.jobCardId, id));
+
+    const invoiceDetails = await Promise.all(jobInvoices.map(async (inv) => {
+      const items = await db.select().from(invoiceItems).where(eq(invoiceItems.invoiceId, inv.id));
+      const invoicePayments = await db.select().from(payments).where(eq(payments.invoiceId, inv.id));
+      return { ...inv, items, payments: invoicePayments };
+    }));
+
+    return {
+      ...jobCard,
+      vehicle,
+      technician: technician ? { id: technician.id, fullName: technician.fullName } : null,
+      diagnostics,
+      recommendations,
+      trackingEvents,
+      invoices: invoiceDetails
+    };
   }
 
   async createJobCard(data: any): Promise<JobCard> {

@@ -1058,6 +1058,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/job-cards/:id/details', isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const jobCardDetails = await storage.getJobCardWithDetails(id);
+      if (!jobCardDetails) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      res.json(jobCardDetails);
+    } catch (error) {
+      console.error("Error fetching job card details:", error);
+      res.status(500).json({ message: "Failed to fetch job card details" });
+    }
+  });
+
   app.post('/api/job-cards', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
