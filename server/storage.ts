@@ -10354,31 +10354,9 @@ export class DatabaseStorage implements IStorage {
     limit?: number;
     offset?: number;
   }): Promise<any[]> {
-    let query = db.select({
-      feedback: serviceFeedback,
-      customer: {
-        id: customerProfiles.userId,
-        firstName: customerProfiles.firstName,
-        lastName: customerProfiles.lastName,
-        email: customerProfiles.email,
-        phone: customerProfiles.phone,
-      },
-      technician: {
-        id: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-      },
-      vehicle: {
-        id: vehicles.id,
-        make: vehicles.make,
-        model: vehicles.model,
-        year: vehicles.year,
-        licensePlate: vehicles.licensePlate,
-      },
-    }).from(serviceFeedback)
-      .leftJoin(customerProfiles, eq(serviceFeedback.customerId, customerProfiles.userId))
-      .leftJoin(users, eq(serviceFeedback.technicianId, users.id))
-      .leftJoin(vehicles, eq(serviceFeedback.vehicleId, vehicles.id))
+    // Simplified query to avoid drizzle nested object issues
+    let query = db.select()
+      .from(serviceFeedback)
       .$dynamic();
 
     if (filters?.sentiment) {

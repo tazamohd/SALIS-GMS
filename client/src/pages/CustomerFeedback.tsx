@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { AnalyticsPage } from "@/components/layouts";
+import { StandardPageLayout } from "@/components/layouts";
 import { 
   MessageSquare, 
   Star, 
@@ -321,14 +321,37 @@ export default function CustomerFeedback() {
   ];
 
   return (
-    <AnalyticsPage
+    <StandardPageLayout
       title={t('customers.feedback.title', 'Customer Feedback')}
       description={t('customers.feedback.description', 'Analyze customer feedback with AI-powered sentiment analysis')}
-      stats={stats}
-      filters={filters}
-      actions={actions}
-      isLoading={isLoading || analyticsLoading}
+      icon={MessageSquare}
     >
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        {stats.map((stat, idx) => (
+          <Card key={idx} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-[#64748B]">{stat.title}</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{stat.value}</p>
+                </div>
+                <stat.icon className="h-8 w-8 text-[#0A5ED7]" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Action buttons */}
+      <div className="flex gap-2 mb-6">
+        {actions.map((action: any, idx) => (
+          <Button key={idx} onClick={action.onClick} variant={action.variant} disabled={action.disabled} data-testid={`action-${idx}`}>
+            <action.icon className="h-4 w-4 mr-2" />
+            {action.label}
+          </Button>
+        ))}
+      </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="overview" data-testid="tab-overview">{t('customers.feedback.overview', 'Overview')}</TabsTrigger>
@@ -713,7 +736,7 @@ export default function CustomerFeedback() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AnalyticsPage>
+    </StandardPageLayout>
   );
 }
 
