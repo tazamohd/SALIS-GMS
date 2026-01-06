@@ -3,282 +3,224 @@ const fs = require('fs');
 const path = require('path');
 
 const BASE_URL = 'http://localhost:5000';
+const OUTPUT_DIR = path.join(__dirname, '..', 'GUI PRTSCN');
 
-const screens = [
-  // Dashboard & Overview
-  { route: '/dashboard', name: '01-dashboard', category: 'dashboard' },
-  { route: '/kpi-dashboard', name: '02-kpi-dashboard', category: 'dashboard' },
-  
-  // Customer Intake & Appointments
-  { route: '/customers', name: '03-customers', category: 'customer-intake' },
-  { route: '/appointments', name: '04-appointments', category: 'customer-intake' },
-  { route: '/calendar', name: '05-calendar', category: 'customer-intake' },
-  { route: '/appointment-reminders', name: '06-appointment-reminders', category: 'customer-intake' },
-  { route: '/kiosk-checkin', name: '07-kiosk-checkin', category: 'customer-intake' },
-  
-  // Vehicle Management
-  { route: '/vehicles', name: '08-vehicles', category: 'vehicle-management' },
-  { route: '/vehicle-history', name: '09-vehicle-history', category: 'vehicle-management' },
-  { route: '/vin-decoder', name: '10-vin-decoder', category: 'vehicle-management' },
-  { route: '/fleet-management', name: '11-fleet-management', category: 'vehicle-management' },
-  { route: '/fleet-tracking', name: '12-fleet-tracking', category: 'vehicle-management' },
-  { route: '/loaner-vehicles', name: '13-loaner-vehicles', category: 'vehicle-management' },
-  
-  // Inspection & Check-In
-  { route: '/vehicle-inspections', name: '14-vehicle-inspections', category: 'inspection' },
-  { route: '/vehicle-checklist', name: '15-vehicle-checklist', category: 'inspection' },
-  { route: '/digital-vehicle-walkaround', name: '16-digital-walkaround', category: 'inspection' },
-  { route: '/security-cameras', name: '17-security-cameras', category: 'inspection' },
-  { route: '/license-plate', name: '18-license-plate', category: 'inspection' },
-  
-  // Diagnostics & Assessment
-  { route: '/diagnostics-obd', name: '19-diagnostics-obd', category: 'diagnostics' },
-  { route: '/smart-damage-assessment', name: '20-smart-damage', category: 'diagnostics' },
-  { route: '/vehicle-health-monitoring', name: '21-vehicle-health', category: 'diagnostics' },
-  { route: '/predictive-maintenance', name: '22-predictive-maintenance', category: 'diagnostics' },
-  { route: '/predictive-diagnostics', name: '23-predictive-diagnostics', category: 'diagnostics' },
-  { route: '/document-ocr', name: '24-document-ocr', category: 'diagnostics' },
-  
-  // Service Planning & Scheduling
-  { route: '/job-cards', name: '25-job-cards', category: 'service-planning' },
-  { route: '/tasks', name: '26-tasks', category: 'service-planning' },
-  { route: '/service-templates', name: '27-service-templates', category: 'service-planning' },
-  { route: '/ai-scheduling', name: '28-ai-scheduling', category: 'service-planning' },
-  { route: '/smart-assignment', name: '29-smart-assignment', category: 'service-planning' },
-  { route: '/estimates', name: '30-estimates', category: 'service-planning' },
-  { route: '/video-estimates', name: '31-video-estimates', category: 'service-planning' },
-  { route: '/smart-parts-recommendations', name: '32-smart-parts-reco', category: 'service-planning' },
-  { route: '/smart-parts-recommender', name: '33-smart-parts-recommender', category: 'service-planning' },
-  { route: '/intelligent-price-optimizer', name: '34-price-optimizer', category: 'service-planning' },
-  
-  // Parts & Inventory
-  { route: '/inventory-management', name: '35-inventory', category: 'parts-inventory' },
-  { route: '/spare-parts', name: '36-spare-parts', category: 'parts-inventory' },
-  { route: '/tools', name: '37-tools', category: 'parts-inventory' },
-  { route: '/parts-auto-reorder', name: '38-auto-reorder', category: 'parts-inventory' },
-  { route: '/smart-inventory-forecasting', name: '39-inventory-forecast', category: 'parts-inventory' },
-  { route: '/suppliers', name: '40-suppliers', category: 'parts-inventory' },
-  { route: '/vendor-supplier-portal', name: '41-vendor-portal', category: 'parts-inventory' },
-  { route: '/purchase-orders', name: '42-purchase-orders', category: 'parts-inventory' },
-  { route: '/parts-marketplace', name: '43-parts-marketplace', category: 'parts-inventory' },
-  { route: '/parts-supply-network', name: '44-parts-network', category: 'parts-inventory' },
-  { route: '/barcode-scanner', name: '45-barcode-scanner', category: 'parts-inventory' },
-  
-  // Service Execution & Operations
-  { route: '/technician-portal', name: '46-technician-portal', category: 'operations' },
-  { route: '/technician-management', name: '47-technician-management', category: 'operations' },
-  { route: '/technician-leaderboards', name: '48-leaderboards', category: 'operations' },
-  { route: '/technician-performance', name: '49-technician-performance', category: 'operations' },
-  { route: '/towing-services', name: '50-towing-services', category: 'operations' },
-  { route: '/towing-assistance', name: '51-towing-assistance', category: 'operations' },
-  { route: '/vehicle-storage', name: '52-vehicle-storage', category: 'operations' },
-  { route: '/tire-management', name: '53-tire-management', category: 'operations' },
-  { route: '/routing-optimizer', name: '54-routing-optimizer', category: 'operations' },
-  { route: '/task-management', name: '55-task-management', category: 'operations' },
-  
-  // Quality & Delivery
-  { route: '/computer-vision-qc', name: '56-computer-vision-qc', category: 'quality' },
-  { route: '/iso-quality-management', name: '57-iso-quality', category: 'quality' },
-  { route: '/performance-analytics', name: '58-performance-analytics', category: 'quality' },
-  { route: '/staff-performance-review', name: '59-staff-review', category: 'quality' },
-  
-  // Billing & Payments
-  { route: '/invoices', name: '60-invoices', category: 'billing' },
-  { route: '/payments', name: '61-payments', category: 'billing' },
-  { route: '/stripe-payments', name: '62-stripe-payments', category: 'billing' },
-  { route: '/refund-management', name: '63-refund-management', category: 'billing' },
-  { route: '/financial-settings', name: '64-financial-settings', category: 'billing' },
-  { route: '/expense-tracking', name: '65-expense-tracking', category: 'billing' },
-  { route: '/payroll-management', name: '66-payroll', category: 'billing' },
-  { route: '/insurance-claims', name: '67-insurance-claims', category: 'billing' },
-  
-  // Analytics & Business Intelligence
-  { route: '/reports', name: '68-reports', category: 'analytics' },
-  { route: '/business-intelligence', name: '69-business-intelligence', category: 'analytics' },
-  { route: '/business-intelligence-dashboard', name: '70-bi-dashboard', category: 'analytics' },
-  { route: '/profit-analysis', name: '71-profit-analysis', category: 'analytics' },
-  { route: '/customer-ltv-analysis', name: '72-customer-ltv', category: 'analytics' },
-  { route: '/business-heatmaps', name: '73-heatmaps', category: 'analytics' },
-  { route: '/custom-report-builder', name: '74-report-builder', category: 'analytics' },
-  
-  // Customer Experience & Growth
-  { route: '/customer-reviews', name: '75-customer-reviews', category: 'customer-experience' },
-  { route: '/customer-loyalty', name: '76-customer-loyalty', category: 'customer-experience' },
-  { route: '/referral-program', name: '77-referral-program', category: 'customer-experience' },
-  { route: '/live-service-tracking', name: '78-live-tracking', category: 'customer-experience' },
-  { route: '/video-consultations', name: '79-video-consultations', category: 'customer-experience' },
-  { route: '/email-marketing', name: '80-email-marketing', category: 'customer-experience' },
-  { route: '/marketing-automation', name: '81-marketing-automation', category: 'customer-experience' },
-  { route: '/social-media', name: '82-social-media', category: 'customer-experience' },
-  
-  // Team & HR Management
-  { route: '/hr-management', name: '83-hr-management', category: 'hr' },
-  { route: '/time-clock-payroll', name: '84-time-clock', category: 'hr' },
-  { route: '/timesheet-management', name: '85-timesheet', category: 'hr' },
-  { route: '/productivity-tracker', name: '86-productivity', category: 'hr' },
-  { route: '/training-lms', name: '87-training-lms', category: 'hr' },
-  { route: '/knowledge-base', name: '88-knowledge-base', category: 'hr' },
-  
-  // Compliance & Safety
-  { route: '/compliance-management', name: '89-compliance', category: 'compliance' },
-  { route: '/safety-incidents', name: '90-safety-incidents', category: 'compliance' },
-  { route: '/environmental-compliance', name: '91-environmental', category: 'compliance' },
-  { route: '/equipment-calibration', name: '92-calibration', category: 'compliance' },
-  { route: '/contract-management', name: '93-contracts', category: 'compliance' },
-  
-  // Enterprise & Franchise
-  { route: '/franchise-management', name: '94-franchise', category: 'enterprise' },
-  { route: '/globalization-layer', name: '95-globalization', category: 'enterprise' },
-  { route: '/oem-software-subscriptions', name: '96-oem-software', category: 'enterprise' },
-  { route: '/warranty-management', name: '97-warranty', category: 'enterprise' },
-  { route: '/document-management', name: '98-documents', category: 'enterprise' },
-  
-  // Emerging Technologies
-  { route: '/emerging-technologies', name: '99-emerging-tech', category: 'emerging-tech' },
-  { route: '/ar-repair-guide', name: '100-ar-repair', category: 'emerging-tech' },
-  { route: '/vr-showroom', name: '101-vr-showroom', category: 'emerging-tech' },
-  { route: '/digital-twin-viewer', name: '102-digital-twin', category: 'emerging-tech' },
-  { route: '/iot-dashboard', name: '103-iot-dashboard', category: 'emerging-tech' },
-  { route: '/telematics-integration', name: '104-telematics', category: 'emerging-tech' },
-  { route: '/drone-inspection', name: '105-drone', category: 'emerging-tech' },
-  { route: '/wearable-integration', name: '106-wearable', category: 'emerging-tech' },
-  { route: '/edge-computing-diagnostics', name: '107-edge-computing', category: 'emerging-tech' },
-  { route: '/sustainable-energy', name: '108-sustainable-energy', category: 'emerging-tech' },
-  { route: '/voice-commands', name: '109-voice-commands', category: 'emerging-tech' },
-  { route: '/neural-network-prediction', name: '110-neural-network', category: 'emerging-tech' },
-  { route: '/blockchain-service-history', name: '111-blockchain', category: 'emerging-tech' },
-  { route: '/smart-contracts', name: '112-smart-contracts', category: 'emerging-tech' },
-  { route: '/next-gen-technologies', name: '113-next-gen', category: 'emerging-tech' },
-  
-  // AI & Automation Hub
-  { route: '/ai-automation', name: '114-ai-automation', category: 'ai-automation' },
-  { route: '/ai-chatbot', name: '115-ai-chatbot', category: 'ai-automation' },
-  { route: '/ai-chatbot-assistant', name: '116-ai-assistant', category: 'ai-automation' },
-  { route: '/ai-service-advisor', name: '117-ai-service-advisor', category: 'ai-automation' },
-  { route: '/ml-fraud-detection', name: '118-fraud-detection', category: 'ai-automation' },
-  { route: '/predictive-demand-forecasting', name: '119-demand-forecast', category: 'ai-automation' },
-  
-  // System & Settings
-  { route: '/settings', name: '120-settings', category: 'system-settings' },
-  { route: '/profile', name: '121-profile', category: 'system-settings' },
-  { route: '/security', name: '122-security', category: 'system-settings' },
-  { route: '/integrations', name: '123-integrations', category: 'system-settings' },
-  { route: '/data-import-export', name: '124-data-import', category: 'system-settings' },
-  { route: '/notifications', name: '125-notifications', category: 'system-settings' },
-  { route: '/call-center', name: '126-call-center', category: 'system-settings' },
-  { route: '/chat', name: '127-chat', category: 'system-settings' },
-  
-  // Customer Portal
-  { route: '/client/dashboard', name: '128-client-dashboard', category: 'customer-portal' },
-  { route: '/client/appointments', name: '129-client-appointments', category: 'customer-portal' },
-  { route: '/client/vehicles', name: '130-client-vehicles', category: 'customer-portal' },
-  { route: '/client/invoices', name: '131-client-invoices', category: 'customer-portal' },
-  { route: '/client/service-history', name: '132-client-service-history', category: 'customer-portal' },
-  { route: '/client/service-reminders', name: '133-client-reminders', category: 'customer-portal' },
-  { route: '/client/live-tracking', name: '134-client-tracking', category: 'customer-portal' },
-  { route: '/client/review-chat', name: '135-client-review', category: 'customer-portal' },
-  { route: '/client/profile', name: '136-client-profile', category: 'customer-portal' },
-  
-  // Mobile Apps - Customer
-  { route: '/mobile/customer', name: '137-mobile-customer-home', category: 'mobile-customer' },
-  { route: '/mobile/customer/booking', name: '138-mobile-customer-booking', category: 'mobile-customer' },
-  { route: '/mobile/customer/vehicles', name: '139-mobile-customer-vehicles', category: 'mobile-customer' },
-  { route: '/mobile/customer/payments', name: '140-mobile-customer-payments', category: 'mobile-customer' },
-  { route: '/mobile/customer/profile', name: '141-mobile-customer-profile', category: 'mobile-customer' },
-  
-  // Mobile Apps - Technician
-  { route: '/mobile/technician', name: '142-mobile-tech-home', category: 'mobile-technician' },
-  { route: '/mobile/technician/jobs', name: '143-mobile-tech-jobs', category: 'mobile-technician' },
-  { route: '/mobile/technician/clock', name: '144-mobile-tech-clock', category: 'mobile-technician' },
-  { route: '/mobile/technician/lookup', name: '145-mobile-tech-lookup', category: 'mobile-technician' },
-  { route: '/mobile/technician/profile', name: '146-mobile-tech-profile', category: 'mobile-technician' },
-  
-  // Authentication & Public
-  { route: '/', name: '147-landing', category: 'auth' },
-  { route: '/login', name: '148-login', category: 'auth' },
-  { route: '/register', name: '149-register', category: 'auth' },
-  { route: '/login-dashboard', name: '150-login-dashboard', category: 'auth' },
-  { route: '/public-tracking', name: '151-public-tracking', category: 'auth' },
-  
-  // Additional Modules
-  { route: '/google-my-business', name: '152-google-my-business', category: 'additional' },
-  { route: '/social-media-monitoring', name: '153-social-monitoring', category: 'additional' },
-  { route: '/payment-gateway-simulator', name: '154-payment-simulator', category: 'additional' },
-  { route: '/digital-signage', name: '155-digital-signage', category: 'additional' },
-  { route: '/mobile-device-management', name: '156-mobile-device', category: 'additional' },
-  { route: '/obd-diagnostic-viewer', name: '157-obd-viewer', category: 'additional' },
-  { route: '/parts-availability', name: '158-parts-availability', category: 'additional' },
-  { route: '/vehicles-enhanced', name: '159-vehicles-enhanced', category: 'additional' },
-  
-  // More screens
-  { route: '/home', name: '160-home', category: 'additional' },
-  { route: '/customer-portal', name: '161-customer-portal', category: 'additional' },
+const routes = [
+  { path: '/', name: '01-Dashboard' },
+  { path: '/welcome', name: '02-Welcome' },
+  { path: '/customers', name: '03-Customers' },
+  { path: '/vehicles', name: '04-Vehicles' },
+  { path: '/appointments', name: '05-Appointments' },
+  { path: '/appointment-reminders', name: '06-Appointment-Reminders' },
+  { path: '/job-cards', name: '07-Job-Cards' },
+  { path: '/estimates', name: '08-Estimates' },
+  { path: '/invoices', name: '09-Invoices' },
+  { path: '/payments', name: '10-Payments' },
+  { path: '/inventory-management', name: '11-Inventory-Management' },
+  { path: '/parts-availability', name: '12-Parts-Availability' },
+  { path: '/smart-parts-recommender', name: '13-Smart-Parts-Recommender' },
+  { path: '/suppliers', name: '14-Suppliers' },
+  { path: '/purchase-orders', name: '15-Purchase-Orders' },
+  { path: '/service-templates', name: '16-Service-Templates' },
+  { path: '/service-bay-dashboard', name: '17-Service-Bay-Dashboard' },
+  { path: '/workshop-calendar', name: '18-Workshop-Calendar' },
+  { path: '/smart-assignment', name: '19-Smart-Assignment' },
+  { path: '/quality-control', name: '20-Quality-Control' },
+  { path: '/vehicle-inspections', name: '21-Vehicle-Inspections' },
+  { path: '/vehicle-checklist', name: '22-Vehicle-Checklist' },
+  { path: '/customer-feedback', name: '23-Customer-Feedback' },
+  { path: '/customer-loyalty', name: '24-Customer-Loyalty' },
+  { path: '/loyalty-program', name: '25-Loyalty-Program' },
+  { path: '/reports', name: '26-Reports' },
+  { path: '/business-intelligence-dashboard', name: '27-Business-Intelligence' },
+  { path: '/performance-analytics', name: '28-Performance-Analytics' },
+  { path: '/profit-margin-analysis', name: '29-Profit-Margin-Analysis' },
+  { path: '/custom-reports', name: '30-Custom-Reports' },
+  { path: '/hr-management', name: '31-HR-Management' },
+  { path: '/staff-directory', name: '32-Staff-Directory' },
+  { path: '/staff-scheduling', name: '33-Staff-Scheduling' },
+  { path: '/timesheet-management', name: '34-Timesheet-Management' },
+  { path: '/leave-requests', name: '35-Leave-Requests' },
+  { path: '/payroll-management', name: '36-Payroll-Management' },
+  { path: '/technician-portal', name: '37-Technician-Portal' },
+  { path: '/technician-leaderboards', name: '38-Technician-Leaderboards' },
+  { path: '/technician-performance', name: '39-Technician-Performance' },
+  { path: '/training-lms', name: '40-Training-LMS' },
+  { path: '/diagnostics-obd-hub', name: '41-Diagnostics-OBD-Hub' },
+  { path: '/oem-software-subscriptions', name: '42-OEM-Software' },
+  { path: '/predictive-diagnostics', name: '43-Predictive-Diagnostics' },
+  { path: '/ai-chatbot', name: '44-AI-Chatbot' },
+  { path: '/ai-automation', name: '45-AI-Automation' },
+  { path: '/ai-service-advisor', name: '46-AI-Service-Advisor' },
+  { path: '/ai-scheduling', name: '47-AI-Scheduling' },
+  { path: '/marketing-hub', name: '48-Marketing-Hub' },
+  { path: '/marketing-automation', name: '49-Marketing-Automation' },
+  { path: '/email-marketing', name: '50-Email-Marketing' },
+  { path: '/social-media-integration', name: '51-Social-Media' },
+  { path: '/call-center', name: '52-Call-Center' },
+  { path: '/franchise-command-center', name: '53-Franchise-Command' },
+  { path: '/multi-location-dashboard', name: '54-Multi-Location' },
+  { path: '/globalization-layer', name: '55-Globalization' },
+  { path: '/compliance-management', name: '56-Compliance' },
+  { path: '/zatca-settings', name: '57-ZATCA-Settings' },
+  { path: '/vat-settings', name: '58-VAT-Settings' },
+  { path: '/zakat-settings', name: '59-Zakat-Settings' },
+  { path: '/safety-incidents', name: '60-Safety-Incidents' },
+  { path: '/chart-of-accounts', name: '61-Chart-Of-Accounts' },
+  { path: '/general-ledger', name: '62-General-Ledger' },
+  { path: '/journal-entries', name: '63-Journal-Entries' },
+  { path: '/accounts-payable', name: '64-Accounts-Payable' },
+  { path: '/accounts-receivable', name: '65-Accounts-Receivable' },
+  { path: '/balance-sheet', name: '66-Balance-Sheet' },
+  { path: '/income-statement', name: '67-Income-Statement' },
+  { path: '/cash-flow-statement', name: '68-Cash-Flow' },
+  { path: '/budget-management', name: '69-Budget-Management' },
+  { path: '/bank-account-management', name: '70-Bank-Accounts' },
+  { path: '/fleet-management', name: '71-Fleet-Management' },
+  { path: '/fleet-tracking', name: '72-Fleet-Tracking' },
+  { path: '/tire-management', name: '73-Tire-Management' },
+  { path: '/loaner-vehicles', name: '74-Loaner-Vehicles' },
+  { path: '/towing-assistance', name: '75-Towing-Assistance' },
+  { path: '/warranty-management', name: '76-Warranty-Management' },
+  { path: '/contract-management', name: '77-Contract-Management' },
+  { path: '/ar-repair-guide', name: '78-AR-Repair-Guide' },
+  { path: '/ar-overlay', name: '79-AR-Overlay' },
+  { path: '/vr-showroom', name: '80-VR-Showroom' },
+  { path: '/digital-twin-viewer', name: '81-Digital-Twin' },
+  { path: '/blockchain-service-history', name: '82-Blockchain-History' },
+  { path: '/smart-contracts', name: '83-Smart-Contracts' },
+  { path: '/iot-dashboard', name: '84-IoT-Dashboard' },
+  { path: '/edge-computing', name: '85-Edge-Computing' },
+  { path: '/neural-network-prediction', name: '86-Neural-Network' },
+  { path: '/quantum-computing-optimization', name: '87-Quantum-Computing' },
+  { path: '/computer-vision-qc', name: '88-Computer-Vision-QC' },
+  { path: '/voice-command-interface', name: '89-Voice-Commands' },
+  { path: '/wearable-integration', name: '90-Wearable-Integration' },
+  { path: '/drone-inspection', name: '91-Drone-Inspection' },
+  { path: '/sustainable-energy-monitoring', name: '92-Sustainable-Energy' },
+  { path: '/ml-fraud-detection', name: '93-ML-Fraud-Detection' },
+  { path: '/user-settings', name: '94-User-Settings' },
+  { path: '/profile', name: '95-Profile' },
+  { path: '/integrations', name: '96-Integrations' },
+  { path: '/notifications', name: '97-Notifications' },
+  { path: '/calendar', name: '98-Calendar' },
+  { path: '/tasks', name: '99-Tasks' },
+  { path: '/chat', name: '100-Chat' },
+  { path: '/document-management', name: '101-Document-Management' },
+  { path: '/data-import-export', name: '102-Data-Import-Export' },
+  { path: '/knowledge-base', name: '103-Knowledge-Base' },
+  { path: '/kiosk-check-in', name: '104-Kiosk-Check-In' },
+  { path: '/digital-signage', name: '105-Digital-Signage' },
+  { path: '/barcode-scanner', name: '106-Barcode-Scanner' },
+  { path: '/security-cameras', name: '107-Security-Cameras' },
+  { path: '/purchase-agent', name: '108-Purchase-Agent-Dashboard' },
+  { path: '/purchase-agent/tasks', name: '109-Purchase-Agent-Tasks' },
+  { path: '/purchase-agent/quotations', name: '110-Purchase-Agent-Quotations' },
+  { path: '/purchase-agent/orders', name: '111-Purchase-Agent-Orders' },
+  { path: '/purchase-agent/suppliers', name: '112-Purchase-Agent-Suppliers' },
+  { path: '/parts-network', name: '113-Parts-Network' },
+  { path: '/parts-network/members', name: '114-Parts-Network-Members' },
+  { path: '/client', name: '115-Client-Portal-Dashboard' },
+  { path: '/client/vehicles', name: '116-Client-Vehicles' },
+  { path: '/client/appointments', name: '117-Client-Appointments' },
+  { path: '/client/invoices', name: '118-Client-Invoices' },
+  { path: '/customer-app', name: '119-Customer-App' },
+  { path: '/technician-app', name: '120-Technician-App' },
+  { path: '/automated-reordering', name: '121-Automated-Reordering' },
+  { path: '/dynamic-pricing', name: '122-Dynamic-Pricing' },
+  { path: '/vehicle-tracking', name: '123-Vehicle-Tracking' },
+  { path: '/telematics-integration', name: '124-Telematics' },
+  { path: '/expense-tracking', name: '125-Expense-Tracking' },
+  { path: '/towing-services', name: '126-Towing-Services' },
+  { path: '/vehicle-storage', name: '127-Vehicle-Storage' },
+  { path: '/google-my-business', name: '128-Google-My-Business' },
+  { path: '/social-media-monitoring', name: '129-Social-Media-Monitoring' },
+  { path: '/staff-performance-review', name: '130-Staff-Performance-Review' },
+  { path: '/task-management', name: '131-Task-Management' },
+  { path: '/vehicle-history', name: '132-Vehicle-History' },
+  { path: '/vendor-supplier-portal', name: '133-Vendor-Portal' },
+  { path: '/vin-decoder', name: '134-VIN-Decoder' },
+  { path: '/document-ocr', name: '135-Document-OCR' },
+  { path: '/productivity-tracker', name: '136-Productivity-Tracker' },
+  { path: '/obd-diagnostic-viewer', name: '137-OBD-Viewer' },
+  { path: '/video-consultations', name: '138-Video-Consultations' },
+  { path: '/video-estimates', name: '139-Video-Estimates' },
+  { path: '/referral-program', name: '140-Referral-Program' },
+  { path: '/customer-portal', name: '141-Customer-Portal' },
+  { path: '/service-reminders', name: '142-Service-Reminders' },
+  { path: '/customer-reviews', name: '143-Customer-Reviews' },
+  { path: '/kpi-dashboard', name: '144-KPI-Dashboard' },
+  { path: '/business-heat-maps', name: '145-Business-Heat-Maps' },
+  { path: '/predictive-maintenance', name: '146-Predictive-Maintenance' },
+  { path: '/vehicle-health-monitoring', name: '147-Vehicle-Health' },
+  { path: '/parts-auto-reorder', name: '148-Parts-Auto-Reorder' },
+  { path: '/smart-inventory-forecasting', name: '149-Smart-Inventory-Forecasting' },
+  { path: '/iso-quality-management', name: '150-ISO-Quality' },
+  { path: '/equipment-calibration', name: '151-Equipment-Calibration' },
+  { path: '/environmental-compliance', name: '152-Environmental-Compliance' },
+  { path: '/emerging-technologies', name: '153-Emerging-Technologies' },
+  { path: '/next-gen-technologies', name: '154-Next-Gen-Tech' },
+  { path: '/mobile-device-management', name: '155-Mobile-Device-Management' },
+  { path: '/sms-integration', name: '156-SMS-Integration' },
 ];
 
 async function captureScreenshots() {
-  console.log('Starting screenshot capture for', screens.length, 'screens...');
-  
+  if (!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  }
+
+  console.log(`Starting screenshot capture of ${routes.length} pages...`);
+  console.log(`Output directory: ${OUTPUT_DIR}\n`);
+
   const browser = await puppeteer.launch({
     headless: 'new',
     executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
   });
-  
+
   const page = await browser.newPage();
   await page.setViewport({ width: 1920, height: 1080 });
-  
-  let capturedCount = 0;
-  let failedCount = 0;
-  const failed = [];
-  
-  for (const screen of screens) {
-    const screenshotPath = path.join('screenshots', screen.category, `${screen.name}.png`);
-    
+
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (let i = 0; i < routes.length; i++) {
+    const route = routes[i];
+    const url = `${BASE_URL}${route.path}`;
+    const filename = `${route.name}.png`;
+    const filepath = path.join(OUTPUT_DIR, filename);
+
     try {
-      console.log(`[${capturedCount + 1}/${screens.length}] Capturing: ${screen.route}`);
+      console.log(`[${i + 1}/${routes.length}] Capturing: ${route.name}`);
       
-      await page.goto(`${BASE_URL}${screen.route}`, {
+      await page.goto(url, { 
         waitUntil: 'networkidle2',
-        timeout: 30000
+        timeout: 30000 
       });
       
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      await page.screenshot({
-        path: screenshotPath,
-        fullPage: false
+      await page.screenshot({ 
+        path: filepath, 
+        fullPage: false,
+        type: 'png'
       });
       
-      capturedCount++;
-      console.log(`  ✓ Saved: ${screenshotPath}`);
-      
+      successCount++;
+      console.log(`  ✓ Saved: ${filename}`);
     } catch (error) {
-      failedCount++;
-      failed.push({ route: screen.route, error: error.message });
-      console.log(`  ✗ Failed: ${screen.route} - ${error.message}`);
+      errorCount++;
+      console.log(`  ✗ Error: ${error.message}`);
     }
   }
-  
+
   await browser.close();
-  
-  console.log('\n========================================');
-  console.log('Screenshot Capture Complete!');
-  console.log(`✓ Captured: ${capturedCount}`);
-  console.log(`✗ Failed: ${failedCount}`);
-  console.log('========================================\n');
-  
-  if (failed.length > 0) {
-    console.log('Failed screens:');
-    failed.forEach(f => console.log(`  - ${f.route}: ${f.error}`));
-  }
-  
-  fs.writeFileSync('screenshots/capture-report.json', JSON.stringify({
-    total: screens.length,
-    captured: capturedCount,
-    failed: failedCount,
-    failedScreens: failed,
-    timestamp: new Date().toISOString()
-  }, null, 2));
+
+  console.log(`\n========================================`);
+  console.log(`Screenshot capture complete!`);
+  console.log(`Success: ${successCount} | Errors: ${errorCount}`);
+  console.log(`Output: ${OUTPUT_DIR}`);
+  console.log(`========================================`);
 }
 
 captureScreenshots().catch(console.error);
