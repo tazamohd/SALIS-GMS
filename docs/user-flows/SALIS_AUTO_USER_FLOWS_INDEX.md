@@ -8,7 +8,7 @@ This documentation provides comprehensive coverage of all user flows, user scena
 
 ## Table of Contents
 
-### 1. [User Roles & Personas](./roles/USER_ROLES_GUIDE.md)
+### 1. [User Roles & Personas](./USER_ROLES_GUIDE.md)
 - System Administrator
 - Franchise Owner
 - Service Manager
@@ -22,7 +22,7 @@ This documentation provides comprehensive coverage of all user flows, user scena
 - Marketing Manager
 - Quality Control Inspector
 
-### 2. [Operational Lifecycle Flows](./flows/OPERATIONAL_LIFECYCLE.md)
+### 2. [Operational Lifecycle Flows](./OPERATIONAL_LIFECYCLE.md)
 - Customer Acquisition & Intake
 - Vehicle Check-In & Inspection
 - Diagnostics & Assessment
@@ -33,28 +33,28 @@ This documentation provides comprehensive coverage of all user flows, user scena
 - Billing & Payments
 - Customer Retention & Loyalty
 
-### 3. [Portal-Specific Flows](./flows/PORTAL_FLOWS.md)
+### 3. [Portal-Specific Flows](./PORTAL_FLOWS.md)
 - Technician Portal Flows
 - Customer Portal Flows
 - Client Portal Flows
 - Purchase Agent Portal Flows
 - Admin Console Flows
 
-### 4. [Compliance & Localization Flows](./compliance/COMPLIANCE_FLOWS.md)
+### 4. [Compliance & Localization Flows](./COMPLIANCE_FLOWS.md)
 - ZATCA E-Invoicing (Phase 2)
 - VAT Management
 - Zakat Calculation
 - Arabic Language Support
 - Hijri Calendar Integration
 
-### 5. [AI & Automation Flows](./flows/AI_AUTOMATION_FLOWS.md)
+### 5. [AI & Automation Flows](./AI_AUTOMATION_FLOWS.md)
 - AI Scheduling & Assignment
 - Predictive Maintenance
 - Smart Parts Recommendations
 - AI Chatbot Assistant
 - Sentiment Analysis
 
-### 6. [System Integration Flows](./integrations/SYSTEM_INTEGRATIONS.md)
+### 6. [System Integration Flows](./SYSTEM_INTEGRATIONS.md)
 - Payment Gateway Integration (Stripe/PayPal)
 - SMS Integration (Twilio)
 - Email Marketing Integration
@@ -62,11 +62,21 @@ This documentation provides comprehensive coverage of all user flows, user scena
 - VIN Decoding & OBD Integration
 - IoT & Telematics
 
-### 7. [Enterprise & Franchise Flows](./flows/ENTERPRISE_FRANCHISE_FLOWS.md)
+### 7. [Enterprise & Franchise Flows](./ENTERPRISE_FRANCHISE_FLOWS.md)
 - Multi-Location Management
 - Franchise Command Center
 - Globalization Layer
 - SLA & Contract Management
+
+### 8. [All User Scenarios Reference](./ALL_USER_SCENARIOS.md)
+- Complete scenarios by role
+- Step-by-step workflows
+- Edge cases and exceptions
+
+### 9. [Workflow Diagrams](./WORKFLOW_DIAGRAMS.md)
+- Visual process flows
+- System architecture diagrams
+- Integration maps
 
 ---
 
