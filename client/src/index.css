@@ -1,5 +1,6 @@
-/* SALIS AUTO Typography - Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* SalisEngine.AI Design System v2.0 - Deep Space & Corporate Steel */
+/* Typography - Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,50 +13,83 @@
 }
 
 :root {
-  /* SALIS AUTO Brand Design System */
+  /* ============================================
+     SalisEngine.AI Design System v2.0
+     Theme: Deep Space & Corporate Steel
+     ============================================ */
   
-  /* Primary Brand Colors - Blue Gradient */
-  --salis-blue-start: #0A5ED7;
-  --salis-blue-end: #0BB3FF;
-  --salis-blue-gradient: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+  /* Core Backgrounds - Deep Space */
+  --bg-dark: #050510;              /* Primary background - near-black void */
+  --bg-deep: #0b0b1a;              /* Deeper recessed areas, sidebars */
+  --bg-card: rgba(15, 23, 42, 0.6); /* Slate-tinted glass for UI cards */
   
-  /* Deep Navy */
-  --salis-navy: #0B1F3B;
+  /* Brand Accents (Logo Matched) */
+  --accent-primary: #0ea5e9;        /* Sky Blue - Primary actions, active tabs, main glows */
+  --accent-secondary: #f97316;      /* Orange - Highlights, data logs, secondary CTA */
+  --accent-dark-blue: #1e3a8a;      /* Deep blue for gradients and borders */
+  --accent-silver: #e2e8f0;         /* Subtitle text, inactive borders, "Steel" look */
   
-  /* Accent Orange - for decisions/warnings/CTAs */
-  --salis-orange: #F97316;
+  /* Functional Colors */
+  --accent-success: #10b981;        /* System Online, success logs, completed tasks */
+  --accent-error: #ef4444;          /* Error logs, critical alerts, delete actions */
   
-  /* Dark Mode Neutrals */
-  --salis-bg-dark: #0E1117;
-  --salis-surface-dark: #151A23;
-  --salis-border-dark: #232A36;
-  --salis-text-primary-dark: #E6EAF0;
-  --salis-text-muted-dark: #9BA4B0;
+  /* Brand Gradient */
+  --gradient-main: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
+  --gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   
-  /* Light Mode Neutrals - Logo-Only Palette */
-  --salis-bg-light: #E6E9ED;
-  --salis-surface-light: #FFFFFF;
-  --salis-border-light: #C9D1DA;
-  --salis-text-primary-light: #2A2F3A;
-  --salis-text-muted-light: #6B7280;
+  /* Glass Variables - Physical Glass Effect */
+  --glass-border: rgba(255, 255, 255, 0.08);    /* Subtle white edge */
+  --glass-surface: rgba(255, 255, 255, 0.03);   /* Base transparency */
+  --glass-highlight: rgba(255, 255, 255, 0.08); /* Top-down lighting */
+  --glass-heavy: rgba(15, 23, 42, 0.85);        /* Almost opaque */
   
-  /* Legacy compatibility - Approved palette only */
-  --salis-black: #0B1F3B;
-  --salis-white: #FFFFFF;
-  --salis-gray: #9BA4B0;
-  --salis-gray-light: #C9D1DA;
-  --salis-gray-dark: #2A2F3A;
-  --salis-50-black: #9BA4B0;
+  /* Glow Effects */
+  --glow-primary: 0 0 25px rgba(14, 165, 233, 0.3);
+  --glow-secondary: 0 0 20px rgba(249, 115, 22, 0.25);
+  --glow-success: 0 0 20px rgba(16, 185, 129, 0.25);
+  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
+  
+  /* Legacy SALIS compatibility */
+  --salis-blue-start: #0ea5e9;
+  --salis-blue-end: #1e3a8a;
+  --salis-blue-gradient: var(--gradient-main);
+  --salis-navy: #0b0b1a;
+  --salis-orange: #f97316;
+  
+  /* Dark Mode Neutrals - Deep Space */
+  --salis-bg-dark: #050510;
+  --salis-surface-dark: rgba(15, 23, 42, 0.6);
+  --salis-border-dark: rgba(255, 255, 255, 0.08);
+  --salis-text-primary-dark: #e2e8f0;
+  --salis-text-muted-dark: #94a3b8;
+  
+  /* Light Mode Neutrals - Corporate Steel */
+  --salis-bg-light: #f1f5f9;
+  --salis-surface-light: #ffffff;
+  --salis-border-light: #cbd5e1;
+  --salis-text-primary-light: #0f172a;
+  --salis-text-muted-light: #64748b;
+  
+  /* Legacy compatibility */
+  --salis-black: #050510;
+  --salis-white: #ffffff;
+  --salis-gray: #94a3b8;
+  --salis-gray-light: #cbd5e1;
+  --salis-gray-dark: #1e293b;
+  --salis-50-black: #64748b;
 
-  /* SALIS AUTO Typography Variables - Inter Primary */
-  --14-regular-font-family: "Inter", "SF Pro", Helvetica;
+  /* Typography Variables - Inter Primary */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", monospace;
+  
+  --14-regular-font-family: "Inter", Helvetica;
   --14-regular-font-size: 14px;
   --14-regular-font-style: normal;
   --14-regular-font-weight: 400;
   --14-regular-letter-spacing: 0px;
   --14-regular-line-height: 140%;
   
-  --body-base-font-family: "Inter", "SF Pro", Helvetica;
+  --body-base-font-family: "Inter", Helvetica;
   --body-base-font-size: 16px;
   --body-base-font-style: normal;
   --body-base-font-weight: 400;
@@ -114,7 +148,7 @@
   --display-large-semibold-font-family: "Inter", Helvetica;
   --display-large-semibold-font-size: 32px;
   --display-large-semibold-font-style: normal;
-  --display-large-semibold-font-weight: 700;
+  --display-large-semibold-font-weight: 800;
   --display-large-semibold-letter-spacing: -0.03em;
   --display-large-semibold-line-height: 1.2;
   
@@ -128,7 +162,7 @@
   --display-small-semibold-font-family: "Inter", Helvetica;
   --display-small-semibold-font-size: 20px;
   --display-small-semibold-font-style: normal;
-  --display-small-semibold-font-weight: 500;
+  --display-small-semibold-font-weight: 600;
   --display-small-semibold-letter-spacing: -0.02em;
   --display-small-semibold-line-height: 1.4;
   
@@ -183,9 +217,9 @@
   --m3-title-small-letter-spacing: 0.01em;
   --m3-title-small-line-height: 20px;
   
-  --shadow: 0px 1px 3px 1px rgba(1, 1, 1, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
-  --shadow-black-lg: 0px 4px 6px -2px rgba(1, 1, 1, 0.05), 0px 12px 16px -4px rgba(1, 1, 1, 0.1);
-  --shadow-black-sm: 0px 1px 2px 0px rgba(1, 1, 1, 0.06), 0px 1px 3px 0px rgba(1, 1, 1, 0.1);
+  --shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  --shadow-black-lg: 0px 4px 6px -2px rgba(0, 0, 0, 0.1), 0px 12px 16px -4px rgba(0, 0, 0, 0.15);
+  --shadow-black-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.15);
   
   --single-line-body-base-font-family: "Inter", Helvetica;
   --single-line-body-base-font-size: 16px;
@@ -239,91 +273,105 @@
 
 @layer base {
   :root {
-    /* SALIS AUTO Brand Theme - Light Mode (Logo-Only Palette) */
-    --background: 216 14% 91%;  /* #E6E9ED - Silver Light */
-    --foreground: 220 16% 20%;  /* #2A2F3A - Graphite Gray */
+    /* Light Mode - Corporate Steel Theme */
+    --background: 210 40% 96%;      /* #f1f5f9 - Slate 100 */
+    --foreground: 222 47% 11%;      /* #0f172a - Slate 900 */
 
-    --muted: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
-    --muted-foreground: 217 14% 45%;  /* Muted text */
+    --muted: 210 40% 90%;           /* Slate 200 */
+    --muted-foreground: 215 16% 47%;/* #64748b - Slate 500 */
 
-    --accent: 212 14% 82%;  /* Cool Gray Light */
-    --accent-foreground: 220 16% 20%;  /* Graphite Gray */
+    --accent: 210 40% 90%;          /* Slate 200 */
+    --accent-foreground: 222 47% 11%;/* Slate 900 */
 
-    --popover: 0 0% 100%;  /* White */
-    --popover-foreground: 220 16% 20%;  /* Graphite Gray */
+    --popover: 0 0% 100%;           /* White */
+    --popover-foreground: 222 47% 11%;
 
-    --border: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
-    --input: 212 14% 82%;  /* Cool Gray Light */
+    --border: 214 32% 78%;          /* #cbd5e1 - Slate 300 */
+    --input: 214 32% 78%;
 
-    --card: 0 0% 100%;  /* White surface */
-    --card-foreground: 220 16% 20%;  /* Graphite Gray */
+    --card: 0 0% 100%;              /* White surface */
+    --card-foreground: 222 47% 11%;
 
-    /* Primary Blue - Brand Color #0A5ED7 */
-    --primary: 214 90% 44%;
+    /* Primary - Sky Blue #0ea5e9 */
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Bright Blue #0BB3FF */
-    --secondary: 197 100% 52%;
+    /* Secondary - Orange #f97316 */
+    --secondary: 24 95% 53%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Destructive/Warning Orange - #F97316 (warnings/critical CTAs ONLY) */
-    --destructive: 24 95% 53%;
+    /* Destructive - Red #ef4444 */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --ring: 214 90% 44%;  /* Blue ring */
+    --ring: 199 89% 48%;            /* Sky Blue ring */
     --radius: 0.5rem;
     
-    /* SALIS AUTO Semantic Colors - Light Mode */
-    --success: 214 90% 44%;  /* Blue for success (no green) */
+    /* Semantic Colors - Light Mode */
+    --success: 160 84% 39%;         /* #10b981 - Emerald */
     --success-foreground: 0 0% 100%;
-    --warning: 24 95% 53%;  /* Orange for warnings */
+    --warning: 24 95% 53%;          /* #f97316 - Orange */
     --warning-foreground: 0 0% 100%;
-    --info: 197 100% 52%;  /* Bright blue for info */
+    --info: 199 89% 48%;            /* #0ea5e9 - Sky Blue */
     --info-foreground: 0 0% 100%;
+    --error: 0 84% 60%;             /* #ef4444 - Red */
+    --error-foreground: 0 0% 100%;
   }
 
   .dark {
-    /* SALIS AUTO Brand Theme - Dark Mode (Logo-Only Palette) */
-    --background: 220 20% 5%;  /* #0E1117 - Dark BG */
-    --foreground: 220 20% 93%;  /* #E6EAF0 - Text Primary Dark */
+    /* ============================================
+       DARK MODE - Deep Space Theme
+       SalisEngine.AI Design System v2.0
+       ============================================ */
+    
+    /* Background - Deep Void */
+    --background: 240 33% 3%;        /* #050510 - Near-black void */
+    --foreground: 210 40% 93%;       /* #e2e8f0 - Slate 200 */
 
-    --muted: 220 15% 13%;  /* #151A23 - Card Surface Dark */
-    --muted-foreground: 217 14% 65%;  /* #9BA4B0 - Text Muted Dark */
+    /* Muted - Recessed Areas */
+    --muted: 240 24% 7%;             /* #0b0b1a - Deep recessed */
+    --muted-foreground: 215 20% 65%; /* #94a3b8 - Slate 400 */
 
-    --accent: 220 15% 13%;  /* Card Surface Dark */
-    --accent-foreground: 220 20% 93%;  /* Text Primary Dark */
+    /* Accent */
+    --accent: 240 24% 7%;            /* Deep recessed */
+    --accent-foreground: 210 40% 93%;
 
-    --popover: 220 15% 13%;  /* #151A23 */
-    --popover-foreground: 220 20% 93%;
+    /* Popover - Glass Card */
+    --popover: 222 47% 11%;          /* Slate 900 with glass effect */
+    --popover-foreground: 210 40% 93%;
 
-    --border: 220 12% 18%;  /* #232A36 - Border Dark */
-    --input: 220 12% 18%;
+    /* Border - Glass Edge */
+    --border: 0 0% 100% / 0.08;      /* White 8% - subtle edge */
+    --input: 222 47% 15%;            /* Slightly lighter for inputs */
 
-    --card: 220 15% 13%;  /* #151A23 - Card Surface Dark */
-    --card-foreground: 220 20% 93%;
+    /* Card - Slate Glass */
+    --card: 222 47% 11% / 0.6;       /* rgba(15, 23, 42, 0.6) */
+    --card-foreground: 210 40% 93%;
 
-    /* Primary Blue - Bright Blue for dark mode */
-    --primary: 197 100% 52%;  /* #0BB3FF */
-    --primary-foreground: 220 20% 5%;
+    /* Primary - Sky Blue #0ea5e9 */
+    --primary: 199 89% 48%;
+    --primary-foreground: 240 33% 3%;
 
-    /* Secondary - Deep Blue */
-    --secondary: 214 90% 44%;  /* #0A5ED7 */
+    /* Secondary - Orange #f97316 */
+    --secondary: 24 95% 53%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Destructive/Warning Orange (warnings/critical CTAs ONLY) */
-    --destructive: 24 95% 53%;  /* #F97316 */
+    /* Destructive - Red #ef4444 */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --ring: 197 100% 52%;
+    --ring: 199 89% 48%;             /* Sky Blue glow ring */
     --radius: 0.5rem;
     
-    /* SALIS AUTO Semantic Colors - Dark Mode */
-    --success: 197 100% 52%;  /* Bright blue for success (no green) */
-    --success-foreground: 220 20% 5%;
-    --warning: 24 95% 53%;  /* Orange for warnings */
+    /* Semantic Colors - Dark Mode (Deep Space) */
+    --success: 160 84% 39%;          /* #10b981 - Emerald Green */
+    --success-foreground: 240 33% 3%;
+    --warning: 24 95% 53%;           /* #f97316 - Orange */
     --warning-foreground: 0 0% 100%;
-    --info: 214 90% 44%;  /* Deep blue for info */
-    --info-foreground: 0 0% 100%;
+    --info: 199 89% 48%;             /* #0ea5e9 - Sky Blue */
+    --info-foreground: 240 33% 3%;
+    --error: 0 84% 60%;              /* #ef4444 - Red */
+    --error-foreground: 0 0% 100%;
   }
 }
 
@@ -334,120 +382,194 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', 'SF Pro', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px;
     line-height: 1.5;
   }
   
-  /* SALIS AUTO Typography Hierarchy - Strict Scale */
+  /* Typography Hierarchy */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', 'SF Pro', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   
-  /* H1: 28-32px, bold, tight tracking */
   h1 {
-    font-size: 1.875rem; /* 30px */
-    font-weight: 700;
+    font-size: 1.875rem;
+    font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.2;
   }
   
-  /* H2: 20-24px, medium */
   h2 {
-    font-size: 1.375rem; /* 22px */
-    font-weight: 500;
+    font-size: 1.375rem;
+    font-weight: 600;
     line-height: 1.3;
   }
   
-  /* H3: 16-18px, medium */
   h3 {
-    font-size: 1.0625rem; /* 17px */
-    font-weight: 500;
+    font-size: 1.0625rem;
+    font-weight: 600;
     line-height: 1.4;
   }
   
-  /* Body: 14-15px, regular */
   p, span, div {
-    font-size: 0.875rem; /* 14px */
+    font-size: 0.875rem;
     line-height: 1.5;
   }
   
-  /* Label: 11-12px, uppercase, muted */
   label {
-    font-size: 0.75rem; /* 12px */
+    font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.025em;
   }
   
-  /* Monospace for metrics */
   .font-mono {
-    font-family: 'JetBrains Mono', 'Inter Mono', 'SF Mono', monospace;
+    font-family: var(--font-mono);
   }
 }
 
 @layer components {
-  /* SALIS AUTO Gradient Text Utility - Brand Blue */
+  /* ============================================
+     SalisEngine.AI Component Library
+     ============================================ */
+  
+  /* Gradient Text Utility */
   .text-gradient-salis {
-    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    background: var(--gradient-main);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
-  /* SALIS AUTO Primary Button - Gradient Blue */
+  /* GlowButton - Primary */
   .btn-primary {
-    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
-    color: #FFFFFF;
+    background: var(--gradient-main);
+    color: #ffffff;
     border: none;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
   }
   
   .btn-primary:hover {
-    background: linear-gradient(135deg, #0952C0 0%, #0AA3EE 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(10, 94, 215, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--glow-primary);
   }
   
-  /* SALIS AUTO Secondary Button - Outline Blue */
+  .btn-primary:hover::before {
+    opacity: 1;
+  }
+  
+  /* GlowButton - Secondary/Ghost */
   .btn-secondary {
     background-color: transparent;
-    color: #0A5ED7;
-    border: 1.5px solid #0A5ED7;
+    color: var(--accent-primary);
+    border: 1.5px solid var(--accent-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-secondary:hover {
-    background-color: rgba(10, 94, 215, 0.1);
+    background-color: rgba(14, 165, 233, 0.1);
+    box-shadow: var(--glow-primary);
+    transform: translateY(-2px);
   }
   
-  /* SALIS AUTO Danger/Critical Button - Orange */
+  /* GlowButton - Danger */
   .btn-danger {
-    background-color: #F97316;
-    color: #FFFFFF;
+    background-color: var(--accent-error);
+    color: #ffffff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-danger:hover {
-    background-color: #EA580C;
+    background-color: #dc2626;
+    box-shadow: var(--glow-error);
+    transform: translateY(-2px);
   }
   
-  /* Brand Card Styles */
+  /* GlassCard - Physical Glass Effect */
+  .glass-card {
+    @apply rounded-xl transition-all duration-300;
+    background: var(--glass-heavy);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 
+      inset 0 1px 0 0 var(--glass-highlight),
+      0 4px 24px -1px rgba(0, 0, 0, 0.3);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+      inset 0 1px 0 0 var(--glass-highlight),
+      var(--glow-primary),
+      0 8px 32px -2px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Brand Card - Legacy Compatibility */
   .brand-card {
-    @apply rounded-xl border transition-all duration-200;
+    @apply rounded-xl border transition-all duration-300;
     background-color: var(--salis-surface-light);
     border-color: var(--salis-border-light);
   }
   
   .dark .brand-card {
-    background-color: var(--salis-surface-dark);
-    border-color: var(--salis-border-dark);
+    background: var(--glass-heavy);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 0 var(--glass-highlight);
   }
   
   .brand-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(10, 94, 215, 0.1);
+    transform: translateY(-5px);
   }
+  
+  .dark .brand-card:hover {
+    box-shadow: 
+      inset 0 1px 0 0 var(--glass-highlight),
+      var(--glow-primary);
+  }
+  
+  /* Console/Terminal Style */
+  .console {
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: #e6edf3;
+  }
+  
+  .console-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .console-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .console-dot-red { background: #ff5f57; }
+  .console-dot-yellow { background: #febc2e; }
+  .console-dot-green { background: #28c840; }
   
   /* Status Pills */
   .status-pill {
@@ -455,28 +577,41 @@
   }
   
   .status-pill-blue {
-    background-color: rgba(10, 94, 215, 0.1);
-    color: #0A5ED7;
-  }
-  
-  .dark .status-pill-blue {
-    background-color: rgba(11, 179, 255, 0.15);
-    color: #0BB3FF;
+    background-color: rgba(14, 165, 233, 0.15);
+    color: #0ea5e9;
   }
   
   .status-pill-orange {
-    background-color: rgba(249, 115, 22, 0.1);
-    color: #F97316;
+    background-color: rgba(249, 115, 22, 0.15);
+    color: #f97316;
+  }
+  
+  .status-pill-green {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+  }
+  
+  .status-pill-red {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
   }
   
   .status-pill-gray {
-    background-color: rgba(107, 114, 128, 0.1);
-    color: #6B7280;
+    background-color: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
   }
   
-  .dark .status-pill-gray {
-    background-color: rgba(155, 164, 176, 0.15);
-    color: #9BA4B0;
+  /* Neon Strip - Active Navigation */
+  .neon-strip {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--accent-primary);
+    border-radius: 0 2px 2px 0;
+    box-shadow: var(--glow-primary);
   }
   
   /* Enhanced Typography Utilities */
@@ -512,38 +647,48 @@
     line-height: var(--headline-semibold-line-height);
   }
   
-  /* Enhanced Card Styles */
+  /* Card Styles */
   .card-elevated {
     box-shadow: var(--shadow-black-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .card-elevated:hover {
-    transform: translateY(-4px);
-    box-shadow: 0px 8px 16px -4px rgba(1, 1, 1, 0.1), 0px 16px 24px -6px rgba(1, 1, 1, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 24px -4px rgba(0, 0, 0, 0.2), 0px 16px 32px -8px rgba(0, 0, 0, 0.25);
   }
   
-  /* Stat Card Styles */
+  .dark .card-elevated:hover {
+    box-shadow: var(--glow-primary), 0px 16px 32px -8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Stat Card */
   .stat-card {
     @apply rounded-xl p-8 border-2 transition-all duration-300;
   }
   
+  .dark .stat-card {
+    background: var(--glass-heavy);
+    backdrop-filter: blur(16px);
+    border-color: var(--glass-border);
+  }
+  
   .stat-card-number {
     @apply font-bold text-5xl tracking-tight;
-    font-family: 'JetBrains Mono', 'Inter', monospace;
+    font-family: var(--font-mono);
   }
   
   .stat-card-label {
     @apply font-medium text-sm uppercase tracking-wider;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
   }
   
   .stat-card-subtitle {
     @apply font-normal text-xs;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
   }
   
-  /* Improved Spacing Utilities */
+  /* Spacing Utilities */
   .section-spacing {
     @apply space-y-8;
   }
@@ -556,7 +701,7 @@
     @apply space-y-4;
   }
   
-  /* Interactive States - Hover, Focus, Active */
+  /* Interactive States */
   .interactive-hover {
     @apply transition-all duration-200 ease-in-out;
   }
@@ -566,10 +711,15 @@
   }
   
   .interactive-card {
-    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer;
+    @apply transition-all duration-300 ease-in-out;
   }
   
-  /* Touch-Friendly Sizing (WCAG 2.1 AA - minimum 44x44px) */
+  .interactive-card:hover {
+    transform: translateY(-5px);
+    @apply shadow-lg cursor-pointer;
+  }
+  
+  /* Touch-Friendly Sizing (WCAG 2.1 AA) */
   .btn-touch {
     @apply min-h-[44px] min-w-[44px] px-4 py-3;
   }
@@ -578,7 +728,7 @@
     @apply min-h-[44px] px-4 py-3 text-base;
   }
   
-  /* Accessibility - Focus States */
+  /* Focus States */
   .focus-visible-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
@@ -587,13 +737,13 @@
     @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus-visible-ring;
   }
   
-  /* High Contrast Text for Accessibility (WCAG AAA) */
+  /* High Contrast Text */
   .text-high-contrast {
     @apply text-foreground dark:text-foreground;
     font-weight: 500;
   }
   
-  /* Responsive Table Utilities */
+  /* Table Utilities */
   .table-responsive {
     @apply w-full overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
   }
@@ -606,7 +756,7 @@
     @apply sticky top-0 bg-background z-10 shadow-sm;
   }
   
-  /* Empty State Utilities */
+  /* Empty State */
   .empty-state-container {
     @apply flex flex-col items-center justify-center py-16 px-4 text-center;
   }
@@ -623,7 +773,7 @@
     @apply text-sm text-muted-foreground mb-6 max-w-md;
   }
   
-  /* Loading States - Linear Progress Only (No Spinners) */
+  /* Loading States */
   .skeleton {
     @apply animate-pulse bg-muted rounded;
   }
@@ -637,7 +787,7 @@
     display: block;
     width: 40%;
     height: 100%;
-    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    background: var(--gradient-main);
     animation: linear-progress 1.5s ease-in-out infinite;
   }
   
@@ -646,7 +796,7 @@
     100% { transform: translateX(350%); }
   }
   
-  /* Page Transition Animations */
+  /* Page Transitions */
   .page-enter {
     opacity: 0;
     transform: translateX(20px);
@@ -669,17 +819,20 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
   
-  /* Hover Effects - Lift + Blue Border Glow */
+  /* Hover Lift with Glow */
   .hover-lift {
-    @apply transition-all duration-200 ease-out;
+    @apply transition-all duration-300 ease-out;
   }
   
   .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 0 2px rgba(11, 179, 255, 0.3), 0 8px 16px rgba(10, 94, 215, 0.15);
+    transform: translateY(-5px);
   }
   
-  /* Chart Animation - Left to Right */
+  .dark .hover-lift:hover {
+    box-shadow: var(--glow-primary);
+  }
+  
+  /* Chart Animation */
   .chart-animate {
     animation: chart-reveal 0.8s ease-out forwards;
   }
@@ -695,7 +848,7 @@
     }
   }
   
-  /* Fade In Animation */
+  /* Fade In */
   .fade-in {
     animation: fadeIn 0.3s ease-out forwards;
   }
@@ -705,7 +858,7 @@
     to { opacity: 1; }
   }
   
-  /* Slide Up Animation */
+  /* Slide Up */
   .slide-up {
     animation: slideUp 0.3s ease-out forwards;
   }
@@ -721,7 +874,21 @@
     }
   }
   
-  /* Mobile-First Responsive Breakpoints */
+  /* Pulse Glow Animation */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(14, 165, 233, 0.5);
+    }
+  }
+  
+  /* Mobile Responsive */
   @media (max-width: 768px) {
     .mobile-stack {
       @apply flex-col space-y-2;
@@ -736,26 +903,39 @@
     }
   }
   
-  /* Smooth Scrolling for Better UX */
+  /* Smooth Scrolling */
   html {
     scroll-behavior: smooth;
   }
   
-  /* Custom Scrollbar for Dark Theme */
+  /* Custom Scrollbar - Deep Space Theme */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted/20;
+    background: rgba(255, 255, 255, 0.03);
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded-full;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground;
+    background: rgba(14, 165, 233, 0.5);
+  }
+  
+  .dark ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(14, 165, 233, 0.4);
   }
 }
