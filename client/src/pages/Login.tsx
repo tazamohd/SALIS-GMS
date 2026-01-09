@@ -56,7 +56,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#080B12] font-sans">
-      {/* Abstract ERP Background */}
+      {/* Abstract Tech Background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-[#080B12] via-[#0C1018] to-[#080B12]"></div>
         
@@ -66,155 +66,265 @@ export default function Login() {
         <div className="absolute top-[40%] left-[30%] w-[400px] h-[400px] bg-[#F97316]/5 rounded-full blur-[80px]"></div>
       </div>
 
-      {/* Left Side - ERP Dashboard Visualization */}
+      {/* Left Side - AI & Neural Network Visualization */}
       <div className="fixed left-0 top-0 bottom-0 w-[40%] pointer-events-none overflow-hidden flex items-center justify-center">
         <div className="relative w-full h-full">
-          {/* Floating Text Labels */}
-          <div className="absolute top-[12%] left-[15%] text-[#0BB3FF]/20 text-xs tracking-[0.3em] uppercase font-semibold">Analytics</div>
-          <div className="absolute top-[28%] left-[8%] text-[#0A5ED7]/20 text-xs tracking-[0.3em] uppercase font-semibold">Inventory</div>
-          <div className="absolute top-[45%] left-[20%] text-[#F97316]/15 text-xs tracking-[0.3em] uppercase font-semibold">Scheduling</div>
-          <div className="absolute top-[62%] left-[10%] text-[#0BB3FF]/20 text-xs tracking-[0.3em] uppercase font-semibold">Invoicing</div>
-          <div className="absolute top-[78%] left-[18%] text-[#0A5ED7]/15 text-xs tracking-[0.3em] uppercase font-semibold">Workflow</div>
+          {/* Floating Tech Labels */}
+          <div className="absolute top-[8%] left-[12%] text-[#0BB3FF]/25 text-[10px] tracking-[0.4em] uppercase font-bold">AI Engine</div>
+          <div className="absolute top-[22%] left-[6%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">Neural Network</div>
+          <div className="absolute top-[38%] left-[18%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">Automation</div>
+          <div className="absolute top-[52%] left-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">Predictive</div>
+          <div className="absolute top-[68%] left-[15%] text-[#0A5ED7]/18 text-[10px] tracking-[0.4em] uppercase font-bold">Machine Learning</div>
+          <div className="absolute top-[82%] left-[10%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">Analytics</div>
           
           <svg viewBox="0 0 500 900" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
-            {/* Connection Lines */}
-            <g opacity="0.12">
-              <path d="M-50,150 Q100,150 150,200 T300,180 T450,220" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
-              <path d="M-50,350 Q80,350 140,400 T320,380 T500,420" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
-              <path d="M-50,550 Q120,550 180,500 T350,520 T500,480" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
-              <path d="M-50,750 Q90,750 160,700 T340,720 T500,680" stroke="#F97316" strokeWidth="1" fill="none"/>
-              <path d="M80,0 Q80,150 120,250 T100,450 T130,650 T110,900" stroke="#0A5ED7" strokeWidth="0.8" fill="none"/>
-              <path d="M200,0 Q200,100 240,200 T220,400 T260,600 T230,900" stroke="#0BB3FF" strokeWidth="0.8" fill="none"/>
-              <path d="M350,0 Q350,120 310,220 T340,420 T300,620 T330,900" stroke="#F97316" strokeWidth="0.6" fill="none"/>
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            
+            {/* Neural Network Layer 1 - Input */}
+            <g opacity="0.3" filter="url(#glow)">
+              <circle cx="60" cy="120" r="8" fill="#0BB3FF"/>
+              <circle cx="60" cy="180" r="8" fill="#0BB3FF"/>
+              <circle cx="60" cy="240" r="8" fill="#0BB3FF"/>
+              <circle cx="60" cy="300" r="8" fill="#0BB3FF"/>
+              
+              {/* Connections to hidden layer */}
+              <g stroke="#0BB3FF" strokeWidth="0.5" opacity="0.4">
+                <line x1="68" y1="120" x2="142" y2="150"/>
+                <line x1="68" y1="120" x2="142" y2="210"/>
+                <line x1="68" y1="180" x2="142" y2="150"/>
+                <line x1="68" y1="180" x2="142" y2="210"/>
+                <line x1="68" y1="180" x2="142" y2="270"/>
+                <line x1="68" y1="240" x2="142" y2="210"/>
+                <line x1="68" y1="240" x2="142" y2="270"/>
+                <line x1="68" y1="300" x2="142" y2="270"/>
+              </g>
             </g>
             
-            {/* Data Nodes */}
+            {/* Neural Network Layer 2 - Hidden */}
+            <g opacity="0.35" filter="url(#glow)">
+              <circle cx="150" cy="150" r="10" fill="#0A5ED7"/>
+              <circle cx="150" cy="210" r="10" fill="#0A5ED7"/>
+              <circle cx="150" cy="270" r="10" fill="#0A5ED7"/>
+              
+              {/* Connections to output */}
+              <g stroke="#0A5ED7" strokeWidth="0.6" opacity="0.5">
+                <line x1="160" y1="150" x2="232" y2="180"/>
+                <line x1="160" y1="150" x2="232" y2="240"/>
+                <line x1="160" y1="210" x2="232" y2="180"/>
+                <line x1="160" y1="210" x2="232" y2="240"/>
+                <line x1="160" y1="270" x2="232" y2="240"/>
+              </g>
+            </g>
+            
+            {/* Neural Network Layer 3 - Output */}
+            <g opacity="0.4" filter="url(#glow)">
+              <circle cx="240" cy="180" r="12" fill="#F97316"/>
+              <circle cx="240" cy="240" r="12" fill="#F97316"/>
+            </g>
+            
+            {/* AI Brain Circuit Pattern */}
+            <g opacity="0.2" stroke="#0BB3FF" strokeWidth="1" fill="none">
+              <ellipse cx="320" cy="420" rx="100" ry="80"/>
+              <ellipse cx="320" cy="420" rx="70" ry="55"/>
+              <ellipse cx="320" cy="420" rx="40" ry="30"/>
+              {/* Brain pathways */}
+              <path d="M250,420 Q280,380 320,380 Q360,380 390,420" strokeWidth="1.5"/>
+              <path d="M250,420 Q280,460 320,460 Q360,460 390,420" strokeWidth="1.5"/>
+              <path d="M270,390 Q320,350 370,390" strokeWidth="0.8"/>
+              <path d="M270,450 Q320,490 370,450" strokeWidth="0.8"/>
+              {/* Neural pulses */}
+              <circle cx="280" cy="400" r="5" fill="#0BB3FF" opacity="0.6"/>
+              <circle cx="320" cy="380" r="4" fill="#0A5ED7" opacity="0.5"/>
+              <circle cx="360" cy="400" r="5" fill="#0BB3FF" opacity="0.6"/>
+              <circle cx="320" cy="420" r="8" fill="#F97316" opacity="0.4"/>
+              <circle cx="300" cy="440" r="4" fill="#0A5ED7" opacity="0.5"/>
+              <circle cx="340" cy="440" r="4" fill="#0A5ED7" opacity="0.5"/>
+            </g>
+            
+            {/* Automation Workflow */}
             <g opacity="0.25">
-              <circle cx="100" cy="150" r="10" fill="#0BB3FF"/>
-              <circle cx="100" cy="150" r="20" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
-              <circle cx="100" cy="150" r="30" stroke="#0BB3FF" strokeWidth="0.5" fill="none" strokeDasharray="4 4"/>
-              <circle cx="180" cy="180" r="7" fill="#0A5ED7"/>
-              <circle cx="180" cy="180" r="14" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
-              <circle cx="140" cy="240" r="6" fill="#0BB3FF"/>
-              <line x1="100" y1="150" x2="180" y2="180" stroke="#0BB3FF" strokeWidth="1"/>
-              <line x1="180" y1="180" x2="140" y2="240" stroke="#0A5ED7" strokeWidth="0.8"/>
-              
-              <circle cx="80" cy="380" r="12" fill="#F97316"/>
-              <circle cx="80" cy="380" r="24" stroke="#F97316" strokeWidth="1.5" fill="none"/>
-              <circle cx="80" cy="380" r="36" stroke="#F97316" strokeWidth="0.5" fill="none" strokeDasharray="4 4"/>
-              <circle cx="170" cy="350" r="8" fill="#0BB3FF"/>
-              <circle cx="220" cy="420" r="10" fill="#0A5ED7"/>
-              <circle cx="220" cy="420" r="18" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
-              <line x1="80" y1="380" x2="170" y2="350" stroke="#F97316" strokeWidth="1"/>
-              <line x1="170" y1="350" x2="220" y2="420" stroke="#0BB3FF" strokeWidth="0.8"/>
-              <line x1="80" y1="380" x2="220" y2="420" stroke="#0A5ED7" strokeWidth="0.6"/>
-              
-              <circle cx="130" cy="600" r="9" fill="#0BB3FF"/>
-              <circle cx="130" cy="600" r="18" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
-              <circle cx="210" cy="580" r="6" fill="#F97316"/>
-              <circle cx="170" cy="670" r="11" fill="#0A5ED7"/>
-              <circle cx="170" cy="670" r="22" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
-              <line x1="130" y1="600" x2="210" y2="580" stroke="#0BB3FF" strokeWidth="0.8"/>
-              <line x1="210" y1="580" x2="170" y2="670" stroke="#F97316" strokeWidth="0.8"/>
+              {/* Workflow boxes */}
+              <rect x="80" y="550" width="50" height="35" rx="5" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
+              <rect x="160" y="550" width="50" height="35" rx="5" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
+              <rect x="240" y="550" width="50" height="35" rx="5" stroke="#F97316" strokeWidth="1.5" fill="none"/>
+              {/* Arrows */}
+              <path d="M130,567 L155,567" stroke="#0A5ED7" strokeWidth="1.5" markerEnd="url(#arrow)"/>
+              <path d="M210,567 L235,567" stroke="#0BB3FF" strokeWidth="1.5"/>
+              {/* Arrow heads */}
+              <polygon points="155,567 148,563 148,571" fill="#0A5ED7"/>
+              <polygon points="235,567 228,563 228,571" fill="#0BB3FF"/>
+              {/* Labels */}
+              <circle cx="105" cy="567" r="3" fill="#0A5ED7"/>
+              <circle cx="185" cy="567" r="3" fill="#0BB3FF"/>
+              <circle cx="265" cy="567" r="3" fill="#F97316"/>
             </g>
             
-            {/* Dashboard Elements */}
+            {/* Data Processing Visualization */}
+            <g opacity="0.2">
+              {/* Binary/data stream */}
+              <text x="60" y="680" fill="#0BB3FF" fontSize="8" fontFamily="monospace" opacity="0.6">01101001</text>
+              <text x="60" y="695" fill="#0A5ED7" fontSize="8" fontFamily="monospace" opacity="0.5">10110010</text>
+              <text x="60" y="710" fill="#0BB3FF" fontSize="8" fontFamily="monospace" opacity="0.4">01001101</text>
+              <text x="60" y="725" fill="#F97316" fontSize="8" fontFamily="monospace" opacity="0.5">11010011</text>
+              
+              {/* Processing arrow */}
+              <path d="M130,700 L180,700" stroke="#0BB3FF" strokeWidth="1.5"/>
+              <polygon points="180,700 172,696 172,704" fill="#0BB3FF"/>
+              
+              {/* Output indicators */}
+              <circle cx="210" cy="680" r="6" fill="#0BB3FF" opacity="0.6"/>
+              <circle cx="210" cy="700" r="6" fill="#0A5ED7" opacity="0.6"/>
+              <circle cx="210" cy="720" r="6" fill="#F97316" opacity="0.6"/>
+            </g>
+            
+            {/* Circuit Board Pattern */}
+            <g opacity="0.1" stroke="#0BB3FF" strokeWidth="0.5">
+              <path d="M300,100 L350,100 L350,150 L400,150"/>
+              <path d="M350,100 L350,50 L420,50"/>
+              <path d="M280,200 L280,250 L350,250 L350,300"/>
+              <circle cx="350" cy="100" r="3" fill="#0BB3FF"/>
+              <circle cx="350" cy="150" r="3" fill="#0A5ED7"/>
+              <circle cx="350" cy="250" r="3" fill="#F97316"/>
+            </g>
+            
+            {/* Flowing Data Lines */}
             <g opacity="0.15">
-              <rect x="300" y="100" width="14" height="50" rx="3" fill="#0BB3FF"/>
-              <rect x="320" y="80" width="14" height="70" rx="3" fill="#0A5ED7"/>
-              <rect x="340" y="110" width="14" height="40" rx="3" fill="#F97316"/>
-              <rect x="360" y="90" width="14" height="60" rx="3" fill="#0BB3FF"/>
-              <rect x="380" y="105" width="14" height="45" rx="3" fill="#0A5ED7"/>
-              
-              <circle cx="340" cy="300" r="55" stroke="#0A5ED7" strokeWidth="4" fill="none" strokeDasharray="250 95"/>
-              <circle cx="340" cy="300" r="42" stroke="#0BB3FF" strokeWidth="2" fill="none" opacity="0.6"/>
-              <circle cx="340" cy="300" r="10" fill="#0A5ED7"/>
-              
-              <path d="M280,500 A70,70 0 0,1 420,500" stroke="#F97316" strokeWidth="5" fill="none" strokeLinecap="round"/>
-              <path d="M295,500 A55,55 0 0,1 405,500" stroke="#0BB3FF" strokeWidth="3" fill="none" opacity="0.5"/>
-              
-              <circle cx="300" cy="700" r="4" fill="#0BB3FF"/>
-              <circle cx="325" cy="690" r="4" fill="#0BB3FF"/>
-              <circle cx="350" cy="680" r="4" fill="#0A5ED7"/>
-              <circle cx="375" cy="685" r="4" fill="#0A5ED7"/>
-              <circle cx="400" cy="675" r="4" fill="#F97316"/>
-              <polyline points="300,700 325,690 350,680 375,685 400,675" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
+              <path d="M-50,800 Q100,780 200,820 T400,800" stroke="#0BB3FF" strokeWidth="2" fill="none"/>
+              <path d="M-50,830 Q120,810 220,850 T420,830" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
+              <path d="M-50,860 Q80,840 180,880 T380,860" stroke="#F97316" strokeWidth="1" fill="none"/>
             </g>
           </svg>
         </div>
       </div>
 
-      {/* Right Side - Complementary Visualization */}
+      {/* Right Side - Advanced Technology Visualization */}
       <div className="fixed right-0 top-0 bottom-0 w-[40%] pointer-events-none overflow-hidden flex items-center justify-center">
         <div className="relative w-full h-full">
-          {/* Floating Text Labels */}
-          <div className="absolute top-[15%] right-[15%] text-[#0A5ED7]/20 text-xs tracking-[0.3em] uppercase font-semibold">Reports</div>
-          <div className="absolute top-[32%] right-[10%] text-[#0BB3FF]/20 text-xs tracking-[0.3em] uppercase font-semibold">Customers</div>
-          <div className="absolute top-[48%] right-[22%] text-[#F97316]/15 text-xs tracking-[0.3em] uppercase font-semibold">Services</div>
-          <div className="absolute top-[65%] right-[12%] text-[#0A5ED7]/20 text-xs tracking-[0.3em] uppercase font-semibold">Vehicles</div>
-          <div className="absolute top-[82%] right-[20%] text-[#0BB3FF]/15 text-xs tracking-[0.3em] uppercase font-semibold">Diagnostics</div>
+          {/* Floating Tech Labels */}
+          <div className="absolute top-[10%] right-[12%] text-[#0A5ED7]/25 text-[10px] tracking-[0.4em] uppercase font-bold">Smart Diagnostics</div>
+          <div className="absolute top-[24%] right-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">IoT Integration</div>
+          <div className="absolute top-[40%] right-[16%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">Real-Time</div>
+          <div className="absolute top-[55%] right-[10%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">Cloud Platform</div>
+          <div className="absolute top-[70%] right-[18%] text-[#0BB3FF]/18 text-[10px] tracking-[0.4em] uppercase font-bold">Data Insights</div>
+          <div className="absolute top-[85%] right-[12%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">Intelligent</div>
           
           <svg viewBox="0 0 500 900" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
-            {/* Connection Lines */}
-            <g opacity="0.12">
-              <path d="M550,100 Q400,100 350,150 T200,130 T50,180" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
-              <path d="M550,300 Q420,300 360,350 T180,330 T0,380" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
-              <path d="M550,500 Q380,500 320,450 T150,470 T0,430" stroke="#F97316" strokeWidth="1" fill="none"/>
-              <path d="M550,700 Q410,700 340,650 T160,680 T0,640" stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
-              <path d="M420,0 Q420,100 380,200 T400,400 T370,600 T390,900" stroke="#0BB3FF" strokeWidth="0.8" fill="none"/>
-              <path d="M300,0 Q300,150 340,250 T320,450 T360,650 T340,900" stroke="#0A5ED7" strokeWidth="0.8" fill="none"/>
-              <path d="M150,0 Q150,80 190,180 T170,380 T210,580 T180,900" stroke="#F97316" strokeWidth="0.6" fill="none"/>
+            {/* Hexagonal Tech Grid */}
+            <g opacity="0.15" stroke="#0A5ED7" strokeWidth="1" fill="none">
+              <polygon points="350,100 380,115 380,145 350,160 320,145 320,115"/>
+              <polygon points="400,130 430,145 430,175 400,190 370,175 370,145"/>
+              <polygon points="350,160 380,175 380,205 350,220 320,205 320,175"/>
+              <circle cx="350" cy="130" r="4" fill="#0A5ED7" opacity="0.5"/>
+              <circle cx="400" cy="160" r="4" fill="#0BB3FF" opacity="0.5"/>
+              <circle cx="350" cy="190" r="4" fill="#F97316" opacity="0.5"/>
             </g>
             
-            {/* Data Nodes */}
+            {/* Radar/Scanning Effect */}
+            <g opacity="0.2">
+              <circle cx="180" cy="280" r="80" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+              <circle cx="180" cy="280" r="60" stroke="#0BB3FF" strokeWidth="0.8" fill="none" strokeDasharray="8 4"/>
+              <circle cx="180" cy="280" r="40" stroke="#0A5ED7" strokeWidth="0.6" fill="none"/>
+              <circle cx="180" cy="280" r="20" stroke="#0A5ED7" strokeWidth="0.5" fill="none" strokeDasharray="4 2"/>
+              <circle cx="180" cy="280" r="6" fill="#F97316"/>
+              {/* Radar sweep line */}
+              <line x1="180" y1="280" x2="260" y2="280" stroke="#0BB3FF" strokeWidth="2" opacity="0.6"/>
+              {/* Detected points */}
+              <circle cx="220" cy="260" r="4" fill="#0BB3FF" opacity="0.8"/>
+              <circle cx="200" cy="310" r="3" fill="#0A5ED7" opacity="0.7"/>
+              <circle cx="150" cy="250" r="3" fill="#F97316" opacity="0.6"/>
+            </g>
+            
+            {/* Cloud/Server Architecture */}
+            <g opacity="0.2">
+              {/* Cloud shape */}
+              <path d="M320,420 Q280,400 300,370 Q310,340 350,340 Q390,340 400,370 Q420,360 440,380 Q470,390 460,420 Q480,450 450,470 L310,470 Q280,460 280,440 Q270,420 320,420" 
+                    stroke="#0BB3FF" strokeWidth="1.5" fill="none"/>
+              {/* Server boxes inside */}
+              <rect x="320" y="390" width="30" height="20" rx="2" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
+              <rect x="360" y="390" width="30" height="20" rx="2" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
+              <rect x="400" y="390" width="30" height="20" rx="2" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
+              {/* Connection lines */}
+              <line x1="335" y1="410" x2="335" y2="450" stroke="#0A5ED7" strokeWidth="0.8"/>
+              <line x1="375" y1="410" x2="375" y2="450" stroke="#0BB3FF" strokeWidth="0.8"/>
+              <line x1="415" y1="410" x2="415" y2="450" stroke="#F97316" strokeWidth="0.8"/>
+              <circle cx="335" cy="450" r="4" fill="#0A5ED7"/>
+              <circle cx="375" cy="450" r="4" fill="#0BB3FF"/>
+              <circle cx="415" cy="450" r="4" fill="#F97316"/>
+            </g>
+            
+            {/* Real-time Data Stream */}
             <g opacity="0.25">
-              <circle cx="400" cy="180" r="12" fill="#0A5ED7"/>
-              <circle cx="400" cy="180" r="24" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
-              <circle cx="400" cy="180" r="36" stroke="#0A5ED7" strokeWidth="0.5" fill="none" strokeDasharray="4 4"/>
-              <circle cx="330" cy="140" r="8" fill="#0BB3FF"/>
-              <circle cx="330" cy="140" r="16" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
-              <circle cx="440" cy="240" r="9" fill="#F97316"/>
-              <line x1="400" y1="180" x2="330" y2="140" stroke="#0A5ED7" strokeWidth="1"/>
-              <line x1="400" y1="180" x2="440" y2="240" stroke="#F97316" strokeWidth="0.8"/>
+              {/* Streaming lines */}
+              <path d="M100,550 C130,540 160,560 190,550 S250,540 280,555" stroke="#0BB3FF" strokeWidth="2" fill="none">
+                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="1s" repeatCount="indefinite"/>
+              </path>
+              <path d="M100,580 C140,570 170,590 200,580 S260,570 290,585" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
+              <path d="M100,610 C120,600 150,620 180,610 S240,600 270,615" stroke="#F97316" strokeWidth="1" fill="none"/>
               
-              <circle cx="420" cy="420" r="10" fill="#0BB3FF"/>
-              <circle cx="420" cy="420" r="20" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
-              <circle cx="350" cy="380" r="7" fill="#0A5ED7"/>
-              <circle cx="350" cy="380" r="14" stroke="#0A5ED7" strokeWidth="0.8" fill="none"/>
-              <circle cx="460" cy="400" r="8" fill="#F97316"/>
-              <line x1="420" y1="420" x2="350" y2="380" stroke="#0BB3FF" strokeWidth="0.8"/>
-              <line x1="420" y1="420" x2="460" y2="400" stroke="#F97316" strokeWidth="0.6"/>
-              
-              <circle cx="380" cy="660" r="11" fill="#F97316"/>
-              <circle cx="380" cy="660" r="22" stroke="#F97316" strokeWidth="1.5" fill="none"/>
-              <circle cx="380" cy="660" r="34" stroke="#F97316" strokeWidth="0.5" fill="none" strokeDasharray="4 4"/>
-              <circle cx="440" cy="620" r="7" fill="#0BB3FF"/>
-              <circle cx="320" cy="700" r="9" fill="#0A5ED7"/>
-              <circle cx="320" cy="700" r="18" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
-              <line x1="380" y1="660" x2="440" y2="620" stroke="#F97316" strokeWidth="0.8"/>
-              <line x1="380" y1="660" x2="320" y2="700" stroke="#0A5ED7" strokeWidth="0.8"/>
+              {/* Data points */}
+              <circle cx="130" cy="545" r="4" fill="#0BB3FF"/>
+              <circle cx="190" cy="555" r="4" fill="#0BB3FF"/>
+              <circle cx="250" cy="548" r="4" fill="#0A5ED7"/>
             </g>
             
-            {/* Dashboard Elements */}
-            <g opacity="0.15">
-              <path d="M180,200 A60,60 0 0,1 240,260" stroke="#0BB3FF" strokeWidth="10" fill="none" strokeLinecap="round"/>
-              <path d="M240,260 A60,60 0 0,1 180,320" stroke="#0A5ED7" strokeWidth="10" fill="none" strokeLinecap="round"/>
-              <path d="M180,320 A60,60 0 0,1 120,260" stroke="#F97316" strokeWidth="10" fill="none" strokeLinecap="round"/>
-              
-              <polyline points="80,450 115,420 150,440 185,390 220,420 255,370" stroke="#0BB3FF" strokeWidth="2.5" fill="none"/>
-              <circle cx="80" cy="450" r="5" fill="#0BB3FF"/>
-              <circle cx="150" cy="440" r="5" fill="#0BB3FF"/>
-              <circle cx="220" cy="420" r="5" fill="#0BB3FF"/>
-              <circle cx="255" cy="370" r="5" fill="#0A5ED7"/>
-              
-              <rect x="80" y="550" width="100" height="12" rx="6" fill="#0A5ED7"/>
-              <rect x="80" y="575" width="140" height="12" rx="6" fill="#0BB3FF"/>
-              <rect x="80" y="600" width="80" height="12" rx="6" fill="#F97316"/>
-              <rect x="80" y="625" width="120" height="12" rx="6" fill="#0A5ED7"/>
-              
-              <circle cx="180" cy="800" r="50" stroke="#0A5ED7" strokeWidth="3" fill="none"/>
-              <circle cx="180" cy="800" r="38" stroke="#0BB3FF" strokeWidth="5" fill="none" strokeDasharray="180 60"/>
-              <circle cx="180" cy="800" r="12" fill="#0A5ED7"/>
+            {/* Gear/Automation Symbol */}
+            <g opacity="0.2" transform="translate(380, 650)">
+              <circle cx="0" cy="0" r="35" stroke="#F97316" strokeWidth="1.5" fill="none"/>
+              <circle cx="0" cy="0" r="25" stroke="#F97316" strokeWidth="1" fill="none"/>
+              <circle cx="0" cy="0" r="10" fill="#F97316" opacity="0.5"/>
+              {/* Gear teeth */}
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+                const rad = angle * Math.PI / 180;
+                return (
+                  <line key={i} x1={35 * Math.cos(rad)} y1={35 * Math.sin(rad)} 
+                        x2={45 * Math.cos(rad)} y2={45 * Math.sin(rad)} 
+                        stroke="#F97316" strokeWidth="4" strokeLinecap="round"/>
+                );
+              })}
+            </g>
+            
+            {/* Connected smaller gear */}
+            <g opacity="0.2" transform="translate(320, 720)">
+              <circle cx="0" cy="0" r="22" stroke="#0A5ED7" strokeWidth="1.5" fill="none"/>
+              <circle cx="0" cy="0" r="14" stroke="#0A5ED7" strokeWidth="1" fill="none"/>
+              <circle cx="0" cy="0" r="6" fill="#0A5ED7" opacity="0.5"/>
+              {[0, 60, 120, 180, 240, 300].map((angle, i) => {
+                const rad = angle * Math.PI / 180;
+                return (
+                  <line key={i} x1={22 * Math.cos(rad)} y1={22 * Math.sin(rad)} 
+                        x2={30 * Math.cos(rad)} y2={30 * Math.sin(rad)} 
+                        stroke="#0A5ED7" strokeWidth="3" strokeLinecap="round"/>
+                );
+              })}
+            </g>
+            
+            {/* Analytics Dashboard Mini */}
+            <g opacity="0.18">
+              <rect x="80" y="720" width="160" height="100" rx="8" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+              {/* Mini bar chart */}
+              <rect x="100" y="780" width="15" height="30" rx="2" fill="#0BB3FF"/>
+              <rect x="125" y="765" width="15" height="45" rx="2" fill="#0A5ED7"/>
+              <rect x="150" y="775" width="15" height="35" rx="2" fill="#F97316"/>
+              <rect x="175" y="760" width="15" height="50" rx="2" fill="#0BB3FF"/>
+              <rect x="200" y="770" width="15" height="40" rx="2" fill="#0A5ED7"/>
+            </g>
+            
+            {/* Circuit traces */}
+            <g opacity="0.1" stroke="#0BB3FF" strokeWidth="0.5">
+              <path d="M50,150 L100,150 L100,200 L150,200"/>
+              <path d="M100,150 L100,100 L180,100"/>
+              <path d="M50,350 L80,350 L80,400 L130,400"/>
+              <circle cx="100" cy="150" r="3" fill="#0BB3FF"/>
+              <circle cx="100" cy="200" r="3" fill="#0A5ED7"/>
+              <circle cx="80" cy="350" r="3" fill="#F97316"/>
             </g>
           </svg>
         </div>
