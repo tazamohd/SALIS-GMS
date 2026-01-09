@@ -9,7 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Mail, Lock, Wrench, Settings, Car, Gauge } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -64,44 +64,184 @@ export default function Login() {
         <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-gradient-to-bl from-[#0A5ED7]/15 via-[#0BB3FF]/8 to-transparent rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-gradient-to-tr from-[#0BB3FF]/12 via-[#0A5ED7]/6 to-transparent rounded-full blur-3xl"></div>
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-[#F97316]/8 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        
-        {/* Automotive Watermark Icons - Scattered */}
-        <div className="absolute inset-0 overflow-hidden opacity-[0.04]">
-          {/* Large Gear/Settings - Top Left */}
-          <Settings className="absolute top-[10%] left-[5%] w-48 h-48 text-[#0BB3FF] transform rotate-12" />
-          
-          {/* Wrench - Top Right */}
-          <Wrench className="absolute top-[15%] right-[10%] w-40 h-40 text-[#0A5ED7] transform -rotate-45" />
-          
-          {/* Car Silhouette - Center Left */}
-          <Car className="absolute top-[40%] left-[8%] w-56 h-56 text-[#F97316] transform -rotate-6" />
-          
-          {/* Gauge/Speedometer - Center Right */}
-          <Gauge className="absolute top-[35%] right-[5%] w-44 h-44 text-[#0BB3FF] transform rotate-15" />
-          
-          {/* Settings - Bottom Left */}
-          <Settings className="absolute bottom-[20%] left-[12%] w-36 h-36 text-[#0A5ED7] transform -rotate-30 animate-spin-slow" style={{ animationDuration: '60s' }} />
-          
-          {/* Wrench - Bottom Right */}
-          <Wrench className="absolute bottom-[15%] right-[15%] w-52 h-52 text-[#F97316] transform rotate-30" />
-          
-          {/* Additional scattered elements */}
-          <Car className="absolute top-[60%] left-[25%] w-32 h-32 text-[#0BB3FF] transform rotate-12" />
-          <Gauge className="absolute bottom-[35%] right-[25%] w-28 h-28 text-[#0A5ED7] transform -rotate-20" />
-          <Settings className="absolute top-[75%] right-[40%] w-24 h-24 text-[#F97316] transform rotate-45" />
-        </div>
-        
-        {/* Grid Pattern Overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `linear-gradient(rgba(11, 179, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(11, 179, 255, 0.3) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }}></div>
-        
-        {/* Diagonal Lines Pattern */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{
-          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(249, 115, 22, 0.1) 100px, rgba(249, 115, 22, 0.1) 101px)`
-        }}></div>
       </div>
+
+      {/* Automotive Sketch Art - Left Side */}
+      <div className="fixed left-0 top-0 bottom-0 w-1/3 pointer-events-none overflow-hidden">
+        <svg viewBox="0 0 400 800" className="absolute inset-0 w-full h-full opacity-[0.08]" preserveAspectRatio="xMidYMid slice">
+          {/* Sports Car Sketch - Top */}
+          <g stroke="#0BB3FF" strokeWidth="1" fill="none" transform="translate(20, 80)">
+            <path d="M50,120 Q80,100 120,100 L200,100 Q240,100 260,90 L300,70 Q320,60 340,60 L360,60" strokeWidth="1.5"/>
+            <path d="M50,120 L30,140 L30,160 Q30,170 40,170 L80,170" strokeWidth="1.5"/>
+            <path d="M80,170 Q90,170 100,160 L120,160 Q130,170 140,170 L220,170 Q230,170 240,160 L260,160 Q270,170 280,170 L340,170" strokeWidth="1.5"/>
+            <path d="M340,170 L360,160 L370,140 L370,100 Q370,80 360,60" strokeWidth="1.5"/>
+            <ellipse cx="100" cy="165" rx="25" ry="25" strokeWidth="1.2"/>
+            <ellipse cx="100" cy="165" rx="15" ry="15" strokeWidth="0.8"/>
+            <ellipse cx="260" cy="165" rx="25" ry="25" strokeWidth="1.2"/>
+            <ellipse cx="260" cy="165" rx="15" ry="15" strokeWidth="0.8"/>
+            <path d="M140,100 L140,70 Q140,60 150,55 L200,45 Q220,40 240,45 L280,55 Q290,60 290,70 L290,90" strokeWidth="0.8"/>
+            <line x1="180" y1="100" x2="180" y2="55" strokeWidth="0.5"/>
+            <line x1="220" y1="100" x2="220" y2="50" strokeWidth="0.5"/>
+          </g>
+
+          {/* Engine Block Sketch - Middle */}
+          <g stroke="#F97316" strokeWidth="0.8" fill="none" transform="translate(30, 300)">
+            <rect x="40" y="40" width="180" height="120" rx="5" strokeWidth="1"/>
+            <rect x="60" y="20" width="140" height="25" rx="3"/>
+            <circle cx="90" cy="100" r="30" strokeWidth="1"/>
+            <circle cx="90" cy="100" r="20"/>
+            <circle cx="90" cy="100" r="10"/>
+            <circle cx="170" cy="100" r="30" strokeWidth="1"/>
+            <circle cx="170" cy="100" r="20"/>
+            <circle cx="170" cy="100" r="10"/>
+            <path d="M40,80 L20,80 L20,120 L40,120"/>
+            <path d="M220,60 L250,50 L260,60 L260,140 L250,150 L220,140"/>
+            <line x1="80" y1="20" x2="80" y2="0"/>
+            <line x1="130" y1="20" x2="130" y2="0"/>
+            <line x1="180" y1="20" x2="180" y2="0"/>
+            {/* Pistons */}
+            <rect x="75" y="-20" width="10" height="25" rx="2"/>
+            <rect x="125" y="-30" width="10" height="35" rx="2"/>
+            <rect x="175" y="-15" width="10" height="20" rx="2"/>
+          </g>
+
+          {/* Gear System - Bottom */}
+          <g stroke="#0A5ED7" strokeWidth="0.8" fill="none" transform="translate(50, 550)">
+            <circle cx="80" cy="80" r="50" strokeWidth="1.2"/>
+            <circle cx="80" cy="80" r="40"/>
+            <circle cx="80" cy="80" r="15"/>
+            {/* Gear teeth */}
+            {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => (
+              <line key={i} x1={80 + 50 * Math.cos(angle * Math.PI / 180)} y1={80 + 50 * Math.sin(angle * Math.PI / 180)} 
+                    x2={80 + 60 * Math.cos(angle * Math.PI / 180)} y2={80 + 60 * Math.sin(angle * Math.PI / 180)} strokeWidth="3"/>
+            ))}
+            <circle cx="180" cy="120" r="35" strokeWidth="1"/>
+            <circle cx="180" cy="120" r="25"/>
+            <circle cx="180" cy="120" r="10"/>
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+              <line key={`small-${i}`} x1={180 + 35 * Math.cos(angle * Math.PI / 180)} y1={120 + 35 * Math.sin(angle * Math.PI / 180)} 
+                    x2={180 + 42 * Math.cos(angle * Math.PI / 180)} y2={120 + 42 * Math.sin(angle * Math.PI / 180)} strokeWidth="2"/>
+            ))}
+          </g>
+
+          {/* Technical Lines */}
+          <g stroke="#0BB3FF" strokeWidth="0.3" opacity="0.5">
+            <line x1="0" y1="250" x2="400" y2="280"/>
+            <line x1="0" y1="500" x2="300" y2="520"/>
+            <line x1="50" y1="0" x2="100" y2="800"/>
+            <line x1="200" y1="0" x2="150" y2="400"/>
+          </g>
+        </svg>
+      </div>
+
+      {/* Automotive Sketch Art - Right Side */}
+      <div className="fixed right-0 top-0 bottom-0 w-1/3 pointer-events-none overflow-hidden">
+        <svg viewBox="0 0 400 800" className="absolute inset-0 w-full h-full opacity-[0.08]" preserveAspectRatio="xMidYMid slice">
+          {/* Speedometer Sketch - Top */}
+          <g stroke="#0BB3FF" strokeWidth="0.8" fill="none" transform="translate(100, 60)">
+            <circle cx="100" cy="100" r="80" strokeWidth="1.5"/>
+            <circle cx="100" cy="100" r="70" strokeWidth="0.8"/>
+            <circle cx="100" cy="100" r="10"/>
+            {/* Speed marks */}
+            {[...Array(11)].map((_, i) => {
+              const angle = -225 + i * 27;
+              const rad = angle * Math.PI / 180;
+              return (
+                <g key={i}>
+                  <line x1={100 + 55 * Math.cos(rad)} y1={100 + 55 * Math.sin(rad)} 
+                        x2={100 + 68 * Math.cos(rad)} y2={100 + 68 * Math.sin(rad)} strokeWidth={i % 2 === 0 ? "2" : "1"}/>
+                </g>
+              );
+            })}
+            {/* Needle */}
+            <path d="M100,100 L60,50" strokeWidth="2" stroke="#F97316"/>
+            <text x="100" y="145" fontSize="8" fill="#0BB3FF" textAnchor="middle" fontFamily="monospace">km/h</text>
+          </g>
+
+          {/* Wheel/Rim Sketch - Middle */}
+          <g stroke="#F97316" strokeWidth="0.8" fill="none" transform="translate(80, 280)">
+            <circle cx="100" cy="100" r="80" strokeWidth="1.5"/>
+            <circle cx="100" cy="100" r="70" strokeWidth="1"/>
+            <circle cx="100" cy="100" r="30" strokeWidth="1.2"/>
+            <circle cx="100" cy="100" r="20"/>
+            {/* Spokes */}
+            {[0, 72, 144, 216, 288].map((angle, i) => (
+              <g key={i}>
+                <path d={`M${100 + 30 * Math.cos(angle * Math.PI / 180)},${100 + 30 * Math.sin(angle * Math.PI / 180)} 
+                          Q${100 + 50 * Math.cos((angle + 20) * Math.PI / 180)},${100 + 50 * Math.sin((angle + 20) * Math.PI / 180)} 
+                          ${100 + 65 * Math.cos(angle * Math.PI / 180)},${100 + 65 * Math.sin(angle * Math.PI / 180)}`} strokeWidth="1.2"/>
+                <path d={`M${100 + 30 * Math.cos(angle * Math.PI / 180)},${100 + 30 * Math.sin(angle * Math.PI / 180)} 
+                          Q${100 + 50 * Math.cos((angle - 20) * Math.PI / 180)},${100 + 50 * Math.sin((angle - 20) * Math.PI / 180)} 
+                          ${100 + 65 * Math.cos(angle * Math.PI / 180)},${100 + 65 * Math.sin(angle * Math.PI / 180)}`} strokeWidth="1.2"/>
+              </g>
+            ))}
+            {/* Lug nuts */}
+            {[0, 72, 144, 216, 288].map((angle, i) => (
+              <circle key={`nut-${i}`} cx={100 + 22 * Math.cos(angle * Math.PI / 180)} cy={100 + 22 * Math.sin(angle * Math.PI / 180)} r="4"/>
+            ))}
+          </g>
+
+          {/* Wrench & Tool Sketch - Bottom */}
+          <g stroke="#0A5ED7" strokeWidth="1" fill="none" transform="translate(60, 520)">
+            {/* Wrench */}
+            <path d="M40,40 L80,80 L90,80 L100,90 L180,170" strokeWidth="1.5"/>
+            <path d="M30,30 Q20,40 25,55 L40,40 L55,25 Q40,20 30,30" strokeWidth="1.2"/>
+            <path d="M180,170 Q200,190 220,180 L200,160 L180,180 Q170,200 180,170" strokeWidth="1.2"/>
+            
+            {/* Screwdriver */}
+            <path d="M140,20 L160,40 L180,180" strokeWidth="1"/>
+            <rect x="130" y="10" width="20" height="15" rx="2" transform="rotate(45, 140, 17)"/>
+            <line x1="175" y1="175" x2="185" y2="185" strokeWidth="2"/>
+            
+            {/* Socket */}
+            <rect x="220" y="80" width="40" height="60" rx="5" strokeWidth="1"/>
+            <ellipse cx="240" cy="80" rx="20" ry="8"/>
+            <ellipse cx="240" cy="140" rx="20" ry="8"/>
+            <rect x="230" y="60" width="20" height="25" rx="3"/>
+          </g>
+
+          {/* Technical Lines */}
+          <g stroke="#F97316" strokeWidth="0.3" opacity="0.4">
+            <line x1="400" y1="200" x2="0" y2="230"/>
+            <line x1="400" y1="450" x2="100" y2="480"/>
+            <line x1="350" y1="0" x2="300" y2="800"/>
+            <line x1="250" y1="0" x2="320" y2="600"/>
+          </g>
+        </svg>
+      </div>
+
+      {/* Decorative Corner Lines */}
+      <svg className="fixed top-0 left-0 w-48 h-48 opacity-20 pointer-events-none" viewBox="0 0 200 200">
+        <path d="M0,80 L80,0" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+        <path d="M0,120 L120,0" stroke="#0A5ED7" strokeWidth="0.5" fill="none"/>
+        <path d="M0,160 L160,0" stroke="#F97316" strokeWidth="0.5" fill="none"/>
+        <circle cx="40" cy="40" r="3" fill="#0BB3FF"/>
+        <circle cx="60" cy="60" r="2" fill="#0A5ED7"/>
+      </svg>
+      
+      <svg className="fixed top-0 right-0 w-48 h-48 opacity-20 pointer-events-none" viewBox="0 0 200 200">
+        <path d="M200,80 L120,0" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+        <path d="M200,120 L80,0" stroke="#0A5ED7" strokeWidth="0.5" fill="none"/>
+        <path d="M200,160 L40,0" stroke="#F97316" strokeWidth="0.5" fill="none"/>
+        <circle cx="160" cy="40" r="3" fill="#0BB3FF"/>
+        <circle cx="140" cy="60" r="2" fill="#F97316"/>
+      </svg>
+      
+      <svg className="fixed bottom-0 left-0 w-48 h-48 opacity-20 pointer-events-none" viewBox="0 0 200 200">
+        <path d="M0,120 L80,200" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+        <path d="M0,80 L120,200" stroke="#0A5ED7" strokeWidth="0.5" fill="none"/>
+        <path d="M0,40 L160,200" stroke="#F97316" strokeWidth="0.5" fill="none"/>
+        <circle cx="40" cy="160" r="3" fill="#F97316"/>
+        <circle cx="60" cy="140" r="2" fill="#0A5ED7"/>
+      </svg>
+      
+      <svg className="fixed bottom-0 right-0 w-48 h-48 opacity-20 pointer-events-none" viewBox="0 0 200 200">
+        <path d="M200,120 L120,200" stroke="#0BB3FF" strokeWidth="1" fill="none"/>
+        <path d="M200,80 L80,200" stroke="#0A5ED7" strokeWidth="0.5" fill="none"/>
+        <path d="M200,40 L40,200" stroke="#F97316" strokeWidth="0.5" fill="none"/>
+        <circle cx="160" cy="160" r="3" fill="#0BB3FF"/>
+        <circle cx="140" cy="140" r="2" fill="#0A5ED7"/>
+      </svg>
 
       <div className="w-full max-w-md p-4 relative z-10">
         {/* Main Login Card */}
