@@ -243,44 +243,44 @@ export default function Login() {
         backgroundSize: '40px 40px'
       }}></div>
 
-      <div className="w-full max-w-md p-4 relative z-10">
+      <div className="w-full max-w-xl p-4 relative z-10">
         {/* Main Login Card */}
         <Card className="bg-[#0F1319]/95 backdrop-blur-2xl border border-[#1A2030] shadow-2xl shadow-black/60 rounded-2xl overflow-hidden">
           {/* Top accent line */}
           <div className="h-1 bg-gradient-to-r from-[#0A5ED7] via-[#0BB3FF] to-[#F97316]"></div>
           
-          <CardHeader className="space-y-4 pb-6 pt-8">
+          <CardHeader className="space-y-6 pb-8 pt-10">
             <div className="flex justify-center">
               <div className="relative group">
-                <div className="absolute -inset-6 bg-gradient-to-r from-[#0A5ED7]/25 to-[#0BB3FF]/25 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
-                <div className="relative p-4 bg-[#0C1018]/90 rounded-2xl border border-[#1A2030]">
+                <div className="absolute -inset-8 bg-gradient-to-r from-[#0A5ED7]/25 to-[#0BB3FF]/25 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+                <div className="relative p-5 bg-[#0C1018]/90 rounded-2xl border border-[#1A2030]">
                   <img 
                     src={logoImage} 
                     alt={t('app.name', 'SALIS AUTO')} 
-                    className="w-44 h-auto drop-shadow-2xl"
+                    className="w-56 h-auto drop-shadow-2xl"
                     data-testid="logo-salis-auto"
                   />
                 </div>
               </div>
             </div>
-            <div className="text-center space-y-2">
-              <CardTitle className="text-2xl font-montserrat font-bold text-white tracking-tight">
+            <div className="text-center space-y-3">
+              <CardTitle className="text-3xl font-montserrat font-bold text-white tracking-tight">
                 {t('auth.signIn', 'Sign In')}
               </CardTitle>
-              <CardDescription className="font-poppins text-[#6B7A90]">
+              <CardDescription className="font-poppins text-[#6B7A90] text-base">
                 {t('auth.enterCredentials', 'Enter your credentials to access your account')}
               </CardDescription>
             </div>
           </CardHeader>
           
-          <CardContent className="pb-8">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="font-poppins text-[#C4D0E4] font-medium text-sm">
+          <CardContent className="pb-10 px-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-3">
+                <Label htmlFor="email" className="font-poppins text-[#C4D0E4] font-medium text-base">
                   {t('auth.email', 'Email')}
                 </Label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#4A5568] group-focus-within:text-[#0BB3FF] transition-colors" />
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-[#4A5568] group-focus-within:text-[#0BB3FF] transition-colors" />
                   <Input
                     id="email"
                     type="email"
@@ -289,17 +289,17 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     data-testid="input-email"
-                    className="pl-12 h-13 font-poppins bg-[#080B12] border-[#1A2030] text-white placeholder:text-[#4A5568] focus:border-[#0BB3FF] focus:ring-2 focus:ring-[#0BB3FF]/20 rounded-xl transition-all duration-200"
+                    className="pl-14 h-14 text-base font-poppins bg-[#080B12] border-[#1A2030] text-white placeholder:text-[#4A5568] focus:border-[#0BB3FF] focus:ring-2 focus:ring-[#0BB3FF]/20 rounded-xl transition-all duration-200"
                   />
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="password" className="font-poppins text-[#C4D0E4] font-medium text-sm">
+              <div className="space-y-3">
+                <Label htmlFor="password" className="font-poppins text-[#C4D0E4] font-medium text-base">
                   {t('auth.password', 'Password')}
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#4A5568] group-focus-within:text-[#0BB3FF] transition-colors" />
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-[#4A5568] group-focus-within:text-[#0BB3FF] transition-colors" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -308,34 +308,34 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     data-testid="input-password"
-                    className="pl-12 pr-12 h-13 font-poppins bg-[#080B12] border-[#1A2030] text-white placeholder:text-[#4A5568] focus:border-[#0BB3FF] focus:ring-2 focus:ring-[#0BB3FF]/20 rounded-xl transition-all duration-200"
+                    className="pl-14 pr-14 h-14 text-base font-poppins bg-[#080B12] border-[#1A2030] text-white placeholder:text-[#4A5568] focus:border-[#0BB3FF] focus:ring-2 focus:ring-[#0BB3FF]/20 rounded-xl transition-all duration-200"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#4A5568] hover:text-[#0BB3FF] transition-colors"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-[#4A5568] hover:text-[#0BB3FF] transition-colors"
                     data-testid="toggle-password-visibility"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
                   </button>
                 </div>
               </div>
               
               <Button 
                 type="submit" 
-                className="w-full h-13 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white font-poppins font-semibold text-base shadow-lg shadow-[#0A5ED7]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#0BB3FF]/40 hover:scale-[1.02] rounded-xl"
+                className="w-full h-14 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white font-poppins font-semibold text-lg shadow-lg shadow-[#0A5ED7]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#0BB3FF]/40 hover:scale-[1.02] rounded-xl mt-8"
                 disabled={loginMutation.isPending}
                 data-testid="login-submit"
               >
                 {loginMutation.isPending ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     {t('auth.signingIn', 'Signing in...')}
                   </span>
                 ) : t('auth.signIn', 'Sign In')}
               </Button>
               
-              <p className="text-center text-sm font-poppins text-[#6B7A90] pt-2">
+              <p className="text-center text-base font-poppins text-[#6B7A90] pt-4">
                 {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
                 <Link 
                   href="/register" 
