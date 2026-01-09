@@ -73,7 +73,14 @@ This documentation provides comprehensive coverage of all user flows, user scena
 - Step-by-step workflows
 - Edge cases and exceptions
 
-### 9. [Workflow Diagrams](./WORKFLOW_DIAGRAMS.md)
+### 9. [Authentication & RBAC Guide](./AUTHENTICATION_RBAC_GUIDE.md)
+- Login/Registration flows
+- 25 professional roles defined
+- Demo credentials
+- Role-to-portal mapping
+- Frontend and backend protection
+
+### 10. [Workflow Diagrams](./WORKFLOW_DIAGRAMS.md)
 - Visual process flows
 - System architecture diagrams
 - Integration maps

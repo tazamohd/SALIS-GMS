@@ -163,12 +163,28 @@ export default function Login() {
         
         {/* Demo Credentials */}
         <div className="mt-6 p-4 bg-white/60 dark:bg-[#151A23]/60 backdrop-blur-sm rounded-xl border border-[#E2E8F0] dark:border-[#232A36]">
-          <p className="text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0] text-center mb-2 uppercase tracking-wider">
-            {t('auth.demoCredentials', 'Demo Credentials')}
+          <p className="text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0] text-center mb-3 uppercase tracking-wider">
+            {t('auth.demoCredentials', 'Demo Credentials')} (Password: Password123!)
           </p>
-          <div className="space-y-1 text-xs font-mono text-center text-[#0B1F3B] dark:text-[#E6EAF0]">
-            <p>admin@salisauto.com / admin123</p>
-            <p>tech@salisauto.com / tech123</p>
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono text-[#0B1F3B] dark:text-[#E6EAF0]">
+            <button type="button" onClick={() => { setEmail('admin@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#0A5ED7]">Admin</span>
+            </button>
+            <button type="button" onClick={() => { setEmail('owner@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#0A5ED7]">Owner</span>
+            </button>
+            <button type="button" onClick={() => { setEmail('service.manager@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#0BB3FF]">Manager</span>
+            </button>
+            <button type="button" onClick={() => { setEmail('tech@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#0BB3FF]">Technician</span>
+            </button>
+            <button type="button" onClick={() => { setEmail('finance@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#F97316]">Finance</span>
+            </button>
+            <button type="button" onClick={() => { setEmail('client@salisauto.com'); setPassword('Password123!'); }} className="p-2 rounded hover:bg-[#0A5ED7]/10 text-left">
+              <span className="text-[#F97316]">Customer</span>
+            </button>
           </div>
         </div>
       </div>
