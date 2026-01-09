@@ -300,6 +300,13 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public Routes - No Auth Required */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/customer-portal" component={CustomerPortal} />
+      <Route path="/track/:token" component={PublicTracking} />
+      <Route path="/landing" component={Landing} />
+
       {/* Root path - show dashboard directly */}
       <Route path="/">
         <Layout>
