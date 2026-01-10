@@ -10,6 +10,7 @@ import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { getPortalForRole } from "@shared/rbac";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -24,13 +25,14 @@ export default function Login() {
       const response = await apiRequest("POST", "/api/login", credentials);
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (user) => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({
         title: t('common.success', 'Success'),
         description: t('auth.loggedInSuccessfully', 'Logged in successfully'),
       });
-      window.location.href = "/";
+      const targetPortal = getPortalForRole(user.role);
+      window.location.href = targetPortal;
     },
     onError: (error: Error) => {
       toast({

@@ -107,6 +107,7 @@ import type { UserSettings, Garage } from "@shared/schema";
 import { 
   navigationConfig, 
   filterNavigationByAccess,
+  mapUserRoleToNavRole,
   type NavGroup,
   type UserRole,
   type SubscriptionPlan
@@ -193,8 +194,7 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   // Get user role and plan for filtering navigation
-  const userRole: UserRole = ((user as any)?.role?.toUpperCase() || 
-    ((user as any)?.userType === 'admin' ? 'ADMIN' : 'ADVISOR')) as UserRole;
+  const userRole: UserRole = mapUserRoleToNavRole((user as any)?.role);
   
   // Subscription plan comes from user object (included by /api/user endpoint)
   const rawPlan = (user as any)?.subscriptionPlan;

@@ -84,8 +84,30 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'ADVISOR' | 'TECHNICIAN' | 'ACCOUNTANT';
+export type UserRole = 'ADMIN' | 'MANAGER' | 'ADVISOR' | 'TECHNICIAN' | 'ACCOUNTANT' | 'CUSTOMER';
 export type SubscriptionPlan = 'STARTER' | 'PRO' | 'ENTERPRISE';
+
+export function mapUserRoleToNavRole(role: string | undefined): UserRole {
+  if (!role) return 'ADVISOR';
+  
+  const normalizedRole = role.toLowerCase();
+  
+  const adminRoles = ['system_administrator', 'business_owner'];
+  const managerRoles = ['general_manager', 'service_manager', 'parts_manager', 'finance_manager', 'hr_manager', 'marketing_manager', 'fleet_manager'];
+  const technicianRoles = ['lead_technician', 'technician', 'quality_control_inspector'];
+  const accountantRoles = ['accountant'];
+  const customerRoles = ['customer'];
+  const advisorRoles = ['service_advisor', 'customer_service_rep', 'receptionist', 'call_center_agent', 'bdc_specialist', 'compliance_officer', 'inventory_controller', 'purchase_agent', 'data_analyst', 'ai_automation_specialist', 'customer_success_manager'];
+  
+  if (adminRoles.includes(normalizedRole)) return 'ADMIN';
+  if (managerRoles.includes(normalizedRole)) return 'MANAGER';
+  if (technicianRoles.includes(normalizedRole)) return 'TECHNICIAN';
+  if (accountantRoles.includes(normalizedRole)) return 'ACCOUNTANT';
+  if (customerRoles.includes(normalizedRole)) return 'CUSTOMER';
+  if (advisorRoles.includes(normalizedRole)) return 'ADVISOR';
+  
+  return 'ADVISOR';
+}
 
 export interface NavItem {
   title: string;
@@ -108,17 +130,19 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Dashboard & Overview",
     icon: Home,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN', 'ACCOUNTANT'],
     items: [
       { title: "Dashboard", href: "/", icon: Home },
-      { title: "KPI Dashboard", href: "/kpi-dashboard", icon: Target },
-      { title: "Service Bay Monitor", href: "/service-bay-dashboard", icon: Wrench },
-      { title: "Auto Reordering", href: "/automated-reordering", icon: PackageSearch },
-      { title: "Loyalty Program", href: "/loyalty-program", icon: Crown },
+      { title: "KPI Dashboard", href: "/kpi-dashboard", icon: Target, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Service Bay Monitor", href: "/service-bay-dashboard", icon: Wrench, roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'] },
+      { title: "Auto Reordering", href: "/automated-reordering", icon: PackageSearch, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Loyalty Program", href: "/loyalty-program", icon: Crown, roles: ['ADMIN', 'MANAGER', 'ADVISOR'] },
     ],
   },
   {
     title: "Customer Intake & Appointments",
     icon: Users,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR'],
     items: [
       { title: "Customers", href: "/customers", icon: Users },
       { title: "Appointments", href: "/appointments", icon: Calendar },
@@ -130,12 +154,13 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Vehicle Management",
     icon: Car,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'],
     items: [
       { title: "Vehicles", href: "/vehicles", icon: Car },
       { title: "Vehicle History", href: "/vehicle-history", icon: Clock },
       { title: "VIN Decoder", href: "/vin-decoder", icon: Fingerprint },
-      { title: "Fleet Management", href: "/fleet-management", icon: Truck },
-      { title: "Fleet Tracking", href: "/fleet-tracking", icon: MapPin },
+      { title: "Fleet Management", href: "/fleet-management", icon: Truck, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Fleet Tracking", href: "/fleet-tracking", icon: MapPin, roles: ['ADMIN', 'MANAGER'] },
       { title: "Vehicle Tracking", href: "/vehicle-tracking", icon: MapPin },
       { title: "Loaner Vehicles", href: "/loaner-vehicles", icon: Key },
     ],
@@ -143,17 +168,19 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Inspection & Check-In",
     icon: FileCheck,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'],
     items: [
       { title: "Vehicle Inspections", href: "/vehicle-inspections", icon: FileCheck },
       { title: "Vehicle Checklist", href: "/vehicle-checklist", icon: ClipboardList },
       { title: "Vehicle Walkaround", href: "/digital-vehicle-walkaround", icon: Camera },
-      { title: "Security Cameras", href: "/security-cameras", icon: Camera },
+      { title: "Security Cameras", href: "/security-cameras", icon: Camera, roles: ['ADMIN', 'MANAGER'] },
       { title: "Plate Recognition", href: "/license-plate", icon: Car },
     ],
   },
   {
     title: "Diagnostics & Assessment",
     icon: Cpu,
+    roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'],
     items: [
       { title: "Diagnostics & OBD", href: "/diagnostics-obd", icon: Cpu },
       { title: "Smart Damage Assessment", href: "/smart-damage-assessment", icon: Camera },
@@ -166,6 +193,7 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Service Planning & Scheduling",
     icon: Wrench,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'],
     items: [
       { title: "Job Cards", href: "/job-cards", icon: Wrench },
       { title: "Tasks", href: "/tasks", icon: ClipboardCheck },
@@ -185,29 +213,31 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Parts & Inventory",
     icon: Package,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR'],
     items: [
       { title: "Inventory", href: "/inventory-management", icon: Warehouse },
       { title: "Spare Parts", href: "/spare-parts", icon: Package },
       { title: "Tools", href: "/tools", icon: Hammer },
       { title: "Equipment Calibration", href: "/equipment-calibration", icon: Gauge },
-      { title: "Auto Reordering", href: "/parts-auto-reorder", icon: RefreshCw },
-      { title: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart },
-      { title: "Purchase Agent", href: "/purchase-agent", icon: Briefcase },
-      { title: "Suppliers", href: "/suppliers", icon: Truck },
+      { title: "Auto Reordering", href: "/parts-auto-reorder", icon: RefreshCw, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Purchase Agent", href: "/purchase-agent", icon: Briefcase, roles: ['ADMIN', 'MANAGER', 'ADVISOR'] },
+      { title: "Suppliers", href: "/suppliers", icon: Truck, roles: ['ADMIN', 'MANAGER'] },
       { title: "Barcode Scanner", href: "/barcode-scanner", icon: ScanLine },
       { title: "Parts Marketplace", href: "/parts-marketplace", icon: Store },
       { title: "Parts Supply Network", href: "/parts-supply-network", icon: Network },
       { title: "Parts Network", href: "/parts-network", icon: Share2 },
-      { title: "Internal Warehouse", href: "/internal-warehouse", icon: Warehouse },
-      { title: "Smart Inventory Forecasting", href: "/smart-inventory-forecasting", icon: TrendingUp },
+      { title: "Internal Warehouse", href: "/internal-warehouse", icon: Warehouse, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Smart Inventory Forecasting", href: "/smart-inventory-forecasting", icon: TrendingUp, roles: ['ADMIN', 'MANAGER'] },
     ],
   },
   {
     title: "Service Execution",
     icon: HardHat,
+    roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'],
     items: [
       { title: "Technician Portal", href: "/technician-portal", icon: HardHat },
-      { title: "Technician Management", href: "/technician-management", icon: Users },
+      { title: "Technician Management", href: "/technician-management", icon: Users, roles: ['ADMIN', 'MANAGER'] },
       { title: "Live Service Tracking", href: "/live-service-tracking", icon: Eye },
       { title: "Routing Optimizer", href: "/routing-optimizer", icon: Route },
       { title: "Tire Management", href: "/tire-management", icon: RefreshCw },
@@ -219,6 +249,7 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Quality & Delivery",
     icon: Award,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN'],
     items: [
       { title: "Quality Control", href: "/quality-control", icon: FileCheck },
       { title: "Computer Vision QC", href: "/computer-vision-qc", icon: Camera },
@@ -285,19 +316,20 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Customer Experience & Growth",
     icon: Star,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR'],
     items: [
       { title: "Customer Portal", href: "/customer-portal", icon: Users },
       { title: "Customer Loyalty", href: "/customer-loyalty", icon: Trophy },
       { title: "Service Reminders", href: "/service-reminders", icon: Bell },
-      { title: "Email Marketing", href: "/email-marketing", icon: Mail },
-      { title: "Email Campaigns", href: "/email-marketing-campaigns", icon: Mail },
-      { title: "Marketing Hub", href: "/marketing-hub", icon: Megaphone },
-      { title: "Marketing Automation", href: "/marketing-automation", icon: RefreshCw },
+      { title: "Email Marketing", href: "/email-marketing", icon: Mail, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Email Campaigns", href: "/email-marketing-campaigns", icon: Mail, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Marketing Hub", href: "/marketing-hub", icon: Megaphone, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Marketing Automation", href: "/marketing-automation", icon: RefreshCw, roles: ['ADMIN', 'MANAGER'] },
       { title: "Referral Program", href: "/referral-program", icon: Gift },
-      { title: "Google My Business", href: "/google-my-business", icon: MapPin },
-      { title: "Social Media", href: "/social-media-integration", icon: Globe },
-      { title: "Social Monitoring", href: "/social-media-monitoring", icon: Search },
-      { title: "Sales Management", href: "/sales-management", icon: DollarSign },
+      { title: "Google My Business", href: "/google-my-business", icon: MapPin, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Social Media", href: "/social-media-integration", icon: Globe, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Social Monitoring", href: "/social-media-monitoring", icon: Search, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Sales Management", href: "/sales-management", icon: DollarSign, roles: ['ADMIN', 'MANAGER'] },
       { title: "Sales Guide", href: "/sales-guide", icon: BookOpen },
     ],
   },
@@ -321,6 +353,7 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Compliance & Safety",
     icon: Shield,
+    roles: ['ADMIN', 'MANAGER'],
     items: [
       { title: "Compliance Management", href: "/compliance-management", icon: Shield },
       { title: "Environmental Compliance", href: "/environmental-compliance", icon: Recycle },
@@ -334,6 +367,7 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Enterprise & Franchise",
     icon: Building2,
+    roles: ['ADMIN', 'MANAGER'],
     minPlan: 'ENTERPRISE',
     items: [
       { title: "Franchise Management", href: "/franchise-management", icon: Building2 },
@@ -347,6 +381,7 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "Emerging Technologies",
     icon: Monitor,
+    roles: ['ADMIN', 'MANAGER', 'TECHNICIAN'],
     minPlan: 'PRO',
     items: [
       { title: "3D Parts Viewer", href: "/interactive-3d-parts", icon: Package },
@@ -366,15 +401,16 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "AI & Automation Hub",
     icon: Brain,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR'],
     items: [
-      { title: "AI Automation", href: "/ai-automation", icon: Brain },
+      { title: "AI Automation", href: "/ai-automation", icon: Brain, roles: ['ADMIN', 'MANAGER'] },
       { title: "Call Center", href: "/call-center", icon: Radio },
       { title: "Support Chat", href: "/support-chat-dashboard", icon: MessageSquare },
       { title: "Parts Availability", href: "/parts-availability", icon: RefreshCw },
       { title: "AI Chatbot", href: "/ai-chatbot", icon: MessageSquare },
       { title: "AI Chatbot Assistant", href: "/ai-chatbot-assistant", icon: Brain },
       { title: "AI Service Advisor", href: "/ai-service-advisor", icon: Brain },
-      { title: "ML Fraud Detection", href: "/ml-fraud-detection", icon: ShieldAlert },
+      { title: "ML Fraud Detection", href: "/ml-fraud-detection", icon: ShieldAlert, roles: ['ADMIN', 'MANAGER'] },
       { title: "Video Consultations", href: "/video-consultations", icon: Video },
       { title: "Voice Commands", href: "/voice-commands", icon: Mic },
       { title: "Voice Interface", href: "/voice-command-interface", icon: Radio },
@@ -383,18 +419,19 @@ export const navigationConfig: NavGroup[] = [
   {
     title: "System & Settings",
     icon: Settings,
+    roles: ['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN', 'ACCOUNTANT'],
     items: [
       { title: "Settings", href: "/settings", icon: Settings },
-      { title: "Role Management", href: "/role-management", icon: Shield },
-      { title: "Security", href: "/security", icon: Shield },
-      { title: "Data Backup", href: "/data-backup", icon: DatabaseBackup },
+      { title: "Role Management", href: "/role-management", icon: Shield, roles: ['ADMIN'] },
+      { title: "Security", href: "/security", icon: Shield, roles: ['ADMIN'] },
+      { title: "Data Backup", href: "/data-backup", icon: DatabaseBackup, roles: ['ADMIN'] },
       { title: "Dashboard Widgets", href: "/dashboard-widgets", icon: LayoutDashboard },
       { title: "Profile", href: "/profile", icon: UserIcon },
       { title: "Notifications", href: "/notifications", icon: Bell },
       { title: "Document Management", href: "/document-management", icon: FileText },
-      { title: "Data Import/Export", href: "/data-import-export", icon: DatabaseBackup },
-      { title: "Integrations", href: "/integrations", icon: Plug2 },
-      { title: "Digital Signage", href: "/digital-signage", icon: Monitor },
+      { title: "Data Import/Export", href: "/data-import-export", icon: DatabaseBackup, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Integrations", href: "/integrations", icon: Plug2, roles: ['ADMIN'] },
+      { title: "Digital Signage", href: "/digital-signage", icon: Monitor, roles: ['ADMIN', 'MANAGER'] },
     ],
   },
 ];
