@@ -194,7 +194,8 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   // Get user role and plan for filtering navigation
-  const userRole: UserRole = mapUserRoleToNavRole((user as any)?.role);
+  const rawRole = (user as any)?.role;
+  const userRole: UserRole = mapUserRoleToNavRole(rawRole);
   
   // Subscription plan comes from user object (included by /api/user endpoint)
   const rawPlan = (user as any)?.subscriptionPlan;
@@ -203,8 +204,12 @@ export function Layout({ children }: LayoutProps) {
     ? normalizedPlan as SubscriptionPlan 
     : 'STARTER';
   
+  // Debug RBAC
+  console.log('RBAC Debug - rawRole:', rawRole, 'userRole:', userRole, 'userPlan:', userPlan);
+  
   // Filter navigation based on role and plan - no loading state needed since plan is in user object
   const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan);
+  console.log('RBAC Debug - navGroups count:', navigationConfig.length, 'filtered count:', filteredNavigation.length);
   
   // Helper function to convert navigation title to translation key
   const getNavKey = (title: string): string => {
