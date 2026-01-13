@@ -185,10 +185,13 @@ const { t } = useTranslation();
 ## Test Credentials
 | Email | Password | Role |
 |-------|----------|------|
-| admin@salisauto.com | admin123 | System Administrator |
-| tech@salisauto.com | tech123 | Technician |
-| client@salisauto.com | client123 | Customer |
-| agent@salisauto.com | agent123 | Purchase Agent |
+| owner@salisauto.com | demo123 | Business Owner |
+| admin@salisauto.com | demo123 | System Administrator |
+| tech@salisauto.com | demo123 | Technician |
+| client@salisauto.com | demo123 | Customer |
+| agent@salisauto.com | demo123 | Purchase Agent |
+| ahmed.tech@salisauto.com | Password123! | Technician |
+| khalid.tech@salisauto.com | Password123! | Technician |
 
 ## External Dependencies
 - PostgreSQL with Drizzle ORM
