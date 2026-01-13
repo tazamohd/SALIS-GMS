@@ -207,9 +207,9 @@ export function Layout({ children }: LayoutProps) {
   // Debug RBAC
   console.log('RBAC Debug - rawRole:', rawRole, 'userRole:', userRole, 'userPlan:', userPlan);
   
-  // Filter navigation based on role and plan - no loading state needed since plan is in user object
-  const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan);
-  console.log('RBAC Debug - navGroups count:', navigationConfig.length, 'filtered count:', filteredNavigation.length);
+  // Filter navigation based on STRICT RBAC - pass rawRole for role-specific access control
+  const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan, false, rawRole);
+  console.log('RBAC Debug - navGroups count:', navigationConfig.length, 'filtered count:', filteredNavigation.length, 'rawRole:', rawRole);
   
   // Helper function to convert navigation title to translation key
   const getNavKey = (title: string): string => {

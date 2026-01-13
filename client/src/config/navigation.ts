@@ -111,17 +111,17 @@ export function mapUserRoleToNavRole(role: string | undefined): UserRole {
 
 export interface NavItem {
   title: string;
-  href: string;
+  href: string; // Used as stable ID for RBAC
   icon?: LucideIcon;
-  roles?: UserRole[];
+  roles?: UserRole[]; // Legacy - kept for backwards compatibility
   minPlan?: SubscriptionPlan;
 }
 
 export interface NavGroup {
-  title: string;
+  title: string; // Used as stable ID for RBAC
   icon: LucideIcon;
   href?: string;
-  roles?: UserRole[];
+  roles?: UserRole[]; // Legacy - kept for backwards compatibility
   minPlan?: SubscriptionPlan;
   items?: NavItem[];
 }
@@ -457,29 +457,458 @@ export function hasRequiredRole(
 ): boolean {
   if (!allowedRoles || allowedRoles.length === 0) return true;
   if (!userRole) return false;
-  if (userRole === 'ADMIN') return true;
+  // RBAC ENFORCED: No bypass for any role including ADMIN
   return allowedRoles.includes(userRole);
 }
+
+// Strict RBAC: Define exactly which navigation group titles each raw role can access
+// No universal access - every role has explicit permissions only
+export const ROLE_NAVIGATION_ACCESS: Record<string, string[]> = {
+  // System Administrator - System, security, integrations, user management, and enterprise features
+  system_administrator: [
+    'Dashboard & Overview',
+    'System & Settings',
+    'Enterprise & Franchise',
+    'Team & HR Management',
+    'Compliance & Safety',
+    'Analytics & Business Intelligence',
+  ],
+  
+  // Business Owner - Executive view: dashboards, analytics, finance, high-level operations
+  business_owner: [
+    'Dashboard & Overview',
+    'Analytics & Business Intelligence',
+    'Finance & Accounting',
+    'Billing & Payments',
+    'Customer Experience & Growth',
+    'Enterprise & Franchise',
+    'Team & HR Management',
+    'System & Settings',
+  ],
+  
+  // General Manager - Broad operational access excluding deep technical/accounting
+  general_manager: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Vehicle Management',
+    'Inspection & Check-In',
+    'Service Planning & Scheduling',
+    'Parts & Inventory',
+    'Service Execution',
+    'Quality & Delivery',
+    'Billing & Payments',
+    'Analytics & Business Intelligence',
+    'Customer Experience & Growth',
+    'Team & HR Management',
+    'Compliance & Safety',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Service Manager - Service operations focused
+  service_manager: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Vehicle Management',
+    'Inspection & Check-In',
+    'Diagnostics & Assessment',
+    'Service Planning & Scheduling',
+    'Service Execution',
+    'Quality & Delivery',
+    'Customer Experience & Growth',
+    'Team & HR Management',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Parts Manager - Inventory and parts focused
+  parts_manager: [
+    'Dashboard & Overview',
+    'Parts & Inventory',
+    'Service Planning & Scheduling',
+    'Billing & Payments',
+    'Analytics & Business Intelligence',
+    'System & Settings',
+  ],
+  
+  // Finance Manager - Financial operations
+  finance_manager: [
+    'Dashboard & Overview',
+    'Billing & Payments',
+    'Finance & Accounting',
+    'Analytics & Business Intelligence',
+    'System & Settings',
+  ],
+  
+  // HR Manager - Human resources focused
+  hr_manager: [
+    'Dashboard & Overview',
+    'Team & HR Management',
+    'Compliance & Safety',
+    'System & Settings',
+  ],
+  
+  // Marketing Manager - Marketing and customer growth
+  marketing_manager: [
+    'Dashboard & Overview',
+    'Customer Experience & Growth',
+    'Analytics & Business Intelligence',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Fleet Manager - Fleet operations
+  fleet_manager: [
+    'Dashboard & Overview',
+    'Vehicle Management',
+    'Service Planning & Scheduling',
+    'Service Execution',
+    'System & Settings',
+  ],
+  
+  // Lead Technician - Technical work with some management
+  lead_technician: [
+    'Dashboard & Overview',
+    'Vehicle Management',
+    'Inspection & Check-In',
+    'Diagnostics & Assessment',
+    'Service Planning & Scheduling',
+    'Service Execution',
+    'Quality & Delivery',
+    'Emerging Technologies',
+    'System & Settings',
+  ],
+  
+  // Technician - Hands-on technical work only
+  technician: [
+    'Dashboard & Overview',
+    'Vehicle Management',
+    'Inspection & Check-In',
+    'Diagnostics & Assessment',
+    'Service Planning & Scheduling',
+    'Service Execution',
+    'Quality & Delivery',
+    'System & Settings',
+  ],
+  
+  // Quality Control Inspector - Quality focused
+  quality_control_inspector: [
+    'Dashboard & Overview',
+    'Inspection & Check-In',
+    'Quality & Delivery',
+    'Compliance & Safety',
+    'System & Settings',
+  ],
+  
+  // Service Advisor - Customer-facing service coordination
+  service_advisor: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Vehicle Management',
+    'Inspection & Check-In',
+    'Service Planning & Scheduling',
+    'Quality & Delivery',
+    'Customer Experience & Growth',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Customer Service Rep - Customer service focused
+  customer_service_rep: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Vehicle Management',
+    'Customer Experience & Growth',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Receptionist - Front desk operations
+  receptionist: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Vehicle Management',
+    'System & Settings',
+  ],
+  
+  // Call Center Agent - Phone/communication focused
+  call_center_agent: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // BDC Specialist - Business development
+  bdc_specialist: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Customer Experience & Growth',
+    'Analytics & Business Intelligence',
+    'System & Settings',
+  ],
+  
+  // Compliance Officer - Compliance and safety focused
+  compliance_officer: [
+    'Dashboard & Overview',
+    'Compliance & Safety',
+    'Quality & Delivery',
+    'System & Settings',
+  ],
+  
+  // Inventory Controller - Inventory management
+  inventory_controller: [
+    'Dashboard & Overview',
+    'Parts & Inventory',
+    'System & Settings',
+  ],
+  
+  // Purchase Agent - Purchasing focused
+  purchase_agent: [
+    'Dashboard & Overview',
+    'Parts & Inventory',
+    'Billing & Payments',
+    'System & Settings',
+  ],
+  
+  // Accountant - Financial record keeping
+  accountant: [
+    'Dashboard & Overview',
+    'Billing & Payments',
+    'Finance & Accounting',
+    'Analytics & Business Intelligence',
+    'System & Settings',
+  ],
+  
+  // Data Analyst - Analytics focused
+  data_analyst: [
+    'Dashboard & Overview',
+    'Analytics & Business Intelligence',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // AI/Automation Specialist - AI and automation
+  ai_automation_specialist: [
+    'Dashboard & Overview',
+    'AI & Automation Hub',
+    'Emerging Technologies',
+    'System & Settings',
+  ],
+  
+  // Customer Success Manager - Customer relationships
+  customer_success_manager: [
+    'Dashboard & Overview',
+    'Customer Intake & Appointments',
+    'Customer Experience & Growth',
+    'AI & Automation Hub',
+    'System & Settings',
+  ],
+  
+  // Customer - Limited self-service portal access
+  customer: [
+    'Dashboard & Overview',
+    'Vehicle Management',
+    'System & Settings',
+  ],
+};
+
+// STRICT RBAC: Define restricted items (by href) per raw role
+// Items in this list are DENIED even if the group is allowed
+export const ROLE_RESTRICTED_ITEMS: Record<string, string[]> = {
+  // System Administrator - No access to operational modules, only system/security
+  system_administrator: [
+    '/kpi-dashboard', '/service-bay-dashboard', '/automated-reordering', '/loyalty-program',
+    '/technician-management', '/payroll-management', '/timeclock-payroll',
+    '/marketing-automation', '/email-marketing', '/email-marketing-campaigns',
+    '/sales-management', '/google-my-business', '/social-media-integration',
+  ],
+  
+  // Business Owner - Executive view, restricted from hands-on operational items
+  business_owner: [
+    '/role-management', '/security', '/data-backup', '/integrations', // Sys admin only
+    '/technician-portal', '/diagnostics-obd', '/vehicle-inspections',
+    '/ai-scheduling', '/smart-assignment', // Operational tools
+  ],
+  
+  // General Manager - Broad access but no system admin
+  general_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+  ],
+  
+  // Service Manager - No deep finance or admin
+  service_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/general-ledger', '/chart-of-accounts', '/journal-entries',
+    '/payroll-management',
+  ],
+  
+  // Parts Manager - Limited to parts and basic functions
+  parts_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/technician-portal', '/hr-management',
+  ],
+  
+  // Finance Manager - No tech/operations/admin tools
+  finance_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/technician-portal', '/diagnostics-obd',
+  ],
+  
+  // HR Manager - No finance/tech/operations
+  hr_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/general-ledger', '/invoices', '/technician-portal',
+  ],
+  
+  // Marketing Manager - No admin/finance/tech
+  marketing_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/general-ledger', '/technician-portal',
+  ],
+  
+  // Fleet Manager - No admin/finance/marketing
+  fleet_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/general-ledger', '/hr-management',
+  ],
+  
+  // Lead Technician - No admin, limited management
+  lead_technician: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage', '/hr-management',
+  ],
+  
+  // Technician - Hands-on work only
+  technician: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage', '/hr-management',
+    '/technician-management', '/kpi-dashboard',
+  ],
+  
+  // Quality Control Inspector
+  quality_control_inspector: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Service Advisor
+  service_advisor: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/hr-management', '/technician-management',
+  ],
+  
+  // Customer Service Rep
+  customer_service_rep: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage', '/hr-management',
+  ],
+  
+  // Receptionist - Basic front desk only
+  receptionist: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Call Center Agent
+  call_center_agent: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // BDC Specialist
+  bdc_specialist: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Compliance Officer
+  compliance_officer: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export',
+  ],
+  
+  // Inventory Controller
+  inventory_controller: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Purchase Agent
+  purchase_agent: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Accountant
+  accountant: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/technician-portal',
+  ],
+  
+  // Data Analyst
+  data_analyst: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // AI/Automation Specialist
+  ai_automation_specialist: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export',
+  ],
+  
+  // Customer Success Manager
+  customer_success_manager: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage',
+  ],
+  
+  // Customer - Most items restricted, only self-service
+  customer: [
+    '/role-management', '/security', '/data-backup', '/integrations',
+    '/data-import-export', '/digital-signage', '/hr-management',
+    '/technician-management', '/kpi-dashboard', '/fleet-management',
+    '/fleet-tracking',
+  ],
+};
 
 export function filterNavigationByAccess(
   navigation: NavGroup[],
   userRole: UserRole | undefined,
   userPlan: SubscriptionPlan | undefined,
-  skipPlanFilter: boolean = false
+  skipPlanFilter: boolean = false,
+  rawRole?: string
 ): NavGroup[] {
+  // STRICT RBAC: Use raw role to filter navigation groups
+  const normalizedRawRole = rawRole?.toLowerCase() || '';
+  const allowedGroups = normalizedRawRole ? ROLE_NAVIGATION_ACCESS[normalizedRawRole] || [] : [];
+  const restrictedItems = normalizedRawRole ? ROLE_RESTRICTED_ITEMS[normalizedRawRole] || [] : [];
+  
   return navigation
     .filter(group => {
-      const hasRole = hasRequiredRole(userRole, group.roles);
+      // STRICT RBAC: Check if this group is allowed for this raw role
+      if (normalizedRawRole && allowedGroups.length > 0) {
+        if (!allowedGroups.includes(group.title)) {
+          return false;
+        }
+      }
+      // Check plan requirements
       const hasPlan = skipPlanFilter || hasRequiredPlan(userPlan, group.minPlan);
-      return hasRole && hasPlan;
+      return hasPlan;
     })
     .map(group => {
       if (!group.items) return group;
       
+      // STRICT RBAC: Filter items based on raw role restrictions (not legacy roles)
       const filteredItems = group.items.filter(item => {
-        const hasRole = hasRequiredRole(userRole, item.roles);
+        // Check if this item is restricted for this role
+        if (normalizedRawRole && restrictedItems.includes(item.href)) {
+          return false;
+        }
+        // Check plan requirements
         const hasPlan = skipPlanFilter || hasRequiredPlan(userPlan, item.minPlan);
-        return hasRole && hasPlan;
+        return hasPlan;
       });
       
       return { ...group, items: filteredItems };
