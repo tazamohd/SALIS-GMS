@@ -3,6 +3,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { usePermissions } from "@/hooks/usePermissions";
+import { RoleGate } from "@/components/RoleGate";
+import { RoleBadge } from "@/components/RoleBadge";
 import {
   Package,
   AlertTriangle,
@@ -15,6 +18,7 @@ import {
   Plus,
   CheckCircle,
   XCircle,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +52,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 export default function InventoryManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { canCreate, canEdit, canDelete, canView, hasPermission, getRoleDisplayName } = usePermissions();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedGarageId, setSelectedGarageId] = useState<string>("");

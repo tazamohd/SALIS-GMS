@@ -267,40 +267,54 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Main Metrics - Brand Cards */}
+        {/* Main Metrics - Role-Based Brand Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Revenue Card */}
-          <div className="group relative" data-testid="card-revenue">
-            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
-              <div className="flex items-start justify-between">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
-                      <DollarSign className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
-                    </div>
-                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
-                      ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                    </h3>
-                    <div className="flex items-center gap-1 text-[#0A5ED7]">
-                      <ArrowUpRight className="w-4 h-4" />
-                      <span className="text-xs font-medium">+12.5%</span>
-                    </div>
+          {/* Revenue Card - Only visible to roles with financial access */}
+          <RoleGate module="invoices" permission="view_financials" fallback={
+            <div className="group relative" data-testid="card-revenue-restricted">
+              <div className="relative h-full bg-zinc-900/50 rounded-2xl p-6 border border-zinc-800 shadow-sm">
+                <div className="flex items-center justify-center h-full min-h-[120px]">
+                  <div className="text-center">
+                    <Shield className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+                    <p className="text-sm text-zinc-500">Financial data restricted</p>
+                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} access</p>
                   </div>
                 </div>
-                <div className="relative">
-                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center shadow-lg shadow-[#0A5ED7]/20">
-                    <TrendingUp className="w-7 h-7 text-white" />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
               </div>
             </div>
-          </div>
+          }>
+            <div className="group relative" data-testid="card-revenue">
+              <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-xl bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
+                        <DollarSign className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
+                      </div>
+                      <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
+                        ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </h3>
+                      <div className="flex items-center gap-1 text-[#0A5ED7]">
+                        <ArrowUpRight className="w-4 h-4" />
+                        <span className="text-xs font-medium">+12.5%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative">
+                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center shadow-lg shadow-[#0A5ED7]/20">
+                      <TrendingUp className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
+                </div>
+              </div>
+            </div>
+          </RoleGate>
 
           {/* Active Jobs Card */}
           <div className="group relative" data-testid="card-active-jobs">

@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { FileText, Plus, Building2 } from "lucide-react";
+import { FileText, Plus, Building2, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CreateInvoiceDialog } from "@/components/CreateInvoiceDialog";
 import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
+import { usePermissions } from "@/hooks/usePermissions";
+import { RoleGate } from "@/components/RoleGate";
+import { RoleBadge } from "@/components/RoleBadge";
 import type { Invoice, Garage, User } from "@shared/schema";
 import type { Column } from "@/components/DataTable";
 
 export function Invoices() {
   const { t } = useTranslation();
+  const { canCreate, canEdit, canApprove, canView, hasPermission, getRoleDisplayName } = usePermissions();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -113,19 +117,41 @@ export function Invoices() {
     },
   ];
 
+  const pageActions = canCreate('invoices') ? [
+    {
+      label: t('invoices.createInvoice', 'Create Invoice'),
+      onClick: () => setIsCreateDialogOpen(true),
+      icon: Plus,
+    },
+  ] : [];
+
+  const canViewFinancials = hasPermission('invoices', 'view_financials');
+
   return (
     <>
+      {/* Role-Based Access Indicator */}
+      <div className="mx-6 mt-4 flex items-center gap-3 p-3 rounded-lg bg-white/50 dark:bg-[#151A23]/50 border border-[#E2E8F0] dark:border-[#232A36]">
+        <RoleBadge size="md" />
+        {canViewFinancials ? (
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            Full financial access - you can view all billing details
+          </span>
+        ) : canCreate('invoices') ? (
+          <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
+            You can create and manage invoices
+          </span>
+        ) : (
+          <span className="text-xs text-zinc-500 flex items-center gap-1">
+            <Shield className="w-3 h-3" /> View only - contact billing department for changes
+          </span>
+        )}
+      </div>
+
       <StandardTablePage
         title={t('invoices.title', 'Invoices & Billing')}
         description={t('invoices.description', 'Manage invoices and payments')}
         icon={FileText}
-        actions={[
-          {
-            label: t('invoices.createInvoice', 'Create Invoice'),
-            onClick: () => setIsCreateDialogOpen(true),
-            icon: Plus,
-          },
-        ]}
+        actions={pageActions}
         data={invoices ?? []}
         isLoading={isLoading}
         columns={columns}
