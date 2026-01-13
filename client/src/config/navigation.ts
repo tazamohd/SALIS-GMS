@@ -882,16 +882,28 @@ export function filterNavigationByAccess(
 ): NavGroup[] {
   // STRICT RBAC: Use raw role to filter navigation groups
   const normalizedRawRole = rawRole?.toLowerCase() || '';
-  const allowedGroups = normalizedRawRole ? ROLE_NAVIGATION_ACCESS[normalizedRawRole] || [] : [];
-  const restrictedItems = normalizedRawRole ? ROLE_RESTRICTED_ITEMS[normalizedRawRole] || [] : [];
+  
+  // CRITICAL: If no rawRole provided, return empty (no access)
+  // This ensures RBAC is always enforced
+  if (!normalizedRawRole) {
+    console.warn('RBAC: No rawRole provided - denying all navigation access');
+    return [];
+  }
+  
+  const allowedGroups = ROLE_NAVIGATION_ACCESS[normalizedRawRole];
+  const restrictedItems = ROLE_RESTRICTED_ITEMS[normalizedRawRole] || [];
+  
+  // CRITICAL: If role not in ROLE_NAVIGATION_ACCESS, deny all access
+  if (!allowedGroups) {
+    console.warn(`RBAC: Role "${normalizedRawRole}" not found in access map - denying all navigation access`);
+    return [];
+  }
   
   return navigation
     .filter(group => {
-      // STRICT RBAC: Check if this group is allowed for this raw role
-      if (normalizedRawRole && allowedGroups.length > 0) {
-        if (!allowedGroups.includes(group.title)) {
-          return false;
-        }
+      // STRICT RBAC: Only show groups explicitly allowed for this role
+      if (!allowedGroups.includes(group.title)) {
+        return false;
       }
       // Check plan requirements
       const hasPlan = skipPlanFilter || hasRequiredPlan(userPlan, group.minPlan);
