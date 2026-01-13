@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge, Settings, Shield, UserCog, Calculator, ShoppingCart, Crown, Calendar, Briefcase } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { RoleGate, RoleSection } from "@/components/RoleGate";
+import { RoleIndicator } from "@/components/RoleBadge";
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Area, AreaChart } from "recharts";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
@@ -18,6 +21,7 @@ interface DashboardStats {
 export function Dashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { role, getRoleDisplayName, canView, canCreate, canEdit, canApprove, hasPermission } = usePermissions();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
@@ -137,8 +141,75 @@ export function Dashboard() {
   const totalInventoryItems = sparePartInventories.length || 1;
   const inventoryPercentage = Math.round((inStockParts / totalInventoryItems) * 100);
 
-  const role = ((user as any)?.role?.toUpperCase() || (user as User | undefined)?.userType?.toUpperCase() || 'TECHNICIAN');
-  const isTechnician = role === 'TECHNICIAN';
+  const isTechnician = role === 'technician';
+  const isCustomer = role === 'customer';
+  const isOwnerOrAdmin = role === 'business_owner' || role === 'system_administrator';
+  const isFinanceRole = role === 'finance_manager' || role === 'accountant';
+  const isHRRole = role === 'hr_manager';
+  const isInventoryRole = role === 'inventory_manager' || role === 'purchase_agent';
+
+  const getRoleIcon = () => {
+    const icons: Record<string, React.ReactNode> = {
+      business_owner: <Crown className="w-8 h-8 text-white" />,
+      system_administrator: <Settings className="w-8 h-8 text-white" />,
+      general_manager: <Briefcase className="w-8 h-8 text-white" />,
+      technician: <Wrench className="w-8 h-8 text-white" />,
+      customer: <Users className="w-8 h-8 text-white" />,
+      purchase_agent: <ShoppingCart className="w-8 h-8 text-white" />,
+      accountant: <Calculator className="w-8 h-8 text-white" />,
+      finance_manager: <DollarSign className="w-8 h-8 text-white" />,
+      hr_manager: <UserCog className="w-8 h-8 text-white" />,
+      inventory_manager: <Package className="w-8 h-8 text-white" />,
+    };
+    return icons[role] || <Sparkles className="w-8 h-8 text-white" />;
+  };
+
+  const getRoleQuickActions = () => {
+    const actions: Record<string, { label: string; href: string; icon: React.ReactNode; variant: 'primary' | 'secondary' }[]> = {
+      business_owner: [
+        { label: t('dashboard.viewReports', 'View Reports'), href: '/reports', icon: <BarChart3 className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.franchiseOverview', 'Franchise Overview'), href: '/franchise-command-center', icon: <Crown className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      system_administrator: [
+        { label: t('dashboard.manageUsers', 'Manage Users'), href: '/staff', icon: <Users className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.systemSettings', 'System Settings'), href: '/user-settings', icon: <Settings className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      technician: [
+        { label: t('dashboard.myTasks', 'My Tasks'), href: '/technician-portal', icon: <Wrench className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.viewJobCards', 'View Job Cards'), href: '/job-cards', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      customer: [
+        { label: t('dashboard.myVehicles', 'My Vehicles'), href: '/vehicles', icon: <Car className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.bookAppointment', 'Book Appointment'), href: '/appointments', icon: <Calendar className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      purchase_agent: [
+        { label: t('dashboard.viewInventory', 'View Inventory'), href: '/inventory', icon: <Package className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.createPO', 'Create Purchase Order'), href: '/purchase-orders', icon: <ShoppingCart className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      accountant: [
+        { label: t('dashboard.viewInvoices', 'View Invoices'), href: '/invoices', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.financialReports', 'Financial Reports'), href: '/reports', icon: <Calculator className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      finance_manager: [
+        { label: t('dashboard.viewInvoices', 'View Invoices'), href: '/invoices', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.budgetManagement', 'Budget Management'), href: '/budget-management', icon: <DollarSign className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      hr_manager: [
+        { label: t('dashboard.viewStaff', 'View Staff'), href: '/staff', icon: <Users className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.hrManagement', 'HR Management'), href: '/hr-management', icon: <UserCog className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+      inventory_manager: [
+        { label: t('dashboard.viewInventory', 'View Inventory'), href: '/inventory', icon: <Package className="w-4 h-4 mr-2" />, variant: 'secondary' },
+        { label: t('dashboard.autoReorder', 'Auto Reorder'), href: '/automated-reordering', icon: <ShoppingCart className="w-4 h-4 mr-2" />, variant: 'primary' },
+      ],
+    };
+    return actions[role] || [
+      { label: t('dashboard.newJobCard', 'New Job Card'), href: '/job-cards', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' as const },
+      { label: t('dashboard.addVehicle', 'Add Vehicle'), href: '/vehicles', icon: <Car className="w-4 h-4 mr-2" />, variant: 'primary' as const },
+    ];
+  };
+
+  const quickActions = getRoleQuickActions();
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -150,7 +221,7 @@ export function Dashboard() {
       </div>
 
       <div className="relative p-6 space-y-8">
-        {/* Hero Header - Brand Design */}
+        {/* Hero Header - Role-Specific Brand Design */}
         <div className="relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
@@ -158,32 +229,40 @@ export function Dashboard() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#0A5ED7] rounded-2xl blur-lg opacity-30 dark:opacity-40"></div>
                   <div className="relative p-3 rounded-2xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-2xl shadow-[#0A5ED7]/25">
-                    <Sparkles className="w-8 h-8 text-white" />
+                    {getRoleIcon()}
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
-                    {t('dashboard.title', 'Dashboard')}
-                  </h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
+                      {t('dashboard.title', 'Dashboard')}
+                    </h1>
+                  </div>
                   <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
                     {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
+                    <span className="mx-2">|</span>
+                    <span className="text-[#0A5ED7] dark:text-[#0BB3FF] font-medium">{getRoleDisplayName()}</span>
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
-              <Button className="relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg" asChild>
-                <Link href="/job-cards">
-                  <FileText className="w-4 h-4 mr-2 relative z-10" />
-                  <span className="relative z-10">{t('dashboard.newJobCard', 'New Job Card')}</span>
-                </Link>
-              </Button>
-              <Button className="relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25" asChild>
-                <Link href="/vehicles">
-                  <Car className="w-4 h-4 mr-2" />
-                  {t('dashboard.addVehicle', 'Add Vehicle')}
-                </Link>
-              </Button>
+            <div className="flex flex-wrap gap-3">
+              <RoleIndicator />
+              {quickActions.map((action, idx) => (
+                <Button 
+                  key={idx}
+                  className={action.variant === 'primary' 
+                    ? "relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25"
+                    : "relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg"
+                  } 
+                  asChild
+                >
+                  <Link href={action.href}>
+                    {action.icon}
+                    <span className="relative z-10">{action.label}</span>
+                  </Link>
+                </Button>
+              ))}
             </div>
           </div>
         </div>

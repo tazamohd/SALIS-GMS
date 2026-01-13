@@ -84,6 +84,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { RoleBadge } from "@/components/RoleBadge";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ArabicLanguageToggle } from "@/components/ArabicLanguageToggle";
@@ -411,6 +412,7 @@ export function Layout({ children }: LayoutProps) {
                 {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
               </kbd>
             </Button>
+            <RoleBadge size="sm" className="hidden sm:flex" />
             <ArabicLanguageToggle />
             <LanguageSwitcher />
             <ThemeToggle />
