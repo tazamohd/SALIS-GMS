@@ -41,6 +41,8 @@ export function Invoices() {
   });
 
 
+  const canViewFinancialsCheck = hasPermission('invoices', 'view_financials');
+
   const columns: Column<Invoice>[] = [
     {
       key: "invoiceNumber",
@@ -80,24 +82,36 @@ export function Invoices() {
         </span>
       ),
     },
-    {
-      key: "totalAmount",
-      label: t('invoices.totalAmount', 'Total Amount'),
-      render: (invoice) => (
-        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
-          ${parseFloat(invoice.totalAmount).toFixed(2)}
-        </span>
-      ),
-    },
-    {
-      key: "balanceAmount",
-      label: t('invoices.balance', 'Balance'),
-      render: (invoice) => (
-        <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
-          ${parseFloat(invoice.balanceAmount).toFixed(2)}
-        </span>
-      ),
-    },
+    ...(canViewFinancialsCheck ? [
+      {
+        key: "totalAmount" as const,
+        label: t('invoices.totalAmount', 'Total Amount'),
+        render: (invoice: Invoice) => (
+          <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
+            ${parseFloat(invoice.totalAmount).toFixed(2)}
+          </span>
+        ),
+      },
+      {
+        key: "balanceAmount" as const,
+        label: t('invoices.balance', 'Balance'),
+        render: (invoice: Invoice) => (
+          <span className="font-['Poppins',Helvetica] font-semibold text-sm text-[#0B1F3B] dark:text-white">
+            ${parseFloat(invoice.balanceAmount).toFixed(2)}
+          </span>
+        ),
+      },
+    ] : [
+      {
+        key: "totalAmount" as const,
+        label: t('invoices.totalAmount', 'Total Amount'),
+        render: () => (
+          <span className="text-sm text-zinc-500 flex items-center gap-1">
+            <Shield className="w-3 h-3" /> Restricted
+          </span>
+        ),
+      },
+    ]),
     {
       key: "status",
       label: t('common.status', 'Status'),
@@ -109,10 +123,14 @@ export function Invoices() {
       key: "actions",
       label: t('common.actions', 'Actions'),
       render: (invoice) => (
-        <InvoiceDetailsDialog 
-          invoice={invoice}
-          customer={customers?.find(c => c.id === invoice.customerId)}
-        />
+        canViewFinancialsCheck ? (
+          <InvoiceDetailsDialog 
+            invoice={invoice}
+            customer={customers?.find(c => c.id === invoice.customerId)}
+          />
+        ) : (
+          <span className="text-xs text-zinc-500">View only</span>
+        )
       ),
     },
   ];

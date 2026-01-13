@@ -33,15 +33,18 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Car, Plus, Edit, Trash2, Search, ScanLine, Loader2, Camera, Upload, FileText, CreditCard } from "lucide-react";
+import { Car, Plus, Edit, Trash2, Search, ScanLine, Loader2, Camera, Upload, FileText, CreditCard, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
+import { RoleBadge } from "@/components/RoleBadge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Vehicles() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { canCreate, canEdit, canDelete, canView, getRoleDisplayName } = usePermissions();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -860,7 +863,26 @@ export default function Vehicles() {
       description={t('vehicles.description', 'Manage customer vehicles and service history')}
       icon={Car}
     >
-      {actionButtons}
+      {canCreate('vehicles') && actionButtons}
+      
+      {/* Role-Based Access Indicator */}
+      <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-white/50 dark:bg-[#151A23]/50 border border-[#E2E8F0] dark:border-[#232A36]">
+        <RoleBadge size="md" />
+        {canCreate('vehicles') ? (
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            You can add and manage vehicles
+          </span>
+        ) : canEdit('vehicles') ? (
+          <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
+            You can update vehicle information
+          </span>
+        ) : (
+          <span className="text-xs text-zinc-500 flex items-center gap-1">
+            <Shield className="w-3 h-3" /> View only - contact a manager to modify vehicle records
+          </span>
+        )}
+      </div>
+
       <div className="space-y-6 mt-6">
         <div className="relative max-w-md">
           <div className="relative bg-white dark:bg-[#0E1117] rounded-xl border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
@@ -956,26 +978,34 @@ export default function Vehicles() {
                     </div>
 
                     <div className="flex gap-2 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(vehicle)}
-                        className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
-                        data-testid={`button-edit-vehicle-${vehicle.id}`}
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        {t('common.edit', 'Edit')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(vehicle.id)}
-                        className="flex-1 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
-                        data-testid={`button-delete-vehicle-${vehicle.id}`}
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        {t('common.delete', 'Delete')}
-                      </Button>
+                      {canEdit('vehicles') ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(vehicle)}
+                          className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                          data-testid={`button-edit-vehicle-${vehicle.id}`}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          {t('common.edit', 'Edit')}
+                        </Button>
+                      ) : (
+                        <span className="flex-1 text-xs text-zinc-500 flex items-center justify-center gap-1">
+                          <Shield className="w-3 h-3" /> No edit access
+                        </span>
+                      )}
+                      {canDelete('vehicles') ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(vehicle.id)}
+                          className="flex-1 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
+                          data-testid={`button-delete-vehicle-${vehicle.id}`}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          {t('common.delete', 'Delete')}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </div>

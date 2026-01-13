@@ -5,16 +5,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { User, Bell, Shield, Palette, Save } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
+import { RoleBadge } from "@/components/RoleBadge";
 
 export default function UserSettings() {
   const { t } = useTranslation();
+  const { getRoleDisplayName, hasPermission } = usePermissions();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#050510] via-[#0a0a1a] to-[#050510] p-6" data-testid="user-settings-page">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white" data-testid="page-title">{t('userSettings.title', 'User Settings')}</h1>
-          <p className="text-gray-400 mt-1" data-testid="page-description">{t('userSettings.description', 'Manage your account preferences and settings')}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white" data-testid="page-title">{t('userSettings.title', 'User Settings')}</h1>
+            <p className="text-gray-400 mt-1" data-testid="page-description">{t('userSettings.description', 'Manage your account preferences and settings')}</p>
+          </div>
+          <RoleBadge size="md" />
+        </div>
+        
+        {/* Role-Based Access Indicator */}
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+          <Shield className="w-4 h-4 text-sky-400" />
+          <span className="text-xs text-gray-400">
+            {hasPermission('settings', 'manage_settings') 
+              ? 'Full access to manage all settings'
+              : 'Personal settings only - system settings require admin access'
+            }
+          </span>
         </div>
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-profile">
