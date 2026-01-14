@@ -4,13 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { User, Bell, Shield, Palette, Save } from "lucide-react";
+import { User, Bell, Shield, Palette, Save, Sun, Moon, Monitor, Sparkles, Cpu, Check } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { RoleBadge } from "@/components/RoleBadge";
+import { useTheme, type Theme } from "@/hooks/useTheme";
+
+const THEMES: { id: Theme; label: string; description: string; icon: typeof Sun; color: string }[] = [
+  { id: "light", label: "Light", description: "Corporate Steel", icon: Sun, color: "text-amber-500" },
+  { id: "dark", label: "Dark", description: "Deep Space", icon: Moon, color: "text-sky-400" },
+  { id: "system", label: "System", description: "Auto-detect", icon: Monitor, color: "text-gray-400" },
+  { id: "kingdom-future", label: "Kingdom Future", description: "Saudi Vision 2030", icon: Sparkles, color: "text-emerald-500" },
+  { id: "neural-dark", label: "Neural Dark", description: "AI & Cyberpunk", icon: Cpu, color: "text-purple-500" },
+];
 
 export default function UserSettings() {
   const { t } = useTranslation();
   const { getRoleDisplayName, hasPermission } = usePermissions();
+  const { theme: currentTheme, setTheme: handleThemeChange } = useTheme();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#050510] via-[#0a0a1a] to-[#050510] p-6" data-testid="user-settings-page">
@@ -87,17 +97,45 @@ export default function UserSettings() {
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-appearance">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2"><Palette className="w-5 h-5 text-sky-400" /> Appearance</CardTitle>
-            <CardDescription className="text-gray-400">Customize your interface</CardDescription>
+            <CardDescription className="text-gray-400">Customize your interface theme</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div data-testid="setting-dark-mode" className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-              <div>
-                <p className="text-white font-medium">Dark Mode</p>
-                <p className="text-sm text-gray-400">Use dark theme</p>
+            <div className="space-y-3">
+              <Label className="text-white font-medium">Theme</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {THEMES.map((theme) => {
+                  const Icon = theme.icon;
+                  const isActive = currentTheme === theme.id;
+                  return (
+                    <button
+                      key={theme.id}
+                      onClick={() => handleThemeChange(theme.id)}
+                      data-testid={`theme-option-${theme.id}`}
+                      className={`relative p-4 rounded-xl border transition-all duration-200 text-left ${
+                        isActive 
+                          ? 'border-primary bg-primary/10 ring-2 ring-primary/50' 
+                          : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${isActive ? 'bg-primary/20' : 'bg-white/10'}`}>
+                          <Icon className={`w-5 h-5 ${theme.color}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm">{theme.label}</p>
+                          <p className="text-xs text-gray-400 truncate">{theme.description}</p>
+                        </div>
+                        {isActive && (
+                          <Check className="w-4 h-4 text-primary absolute top-2 right-2" />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-              <Switch data-testid="switch-dark-mode" defaultChecked />
             </div>
-            <div data-testid="setting-compact-mode" className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+            
+            <div data-testid="setting-compact-mode" className="flex items-center justify-between p-3 rounded-lg bg-white/5 mt-4">
               <div>
                 <p className="text-white font-medium">Compact Mode</p>
                 <p className="text-sm text-gray-400">Reduce spacing in UI</p>

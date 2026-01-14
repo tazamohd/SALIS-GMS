@@ -7,45 +7,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useTheme, type Theme } from "@/hooks/useTheme";
 
-export type Theme = "light" | "dark" | "system" | "kingdom-future" | "neural-dark";
-
-const THEME_CONFIG: Record<Theme, { label: string; icon: typeof Sun; description: string }> = {
-  light: { label: "Light", icon: Sun, description: "Corporate Steel" },
-  dark: { label: "Dark", icon: Moon, description: "Deep Space" },
-  system: { label: "System", icon: Monitor, description: "Auto-detect" },
-  "kingdom-future": { label: "Kingdom Future", icon: Sparkles, description: "Saudi Vision 2030" },
-  "neural-dark": { label: "Neural Dark", icon: Cpu, description: "AI & Cyberpunk" },
+const THEME_CONFIG: Record<Theme, { label: string; icon: typeof Sun; description: string; color: string }> = {
+  light: { label: "Light", icon: Sun, description: "Corporate Steel", color: "text-amber-500" },
+  dark: { label: "Dark", icon: Moon, description: "Deep Space", color: "text-sky-400" },
+  system: { label: "System", icon: Monitor, description: "Auto-detect", color: "text-gray-400" },
+  "kingdom-future": { label: "Kingdom Future", icon: Sparkles, description: "Saudi Vision 2030", color: "text-emerald-500" },
+  "neural-dark": { label: "Neural Dark", icon: Cpu, description: "AI & Cyberpunk", color: "text-purple-500" },
 };
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("theme") as Theme;
-    return stored || "system";
-  });
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark", "kingdom-future", "neural-dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      root.classList.add(systemTheme);
-    } else if (theme === "kingdom-future" || theme === "neural-dark") {
-      root.classList.add(theme);
-    } else {
-      root.classList.add(theme);
-    }
-
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const currentConfig = THEME_CONFIG[theme];
-  const CurrentIcon = currentConfig.icon;
+  const getIcon = () => {
+    if (theme === "kingdom-future") return <Sparkles className="h-[1.2rem] w-[1.2rem] text-emerald-500" />;
+    if (theme === "neural-dark") return <Cpu className="h-[1.2rem] w-[1.2rem] text-purple-500" />;
+    if (resolvedTheme === "dark") return <Moon className="h-[1.2rem] w-[1.2rem]" />;
+    return <Sun className="h-[1.2rem] w-[1.2rem]" />;
+  };
 
   return (
     <DropdownMenu>
@@ -56,10 +36,7 @@ export function ThemeToggle() {
           className="h-9 w-9"
           data-testid="button-theme-toggle"
         >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 kingdom-future:-rotate-90 kingdom-future:scale-0 neural-dark:-rotate-90 neural-dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <Sparkles className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all kingdom-future:rotate-0 kingdom-future:scale-100" />
-          <Cpu className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all neural-dark:rotate-0 neural-dark:scale-100" />
+          {getIcon()}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
@@ -69,7 +46,7 @@ export function ThemeToggle() {
           className="flex items-center gap-3"
           data-testid="menu-theme-light"
         >
-          <Sun className="h-4 w-4" />
+          <Sun className="h-4 w-4 text-amber-500" />
           <div className="flex flex-col">
             <span className="font-medium">Light</span>
             <span className="text-xs text-muted-foreground">Corporate Steel</span>
@@ -81,7 +58,7 @@ export function ThemeToggle() {
           className="flex items-center gap-3"
           data-testid="menu-theme-dark"
         >
-          <Moon className="h-4 w-4" />
+          <Moon className="h-4 w-4 text-sky-400" />
           <div className="flex flex-col">
             <span className="font-medium">Dark</span>
             <span className="text-xs text-muted-foreground">Deep Space</span>
@@ -93,7 +70,7 @@ export function ThemeToggle() {
           className="flex items-center gap-3"
           data-testid="menu-theme-system"
         >
-          <Monitor className="h-4 w-4" />
+          <Monitor className="h-4 w-4 text-gray-400" />
           <div className="flex flex-col">
             <span className="font-medium">System</span>
             <span className="text-xs text-muted-foreground">Auto-detect preference</span>
