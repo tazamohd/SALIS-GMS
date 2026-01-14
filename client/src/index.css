@@ -373,6 +373,116 @@
     --error: 0 84% 60%;              /* #ef4444 - Red */
     --error-foreground: 0 0% 100%;
   }
+
+  /* ============================================
+     KINGDOM FUTURE THEME - Saudi Vision 2030
+     "Heritage Meets Horizon"
+     ============================================ */
+  .kingdom-future {
+    /* Background - The Deep Void (Desert Night Sky) */
+    --background: 150 30% 3%;        /* #040B06 - Deep emerald-tinted void */
+    --foreground: 150 10% 90%;       /* Light text with subtle green tint */
+
+    /* Muted - Recessed Areas */
+    --muted: 150 25% 6%;             /* Slightly lighter void */
+    --muted-foreground: 150 10% 60%; /* Muted green-gray */
+
+    /* Accent */
+    --accent: 150 25% 8%;            /* Emerald-tinted accent bg */
+    --accent-foreground: 150 100% 45%; /* Neon Emerald text */
+
+    /* Popover - Glass Card */
+    --popover: 150 25% 6%;
+    --popover-foreground: 150 10% 90%;
+
+    /* Border - Glass Edge */
+    --border: 150 30% 20% / 0.3;     /* Emerald-tinted border */
+    --input: 150 25% 10%;
+
+    /* Card - Glassmorphism */
+    --card: 150 25% 6% / 0.6;
+    --card-foreground: 150 10% 90%;
+
+    /* Primary - Neon Emerald #00E676 */
+    --primary: 150 100% 45%;
+    --primary-foreground: 150 30% 3%;
+
+    /* Secondary - Royal Gold #F2C94C */
+    --secondary: 45 90% 50%;
+    --secondary-foreground: 150 30% 3%;
+
+    /* Destructive */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 150 100% 45%;            /* Neon Emerald glow ring */
+    --radius: 0.5rem;
+    
+    /* Semantic Colors - Kingdom Future */
+    --success: 150 100% 45%;         /* Neon Emerald */
+    --success-foreground: 150 30% 3%;
+    --warning: 45 90% 50%;           /* Royal Gold */
+    --warning-foreground: 150 30% 3%;
+    --info: 175 70% 45%;             /* Teal (instead of blue) */
+    --info-foreground: 150 30% 3%;
+    --error: 0 70% 55%;              /* Soft Red */
+    --error-foreground: 0 0% 100%;
+  }
+
+  /* ============================================
+     NEURAL DARK THEME - The Pulse of Intelligence
+     Cyberpunk / AI / Neural Network Aesthetics
+     ============================================ */
+  .neural-dark {
+    /* Background - The Neural Void */
+    --background: 240 10% 4%;        /* #09090B - Deep neutral void */
+    --foreground: 240 5% 90%;        /* Cool light text */
+
+    /* Muted - Recessed Areas */
+    --muted: 240 8% 8%;              /* Slightly lighter void */
+    --muted-foreground: 240 5% 55%;  /* Muted gray */
+
+    /* Accent */
+    --accent: 263 50% 15%;           /* Purple-tinted accent bg */
+    --accent-foreground: 263 70% 60%; /* Neon Purple text */
+
+    /* Popover - Glass Card */
+    --popover: 240 8% 8%;
+    --popover-foreground: 240 5% 90%;
+
+    /* Border - Glass Edge */
+    --border: 263 30% 25% / 0.3;     /* Purple-tinted border */
+    --input: 240 8% 12%;
+
+    /* Card - Glassmorphism */
+    --card: 240 8% 8% / 0.7;
+    --card-foreground: 240 5% 90%;
+
+    /* Primary - Neon Purple #7C3AED */
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Electric Cyan #22D3EE */
+    --secondary: 190 100% 54%;
+    --secondary-foreground: 240 10% 4%;
+
+    /* Destructive */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 263 70% 58%;             /* Neon Purple glow ring */
+    --radius: 0.5rem;
+    
+    /* Semantic Colors - Neural Dark */
+    --success: 160 80% 45%;          /* Cyber Green */
+    --success-foreground: 240 10% 4%;
+    --warning: 45 95% 55%;           /* Amber */
+    --warning-foreground: 240 10% 4%;
+    --info: 190 100% 54%;            /* Electric Cyan */
+    --info-foreground: 240 10% 4%;
+    --error: 0 75% 55%;              /* Neon Red */
+    --error-foreground: 0 0% 100%;
+  }
 }
 
 @layer base {
