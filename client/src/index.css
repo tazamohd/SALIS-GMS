@@ -373,13 +373,15 @@
     --error: 0 84% 60%;              /* #ef4444 - Red */
     --error-foreground: 0 0% 100%;
   }
+}
 
-  /* ============================================
-     KINGDOM FUTURE THEME - Saudi Vision 2030
-     "Heritage Meets Horizon"
-     ============================================ */
-  html[data-theme="kingdom-future"],
-  html[data-theme="kingdom-future"].dark {
+/* ============================================
+   KINGDOM FUTURE THEME - Saudi Vision 2030
+   "Heritage Meets Horizon"
+   (Outside @layer for proper specificity)
+   ============================================ */
+html[data-theme="kingdom-future"],
+html[data-theme="kingdom-future"].dark {
     /* Backgrounds - Deep Green/Black Void */
     --background: 150 30% 3%;        /* #040B06 */
     --foreground: 0 0% 98%;          /* #FAFAFA */
@@ -446,81 +448,81 @@
     --info-foreground: 150 30% 3%;
     --error: 0 62.8% 30.6%;
     --error-foreground: 0 0% 98%;
-  }
+}
 
-  /* ============================================
-     NEURAL DARK THEME - The Pulse of Intelligence
-     Cyberpunk / AI / Neural Network Aesthetics
-     ============================================ */
-  html[data-theme="neural-dark"],
-  html[data-theme="neural-dark"].dark {
-    /* Backgrounds */
-    --background: 240 10% 3.9%;      /* #09090B */
-    --foreground: 0 0% 98%;          /* #FAFAFA */
+/* ============================================
+   NEURAL DARK THEME - The Pulse of Intelligence
+   Cyberpunk / AI / Neural Network Aesthetics
+   (Outside @layer for proper specificity)
+   ============================================ */
+html[data-theme="neural-dark"],
+html[data-theme="neural-dark"].dark {
+  /* Backgrounds */
+  --background: 240 10% 3.9%;      /* #09090B */
+  --foreground: 0 0% 98%;          /* #FAFAFA */
 
-    /* Card */
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+  /* Card */
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
 
-    /* Popover */
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+  /* Popover */
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
 
-    /* Primary - Neon Purple */
-    --primary: 263.4 70% 50.4%;      /* #7C3AED */
-    --primary-foreground: 210 40% 98%;
+  /* Primary - Neon Purple */
+  --primary: 263.4 70% 50.4%;      /* #7C3AED */
+  --primary-foreground: 210 40% 98%;
 
-    /* Secondary - Deep Void/Grey */
-    --secondary: 240 3.7% 15.9%;     /* #27272A */
-    --secondary-foreground: 0 0% 98%;
+  /* Secondary - Deep Void/Grey */
+  --secondary: 240 3.7% 15.9%;     /* #27272A */
+  --secondary-foreground: 0 0% 98%;
 
-    /* Muted */
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%; /* #A1A1AA */
+  /* Muted */
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%; /* #A1A1AA */
 
-    /* Accent */
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+  /* Accent */
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
 
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+  /* Destructive */
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
 
-    /* Border & Input */
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+  /* Border & Input */
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
 
-    /* Neon Ring */
-    --ring: 263.4 70% 50.4%;
-    --radius: 1rem;
+  /* Neon Ring */
+  --ring: 263.4 70% 50.4%;
+  --radius: 1rem;
 
-    /* Chart Colors - Neon Palette */
-    --chart-1: 252 100% 70%;         /* Neon Purple */
-    --chart-2: 190 100% 50%;         /* Cyan */
-    --chart-3: 320 100% 60%;         /* Hot Pink */
-    --chart-4: 45 100% 60%;          /* Electric Gold */
-    --chart-5: 140 100% 60%;         /* Neon Green */
+  /* Chart Colors - Neon Palette */
+  --chart-1: 252 100% 70%;         /* Neon Purple */
+  --chart-2: 190 100% 50%;         /* Cyan */
+  --chart-3: 320 100% 60%;         /* Hot Pink */
+  --chart-4: 45 100% 60%;          /* Electric Gold */
+  --chart-5: 140 100% 60%;         /* Neon Green */
 
-    /* Sidebar */
-    --sidebar: 240 10% 3.9%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 263.4 70% 50.4%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 263.4 70% 50.4%;
-    
-    /* Semantic Colors - Neural Dark */
-    --success: 140 100% 60%;         /* Neon Green */
-    --success-foreground: 240 10% 4%;
-    --warning: 45 100% 60%;          /* Electric Gold */
-    --warning-foreground: 240 10% 4%;
-    --info: 190 100% 50%;            /* Cyan */
-    --info-foreground: 240 10% 4%;
-    --error: 320 100% 60%;           /* Hot Pink */
-    --error-foreground: 0 0% 100%;
-  }
+  /* Sidebar */
+  --sidebar: 240 10% 3.9%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 263.4 70% 50.4%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 263.4 70% 50.4%;
+  
+  /* Semantic Colors - Neural Dark */
+  --success: 140 100% 60%;         /* Neon Green */
+  --success-foreground: 240 10% 4%;
+  --warning: 45 100% 60%;          /* Electric Gold */
+  --warning-foreground: 240 10% 4%;
+  --info: 190 100% 50%;            /* Cyan */
+  --info-foreground: 240 10% 4%;
+  --error: 320 100% 60%;           /* Hot Pink */
+  --error-foreground: 0 0% 100%;
 }
 
 @layer base {
