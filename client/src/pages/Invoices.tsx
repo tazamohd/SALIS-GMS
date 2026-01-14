@@ -107,7 +107,7 @@ export function Invoices() {
         label: t('invoices.totalAmount', 'Total Amount'),
         render: () => (
           <span className="text-sm text-zinc-500 flex items-center gap-1">
-            <Shield className="w-3 h-3" /> Restricted
+            <Shield className="w-3 h-3" /> {t('permissions.restricted', 'مقيد')}
           </span>
         ),
       },
@@ -129,7 +129,7 @@ export function Invoices() {
             customer={customers?.find(c => c.id === invoice.customerId)}
           />
         ) : (
-          <span className="text-xs text-zinc-500">View only</span>
+          <span className="text-xs text-zinc-500">{t('permissions.viewOnly', 'عرض فقط')}</span>
         )
       ),
     },
@@ -152,15 +152,15 @@ export function Invoices() {
         <RoleBadge size="md" />
         {canViewFinancials ? (
           <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            Full financial access - you can view all billing details
+            {t('permissions.fullFinancialAccess', 'صلاحية مالية كاملة - يمكنك عرض جميع تفاصيل الفوترة')}
           </span>
         ) : canCreate('invoices') ? (
           <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-            You can create and manage invoices
+            {t('permissions.canCreateInvoices', 'يمكنك إنشاء وإدارة الفواتير')}
           </span>
         ) : (
           <span className="text-xs text-zinc-500 flex items-center gap-1">
-            <Shield className="w-3 h-3" /> View only - contact billing department for changes
+            <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContact', 'عرض فقط - تواصل مع قسم الفوترة للتغييرات')}
           </span>
         )}
       </div>

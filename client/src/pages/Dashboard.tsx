@@ -276,8 +276,8 @@ export function Dashboard() {
                 <div className="flex items-center justify-center h-full min-h-[120px]">
                   <div className="text-center">
                     <Shield className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                    <p className="text-sm text-zinc-500">Financial data restricted</p>
-                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} access</p>
+                    <p className="text-sm text-zinc-500">{t('permissions.financialDataRestricted', 'البيانات المالية مقيدة')}</p>
+                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} {t('common.access', 'الوصول')}</p>
                   </div>
                 </div>
               </div>
@@ -330,8 +330,8 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
                     <div className="flex gap-2">
-                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} pending</Badge>
-                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} active</Badge>
+                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} {t('statusLabels.pending', 'قيد الانتظار')}</Badge>
+                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} {t('statusLabels.active', 'نشط')}</Badge>
                     </div>
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export function Dashboard() {
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{activeCustomersCount}</h3>
                     <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
                       <Award className="w-4 h-4" />
-                      <span className="text-xs font-medium">+8 this week</span>
+                      <span className="text-xs font-medium">+8 {t('common.thisWeek', 'هذا الأسبوع')}</span>
                     </div>
                   </div>
                 </div>
@@ -385,7 +385,7 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
-                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
+                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} {t('inventory.inStock', 'في المخزون')}</p>
                   </div>
                 </div>
                 <div className="relative">

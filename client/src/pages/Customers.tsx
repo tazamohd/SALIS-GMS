@@ -229,7 +229,7 @@ export function Customers() {
           label: (
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4" />
-              <span>{selectedGarageId === "all" ? "All Garages" : garages?.find(g => g.id === selectedGarageId)?.name || "Select Garage"}</span>
+              <span>{selectedGarageId === "all" ? t('customers.allGarages', 'جميع الورش') : garages?.find(g => g.id === selectedGarageId)?.name || t('customers.selectGarage', 'اختر ورشة')}</span>
             </div>
           ) as any,
           onClick: () => {},
@@ -239,7 +239,7 @@ export function Customers() {
             <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
               <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage-filter">
                 <Building2 className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="All Garages" />
+                <SelectValue placeholder={t('customers.allGarages', 'جميع الورش')} />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23]">
                 <SelectItem value="all">{t('customers.allGarages', 'All Garages')}</SelectItem>
@@ -267,15 +267,15 @@ export function Customers() {
         <RoleBadge size="md" />
         {canCreate('customers') ? (
           <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            You can create and manage customer profiles
+            {t('permissions.canCreateCustomers', 'يمكنك إنشاء وإدارة ملفات العملاء')}
           </span>
         ) : canEdit('customers') ? (
           <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-            You can update customer information
+            {t('permissions.canEditCustomers', 'يمكنك تحديث معلومات العملاء')}
           </span>
         ) : (
           <span className="text-xs text-zinc-500 flex items-center gap-1">
-            <Shield className="w-3 h-3" /> View only - contact a manager to modify customer records
+            <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContactManagerCustomers', 'عرض فقط - تواصل مع المدير لتعديل سجلات العملاء')}
           </span>
         )}
       </div>

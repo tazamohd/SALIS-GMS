@@ -17,9 +17,9 @@ export default function LeaveRequests() {
 
   const getStatusBadge = (status: string, id: number) => {
     switch (status) {
-      case "approved": return <Badge data-testid={`status-approved-${id}`} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"><CheckCircle className="w-3 h-3 mr-1" />Approved</Badge>;
-      case "pending": return <Badge data-testid={`status-pending-${id}`} className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"><AlertCircle className="w-3 h-3 mr-1" />Pending</Badge>;
-      case "rejected": return <Badge data-testid={`status-rejected-${id}`} className="bg-red-500/20 text-red-400 border-red-500/30"><XCircle className="w-3 h-3 mr-1" />Rejected</Badge>;
+      case "approved": return <Badge data-testid={`status-approved-${id}`} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"><CheckCircle className="w-3 h-3 mr-1" />{t('statusLabels.approved', 'موافق عليه')}</Badge>;
+      case "pending": return <Badge data-testid={`status-pending-${id}`} className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"><AlertCircle className="w-3 h-3 mr-1" />{t('statusLabels.pending', 'قيد الانتظار')}</Badge>;
+      case "rejected": return <Badge data-testid={`status-rejected-${id}`} className="bg-red-500/20 text-red-400 border-red-500/30"><XCircle className="w-3 h-3 mr-1" />{t('statusLabels.rejected', 'مرفوض')}</Badge>;
       default: return <Badge>{status}</Badge>;
     }
   };
@@ -45,7 +45,7 @@ export default function LeaveRequests() {
                 <div className="p-2 rounded-lg bg-sky-500/20"><Calendar className="w-5 h-5 text-sky-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-total-requests">12</p>
-                  <p className="text-sm text-gray-400">Total Requests</p>
+                  <p className="text-sm text-gray-400">{t('leaveRequests.totalRequests', 'إجمالي الطلبات')}</p>
                 </div>
               </div>
             </CardContent>
@@ -56,7 +56,7 @@ export default function LeaveRequests() {
                 <div className="p-2 rounded-lg bg-yellow-500/20"><Clock className="w-5 h-5 text-yellow-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-pending">3</p>
-                  <p className="text-sm text-gray-400">Pending</p>
+                  <p className="text-sm text-gray-400">{t('statusLabels.pending', 'قيد الانتظار')}</p>
                 </div>
               </div>
             </CardContent>
@@ -67,7 +67,7 @@ export default function LeaveRequests() {
                 <div className="p-2 rounded-lg bg-emerald-500/20"><CheckCircle className="w-5 h-5 text-emerald-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-approved">8</p>
-                  <p className="text-sm text-gray-400">Approved</p>
+                  <p className="text-sm text-gray-400">{t('statusLabels.approved', 'موافق عليه')}</p>
                 </div>
               </div>
             </CardContent>
@@ -78,7 +78,7 @@ export default function LeaveRequests() {
                 <div className="p-2 rounded-lg bg-red-500/20"><XCircle className="w-5 h-5 text-red-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-rejected">1</p>
-                  <p className="text-sm text-gray-400">Rejected</p>
+                  <p className="text-sm text-gray-400">{t('statusLabels.rejected', 'مرفوض')}</p>
                 </div>
               </div>
             </CardContent>
@@ -87,8 +87,8 @@ export default function LeaveRequests() {
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-recent-requests">
           <CardHeader>
-            <CardTitle className="text-white">Recent Leave Requests</CardTitle>
-            <CardDescription className="text-gray-400">Review and manage leave requests from employees</CardDescription>
+            <CardTitle className="text-white">{t('leaveRequests.recentRequests', 'طلبات الإجازة الأخيرة')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('leaveRequests.reviewManage', 'مراجعة وإدارة طلبات الإجازة من الموظفين')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -106,7 +106,7 @@ export default function LeaveRequests() {
                   <div className="flex items-center gap-6">
                     <div className="text-right">
                       <p className="text-sm text-white">{request.startDate} - {request.endDate}</p>
-                      <p className="text-sm text-gray-400">{request.days} days</p>
+                      <p className="text-sm text-gray-400">{request.days} {t('common.days', 'أيام')}</p>
                     </div>
                     {getStatusBadge(request.status, request.id)}
                   </div>
