@@ -379,54 +379,72 @@
      "Heritage Meets Horizon"
      ============================================ */
   .kingdom-future {
-    /* Background - The Deep Void (Desert Night Sky) */
-    --background: 150 30% 3%;        /* #040B06 - Deep emerald-tinted void */
-    --foreground: 150 10% 90%;       /* Light text with subtle green tint */
+    /* Backgrounds - Deep Green/Black Void */
+    --background: 150 30% 3%;        /* #040B06 */
+    --foreground: 0 0% 98%;          /* #FAFAFA */
 
-    /* Muted - Recessed Areas */
-    --muted: 150 25% 6%;             /* Slightly lighter void */
-    --muted-foreground: 150 10% 60%; /* Muted green-gray */
+    /* Card */
+    --card: 150 30% 4%;              /* #070D08 */
+    --card-foreground: 0 0% 98%;
 
-    /* Accent */
-    --accent: 150 25% 8%;            /* Emerald-tinted accent bg */
-    --accent-foreground: 150 100% 45%; /* Neon Emerald text */
+    /* Popover */
+    --popover: 150 30% 4%;
+    --popover-foreground: 0 0% 98%;
 
-    /* Popover - Glass Card */
-    --popover: 150 25% 6%;
-    --popover-foreground: 150 10% 90%;
-
-    /* Border - Glass Edge */
-    --border: 150 30% 20% / 0.3;     /* Emerald-tinted border */
-    --input: 150 25% 10%;
-
-    /* Card - Glassmorphism */
-    --card: 150 25% 6% / 0.6;
-    --card-foreground: 150 10% 90%;
-
-    /* Primary - Neon Emerald #00E676 */
-    --primary: 150 100% 45%;
+    /* Primary - Neon Emerald */
+    --primary: 150 100% 45%;         /* #00E676 */
     --primary-foreground: 150 30% 3%;
 
-    /* Secondary - Royal Gold #F2C94C */
-    --secondary: 45 90% 50%;
+    /* Secondary - Royal Gold */
+    --secondary: 45 90% 50%;         /* #F2C94C */
     --secondary-foreground: 150 30% 3%;
 
-    /* Destructive */
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
+    /* Muted */
+    --muted: 150 20% 12%;            /* #1A261E */
+    --muted-foreground: 150 10% 70%;
 
-    --ring: 150 100% 45%;            /* Neon Emerald glow ring */
-    --radius: 0.5rem;
+    /* Accent */
+    --accent: 150 20% 12%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Border & Input */
+    --border: 150 20% 12%;
+    --input: 150 20% 12%;
+
+    /* Emerald Ring */
+    --ring: 150 100% 45%;
+    --radius: 1rem;
+
+    /* Chart Colors - National Palette */
+    --chart-1: 150 100% 50%;         /* Neon Emerald */
+    --chart-2: 45 100% 60%;          /* Bright Gold */
+    --chart-3: 180 100% 50%;         /* Cyan */
+    --chart-4: 0 0% 100%;            /* White */
+    --chart-5: 120 80% 60%;          /* Lime */
+
+    /* Sidebar */
+    --sidebar: 150 30% 3%;
+    --sidebar-foreground: 150 10% 90%;
+    --sidebar-primary: 150 100% 45%;
+    --sidebar-primary-foreground: 150 30% 3%;
+    --sidebar-accent: 150 20% 12%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 150 20% 12%;
+    --sidebar-ring: 150 100% 45%;
     
     /* Semantic Colors - Kingdom Future */
     --success: 150 100% 45%;         /* Neon Emerald */
     --success-foreground: 150 30% 3%;
     --warning: 45 90% 50%;           /* Royal Gold */
     --warning-foreground: 150 30% 3%;
-    --info: 175 70% 45%;             /* Teal (instead of blue) */
+    --info: 180 100% 50%;            /* Cyan */
     --info-foreground: 150 30% 3%;
-    --error: 0 70% 55%;              /* Soft Red */
-    --error-foreground: 0 0% 100%;
+    --error: 0 62.8% 30.6%;
+    --error-foreground: 0 0% 98%;
   }
 
   /* ============================================
@@ -651,6 +669,31 @@
     box-shadow: 
       inset 0 1px 0 0 var(--glass-highlight),
       var(--glow-primary);
+  }
+
+  /* Kingdom Future Theme Utilities */
+  .kingdom-future .glass-card {
+    background: rgba(4, 11, 6, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px rgba(0, 230, 118, 0.6);
+  }
+
+  .gold-glow {
+    text-shadow: 0 0 15px rgba(242, 201, 76, 0.6);
+  }
+
+  .kingdom-future .neon-glow {
+    box-shadow: 0 0 20px rgba(0, 230, 118, 0.4), 0 0 40px rgba(0, 230, 118, 0.2);
   }
   
   /* Console/Terminal Style */
