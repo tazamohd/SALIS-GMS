@@ -1336,7 +1336,36 @@
     "searchVendorsOrInvoices": "البحث عن الموردين أو الفواتير...",
     "allStatus": "جميع الحالات",
     "makePayment": "إجراء دفعة",
-    "recordPaymentToVendor": "تسجيل دفعة للمورد"
+    "recordPaymentToVendor": "تسجيل دفعة للمورد",
+    "vendor": "المورد",
+    "selectVendor": "اختر المورد",
+    "invoice": "الفاتورة",
+    "invoicePlaceholder": "مثال: VND-INV-2024-0156",
+    "amountSAR": "المبلغ (ريال)",
+    "paymentDate": "تاريخ الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "selectMethod": "اختر الطريقة",
+    "bankTransfer": "تحويل بنكي",
+    "check": "شيك",
+    "cash": "نقدي",
+    "wireTransfer": "حوالة مصرفية",
+    "referenceOptional": "المرجع (اختياري)",
+    "referencePlaceholder": "مثال: تحويل #12345",
+    "selectDate": "اختر التاريخ",
+    "selectPeriod": "اختر الفترة",
+    "dates": {
+      "jan2024": "31 يناير 2024",
+      "dec2023": "31 ديسمبر 2023",
+      "sep2023": "30 سبتمبر 2023",
+      "jun2023": "30 يونيو 2023"
+    },
+    "periods": {
+      "jan2024": "يناير 2024",
+      "q12024": "الربع الأول 2024",
+      "fullYear2023": "السنة الكاملة 2023",
+      "q42023": "الربع الرابع 2023"
+    },
+    "cashFlowStatement": "قائمة التدفقات النقدية"
   },
   "accounting": {
     "title": "💼 تكامل المحاسبة",
@@ -1376,7 +1405,44 @@
     "status": {
       "synced": "تمت المزامنة",
       "failed": "فشلت",
-      "pending": "قيد الانتظار"
+      "pending": "قيد الانتظار",
+      "current": "حالية",
+      "dueSoon": "مستحقة قريباً",
+      "overdue": "متأخرة",
+      "paid": "مدفوعة"
+    },
+    "searchVendorsOrInvoices": "البحث عن الموردين أو الفواتير...",
+    "allStatus": "جميع الحالات",
+    "makePayment": "إجراء دفعة",
+    "recordPaymentToVendor": "تسجيل دفعة للمورد",
+    "vendor": "المورد",
+    "selectVendor": "اختر المورد",
+    "invoice": "الفاتورة",
+    "invoicePlaceholder": "مثال: VND-INV-2024-0156",
+    "amountSAR": "المبلغ (ريال)",
+    "paymentDate": "تاريخ الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "selectMethod": "اختر الطريقة",
+    "bankTransfer": "تحويل بنكي",
+    "check": "شيك",
+    "cash": "نقدي",
+    "wireTransfer": "حوالة مصرفية",
+    "referenceOptional": "المرجع (اختياري)",
+    "referencePlaceholder": "مثال: تحويل #12345",
+    "selectDate": "اختر التاريخ",
+    "selectPeriod": "اختر الفترة",
+    "cashFlowStatement": "قائمة التدفقات النقدية",
+    "dates": {
+      "jan2024": "31 يناير 2024",
+      "dec2023": "31 ديسمبر 2023",
+      "sep2023": "30 سبتمبر 2023",
+      "jun2023": "30 يونيو 2023"
+    },
+    "periods": {
+      "jan2024": "يناير 2024",
+      "q12024": "الربع الأول 2024",
+      "fullYear2023": "السنة الكاملة 2023",
+      "q42023": "الربع الرابع 2023"
     }
   },
   "aiAutomation": {
