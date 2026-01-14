@@ -452,53 +452,71 @@
      Cyberpunk / AI / Neural Network Aesthetics
      ============================================ */
   .neural-dark {
-    /* Background - The Neural Void */
-    --background: 240 10% 4%;        /* #09090B - Deep neutral void */
-    --foreground: 240 5% 90%;        /* Cool light text */
+    /* Backgrounds */
+    --background: 240 10% 3.9%;      /* #09090B */
+    --foreground: 0 0% 98%;          /* #FAFAFA */
 
-    /* Muted - Recessed Areas */
-    --muted: 240 8% 8%;              /* Slightly lighter void */
-    --muted-foreground: 240 5% 55%;  /* Muted gray */
+    /* Card */
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    /* Popover */
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary - Neon Purple */
+    --primary: 263.4 70% 50.4%;      /* #7C3AED */
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary - Deep Void/Grey */
+    --secondary: 240 3.7% 15.9%;     /* #27272A */
+    --secondary-foreground: 0 0% 98%;
+
+    /* Muted */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%; /* #A1A1AA */
 
     /* Accent */
-    --accent: 263 50% 15%;           /* Purple-tinted accent bg */
-    --accent-foreground: 263 70% 60%; /* Neon Purple text */
-
-    /* Popover - Glass Card */
-    --popover: 240 8% 8%;
-    --popover-foreground: 240 5% 90%;
-
-    /* Border - Glass Edge */
-    --border: 263 30% 25% / 0.3;     /* Purple-tinted border */
-    --input: 240 8% 12%;
-
-    /* Card - Glassmorphism */
-    --card: 240 8% 8% / 0.7;
-    --card-foreground: 240 5% 90%;
-
-    /* Primary - Neon Purple #7C3AED */
-    --primary: 263 70% 58%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Secondary - Electric Cyan #22D3EE */
-    --secondary: 190 100% 54%;
-    --secondary-foreground: 240 10% 4%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
 
     /* Destructive */
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    --ring: 263 70% 58%;             /* Neon Purple glow ring */
-    --radius: 0.5rem;
+    /* Border & Input */
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+
+    /* Neon Ring */
+    --ring: 263.4 70% 50.4%;
+    --radius: 1rem;
+
+    /* Chart Colors - Neon Palette */
+    --chart-1: 252 100% 70%;         /* Neon Purple */
+    --chart-2: 190 100% 50%;         /* Cyan */
+    --chart-3: 320 100% 60%;         /* Hot Pink */
+    --chart-4: 45 100% 60%;          /* Electric Gold */
+    --chart-5: 140 100% 60%;         /* Neon Green */
+
+    /* Sidebar */
+    --sidebar: 240 10% 3.9%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 263.4 70% 50.4%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 263.4 70% 50.4%;
     
     /* Semantic Colors - Neural Dark */
-    --success: 160 80% 45%;          /* Cyber Green */
+    --success: 140 100% 60%;         /* Neon Green */
     --success-foreground: 240 10% 4%;
-    --warning: 45 95% 55%;           /* Amber */
+    --warning: 45 100% 60%;          /* Electric Gold */
     --warning-foreground: 240 10% 4%;
-    --info: 190 100% 54%;            /* Electric Cyan */
+    --info: 190 100% 50%;            /* Cyan */
     --info-foreground: 240 10% 4%;
-    --error: 0 75% 55%;              /* Neon Red */
+    --error: 320 100% 60%;           /* Hot Pink */
     --error-foreground: 0 0% 100%;
   }
 }
@@ -694,6 +712,31 @@
 
   .kingdom-future .neon-glow {
     box-shadow: 0 0 20px rgba(0, 230, 118, 0.4), 0 0 40px rgba(0, 230, 118, 0.2);
+  }
+
+  /* Neural Dark Theme Utilities */
+  .neural-dark .glass-card {
+    background: rgba(24, 24, 27, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .neural-dark .neon-glow {
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .neural-dark .text-glow {
+    text-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  }
+
+  .purple-glow {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 40px rgba(124, 58, 237, 0.2);
+  }
+
+  .cyan-glow {
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
   }
   
   /* Console/Terminal Style */
