@@ -99,8 +99,17 @@ export function Dashboard() {
       'body_work': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🎨' },
       'tire_service': { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '⭕' },
     };
-    const config = types[serviceType.toLowerCase().replace(/\s+/g, '_')] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
-    return { ...config, label: serviceType };
+    const serviceTypeLabels: { [key: string]: string } = {
+      'maintenance': t('serviceTypes.maintenance', 'الصيانة'),
+      'repair': t('serviceTypes.repair', 'الإصلاح'),
+      'diagnostic': t('serviceTypes.diagnostic', 'التشخيص'),
+      'inspection': t('serviceTypes.inspection', 'الفحص'),
+      'body_work': t('serviceTypes.bodyWork', 'أعمال الهيكل'),
+      'tire_service': t('serviceTypes.tireService', 'خدمة الإطارات'),
+    };
+    const key = serviceType.toLowerCase().replace(/\s+/g, '_');
+    const config = types[key] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
+    return { ...config, label: serviceTypeLabels[key] || serviceType };
   };
 
   const getStatusBadge = (status: string) => {
@@ -112,8 +121,16 @@ export function Dashboard() {
       'delivered': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🚗' },
       'cancelled': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '❌' },
     };
+    const statusLabels: { [key: string]: string } = {
+      'pending': t('statusLabels.pending', 'قيد الانتظار'),
+      'assigned': t('statusLabels.assigned', 'معين'),
+      'in_progress': t('statusLabels.inProgress', 'قيد التنفيذ'),
+      'completed': t('statusLabels.completed', 'مكتمل'),
+      'delivered': t('statusLabels.delivered', 'تم التسليم'),
+      'cancelled': t('statusLabels.cancelled', 'ملغي'),
+    };
     const config = statusColors[status] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '○' };
-    return { ...config, label: status };
+    return { ...config, label: statusLabels[status] || status };
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -123,8 +140,14 @@ export function Dashboard() {
       'medium': { bg: 'bg-[#0BB3FF] dark:bg-[#0891b2]', text: 'text-white', icon: '⭐' },
       'low': { bg: 'bg-[#0A5ED7] dark:bg-[#0952C0]', text: 'text-white', icon: '💙' },
     };
+    const priorityLabels: { [key: string]: string } = {
+      'urgent': t('priorityLabels.urgent', 'عاجل'),
+      'high': t('priorityLabels.high', 'مرتفع'),
+      'medium': t('priorityLabels.medium', 'متوسط'),
+      'low': t('priorityLabels.low', 'منخفض'),
+    };
     const config = priorityColors[priority] || { bg: 'bg-[#64748B]', text: 'text-white', icon: '○' };
-    return { ...config, label: priority };
+    return { ...config, label: priorityLabels[priority] || priority };
   };
 
   const shortenId = (id: string) => {

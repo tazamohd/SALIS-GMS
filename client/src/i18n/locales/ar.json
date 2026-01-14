@@ -719,11 +719,38 @@
       "fleet": "أسطول"
     }
   },
+  "vehiclesEnhanced": {
+    "vehicle": "المركبة",
+    "serviceType": "نوع الخدمة",
+    "mileage": "المسافة المقطوعة",
+    "technician": "الفني",
+    "cost": "التكلفة",
+    "allVehicles": "جميع المركبات",
+    "allServiceTypes": "جميع أنواع الخدمات",
+    "serviceHistory": "سجل الخدمة",
+    "serviceHistoryDescription": "عرض وإدارة سجل صيانة المركبات"
+  },
   "vehicles": {
     "title": "المركبات",
     "subtitle": "إدارة بيانات المركبات",
     "newVehicle": "مركبة جديدة",
     "editVehicle": "تعديل المركبة",
+    "vehicle": "المركبة",
+    "serviceType": "نوع الخدمة",
+    "mileage": "المسافة المقطوعة",
+    "technician": "الفني",
+    "cost": "التكلفة",
+    "allVehicles": "جميع المركبات",
+    "allServices": "جميع الخدمات",
+    "oilChange": "تغيير الزيت",
+    "brakeService": "خدمة الفرامل",
+    "diagnostics": "التشخيص",
+    "tireService": "خدمة الإطارات",
+    "vehicleHistory": "سجل المركبات",
+    "vehicleHistoryDescription": "سجل الخدمة الكامل وسجلات الصيانة لجميع المركبات",
+    "searchVehicleHistory": "البحث في سجل المركبات...",
+    "noServiceHistoryFound": "لم يتم العثور على سجل خدمة",
+    "noServiceHistoryDescription": "لا توجد سجلات خدمة متاحة للمعايير المحددة.",
     "vehicleDetails": "تفاصيل المركبة",
     "plateNumber": "رقم اللوحة",
     "vin": "رقم الهيكل",
@@ -1298,6 +1325,18 @@
     "min": "دقيقة",
     "scanRecorded": "تم تسجيل مسح لوحة المركبة بنجاح",
     "scanFailed": "فشل تسجيل المسح"
+  },
+  "accountingEnhanced": {
+    "status": {
+      "current": "حالية",
+      "dueSoon": "مستحقة قريباً",
+      "overdue": "متأخرة",
+      "paid": "مدفوعة"
+    },
+    "searchVendorsOrInvoices": "البحث عن الموردين أو الفواتير...",
+    "allStatus": "جميع الحالات",
+    "makePayment": "إجراء دفعة",
+    "recordPaymentToVendor": "تسجيل دفعة للمورد"
   },
   "accounting": {
     "title": "💼 تكامل المحاسبة",
@@ -2641,7 +2680,23 @@
     "noShow": "لم يحضر",
     "overdue": "متأخر",
     "approved": "موافق عليه",
-    "rejected": "مرفوض"
+    "rejected": "مرفوض",
+    "assigned": "معين",
+    "delivered": "تم التسليم"
+  },
+  "serviceTypes": {
+    "maintenance": "الصيانة",
+    "repair": "الإصلاح",
+    "diagnostic": "التشخيص",
+    "inspection": "الفحص",
+    "bodyWork": "أعمال الهيكل",
+    "tireService": "خدمة الإطارات"
+  },
+  "priorityLabels": {
+    "urgent": "عاجل",
+    "high": "مرتفع",
+    "medium": "متوسط",
+    "low": "منخفض"
   },
   "leaveRequests": {
     "title": "طلبات الإجازة",
@@ -2667,6 +2722,13 @@
     "noData": "لا توجد بيانات",
     "save": "حفظ",
     "cancel": "إلغاء",
+    "completed": "مكتمل",
+    "inProgress": "قيد التنفيذ",
+    "cancelled": "ملغي",
+    "date": "التاريخ",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "view": "عرض",
     "delete": "حذف",
     "edit": "تعديل",
     "add": "إضافة",
