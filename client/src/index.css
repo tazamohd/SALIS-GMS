@@ -382,72 +382,72 @@
    ============================================ */
 html[data-theme="kingdom-future"],
 html[data-theme="kingdom-future"].dark {
-    /* Backgrounds - Deep Green/Black Void */
-    --background: 150 30% 3%;        /* #040B06 */
-    --foreground: 0 0% 98%;          /* #FAFAFA */
+  /* Backgrounds - Deep Green/Black Void */
+  --background: 150 30% 3% !important;        /* #040B06 */
+  --foreground: 0 0% 98% !important;          /* #FAFAFA */
 
-    /* Card */
-    --card: 150 30% 4%;              /* #070D08 */
-    --card-foreground: 0 0% 98%;
+  /* Card */
+  --card: 150 30% 4% !important;              /* #070D08 */
+  --card-foreground: 0 0% 98% !important;
 
-    /* Popover */
-    --popover: 150 30% 4%;
-    --popover-foreground: 0 0% 98%;
+  /* Popover */
+  --popover: 150 30% 4% !important;
+  --popover-foreground: 0 0% 98% !important;
 
-    /* Primary - Neon Emerald */
-    --primary: 150 100% 45%;         /* #00E676 */
-    --primary-foreground: 150 30% 3%;
+  /* Primary - Neon Emerald */
+  --primary: 150 100% 45% !important;         /* #00E676 */
+  --primary-foreground: 150 30% 3% !important;
 
-    /* Secondary - Royal Gold */
-    --secondary: 45 90% 50%;         /* #F2C94C */
-    --secondary-foreground: 150 30% 3%;
+  /* Secondary - Royal Gold */
+  --secondary: 45 90% 50% !important;         /* #F2C94C */
+  --secondary-foreground: 150 30% 3% !important;
 
-    /* Muted */
-    --muted: 150 20% 12%;            /* #1A261E */
-    --muted-foreground: 150 10% 70%;
+  /* Muted */
+  --muted: 150 20% 12% !important;            /* #1A261E */
+  --muted-foreground: 150 10% 70% !important;
 
-    /* Accent */
-    --accent: 150 20% 12%;
-    --accent-foreground: 0 0% 98%;
+  /* Accent */
+  --accent: 150 20% 12% !important;
+  --accent-foreground: 0 0% 98% !important;
 
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+  /* Destructive */
+  --destructive: 0 62.8% 30.6% !important;
+  --destructive-foreground: 0 0% 98% !important;
 
-    /* Border & Input */
-    --border: 150 20% 12%;
-    --input: 150 20% 12%;
+  /* Border & Input */
+  --border: 150 20% 12% !important;
+  --input: 150 20% 12% !important;
 
-    /* Emerald Ring */
-    --ring: 150 100% 45%;
-    --radius: 1rem;
+  /* Emerald Ring */
+  --ring: 150 100% 45% !important;
+  --radius: 1rem !important;
 
-    /* Chart Colors - National Palette */
-    --chart-1: 150 100% 50%;         /* Neon Emerald */
-    --chart-2: 45 100% 60%;          /* Bright Gold */
-    --chart-3: 180 100% 50%;         /* Cyan */
-    --chart-4: 0 0% 100%;            /* White */
-    --chart-5: 120 80% 60%;          /* Lime */
+  /* Chart Colors - National Palette */
+  --chart-1: 150 100% 50% !important;         /* Neon Emerald */
+  --chart-2: 45 100% 60% !important;          /* Bright Gold */
+  --chart-3: 180 100% 50% !important;         /* Cyan */
+  --chart-4: 0 0% 100% !important;            /* White */
+  --chart-5: 120 80% 60% !important;          /* Lime */
 
-    /* Sidebar */
-    --sidebar: 150 30% 3%;
-    --sidebar-foreground: 150 10% 90%;
-    --sidebar-primary: 150 100% 45%;
-    --sidebar-primary-foreground: 150 30% 3%;
-    --sidebar-accent: 150 20% 12%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 150 20% 12%;
-    --sidebar-ring: 150 100% 45%;
-    
-    /* Semantic Colors - Kingdom Future */
-    --success: 150 100% 45%;         /* Neon Emerald */
-    --success-foreground: 150 30% 3%;
-    --warning: 45 90% 50%;           /* Royal Gold */
-    --warning-foreground: 150 30% 3%;
-    --info: 180 100% 50%;            /* Cyan */
-    --info-foreground: 150 30% 3%;
-    --error: 0 62.8% 30.6%;
-    --error-foreground: 0 0% 98%;
+  /* Sidebar */
+  --sidebar: 150 30% 3% !important;
+  --sidebar-foreground: 150 10% 90% !important;
+  --sidebar-primary: 150 100% 45% !important;
+  --sidebar-primary-foreground: 150 30% 3% !important;
+  --sidebar-accent: 150 20% 12% !important;
+  --sidebar-accent-foreground: 0 0% 100% !important;
+  --sidebar-border: 150 20% 12% !important;
+  --sidebar-ring: 150 100% 45% !important;
+  
+  /* Semantic Colors - Kingdom Future */
+  --success: 150 100% 45% !important;         /* Neon Emerald */
+  --success-foreground: 150 30% 3% !important;
+  --warning: 45 90% 50% !important;           /* Royal Gold */
+  --warning-foreground: 150 30% 3% !important;
+  --info: 180 100% 50% !important;            /* Cyan */
+  --info-foreground: 150 30% 3% !important;
+  --error: 0 62.8% 30.6% !important;
+  --error-foreground: 0 0% 98% !important;
 }
 
 /* ============================================
@@ -458,71 +458,71 @@ html[data-theme="kingdom-future"].dark {
 html[data-theme="neural-dark"],
 html[data-theme="neural-dark"].dark {
   /* Backgrounds */
-  --background: 240 10% 3.9%;      /* #09090B */
-  --foreground: 0 0% 98%;          /* #FAFAFA */
+  --background: 240 10% 3.9% !important;      /* #09090B */
+  --foreground: 0 0% 98% !important;          /* #FAFAFA */
 
   /* Card */
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
+  --card: 240 10% 3.9% !important;
+  --card-foreground: 0 0% 98% !important;
 
   /* Popover */
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9% !important;
+  --popover-foreground: 0 0% 98% !important;
 
   /* Primary - Neon Purple */
-  --primary: 263.4 70% 50.4%;      /* #7C3AED */
-  --primary-foreground: 210 40% 98%;
+  --primary: 263.4 70% 50.4% !important;      /* #7C3AED */
+  --primary-foreground: 210 40% 98% !important;
 
   /* Secondary - Deep Void/Grey */
-  --secondary: 240 3.7% 15.9%;     /* #27272A */
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 240 3.7% 15.9% !important;     /* #27272A */
+  --secondary-foreground: 0 0% 98% !important;
 
   /* Muted */
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%; /* #A1A1AA */
+  --muted: 240 3.7% 15.9% !important;
+  --muted-foreground: 240 5% 64.9% !important; /* #A1A1AA */
 
   /* Accent */
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 240 3.7% 15.9% !important;
+  --accent-foreground: 0 0% 98% !important;
 
   /* Destructive */
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6% !important;
+  --destructive-foreground: 0 0% 98% !important;
 
   /* Border & Input */
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
+  --border: 240 3.7% 15.9% !important;
+  --input: 240 3.7% 15.9% !important;
 
   /* Neon Ring */
-  --ring: 263.4 70% 50.4%;
-  --radius: 1rem;
+  --ring: 263.4 70% 50.4% !important;
+  --radius: 1rem !important;
 
   /* Chart Colors - Neon Palette */
-  --chart-1: 252 100% 70%;         /* Neon Purple */
-  --chart-2: 190 100% 50%;         /* Cyan */
-  --chart-3: 320 100% 60%;         /* Hot Pink */
-  --chart-4: 45 100% 60%;          /* Electric Gold */
-  --chart-5: 140 100% 60%;         /* Neon Green */
+  --chart-1: 252 100% 70% !important;         /* Neon Purple */
+  --chart-2: 190 100% 50% !important;         /* Cyan */
+  --chart-3: 320 100% 60% !important;         /* Hot Pink */
+  --chart-4: 45 100% 60% !important;          /* Electric Gold */
+  --chart-5: 140 100% 60% !important;         /* Neon Green */
 
   /* Sidebar */
-  --sidebar: 240 10% 3.9%;
-  --sidebar-foreground: 240 4.8% 95.9%;
-  --sidebar-primary: 263.4 70% 50.4%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 3.7% 15.9%;
-  --sidebar-accent-foreground: 240 4.8% 95.9%;
-  --sidebar-border: 240 3.7% 15.9%;
-  --sidebar-ring: 263.4 70% 50.4%;
+  --sidebar: 240 10% 3.9% !important;
+  --sidebar-foreground: 240 4.8% 95.9% !important;
+  --sidebar-primary: 263.4 70% 50.4% !important;
+  --sidebar-primary-foreground: 0 0% 100% !important;
+  --sidebar-accent: 240 3.7% 15.9% !important;
+  --sidebar-accent-foreground: 240 4.8% 95.9% !important;
+  --sidebar-border: 240 3.7% 15.9% !important;
+  --sidebar-ring: 263.4 70% 50.4% !important;
   
   /* Semantic Colors - Neural Dark */
-  --success: 140 100% 60%;         /* Neon Green */
-  --success-foreground: 240 10% 4%;
-  --warning: 45 100% 60%;          /* Electric Gold */
-  --warning-foreground: 240 10% 4%;
-  --info: 190 100% 50%;            /* Cyan */
-  --info-foreground: 240 10% 4%;
-  --error: 320 100% 60%;           /* Hot Pink */
-  --error-foreground: 0 0% 100%;
+  --success: 140 100% 60% !important;         /* Neon Green */
+  --success-foreground: 240 10% 4% !important;
+  --warning: 45 100% 60% !important;          /* Electric Gold */
+  --warning-foreground: 240 10% 4% !important;
+  --info: 190 100% 50% !important;            /* Cyan */
+  --info-foreground: 240 10% 4% !important;
+  --error: 320 100% 60% !important;           /* Hot Pink */
+  --error-foreground: 0 0% 100% !important;
 }
 
 @layer base {

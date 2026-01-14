@@ -25,6 +25,11 @@ function applyTheme(theme: Theme) {
   if (theme === "kingdom-future" || theme === "neural-dark") {
     root.classList.add("dark");
     root.setAttribute("data-theme", theme);
+    console.log(`Theme applied: ${theme}, data-theme: ${root.getAttribute("data-theme")}, classes: ${root.className}`);
+    
+    // Force CSS variable application by reading computed style
+    const bg = getComputedStyle(root).getPropertyValue("--primary");
+    console.log(`--primary value: ${bg}`);
   } else {
     const resolvedTheme = getResolvedTheme(theme);
     root.classList.add(resolvedTheme);
