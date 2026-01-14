@@ -272,58 +272,86 @@
 }
 
 @layer base {
-  :root {
-    /* Light Mode - Corporate Steel Theme */
-    --background: 210 40% 96%;      /* #f1f5f9 - Slate 100 */
-    --foreground: 222 47% 11%;      /* #0f172a - Slate 900 */
+  /* ============================================
+     DEFAULT THEME: KINGDOM FUTURE
+     Saudi Vision 2030 - "Heritage Meets Horizon"
+     ============================================ */
+  :root,
+  .dark {
+    /* Backgrounds - Deep Green/Black Void */
+    --background: 150 30% 3%;        /* #040B06 */
+    --foreground: 0 0% 98%;          /* #FAFAFA */
 
-    --muted: 210 40% 90%;           /* Slate 200 */
-    --muted-foreground: 215 16% 47%;/* #64748b - Slate 500 */
+    /* Card */
+    --card: 150 30% 4%;              /* #070D08 */
+    --card-foreground: 0 0% 98%;
 
-    --accent: 210 40% 90%;          /* Slate 200 */
-    --accent-foreground: 222 47% 11%;/* Slate 900 */
+    /* Popover */
+    --popover: 150 30% 4%;
+    --popover-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;           /* White */
-    --popover-foreground: 222 47% 11%;
+    /* Primary - Neon Emerald */
+    --primary: 150 100% 45%;         /* #00E676 */
+    --primary-foreground: 150 30% 3%;
 
-    --border: 214 32% 78%;          /* #cbd5e1 - Slate 300 */
-    --input: 214 32% 78%;
+    /* Secondary - Royal Gold */
+    --secondary: 45 90% 50%;         /* #F2C94C */
+    --secondary-foreground: 150 30% 3%;
 
-    --card: 0 0% 100%;              /* White surface */
-    --card-foreground: 222 47% 11%;
+    /* Muted */
+    --muted: 150 20% 12%;            /* #1A261E */
+    --muted-foreground: 150 10% 70%;
 
-    /* Primary - Sky Blue #0ea5e9 */
-    --primary: 199 89% 48%;
-    --primary-foreground: 0 0% 100%;
+    /* Accent */
+    --accent: 150 20% 12%;
+    --accent-foreground: 0 0% 98%;
 
-    /* Secondary - Orange #f97316 */
-    --secondary: 24 95% 53%;
-    --secondary-foreground: 0 0% 100%;
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Destructive - Red #ef4444 */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* Border & Input */
+    --border: 150 20% 12%;
+    --input: 150 20% 12%;
 
-    --ring: 199 89% 48%;            /* Sky Blue ring */
-    --radius: 0.5rem;
+    /* Emerald Ring */
+    --ring: 150 100% 45%;
+    --radius: 1rem;
+
+    /* Chart Colors - National Palette */
+    --chart-1: 150 100% 50%;         /* Neon Emerald */
+    --chart-2: 45 100% 60%;          /* Bright Gold */
+    --chart-3: 180 100% 50%;         /* Cyan */
+    --chart-4: 0 0% 100%;            /* White */
+    --chart-5: 120 80% 60%;          /* Lime */
+
+    /* Sidebar */
+    --sidebar: 150 30% 3%;
+    --sidebar-foreground: 150 10% 90%;
+    --sidebar-primary: 150 100% 45%;
+    --sidebar-primary-foreground: 150 30% 3%;
+    --sidebar-accent: 150 20% 12%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 150 20% 12%;
+    --sidebar-ring: 150 100% 45%;
     
-    /* Semantic Colors - Light Mode */
-    --success: 160 84% 39%;         /* #10b981 - Emerald */
-    --success-foreground: 0 0% 100%;
-    --warning: 24 95% 53%;          /* #f97316 - Orange */
-    --warning-foreground: 0 0% 100%;
-    --info: 199 89% 48%;            /* #0ea5e9 - Sky Blue */
-    --info-foreground: 0 0% 100%;
-    --error: 0 84% 60%;             /* #ef4444 - Red */
-    --error-foreground: 0 0% 100%;
+    /* Semantic Colors - Kingdom Future */
+    --success: 150 100% 45%;         /* Neon Emerald */
+    --success-foreground: 150 30% 3%;
+    --warning: 45 90% 50%;           /* Royal Gold */
+    --warning-foreground: 150 30% 3%;
+    --info: 180 100% 50%;            /* Cyan */
+    --info-foreground: 150 30% 3%;
+    --error: 0 62.8% 30.6%;
+    --error-foreground: 0 0% 98%;
   }
 
-  .dark {
-    /* ============================================
-       DARK MODE - Deep Space Theme
-       SalisEngine.AI Design System v2.0
-       ============================================ */
-    
+  /* ============================================
+     DEEP SPACE THEME - Original Dark Theme
+     For users who prefer the blue/orange palette
+     ============================================ */
+  html[data-theme="deep-space"],
+  html[data-theme="deep-space"].dark {
     /* Background - Deep Void */
     --background: 240 33% 3%;        /* #050510 - Near-black void */
     --foreground: 210 40% 93%;       /* #e2e8f0 - Slate 200 */
@@ -341,11 +369,11 @@
     --popover-foreground: 210 40% 93%;
 
     /* Border - Glass Edge */
-    --border: 0 0% 100% / 0.08;      /* White 8% - subtle edge */
+    --border: 215 20% 15%;
     --input: 222 47% 15%;            /* Slightly lighter for inputs */
 
     /* Card - Slate Glass */
-    --card: 222 47% 11% / 0.6;       /* rgba(15, 23, 42, 0.6) */
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 93%;
 
     /* Primary - Sky Blue #0ea5e9 */
@@ -363,7 +391,24 @@
     --ring: 199 89% 48%;             /* Sky Blue glow ring */
     --radius: 0.5rem;
     
-    /* Semantic Colors - Dark Mode (Deep Space) */
+    /* Chart Colors */
+    --chart-1: 199 89% 48%;
+    --chart-2: 24 95% 53%;
+    --chart-3: 160 84% 39%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 280 70% 50%;
+
+    /* Sidebar */
+    --sidebar: 240 33% 3%;
+    --sidebar-foreground: 210 40% 93%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 240 33% 3%;
+    --sidebar-accent: 240 24% 7%;
+    --sidebar-accent-foreground: 210 40% 93%;
+    --sidebar-border: 215 20% 15%;
+    --sidebar-ring: 199 89% 48%;
+    
+    /* Semantic Colors - Deep Space */
     --success: 160 84% 39%;          /* #10b981 - Emerald Green */
     --success-foreground: 240 33% 3%;
     --warning: 24 95% 53%;           /* #f97316 - Orange */
@@ -373,81 +418,6 @@
     --error: 0 84% 60%;              /* #ef4444 - Red */
     --error-foreground: 0 0% 100%;
   }
-}
-
-/* ============================================
-   KINGDOM FUTURE THEME - Saudi Vision 2030
-   "Heritage Meets Horizon"
-   (Outside @layer for proper specificity)
-   ============================================ */
-html[data-theme="kingdom-future"],
-html[data-theme="kingdom-future"].dark {
-  /* Backgrounds - Deep Green/Black Void */
-  --background: 150 30% 3% !important;        /* #040B06 */
-  --foreground: 0 0% 98% !important;          /* #FAFAFA */
-
-  /* Card */
-  --card: 150 30% 4% !important;              /* #070D08 */
-  --card-foreground: 0 0% 98% !important;
-
-  /* Popover */
-  --popover: 150 30% 4% !important;
-  --popover-foreground: 0 0% 98% !important;
-
-  /* Primary - Neon Emerald */
-  --primary: 150 100% 45% !important;         /* #00E676 */
-  --primary-foreground: 150 30% 3% !important;
-
-  /* Secondary - Royal Gold */
-  --secondary: 45 90% 50% !important;         /* #F2C94C */
-  --secondary-foreground: 150 30% 3% !important;
-
-  /* Muted */
-  --muted: 150 20% 12% !important;            /* #1A261E */
-  --muted-foreground: 150 10% 70% !important;
-
-  /* Accent */
-  --accent: 150 20% 12% !important;
-  --accent-foreground: 0 0% 98% !important;
-
-  /* Destructive */
-  --destructive: 0 62.8% 30.6% !important;
-  --destructive-foreground: 0 0% 98% !important;
-
-  /* Border & Input */
-  --border: 150 20% 12% !important;
-  --input: 150 20% 12% !important;
-
-  /* Emerald Ring */
-  --ring: 150 100% 45% !important;
-  --radius: 1rem !important;
-
-  /* Chart Colors - National Palette */
-  --chart-1: 150 100% 50% !important;         /* Neon Emerald */
-  --chart-2: 45 100% 60% !important;          /* Bright Gold */
-  --chart-3: 180 100% 50% !important;         /* Cyan */
-  --chart-4: 0 0% 100% !important;            /* White */
-  --chart-5: 120 80% 60% !important;          /* Lime */
-
-  /* Sidebar */
-  --sidebar: 150 30% 3% !important;
-  --sidebar-foreground: 150 10% 90% !important;
-  --sidebar-primary: 150 100% 45% !important;
-  --sidebar-primary-foreground: 150 30% 3% !important;
-  --sidebar-accent: 150 20% 12% !important;
-  --sidebar-accent-foreground: 0 0% 100% !important;
-  --sidebar-border: 150 20% 12% !important;
-  --sidebar-ring: 150 100% 45% !important;
-  
-  /* Semantic Colors - Kingdom Future */
-  --success: 150 100% 45% !important;         /* Neon Emerald */
-  --success-foreground: 150 30% 3% !important;
-  --warning: 45 90% 50% !important;           /* Royal Gold */
-  --warning-foreground: 150 30% 3% !important;
-  --info: 180 100% 50% !important;            /* Cyan */
-  --info-foreground: 150 30% 3% !important;
-  --error: 0 62.8% 30.6% !important;
-  --error-foreground: 0 0% 98% !important;
 }
 
 /* ============================================
