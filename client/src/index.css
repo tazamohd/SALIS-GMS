@@ -1,6 +1,6 @@
 /* SalisEngine.AI Design System v2.0 - Deep Space & Corporate Steel */
 /* Typography - Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -378,7 +378,7 @@
      KINGDOM FUTURE THEME - Saudi Vision 2030
      "Heritage Meets Horizon"
      ============================================ */
-  .kingdom-future {
+  [data-theme="kingdom-future"] {
     /* Backgrounds - Deep Green/Black Void */
     --background: 150 30% 3%;        /* #040B06 */
     --foreground: 0 0% 98%;          /* #FAFAFA */
@@ -451,7 +451,7 @@
      NEURAL DARK THEME - The Pulse of Intelligence
      Cyberpunk / AI / Neural Network Aesthetics
      ============================================ */
-  .neural-dark {
+  [data-theme="neural-dark"] {
     /* Backgrounds */
     --background: 240 10% 3.9%;      /* #09090B */
     --foreground: 0 0% 98%;          /* #FAFAFA */
@@ -690,53 +690,135 @@
   }
 
   /* Kingdom Future Theme Utilities */
-  .kingdom-future .glass-card {
+  [data-theme="kingdom-future"] {
+    color-scheme: dark;
+    background-image: 
+      radial-gradient(circle at 50% 0%, hsla(150, 100%, 45%, 0.1), transparent 50%),
+      radial-gradient(circle at 100% 0%, hsla(45, 90%, 50%, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+
+  [data-theme="kingdom-future"] .font-display {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  [data-theme="kingdom-future"] .glass-card {
     background: rgba(4, 11, 6, 0.4);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius);
   }
 
-  .neon-glow {
-    box-shadow: 0 0 15px rgba(0, 230, 118, 0.3);
+  [data-theme="kingdom-future"] .neon-text {
+    color: hsl(var(--primary));
+    text-shadow: 0 0 15px hsla(150, 100%, 45%, 0.6), 0 0 30px hsla(150, 100%, 45%, 0.4);
   }
 
-  .text-glow {
-    text-shadow: 0 0 15px rgba(0, 230, 118, 0.6);
+  [data-theme="kingdom-future"] .neon-gold {
+    color: hsl(var(--secondary));
+    text-shadow: 0 0 15px hsla(45, 90%, 50%, 0.6), 0 0 30px hsla(45, 90%, 50%, 0.4);
   }
 
-  .gold-glow {
-    text-shadow: 0 0 15px rgba(242, 201, 76, 0.6);
+  [data-theme="kingdom-future"] .neon-border {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 10px hsla(150, 100%, 45%, 0.3), inset 0 0 10px hsla(150, 100%, 45%, 0.1);
   }
 
-  .kingdom-future .neon-glow {
+  [data-theme="kingdom-future"] .neon-glow {
     box-shadow: 0 0 20px rgba(0, 230, 118, 0.4), 0 0 40px rgba(0, 230, 118, 0.2);
   }
 
+  [data-theme="kingdom-future"] .text-glow {
+    text-shadow: 0 0 15px rgba(0, 230, 118, 0.6);
+  }
+
+  [data-theme="kingdom-future"] .gold-glow {
+    text-shadow: 0 0 15px rgba(242, 201, 76, 0.6);
+  }
+
+  [data-theme="kingdom-future"] button.primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 0 15px hsla(150, 100%, 45%, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  [data-theme="kingdom-future"] button.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 25px hsla(150, 100%, 45%, 0.6);
+  }
+
   /* Neural Dark Theme Utilities */
-  .neural-dark .glass-card {
+  [data-theme="neural-dark"] {
+    color-scheme: dark;
+    background-image: 
+      radial-gradient(circle at 50% 0%, hsla(263, 70%, 50%, 0.08), transparent 50%),
+      radial-gradient(circle at 0% 50%, hsla(190, 100%, 50%, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+
+  [data-theme="neural-dark"] .font-display {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  [data-theme="neural-dark"] .glass-card {
     background: rgba(24, 24, 27, 0.4);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius);
   }
 
-  .neural-dark .neon-glow {
+  [data-theme="neural-dark"] .neon-text {
+    color: hsl(var(--primary));
+    text-shadow: 0 0 15px hsla(263, 70%, 50%, 0.6), 0 0 30px hsla(263, 70%, 50%, 0.4);
+  }
+
+  [data-theme="neural-dark"] .neon-cyan {
+    color: hsl(190 100% 50%);
+    text-shadow: 0 0 15px hsla(190, 100%, 50%, 0.6), 0 0 30px hsla(190, 100%, 50%, 0.4);
+  }
+
+  [data-theme="neural-dark"] .neon-border {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 10px hsla(263, 70%, 50%, 0.3), inset 0 0 10px hsla(263, 70%, 50%, 0.1);
+  }
+
+  [data-theme="neural-dark"] .neon-glow {
     box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
   }
 
-  .neural-dark .text-glow {
+  [data-theme="neural-dark"] .text-glow {
     text-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
   }
 
-  .purple-glow {
+  [data-theme="neural-dark"] .purple-glow {
     box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 40px rgba(124, 58, 237, 0.2);
   }
 
-  .cyan-glow {
+  [data-theme="neural-dark"] .cyan-glow {
     box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+  }
+
+  [data-theme="neural-dark"] button.primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 0 15px hsla(263, 70%, 50%, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  [data-theme="neural-dark"] button.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 25px hsla(263, 70%, 50%, 0.6);
   }
   
   /* Console/Terminal Style */

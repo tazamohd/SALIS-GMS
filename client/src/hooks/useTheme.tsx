@@ -19,11 +19,12 @@ function getResolvedTheme(theme: Theme): string {
 
 function applyTheme(theme: Theme) {
   const root = window.document.documentElement;
-  root.classList.remove("light", "dark", "kingdom-future", "neural-dark");
+  root.classList.remove("light", "dark");
+  root.removeAttribute("data-theme");
   
   if (theme === "kingdom-future" || theme === "neural-dark") {
     root.classList.add("dark");
-    root.classList.add(theme);
+    root.setAttribute("data-theme", theme);
   } else {
     const resolvedTheme = getResolvedTheme(theme);
     root.classList.add(resolvedTheme);
