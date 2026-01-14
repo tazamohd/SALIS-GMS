@@ -20,8 +20,14 @@ function getResolvedTheme(theme: Theme): string {
 function applyTheme(theme: Theme) {
   const root = window.document.documentElement;
   root.classList.remove("light", "dark", "kingdom-future", "neural-dark");
-  const resolvedTheme = getResolvedTheme(theme);
-  root.classList.add(resolvedTheme);
+  
+  if (theme === "kingdom-future" || theme === "neural-dark") {
+    root.classList.add("dark");
+    root.classList.add(theme);
+  } else {
+    const resolvedTheme = getResolvedTheme(theme);
+    root.classList.add(resolvedTheme);
+  }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
