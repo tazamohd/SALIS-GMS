@@ -454,26 +454,27 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
     count: data.count,
   }));
 
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <Card data-testid="card-utilization-summary">
         <CardHeader>
-          <CardTitle>Utilization Summary - {contract.contractNumber}</CardTitle>
+          <CardTitle>{t('contracts.utilizationSummary', 'ملخص الاستخدام')} - {contract.contractNumber}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <p className="text-sm text-muted-foreground">Total Utilized</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.totalUtilized', 'إجمالي الاستخدام')}</p>
               <p className="text-2xl font-bold" data-testid="text-total-utilized">
                 ${totalUtilized.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Service Cap</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.serviceCap', 'سقف الخدمة')}</p>
               <p className="text-2xl font-bold">${serviceCap.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Remaining Budget</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.remainingBudget', 'الميزانية المتبقية')}</p>
               <p className={`text-2xl font-bold ${remaining < 0 ? 'text-red-500' : 'text-green-500'}`}>
                 ${remaining.toLocaleString()}
               </p>
@@ -481,7 +482,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
           </div>
           <div className="mt-4">
             <div className="flex justify-between text-sm mb-2">
-              <span>Utilization Progress</span>
+              <span>{t('contracts.utilizationProgress', 'تقدم الاستخدام')}</span>
               <span className="font-medium">{utilizationPercentage.toFixed(1)}%</span>
             </div>
             <Progress value={utilizationPercentage} className="h-3" />
@@ -492,7 +493,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
       <div className="grid gap-4 md:grid-cols-2">
         <Card data-testid="card-service-breakdown">
           <CardHeader>
-            <CardTitle>Service Type Breakdown</CardTitle>
+            <CardTitle>{t('contracts.serviceTypeBreakdown', 'تفاصيل نوع الخدمة')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -519,7 +520,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
 
         <Card data-testid="card-recent-usage">
           <CardHeader>
-            <CardTitle>Recent Service Usage</CardTitle>
+            <CardTitle>{t('contracts.recentServiceUsage', 'استخدام الخدمة الأخير')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -534,7 +535,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
                   <div className="text-right">
                     <p className="font-medium">${parseFloat(u.totalCost || "0").toLocaleString()}</p>
                     {u.isCoveredByContract && (
-                      <Badge variant="outline" className="text-xs">Covered</Badge>
+                      <Badge variant="outline" className="text-xs">{t('contracts.covered', 'مغطى')}</Badge>
                     )}
                   </div>
                 </div>
@@ -548,6 +549,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
 }
 
 function ContractSLADetail({ contract }: { contract: any }) {
+  const { t } = useTranslation();
   const slaMetrics = contract.slaMetrics || [];
   const metCount = slaMetrics.filter((m: any) => m.complianceStatus === "met").length;
   const breachCount = slaMetrics.filter((m: any) => m.complianceStatus === "breached").length;
@@ -561,26 +563,26 @@ function ContractSLADetail({ contract }: { contract: any }) {
     <div className="space-y-4">
       <Card data-testid="card-sla-summary">
         <CardHeader>
-          <CardTitle>SLA Performance - {contract.contractNumber}</CardTitle>
+          <CardTitle>{t('contracts.slaPerformance', 'أداء اتفاقية مستوى الخدمة')} - {contract.contractNumber}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-4">
             <div>
-              <p className="text-sm text-muted-foreground">Compliance Rate</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.complianceRate', 'معدل الامتثال')}</p>
               <p className="text-2xl font-bold" data-testid="text-compliance-rate">
                 {complianceRate.toFixed(1)}%
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">SLA Met</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.slaMet', 'تم الوفاء')}</p>
               <p className="text-2xl font-bold text-green-500">{metCount}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Breaches</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.breaches', 'الانتهاكات')}</p>
               <p className="text-2xl font-bold text-red-500">{breachCount}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Penalties</p>
+              <p className="text-sm text-muted-foreground">{t('contracts.totalPenalties', 'إجمالي العقوبات')}</p>
               <p className="text-2xl font-bold text-orange-500">
                 ${totalPenalties.toLocaleString()}
               </p>
@@ -591,40 +593,40 @@ function ContractSLADetail({ contract }: { contract: any }) {
 
       <Card data-testid="card-sla-targets">
         <CardHeader>
-          <CardTitle>SLA Targets</CardTitle>
+          <CardTitle>{t('contracts.slaTargets', 'أهداف اتفاقية مستوى الخدمة')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {contract.slaResponseTime && (
               <div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm">Response Time Target</span>
-                  <span className="text-sm font-medium">{contract.slaResponseTime} minutes</span>
+                  <span className="text-sm">{t('contracts.responseTimeTarget', 'هدف وقت الاستجابة')}</span>
+                  <span className="text-sm font-medium">{contract.slaResponseTime} {t('common.minutes', 'دقيقة')}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Average response time monitoring
+                  {t('contracts.avgResponseTimeMonitoring', 'مراقبة متوسط وقت الاستجابة')}
                 </div>
               </div>
             )}
             {contract.slaCompletionTime && (
               <div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm">Completion Time Target</span>
-                  <span className="text-sm font-medium">{contract.slaCompletionTime} hours</span>
+                  <span className="text-sm">{t('contracts.completionTimeTarget', 'هدف وقت الإنجاز')}</span>
+                  <span className="text-sm font-medium">{contract.slaCompletionTime} {t('common.hours', 'ساعة')}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Job completion deadline tracking
+                  {t('contracts.jobCompletionTracking', 'تتبع موعد إنجاز العمل')}
                 </div>
               </div>
             )}
             {contract.slaUptimePercentage && (
               <div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-sm">Uptime Target</span>
+                  <span className="text-sm">{t('contracts.uptimeTarget', 'هدف وقت التشغيل')}</span>
                   <span className="text-sm font-medium">{contract.slaUptimePercentage}%</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Service availability requirement
+                  {t('contracts.serviceAvailability', 'متطلبات توفر الخدمة')}
                 </div>
               </div>
             )}
@@ -634,7 +636,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
 
       <Card data-testid="card-sla-incidents">
         <CardHeader>
-          <CardTitle>SLA Incidents</CardTitle>
+          <CardTitle>{t('contracts.slaIncidents', 'حوادث اتفاقية مستوى الخدمة')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -673,7 +675,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
                       <div className="text-sm font-medium text-orange-500">
                         -${parseFloat(metric.penaltyApplied).toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">Penalty</div>
+                      <div className="text-xs text-muted-foreground">{t('contracts.penalty', 'العقوبة')}</div>
                     </div>
                   )}
                 </div>

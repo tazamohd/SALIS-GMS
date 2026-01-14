@@ -334,7 +334,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">Total Widgets</p>
+                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.totalWidgets', 'إجمالي الأدوات')}</p>
                   <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{widgets.length}</p>
                 </div>
                 <LayoutDashboard className="h-8 w-8 text-[#0A5ED7]" />
@@ -346,7 +346,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">Active Widgets</p>
+                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.activeWidgets', 'الأدوات النشطة')}</p>
                   <p className="text-2xl font-bold text-green-600">{activeWidgetsCount}</p>
                 </div>
                 <Eye className="h-8 w-8 text-green-500" />
@@ -358,7 +358,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">Hidden Widgets</p>
+                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.hiddenWidgets', 'الأدوات المخفية')}</p>
                   <p className="text-2xl font-bold text-[#64748B]">{widgets.length - activeWidgetsCount}</p>
                 </div>
                 <EyeOff className="h-8 w-8 text-[#64748B]" />
@@ -373,10 +373,10 @@ export default function DashboardWidgets() {
               <div>
                 <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
                   <Settings className="h-5 w-5 text-[#64748B]" />
-                  Your Widgets
+                  {t('dashboardWidgets.yourWidgets', 'أدواتك')}
                 </CardTitle>
                 <CardDescription className="text-[#64748B]">
-                  Drag to reorder, toggle visibility, or remove widgets
+                  {t('dashboardWidgets.dragToReorder', 'اسحب لإعادة الترتيب أو تبديل الرؤية أو إزالة الأدوات')}
                 </CardDescription>
               </div>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -388,14 +388,14 @@ export default function DashboardWidgets() {
                 </DialogTrigger>
                 <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <DialogHeader>
-                    <DialogTitle className="text-[#0B1F3B] dark:text-white">Add New Widget</DialogTitle>
+                    <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.addNewWidget', 'إضافة أداة جديدة')}</DialogTitle>
                     <DialogDescription className="text-[#64748B]">
-                      Create a custom widget for your dashboard
+                      {t('dashboardWidgets.createCustomWidget', 'إنشاء أداة مخصصة للوحة التحكم')}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">Widget Title</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.widgetTitle', 'عنوان الأداة')}</Label>
                       <Input
                         value={newWidget.title}
                         onChange={(e) => setNewWidget({ ...newWidget, title: e.target.value })}
@@ -405,7 +405,7 @@ export default function DashboardWidgets() {
                       />
                     </div>
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">Widget Type</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.widgetType', 'نوع الأداة')}</Label>
                       <Select value={newWidget.widgetType} onValueChange={(v) => setNewWidget({ ...newWidget, widgetType: v })}>
                         <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-widget-type">
                           <SelectValue />
@@ -413,29 +413,29 @@ export default function DashboardWidgets() {
                         <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="kpi">
                             <span className="flex items-center gap-2">
-                              <TrendingUp className="h-4 w-4" /> KPI Card
+                              <TrendingUp className="h-4 w-4" /> {t('widgets.widgetTypes.kpi', 'مؤشرات الأداء')}
                             </span>
                           </SelectItem>
                           <SelectItem value="chart">
                             <span className="flex items-center gap-2">
-                              <BarChart3 className="h-4 w-4" /> Chart
+                              <BarChart3 className="h-4 w-4" /> {t('dashboardWidgets.chart', 'رسم بياني')}
                             </span>
                           </SelectItem>
                           <SelectItem value="table">
                             <span className="flex items-center gap-2">
-                              <Table className="h-4 w-4" /> Table
+                              <Table className="h-4 w-4" /> {t('dashboardWidgets.table', 'جدول')}
                             </span>
                           </SelectItem>
                           <SelectItem value="metric">
                             <span className="flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" /> Metric
+                              <DollarSign className="h-4 w-4" /> {t('dashboardWidgets.metric', 'مقياس')}
                             </span>
                           </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">Data Source</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.dataSource', 'مصدر البيانات')}</Label>
                       <Select value={newWidget.dataSource} onValueChange={(v) => setNewWidget({ ...newWidget, dataSource: v })}>
                         <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-data-source">
                           <SelectValue />
@@ -443,22 +443,22 @@ export default function DashboardWidgets() {
                         <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="invoices">
                             <span className="flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" /> Invoices
+                              <DollarSign className="h-4 w-4" /> {t('dashboardWidgets.invoices', 'الفواتير')}
                             </span>
                           </SelectItem>
                           <SelectItem value="customers">
                             <span className="flex items-center gap-2">
-                              <Users className="h-4 w-4" /> Customers
+                              <Users className="h-4 w-4" /> {t('dashboardWidgets.customers', 'العملاء')}
                             </span>
                           </SelectItem>
                           <SelectItem value="job_cards">
                             <span className="flex items-center gap-2">
-                              <Wrench className="h-4 w-4" /> Job Cards
+                              <Wrench className="h-4 w-4" /> {t('dashboardWidgets.jobCards', 'بطاقات العمل')}
                             </span>
                           </SelectItem>
                           <SelectItem value="inventory">
                             <span className="flex items-center gap-2">
-                              <Package className="h-4 w-4" /> Inventory
+                              <Package className="h-4 w-4" /> {t('dashboardWidgets.inventory', 'المخزون')}
                             </span>
                           </SelectItem>
                         </SelectContent>
@@ -467,7 +467,7 @@ export default function DashboardWidgets() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
-                      Cancel
+                      {t('common.cancel', 'إلغاء')}
                     </Button>
                     <Button 
                       className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
@@ -476,7 +476,7 @@ export default function DashboardWidgets() {
                       data-testid="button-save-widget"
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      Save Widget
+                      {t('common.save', 'حفظ')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -490,8 +490,8 @@ export default function DashboardWidgets() {
               ) : widgets.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-[#64748B]">
                   <LayoutDashboard className="h-12 w-12 mb-4 opacity-50" />
-                  <p>No widgets configured</p>
-                  <p className="text-sm">Add widgets to customize your dashboard</p>
+                  <p>{t('dashboardWidgets.noWidgetsConfigured', 'لم يتم تكوين أدوات')}</p>
+                  <p className="text-sm">{t('dashboardWidgets.addWidgetsToCustomize', 'أضف أدوات لتخصيص لوحة التحكم')}</p>
                 </div>
               ) : (
                 <DndContext
@@ -523,10 +523,10 @@ export default function DashboardWidgets() {
             <CardHeader>
               <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-purple-500" />
-                Preset Widgets
+                {t('presetWidgets.title', 'الأدوات المُعدة مسبقاً')}
               </CardTitle>
               <CardDescription className="text-[#64748B]">
-                Quick-add popular widget configurations
+                {t('presetWidgets.description', 'إضافة سريعة لتكوينات الأدوات الشائعة')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -562,35 +562,35 @@ export default function DashboardWidgets() {
 
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-widget-tips">
           <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">Widget Tips</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('dashboard.widgetTips', 'نصائح الأدوات')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
                 <h4 className="font-medium text-[#0A5ED7] dark:text-[#0BB3FF] mb-2 flex items-center gap-2">
                   <GripVertical className="h-4 w-4" />
-                  {t('dashboard.dragToReorder', 'Drag to Reorder')}
+                  {t('dashboard.dragToReorder', 'اسحب لإعادة الترتيب')}
                 </h4>
                 <p className="text-sm text-[#0A5ED7]/70 dark:text-[#0BB3FF]/70">
-                  Use the drag handle to rearrange widgets in your preferred order.
+                  {t('dashboard.dragToReorderDesc', 'استخدم مقبض السحب لإعادة ترتيب الأدوات حسب تفضيلك.')}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/20">
                 <h4 className="font-medium text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  Toggle Visibility
+                  {t('dashboard.toggleVisibility', 'تبديل الرؤية')}
                 </h4>
                 <p className="text-sm text-green-700 dark:text-green-400">
-                  Hide widgets you don't need without deleting them.
+                  {t('dashboard.toggleVisibilityDesc', 'إخفاء الأدوات التي لا تحتاجها دون حذفها.')}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-purple-100 dark:bg-purple-900/20">
                 <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Quick Add
+                  {t('dashboard.quickAdd', 'إضافة سريعة')}
                 </h4>
                 <p className="text-sm text-purple-700 dark:text-purple-400">
-                  Click preset widgets to instantly add them to your dashboard.
+                  {t('dashboard.quickAddDesc', 'انقر على الأدوات المُعدة مسبقاً لإضافتها فوراً إلى لوحة التحكم.')}
                 </p>
               </div>
             </div>
