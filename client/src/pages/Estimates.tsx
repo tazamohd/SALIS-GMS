@@ -47,11 +47,11 @@ export function Estimates() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      draft: t('statusLabels.draft', 'مسودة'),
-      sent: t('statusLabels.sent', 'مرسل'),
-      accepted: t('statusLabels.accepted', 'مقبول'),
-      declined: t('statusLabels.declined', 'مرفوض'),
-      expired: t('statusLabels.expired', 'منتهي الصلاحية'),
+      draft: t('statusLabels.draft', 'Draft'),
+      sent: t('statusLabels.sent', 'Sent'),
+      accepted: t('statusLabels.accepted', 'Accepted'),
+      declined: t('statusLabels.declined', 'Declined'),
+      expired: t('statusLabels.expired', 'Expired'),
     };
     return labels[status] || status;
   };
@@ -94,7 +94,7 @@ export function Estimates() {
     },
     {
       key: "status",
-      label: t('common.status', 'الحالة'),
+      label: t('common.status', 'Status'),
       render: (estimate: Estimate) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(estimate.status)}`}
@@ -134,14 +134,14 @@ export function Estimates() {
         },
         {
           id: "status",
-          label: t('common.status', 'الحالة'),
+          label: t('common.status', 'Status'),
           options: [
-            { value: "all", label: t('estimates.allStatus', 'جميع الحالات') },
-            { value: "draft", label: t('statusLabels.draft', 'مسودة') },
-            { value: "sent", label: t('statusLabels.sent', 'مرسل') },
-            { value: "accepted", label: t('statusLabels.accepted', 'مقبول') },
-            { value: "declined", label: t('statusLabels.declined', 'مرفوض') },
-            { value: "expired", label: t('statusLabels.expired', 'منتهي الصلاحية') },
+            { value: "all", label: t('estimates.allStatus', 'All Status') },
+            { value: "draft", label: t('statusLabels.draft', 'Draft') },
+            { value: "sent", label: t('statusLabels.sent', 'Sent') },
+            { value: "accepted", label: t('statusLabels.accepted', 'Accepted') },
+            { value: "declined", label: t('statusLabels.declined', 'Declined') },
+            { value: "expired", label: t('statusLabels.expired', 'Expired') },
           ],
           defaultValue: statusFilter,
         },

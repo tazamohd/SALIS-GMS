@@ -4,6 +4,29 @@
     "tagline": "نظام إدارة مراكز السيارات المتكامل",
     "copyright": "جميع الحقوق محفوظة"
   },
+  "statusLabels": {
+    "draft": "مسودة",
+    "sent": "مرسل",
+    "accepted": "مقبول",
+    "declined": "مرفوض",
+    "expired": "منتهي الصلاحية",
+    "pending": "قيد الانتظار",
+    "assigned": "معين",
+    "inProgress": "قيد التنفيذ",
+    "in_progress": "قيد التنفيذ",
+    "completed": "مكتمل",
+    "cancelled": "ملغي",
+    "delivered": "تم التسليم",
+    "scheduled": "مجدول",
+    "waiting": "في الانتظار",
+    "onHold": "معلق",
+    "approved": "معتمد",
+    "rejected": "مرفوض",
+    "overdue": "متأخر",
+    "current": "حالية",
+    "dueSoon": "مستحقة قريباً",
+    "paid": "مدفوعة"
+  },
   "common": {
     "welcome": "مرحباً بك في نظام إدارة ساليس أوتو",
     "loading": "جاري التحميل...",
@@ -1444,6 +1467,19 @@
       "fullYear2023": "السنة الكاملة 2023",
       "q42023": "الربع الرابع 2023"
     }
+  },
+  "estimates": {
+    "estimateNumber": "رقم التقدير",
+    "description": "إنشاء وإدارة تقديرات العملاء",
+    "createEstimate": "إنشاء تقدير",
+    "searchPlaceholder": "بحث في التقديرات...",
+    "garage": "الورشة",
+    "allGarages": "جميع الورش",
+    "allStatus": "جميع الحالات",
+    "unknownCustomer": "عميل غير معروف",
+    "validUntil": "صالح حتى",
+    "noEstimates": "لا توجد تقديرات",
+    "noEstimatesDescription": "أنشئ أول تقدير لبدء عرض الأسعار للعملاء"
   },
   "aiAutomation": {
     "title": "مركز أتمتة الذكاء الاصطناعي",
