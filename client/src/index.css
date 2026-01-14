@@ -378,7 +378,8 @@
      KINGDOM FUTURE THEME - Saudi Vision 2030
      "Heritage Meets Horizon"
      ============================================ */
-  [data-theme="kingdom-future"] {
+  html[data-theme="kingdom-future"],
+  html[data-theme="kingdom-future"].dark {
     /* Backgrounds - Deep Green/Black Void */
     --background: 150 30% 3%;        /* #040B06 */
     --foreground: 0 0% 98%;          /* #FAFAFA */
@@ -451,7 +452,8 @@
      NEURAL DARK THEME - The Pulse of Intelligence
      Cyberpunk / AI / Neural Network Aesthetics
      ============================================ */
-  [data-theme="neural-dark"] {
+  html[data-theme="neural-dark"],
+  html[data-theme="neural-dark"].dark {
     /* Backgrounds */
     --background: 240 10% 3.9%;      /* #09090B */
     --foreground: 0 0% 98%;          /* #FAFAFA */
