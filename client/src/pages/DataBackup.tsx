@@ -236,14 +236,14 @@ export default function DataBackup() {
       queryClient.invalidateQueries({ queryKey: ['/api/backups'] });
       queryClient.invalidateQueries({ queryKey: ['/api/backups/stats'] });
       toast({
-        title: t('dataBackup.backupDeleted', 'تم حذف النسخة الاحتياطية'),
-        description: t('dataBackup.backupRemoved', 'تمت إزالة النسخة الاحتياطية.'),
+        title: t('dataBackup.backupDeleted', 'Backup Deleted'),
+        description: t('dataBackup.backupRemoved', 'Backup has been removed.'),
       });
     },
     onError: () => {
       toast({
-        title: t('dataBackup.deleteFailed', 'فشل الحذف'),
-        description: t('dataBackup.deleteFailedDesc', 'فشل في حذف النسخة الاحتياطية. يرجى المحاولة مرة أخرى.'),
+        title: t('dataBackup.deleteFailed', 'Delete Failed'),
+        description: t('dataBackup.deleteFailedDesc', 'Failed to delete backup. Please try again.'),
         variant: "destructive",
       });
     },
@@ -279,12 +279,12 @@ export default function DataBackup() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><CheckCircle className="w-3 h-3 mr-1" />{t('dataBackup.completed', 'مكتمل')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><CheckCircle className="w-3 h-3 mr-1" />{t('dataBackup.completed', 'Completed')}</Badge>;
       case 'pending':
       case 'in_progress':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><Clock className="w-3 h-3 mr-1" />{t('dataBackup.inProgress', 'قيد التنفيذ')}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><Clock className="w-3 h-3 mr-1" />{t('dataBackup.inProgress', 'In Progress')}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><XCircle className="w-3 h-3 mr-1" />{t('dataBackup.failed', 'فشل')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><XCircle className="w-3 h-3 mr-1" />{t('dataBackup.failed', 'Failed')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -314,7 +314,7 @@ export default function DataBackup() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">{t('dataBackup.completed', 'مكتمل')}</p>
+                  <p className="text-sm text-[#64748B]">{t('dataBackup.completed', 'Completed')}</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats?.completedBackups || 0}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500" />
@@ -357,7 +357,7 @@ export default function DataBackup() {
                 {t('backup.createBackup', 'Create Backup')}
               </CardTitle>
               <CardDescription className="text-[#64748B]">
-                {t('dataBackup.configureCreateBackup', 'تكوين وإنشاء نسخة احتياطية جديدة')}
+                {t('dataBackup.configureCreateBackup', 'Configure and create a new backup')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

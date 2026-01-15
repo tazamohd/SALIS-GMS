@@ -121,7 +121,7 @@ export default function CashFlowStatement() {
         <CardHeader className="text-center border-b border-[#E2E8F0] dark:border-[#232A36]">
           <CardTitle className="text-xl text-[#0B1F3B] dark:text-white">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base text-[#64748B]">
-            {t('accounting.cashFlowStatement', 'Cash Flow Statement')} (قائمة التدفقات النقدية)
+            {t('accounting.cashFlowStatement', 'Cash Flow Statement')}
           </CardDescription>
           <p className="text-sm text-[#64748B]">
             {t('accounting.forPeriodEnding', 'For the Period Ending January 31, 2024')}
@@ -472,7 +472,7 @@ export default function CashFlowStatement() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.cashFlowStatementTitle', 'Cash Flow Statement - قائمة التدفقات النقدية')}
+      title={t('accounting.cashFlowStatementTitle', 'Cash Flow Statement')}
       description={t('accounting.cashFlowStatementDescription', 'Track cash inflows and outflows')}
       icon={Banknote}
       tabs={tabs}

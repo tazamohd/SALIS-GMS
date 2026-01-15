@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 import {
   Package,
   Send,
@@ -70,6 +71,7 @@ const navigationItems = [
 ];
 
 export default function PartsNetworkLayout({ children, title, description }: PartsNetworkLayoutProps) {
+  const { t } = useTranslation();
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -126,8 +128,8 @@ export default function PartsNetworkLayout({ children, title, description }: Par
                   <Package className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg text-[#0B1F3B] dark:text-white">Parts Network</h2>
-                  <p className="text-xs text-[#64748B]">شبكة قطع الغيار B2B</p>
+                  <h2 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{t("partsNetwork.title", "Parts Network")}</h2>
+                  <p className="text-xs text-[#64748B]">{t("partsNetwork.subtitle", "B2B Parts Marketplace")}</p>
                 </div>
               </div>
             </div>

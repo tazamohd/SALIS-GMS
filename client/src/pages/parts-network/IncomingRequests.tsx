@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import {
   Package,
@@ -97,6 +98,7 @@ const sampleIncomingRequests: IncomingRequest[] = [
 ];
 
 export default function IncomingRequests() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState("all");
   const [respondedFilter, setRespondedFilter] = useState("all");
@@ -142,8 +144,8 @@ export default function IncomingRequests() {
 
   return (
     <PartsNetworkLayout 
-      title="Incoming Quotation Requests" 
-      description="طلبات عروض الأسعار الواردة من الورش"
+      title={t("partsNetwork.incomingRequests", "Incoming Quotation Requests")} 
+      description={t("partsNetwork.incomingRequestsDescription", "Quotation requests from workshops")}
     >
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

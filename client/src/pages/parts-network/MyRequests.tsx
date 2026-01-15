@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import {
   Package,
@@ -94,6 +95,7 @@ const sampleRequests: QuotationRequest[] = [
 ];
 
 export default function MyRequests() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -147,8 +149,8 @@ export default function MyRequests() {
 
   return (
     <PartsNetworkLayout 
-      title="My Quotation Requests" 
-      description="طلبات عروض الأسعار الخاصة بي"
+      title={t("partsNetwork.myQuotationRequests", "My Quotation Requests")} 
+      description={t("partsNetwork.myQuotationRequestsDescription", "View and manage your quotation requests")}
     >
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

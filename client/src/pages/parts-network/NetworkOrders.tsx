@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   Package,
   Search,
@@ -108,6 +109,7 @@ const sampleOrders: NetworkOrder[] = [
 ];
 
 export default function NetworkOrders() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -164,8 +166,8 @@ export default function NetworkOrders() {
 
   return (
     <PartsNetworkLayout 
-      title="My Orders" 
-      description="طلباتي - Track your parts orders"
+      title={t("partsNetwork.myOrders", "My Orders")} 
+      description={t("partsNetwork.myOrdersDescription", "Track your parts orders")}
     >
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

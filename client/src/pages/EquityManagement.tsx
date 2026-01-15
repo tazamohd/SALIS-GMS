@@ -182,7 +182,7 @@ export default function EquityManagement() {
             <div className="text-2xl font-bold text-[#0A5ED7]">
               SAR {shareCapital.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('equity.shareCapitalAr', 'رأس المال')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('equity.shareCapitalAr', 'Share Capital')}</p>
           </CardContent>
         </Card>
 
@@ -194,7 +194,7 @@ export default function EquityManagement() {
             <div className="text-2xl font-bold text-[#0BB3FF]">
               SAR {retainedEarnings.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('equity.retainedEarningsAr', 'الأرباح المحتجزة')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('equity.retainedEarningsAr', 'Retained Earnings')}</p>
           </CardContent>
         </Card>
 
@@ -204,7 +204,7 @@ export default function EquityManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">15.2%</div>
-            <p className="text-xs text-[#0A5ED7] mt-1">{t('equity.returnOnEquityAr', 'العائد على حقوق الملكية')}</p>
+            <p className="text-xs text-[#0A5ED7] mt-1">{t('equity.returnOnEquityAr', 'Return on Equity')}</p>
           </CardContent>
         </Card>
       </div>
@@ -213,7 +213,7 @@ export default function EquityManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('equity.equityComposition', 'Equity Composition')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('equity.equityCompositionAr', 'تكوين حقوق الملكية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('equity.equityCompositionAr', 'Equity Composition')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -242,7 +242,7 @@ export default function EquityManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('equity.equityGrowthTrend', 'Equity Growth Trend')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('equity.equityGrowthTrendDesc', 'اتجاه نمو حقوق الملكية - Last 6 years')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('equity.equityGrowthTrendDesc', 'Last 6 years')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -263,7 +263,7 @@ export default function EquityManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('equity.keyFinancialRatios', 'Key Financial Ratios')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('equity.keyFinancialRatiosAr', 'النسب المالية الرئيسية')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('equity.keyFinancialRatiosAr', 'Key Financial Ratios')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -294,7 +294,7 @@ export default function EquityManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('equity.relatedEquityModules', 'Related Equity Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('equity.relatedEquityModulesDesc', 'وحدات حقوق الملكية ذات الصلة - Quick access to equity sub-categories')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('equity.relatedEquityModulesDesc', 'Quick access to equity sub-categories')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -306,7 +306,7 @@ export default function EquityManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('equity.capitalManagement', 'Capital Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('equity.capitalManagementAr', 'رأس المال')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('equity.capitalManagementAr', 'Capital')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('equity.capitalManagementDesc', 'Manage share capital, ownership structure, and capital contributions')}</p>
@@ -322,7 +322,7 @@ export default function EquityManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('equity.partnersAccount', 'Partners Account')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('equity.partnersAccountAr', 'جاري الشركاء')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('equity.partnersAccountAr', 'Partners Current Account')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('equity.partnersAccountDesc', 'Track partner balances, transactions, and withdrawals')}</p>
@@ -338,7 +338,7 @@ export default function EquityManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('equity.retainedEarnings', 'Retained Earnings')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('equity.retainedEarningsLinkAr', 'الاحتياطات والأرباح')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('equity.retainedEarningsLinkAr', 'Reserves and Profits')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('equity.retainedEarningsDesc', 'Manage profit reserves, distributions, and retained earnings')}</p>
@@ -358,7 +358,7 @@ export default function EquityManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('equity.capitalStructure', 'Capital Structure')}</CardTitle>
-              <CardDescription className="text-[#64748B]">{t('equity.capitalStructureDesc', 'هيكل رأس المال - Owner\'s investments and equity')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('equity.capitalStructureDesc', 'Owner\'s investments and equity')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -370,7 +370,7 @@ export default function EquityManagement() {
               <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-capital">
                 <DialogHeader>
                   <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('equity.addCapitalEntry', 'Add Capital Entry')}</DialogTitle>
-                  <DialogDescription className="text-[#64748B]">{t('equity.addCapitalEntryAr', 'إضافة قيد رأس المال')}</DialogDescription>
+                  <DialogDescription className="text-[#64748B]">{t('equity.addCapitalEntryAr', 'Add capital entry')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -516,7 +516,7 @@ export default function EquityManagement() {
               <Users className="h-5 w-5 text-[#0A5ED7]" />
               {t('equity.ownershipStructure', 'Ownership Structure')}
             </CardTitle>
-            <CardDescription className="text-[#64748B]">{t('equity.ownershipStructureAr', 'هيكل الملكية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('equity.ownershipStructureAr', 'Ownership Structure')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -550,7 +550,7 @@ export default function EquityManagement() {
               <DollarSign className="h-5 w-5 text-[#0A5ED7]" />
               {t('equity.dividendHistory', 'Dividend History')}
             </CardTitle>
-            <CardDescription className="text-[#64748B]">{t('equity.dividendHistoryAr', 'تاريخ توزيع الأرباح')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('equity.dividendHistoryAr', 'Dividend History')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -596,7 +596,7 @@ export default function EquityManagement() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('equity.title', 'Equity Management')}
-        description={t('equity.description', 'إدارة حقوق الملكية - Track owner\'s equity, capital, and retained earnings')}
+        description={t('equity.description', 'Track owner\'s equity, capital, and retained earnings')}
         defaultTab="overview"
         tabs={tabs}
       />

@@ -72,12 +72,12 @@ export default function Login() {
       <div className="fixed left-0 top-0 bottom-0 w-[40%] pointer-events-none overflow-hidden flex items-center justify-center">
         <div className="relative w-full h-full">
           {/* Floating Tech Labels */}
-          <div className="absolute top-[8%] left-[12%] text-[#0BB3FF]/25 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.aiEngine', 'محرك الذكاء')}</div>
-          <div className="absolute top-[22%] left-[6%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.neuralNetwork', 'الشبكة العصبية')}</div>
-          <div className="absolute top-[38%] left-[18%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.automation', 'الأتمتة')}</div>
-          <div className="absolute top-[52%] left-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.predictive', 'التنبؤية')}</div>
-          <div className="absolute top-[68%] left-[15%] text-[#0A5ED7]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.machineLearning', 'التعلم الآلي')}</div>
-          <div className="absolute top-[82%] left-[10%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.analytics', 'التحليلات')}</div>
+          <div className="absolute top-[8%] left-[12%] text-[#0BB3FF]/25 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.aiEngine', 'AI Engine')}</div>
+          <div className="absolute top-[22%] left-[6%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.neuralNetwork', 'Neural Network')}</div>
+          <div className="absolute top-[38%] left-[18%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.automation', 'Automation')}</div>
+          <div className="absolute top-[52%] left-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.predictive', 'Predictive')}</div>
+          <div className="absolute top-[68%] left-[15%] text-[#0A5ED7]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.machineLearning', 'Machine Learning')}</div>
+          <div className="absolute top-[82%] left-[10%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.analytics', 'Analytics')}</div>
           
           <svg viewBox="0 0 500 900" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
             <defs>
@@ -211,12 +211,12 @@ export default function Login() {
       <div className="fixed right-0 top-0 bottom-0 w-[40%] pointer-events-none overflow-hidden flex items-center justify-center">
         <div className="relative w-full h-full">
           {/* Floating Tech Labels */}
-          <div className="absolute top-[10%] right-[12%] text-[#0A5ED7]/25 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.smartDiagnostics', 'التشخيص الذكي')}</div>
-          <div className="absolute top-[24%] right-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.iotIntegration', 'تكامل إنترنت الأشياء')}</div>
-          <div className="absolute top-[40%] right-[16%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.realTime', 'الوقت الفعلي')}</div>
-          <div className="absolute top-[55%] right-[10%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.cloudPlatform', 'المنصة السحابية')}</div>
-          <div className="absolute top-[70%] right-[18%] text-[#0BB3FF]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.dataInsights', 'رؤى البيانات')}</div>
-          <div className="absolute top-[85%] right-[12%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.intelligent', 'ذكي')}</div>
+          <div className="absolute top-[10%] right-[12%] text-[#0A5ED7]/25 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.smartDiagnostics', 'Smart Diagnostics')}</div>
+          <div className="absolute top-[24%] right-[8%] text-[#0BB3FF]/22 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.iotIntegration', 'IoT Integration')}</div>
+          <div className="absolute top-[40%] right-[16%] text-[#F97316]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.realTime', 'Real Time')}</div>
+          <div className="absolute top-[55%] right-[10%] text-[#0A5ED7]/20 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.cloudPlatform', 'Cloud Platform')}</div>
+          <div className="absolute top-[70%] right-[18%] text-[#0BB3FF]/18 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.dataInsights', 'Data Insights')}</div>
+          <div className="absolute top-[85%] right-[12%] text-[#F97316]/15 text-[10px] tracking-[0.4em] uppercase font-bold">{t('login.intelligent', 'Intelligent')}</div>
           
           <svg viewBox="0 0 500 900" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
             {/* Hexagonal Tech Grid */}
@@ -453,56 +453,56 @@ export default function Login() {
             </p>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#1A2030] to-transparent"></div>
           </div>
-          <p className="text-center text-sm text-[#4A5568] mb-5 font-mono tracking-wide">{t('auth.passwordLabel', 'كلمة المرور')}: Password123!</p>
+          <p className="text-center text-sm text-[#4A5568] mb-5 font-mono tracking-wide">{t('auth.passwordLabel', 'Password')}: Password123!</p>
           <div className="grid grid-cols-3 gap-3">
             <button 
               type="button" 
               onClick={() => { setEmail('admin@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#0A5ED7] hover:bg-[#0A5ED7]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#0A5ED7] group-hover:text-[#0BB3FF]">{t('roles.admin', 'مدير النظام')}</span>
+              <span className="text-sm font-semibold text-[#0A5ED7] group-hover:text-[#0BB3FF]">{t('roles.admin', 'Admin')}</span>
             </button>
             <button 
               type="button" 
               onClick={() => { setEmail('owner@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#0A5ED7] hover:bg-[#0A5ED7]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#0A5ED7] group-hover:text-[#0BB3FF]">{t('roles.owner', 'المالك')}</span>
+              <span className="text-sm font-semibold text-[#0A5ED7] group-hover:text-[#0BB3FF]">{t('roles.owner', 'Owner')}</span>
             </button>
             <button 
               type="button" 
               onClick={() => { setEmail('service.manager@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#0BB3FF] hover:bg-[#0BB3FF]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#0BB3FF] group-hover:text-white">{t('roles.manager', 'المدير')}</span>
+              <span className="text-sm font-semibold text-[#0BB3FF] group-hover:text-white">{t('roles.manager', 'Manager')}</span>
             </button>
             <button 
               type="button" 
               onClick={() => { setEmail('tech@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#0BB3FF] hover:bg-[#0BB3FF]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#0BB3FF] group-hover:text-white">{t('roles.technician', 'الفني')}</span>
+              <span className="text-sm font-semibold text-[#0BB3FF] group-hover:text-white">{t('roles.technician', 'Technician')}</span>
             </button>
             <button 
               type="button" 
               onClick={() => { setEmail('finance@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#F97316] hover:bg-[#F97316]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#F97316] group-hover:text-white">{t('roles.finance', 'المالية')}</span>
+              <span className="text-sm font-semibold text-[#F97316] group-hover:text-white">{t('roles.finance', 'Finance')}</span>
             </button>
             <button 
               type="button" 
               onClick={() => { setEmail('client@salisauto.com'); setPassword('Password123!'); }} 
               className="p-4 rounded-xl bg-[#080B12] border border-[#1A2030] hover:border-[#F97316] hover:bg-[#F97316]/10 transition-all duration-200 group"
             >
-              <span className="text-sm font-semibold text-[#F97316] group-hover:text-white">{t('roles.customer', 'العميل')}</span>
+              <span className="text-sm font-semibold text-[#F97316] group-hover:text-white">{t('roles.customer', 'Customer')}</span>
             </button>
           </div>
         </div>
         
         {/* Footer */}
         <p className="text-center text-sm text-[#4A5568] mt-6 tracking-wide">
-          © 2026 {t('app.name', 'ساليس أوتو')}. {t('common.allRightsReserved', 'جميع الحقوق محفوظة')}.
+          © 2026 {t('app.name', 'SALIS AUTO')}. {t('common.allRightsReserved', 'All rights reserved')}.
         </p>
       </div>
     </div>

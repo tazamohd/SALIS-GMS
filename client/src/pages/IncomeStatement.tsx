@@ -564,7 +564,7 @@ export default function IncomeStatement() {
 
   return (
     <TabsPageLayout
-      title={t('incomeStatement.title', 'Income Statement - قائمة الدخل')}
+      title={t('incomeStatement.title', 'Income Statement')}
       description={t('incomeStatement.description', 'Profit and Loss statement for the period')}
       icon={TrendingUp}
       tabs={tabs}

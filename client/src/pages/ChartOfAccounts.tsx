@@ -564,7 +564,7 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-green-600">
               SAR {totalAssets.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalAssetsAr', 'إجمالي الأصول')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalAssetsAr', 'Total Assets')}</p>
           </CardContent>
         </Card>
 
@@ -579,7 +579,7 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-red-600">
               SAR {totalLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('accounting.totalLiabilitiesAr', 'Total Liabilities')}</p>
           </CardContent>
         </Card>
 
@@ -594,7 +594,7 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-blue-600">
               SAR {totalEquity.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalEquityAr', 'حقوق الملكية')}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalEquityAr', 'Total Equity')}</p>
           </CardContent>
         </Card>
 
@@ -609,7 +609,7 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-purple-600">
               SAR {totalRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalRevenueAr', 'الإيرادات')}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalRevenueAr', 'Revenue')}</p>
           </CardContent>
         </Card>
 
@@ -624,7 +624,7 @@ export default function ChartOfAccounts() {
             <div className="text-2xl font-bold text-orange-600">
               SAR {totalExpenses.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalExpensesAr', 'المصروفات')}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('accounting.totalExpensesAr', 'Expenses')}</p>
           </CardContent>
         </Card>
       </div>
@@ -637,7 +637,7 @@ export default function ChartOfAccounts() {
                 <FolderTree className="h-5 w-5" />
                 {t('accounting.accountTreeStructure', 'Account Tree Structure')}
               </CardTitle>
-              <CardDescription className="text-[#64748B]">{t('accounting.accountTreeDescription', 'شجرة الحسابات - Hierarchical view of all accounts')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('accounting.accountTreeDescription', 'Hierarchical view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-expand-all">
@@ -658,7 +658,7 @@ export default function ChartOfAccounts() {
                 <DialogContent className="max-w-2xl" data-testid="modal-add-account">
                   <DialogHeader>
                     <DialogTitle>{t('accounting.addNewAccount', 'Add New Account')}</DialogTitle>
-                    <DialogDescription>{t('accounting.addNewAccountDescription', 'إضافة حساب جديد - Create a new account in the chart')}</DialogDescription>
+                    <DialogDescription>{t('accounting.addNewAccountDescription', 'Create a new account in the chart')}</DialogDescription>
                   </DialogHeader>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -711,7 +711,7 @@ export default function ChartOfAccounts() {
                             <FormItem>
                               <FormLabel>{t('accounting.arabicName', 'Arabic Name')}</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder={t('accounting.accountNameAr', 'اسم الحساب')} dir="rtl" data-testid="input-name-ar" />
+                                <Input {...field} placeholder={t('accounting.accountNameAr', 'Account name (Arabic)')} dir="rtl" data-testid="input-name-ar" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -746,11 +746,11 @@ export default function ChartOfAccounts() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="asset">{t('accounting.asset', 'Asset (أصل)')}</SelectItem>
-                                  <SelectItem value="liability">{t('accounting.liability', 'Liability (خصم)')}</SelectItem>
-                                  <SelectItem value="equity">{t('accounting.equity', 'Equity (حقوق ملكية)')}</SelectItem>
-                                  <SelectItem value="revenue">{t('accounting.revenue', 'Revenue (إيراد)')}</SelectItem>
-                                  <SelectItem value="expense">{t('accounting.expense', 'Expense (مصروف)')}</SelectItem>
+                                  <SelectItem value="asset">{t('accounting.asset', 'Asset')}</SelectItem>
+                                  <SelectItem value="liability">{t('accounting.liability', 'Liability')}</SelectItem>
+                                  <SelectItem value="equity">{t('accounting.equity', 'Equity')}</SelectItem>
+                                  <SelectItem value="revenue">{t('accounting.revenue', 'Revenue')}</SelectItem>
+                                  <SelectItem value="expense">{t('accounting.expense', 'Expense')}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -770,8 +770,8 @@ export default function ChartOfAccounts() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="debit">{t('accounting.debitNature', 'Debit (مدين)')}</SelectItem>
-                                  <SelectItem value="credit">{t('accounting.creditNature', 'Credit (دائن)')}</SelectItem>
+                                  <SelectItem value="debit">{t('accounting.debitNature', 'Debit')}</SelectItem>
+                                  <SelectItem value="credit">{t('accounting.creditNature', 'Credit')}</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -844,7 +844,7 @@ export default function ChartOfAccounts() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('accounting.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to related modules')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('accounting.relatedFinancialModulesDescription', 'Quick access to related modules')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -856,7 +856,7 @@ export default function ChartOfAccounts() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.assets_management', 'Assets Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('accounting.assetsAr', 'الأصول')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('accounting.assetsAr', 'Assets')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -869,7 +869,7 @@ export default function ChartOfAccounts() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.liabilities', 'Liabilities')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('accounting.liabilitiesAr', 'الخصوم')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('accounting.liabilitiesAr', 'Liabilities')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -882,7 +882,7 @@ export default function ChartOfAccounts() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.equity_management', 'Equity Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('accounting.equityAr', 'حقوق الملكية')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('accounting.equityAr', 'Equity')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -895,7 +895,7 @@ export default function ChartOfAccounts() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('nav.sales_revenue', 'Sales & Revenue')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('accounting.salesRevenueAr', 'المبيعات والإيرادات')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('accounting.salesRevenueAr', 'Sales & Revenue')}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -915,7 +915,7 @@ export default function ChartOfAccounts() {
                 <LayoutList className="h-5 w-5" />
                 {t('accounting.allAccountsList', 'All Accounts List')}
               </CardTitle>
-              <CardDescription className="text-[#64748B]">{t('accounting.allAccountsListDescription', 'قائمة جميع الحسابات - Flat view of all accounts')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('accounting.allAccountsListDescription', 'Flat view of all accounts')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -1016,7 +1016,7 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Building2 className="h-5 w-5 text-green-600" />
-              {t('accounting.assetsTitle', 'Assets (الأصول)')}
+              {t('accounting.assetsTitle', 'Assets')}
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('accounting.assetsDescription', 'Resources owned by the business')}</CardDescription>
           </CardHeader>
@@ -1035,7 +1035,7 @@ export default function ChartOfAccounts() {
               </div>
             </div>
             <div className="mt-4 text-xs text-[#64748B]">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1044,7 +1044,7 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <CreditCard className="h-5 w-5 text-red-600" />
-              {t('accounting.liabilitiesTitle', 'Liabilities (الخصوم)')}
+              {t('accounting.liabilitiesTitle', 'Liabilities')}
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('accounting.liabilitiesDescription', 'Obligations owed to others')}</CardDescription>
           </CardHeader>
@@ -1063,7 +1063,7 @@ export default function ChartOfAccounts() {
               </div>
             </div>
             <div className="mt-4 text-xs text-[#64748B]">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1072,7 +1072,7 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <Wallet className="h-5 w-5 text-blue-600" />
-              {t('accounting.equityTitle', 'Equity (حقوق الملكية)')}
+              {t('accounting.equityTitle', 'Equity')}
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('accounting.equityDescription', "Owner's stake in the business")}</CardDescription>
           </CardHeader>
@@ -1091,7 +1091,7 @@ export default function ChartOfAccounts() {
               </div>
             </div>
             <div className="mt-4 text-xs text-[#64748B]">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1100,7 +1100,7 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <TrendingUp className="h-5 w-5 text-purple-600" />
-              {t('accounting.revenueTitle', 'Revenue (الإيرادات)')}
+              {t('accounting.revenueTitle', 'Revenue')}
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('accounting.revenueDescription', 'Income from business operations')}</CardDescription>
           </CardHeader>
@@ -1119,7 +1119,7 @@ export default function ChartOfAccounts() {
               </div>
             </div>
             <div className="mt-4 text-xs text-[#64748B]">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit (دائن)')}</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.creditNature', 'Credit')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1128,7 +1128,7 @@ export default function ChartOfAccounts() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
               <TrendingDown className="h-5 w-5 text-[#F97316]" />
-              {t('accounting.expensesTitle', 'Expenses (المصروفات)')}
+              {t('accounting.expensesTitle', 'Expenses')}
             </CardTitle>
             <CardDescription className="text-[#64748B]">{t('accounting.expensesDescription', 'Costs of business operations')}</CardDescription>
           </CardHeader>
@@ -1147,7 +1147,7 @@ export default function ChartOfAccounts() {
               </div>
             </div>
             <div className="mt-4 text-xs text-[#64748B]">
-              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit (مدين)')}</Badge>
+              {t('accounting.normalBalance', 'Normal Balance')}: <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('accounting.debitNature', 'Debit')}</Badge>
             </div>
           </CardContent>
         </Card>
@@ -1158,13 +1158,13 @@ export default function ChartOfAccounts() {
               <DollarSign className="h-5 w-5" />
               {t('accounting.accountingEquation', 'Accounting Equation')}
             </CardTitle>
-            <CardDescription className="text-[#64748B]">{t('accounting.accountingEquationAr', 'معادلة الميزانية العمومية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('accounting.accountingEquationAr', 'Balance Sheet Equation')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="text-center p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
                 <p className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('accounting.equationFormula', 'Assets = Liabilities + Equity')}</p>
-                <p className="text-sm text-[#64748B] mt-1">{t('accounting.equationFormulaAr', 'الأصول = الخصوم + حقوق الملكية')}</p>
+                <p className="text-sm text-[#64748B] mt-1">{t('accounting.equationFormulaAr', 'Assets = Liabilities + Equity')}</p>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-2 bg-green-100 dark:bg-green-900 rounded">
@@ -1215,7 +1215,7 @@ export default function ChartOfAccounts() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.chartOfAccounts.title', 'Chart of Accounts - شجرة الحسابات')}
+      title={t('accounting.chartOfAccounts.title', 'Chart of Accounts')}
       description={t('accounting.chartOfAccounts.description', 'Manage your complete chart of accounts with hierarchical structure')}
       icon={FolderTree}
       tabs={tabs}

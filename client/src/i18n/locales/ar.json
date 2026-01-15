@@ -1481,6 +1481,27 @@
     "noEstimates": "لا توجد تقديرات",
     "noEstimatesDescription": "أنشئ أول تقدير لبدء عرض الأسعار للعملاء"
   },
+  "feedback": {
+    "positive": "إيجابي",
+    "neutral": "محايد",
+    "negative": "سلبي",
+    "unanalyzed": "غير محلل"
+  },
+  "partsNetwork": {
+    "myOrdersDescription": "تتبع طلبات قطع الغيار الخاصة بك",
+    "myQuotationRequestsDescription": "عرض وإدارة طلبات عروض الأسعار الخاصة بك",
+    "networkMembersDescription": "الموردون والوكلاء والشركاء",
+    "quotationsReceivedDescription": "مقارنة واختيار أفضل العروض",
+    "incomingRequestsDescription": "طلبات عروض الأسعار من الورش",
+    "subtitle": "سوق قطع الغيار B2B",
+    "sendQuotationRequest": "إرسال طلب عرض أسعار",
+    "sendQuotationRequestDescription": "طلب عروض أسعار من الموردين",
+    "partInformation": "معلومات القطعة المطلوبة",
+    "vehicleInformation": "معلومات المركبة (للتوافق)",
+    "partNameArPlaceholder": "مثال: طقم فحمات فرامل أمامي",
+    "targetRegions": "المناطق المستهدفة",
+    "dashboardDescription": "سوق قطع الغيار B2B للسيارات"
+  },
   "aiAutomation": {
     "title": "مركز أتمتة الذكاء الاصطناعي",
     "description": "استخدم الذكاء الاصطناعي لأتمتة وتحسين عمليات الورشة",

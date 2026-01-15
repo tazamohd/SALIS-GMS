@@ -64,11 +64,12 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 function SentimentBadge({ sentiment, score }: { sentiment: string; score?: number }) {
+  const { t } = useTranslation();
   const config: Record<string, { icon: typeof ThumbsUp; color: string; label: string }> = {
-    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: "إيجابي" },
-    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: "محايد" },
-    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: "سلبي" },
-    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: "غير محلل" },
+    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: t('feedback.positive', 'Positive') },
+    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: t('feedback.neutral', 'Neutral') },
+    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: t('feedback.negative', 'Negative') },
+    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: t('feedback.unanalyzed', 'Unanalyzed') },
   };
 
   const { icon: Icon, color, label } = config[sentiment] || config.unanalyzed;

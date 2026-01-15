@@ -100,12 +100,12 @@ export function Dashboard() {
       'tire_service': { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '⭕' },
     };
     const serviceTypeLabels: { [key: string]: string } = {
-      'maintenance': t('serviceTypes.maintenance', 'الصيانة'),
-      'repair': t('serviceTypes.repair', 'الإصلاح'),
-      'diagnostic': t('serviceTypes.diagnostic', 'التشخيص'),
-      'inspection': t('serviceTypes.inspection', 'الفحص'),
-      'body_work': t('serviceTypes.bodyWork', 'أعمال الهيكل'),
-      'tire_service': t('serviceTypes.tireService', 'خدمة الإطارات'),
+      'maintenance': t('serviceTypes.maintenance', 'Maintenance'),
+      'repair': t('serviceTypes.repair', 'Repair'),
+      'diagnostic': t('serviceTypes.diagnostic', 'Diagnostic'),
+      'inspection': t('serviceTypes.inspection', 'Inspection'),
+      'body_work': t('serviceTypes.bodyWork', 'Body Work'),
+      'tire_service': t('serviceTypes.tireService', 'Tire Service'),
     };
     const key = serviceType.toLowerCase().replace(/\s+/g, '_');
     const config = types[key] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
@@ -122,12 +122,12 @@ export function Dashboard() {
       'cancelled': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '❌' },
     };
     const statusLabels: { [key: string]: string } = {
-      'pending': t('statusLabels.pending', 'قيد الانتظار'),
-      'assigned': t('statusLabels.assigned', 'معين'),
-      'in_progress': t('statusLabels.inProgress', 'قيد التنفيذ'),
-      'completed': t('statusLabels.completed', 'مكتمل'),
-      'delivered': t('statusLabels.delivered', 'تم التسليم'),
-      'cancelled': t('statusLabels.cancelled', 'ملغي'),
+      'pending': t('statusLabels.pending', 'Pending'),
+      'assigned': t('statusLabels.assigned', 'Assigned'),
+      'in_progress': t('statusLabels.inProgress', 'In Progress'),
+      'completed': t('statusLabels.completed', 'Completed'),
+      'delivered': t('statusLabels.delivered', 'Delivered'),
+      'cancelled': t('statusLabels.cancelled', 'Cancelled'),
     };
     const config = statusColors[status] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '○' };
     return { ...config, label: statusLabels[status] || status };
@@ -141,10 +141,10 @@ export function Dashboard() {
       'low': { bg: 'bg-[#0A5ED7] dark:bg-[#0952C0]', text: 'text-white', icon: '💙' },
     };
     const priorityLabels: { [key: string]: string } = {
-      'urgent': t('priorityLabels.urgent', 'عاجل'),
-      'high': t('priorityLabels.high', 'مرتفع'),
-      'medium': t('priorityLabels.medium', 'متوسط'),
-      'low': t('priorityLabels.low', 'منخفض'),
+      'urgent': t('priorityLabels.urgent', 'Urgent'),
+      'high': t('priorityLabels.high', 'High'),
+      'medium': t('priorityLabels.medium', 'Medium'),
+      'low': t('priorityLabels.low', 'Low'),
     };
     const config = priorityColors[priority] || { bg: 'bg-[#64748B]', text: 'text-white', icon: '○' };
     return { ...config, label: priorityLabels[priority] || priority };
@@ -299,8 +299,8 @@ export function Dashboard() {
                 <div className="flex items-center justify-center h-full min-h-[120px]">
                   <div className="text-center">
                     <Shield className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                    <p className="text-sm text-zinc-500">{t('permissions.financialDataRestricted', 'البيانات المالية مقيدة')}</p>
-                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} {t('common.access', 'الوصول')}</p>
+                    <p className="text-sm text-zinc-500">{t('permissions.financialDataRestricted', 'Financial data restricted')}</p>
+                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} {t('common.access', 'access')}</p>
                   </div>
                 </div>
               </div>
@@ -353,8 +353,8 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
                     <div className="flex gap-2">
-                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} {t('statusLabels.pending', 'قيد الانتظار')}</Badge>
-                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} {t('statusLabels.active', 'نشط')}</Badge>
+                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} {t('statusLabels.pending', 'Pending')}</Badge>
+                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} {t('statusLabels.active', 'Active')}</Badge>
                     </div>
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export function Dashboard() {
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{activeCustomersCount}</h3>
                     <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
                       <Award className="w-4 h-4" />
-                      <span className="text-xs font-medium">+8 {t('common.thisWeek', 'هذا الأسبوع')}</span>
+                      <span className="text-xs font-medium">+8 {t('common.thisWeek', 'this week')}</span>
                     </div>
                   </div>
                 </div>
@@ -408,7 +408,7 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
-                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} {t('inventory.inStock', 'في المخزون')}</p>
+                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} {t('inventory.inStock', 'in stock')}</p>
                   </div>
                 </div>
                 <div className="relative">

@@ -239,15 +239,15 @@ export function JobCards() {
           <RoleBadge size="md" />
           {canCreate('job_cards') ? (
             <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              {t('permissions.canCreateJobCards', 'يمكنك إنشاء وإدارة بطاقات العمل')}
+              {t('permissions.canCreateJobCards', 'You can create and manage job cards')}
             </span>
           ) : canEdit('job_cards') ? (
             <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-              {t('permissions.canEditJobCards', 'يمكنك تعديل بطاقات العمل الموجودة')}
+              {t('permissions.canEditJobCards', 'You can edit existing job cards')}
             </span>
           ) : (
             <span className="text-xs text-zinc-500 flex items-center gap-1">
-              <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContactManager', 'عرض فقط - تواصل مع المدير لإنشاء بطاقات العمل')}
+              <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContactManager', 'View only - Contact manager to create job cards')}
             </span>
           )}
         </div>

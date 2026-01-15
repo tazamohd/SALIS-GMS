@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   Package,
   Search,
@@ -120,6 +121,7 @@ const sampleQuotations: Quotation[] = [
 ];
 
 export default function QuotationsList() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"price" | "date" | "rating">("date");
 
@@ -180,8 +182,8 @@ export default function QuotationsList() {
 
   return (
     <PartsNetworkLayout 
-      title="Quotations Received" 
-      description="عروض الأسعار المستلمة - Compare and select the best offers"
+      title={t("partsNetwork.quotationsReceived", "Quotations Received")} 
+      description={t("partsNetwork.quotationsReceivedDescription", "Compare and select the best offers")}
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

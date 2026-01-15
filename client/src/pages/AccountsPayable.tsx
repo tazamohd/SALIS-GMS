@@ -591,7 +591,7 @@ export default function AccountsPayable() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.accountsPayableTitle', 'Accounts Payable - الحسابات الدائنة')}
+      title={t('accounting.accountsPayableTitle', 'Accounts Payable')}
       description={t('accounting.accountsPayableDescription', 'Manage vendor invoices and payments')}
       icon={Building2}
       tabs={tabs}

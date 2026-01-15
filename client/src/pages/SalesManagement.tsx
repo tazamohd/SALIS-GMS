@@ -217,7 +217,7 @@ export default function SalesManagement() {
             <div className="text-2xl font-bold text-[#0A5ED7] dark:text-[#0BB3FF]">
               SAR {serviceRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.serviceRevenueAr', 'إيرادات الخدمات')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.serviceRevenueAr', 'Service Revenue')}</p>
           </CardContent>
         </Card>
 
@@ -229,7 +229,7 @@ export default function SalesManagement() {
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               SAR {partsRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.partsRevenueAr', 'إيرادات قطع الغيار')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.partsRevenueAr', 'Parts Revenue')}</p>
           </CardContent>
         </Card>
 
@@ -248,7 +248,7 @@ export default function SalesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.monthlySalesTrend', 'Monthly Sales Trend')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('salesManagement.monthlySalesTrendDesc', 'اتجاه المبيعات الشهرية - Last 6 months')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.monthlySalesTrendDesc', 'Monthly sales trend - Last 6 months')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -268,7 +268,7 @@ export default function SalesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.topSellingProducts', 'Top Selling Products')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('salesManagement.topSellingProductsAr', 'أفضل المنتجات مبيعاً')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.topSellingProductsAr', 'Top Selling Products')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -300,7 +300,7 @@ export default function SalesManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('salesManagement.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to related accounting')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('salesManagement.relatedFinancialModulesDesc', 'Related financial modules - Quick access to related accounting')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -312,7 +312,7 @@ export default function SalesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.expensesManagement', 'Expenses Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('salesManagement.expensesManagementAr', 'المصروفات')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.expensesManagementAr', 'Expenses')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('salesManagement.expensesManagementDesc', 'Track and manage all business expenses and budgets')}</p>
@@ -328,7 +328,7 @@ export default function SalesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.invoices', 'Invoices')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('salesManagement.invoicesAr', 'الفواتير')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.invoicesAr', 'Invoices')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('salesManagement.invoicesDesc', 'Manage customer invoices and payment tracking')}</p>
@@ -348,7 +348,7 @@ export default function SalesManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.salesTransactions', 'Sales Transactions')}</CardTitle>
-              <CardDescription className="text-[#64748B]">{t('salesManagement.salesTransactionsDesc', 'معاملات المبيعات - All sales records')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('salesManagement.salesTransactionsDesc', 'Sales transactions - All sales records')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -360,7 +360,7 @@ export default function SalesManagement() {
               <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-sale">
                 <DialogHeader>
                   <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.recordNewSale', 'Record New Sale')}</DialogTitle>
-                  <DialogDescription className="text-[#64748B]">{t('salesManagement.recordNewSaleAr', 'تسجيل عملية بيع جديدة')}</DialogDescription>
+                  <DialogDescription className="text-[#64748B]">{t('salesManagement.recordNewSaleAr', 'Record a new sale transaction')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -567,7 +567,7 @@ export default function SalesManagement() {
   return (
     <TabsPageLayout
       title={t('salesManagement.title', 'Sales Management')}
-      description={t('salesManagement.description', 'إدارة المبيعات - Track sales, revenue, and performance')}
+      description={t('salesManagement.description', 'Track sales, revenue, and performance')}
       icon={ShoppingCart}
       defaultTab="overview"
       tabs={[

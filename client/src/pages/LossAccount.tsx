@@ -520,7 +520,7 @@ export default function LossAccount() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen space-y-6">
       <TabsPageLayout
         title={t('lossAccount.title', 'Loss Account')}
-        description={t('lossAccount.description', 'حساب الخسائر - Track and manage business losses, write-offs, and recovery')}
+        description={t('lossAccount.description', 'Track and manage business losses, write-offs, and recovery')}
         defaultTab="overview"
         tabs={[
           { id: "overview", label: t('lossAccount.overview', 'Overview'), icon: TrendingDown, content: overviewTab },

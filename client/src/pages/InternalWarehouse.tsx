@@ -562,22 +562,22 @@ export default function InternalWarehouse() {
   return (
     <div className="p-6 space-y-6">
       <TabsPageLayout
-        title={t('warehouse.title', 'المستودع الداخلي')}
-        description={t('warehouse.description', 'إدارة مواقع المستودع والمناطق وحركات المخزون')}
+        title={t('warehouse.title', 'Internal Warehouse')}
+        description={t('warehouse.description', 'Manage warehouse locations, zones, and inventory movements')}
         defaultTab="locations"
         tabs={[
-          { id: "locations", label: t('warehouse.locations', 'المواقع'), icon: MapPin, content: locationsTab },
-          { id: "zones", label: t('warehouse.zones', 'المناطق'), icon: Grid3X3, content: zonesTab },
-          { id: "transfers", label: t('warehouse.transfers', 'التحويلات'), icon: ArrowRightLeft, content: transfersTab },
-          { id: "layout", label: t('warehouse.layout', 'التخطيط'), icon: Layers, content: layoutTab },
+          { id: "locations", label: t('warehouse.locations', 'Locations'), icon: MapPin, content: locationsTab },
+          { id: "zones", label: t('warehouse.zones', 'Zones'), icon: Grid3X3, content: zonesTab },
+          { id: "transfers", label: t('warehouse.transfers', 'Transfers'), icon: ArrowRightLeft, content: transfersTab },
+          { id: "layout", label: t('warehouse.layout', 'Layout'), icon: Layers, content: layoutTab },
         ]}
       />
 
       <Dialog open={isLocationDialogOpen} onOpenChange={setIsLocationDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-location">
           <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">{editingLocationId ? t('warehouse.editLocation', 'تعديل الموقع') : t('warehouse.addLocation', 'إضافة موقع')}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">{t('warehouse.configureLocationDetails', 'تكوين تفاصيل موقع المستودع')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{editingLocationId ? t('warehouse.editLocation', 'Edit Location') : t('warehouse.addLocation', 'Add Location')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('warehouse.configureLocationDetails', 'Configure warehouse location details')}</DialogDescription>
           </DialogHeader>
           <Form {...locationForm}>
             <form onSubmit={locationForm.handleSubmit((data) => locationMutation.mutate(data))} className="space-y-4">
@@ -587,7 +587,7 @@ export default function InternalWarehouse() {
                   name="locationCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.locationCode', 'رمز الموقع')}</FormLabel>
+                      <FormLabel>{t('warehouse.locationCode', 'Location Code')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="A-01-01-01" data-testid="input-location-code" />
                       </FormControl>
@@ -600,9 +600,9 @@ export default function InternalWarehouse() {
                   name="locationName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.locationName', 'اسم الموقع')}</FormLabel>
+                      <FormLabel>{t('warehouse.locationName', 'Location Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('warehouse.mainStorageArea', 'منطقة التخزين الرئيسية 1')} data-testid="input-location-name" />
+                        <Input {...field} placeholder={t('warehouse.mainStorageArea', 'Main Storage Area 1')} data-testid="input-location-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -613,11 +613,11 @@ export default function InternalWarehouse() {
                   name="zone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.zone', 'المنطقة')}</FormLabel>
+                      <FormLabel>{t('warehouse.zone', 'Zone')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-location-zone">
-                            <SelectValue placeholder={t('warehouse.selectZone', 'اختر المنطقة')} />
+                            <SelectValue placeholder={t('warehouse.selectZone', 'Select Zone')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -637,20 +637,20 @@ export default function InternalWarehouse() {
                   name="locationType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.locationType', 'نوع الموقع')}</FormLabel>
+                      <FormLabel>{t('warehouse.locationType', 'Location Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-location-type">
-                            <SelectValue placeholder={t('warehouse.selectType', 'اختر النوع')} />
+                            <SelectValue placeholder={t('warehouse.selectType', 'Select Type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="storage">{t('warehouse.storage', 'التخزين')}</SelectItem>
-                          <SelectItem value="receiving">{t('warehouse.receiving', 'الاستلام')}</SelectItem>
-                          <SelectItem value="shipping">{t('warehouse.shipping', 'الشحن')}</SelectItem>
-                          <SelectItem value="staging">{t('warehouse.staging', 'التجهيز')}</SelectItem>
-                          <SelectItem value="quarantine">{t('warehouse.quarantine', 'الحجر')}</SelectItem>
-                          <SelectItem value="returns">{t('warehouse.returns', 'المرتجعات')}</SelectItem>
+                          <SelectItem value="storage">{t('warehouse.storage', 'Storage')}</SelectItem>
+                          <SelectItem value="receiving">{t('warehouse.receiving', 'Receiving')}</SelectItem>
+                          <SelectItem value="shipping">{t('warehouse.shipping', 'Shipping')}</SelectItem>
+                          <SelectItem value="staging">{t('warehouse.staging', 'Staging')}</SelectItem>
+                          <SelectItem value="quarantine">{t('warehouse.quarantine', 'Quarantine')}</SelectItem>
+                          <SelectItem value="returns">{t('warehouse.returns', 'Returns')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -662,7 +662,7 @@ export default function InternalWarehouse() {
                   name="aisle"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.aisle', 'الممر')}</FormLabel>
+                      <FormLabel>{t('warehouse.aisle', 'Aisle')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="A" data-testid="input-aisle" />
                       </FormControl>
@@ -675,7 +675,7 @@ export default function InternalWarehouse() {
                   name="rack"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.rack', 'الرف')}</FormLabel>
+                      <FormLabel>{t('warehouse.rack', 'Rack')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="01" data-testid="input-rack" />
                       </FormControl>
@@ -688,7 +688,7 @@ export default function InternalWarehouse() {
                   name="shelf"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.shelf', 'الرف الفرعي')}</FormLabel>
+                      <FormLabel>{t('warehouse.shelf', 'Shelf')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="01" data-testid="input-shelf" />
                       </FormControl>
@@ -701,7 +701,7 @@ export default function InternalWarehouse() {
                   name="bin"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.bin', 'الصندوق')}</FormLabel>
+                      <FormLabel>{t('warehouse.bin', 'Bin')}</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="01" data-testid="input-bin" />
                       </FormControl>
@@ -714,7 +714,7 @@ export default function InternalWarehouse() {
                   name="capacity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.capacity', 'السعة')}</FormLabel>
+                      <FormLabel>{t('warehouse.capacity', 'Capacity')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" placeholder="100" data-testid="input-capacity" />
                       </FormControl>
@@ -728,9 +728,9 @@ export default function InternalWarehouse() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.notes', 'ملاحظات')}</FormLabel>
+                    <FormLabel>{t('warehouse.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('warehouse.additionalNotes', 'ملاحظات إضافية...')} data-testid="input-location-notes" />
+                      <Textarea {...field} placeholder={t('warehouse.additionalNotes', 'Additional notes...')} data-testid="input-location-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -738,10 +738,10 @@ export default function InternalWarehouse() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsLocationDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
-                  {t('common.cancel', 'إلغاء')}
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={locationMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-location">
-                  {locationMutation.isPending ? t('common.saving', 'جاري الحفظ...') : t('warehouse.saveLocation', 'حفظ الموقع')}
+                  {locationMutation.isPending ? t('common.saving', 'Saving...') : t('warehouse.saveLocation', 'Save Location')}
                 </Button>
               </DialogFooter>
             </form>
@@ -752,8 +752,8 @@ export default function InternalWarehouse() {
       <Dialog open={isZoneDialogOpen} onOpenChange={setIsZoneDialogOpen}>
         <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-zone">
           <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('warehouse.addZone', 'إضافة منطقة')}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">{t('warehouse.createNewZone', 'إنشاء منطقة مستودع جديدة')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('warehouse.addZone', 'Add Zone')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('warehouse.createNewZone', 'Create a new warehouse zone')}</DialogDescription>
           </DialogHeader>
           <Form {...zoneForm}>
             <form onSubmit={zoneForm.handleSubmit((data) => zoneMutation.mutate(data))} className="space-y-4">
@@ -762,9 +762,9 @@ export default function InternalWarehouse() {
                 name="zoneName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.zoneName', 'اسم المنطقة')}</FormLabel>
+                    <FormLabel>{t('warehouse.zoneName', 'Zone Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('warehouse.mainStorage', 'التخزين الرئيسي')} data-testid="input-zone-name" />
+                      <Input {...field} placeholder={t('warehouse.mainStorage', 'Main Storage')} data-testid="input-zone-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -775,7 +775,7 @@ export default function InternalWarehouse() {
                 name="zoneCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.zoneCode', 'رمز المنطقة')}</FormLabel>
+                    <FormLabel>{t('warehouse.zoneCode', 'Zone Code')}</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="MAIN" data-testid="input-zone-code" />
                     </FormControl>
@@ -788,17 +788,17 @@ export default function InternalWarehouse() {
                 name="temperature"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.temperature', 'درجة الحرارة')}</FormLabel>
+                    <FormLabel>{t('warehouse.temperature', 'Temperature')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-zone-temperature">
-                          <SelectValue placeholder={t('warehouse.selectTemperature', 'اختر درجة الحرارة')} />
+                          <SelectValue placeholder={t('warehouse.selectTemperature', 'Select Temperature')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="ambient">{t('warehouse.ambient', 'عادي')}</SelectItem>
-                        <SelectItem value="cold">{t('warehouse.cold', 'بارد')}</SelectItem>
-                        <SelectItem value="frozen">{t('warehouse.frozen', 'مجمد')}</SelectItem>
+                        <SelectItem value="ambient">{t('warehouse.ambient', 'Ambient')}</SelectItem>
+                        <SelectItem value="cold">{t('warehouse.cold', 'Cold')}</SelectItem>
+                        <SelectItem value="frozen">{t('warehouse.frozen', 'Frozen')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -810,9 +810,9 @@ export default function InternalWarehouse() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.description', 'الوصف')}</FormLabel>
+                    <FormLabel>{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('warehouse.zoneDescription', 'وصف المنطقة...')} data-testid="input-zone-description" />
+                      <Textarea {...field} placeholder={t('warehouse.zoneDescription', 'Zone description...')} data-testid="input-zone-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -820,10 +820,10 @@ export default function InternalWarehouse() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsZoneDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
-                  {t('common.cancel', 'إلغاء')}
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={zoneMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-save-zone">
-                  {zoneMutation.isPending ? t('common.saving', 'جاري الحفظ...') : t('warehouse.saveZone', 'حفظ المنطقة')}
+                  {zoneMutation.isPending ? t('common.saving', 'Saving...') : t('warehouse.saveZone', 'Save Zone')}
                 </Button>
               </DialogFooter>
             </form>
@@ -834,8 +834,8 @@ export default function InternalWarehouse() {
       <Dialog open={isTransferDialogOpen} onOpenChange={setIsTransferDialogOpen}>
         <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-transfer">
           <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('warehouse.stockTransfer', 'تحويل المخزون')}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">{t('warehouse.transferBetweenLocations', 'تحويل المخزون بين المواقع')}</DialogDescription>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('warehouse.stockTransfer', 'Stock Transfer')}</DialogTitle>
+            <DialogDescription className="text-[#64748B]">{t('warehouse.transferBetweenLocations', 'Transfer inventory between locations')}</DialogDescription>
           </DialogHeader>
           <Form {...transferForm}>
             <form onSubmit={transferForm.handleSubmit((data) => transferMutation.mutate(data))} className="space-y-4">
@@ -844,11 +844,11 @@ export default function InternalWarehouse() {
                 name="partId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.part', 'القطعة')}</FormLabel>
+                    <FormLabel>{t('warehouse.part', 'Part')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-transfer-part">
-                          <SelectValue placeholder={t('warehouse.selectPart', 'اختر القطعة')} />
+                          <SelectValue placeholder={t('warehouse.selectPart', 'Select Part')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -869,11 +869,11 @@ export default function InternalWarehouse() {
                   name="fromLocationId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.fromLocation', 'من الموقع')}</FormLabel>
+                      <FormLabel>{t('warehouse.fromLocation', 'From Location')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-from-location">
-                            <SelectValue placeholder={t('warehouse.selectSource', 'اختر المصدر')} />
+                            <SelectValue placeholder={t('warehouse.selectSource', 'Select Source')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -893,11 +893,11 @@ export default function InternalWarehouse() {
                   name="toLocationId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('warehouse.toLocation', 'إلى الموقع')}</FormLabel>
+                      <FormLabel>{t('warehouse.toLocation', 'To Location')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-to-location">
-                            <SelectValue placeholder={t('warehouse.selectDestination', 'اختر الوجهة')} />
+                            <SelectValue placeholder={t('warehouse.selectDestination', 'Select Destination')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -918,7 +918,7 @@ export default function InternalWarehouse() {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('common.quantity', 'الكمية')}</FormLabel>
+                    <FormLabel>{t('common.quantity', 'Quantity')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="number" placeholder="1" data-testid="input-transfer-quantity" />
                     </FormControl>
@@ -931,9 +931,9 @@ export default function InternalWarehouse() {
                 name="reason"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('warehouse.reason', 'السبب')}</FormLabel>
+                    <FormLabel>{t('warehouse.reason', 'Reason')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('warehouse.reasonForTransfer', 'سبب التحويل')} data-testid="input-transfer-reason" />
+                      <Input {...field} placeholder={t('warehouse.reasonForTransfer', 'Reason for transfer')} data-testid="input-transfer-reason" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -941,10 +941,10 @@ export default function InternalWarehouse() {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsTransferDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
-                  {t('common.cancel', 'إلغاء')}
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={transferMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-complete-transfer">
-                  {transferMutation.isPending ? t('warehouse.transferring', 'جاري التحويل...') : t('warehouse.completeTransfer', 'إكمال التحويل')}
+                  {transferMutation.isPending ? t('warehouse.transferring', 'Transferring...') : t('warehouse.completeTransfer', 'Complete Transfer')}
                 </Button>
               </DialogFooter>
             </form>

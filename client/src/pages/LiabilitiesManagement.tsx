@@ -209,7 +209,7 @@ export default function LiabilitiesManagement() {
             <div className="text-2xl font-bold text-[#F97316]">
               SAR {totalLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.totalLiabilitiesAr', 'إجمالي الخصوم')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.totalLiabilitiesAr', 'Total Liabilities')}</p>
           </CardContent>
         </Card>
 
@@ -221,7 +221,7 @@ export default function LiabilitiesManagement() {
             <div className="text-2xl font-bold text-[#F97316]">
               SAR {currentLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.currentLiabilitiesAr', 'الخصوم المتداولة')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.currentLiabilitiesAr', 'Current Liabilities')}</p>
           </CardContent>
         </Card>
 
@@ -233,7 +233,7 @@ export default function LiabilitiesManagement() {
             <div className="text-2xl font-bold text-[#0A5ED7]">
               SAR {longTermLiabilities.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.longTermLiabilitiesAr', 'الخصوم طويلة الأجل')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.longTermLiabilitiesAr', 'Long-term Liabilities')}</p>
           </CardContent>
         </Card>
 
@@ -243,7 +243,7 @@ export default function LiabilitiesManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR 17,083</div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.monthlyObligationsAr', 'الالتزامات الشهرية')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.monthlyObligationsAr', 'Monthly Obligations')}</p>
           </CardContent>
         </Card>
       </div>
@@ -253,7 +253,7 @@ export default function LiabilitiesManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('liabilities.liabilitiesRegister', 'Liabilities Register')}</CardTitle>
-              <CardDescription className="text-[#64748B]">{t('liabilities.liabilitiesRegisterDesc', 'سجل الخصوم والالتزامات - All company obligations')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('liabilities.liabilitiesRegisterDesc', 'All company obligations')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -265,7 +265,7 @@ export default function LiabilitiesManagement() {
               <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-liability">
                 <DialogHeader>
                   <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('liabilities.addNewLiability', 'Add New Liability')}</DialogTitle>
-                  <DialogDescription className="text-[#64748B]">{t('liabilities.addNewLiabilityDesc', 'إضافة التزام جديد - Record a new obligation')}</DialogDescription>
+                  <DialogDescription className="text-[#64748B]">{t('liabilities.addNewLiabilityDesc', 'Record a new obligation')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -466,7 +466,7 @@ export default function LiabilitiesManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('liabilities.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('liabilities.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to balance sheet items')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('liabilities.relatedFinancialModulesDesc', 'Quick access to balance sheet items')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -478,7 +478,7 @@ export default function LiabilitiesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('liabilities.assetsManagement', 'Assets Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('liabilities.assetsManagementAr', 'الأصول')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('liabilities.assetsManagementAr', 'Assets')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('liabilities.assetsManagementDesc', 'Track and manage all company assets and depreciation')}</p>
@@ -494,7 +494,7 @@ export default function LiabilitiesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('liabilities.equityManagement', 'Equity Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('liabilities.equityManagementAr', 'حقوق الملكية')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('liabilities.equityManagementAr', 'Equity')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('liabilities.equityManagementDesc', 'Track owner\'s equity, capital, and retained earnings')}</p>
@@ -516,7 +516,7 @@ export default function LiabilitiesManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0A5ED7]">SAR 1,395,000</div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.totalLoansAr', 'إجمالي القروض')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.totalLoansAr', 'Total Loans')}</p>
           </CardContent>
         </Card>
 
@@ -526,7 +526,7 @@ export default function LiabilitiesManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#F97316]">SAR 17,083</div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.monthlyPaymentsAr', 'الأقساط الشهرية')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.monthlyPaymentsAr', 'Monthly Payments')}</p>
           </CardContent>
         </Card>
 
@@ -536,7 +536,7 @@ export default function LiabilitiesManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">4.83%</div>
-            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.avgInterestRateAr', 'متوسط معدل الفائدة')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('liabilities.avgInterestRateAr', 'Avg Interest Rate')}</p>
           </CardContent>
         </Card>
       </div>
@@ -544,7 +544,7 @@ export default function LiabilitiesManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('liabilities.paymentSchedule', 'Payment Schedule')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('liabilities.paymentScheduleDesc', 'جدول السداد - Upcoming payment obligations')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('liabilities.paymentScheduleDesc', 'Upcoming payment obligations')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -593,7 +593,7 @@ export default function LiabilitiesManagement() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('liabilities.title', 'Liabilities Management')}
-        description={t('liabilities.description', 'إدارة الخصوم - Track and manage all company obligations')}
+        description={t('liabilities.description', 'Track and manage all company obligations')}
         defaultTab="payables"
         tabs={tabs}
       />

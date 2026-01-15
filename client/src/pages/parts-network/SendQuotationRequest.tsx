@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
   Form,
@@ -66,6 +67,7 @@ const partCategories = [
 ];
 
 export default function SendQuotationRequest() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [alternativeBrands, setAlternativeBrands] = useState<string[]>([]);
@@ -82,13 +84,10 @@ export default function SendQuotationRequest() {
 
   const createRequest = useMutation({
     mutationFn: async (data: RequestFormValues) => {
-      return apiRequest("/api/parts-network/requests", {
-        method: "POST",
-        body: JSON.stringify({
-          ...data,
-          alternativeBrands,
-          targetRegions,
-        }),
+      return apiRequest("POST", "/api/parts-network/requests", {
+        ...data,
+        alternativeBrands,
+        targetRegions,
       });
     },
     onSuccess: () => {
@@ -124,8 +123,8 @@ export default function SendQuotationRequest() {
 
   return (
     <PartsNetworkLayout 
-      title="Send Quotation Request" 
-      description="إرسال طلب عرض أسعار - Request price quotes from suppliers"
+      title={t("partsNetwork.sendQuotationRequest", "Send Quotation Request")} 
+      description={t("partsNetwork.sendQuotationRequestDescription", "Request price quotes from suppliers")}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -137,9 +136,9 @@ export default function SendQuotationRequest() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-[#0A5ED7]" />
-                    <CardTitle className="text-[#0B1F3B] dark:text-white">Part Information</CardTitle>
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">{t("partsNetwork.partInformation", "Part Information")}</CardTitle>
                   </div>
-                  <CardDescription className="text-[#64748B]">معلومات القطعة المطلوبة</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t("partsNetwork.partInformationDescription", "Details of the required part")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -210,7 +209,7 @@ export default function SendQuotationRequest() {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="مثال: طقم فحمات فرامل أمامي"
+                            placeholder={t("partsNetwork.partNameArPlaceholder", "e.g. Front brake pads set")}
                             className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right text-[#0B1F3B] dark:text-white"
                             dir="rtl"
                             data-testid="input-part-name-ar"
@@ -291,9 +290,9 @@ export default function SendQuotationRequest() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Car className="h-5 w-5 text-green-500" />
-                    <CardTitle className="text-[#0B1F3B] dark:text-white">Vehicle Information</CardTitle>
+                    <CardTitle className="text-[#0B1F3B] dark:text-white">{t("partsNetwork.vehicleInformation", "Vehicle Information")}</CardTitle>
                   </div>
-                  <CardDescription className="text-[#64748B]">معلومات المركبة (للتوافق)</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t("partsNetwork.vehicleInformationDescription", "For compatibility matching")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -471,8 +470,8 @@ export default function SendQuotationRequest() {
               {/* Target Regions */}
               <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardHeader>
-                  <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Target Regions</CardTitle>
-                  <CardDescription className="text-[#64748B]">المناطق المستهدفة</CardDescription>
+                  <CardTitle className="text-base text-[#0B1F3B] dark:text-white">{t("partsNetwork.targetRegions", "Target Regions")}</CardTitle>
+                  <CardDescription className="text-[#64748B]">{t("partsNetwork.targetRegionsDescription", "Select regions to send request")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
