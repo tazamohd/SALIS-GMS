@@ -1,6 +1,6 @@
 /* SalisEngine.AI Design System v2.0 - Deep Space & Corporate Steel */
 /* Typography - Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -272,86 +272,58 @@
 }
 
 @layer base {
-  /* ============================================
-     DEFAULT THEME: KINGDOM FUTURE
-     Saudi Vision 2030 - "Heritage Meets Horizon"
-     ============================================ */
-  :root,
-  .dark {
-    /* Backgrounds - Deep Green/Black Void */
-    --background: 150 30% 3%;        /* #040B06 */
-    --foreground: 0 0% 98%;          /* #FAFAFA */
+  :root {
+    /* Light Mode - Corporate Steel Theme */
+    --background: 210 40% 96%;      /* #f1f5f9 - Slate 100 */
+    --foreground: 222 47% 11%;      /* #0f172a - Slate 900 */
 
-    /* Card */
-    --card: 150 30% 4%;              /* #070D08 */
-    --card-foreground: 0 0% 98%;
+    --muted: 210 40% 90%;           /* Slate 200 */
+    --muted-foreground: 215 16% 47%;/* #64748b - Slate 500 */
 
-    /* Popover */
-    --popover: 150 30% 4%;
-    --popover-foreground: 0 0% 98%;
+    --accent: 210 40% 90%;          /* Slate 200 */
+    --accent-foreground: 222 47% 11%;/* Slate 900 */
 
-    /* Primary - Neon Emerald */
-    --primary: 150 100% 45%;         /* #00E676 */
-    --primary-foreground: 150 30% 3%;
+    --popover: 0 0% 100%;           /* White */
+    --popover-foreground: 222 47% 11%;
 
-    /* Secondary - Royal Gold */
-    --secondary: 45 90% 50%;         /* #F2C94C */
-    --secondary-foreground: 150 30% 3%;
+    --border: 214 32% 78%;          /* #cbd5e1 - Slate 300 */
+    --input: 214 32% 78%;
 
-    /* Muted */
-    --muted: 150 20% 12%;            /* #1A261E */
-    --muted-foreground: 150 10% 70%;
+    --card: 0 0% 100%;              /* White surface */
+    --card-foreground: 222 47% 11%;
 
-    /* Accent */
-    --accent: 150 20% 12%;
-    --accent-foreground: 0 0% 98%;
+    /* Primary - Sky Blue #0ea5e9 */
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    /* Secondary - Orange #f97316 */
+    --secondary: 24 95% 53%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Border & Input */
-    --border: 150 20% 12%;
-    --input: 150 20% 12%;
+    /* Destructive - Red #ef4444 */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Emerald Ring */
-    --ring: 150 100% 45%;
-    --radius: 1rem;
-
-    /* Chart Colors - National Palette */
-    --chart-1: 150 100% 50%;         /* Neon Emerald */
-    --chart-2: 45 100% 60%;          /* Bright Gold */
-    --chart-3: 180 100% 50%;         /* Cyan */
-    --chart-4: 0 0% 100%;            /* White */
-    --chart-5: 120 80% 60%;          /* Lime */
-
-    /* Sidebar */
-    --sidebar: 150 30% 3%;
-    --sidebar-foreground: 150 10% 90%;
-    --sidebar-primary: 150 100% 45%;
-    --sidebar-primary-foreground: 150 30% 3%;
-    --sidebar-accent: 150 20% 12%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 150 20% 12%;
-    --sidebar-ring: 150 100% 45%;
+    --ring: 199 89% 48%;            /* Sky Blue ring */
+    --radius: 0.5rem;
     
-    /* Semantic Colors - Kingdom Future */
-    --success: 150 100% 45%;         /* Neon Emerald */
-    --success-foreground: 150 30% 3%;
-    --warning: 45 90% 50%;           /* Royal Gold */
-    --warning-foreground: 150 30% 3%;
-    --info: 180 100% 50%;            /* Cyan */
-    --info-foreground: 150 30% 3%;
-    --error: 0 62.8% 30.6%;
-    --error-foreground: 0 0% 98%;
+    /* Semantic Colors - Light Mode */
+    --success: 160 84% 39%;         /* #10b981 - Emerald */
+    --success-foreground: 0 0% 100%;
+    --warning: 24 95% 53%;          /* #f97316 - Orange */
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;            /* #0ea5e9 - Sky Blue */
+    --info-foreground: 0 0% 100%;
+    --error: 0 84% 60%;             /* #ef4444 - Red */
+    --error-foreground: 0 0% 100%;
   }
 
-  /* ============================================
-     DEEP SPACE THEME - Original Dark Theme
-     For users who prefer the blue/orange palette
-     ============================================ */
-  html[data-theme="deep-space"],
-  html[data-theme="deep-space"].dark {
+  .dark {
+    /* ============================================
+       DARK MODE - Deep Space Theme
+       SalisEngine.AI Design System v2.0
+       ============================================ */
+    
     /* Background - Deep Void */
     --background: 240 33% 3%;        /* #050510 - Near-black void */
     --foreground: 210 40% 93%;       /* #e2e8f0 - Slate 200 */
@@ -369,11 +341,11 @@
     --popover-foreground: 210 40% 93%;
 
     /* Border - Glass Edge */
-    --border: 215 20% 15%;
+    --border: 0 0% 100% / 0.08;      /* White 8% - subtle edge */
     --input: 222 47% 15%;            /* Slightly lighter for inputs */
 
     /* Card - Slate Glass */
-    --card: 222 47% 8%;
+    --card: 222 47% 11% / 0.6;       /* rgba(15, 23, 42, 0.6) */
     --card-foreground: 210 40% 93%;
 
     /* Primary - Sky Blue #0ea5e9 */
@@ -391,24 +363,7 @@
     --ring: 199 89% 48%;             /* Sky Blue glow ring */
     --radius: 0.5rem;
     
-    /* Chart Colors */
-    --chart-1: 199 89% 48%;
-    --chart-2: 24 95% 53%;
-    --chart-3: 160 84% 39%;
-    --chart-4: 0 84% 60%;
-    --chart-5: 280 70% 50%;
-
-    /* Sidebar */
-    --sidebar: 240 33% 3%;
-    --sidebar-foreground: 210 40% 93%;
-    --sidebar-primary: 199 89% 48%;
-    --sidebar-primary-foreground: 240 33% 3%;
-    --sidebar-accent: 240 24% 7%;
-    --sidebar-accent-foreground: 210 40% 93%;
-    --sidebar-border: 215 20% 15%;
-    --sidebar-ring: 199 89% 48%;
-    
-    /* Semantic Colors - Deep Space */
+    /* Semantic Colors - Dark Mode (Deep Space) */
     --success: 160 84% 39%;          /* #10b981 - Emerald Green */
     --success-foreground: 240 33% 3%;
     --warning: 24 95% 53%;           /* #f97316 - Orange */
@@ -418,81 +373,116 @@
     --error: 0 84% 60%;              /* #ef4444 - Red */
     --error-foreground: 0 0% 100%;
   }
-}
 
-/* ============================================
-   NEURAL DARK THEME - The Pulse of Intelligence
-   Cyberpunk / AI / Neural Network Aesthetics
-   (Outside @layer for proper specificity)
-   ============================================ */
-html[data-theme="neural-dark"],
-html[data-theme="neural-dark"].dark {
-  /* Backgrounds */
-  --background: 240 10% 3.9% !important;      /* #09090B */
-  --foreground: 0 0% 98% !important;          /* #FAFAFA */
+  /* ============================================
+     KINGDOM FUTURE THEME - Saudi Vision 2030
+     "Heritage Meets Horizon"
+     ============================================ */
+  .kingdom-future {
+    /* Background - The Deep Void (Desert Night Sky) */
+    --background: 150 30% 3%;        /* #040B06 - Deep emerald-tinted void */
+    --foreground: 150 10% 90%;       /* Light text with subtle green tint */
 
-  /* Card */
-  --card: 240 10% 3.9% !important;
-  --card-foreground: 0 0% 98% !important;
+    /* Muted - Recessed Areas */
+    --muted: 150 25% 6%;             /* Slightly lighter void */
+    --muted-foreground: 150 10% 60%; /* Muted green-gray */
 
-  /* Popover */
-  --popover: 240 10% 3.9% !important;
-  --popover-foreground: 0 0% 98% !important;
+    /* Accent */
+    --accent: 150 25% 8%;            /* Emerald-tinted accent bg */
+    --accent-foreground: 150 100% 45%; /* Neon Emerald text */
 
-  /* Primary - Neon Purple */
-  --primary: 263.4 70% 50.4% !important;      /* #7C3AED */
-  --primary-foreground: 210 40% 98% !important;
+    /* Popover - Glass Card */
+    --popover: 150 25% 6%;
+    --popover-foreground: 150 10% 90%;
 
-  /* Secondary - Deep Void/Grey */
-  --secondary: 240 3.7% 15.9% !important;     /* #27272A */
-  --secondary-foreground: 0 0% 98% !important;
+    /* Border - Glass Edge */
+    --border: 150 30% 20% / 0.3;     /* Emerald-tinted border */
+    --input: 150 25% 10%;
 
-  /* Muted */
-  --muted: 240 3.7% 15.9% !important;
-  --muted-foreground: 240 5% 64.9% !important; /* #A1A1AA */
+    /* Card - Glassmorphism */
+    --card: 150 25% 6% / 0.6;
+    --card-foreground: 150 10% 90%;
 
-  /* Accent */
-  --accent: 240 3.7% 15.9% !important;
-  --accent-foreground: 0 0% 98% !important;
+    /* Primary - Neon Emerald #00E676 */
+    --primary: 150 100% 45%;
+    --primary-foreground: 150 30% 3%;
 
-  /* Destructive */
-  --destructive: 0 62.8% 30.6% !important;
-  --destructive-foreground: 0 0% 98% !important;
+    /* Secondary - Royal Gold #F2C94C */
+    --secondary: 45 90% 50%;
+    --secondary-foreground: 150 30% 3%;
 
-  /* Border & Input */
-  --border: 240 3.7% 15.9% !important;
-  --input: 240 3.7% 15.9% !important;
+    /* Destructive */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-  /* Neon Ring */
-  --ring: 263.4 70% 50.4% !important;
-  --radius: 1rem !important;
+    --ring: 150 100% 45%;            /* Neon Emerald glow ring */
+    --radius: 0.5rem;
+    
+    /* Semantic Colors - Kingdom Future */
+    --success: 150 100% 45%;         /* Neon Emerald */
+    --success-foreground: 150 30% 3%;
+    --warning: 45 90% 50%;           /* Royal Gold */
+    --warning-foreground: 150 30% 3%;
+    --info: 175 70% 45%;             /* Teal (instead of blue) */
+    --info-foreground: 150 30% 3%;
+    --error: 0 70% 55%;              /* Soft Red */
+    --error-foreground: 0 0% 100%;
+  }
 
-  /* Chart Colors - Neon Palette */
-  --chart-1: 252 100% 70% !important;         /* Neon Purple */
-  --chart-2: 190 100% 50% !important;         /* Cyan */
-  --chart-3: 320 100% 60% !important;         /* Hot Pink */
-  --chart-4: 45 100% 60% !important;          /* Electric Gold */
-  --chart-5: 140 100% 60% !important;         /* Neon Green */
+  /* ============================================
+     NEURAL DARK THEME - The Pulse of Intelligence
+     Cyberpunk / AI / Neural Network Aesthetics
+     ============================================ */
+  .neural-dark {
+    /* Background - The Neural Void */
+    --background: 240 10% 4%;        /* #09090B - Deep neutral void */
+    --foreground: 240 5% 90%;        /* Cool light text */
 
-  /* Sidebar */
-  --sidebar: 240 10% 3.9% !important;
-  --sidebar-foreground: 240 4.8% 95.9% !important;
-  --sidebar-primary: 263.4 70% 50.4% !important;
-  --sidebar-primary-foreground: 0 0% 100% !important;
-  --sidebar-accent: 240 3.7% 15.9% !important;
-  --sidebar-accent-foreground: 240 4.8% 95.9% !important;
-  --sidebar-border: 240 3.7% 15.9% !important;
-  --sidebar-ring: 263.4 70% 50.4% !important;
-  
-  /* Semantic Colors - Neural Dark */
-  --success: 140 100% 60% !important;         /* Neon Green */
-  --success-foreground: 240 10% 4% !important;
-  --warning: 45 100% 60% !important;          /* Electric Gold */
-  --warning-foreground: 240 10% 4% !important;
-  --info: 190 100% 50% !important;            /* Cyan */
-  --info-foreground: 240 10% 4% !important;
-  --error: 320 100% 60% !important;           /* Hot Pink */
-  --error-foreground: 0 0% 100% !important;
+    /* Muted - Recessed Areas */
+    --muted: 240 8% 8%;              /* Slightly lighter void */
+    --muted-foreground: 240 5% 55%;  /* Muted gray */
+
+    /* Accent */
+    --accent: 263 50% 15%;           /* Purple-tinted accent bg */
+    --accent-foreground: 263 70% 60%; /* Neon Purple text */
+
+    /* Popover - Glass Card */
+    --popover: 240 8% 8%;
+    --popover-foreground: 240 5% 90%;
+
+    /* Border - Glass Edge */
+    --border: 263 30% 25% / 0.3;     /* Purple-tinted border */
+    --input: 240 8% 12%;
+
+    /* Card - Glassmorphism */
+    --card: 240 8% 8% / 0.7;
+    --card-foreground: 240 5% 90%;
+
+    /* Primary - Neon Purple #7C3AED */
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Electric Cyan #22D3EE */
+    --secondary: 190 100% 54%;
+    --secondary-foreground: 240 10% 4%;
+
+    /* Destructive */
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 263 70% 58%;             /* Neon Purple glow ring */
+    --radius: 0.5rem;
+    
+    /* Semantic Colors - Neural Dark */
+    --success: 160 80% 45%;          /* Cyber Green */
+    --success-foreground: 240 10% 4%;
+    --warning: 45 95% 55%;           /* Amber */
+    --warning-foreground: 240 10% 4%;
+    --info: 190 100% 54%;            /* Electric Cyan */
+    --info-foreground: 240 10% 4%;
+    --error: 0 75% 55%;              /* Neon Red */
+    --error-foreground: 0 0% 100%;
+  }
 }
 
 @layer base {
@@ -661,138 +651,6 @@ html[data-theme="neural-dark"].dark {
     box-shadow: 
       inset 0 1px 0 0 var(--glass-highlight),
       var(--glow-primary);
-  }
-
-  /* Kingdom Future Theme Utilities */
-  [data-theme="kingdom-future"] {
-    color-scheme: dark;
-    background-image: 
-      radial-gradient(circle at 50% 0%, hsla(150, 100%, 45%, 0.1), transparent 50%),
-      radial-gradient(circle at 100% 0%, hsla(45, 90%, 50%, 0.05), transparent 40%);
-    background-attachment: fixed;
-  }
-
-  [data-theme="kingdom-future"] .font-display {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.02em;
-  }
-
-  [data-theme="kingdom-future"] .glass-card {
-    background: rgba(4, 11, 6, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-radius: var(--radius);
-  }
-
-  [data-theme="kingdom-future"] .neon-text {
-    color: hsl(var(--primary));
-    text-shadow: 0 0 15px hsla(150, 100%, 45%, 0.6), 0 0 30px hsla(150, 100%, 45%, 0.4);
-  }
-
-  [data-theme="kingdom-future"] .neon-gold {
-    color: hsl(var(--secondary));
-    text-shadow: 0 0 15px hsla(45, 90%, 50%, 0.6), 0 0 30px hsla(45, 90%, 50%, 0.4);
-  }
-
-  [data-theme="kingdom-future"] .neon-border {
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 10px hsla(150, 100%, 45%, 0.3), inset 0 0 10px hsla(150, 100%, 45%, 0.1);
-  }
-
-  [data-theme="kingdom-future"] .neon-glow {
-    box-shadow: 0 0 20px rgba(0, 230, 118, 0.4), 0 0 40px rgba(0, 230, 118, 0.2);
-  }
-
-  [data-theme="kingdom-future"] .text-glow {
-    text-shadow: 0 0 15px rgba(0, 230, 118, 0.6);
-  }
-
-  [data-theme="kingdom-future"] .gold-glow {
-    text-shadow: 0 0 15px rgba(242, 201, 76, 0.6);
-  }
-
-  [data-theme="kingdom-future"] button.primary {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    border: none;
-    font-weight: 600;
-    box-shadow: 0 0 15px hsla(150, 100%, 45%, 0.4);
-    transition: all 0.3s ease;
-  }
-
-  [data-theme="kingdom-future"] button.primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px hsla(150, 100%, 45%, 0.6);
-  }
-
-  /* Neural Dark Theme Utilities */
-  [data-theme="neural-dark"] {
-    color-scheme: dark;
-    background-image: 
-      radial-gradient(circle at 50% 0%, hsla(263, 70%, 50%, 0.08), transparent 50%),
-      radial-gradient(circle at 0% 50%, hsla(190, 100%, 50%, 0.05), transparent 40%);
-    background-attachment: fixed;
-  }
-
-  [data-theme="neural-dark"] .font-display {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.02em;
-  }
-
-  [data-theme="neural-dark"] .glass-card {
-    background: rgba(24, 24, 27, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-radius: var(--radius);
-  }
-
-  [data-theme="neural-dark"] .neon-text {
-    color: hsl(var(--primary));
-    text-shadow: 0 0 15px hsla(263, 70%, 50%, 0.6), 0 0 30px hsla(263, 70%, 50%, 0.4);
-  }
-
-  [data-theme="neural-dark"] .neon-cyan {
-    color: hsl(190 100% 50%);
-    text-shadow: 0 0 15px hsla(190, 100%, 50%, 0.6), 0 0 30px hsla(190, 100%, 50%, 0.4);
-  }
-
-  [data-theme="neural-dark"] .neon-border {
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 10px hsla(263, 70%, 50%, 0.3), inset 0 0 10px hsla(263, 70%, 50%, 0.1);
-  }
-
-  [data-theme="neural-dark"] .neon-glow {
-    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
-  }
-
-  [data-theme="neural-dark"] .text-glow {
-    text-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
-  }
-
-  [data-theme="neural-dark"] .purple-glow {
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 40px rgba(124, 58, 237, 0.2);
-  }
-
-  [data-theme="neural-dark"] .cyan-glow {
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
-  }
-
-  [data-theme="neural-dark"] button.primary {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    border: none;
-    font-weight: 600;
-    box-shadow: 0 0 15px hsla(263, 70%, 50%, 0.4);
-    transition: all 0.3s ease;
-  }
-
-  [data-theme="neural-dark"] button.primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px hsla(263, 70%, 50%, 0.6);
   }
   
   /* Console/Terminal Style */

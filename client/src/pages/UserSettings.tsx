@@ -4,16 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { User, Bell, Shield, Palette, Save, Sun, Moon, Monitor, Sparkles, Cpu, Check, Orbit } from "lucide-react";
+import { User, Bell, Shield, Palette, Save, Sun, Moon, Monitor, Sparkles, Cpu, Check } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 
 const THEMES: { id: Theme; label: string; description: string; icon: typeof Sun; color: string }[] = [
-  { id: "kingdom-future", label: "Kingdom Future", description: "Saudi Vision 2030 (Default)", icon: Sparkles, color: "text-emerald-500" },
-  { id: "neural-dark", label: "Neural Dark", description: "AI & Cyberpunk", icon: Cpu, color: "text-purple-500" },
-  { id: "deep-space", label: "Deep Space", description: "Blue & Orange", icon: Orbit, color: "text-sky-400" },
+  { id: "light", label: "Light", description: "Corporate Steel", icon: Sun, color: "text-amber-500" },
+  { id: "dark", label: "Dark", description: "Deep Space", icon: Moon, color: "text-sky-400" },
   { id: "system", label: "System", description: "Auto-detect", icon: Monitor, color: "text-gray-400" },
+  { id: "kingdom-future", label: "Kingdom Future", description: "Saudi Vision 2030", icon: Sparkles, color: "text-emerald-500" },
+  { id: "neural-dark", label: "Neural Dark", description: "AI & Cyberpunk", icon: Cpu, color: "text-purple-500" },
 ];
 
 export default function UserSettings() {

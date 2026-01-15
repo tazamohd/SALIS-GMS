@@ -1,10 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-// Theme options:
-// - "dark" / "system" / "kingdom-future": Uses Kingdom Future (default emerald/gold theme)
-// - "deep-space": Uses Deep Space (blue/orange theme)
-// - "neural-dark": Uses Neural Dark (purple/cyan cyberpunk theme)
-export type Theme = "light" | "dark" | "system" | "kingdom-future" | "deep-space" | "neural-dark";
+export type Theme = "light" | "dark" | "system" | "kingdom-future" | "neural-dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -23,18 +19,11 @@ function getResolvedTheme(theme: Theme): string {
 
 function applyTheme(theme: Theme) {
   const root = window.document.documentElement;
-  root.classList.remove("light", "dark");
-  root.removeAttribute("data-theme");
+  root.classList.remove("light", "dark", "kingdom-future", "neural-dark");
   
-  // Kingdom Future is now the default theme in :root and .dark
-  // Only set data-theme for alternative themes (deep-space, neural-dark)
-  if (theme === "deep-space" || theme === "neural-dark") {
+  if (theme === "kingdom-future" || theme === "neural-dark") {
     root.classList.add("dark");
-    root.setAttribute("data-theme", theme);
-  } else if (theme === "kingdom-future" || theme === "dark" || theme === "system") {
-    // Kingdom Future is the default dark theme
-    root.classList.add("dark");
-    // No data-theme needed - Kingdom Future is in :root and .dark
+    root.classList.add(theme);
   } else {
     const resolvedTheme = getResolvedTheme(theme);
     root.classList.add(resolvedTheme);
