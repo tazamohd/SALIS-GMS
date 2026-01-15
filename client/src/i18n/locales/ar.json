@@ -4,6 +4,22 @@
     "tagline": "نظام إدارة مراكز السيارات المتكامل",
     "copyright": "جميع الحقوق محفوظة"
   },
+  "languages": {
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "spanish": "الإسبانية",
+    "french": "الفرنسية",
+    "german": "الألمانية",
+    "italian": "الإيطالية",
+    "portuguese": "البرتغالية",
+    "chinese": "الصينية",
+    "japanese": "اليابانية"
+  },
+  "languageToggle": {
+    "switchToEnglish": "التبديل إلى الإنجليزية",
+    "switchToArabic": "التبديل إلى العربية",
+    "ar": "عربي"
+  },
   "statusLabels": {
     "draft": "مسودة",
     "sent": "مرسل",

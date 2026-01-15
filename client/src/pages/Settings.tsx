@@ -233,15 +233,15 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="ar">العربية</SelectItem>
-              <SelectItem value="es">Español</SelectItem>
-              <SelectItem value="fr">Français</SelectItem>
-              <SelectItem value="de">Deutsch</SelectItem>
-              <SelectItem value="it">Italiano</SelectItem>
-              <SelectItem value="pt">Português</SelectItem>
-              <SelectItem value="zh">中文</SelectItem>
-              <SelectItem value="ja">日本語</SelectItem>
+              <SelectItem value="en">{t('languages.english', 'English')}</SelectItem>
+              <SelectItem value="ar">{t('languages.arabic', 'Arabic')}</SelectItem>
+              <SelectItem value="es">{t('languages.spanish', 'Spanish')}</SelectItem>
+              <SelectItem value="fr">{t('languages.french', 'French')}</SelectItem>
+              <SelectItem value="de">{t('languages.german', 'German')}</SelectItem>
+              <SelectItem value="it">{t('languages.italian', 'Italian')}</SelectItem>
+              <SelectItem value="pt">{t('languages.portuguese', 'Portuguese')}</SelectItem>
+              <SelectItem value="zh">{t('languages.chinese', 'Chinese')}</SelectItem>
+              <SelectItem value="ja">{t('languages.japanese', 'Japanese')}</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-sm text-[#64748B]">
@@ -282,7 +282,7 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectItem value="CNY">CNY - {t('settings.chineseYuan', 'Chinese Yuan')} (¥)</SelectItem>
               <SelectItem value="INR">INR - {t('settings.indianRupee', 'Indian Rupee')} (₹)</SelectItem>
               <SelectItem value="SAR">SAR - {t('settings.saudiRiyal', 'Saudi Riyal')} (﷼)</SelectItem>
-              <SelectItem value="AED">AED - {t('settings.emiratiDirham', 'Emirati Dirham')} (د.إ)</SelectItem>
+              <SelectItem value="AED">AED - {t('settings.emiratiDirham', 'Emirati Dirham')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -38,13 +38,13 @@ import {
 import { CURRENCIES as CURRENCY_CONFIG, PAYMENT_METHODS, getPaymentMethods } from "@/lib/currency";
 
 const CURRENCIES = [
-  { code: 'sar', symbol: 'ر.س', name: 'SAR - Saudi Riyal' },
+  { code: 'sar', symbol: 'SAR', name: 'SAR - Saudi Riyal' },
   { code: 'usd', symbol: '$', name: 'USD - US Dollar' },
-  { code: 'aed', symbol: 'د.إ', name: 'AED - UAE Dirham' },
-  { code: 'bhd', symbol: 'د.ب', name: 'BHD - Bahraini Dinar' },
-  { code: 'kwd', symbol: 'د.ك', name: 'KWD - Kuwaiti Dinar' },
-  { code: 'omr', symbol: 'ر.ع', name: 'OMR - Omani Rial' },
-  { code: 'qar', symbol: 'ر.ق', name: 'QAR - Qatari Riyal' },
+  { code: 'aed', symbol: 'AED', name: 'AED - UAE Dirham' },
+  { code: 'bhd', symbol: 'BHD', name: 'BHD - Bahraini Dinar' },
+  { code: 'kwd', symbol: 'KWD', name: 'KWD - Kuwaiti Dinar' },
+  { code: 'omr', symbol: 'OMR', name: 'OMR - Omani Rial' },
+  { code: 'qar', symbol: 'QAR', name: 'QAR - Qatari Riyal' },
   { code: 'eur', symbol: '€', name: 'EUR - Euro' },
   { code: 'gbp', symbol: '£', name: 'GBP - British Pound' },
 ];

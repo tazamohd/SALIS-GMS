@@ -325,7 +325,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ar">العربية (Arabic)</SelectItem>
+                            <SelectItem value="ar">Arabic</SelectItem>
                             <SelectItem value="en">English</SelectItem>
                           </SelectContent>
                         </Select>
