@@ -126,7 +126,7 @@ export default function BalanceSheet() {
         <CardHeader className="text-center border-b">
           <CardTitle className="text-xl">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base">
-            {t('accounting.balanceSheet', 'Balance Sheet')} (الميزانية العمومية)
+            {t('accounting.balanceSheet', 'Balance Sheet')}
           </CardDescription>
           <p className="text-sm text-muted-foreground">
             {t('accounting.asOf', 'As of')} {period === "2024-01-31" ? t('accounting.dates.jan2024', 'January 31, 2024') : period}

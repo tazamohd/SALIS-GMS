@@ -978,7 +978,7 @@ export default function ChartOfAccounts() {
                   </TableCell>
                   <TableCell>
                     <Badge variant={account.nature === "debit" ? "default" : "secondary"}>
-                      {account.nature === "debit" ? "مدين" : "دائن"}
+                      {account.nature === "debit" ? t('accounting.debit', 'Debit') : t('accounting.credit', 'Credit')}
                     </Badge>
                   </TableCell>
                   <TableCell>{account.level}</TableCell>

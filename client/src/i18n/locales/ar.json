@@ -910,14 +910,19 @@
       "cancelled": "ملغي"
     },
     "acceptedMethods": "طرق الدفع المقبولة",
-    "mada": "مدى",
-    "stcPay": "إس تي سي باي",
-    "stcBank": "بنك إس تي سي",
-    "visa": "فيزا",
-    "mastercard": "ماستركارد",
-    "amex": "أمريكان إكسبريس",
-    "applePay": "آبل باي",
-    "bankTransfer": "تحويل بنكي",
+    "methods": {
+      "mada": "مدى",
+      "stcPay": "إس تي سي باي",
+      "stcBank": "بنك إس تي سي",
+      "visa": "فيزا",
+      "mastercard": "ماستركارد",
+      "amex": "أمريكان إكسبريس",
+      "applePay": "آبل باي",
+      "bankTransfer": "تحويل بنكي"
+    },
+    "currency": {
+      "sar": "ريال سعودي (SAR)"
+    },
     "refund": "استرداد",
     "processRefund": "معالجة الاسترداد",
     "refundAmount": "مبلغ الاسترداد",
@@ -1393,6 +1398,8 @@
   "accounting": {
     "title": "💼 تكامل المحاسبة",
     "description": "المزامنة مع QuickBooks و Xero للمحاسبة الآلية",
+    "debit": "مدين",
+    "credit": "دائن",
     "totalSynced": "إجمالي المزامنة",
     "records": "سجلات",
     "lastSync": "آخر مزامنة",
