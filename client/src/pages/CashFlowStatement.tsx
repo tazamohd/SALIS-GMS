@@ -37,36 +37,36 @@ import {
   Banknote,
 } from "lucide-react";
 
-const operatingActivities = [
-  { description: "Net Income", amount: 141000 },
-  { description: "Adjustments:", amount: null, isHeader: true },
-  { description: "Depreciation & Amortization", amount: 30500 },
-  { description: "Changes in Working Capital:", amount: null, isHeader: true },
-  { description: "Increase in Accounts Receivable", amount: -11500 },
-  { description: "Increase in Inventory", amount: -7000 },
-  { description: "Increase in Prepaid Expenses", amount: -3000 },
-  { description: "Increase in Accounts Payable", amount: 13500 },
-  { description: "Increase in Accrued Expenses", amount: 3000 },
-  { description: "Increase in VAT Payable", amount: 3000 },
-  { description: "Increase in Unearned Revenue", amount: 4000 },
-];
-
-const investingActivities = [
-  { description: "Purchase of Equipment", amount: 0 },
-  { description: "Purchase of Vehicles", amount: 0 },
-  { description: "Purchase of Intangible Assets", amount: 0 },
-  { description: "Proceeds from Sale of Assets", amount: 5000 },
-];
-
-const financingActivities = [
-  { description: "Repayment of Long-term Loan", amount: -24000 },
-  { description: "Dividends Paid", amount: -50000 },
-  { description: "Additional Capital Contributions", amount: 0 },
-];
-
 export default function CashFlowStatement() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01");
+
+  const operatingActivities = [
+    { description: t('accounting.cashFlow.netIncome', 'Net Income'), amount: 141000 },
+    { description: t('accounting.cashFlow.adjustments', 'Adjustments:'), amount: null, isHeader: true },
+    { description: t('accounting.cashFlow.depreciationAmortization', 'Depreciation & Amortization'), amount: 30500 },
+    { description: t('accounting.cashFlow.changesWorkingCapital', 'Changes in Working Capital:'), amount: null, isHeader: true },
+    { description: t('accounting.cashFlow.increaseAccountsReceivable', 'Increase in Accounts Receivable'), amount: -11500 },
+    { description: t('accounting.cashFlow.increaseInventory', 'Increase in Inventory'), amount: -7000 },
+    { description: t('accounting.cashFlow.increasePrepaidExpenses', 'Increase in Prepaid Expenses'), amount: -3000 },
+    { description: t('accounting.cashFlow.increaseAccountsPayable', 'Increase in Accounts Payable'), amount: 13500 },
+    { description: t('accounting.cashFlow.increaseAccruedExpenses', 'Increase in Accrued Expenses'), amount: 3000 },
+    { description: t('accounting.cashFlow.increaseVatPayable', 'Increase in VAT Payable'), amount: 3000 },
+    { description: t('accounting.cashFlow.increaseUnearnedRevenue', 'Increase in Unearned Revenue'), amount: 4000 },
+  ];
+
+  const investingActivities = [
+    { description: t('accounting.cashFlow.purchaseEquipment', 'Purchase of Equipment'), amount: 0 },
+    { description: t('accounting.cashFlow.purchaseVehicles', 'Purchase of Vehicles'), amount: 0 },
+    { description: t('accounting.cashFlow.purchaseIntangibleAssets', 'Purchase of Intangible Assets'), amount: 0 },
+    { description: t('accounting.cashFlow.proceedsSaleAssets', 'Proceeds from Sale of Assets'), amount: 5000 },
+  ];
+
+  const financingActivities = [
+    { description: t('accounting.cashFlow.repaymentLongTermLoan', 'Repayment of Long-term Loan'), amount: -24000 },
+    { description: t('accounting.cashFlow.dividendsPaid', 'Dividends Paid'), amount: -50000 },
+    { description: t('accounting.cashFlow.additionalCapitalContributions', 'Additional Capital Contributions'), amount: 0 },
+  ];
 
   const netOperatingCash = operatingActivities
     .filter((item) => item.amount !== null)
