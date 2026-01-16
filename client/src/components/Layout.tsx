@@ -254,7 +254,7 @@ export function Layout({ children }: LayoutProps) {
           <div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close mobile menu"
+            aria-label={t("common.closeMobileMenu", "Close mobile menu")}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === "Enter" && setMobileMenuOpen(false)}
@@ -381,7 +381,7 @@ export function Layout({ children }: LayoutProps) {
               size="icon"
               className="lg:hidden text-[#0F172A] dark:text-[#E6EAF0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] h-8 w-8"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle mobile menu"
+              aria-label={t("common.toggleMobileMenu", "Toggle mobile menu")}
               data-testid="button-mobile-menu"
             >
               {mobileMenuOpen ? (

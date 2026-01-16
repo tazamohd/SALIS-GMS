@@ -9,18 +9,18 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useTheme, type Theme } from "@/hooks/useTheme";
 
-const THEMES: { id: Theme; label: string; description: string; icon: typeof Sun; color: string }[] = [
-  { id: "light", label: "Light", description: "Corporate Steel", icon: Sun, color: "text-amber-500" },
-  { id: "dark", label: "Dark", description: "Deep Space", icon: Moon, color: "text-sky-400" },
-  { id: "system", label: "System", description: "Auto-detect", icon: Monitor, color: "text-gray-400" },
-  { id: "kingdom-future", label: "Kingdom Future", description: "Saudi Vision 2030", icon: Sparkles, color: "text-emerald-500" },
-  { id: "neural-dark", label: "Neural Dark", description: "AI & Cyberpunk", icon: Cpu, color: "text-purple-500" },
-];
-
 export default function UserSettings() {
   const { t } = useTranslation();
   const { getRoleDisplayName, hasPermission } = usePermissions();
   const { theme: currentTheme, setTheme: handleThemeChange } = useTheme();
+
+  const THEMES: { id: Theme; labelKey: string; descKey: string; icon: typeof Sun; color: string }[] = [
+    { id: "light", labelKey: "userSettings.themeLight", descKey: "userSettings.themeLightDesc", icon: Sun, color: "text-amber-500" },
+    { id: "dark", labelKey: "userSettings.themeDark", descKey: "userSettings.themeDarkDesc", icon: Moon, color: "text-sky-400" },
+    { id: "system", labelKey: "userSettings.themeSystem", descKey: "userSettings.themeSystemDesc", icon: Monitor, color: "text-gray-400" },
+    { id: "kingdom-future", labelKey: "userSettings.themeKingdomFuture", descKey: "userSettings.themeKingdomFutureDesc", icon: Sparkles, color: "text-emerald-500" },
+    { id: "neural-dark", labelKey: "userSettings.themeNeuralDark", descKey: "userSettings.themeNeuralDarkDesc", icon: Cpu, color: "text-purple-500" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#050510] via-[#0a0a1a] to-[#050510] p-6" data-testid="user-settings-page">
@@ -38,16 +38,16 @@ export default function UserSettings() {
           <Shield className="w-4 h-4 text-sky-400" />
           <span className="text-xs text-gray-400">
             {hasPermission('settings', 'manage_settings') 
-              ? 'Full access to manage all settings'
-              : 'Personal settings only - system settings require admin access'
+              ? t('userSettings.fullAccess', 'Full access to manage all settings')
+              : t('userSettings.personalSettingsOnly', 'Personal settings only - system settings require admin access')
             }
           </span>
         </div>
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-profile">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2"><User className="w-5 h-5 text-sky-400" /> Profile Information</CardTitle>
-            <CardDescription className="text-gray-400">Update your personal details</CardDescription>
+            <CardTitle className="text-white flex items-center gap-2"><User className="w-5 h-5 text-sky-400" /> {t('userSettings.profileInformation', 'Profile Information')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('userSettings.updatePersonalDetails', 'Update your personal details')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -73,20 +73,20 @@ export default function UserSettings() {
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-notifications">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2"><Bell className="w-5 h-5 text-sky-400" /> Notifications</CardTitle>
-            <CardDescription className="text-gray-400">Configure your notification preferences</CardDescription>
+            <CardTitle className="text-white flex items-center gap-2"><Bell className="w-5 h-5 text-sky-400" /> {t('userSettings.notifications', 'Notifications')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('userSettings.configureNotificationPreferences', 'Configure your notification preferences')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
-              { id: "email", label: "Email Notifications", desc: "Receive updates via email" },
-              { id: "sms", label: "SMS Notifications", desc: "Receive updates via SMS" },
-              { id: "push", label: "Push Notifications", desc: "Receive browser push notifications" },
-              { id: "jobs", label: "Job Assignments", desc: "Notify when assigned new jobs" },
+              { id: "email", labelKey: "userSettings.emailNotifications", descKey: "userSettings.receiveUpdatesViaEmail", labelFallback: "Email Notifications", descFallback: "Receive updates via email" },
+              { id: "sms", labelKey: "userSettings.smsNotifications", descKey: "userSettings.receiveUpdatesViaSms", labelFallback: "SMS Notifications", descFallback: "Receive updates via SMS" },
+              { id: "push", labelKey: "userSettings.pushNotifications", descKey: "userSettings.receiveBrowserPushNotifications", labelFallback: "Push Notifications", descFallback: "Receive browser push notifications" },
+              { id: "jobs", labelKey: "userSettings.jobAssignments", descKey: "userSettings.notifyWhenAssignedNewJobs", labelFallback: "Job Assignments", descFallback: "Notify when assigned new jobs" },
             ].map((item, idx) => (
               <div key={item.id} data-testid={`setting-${item.id}`} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
                 <div>
-                  <p className="text-white font-medium">{item.label}</p>
-                  <p className="text-sm text-gray-400">{item.desc}</p>
+                  <p className="text-white font-medium">{t(item.labelKey, item.labelFallback)}</p>
+                  <p className="text-sm text-gray-400">{t(item.descKey, item.descFallback)}</p>
                 </div>
                 <Switch data-testid={`switch-${item.id}`} defaultChecked={idx < 3} />
               </div>
@@ -96,12 +96,12 @@ export default function UserSettings() {
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-appearance">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2"><Palette className="w-5 h-5 text-sky-400" /> Appearance</CardTitle>
-            <CardDescription className="text-gray-400">Customize your interface theme</CardDescription>
+            <CardTitle className="text-white flex items-center gap-2"><Palette className="w-5 h-5 text-sky-400" /> {t('userSettings.appearance', 'Appearance')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('userSettings.customizeInterfaceTheme', 'Customize your interface theme')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
-              <Label className="text-white font-medium">Theme</Label>
+              <Label className="text-white font-medium">{t('userSettings.theme', 'Theme')}</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {THEMES.map((theme) => {
                   const Icon = theme.icon;
@@ -122,8 +122,8 @@ export default function UserSettings() {
                           <Icon className={`w-5 h-5 ${theme.color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white font-medium text-sm">{theme.label}</p>
-                          <p className="text-xs text-gray-400 truncate">{theme.description}</p>
+                          <p className="text-white font-medium text-sm">{t(theme.labelKey, theme.id)}</p>
+                          <p className="text-xs text-gray-400 truncate">{t(theme.descKey, '')}</p>
                         </div>
                         {isActive && (
                           <Check className="w-4 h-4 text-primary absolute top-2 right-2" />
@@ -137,8 +137,8 @@ export default function UserSettings() {
             
             <div data-testid="setting-compact-mode" className="flex items-center justify-between p-3 rounded-lg bg-white/5 mt-4">
               <div>
-                <p className="text-white font-medium">Compact Mode</p>
-                <p className="text-sm text-gray-400">Reduce spacing in UI</p>
+                <p className="text-white font-medium">{t('userSettings.compactMode', 'Compact Mode')}</p>
+                <p className="text-sm text-gray-400">{t('userSettings.reduceSpacingInUi', 'Reduce spacing in UI')}</p>
               </div>
               <Switch data-testid="switch-compact-mode" />
             </div>
@@ -148,7 +148,7 @@ export default function UserSettings() {
         <div className="flex justify-end">
           <Button data-testid="button-save" className="bg-sky-500 hover:bg-sky-600 text-white">
             <Save className="w-4 h-4 mr-2" />
-            Save Changes
+            {t('userSettings.saveChanges', 'Save Changes')}
           </Button>
         </div>
       </div>

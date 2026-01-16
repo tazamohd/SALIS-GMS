@@ -495,15 +495,15 @@ export default function InventoryManagement() {
       <RoleBadge size="md" />
       {hasPermission('inventory', 'manage_inventory') ? (
         <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 px-2 py-1 rounded bg-emerald-900/20">
-          Full inventory management access
+          {t('inventory.fullManagementAccess', 'Full inventory management access')}
         </span>
       ) : canEdit('inventory') ? (
         <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 px-2 py-1 rounded bg-blue-900/20">
-          Can update stock levels
+          {t('inventory.canUpdateStock', 'Can update stock levels')}
         </span>
       ) : (
         <span className="text-xs text-zinc-500 flex items-center gap-1 px-2 py-1 rounded bg-zinc-800/50">
-          <Shield className="w-3 h-3" /> View only
+          <Shield className="w-3 h-3" /> {t('common.viewOnly', 'View only')}
         </span>
       )}
       <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>

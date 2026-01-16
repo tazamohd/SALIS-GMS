@@ -493,7 +493,7 @@ export default function AssetsManagement() {
                   </TableCell>
                   <TableCell>
                     <Badge className={asset.condition === "Excellent" ? "bg-[#0A5ED7] text-white" : "bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B]"}>
-                      {asset.condition}
+                      {t(`assets.conditions.${asset.condition.toLowerCase()}`, asset.condition)}
                     </Badge>
                   </TableCell>
                   <TableCell>

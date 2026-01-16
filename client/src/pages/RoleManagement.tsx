@@ -520,7 +520,7 @@ export default function RoleManagement() {
                 <SelectContent>
                   <SelectItem value="all">{t('roles.allCategories', 'All Categories')}</SelectItem>
                   {roleCategories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    <SelectItem key={cat.id} value={cat.id}>{t(`roles.categories.${cat.id}`, cat.name)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -533,7 +533,7 @@ export default function RoleManagement() {
                     <div className="p-1.5 rounded-lg" style={{ backgroundColor: `${category.color}20` }}>
                       <category.icon className="w-4 h-4" style={{ color: category.color }} />
                     </div>
-                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{category.name}</h3>
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{t(`roles.categories.${category.id}`, category.name)}</h3>
                     <Badge variant="outline" className="ml-2">{category.roles.length}</Badge>
                   </div>
                   <div className="grid gap-3">
@@ -561,7 +561,7 @@ export default function RoleManagement() {
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-sm text-[#64748B]">{role.description}</p>
+                              <p className="text-sm text-[#64748B]">{t(`roles.roleDescriptions.${role.id}`, role.description)}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
@@ -668,7 +668,7 @@ export default function RoleManagement() {
                           <SelectItem key={cat.id} value={cat.id}>
                             <div className="flex items-center gap-2">
                               <cat.icon className="w-4 h-4" style={{ color: cat.color }} />
-                              {cat.name}
+                              {t(`roles.categories.${cat.id}`, cat.name)}
                             </div>
                           </SelectItem>
                         ))}
@@ -744,7 +744,7 @@ export default function RoleManagement() {
                                 data-testid={`checkbox-group-${group.id}`}
                               />
                               <group.icon className="w-4 h-4 text-[#0A5ED7]" />
-                              <span className="font-medium text-[#0B1F3B] dark:text-white">{group.name}</span>
+                              <span className="font-medium text-[#0B1F3B] dark:text-white">{t(`roles.permissionGroups.${group.id}`, group.name)}</span>
                               <Badge variant="outline" className="ml-auto mr-2">
                                 {selectedCount}/{group.permissions.length}
                               </Badge>
@@ -762,7 +762,7 @@ export default function RoleManagement() {
                                     onCheckedChange={() => togglePermission(perm.id)}
                                     data-testid={`checkbox-perm-${perm.id}`}
                                   />
-                                  <span className="text-sm text-[#0B1F3B] dark:text-white">{perm.name}</span>
+                                  <span className="text-sm text-[#0B1F3B] dark:text-white">{t(`roles.permissionNames.${perm.id}`, perm.name)}</span>
                                 </label>
                               ))}
                             </div>
@@ -924,7 +924,7 @@ export default function RoleManagement() {
                                   data-testid={`checkbox-edit-group-${group.id}`}
                                 />
                                 <group.icon className="w-4 h-4 text-[#0A5ED7]" />
-                                <span className="font-medium text-[#0B1F3B] dark:text-white">{group.name}</span>
+                                <span className="font-medium text-[#0B1F3B] dark:text-white">{t(`roles.permissionGroups.${group.id}`, group.name)}</span>
                                 <Badge variant="outline" className="ml-auto mr-2">
                                   {selectedCount}/{group.permissions.length}
                                 </Badge>
@@ -942,7 +942,7 @@ export default function RoleManagement() {
                                       onCheckedChange={() => togglePermission(perm.id, true)}
                                       data-testid={`checkbox-edit-perm-${perm.id}`}
                                     />
-                                    <span className="text-sm text-[#0B1F3B] dark:text-white">{perm.name}</span>
+                                    <span className="text-sm text-[#0B1F3B] dark:text-white">{t(`roles.permissionNames.${perm.id}`, perm.name)}</span>
                                   </label>
                                 ))}
                               </div>

@@ -262,7 +262,7 @@ export function Dashboard() {
                     </h1>
                   </div>
                   <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
-                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
+                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || t('common.user', 'User')}</span>
                     <span className="mx-2">|</span>
                     <span className="text-[#0A5ED7] dark:text-[#0BB3FF] font-medium">{getRoleDisplayName()}</span>
                   </p>
@@ -488,7 +488,7 @@ export function Dashboard() {
                       <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, t('dashboard.revenue', 'Revenue')]}
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                         labelStyle={{ color: '#0B1F3B' }}
                       />
@@ -646,7 +646,7 @@ export function Dashboard() {
                             </Badge>
                           </td>
                           <td className="py-4 px-6 text-[#0B1F3B] dark:text-[#E6EAF0] text-sm">
-                            {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
+                            {vehicleInfo?.customerName || vehicleInfo?.owner || t('common.na', 'N/A')}
                           </td>
                           <td className="py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-sm">
                             {vehicleInfo?.make} {vehicleInfo?.model}
