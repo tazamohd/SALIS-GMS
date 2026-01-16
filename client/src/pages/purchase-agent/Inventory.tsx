@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import { Link } from "wouter";
 import type { SparePart, SparePartInventory } from "@shared/schema";
 
 export default function PurchaseAgentInventory() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState<string>("all");
 
@@ -207,8 +209,8 @@ export default function PurchaseAgentInventory() {
                     </div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-[#64748B]">
-                        <span>Current: {inv?.stockQuantity || 0}</span>
-                        <span>Min: {inv?.minThreshold || 0}</span>
+                        <span>{t('purchaseAgent.current', 'Current')}: {inv?.stockQuantity || 0}</span>
+                        <span>{t('purchaseAgent.min', 'Min')}: {inv?.minThreshold || 0}</span>
                       </div>
                       <Progress
                         value={getStockLevel(part)}
@@ -243,11 +245,11 @@ export default function PurchaseAgentInventory() {
                   <SelectValue placeholder="Stock Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  <SelectItem value="low">Low Stock</SelectItem>
-                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
-                  <SelectItem value="warning">Warning</SelectItem>
-                  <SelectItem value="healthy">Healthy</SelectItem>
+                  <SelectItem value="all">{t('purchaseAgent.allLevels', 'All Levels')}</SelectItem>
+                  <SelectItem value="low">{t('purchaseAgent.lowStock', 'Low Stock')}</SelectItem>
+                  <SelectItem value="out_of_stock">{t('purchaseAgent.outOfStock', 'Out of Stock')}</SelectItem>
+                  <SelectItem value="warning">{t('purchaseAgent.warning', 'Warning')}</SelectItem>
+                  <SelectItem value="healthy">{t('purchaseAgent.healthy', 'Healthy')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

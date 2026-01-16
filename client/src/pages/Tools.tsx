@@ -38,12 +38,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Wrench, CheckCircle, XCircle } from "lucide-react";
 import { z } from "zod";
 
-const formSchema = insertToolSchema.extend({
-  name: z.string().min(1, "Tool name is required"),
-  toolType: z.string().min(1, "Tool type is required"),
+const baseFormSchema = insertToolSchema.extend({
+  name: z.string().min(1),
+  toolType: z.string().min(1),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof baseFormSchema>;
 
 export default function Tools() {
   const { t } = useTranslation();
@@ -55,6 +55,11 @@ export default function Tools() {
 
   const { data: tools, isLoading, isError, error } = useQuery<Tool[]>({
     queryKey: ["/api/tools"],
+  });
+
+  const formSchema = baseFormSchema.extend({
+    name: z.string().min(1, t('inventory.toolNameRequired', 'Tool name is required')),
+    toolType: z.string().min(1, t('inventory.toolTypeRequired', 'Tool type is required')),
   });
 
   const form = useForm<FormData>({
@@ -231,9 +236,9 @@ export default function Tools() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">Tool Name</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.toolName', 'Tool Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="e.g., OBD-II Scanner" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-name" />
+                      <Input {...field} placeholder={t('inventory.egOBDScanner', 'e.g., OBD-II Scanner')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -245,17 +250,17 @@ export default function Tools() {
                 name="toolType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">Tool Type</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.toolType', 'Tool Type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-tool-type">
-                          <SelectValue placeholder="Select tool type" />
+                          <SelectValue placeholder={t('inventory.selectToolType', 'Select tool type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                        <SelectItem value="diagnostic">Diagnostic</SelectItem>
-                        <SelectItem value="mechanical">Mechanical</SelectItem>
-                        <SelectItem value="electrical">Electrical</SelectItem>
+                        <SelectItem value="diagnostic">{t('inventory.diagnostic', 'Diagnostic')}</SelectItem>
+                        <SelectItem value="mechanical">{t('inventory.mechanical', 'Mechanical')}</SelectItem>
+                        <SelectItem value="electrical">{t('inventory.electrical', 'Electrical')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -268,9 +273,9 @@ export default function Tools() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">Description</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} value={field.value || ""} placeholder="Describe the tool..." className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-description" />
+                      <Textarea {...field} value={field.value || ""} placeholder={t('inventory.describeTheTool', 'Describe the tool...')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-description" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -283,9 +288,9 @@ export default function Tools() {
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Brand</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.brand', 'Brand')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="e.g., Bosch" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-brand" />
+                        <Input {...field} value={field.value || ""} placeholder={t('inventory.egBosch', 'e.g., Bosch')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-brand" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -297,9 +302,9 @@ export default function Tools() {
                   name="manufacturer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Manufacturer</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.manufacturer', 'Manufacturer')}</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ""} placeholder="Manufacturer name" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-manufacturer" />
+                        <Input {...field} value={field.value || ""} placeholder={t('inventory.manufacturerName', 'Manufacturer name')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="input-manufacturer" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -312,17 +317,17 @@ export default function Tools() {
                 name="visibility"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">Visibility</FormLabel>
+                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('inventory.visibility', 'Visibility')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-visibility">
-                          <SelectValue placeholder="Select visibility" />
+                          <SelectValue placeholder={t('inventory.selectVisibility', 'Select visibility')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="shared">Shared</SelectItem>
+                        <SelectItem value="private">{t('inventory.private', 'Private')}</SelectItem>
+                        <SelectItem value="public">{t('inventory.public', 'Public')}</SelectItem>
+                        <SelectItem value="shared">{t('inventory.shared', 'Shared')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -338,10 +343,10 @@ export default function Tools() {
                   className="border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="button-cancel-create"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-submit-create">
-                  {createMutation.isPending ? "Adding..." : "Add Tool"}
+                  {createMutation.isPending ? t('inventory.adding', 'Adding...') : t('inventory.addTool', 'Add Tool')}
                 </Button>
               </DialogFooter>
             </form>
@@ -353,49 +358,49 @@ export default function Tools() {
         <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
             <DialogTitle className="text-[#0B1F3B] dark:text-white">{selectedTool?.name}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">Tool details and information</DialogDescription>
+            <DialogDescription className="text-[#64748B]">{t('inventory.toolDetailsAndInformation', 'Tool details and information')}</DialogDescription>
           </DialogHeader>
           {selectedTool && (
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">Tool Type</h4>
+                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.toolType', 'Tool Type')}</h4>
                 <Badge className={getToolTypeBadge(selectedTool.toolType)}>{selectedTool.toolType}</Badge>
               </div>
               {selectedTool.description && (
                 <div>
-                  <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">Description</h4>
+                  <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.description', 'Description')}</h4>
                   <p className="text-sm text-[#64748B]">{selectedTool.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 {selectedTool.brand && (
                   <div>
-                    <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">Brand</h4>
+                    <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.brand', 'Brand')}</h4>
                     <p className="text-sm text-[#64748B]">{selectedTool.brand}</p>
                   </div>
                 )}
                 {selectedTool.manufacturer && (
                   <div>
-                    <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">Manufacturer</h4>
+                    <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.manufacturer', 'Manufacturer')}</h4>
                     <p className="text-sm text-[#64748B]">{selectedTool.manufacturer}</p>
                   </div>
                 )}
               </div>
               <div>
-                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">Status</h4>
+                <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('inventory.status', 'Status')}</h4>
                 <div className="flex gap-2">
                   {selectedTool.isActive ? (
                     <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800">
-                      <CheckCircle className="h-3 w-3 mr-1" /> Active
+                      <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-[#E2E8F0] dark:border-[#232A36]">
-                      <XCircle className="h-3 w-3 mr-1" /> Inactive
+                      <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
                     </Badge>
                   )}
                   {selectedTool.isGlobal && (
                     <Badge variant="outline" className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF] border-[#0A5ED7]/30">
-                      Global
+                      {t('inventory.global', 'Global')}
                     </Badge>
                   )}
                   <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{selectedTool.visibility}</Badge>

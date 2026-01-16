@@ -110,7 +110,8 @@ export default function VehiclesEnhanced() {
 
     setVinDecoding(true);
     try {
-      const data = await apiRequest('GET', `/api/decode-vin/${vin}`) as any[];
+      const response = await apiRequest(`/api/decode-vin/${vin}`, 'GET');
+      const data = response as unknown as any[];
       
       const makeField = data?.find((item: any) => item.Variable === "Make")?.Value;
       const modelField = data?.find((item: any) => item.Variable === "Model")?.Value;

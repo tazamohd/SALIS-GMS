@@ -241,7 +241,7 @@ export default function ExpenseTracking() {
                           Code: {category.categoryCode}
                         </p>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-category-description-${category.id}`}>
-                          {category.description || "No description"}
+                          {category.description || t('common.noDescription', 'No description')}
                         </p>
                       </div>
                       <div className="text-right">

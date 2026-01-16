@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { insertUserSchema, Garage } from "@shared/schema";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -31,6 +32,7 @@ interface AddTechnicianDialogProps {
 
 export default function AddTechnicianDialog({ open, onOpenChange, garages }: AddTechnicianDialogProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const form = useForm<TechnicianFormValues>({
     resolver: zodResolver(technicianFormSchema),
@@ -77,9 +79,9 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md" data-testid="dialog-add-technician">
         <DialogHeader>
-          <DialogTitle data-testid="text-dialog-title">Add New Technician</DialogTitle>
+          <DialogTitle data-testid="text-dialog-title">{t('technicians.addNewTechnician', 'Add New Technician')}</DialogTitle>
           <DialogDescription data-testid="text-dialog-subtitle">
-            Create a new technician account
+            {t('technicians.createNewAccount', 'Create a new technician account')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -89,7 +91,7 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t('technicians.fullName', 'Full Name')}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="John Technician" data-testid="input-fullname" />
                   </FormControl>
@@ -103,7 +105,7 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t('technicians.email', 'Email')}</FormLabel>
                   <FormControl>
                     <Input {...field} type="email" placeholder="technician@garage.com" data-testid="input-email" />
                   </FormControl>
@@ -117,7 +119,7 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone (Optional)</FormLabel>
+                  <FormLabel>{t('technicians.phoneOptional', 'Phone (Optional)')}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="+1234567890" data-testid="input-phone" />
                   </FormControl>
@@ -131,11 +133,11 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
               name="garageId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Garage</FormLabel>
+                  <FormLabel>{t('technicians.garage', 'Garage')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-garage">
-                        <SelectValue placeholder="Select garage" />
+                        <SelectValue placeholder={t('technicians.selectGarage', 'Select garage')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -158,10 +160,10 @@ export default function AddTechnicianDialog({ open, onOpenChange, garages }: Add
                 onClick={() => onOpenChange(false)}
                 data-testid="button-cancel"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                {createMutation.isPending ? "Creating..." : "Create Technician"}
+                {createMutation.isPending ? t('common.creating', 'Creating...') : t('technicians.createTechnician', 'Create Technician')}
               </Button>
             </div>
           </form>

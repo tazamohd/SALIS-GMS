@@ -196,24 +196,21 @@ export default function DashboardWidgets() {
 
   const createWidgetMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/dashboard/widgets', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('/api/dashboard/widgets', 'POST', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
       setIsAddDialogOpen(false);
       setNewWidget({ title: '', widgetType: 'kpi', dataSource: 'invoices' });
       toast({
-        title: "Widget Created",
-        description: "Your new dashboard widget has been added.",
+        title: t('dashboardWidgets.widgetCreated', 'Widget Created'),
+        description: t('dashboardWidgets.widgetCreatedDesc', 'Your new dashboard widget has been added.'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to create widget. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('dashboardWidgets.failedToCreateWidget', 'Failed to create widget. Please try again.'),
         variant: "destructive",
       });
     },
@@ -221,10 +218,7 @@ export default function DashboardWidgets() {
 
   const updateWidgetMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return apiRequest(`/api/dashboard/widgets/${id}`, 'PATCH', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -233,21 +227,19 @@ export default function DashboardWidgets() {
 
   const deleteWidgetMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest(`/api/dashboard/widgets/${id}`, 'DELETE');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
       toast({
-        title: "Widget Deleted",
-        description: "The widget has been removed from your dashboard.",
+        title: t('dashboardWidgets.widgetDeleted', 'Widget Deleted'),
+        description: t('dashboardWidgets.widgetDeletedDesc', 'The widget has been removed from your dashboard.'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to delete widget. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('dashboardWidgets.failedToDeleteWidget', 'Failed to delete widget. Please try again.'),
         variant: "destructive",
       });
     },
@@ -255,15 +247,12 @@ export default function DashboardWidgets() {
 
   const updatePositionsMutation = useMutation({
     mutationFn: async (positions: { id: string; position: any }[]) => {
-      return apiRequest('/api/dashboard/widgets/positions', {
-        method: 'PATCH',
-        body: JSON.stringify({ positions }),
-      });
+      return apiRequest('/api/dashboard/widgets/positions', 'PATCH', { positions });
     },
     onSuccess: () => {
       toast({
-        title: "Layout Saved",
-        description: "Widget positions have been updated.",
+        title: t('dashboardWidgets.layoutSaved', 'Layout Saved'),
+        description: t('dashboardWidgets.layoutSavedDesc', 'Widget positions have been updated.'),
       });
     },
   });
@@ -288,8 +277,8 @@ export default function DashboardWidgets() {
   const handleToggleWidget = (id: string, isActive: boolean) => {
     updateWidgetMutation.mutate({ id, data: { isActive } });
     toast({
-      title: isActive ? "Widget Enabled" : "Widget Disabled",
-      description: isActive ? "Widget will now appear on your dashboard." : "Widget has been hidden from your dashboard.",
+      title: isActive ? t('dashboardWidgets.widgetEnabled', 'Widget Enabled') : t('dashboardWidgets.widgetDisabled', 'Widget Disabled'),
+      description: isActive ? t('dashboardWidgets.widgetEnabledDesc', 'Widget will now appear on your dashboard.') : t('dashboardWidgets.widgetDisabledDesc', 'Widget has been hidden from your dashboard.'),
     });
   };
 
@@ -300,8 +289,8 @@ export default function DashboardWidgets() {
   const handleAddWidget = () => {
     if (!newWidget.title.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a widget title.",
+        title: t('common.error', 'Error'),
+        description: t('dashboardWidgets.pleaseEnterTitle', 'Please enter a widget title.'),
         variant: "destructive",
       });
       return;
@@ -325,7 +314,7 @@ export default function DashboardWidgets() {
   return (
     <StandardPageLayout
       title={t('dashboard.customizeWidgets', 'Customize Dashboard Widgets')}
-      description="Personalize your dashboard by adding, removing, and rearranging widgets"
+      description={t('dashboardWidgets.personalizeDescription', 'Personalize your dashboard by adding, removing, and rearranging widgets')}
       icon={LayoutDashboard}
     >
       <div className="space-y-6">
@@ -399,7 +388,7 @@ export default function DashboardWidgets() {
                       <Input
                         value={newWidget.title}
                         onChange={(e) => setNewWidget({ ...newWidget, title: e.target.value })}
-                        placeholder="e.g., Monthly Revenue"
+                        placeholder={t('dashboardWidgets.widgetTitlePlaceholder', 'e.g., Monthly Revenue')}
                         className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                         data-testid="input-widget-title"
                       />

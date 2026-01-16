@@ -1,5 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Trash2, FileText, File, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,7 @@ interface EstimateDetailsDialogProps {
 }
 
 export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -200,7 +202,7 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
         </DialogTrigger>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Estimate Details - {estimate.estimateNumber}</DialogTitle>
+            <DialogTitle>{t('estimates.estimateDetails', 'Estimate Details')} - {estimate.estimateNumber}</DialogTitle>
             <DialogDescription className="sr-only">
               View estimate details, status, items, and convert to job card or invoice
             </DialogDescription>
@@ -333,7 +335,7 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Estimate</AlertDialogTitle>
+            <AlertDialogTitle>{t('estimates.deleteEstimate', 'Delete Estimate')}</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this estimate? This action cannot be undone.
             </AlertDialogDescription>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,7 @@ import { insertSupplierSchema, type InsertSupplier, type Garage } from "@shared/
 export function AddSupplierDialog() {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -86,14 +88,14 @@ export function AddSupplierDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" data-testid="button-add-supplier">
           <Plus className="w-4 h-4 mr-2" />
-          Add Supplier
+          {t('suppliers.addSupplier', 'Add Supplier')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Supplier</DialogTitle>
+          <DialogTitle>{t('suppliers.addNewSupplier', 'Add New Supplier')}</DialogTitle>
           <DialogDescription className="sr-only">
-            Form to add a new supplier to the system
+            {t('suppliers.formDescription', 'Form to add a new supplier to the system')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -103,11 +105,11 @@ export function AddSupplierDialog() {
               name="garageId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Garage</FormLabel>
+                  <FormLabel>{t('suppliers.garage', 'Garage')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-supplier-garage">
-                        <SelectValue placeholder="Select garage" />
+                        <SelectValue placeholder={t('suppliers.selectGarage', 'Select garage')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -129,7 +131,7 @@ export function AddSupplierDialog() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Supplier Name</FormLabel>
+                    <FormLabel>{t('suppliers.supplierName', 'Supplier Name')}</FormLabel>
                     <FormControl>
                       <Input placeholder="ABC Auto Parts" {...field} data-testid="input-supplier-name" />
                     </FormControl>
@@ -142,7 +144,7 @@ export function AddSupplierDialog() {
                 name="contactPerson"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contact Person (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.contactPersonOptional', 'Contact Person (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="John Doe" {...field} value={field.value ?? ""} data-testid="input-contact-person" />
                     </FormControl>
@@ -158,7 +160,7 @@ export function AddSupplierDialog() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.emailOptional', 'Email (Optional)')}</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="supplier@example.com" {...field} value={field.value ?? ""} data-testid="input-supplier-email" />
                     </FormControl>
@@ -171,7 +173,7 @@ export function AddSupplierDialog() {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.phoneOptional', 'Phone (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="+1 234 567 8900" {...field} value={field.value ?? ""} data-testid="input-supplier-phone" />
                     </FormControl>
@@ -186,7 +188,7 @@ export function AddSupplierDialog() {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address (Optional)</FormLabel>
+                  <FormLabel>{t('suppliers.addressOptional', 'Address (Optional)')}</FormLabel>
                   <FormControl>
                     <Textarea placeholder="123 Main St" {...field} value={field.value ?? ""} data-testid="textarea-supplier-address" />
                   </FormControl>
@@ -201,7 +203,7 @@ export function AddSupplierDialog() {
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.cityOptional', 'City (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="New York" {...field} value={field.value ?? ""} data-testid="input-supplier-city" />
                     </FormControl>
@@ -214,7 +216,7 @@ export function AddSupplierDialog() {
                 name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.countryOptional', 'Country (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="USA" {...field} value={field.value ?? ""} data-testid="input-supplier-country" />
                     </FormControl>
@@ -230,7 +232,7 @@ export function AddSupplierDialog() {
                 name="taxId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax ID (Optional)</FormLabel>
+                    <FormLabel>{t('suppliers.taxIdOptional', 'Tax ID (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="123-45-6789" {...field} value={field.value ?? ""} data-testid="input-supplier-tax-id" />
                     </FormControl>
@@ -243,17 +245,17 @@ export function AddSupplierDialog() {
                 name="paymentTerms"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Payment Terms</FormLabel>
+                    <FormLabel>{t('suppliers.paymentTerms', 'Payment Terms')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value ?? "net30"}>
                       <FormControl>
                         <SelectTrigger data-testid="select-payment-terms">
-                          <SelectValue placeholder="Select payment terms" />
+                          <SelectValue placeholder={t('suppliers.selectPaymentTerms', 'Select payment terms')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="net30">Net 30</SelectItem>
-                        <SelectItem value="net60">Net 60</SelectItem>
-                        <SelectItem value="cod">COD (Cash on Delivery)</SelectItem>
+                        <SelectItem value="net30">{t('suppliers.net30', 'Net 30')}</SelectItem>
+                        <SelectItem value="net60">{t('suppliers.net60', 'Net 60')}</SelectItem>
+                        <SelectItem value="cod">{t('suppliers.cod', 'COD (Cash on Delivery)')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -267,9 +269,9 @@ export function AddSupplierDialog() {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormLabel>{t('suppliers.notesOptional', 'Notes (Optional)')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Additional notes..." {...field} value={field.value ?? ""} data-testid="textarea-supplier-notes" />
+                    <Textarea placeholder={t('suppliers.additionalNotes', 'Additional notes...')} {...field} value={field.value ?? ""} data-testid="textarea-supplier-notes" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -283,14 +285,14 @@ export function AddSupplierDialog() {
                 onClick={() => setOpen(false)}
                 data-testid="button-cancel-supplier"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={createSupplierMutation.isPending}
                 data-testid="button-submit-supplier"
               >
-                {createSupplierMutation.isPending ? "Adding..." : "Add Supplier"}
+                {createSupplierMutation.isPending ? t('common.adding', 'Adding...') : t('suppliers.addSupplier', 'Add Supplier')}
               </Button>
             </div>
           </form>

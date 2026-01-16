@@ -29,7 +29,7 @@ export default function CustomerReviewsRatings() {
       return await apiRequest(`/api/reviews/${id}/respond`, "POST", { response });
     },
     onSuccess: () => {
-      toast({ title: "Response posted", description: "Your response has been published." });
+      toast({ title: t('customers.reviews.responsePosted', 'Response posted'), description: t('customers.reviews.responsePublished', 'Your response has been published.') });
       setIsRespondDialogOpen(false);
       setResponseText("");
       setSelectedReview(null);
@@ -177,14 +177,14 @@ export default function CustomerReviewsRatings() {
                     <div>
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-[#0B1F3B] dark:text-white">
-                          {review.customerName || "Customer"}
+                          {review.customerName || t('customers.reviews.customer', 'Customer')}
                         </h3>
                         {review.platform && <Badge>{review.platform}</Badge>}
                       </div>
                       {renderStars(review.rating)}
                     </div>
                     <span className="text-sm text-[#64748B]">
-                      {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Date N/A"}
+                      {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : t('customers.reviews.dateNA', 'Date N/A')}
                     </span>
                   </div>
 
@@ -199,25 +199,25 @@ export default function CustomerReviewsRatings() {
                     <div className="flex flex-wrap gap-3 text-sm text-[#64748B] mb-3">
                       {review.serviceQualityRating && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Service Quality:</span>
+                          <span className="font-medium">{t('customers.reviews.serviceQuality', 'Service Quality')}:</span>
                           {renderStars(review.serviceQualityRating)}
                         </div>
                       )}
                       {review.pricingRating && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Pricing:</span>
+                          <span className="font-medium">{t('customers.reviews.pricing', 'Pricing')}:</span>
                           {renderStars(review.pricingRating)}
                         </div>
                       )}
                       {review.speedRating && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Speed:</span>
+                          <span className="font-medium">{t('customers.reviews.speed', 'Speed')}:</span>
                           {renderStars(review.speedRating)}
                         </div>
                       )}
                       {review.communicationRating && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Communication:</span>
+                          <span className="font-medium">{t('customers.reviews.communication', 'Communication')}:</span>
                           {renderStars(review.communicationRating)}
                         </div>
                       )}
@@ -227,19 +227,19 @@ export default function CustomerReviewsRatings() {
                   {review.wouldRecommend && (
                     <div className="flex items-center gap-2 mb-3">
                       <ThumbsUp className="h-4 w-4 text-green-600" />
-                      <span className="text-sm text-green-600 font-medium">Would recommend</span>
+                      <span className="text-sm text-green-600 font-medium">{t('customers.reviews.wouldRecommendLabel', 'Would recommend')}</span>
                     </div>
                   )}
 
                   {review.responseText && (
                     <div className="bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 rounded-lg p-3 mb-3">
                       <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white mb-1">
-                        Response from SALIS AUTO:
+                        {t('customers.reviews.responseFrom', 'Response from SALIS AUTO')}:
                       </p>
                       <p className="text-sm text-[#0B1F3B] dark:text-gray-300">{review.responseText}</p>
                       {review.respondedAt && (
                         <p className="text-xs text-[#64748B] mt-1">
-                          Responded: {new Date(review.respondedAt).toLocaleString()}
+                          {t('customers.reviews.responded', 'Responded')}: {new Date(review.respondedAt).toLocaleString()}
                         </p>
                       )}
                     </div>
@@ -276,10 +276,10 @@ export default function CustomerReviewsRatings() {
             {selectedReview && (
               <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3 mb-3 border border-[#E2E8F0] dark:border-[#232A36]">
                 <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
-                  {selectedReview.customerName || "Customer"} - {selectedReview.rating || 0} stars
+                  {selectedReview.customerName || t('customers.reviews.customer', 'Customer')} - {selectedReview.rating || 0} {t('customers.reviews.stars', 'stars')}
                 </p>
                 <p className="text-sm text-[#64748B]">
-                  {selectedReview.comment || "No comment"}
+                  {selectedReview.comment || t('customers.reviews.noComment', 'No comment')}
                 </p>
               </div>
             )}
@@ -288,7 +288,7 @@ export default function CustomerReviewsRatings() {
               <Textarea
                 className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 rows={4}
-                placeholder="Thank you for your feedback..."
+                placeholder={t('customers.reviews.responsePlaceholder', 'Thank you for your feedback...')}
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
                 data-testid="textarea-response"

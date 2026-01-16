@@ -324,8 +324,8 @@ export default function AccountingIntegration() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                <SelectItem value="quickbooks">QuickBooks</SelectItem>
-                <SelectItem value="xero">Xero</SelectItem>
+                <SelectItem value="quickbooks">{t('accounting.providers.quickbooks', 'QuickBooks')}</SelectItem>
+                <SelectItem value="xero">{t('accounting.providers.xero', 'Xero')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

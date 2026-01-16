@@ -52,20 +52,20 @@ export default function UserSettings() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-white">First Name</Label>
+                <Label className="text-white">{t('userSettings.firstName', 'First Name')}</Label>
                 <Input data-testid="input-first-name" defaultValue="Ahmed" className="bg-white/5 border-white/10 text-white" />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Last Name</Label>
+                <Label className="text-white">{t('userSettings.lastName', 'Last Name')}</Label>
                 <Input data-testid="input-last-name" defaultValue="Hassan" className="bg-white/5 border-white/10 text-white" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Email</Label>
+              <Label className="text-white">{t('userSettings.email', 'Email')}</Label>
               <Input data-testid="input-email" defaultValue="ahmed@salisauto.com" className="bg-white/5 border-white/10 text-white" />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Phone</Label>
+              <Label className="text-white">{t('userSettings.phone', 'Phone')}</Label>
               <Input data-testid="input-phone" defaultValue="+966 50 123 4567" className="bg-white/5 border-white/10 text-white" />
             </div>
           </CardContent>

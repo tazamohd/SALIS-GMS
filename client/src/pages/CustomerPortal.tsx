@@ -246,7 +246,7 @@ export default function CustomerPortal() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder={t('auth.emailPlaceholder', 'your@email.com')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -259,7 +259,7 @@ export default function CustomerPortal() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder', '••••••••')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -303,7 +303,7 @@ export default function CustomerPortal() {
                   <div>
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">{appt.serviceType || t('customers.portal.serviceAppointment', 'Service Appointment')}</p>
                     <p className="text-sm text-[#64748B]">
-                      {new Date(appt.appointmentDate).toLocaleDateString()} at{' '}
+                      {new Date(appt.appointmentDate).toLocaleDateString()} {t('common.at', 'at')}{' '}
                       {appt.appointmentTime}
                     </p>
                   </div>
@@ -343,13 +343,13 @@ export default function CustomerPortal() {
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </p>
                     <p className="text-sm text-[#64748B]">{vehicle.licensePlate}</p>
-                    <p className="text-xs text-[#64748B]">VIN: {vehicle.vin}</p>
+                    <p className="text-xs text-[#64748B]">{t('vehicles.vin', 'VIN')}: {vehicle.vin}</p>
                   </div>
                   <Car className="w-8 h-8 text-[#64748B]" />
                 </div>
                 {vehicle.currentMileage && (
                   <p className="text-sm text-[#64748B]">
-                    {vehicle.currentMileage.toLocaleString()} miles
+                    {vehicle.currentMileage.toLocaleString()} {t('vehicles.miles', 'miles')}
                   </p>
                 )}
               </div>
@@ -423,7 +423,7 @@ export default function CustomerPortal() {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">Estimate #{est.estimate.estimateNumber}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('estimates.estimateNumber', 'Estimate')} #{est.estimate.estimateNumber}</p>
                     <p className="text-sm text-[#64748B]">
                       {new Date(est.estimate.createdAt).toLocaleDateString()}
                     </p>
@@ -483,11 +483,11 @@ export default function CustomerPortal() {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">Invoice #{inv.invoiceNumber}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('invoices.invoiceNumber', 'Invoice')} #{inv.invoiceNumber}</p>
                     <p className="text-sm text-[#64748B]">
                       {new Date(inv.invoiceDate).toLocaleDateString()}
                     </p>
-                    <p className="text-xs text-[#64748B]">Due: {new Date(inv.dueDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-[#64748B]">{t('invoices.dueDate', 'Due')}: {new Date(inv.dueDate).toLocaleDateString()}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">
@@ -524,14 +524,14 @@ export default function CustomerPortal() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">
-                      Payment - {payment.payment.paymentMethod}
+                      {t('payments.payment', 'Payment')} - {payment.payment.paymentMethod}
                     </p>
                     <p className="text-sm text-[#64748B]">
                       {new Date(payment.payment.paymentDate).toLocaleDateString()}
                     </p>
                     {payment.invoice && (
                       <p className="text-xs text-[#64748B]">
-                        Invoice: {payment.invoice.invoiceNumber}
+                        {t('invoices.invoice', 'Invoice')}: {payment.invoice.invoiceNumber}
                       </p>
                     )}
                   </div>

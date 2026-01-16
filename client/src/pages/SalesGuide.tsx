@@ -42,7 +42,7 @@ interface SalesScript {
   scenario: string;
   scenarioAr: string;
   script: string;
-  objections: { objection: string; response: string }[];
+  objections: { objection: string; objectionKey?: string; response: string; responseKey?: string }[];
 }
 
 const salesProcesses: SalesProcess[] = [
@@ -156,7 +156,9 @@ const salesScripts: SalesScript[] = [
       },
       {
         objection: "I don't have an appointment",
-        response: "No problem at all! We welcome walk-ins. Depending on your needs, we may be able to assist you right away or schedule a convenient time. What service are you interested in today?"
+        objectionKey: "salesGuide.objections.noAppointment",
+        response: "No problem at all! We welcome walk-ins. Depending on your needs, we may be able to assist you right away or schedule a convenient time. What service are you interested in today?",
+        responseKey: "salesGuide.responses.noAppointment"
       }
     ]
   },
@@ -340,12 +342,12 @@ export default function SalesGuide() {
                 <div>
                   <h4 className="font-medium mb-3 text-[#0B1F3B] dark:text-white">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
                   <div className="space-y-3">
-                    {script.objections.map((obj, i) => (
+                    {script.objections.map((obj: any, i) => (
                       <div key={i} className="border-l-4 border-[#E2E8F0] dark:border-[#232A36] pl-4">
-                        <p className="font-medium text-[#F97316]">❝ {obj.objection}</p>
+                        <p className="font-medium text-[#F97316]">❝ {obj.objectionKey ? t(obj.objectionKey, obj.objection) : obj.objection}</p>
                         <p className="mt-1 text-green-600 dark:text-green-400">
                           <ArrowRight className="h-4 w-4 inline mr-1" />
-                          {obj.response}
+                          {obj.responseKey ? t(obj.responseKey, obj.response) : obj.response}
                         </p>
                       </div>
                     ))}

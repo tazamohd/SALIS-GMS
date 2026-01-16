@@ -204,13 +204,13 @@ export default function DataImportExport() {
               <SelectItem value="csv">
                 <div className="flex items-center gap-2">
                   <FileSpreadsheet className="h-4 w-4" />
-                  CSV
+                  {t('dataImportExport.csvFile', 'CSV File')}
                 </div>
               </SelectItem>
               <SelectItem value="json">
                 <div className="flex items-center gap-2">
                   <FileJson className="h-4 w-4" />
-                  JSON
+                  {t('dataImportExport.jsonFormat', 'JSON Format')}
                 </div>
               </SelectItem>
             </SelectContent>

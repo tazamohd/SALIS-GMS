@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ interface ServiceTemplatesDialogProps {
 }
 
 export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesDialogProps) {
+  const { t } = useTranslation();
   const { data: templates = [], isLoading } = useQuery<ServiceTemplate[]>({
     queryKey: ['/api/service-templates'],
   });
@@ -30,10 +32,10 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
         <DialogHeader>
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-gray-900 dark:text-white flex items-center gap-2">
             <FileText className="w-6 h-6" />
-            Service Templates
+            {t('serviceTemplates.title', 'Service Templates')}
           </DialogTitle>
           <DialogDescription className="font-['Poppins',Helvetica] text-sm text-gray-500 dark:text-gray-500">
-            Pre-configured service workflows with steps and requirements
+            {t('serviceTemplates.description', 'Pre-configured service workflows with steps and requirements')}
           </DialogDescription>
         </DialogHeader>
 
@@ -46,7 +48,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
         ) : templates.length === 0 ? (
           <div className="text-center py-8">
             <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-            <p className="text-gray-500">No service templates found</p>
+            <p className="text-gray-500">{t('serviceTemplates.noTemplatesFound', 'No service templates found')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -64,7 +66,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                         </Badge>
                         {template.isActive && (
                           <Badge variant="outline" className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                            Active
+                            {t('serviceTemplates.active', 'Active')}
                           </Badge>
                         )}
                       </div>
@@ -80,7 +82,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                     {template.estimatedHours && (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Clock className="w-4 h-4" />
-                        <span>{template.estimatedHours}h estimated</span>
+                        <span>{template.estimatedHours}{t('serviceTemplates.hoursEstimated', 'h estimated')}</span>
                       </div>
                     )}
                     {template.standardCost && (
@@ -91,35 +93,35 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                     )}
                   </div>
 
-                  {template.taskSteps && typeof template.taskSteps === 'object' && Array.isArray(template.taskSteps) && template.taskSteps.length > 0 && (
+                  {template.taskSteps && Array.isArray(template.taskSteps) && (template.taskSteps as unknown[]).length > 0 && (
                     <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                       <h5 className="font-medium text-sm mb-2 flex items-center gap-1">
                         <CheckCircle className="w-4 h-4" />
-                        Task Steps ({template.taskSteps.length})
+                        {t('serviceTemplates.taskSteps', 'Task Steps')} ({(template.taskSteps as unknown[]).length})
                       </h5>
                       <ul className="space-y-1">
-                        {(template.taskSteps as any[]).slice(0, 3).map((step: any, index: number) => (
+                        {(template.taskSteps as unknown[]).slice(0, 3).map((step, index: number) => (
                           <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
                             <span className="text-gray-800 dark:text-gray-200 font-medium">{index + 1}.</span>
-                            <span>{typeof step === 'string' ? step : step.description || step.name || 'Step'}</span>
+                            <span>{typeof step === 'string' ? step : (step as Record<string, string>)?.description || (step as Record<string, string>)?.name || t('serviceTemplates.step', 'Step')}</span>
                           </li>
                         ))}
-                        {(template.taskSteps as any[]).length > 3 && (
+                        {(template.taskSteps as unknown[]).length > 3 && (
                           <li className="text-sm text-gray-500 italic">
-                            +{(template.taskSteps as any[]).length - 3} more steps...
+                            +{(template.taskSteps as unknown[]).length - 3} {t('serviceTemplates.moreSteps', 'more steps...')}
                           </li>
                         )}
                       </ul>
                     </div>
                   )}
 
-                  {template.requiredSkills && typeof template.requiredSkills === 'object' && Array.isArray(template.requiredSkills) && template.requiredSkills.length > 0 && (
+                  {template.requiredSkills && Array.isArray(template.requiredSkills) && (template.requiredSkills as unknown[]).length > 0 && (
                     <div className="mt-3 flex items-center gap-2 flex-wrap">
                       <Wrench className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-500">Required Skills:</span>
-                      {(template.requiredSkills as any[]).map((skill: any, index: number) => (
+                      <span className="text-sm text-gray-500">{t('serviceTemplates.requiredSkills', 'Required Skills:')}</span>
+                      {(template.requiredSkills as unknown[]).map((skill, index: number) => (
                         <Badge key={index} variant="secondary" className="text-xs">
-                          {typeof skill === 'string' ? skill : skill.name || 'Skill'}
+                          {typeof skill === 'string' ? skill : (skill as Record<string, string>)?.name || t('serviceTemplates.skill', 'Skill')}
                         </Badge>
                       ))}
                     </div>
@@ -132,8 +134,8 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
 
         <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
           <p className="text-sm text-gray-700 dark:text-gray-300">
-            <strong>Total Templates:</strong> {templates.length} | 
-            <strong className="ml-2">Active:</strong> {templates.filter(t => t.isActive).length}
+            <strong>{t('serviceTemplates.totalTemplates', 'Total Templates')}:</strong> {templates.length} | 
+            <strong className="ml-2">{t('serviceTemplates.activeCount', 'Active')}:</strong> {templates.filter(t => t.isActive).length}
           </p>
         </div>
       </DialogContent>

@@ -240,9 +240,9 @@ export default function CustomerFeedback() {
 
   const categoryData = analytics?.categoryRatings
     ? [
-        { category: "Wait Time", rating: parseFloat(analytics.categoryRatings.waitTime) || 0 },
-        { category: "Quality", rating: parseFloat(analytics.categoryRatings.quality) || 0 },
-        { category: "Communication", rating: parseFloat(analytics.categoryRatings.communication) || 0 },
+        { category: t('feedback.waitTime', 'Wait Time'), rating: parseFloat(analytics.categoryRatings.waitTime) || 0 },
+        { category: t('feedback.quality', 'Quality'), rating: parseFloat(analytics.categoryRatings.quality) || 0 },
+        { category: t('feedback.communication', 'Communication'), rating: parseFloat(analytics.categoryRatings.communication) || 0 },
       ]
     : [];
 
@@ -470,7 +470,7 @@ export default function CustomerFeedback() {
                   {filteredFeedback.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>No feedback found matching your filters.</p>
+                      <p>{t('feedback.noFeedbackFound', 'No feedback found matching your filters.')}</p>
                     </div>
                   )}
                 </div>
@@ -758,6 +758,7 @@ function FeedbackCard({
   isAnalyzing: boolean;
   expanded?: boolean;
 }) {
+  const { t } = useTranslation();
   const f = item.feedback;
   const customer = item.customer;
   const vehicle = item.vehicle;
@@ -794,7 +795,7 @@ function FeedbackCard({
             )}
 
             <p className={`text-gray-600 dark:text-gray-300 ${expanded ? '' : 'line-clamp-2'}`}>
-              "{f.comments || 'No comments provided'}"
+              "{f.comments || t('feedback.noCommentsProvided', 'No comments provided')}"
             </p>
 
             {f.sentimentKeywords && (f.sentimentKeywords as string[]).length > 0 && (
@@ -807,11 +808,11 @@ function FeedbackCard({
 
             {f.response && (
               <div className="mt-3 p-3 bg-gray-100 dark:bg-salis-gray-dark/50 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Response:</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('feedback.response', 'Response')}:</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{f.response}</p>
                 {f.respondedAt && (
                   <p className="text-xs text-gray-400 mt-1">
-                    Responded {format(new Date(f.respondedAt), 'MMM d, yyyy')}
+                    {t('feedback.responded', 'Responded')} {format(new Date(f.respondedAt), 'MMM d, yyyy')}
                   </p>
                 )}
               </div>
@@ -820,7 +821,7 @@ function FeedbackCard({
             <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
               <span>{format(new Date(f.submittedAt), 'MMM d, yyyy h:mm a')}</span>
               {technician && (
-                <span>Technician: {technician.firstName} {technician.lastName}</span>
+                <span>{t('feedback.technician', 'Technician')}: {technician.firstName} {technician.lastName}</span>
               )}
             </div>
           </div>
@@ -836,7 +837,7 @@ function FeedbackCard({
                 data-testid={`button-analyze-${f.id}`}
               >
                 <Brain className="h-3.5 w-3.5 mr-1" />
-                Analyze
+                {t('feedback.analyze', 'Analyze')}
               </Button>
             )}
             {!f.response && (
@@ -848,7 +849,7 @@ function FeedbackCard({
                 data-testid={`button-respond-${f.id}`}
               >
                 <Send className="h-3.5 w-3.5 mr-1" />
-                Respond
+                {t('feedback.respond', 'Respond')}
               </Button>
             )}
             {f.isFlagged ? (
@@ -860,7 +861,7 @@ function FeedbackCard({
                 data-testid={`button-unflag-${f.id}`}
               >
                 <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                Unflag
+                {t('feedback.unflag', 'Unflag')}
               </Button>
             ) : (
               <Button 
@@ -871,7 +872,7 @@ function FeedbackCard({
                 data-testid={`button-flag-${f.id}`}
               >
                 <Flag className="h-3.5 w-3.5 mr-1" />
-                Flag
+                {t('feedback.flag', 'Flag')}
               </Button>
             )}
           </div>

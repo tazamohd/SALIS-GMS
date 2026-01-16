@@ -89,10 +89,10 @@ export default function PaymentGatewaySimulator() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                  <SelectItem value="stripe">Stripe</SelectItem>
-                  <SelectItem value="paypal">PayPal</SelectItem>
-                  <SelectItem value="square">Square</SelectItem>
-                  <SelectItem value="authorize">Authorize.Net</SelectItem>
+                  <SelectItem value="stripe">{t('paymentSimulator.gateways.stripe', 'Stripe')}</SelectItem>
+                  <SelectItem value="paypal">{t('paymentSimulator.gateways.paypal', 'PayPal')}</SelectItem>
+                  <SelectItem value="square">{t('paymentSimulator.gateways.square', 'Square')}</SelectItem>
+                  <SelectItem value="authorize">{t('paymentSimulator.gateways.authorize', 'Authorize.Net')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -182,11 +182,11 @@ export default function PaymentGatewaySimulator() {
                             : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                         }
                       >
-                        {txn.status}
+                        {t(`paymentSimulator.status.${txn.status}`, txn.status)}
                       </Badge>
                     </div>
                     <div className="text-sm text-[#64748B]">
-                      <p>{t('paymentSimulator.gateway', 'Gateway')}: {txn.gateway}</p>
+                      <p>{t('paymentSimulator.gateway', 'Gateway')}: {t(`paymentSimulator.gateways.${txn.gateway}`, txn.gateway)}</p>
                       <p>{t('paymentSimulator.cardLabel', 'Card')}: **** **** **** {txn.cardLast4}</p>
                       <p>{txn.timestamp.toLocaleString()}</p>
                     </div>
@@ -213,7 +213,7 @@ export default function PaymentGatewaySimulator() {
 
               return (
                 <div key={gw} className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
-                  <p className="text-sm text-[#64748B] capitalize">{gw}</p>
+                  <p className="text-sm text-[#64748B]">{t(`paymentSimulator.gateways.${gw}`, gw)}</p>
                   <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">{successRate.toFixed(0)}%</p>
                   <p className="text-xs text-[#64748B]">
                     {gwTransactions.length} {t('paymentSimulator.transactions', 'transactions')}

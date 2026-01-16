@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Zap, CheckCircle, XCircle, AlertCircle } from "lucide-react";
@@ -10,6 +11,7 @@ interface ToolAvailabilityDialogProps {
 }
 
 export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityDialogProps) {
+  const { t } = useTranslation();
   const { data: tools = [], isLoading: toolsLoading } = useQuery<Tool[]>({
     queryKey: ['/api/tools'],
   });
@@ -89,7 +91,7 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
                             <span className="text-sm text-gray-500">{tool.brand}</span>
                           )}
                           {tool.isGlobal && (
-                            <Badge variant="secondary">Global</Badge>
+                            <Badge variant="secondary">{t('tools.global', 'Global')}</Badge>
                           )}
                         </div>
                         {tool.description && (

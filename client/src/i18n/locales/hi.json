@@ -164,5 +164,33 @@
       "calendar": "कैलेंडर",
       "tasks": "कार्य सूची"
     }
+  },
+  "social": {
+    "totalPosts": "कुल पोस्ट",
+    "totalReviews": "कुल समीक्षाएं",
+    "avgRating": "औसत रेटिंग",
+    "responseRate": "प्रतिक्रिया दर",
+    "followers": "फॉलोअर्स",
+    "socialMediaPosts": "सोशल मीडिया पोस्ट",
+    "customerReviews": "ग्राहक समीक्षाएं",
+    "platform": "प्लेटफॉर्म",
+    "content": "सामग्री",
+    "writeYourPost": "अपनी पोस्ट लिखें...",
+    "scheduleOptional": "शेड्यूल (वैकल्पिक)",
+    "createSocialMediaPost": "सोशल मीडिया पोस्ट बनाएं",
+    "reach": "पहुंच",
+    "scheduledFor": "शेड्यूल किया गया",
+    "posts": "पोस्ट",
+    "reviews": "समीक्षाएं",
+    "responded": "जवाब दिया गया",
+    "respond": "जवाब दें",
+    "createPost": "पोस्ट बनाएं",
+    "pageDescription": "सोशल मीडिया पोस्ट प्रबंधित करें और ग्राहक समीक्षाओं का जवाब दें",
+    "postCreated": "पोस्ट बनाई गई",
+    "postScheduled": "आपकी पोस्ट शेड्यूल कर दी गई है।",
+    "facebook": "फेसबुक",
+    "instagram": "इंस्टाग्राम",
+    "googleBusiness": "गूगल बिजनेस",
+    "yelp": "येल्प"
   }
 }

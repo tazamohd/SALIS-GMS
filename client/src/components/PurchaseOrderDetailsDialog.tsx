@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Eye, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +38,7 @@ interface PurchaseOrderDetailsDialogProps {
 }
 
 export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: PurchaseOrderDetailsDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(purchaseOrder.status);
@@ -151,12 +153,12 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                    <SelectItem value="partial">Partially Received</SelectItem>
-                    <SelectItem value="received">Received</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="draft">{t('statusLabels.draft', 'Draft')}</SelectItem>
+                    <SelectItem value="sent">{t('statusLabels.sent', 'Sent')}</SelectItem>
+                    <SelectItem value="confirmed">{t('statusLabels.confirmed', 'Confirmed')}</SelectItem>
+                    <SelectItem value="partial">{t('statusLabels.partiallyReceived', 'Partially Received')}</SelectItem>
+                    <SelectItem value="received">{t('statusLabels.received', 'Received')}</SelectItem>
+                    <SelectItem value="cancelled">{t('statusLabels.cancelled', 'Cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -226,7 +228,7 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                     <span className="font-medium">${parseFloat(purchaseOrder.taxAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
-                    <span>Total:</span>
+                    <span>{t('common.total', 'Total')}:</span>
                     <span>${parseFloat(purchaseOrder.totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
@@ -255,14 +257,13 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Purchase Order?</AlertDialogTitle>
+            <AlertDialogTitle>{t('purchaseOrders.deletePurchaseOrder', 'Delete Purchase Order?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete purchase order {purchaseOrder.poNumber}? This action cannot
-              be undone and will also delete all associated line items.
+              {t('purchaseOrders.deleteConfirmation', 'Are you sure you want to delete purchase order {{poNumber}}? This action cannot be undone and will also delete all associated line items.', { poNumber: purchaseOrder.poNumber })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete-po">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete-po">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deletePOMutation.mutate()}
               className="bg-red-600 hover:bg-red-700"

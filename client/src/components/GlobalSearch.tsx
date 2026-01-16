@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Search, X, FileText, User, Car, Receipt, FileSpreadsheet, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ interface SearchResults {
 }
 
 export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [, navigate] = useLocation();
 
@@ -146,7 +148,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle>Search</DialogTitle>
+          <DialogTitle>{t('common.search', 'Search')}</DialogTitle>
           <DialogDescription className="sr-only">
             Global search across all modules including job cards, customers, vehicles, invoices, estimates, and spare parts
           </DialogDescription>
@@ -157,7 +159,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search across all modules..."
+            placeholder={t('search.searchAcrossModules', 'Search across all modules...')}
             className="pl-9 pr-9"
             autoFocus
             data-testid="input-global-search"

@@ -27,16 +27,16 @@ export default function StaffDirectory() {
           </div>
           <Button data-testid="button-add-employee" className="bg-sky-500 hover:bg-sky-600 text-white">
             <Plus className="w-4 h-4 mr-2" />
-            Add Employee
+            {t('staffDirectory.addEmployee', 'Add Employee')}
           </Button>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input data-testid="input-search" placeholder="Search employees..." className="pl-10 bg-white/5 border-white/10 text-white" />
+            <Input data-testid="input-search" placeholder={t('staffDirectory.searchPlaceholder', 'Search employees...')} className="pl-10 bg-white/5 border-white/10 text-white" />
           </div>
-          <Badge data-testid="badge-total-employees" className="bg-sky-500/20 text-sky-400">{staff.length} Employees</Badge>
+          <Badge data-testid="badge-total-employees" className="bg-sky-500/20 text-sky-400">{staff.length} {t('staffDirectory.employees', 'Employees')}</Badge>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -54,7 +54,7 @@ export default function StaffDirectory() {
                     </div>
                   </div>
                   <Badge data-testid={`status-${person.status}-${person.id}`} className={person.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}>
-                    {person.status}
+                    {t(`staffDirectory.status.${person.status}`, person.status)}
                   </Badge>
                 </div>
                 <div className="space-y-2 text-sm">

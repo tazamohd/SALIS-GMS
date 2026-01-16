@@ -479,7 +479,7 @@ export default function GeneralLedger() {
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Badge className={getAccountTypeBadge(type)}>{type}</Badge>
                   <span className="text-muted-foreground text-sm">
-                    ({typeAccounts.length} accounts)
+                    ({typeAccounts.length} {t('common.accounts', 'accounts')})
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -611,9 +611,9 @@ export default function GeneralLedger() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                  <SelectItem value="excel">Excel</SelectItem>
-                  <SelectItem value="csv">CSV</SelectItem>
+                  <SelectItem value="pdf">{t('common.formatOptions.pdf', 'PDF')}</SelectItem>
+                  <SelectItem value="excel">{t('common.formatOptions.excel', 'Excel')}</SelectItem>
+                  <SelectItem value="csv">{t('common.formatOptions.csv', 'CSV')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

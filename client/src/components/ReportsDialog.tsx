@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ interface ReportsDialogProps {
 }
 
 export function ReportsDialog({ open, onOpenChange }: ReportsDialogProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
 
   const { data: jobCards = [] } = useQuery<JobCard[]>({
@@ -91,9 +93,9 @@ export function ReportsDialog({ open, onOpenChange }: ReportsDialogProps) {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-            <TabsTrigger value="job-cards" data-testid="tab-job-cards">Job Cards</TabsTrigger>
-            <TabsTrigger value="tools" data-testid="tab-tools">Tools</TabsTrigger>
+            <TabsTrigger value="overview" data-testid="tab-overview">{t('reports.overview', 'Overview')}</TabsTrigger>
+            <TabsTrigger value="job-cards" data-testid="tab-job-cards">{t('reports.jobCards', 'Job Cards')}</TabsTrigger>
+            <TabsTrigger value="tools" data-testid="tab-tools">{t('reports.tools', 'Tools')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4 mt-4">

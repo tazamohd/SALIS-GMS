@@ -310,9 +310,9 @@ export default function DiagnosticsOBDHub() {
                   <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl><SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                      <SelectItem value="Bosch">Bosch</SelectItem>
-                      <SelectItem value="Launch">Launch</SelectItem>
-                      <SelectItem value="Autel">Autel</SelectItem>
+                      <SelectItem value="Bosch">{t('diagnosticsOBD.bosch', 'Bosch')}</SelectItem>
+                      <SelectItem value="Launch">{t('diagnosticsOBD.launch', 'Launch')}</SelectItem>
+                      <SelectItem value="Autel">{t('diagnosticsOBD.autel', 'Autel')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>

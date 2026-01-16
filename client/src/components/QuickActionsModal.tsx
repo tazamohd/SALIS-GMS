@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +48,7 @@ interface QuickActionsModalProps {
 }
 
 export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -237,7 +239,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#64748B] dark:text-[#9BA4B0]" />
             <Input
               type="text"
-              placeholder="Search actions..."
+              placeholder={t('search.searchActions', 'Search actions...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#94A3B8] dark:placeholder:text-[#6B7280]"

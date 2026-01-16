@@ -182,7 +182,7 @@ export default function CustomerLTVAnalysis() {
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.highRisk', 'High Risk')}</p>
               <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">42</h3>
-              <p className="text-sm text-[#F97316] mt-1">Need attention</p>
+              <p className="text-sm text-[#F97316] mt-1">{t('customers.ltv.needAttention', 'Need attention')}</p>
             </div>
             <AlertTriangle className="h-12 w-12 text-[#F97316]" />
           </div>
@@ -259,16 +259,16 @@ export default function CustomerLTVAnalysis() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-[#64748B]">
                   <div>
-                    <span className="font-medium">Revenue:</span> ${customer.totalRevenue.toLocaleString()}
+                    <span className="font-medium">{t('customers.ltv.revenue', 'Revenue:')} </span>${customer.totalRevenue.toLocaleString()}
                   </div>
                   <div>
-                    <span className="font-medium">Visits:</span> {customer.visits}
+                    <span className="font-medium">{t('customers.ltv.visits', 'Visits:')} </span>{customer.visits}
                   </div>
                   <div>
-                    <span className="font-medium">Avg Order:</span> ${customer.avgOrderValue.toLocaleString()}
+                    <span className="font-medium">{t('customers.ltv.avgOrder', 'Avg Order:')} </span>${customer.avgOrderValue.toLocaleString()}
                   </div>
                   <div>
-                    <span className="font-medium">Last Visit:</span> {new Date(customer.lastVisit).toLocaleDateString()}
+                    <span className="font-medium">{t('customers.ltv.lastVisit', 'Last Visit:')} </span>{new Date(customer.lastVisit).toLocaleDateString()}
                   </div>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function CustomerLTVAnalysis() {
                 <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                   ${customer.predictedLTV.toLocaleString()}
                 </p>
-                <p className="text-xs text-[#64748B]">Predicted LTV</p>
+                <p className="text-xs text-[#64748B]">{t('customers.ltv.predictedLTV', 'Predicted LTV')}</p>
                 <p className={`text-sm font-medium mt-1 ${getRiskColor(customer.retentionRisk)}`}>
                   {customer.retentionScore}% retention
                 </p>
@@ -414,7 +414,7 @@ export default function CustomerLTVAnalysis() {
       icon={TrendingUp}
       secondaryActions={[
         {
-          label: riskFilter === "all" ? "All Customers" : riskFilter === "low" ? "Low Risk" : riskFilter === "medium" ? "Medium Risk" : "High Risk",
+          label: riskFilter === "all" ? t('customers.ltv.riskFilters.allCustomers', 'All Customers') : riskFilter === "low" ? t('customers.ltv.riskFilters.lowRisk', 'Low Risk') : riskFilter === "medium" ? t('customers.ltv.riskFilters.mediumRisk', 'Medium Risk') : t('customers.ltv.riskFilters.highRisk', 'High Risk'),
           icon: Target,
           onClick: () => {},
           variant: "outline",
@@ -429,10 +429,10 @@ export default function CustomerLTVAnalysis() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Customers</SelectItem>
-                <SelectItem value="low">Low Risk</SelectItem>
-                <SelectItem value="medium">Medium Risk</SelectItem>
-                <SelectItem value="high">High Risk</SelectItem>
+                <SelectItem value="all">{t('customers.ltv.riskFilters.allCustomers', 'All Customers')}</SelectItem>
+                <SelectItem value="low">{t('customers.ltv.riskFilters.lowRisk', 'Low Risk')}</SelectItem>
+                <SelectItem value="medium">{t('customers.ltv.riskFilters.mediumRisk', 'Medium Risk')}</SelectItem>
+                <SelectItem value="high">{t('customers.ltv.riskFilters.highRisk', 'High Risk')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

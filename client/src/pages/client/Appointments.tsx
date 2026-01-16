@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 const bookingSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -32,6 +33,7 @@ type BookingFormValues = z.infer<typeof bookingSchema>;
 export default function ClientAppointments() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: vehicles, isLoading: vehiclesLoading } = useQuery({
@@ -198,7 +200,7 @@ export default function ClientAppointments() {
                               {field.value ? (
                                 <span className="text-[#0B1F3B] dark:text-white">{format(field.value, "PPP")}</span>
                               ) : (
-                                <span>Pick a date</span>
+                                <span>{t('clientPortal.pickADate', 'Pick a date')}</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -296,7 +298,7 @@ export default function ClientAppointments() {
           ) : upcomingAppointments.length === 0 ? (
             <div className="text-center py-12 text-[#64748B]">
               <CalendarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No upcoming appointments</p>
+              <p>{t('clientPortal.noUpcomingAppointments', 'No upcoming appointments')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -362,7 +364,7 @@ export default function ClientAppointments() {
           ) : pastAppointments.length === 0 ? (
             <div className="text-center py-8 text-[#64748B]">
               <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No past appointments</p>
+              <p>{t('clientPortal.noPastAppointments', 'No past appointments')}</p>
             </div>
           ) : (
             <div className="space-y-3">

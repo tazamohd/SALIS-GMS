@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +58,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
   const [open, setOpen] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ["/api/garages"],
@@ -109,16 +111,16 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
       <DialogTrigger asChild>
         <Button data-testid="button-add-customer">
           <UserPlus className="w-4 h-4 mr-2" />
-          Add Customer
+          {t('customers.addCustomer', 'Add Customer')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]" data-testid="dialog-add-customer">
         <DialogHeader>
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl">
-            Add New Customer
+            {t('customers.addNewCustomer', 'Add New Customer')}
           </DialogTitle>
           <DialogDescription>
-            Create a new customer profile for your garage
+            {t('customers.createCustomerDescription', 'Create a new customer profile for your garage')}
           </DialogDescription>
         </DialogHeader>
 
@@ -129,10 +131,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name *</FormLabel>
+                  <FormLabel>{t('customers.fullName', 'Full Name')} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter customer name"
+                      placeholder={t('customers.enterCustomerName', 'Enter customer name')}
                       {...field}
                       data-testid="input-customer-name"
                     />
@@ -147,7 +149,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address *</FormLabel>
+                  <FormLabel>{t('customers.emailAddress', 'Email Address')} *</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -166,7 +168,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>{t('customers.phoneNumber', 'Phone Number')}</FormLabel>
                   <FormControl>
                     <Input
                       type="tel"
@@ -185,14 +187,14 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
               name="garageId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Garage *</FormLabel>
+                  <FormLabel>{t('customers.garage', 'Garage')} *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger data-testid="select-customer-garage">
-                        <SelectValue placeholder="Select a garage" />
+                        <SelectValue placeholder={t('customers.selectGarage', 'Select a garage')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -216,7 +218,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                   className="w-full flex items-center justify-between text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                   data-testid="button-toggle-optional"
                 >
-                  <span>Optional Details</span>
+                  <span>{t('customers.optionalDetails', 'Optional Details')}</span>
                   {showOptional ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </Button>
               </CollapsibleTrigger>
@@ -227,10 +229,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t('customers.firstName', 'First Name')}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="First name"
+                            placeholder={t('customers.firstName', 'First name')}
                             {...field}
                             data-testid="input-customer-first-name"
                           />
@@ -244,10 +246,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t('customers.lastName', 'Last Name')}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Last name"
+                            placeholder={t('customers.lastName', 'Last name')}
                             {...field}
                             data-testid="input-customer-last-name"
                           />
@@ -263,10 +265,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                   name="nationalId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>National ID</FormLabel>
+                      <FormLabel>{t('customers.nationalId', 'National ID')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter national ID"
+                          placeholder={t('customers.enterNationalId', 'Enter national ID')}
                           {...field}
                           data-testid="input-customer-national-id"
                         />
@@ -281,10 +283,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                   name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel>{t('customers.address', 'Address')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter address"
+                          placeholder={t('customers.enterAddress', 'Enter address')}
                           {...field}
                           data-testid="input-customer-address"
                         />
@@ -300,10 +302,10 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                     name="nationality"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nationality</FormLabel>
+                        <FormLabel>{t('customers.nationality', 'Nationality')}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g. Saudi Arabia"
+                            placeholder={t('customers.nationalityPlaceholder', 'e.g. Saudi Arabia')}
                             {...field}
                             data-testid="input-customer-nationality"
                           />
@@ -317,16 +319,16 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                     name="preferredLanguage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Preferred Language</FormLabel>
+                        <FormLabel>{t('customers.preferredLanguage', 'Preferred Language')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-customer-language">
-                              <SelectValue placeholder="Select language" />
+                              <SelectValue placeholder={t('customers.selectLanguage', 'Select language')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="ar">Arabic</SelectItem>
-                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="ar">{t('languages.arabic', 'Arabic')}</SelectItem>
+                            <SelectItem value="en">{t('languages.english', 'English')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -344,7 +346,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                 onClick={() => setOpen(false)}
                 data-testid="button-cancel-customer"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
@@ -354,12 +356,12 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
                 {createCustomerMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    {t('common.creating', 'Creating...')}
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-4 h-4 mr-2" />
-                    Create Customer
+                    {t('customers.createCustomer', 'Create Customer')}
                   </>
                 )}
               </Button>

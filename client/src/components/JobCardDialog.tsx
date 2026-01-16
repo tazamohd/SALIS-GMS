@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type Garage, type InsertJobCard } from "@shared/schema";
@@ -61,6 +62,7 @@ interface JobCardDialogProps {
 }
 
 export function JobCardDialog({ trigger, onSuccess }: JobCardDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
@@ -144,7 +146,7 @@ export function JobCardDialog({ trigger, onSuccess }: JobCardDialogProps) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-job-card">
         <DialogHeader>
-          <DialogTitle>Create New Job Card</DialogTitle>
+          <DialogTitle>{t('jobCards.createNewJobCard', 'Create New Job Card')}</DialogTitle>
           <DialogDescription>
             Fill in the details to create a new job card for vehicle service
           </DialogDescription>

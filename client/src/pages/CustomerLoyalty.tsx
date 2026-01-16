@@ -258,10 +258,10 @@ export default function CustomerLoyalty() {
                           <Star className="h-8 w-8 text-salis-gray dark:text-salis-gray-light" />
                           <div>
                             <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-tier-${account.id}`}>
-                              {account.currentTier || "Bronze"} Member
+                              {account.currentTier || "Bronze"} {t('customers.loyalty.member', 'Member')}
                             </p>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-member-points-${account.id}`}>
-                              {account.currentPoints ?? 0} points
+                              {account.currentPoints ?? 0} {t('customers.loyalty.points', 'points')}
                             </p>
                           </div>
                         </div>
@@ -434,7 +434,7 @@ export default function CustomerLoyalty() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.programName', 'Program Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="VIP Rewards Program" data-testid="input-program-name" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('customers.loyalty.vipRewardsProgramPlaceholder', 'VIP Rewards Program')} data-testid="input-program-name" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -448,7 +448,7 @@ export default function CustomerLoyalty() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white font-poppins">{t('common.description', 'Description')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder="Earn points with every service..." rows={3} data-testid="input-program-description" className="bg-white dark:bg-[#010101]" />
+                      <Textarea {...field} placeholder={t('customers.loyalty.earnPointsPlaceholder', 'Earn points with every service...')} rows={3} data-testid="input-program-description" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -517,7 +517,7 @@ export default function CustomerLoyalty() {
                   <FormItem>
                     <FormLabel className="text-salis-black dark:text-white font-poppins">{t('customers.loyalty.rewardName', 'Reward Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="$10 Service Discount" data-testid="input-reward-name" className="bg-white dark:bg-[#010101]" />
+                      <Input {...field} placeholder={t('customers.loyalty.serviceDiscountPlaceholder', '$10 Service Discount')} data-testid="input-reward-name" className="bg-white dark:bg-[#010101]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

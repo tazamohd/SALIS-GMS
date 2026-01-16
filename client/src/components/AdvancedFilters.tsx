@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Filter, Save, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ interface AdvancedFiltersProps {
 
 export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter }: AdvancedFiltersProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [isGlobal, setIsGlobal] = useState(false);
@@ -56,13 +58,13 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/filter-presets')
       });
-      toast({ title: "Filter preset saved successfully" });
+      toast({ title: t('filters.presetSaved', 'Filter preset saved successfully') });
       setSaveDialogOpen(false);
       setPresetName("");
       setIsGlobal(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to save filter preset", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('filters.failedToSavePreset', 'Failed to save filter preset'), variant: "destructive" });
     },
   });
 
@@ -76,21 +78,21 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/filter-presets')
       });
-      toast({ title: "Filter preset deleted" });
+      toast({ title: t('filters.presetDeleted', 'Filter preset deleted') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete preset", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('filters.failedToDeletePreset', 'Failed to delete preset'), variant: "destructive" });
     },
   });
 
   const handleSavePreset = () => {
     if (!presetName.trim()) {
-      toast({ title: "Error", description: "Please enter a preset name", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('filters.enterPresetName', 'Please enter a preset name'), variant: "destructive" });
       return;
     }
 
     if (!currentFilter) {
-      toast({ title: "Error", description: "No filter to save", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('filters.noFilterToSave', 'No filter to save'), variant: "destructive" });
       return;
     }
 
@@ -103,7 +105,7 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
 
   const handleApplyPreset = (preset: SavedFilterPreset) => {
     onApplyFilter(preset.filterConfig);
-    toast({ title: "Filter preset applied" });
+    toast({ title: t('filters.presetApplied', 'Filter preset applied') });
   };
 
   const handleDeletePreset = (id: string, e: React.MouseEvent) => {
@@ -152,7 +154,7 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {new Date(preset.createdAt).toLocaleDateString()}
+                    {preset.createdAt ? new Date(preset.createdAt).toLocaleDateString() : ''}
                   </div>
                 </div>
               </div>
@@ -174,7 +176,7 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save Filter Preset</DialogTitle>
+            <DialogTitle>{t('dialogs.saveFilterPreset', 'Save Filter Preset')}</DialogTitle>
             <DialogDescription className="sr-only">
               Save current filter configuration as a reusable preset
             </DialogDescription>

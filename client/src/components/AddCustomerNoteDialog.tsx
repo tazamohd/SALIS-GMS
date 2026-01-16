@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +41,7 @@ interface AddCustomerNoteDialogProps {
 export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const form = useForm<InsertCustomerNote>({
     resolver: zodResolver(insertCustomerNoteSchema),
@@ -81,14 +83,14 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
       <DialogTrigger asChild>
         <Button size="sm" data-testid="button-add-note">
           <Plus className="w-4 h-4 mr-2" />
-          Add Note
+          {t('customers.addNote', 'Add Note')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Customer Note</DialogTitle>
+          <DialogTitle>{t('customers.addCustomerNote', 'Add Customer Note')}</DialogTitle>
           <DialogDescription className="sr-only">
-            Form to add a note about the customer
+            {t('customers.addNoteDescription', 'Form to add a note about the customer')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -98,10 +100,10 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
               name="subject"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject (Optional)</FormLabel>
+                  <FormLabel>{t('customers.subjectOptional', 'Subject (Optional)')}</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Note subject" 
+                      placeholder={t('customers.noteSubject', 'Note subject')} 
                       {...field} 
                       value={field.value ?? ""} 
                       data-testid="input-note-subject" 
@@ -117,18 +119,18 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
               name="noteType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note Type</FormLabel>
+                  <FormLabel>{t('customers.noteType', 'Note Type')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-note-type">
-                        <SelectValue placeholder="Select note type" />
+                        <SelectValue placeholder={t('customers.selectNoteType', 'Select note type')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="complaint">Complaint</SelectItem>
-                      <SelectItem value="feedback">Feedback</SelectItem>
-                      <SelectItem value="reminder">Reminder</SelectItem>
+                      <SelectItem value="general">{t('customers.noteTypes.general', 'General')}</SelectItem>
+                      <SelectItem value="complaint">{t('customers.noteTypes.complaint', 'Complaint')}</SelectItem>
+                      <SelectItem value="feedback">{t('customers.noteTypes.feedback', 'Feedback')}</SelectItem>
+                      <SelectItem value="reminder">{t('customers.noteTypes.reminder', 'Reminder')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -141,10 +143,10 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>{t('customers.note', 'Note')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter your note here..."
+                      placeholder={t('customers.enterNoteHere', 'Enter your note here...')}
                       className="min-h-[100px]"
                       {...field}
                       data-testid="textarea-note-content"
@@ -162,14 +164,14 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
                 onClick={() => setOpen(false)}
                 data-testid="button-cancel-note"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={createNoteMutation.isPending}
                 data-testid="button-submit-note"
               >
-                {createNoteMutation.isPending ? "Adding..." : "Add Note"}
+                {createNoteMutation.isPending ? t('common.adding', 'Adding...') : t('customers.addNote', 'Add Note')}
               </Button>
             </div>
           </form>

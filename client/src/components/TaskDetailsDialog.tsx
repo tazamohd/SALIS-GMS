@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { JobCard } from "@shared/schema";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
 interface TaskDetailsDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ type UpdateTaskData = z.infer<typeof updateTaskSchema>;
 export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [status, setStatus] = useState<string>("pending");
   const [priority, setPriority] = useState<string>("medium");
   const [description, setDescription] = useState<string>("");
@@ -46,8 +48,8 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
   }, [task]);
 
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ taskId, data }: { taskId: number; data: UpdateTaskData }) => {
-      return apiRequest('PATCH', `/api/job-cards/${taskId}`, data);
+    mutationFn: async ({ taskId, data }: { taskId: string | number; data: UpdateTaskData }) => {
+      return apiRequest(`/api/job-cards/${taskId}`, 'PATCH', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/job-cards'] });
@@ -160,18 +162,18 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
               {/* Status */}
               <div>
                 <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                  Status
+                  {t('common.status', 'Status')}
                 </Label>
                 <Select value={status} onValueChange={setStatus}>
                   <SelectTrigger data-testid="select-task-status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">check-in</SelectItem>
-                    <SelectItem value="in_progress">Repair</SelectItem>
-                    <SelectItem value="completed">Quality Check</SelectItem>
-                    <SelectItem value="delivered">completion</SelectItem>
-                    <SelectItem value="cancelled">Canceled</SelectItem>
+                    <SelectItem value="pending">{t('taskDetails.status.checkIn', 'Check-in')}</SelectItem>
+                    <SelectItem value="in_progress">{t('taskDetails.status.repair', 'Repair')}</SelectItem>
+                    <SelectItem value="completed">{t('taskDetails.status.qualityCheck', 'Quality Check')}</SelectItem>
+                    <SelectItem value="delivered">{t('taskDetails.status.completion', 'Completion')}</SelectItem>
+                    <SelectItem value="cancelled">{t('taskDetails.status.cancelled', 'Cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -199,16 +201,16 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
               {/* Priority */}
               <div>
                 <Label className="font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white mb-2 block">
-                  Priority
+                  {t('taskAssignment.priority', 'Priority')}
                 </Label>
                 <Select value={priority} onValueChange={setPriority}>
                   <SelectTrigger data-testid="select-task-priority">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="high">{t('taskAssignment.priorities.high', 'High')}</SelectItem>
+                    <SelectItem value="medium">{t('taskAssignment.priorities.medium', 'Medium')}</SelectItem>
+                    <SelectItem value="low">{t('taskAssignment.priorities.low', 'Low')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

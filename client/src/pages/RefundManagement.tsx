@@ -86,12 +86,12 @@ export default function RefundManagement() {
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
       });
-      toast({ title: "Refund request created successfully" });
+      toast({ title: t('payments.refunds.createRefund', 'Create Refund'), description: t('common.success', 'Success') });
       setRefundDialogOpen(false);
       refundForm.reset();
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create refund request", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payments.refunds.failedCreateRefund', 'Failed to create refund request'), variant: "destructive" });
     },
   });
 
@@ -104,10 +104,10 @@ export default function RefundManagement() {
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
       });
-      toast({ title: "Refund approved" });
+      toast({ title: t('payments.refunds.approve', 'Approve'), description: t('common.success', 'Success') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to approve refund", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payments.refunds.failedApproveRefund', 'Failed to approve refund'), variant: "destructive" });
     },
   });
 
@@ -120,10 +120,10 @@ export default function RefundManagement() {
         predicate: (query) => 
           typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/api/refunds')
       });
-      toast({ title: "Refund processed successfully" });
+      toast({ title: t('payments.refunds.process', 'Process'), description: t('common.success', 'Success') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to process refund", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('payments.refunds.failedProcessRefund', 'Failed to process refund'), variant: "destructive" });
     },
   });
 
@@ -136,10 +136,11 @@ export default function RefundManagement() {
     };
     const config = variants[status] || variants.pending;
     const Icon = config.icon;
+    const statusLabel = t(`statusLabels.${status}`, status.charAt(0).toUpperCase() + status.slice(1));
     return (
       <Badge variant={config.variant} className={config.className}>
         <Icon className="h-3 w-3 mr-1" />
-        {status}
+        {statusLabel}
       </Badge>
     );
   };
@@ -153,7 +154,7 @@ export default function RefundManagement() {
       <div className="flex gap-2 items-center mb-6">
         <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
           <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
-            <SelectValue placeholder="Select garage" />
+            <SelectValue placeholder={t('payments.refunds.selectGarage', 'Select garage')} />
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             {garages.map((garage) => (
@@ -277,14 +278,14 @@ export default function RefundManagement() {
       <div className="flex gap-4 mb-6">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
-            <SelectValue placeholder="All Status" />
+            <SelectValue placeholder={t('payments.refunds.allStatus', 'All Status')} />
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="processed">Processed</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
+            <SelectItem value="all">{t('payments.refunds.allStatus', 'All Status')}</SelectItem>
+            <SelectItem value="pending">{t('statusLabels.pending', 'Pending')}</SelectItem>
+            <SelectItem value="approved">{t('statusLabels.approved', 'Approved')}</SelectItem>
+            <SelectItem value="processed">{t('statusLabels.processed', 'Processed')}</SelectItem>
+            <SelectItem value="rejected">{t('statusLabels.rejected', 'Rejected')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

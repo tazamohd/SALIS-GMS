@@ -245,13 +245,13 @@ export default function JournalEntries() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[150px]" data-testid="select-status-filter">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="posted">Posted</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="all">{t('accounting.allStatus', 'All Status')}</SelectItem>
+              <SelectItem value="posted">{t('accounting.posted', 'Posted')}</SelectItem>
+              <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
+              <SelectItem value="draft">{t('common.draft', 'Draft')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

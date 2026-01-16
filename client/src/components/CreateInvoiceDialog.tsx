@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,7 @@ export function CreateInvoiceDialog() {
     taxRate: 10,
   });
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -181,7 +183,7 @@ export function CreateInvoiceDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Invoice</DialogTitle>
+          <DialogTitle>{t('dialogs.createInvoice', 'Create Invoice')}</DialogTitle>
           <DialogDescription className="sr-only">
             Form to create a new invoice with items and pricing for a customer
           </DialogDescription>

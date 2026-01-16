@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ interface AssignmentRecommendation {
 }
 
 export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDialogProps) {
+  const { t } = useTranslation();
   const [selectedJobCardId, setSelectedJobCardId] = useState<string>("");
   const [analyzing, setAnalyzing] = useState(false);
   const [recommendations, setRecommendations] = useState<AssignmentRecommendation[]>([]);
@@ -100,7 +102,7 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
       case 'reserved':
         return <Badge className="bg-yellow-100 text-yellow-700">Reserved</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">{t('common.unknown', 'Unknown')}</Badge>;
     }
   };
 
@@ -197,7 +199,7 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
 
                       {rec.tool.brand && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <span className="font-medium">Brand:</span>
+                          <span className="font-medium">{t('tools.brand', 'Brand')}:</span>
                           <span>{rec.tool.brand}</span>
                         </div>
                       )}
@@ -209,7 +211,7 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
                             className="w-full bg-purple-600 hover:bg-purple-700"
                             data-testid={`button-assign-tool-${index}`}
                           >
-                            Assign This Tool
+                            {t('tools.assignThisTool', 'Assign This Tool')}
                           </Button>
                         </div>
                       )}
@@ -224,8 +226,8 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
             <Card className="border-2 border-orange-200 bg-orange-50">
               <CardContent className="p-6 text-center">
                 <Wrench className="w-12 h-12 mx-auto text-orange-400 mb-3" />
-                <p className="text-orange-700 font-medium">No tools available in inventory</p>
-                <p className="text-sm text-orange-600 mt-2">Add tools to your inventory to get AI recommendations</p>
+                <p className="text-orange-700 font-medium">{t('tools.noToolsAvailable', 'No tools available in inventory')}</p>
+                <p className="text-sm text-orange-600 mt-2">{t('tools.addToolsForRecommendations', 'Add tools to your inventory to get AI recommendations')}</p>
               </CardContent>
             </Card>
           )}
@@ -234,7 +236,7 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
             <Card className="border-2 border-gray-200">
               <CardContent className="p-6 text-center">
                 <Sparkles className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-500">Click "Analyze & Recommend" to get AI-powered tool suggestions</p>
+                <p className="text-gray-500">{t('tools.clickAnalyzeForRecommendations', 'Click "Analyze & Recommend" to get AI-powered tool suggestions')}</p>
               </CardContent>
             </Card>
           )}
@@ -245,10 +247,9 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
                 <div className="flex items-start gap-3">
                   <User className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-900">How It Works</h4>
+                    <h4 className="font-medium text-blue-900">{t('tools.howItWorks', 'How It Works')}</h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      Our AI analyzes job requirements, service type, and tool availability to recommend the best tools for each task. 
-                      The system considers tool compatibility, current availability, and success patterns from previous assignments.
+                      {t('tools.aiAnalysisDescription', 'Our AI analyzes job requirements, service type, and tool availability to recommend the best tools for each task. The system considers tool compatibility, current availability, and success patterns from previous assignments.')}
                     </p>
                   </div>
                 </div>

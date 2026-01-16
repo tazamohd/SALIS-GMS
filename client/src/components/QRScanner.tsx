@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ export function QRScanner({
   onScanError,
   autoCheckIn = false 
 }: QRScannerProps) {
+  const { t } = useTranslation();
   const [qrCodeData, setQrCodeData] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
@@ -145,9 +147,9 @@ export function QRScanner({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Scan QR Code</CardTitle>
+        <CardTitle>{t('qrCode.scanQRCode', 'Scan QR Code')}</CardTitle>
         <CardDescription>
-          Scan or enter the customer's QR code for check-in
+          {t('qrCode.scanDescription', "Scan or enter the customer's QR code for check-in")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

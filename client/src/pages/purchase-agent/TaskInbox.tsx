@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -129,6 +130,7 @@ const mockTasks: PurchaseTask[] = [
 ];
 
 export default function TaskInbox() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTask, setSelectedTask] = useState<PurchaseTask | null>(null);
   const [activeTab, setActiveTab] = useState("all");
@@ -255,11 +257,11 @@ export default function TaskInbox() {
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="all">{t('common.all', 'All')}</SelectItem>
+                  <SelectItem value="urgent">{t('purchaseAgent.urgent', 'Urgent')}</SelectItem>
+                  <SelectItem value="high">{t('purchaseAgent.high', 'High')}</SelectItem>
+                  <SelectItem value="medium">{t('purchaseAgent.medium', 'Medium')}</SelectItem>
+                  <SelectItem value="low">{t('purchaseAgent.low', 'Low')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

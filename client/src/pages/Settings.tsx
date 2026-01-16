@@ -140,7 +140,7 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                <SelectItem value="UTC">UTC</SelectItem>
+                <SelectItem value="UTC">{t('settings.utc', 'UTC')}</SelectItem>
                 <SelectItem value="America/New_York">{t('settings.easternTime', 'Eastern Time')}</SelectItem>
                 <SelectItem value="America/Chicago">{t('settings.centralTime', 'Central Time')}</SelectItem>
                 <SelectItem value="America/Denver">{t('settings.mountainTime', 'Mountain Time')}</SelectItem>
@@ -162,9 +162,9 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                <SelectItem value="MM/DD/YYYY">{t('settings.dateFormatMMDDYYYY', 'MM/DD/YYYY')}</SelectItem>
+                <SelectItem value="DD/MM/YYYY">{t('settings.dateFormatDDMMYYYY', 'DD/MM/YYYY')}</SelectItem>
+                <SelectItem value="YYYY-MM-DD">{t('settings.dateFormatYYYYMMDD', 'YYYY-MM-DD')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

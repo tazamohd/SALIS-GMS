@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +41,7 @@ interface AddPaymentDialogProps {
 export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const maxPaymentAmount = parseFloat(invoice.balanceAmount);
   const canAddPayment = maxPaymentAmount > 0;
@@ -112,28 +114,28 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
           data-testid="button-add-payment"
         >
           <DollarSign className="w-4 h-4 mr-2" />
-          Add Payment
+          {t('payments.addPayment', 'Add Payment')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Record Payment</DialogTitle>
+          <DialogTitle>{t('payments.recordPayment', 'Record Payment')}</DialogTitle>
           <DialogDescription className="sr-only">
-            Form to record a payment against an invoice
+            {t('payments.recordPaymentDescription', 'Form to record a payment against an invoice')}
           </DialogDescription>
         </DialogHeader>
         
         <div className="mb-4 p-3 bg-blue-50 rounded">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Invoice Total:</span>
+            <span className="text-gray-600">{t('invoices.invoiceTotal', 'Invoice Total')}:</span>
             <span className="font-medium">${parseFloat(invoice.totalAmount).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Paid Amount:</span>
+            <span className="text-gray-600">{t('payments.paidAmount', 'Paid Amount')}:</span>
             <span className="font-medium text-green-600">${parseFloat(invoice.paidAmount).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm font-bold border-t mt-2 pt-2">
-            <span>Balance Due:</span>
+            <span>{t('payments.balanceDue', 'Balance Due')}:</span>
             <span className="text-orange-600">${maxPaymentAmount.toFixed(2)}</span>
           </div>
         </div>
@@ -145,7 +147,7 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Amount</FormLabel>
+                  <FormLabel>{t('payments.paymentAmount', 'Payment Amount')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -165,18 +167,18 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
               name="paymentMethod"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Method</FormLabel>
+                  <FormLabel>{t('payments.paymentMethod', 'Payment Method')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger data-testid="select-payment-method">
-                        <SelectValue placeholder="Select method" />
+                        <SelectValue placeholder={t('payments.selectMethod', 'Select method')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="card">Card</SelectItem>
-                      <SelectItem value="transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="check">Check</SelectItem>
+                      <SelectItem value="cash">{t('payments.methods.cash', 'Cash')}</SelectItem>
+                      <SelectItem value="card">{t('payments.methods.card', 'Card')}</SelectItem>
+                      <SelectItem value="transfer">{t('payments.methods.bankTransfer', 'Bank Transfer')}</SelectItem>
+                      <SelectItem value="check">{t('payments.methods.check', 'Check')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -189,7 +191,7 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
               name="paymentDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Date</FormLabel>
+                  <FormLabel>{t('payments.paymentDate', 'Payment Date')}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -209,10 +211,10 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
               name="referenceNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Reference Number (Optional)</FormLabel>
+                  <FormLabel>{t('payments.referenceNumberOptional', 'Reference Number (Optional)')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Check number, transaction ID, etc."
+                      placeholder={t('payments.referencePlaceholder', 'Check number, transaction ID, etc.')}
                       {...field}
                       value={field.value ?? ""}
                       data-testid="input-reference-number"
@@ -228,10 +230,10 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormLabel>{t('payments.notesOptional', 'Notes (Optional)')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Additional payment notes..."
+                      placeholder={t('payments.additionalNotes', 'Additional payment notes...')}
                       {...field}
                       value={field.value ?? ""}
                       data-testid="textarea-payment-notes"
@@ -249,14 +251,14 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
                 onClick={() => setOpen(false)}
                 data-testid="button-cancel-payment"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={addPaymentMutation.isPending}
                 data-testid="button-submit-payment"
               >
-                {addPaymentMutation.isPending ? "Recording..." : "Record Payment"}
+                {addPaymentMutation.isPending ? t('payments.recording', 'Recording...') : t('payments.recordPayment', 'Record Payment')}
               </Button>
             </div>
           </form>

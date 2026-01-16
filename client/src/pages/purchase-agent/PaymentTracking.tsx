@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -147,6 +148,7 @@ const mockPayments: PaymentRecord[] = [
 ];
 
 export default function PaymentTracking() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedPayment, setSelectedPayment] = useState<PaymentRecord | null>(null);
@@ -273,11 +275,11 @@ export default function PaymentTracking() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
-              <TabsTrigger value="all" data-testid="tab-all">All</TabsTrigger>
-              <TabsTrigger value="pending" data-testid="tab-pending">Pending</TabsTrigger>
-              <TabsTrigger value="processing" data-testid="tab-processing">Processing</TabsTrigger>
-              <TabsTrigger value="paid" data-testid="tab-paid">Paid</TabsTrigger>
-              <TabsTrigger value="overdue" data-testid="tab-overdue">Overdue</TabsTrigger>
+              <TabsTrigger value="all" data-testid="tab-all">{t('common.all', 'All')}</TabsTrigger>
+              <TabsTrigger value="pending" data-testid="tab-pending">{t('statusLabels.pending', 'Pending')}</TabsTrigger>
+              <TabsTrigger value="processing" data-testid="tab-processing">{t('statusLabels.processed', 'Processing')}</TabsTrigger>
+              <TabsTrigger value="paid" data-testid="tab-paid">{t('statusLabels.paid', 'Paid')}</TabsTrigger>
+              <TabsTrigger value="overdue" data-testid="tab-overdue">{t('statusLabels.overdue', 'Overdue')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab}>

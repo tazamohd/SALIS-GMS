@@ -697,6 +697,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
   contracts: any[]; 
   onAcceptRenewal: (data: { renewalId: string; contractId: string }) => void;
 }) {
+  const { t } = useTranslation();
   const allRenewals = contracts.flatMap(c => 
     (c.renewals || []).map((r: any) => ({ ...r, contract: c }))
   );
@@ -708,8 +709,8 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
     <div className="space-y-4">
       <Card data-testid="card-pending-renewals">
         <CardHeader>
-          <CardTitle>Pending Renewals ({pendingRenewals.length})</CardTitle>
-          <CardDescription>Contracts requiring renewal action</CardDescription>
+          <CardTitle>{t('payments.contracts.pendingRenewals', 'Pending Renewals')} ({pendingRenewals.length})</CardTitle>
+          <CardDescription>{t('payments.contracts.contractsRequiringRenewalAction', 'Contracts requiring renewal action')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -731,20 +732,20 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                     </p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Current End:</span>{" "}
+                        <span className="text-muted-foreground">{t('payments.contracts.currentEnd', 'Current End:')}</span>{" "}
                         {format(new Date(renewal.contract.endDate), "MMM dd, yyyy")}
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Proposed Start:</span>{" "}
+                        <span className="text-muted-foreground">{t('payments.contracts.proposedStart', 'Proposed Start:')}</span>{" "}
                         {format(new Date(renewal.proposedStartDate), "MMM dd, yyyy")}
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Proposed End:</span>{" "}
+                        <span className="text-muted-foreground">{t('payments.contracts.proposedEnd', 'Proposed End:')}</span>{" "}
                         {format(new Date(renewal.proposedEndDate), "MMM dd, yyyy")}
                       </div>
                       {renewal.proposedMonthlyFee && (
                         <div>
-                          <span className="text-muted-foreground">New Monthly Fee:</span>{" "}
+                          <span className="text-muted-foreground">{t('payments.contracts.newMonthlyFee', 'New Monthly Fee:')}</span>{" "}
                           ${parseFloat(renewal.proposedMonthlyFee).toLocaleString()}
                         </div>
                       )}
@@ -762,10 +763,10 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                       data-testid={`button-accept-renewal-${renewal.id}`}
                     >
                       <CheckCircle className="mr-1 h-4 w-4" />
-                      Accept
+                      {t('payments.contracts.accept', 'Accept')}
                     </Button>
                     <Button size="sm" variant="outline" data-testid={`button-negotiate-renewal-${renewal.id}`}>
-                      Negotiate
+                      {t('payments.contracts.negotiate', 'Negotiate')}
                     </Button>
                   </div>
                 </div>
@@ -773,7 +774,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
             ))}
             {pendingRenewals.length === 0 && (
               <p className="text-center text-muted-foreground py-8">
-                No pending renewals
+                {t('payments.contracts.noPendingRenewals', 'No pending renewals')}
               </p>
             )}
           </div>
@@ -782,8 +783,8 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
 
       <Card data-testid="card-completed-renewals">
         <CardHeader>
-          <CardTitle>Renewal History</CardTitle>
-          <CardDescription>Recently completed renewals</CardDescription>
+          <CardTitle>{t('payments.contracts.renewalHistory', 'Renewal History')}</CardTitle>
+          <CardDescription>{t('payments.contracts.recentlyCompletedRenewals', 'Recently completed renewals')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -795,12 +796,12 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                     {format(new Date(renewal.proposedStartDate), "MMM dd, yyyy")}
                   </p>
                 </div>
-                <Badge variant="outline">Completed</Badge>
+                <Badge variant="outline">{t('statusLabels.completed', 'Completed')}</Badge>
               </div>
             ))}
             {completedRenewals.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                No renewal history
+                {t('payments.contracts.noRenewalHistory', 'No renewal history')}
               </p>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -180,6 +181,7 @@ const mockRequests: QuotationRequest[] = [
 ];
 
 export default function QuotationManagement() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedRequest, setSelectedRequest] = useState<QuotationRequest | null>(null);
@@ -301,10 +303,10 @@ export default function QuotationManagement() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
-              <TabsTrigger value="all" data-testid="tab-all">All</TabsTrigger>
-              <TabsTrigger value="sent" data-testid="tab-sent">Sent</TabsTrigger>
-              <TabsTrigger value="received" data-testid="tab-received">Received</TabsTrigger>
-              <TabsTrigger value="selected" data-testid="tab-selected">Selected</TabsTrigger>
+              <TabsTrigger value="all" data-testid="tab-all">{t('common.all', 'All')}</TabsTrigger>
+              <TabsTrigger value="sent" data-testid="tab-sent">{t('statusLabels.sent', 'Sent')}</TabsTrigger>
+              <TabsTrigger value="received" data-testid="tab-received">{t('purchaseAgent.received', 'Received')}</TabsTrigger>
+              <TabsTrigger value="selected" data-testid="tab-selected">{t('purchaseAgent.selected', 'Selected')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="space-y-4">
@@ -339,7 +341,7 @@ export default function QuotationManagement() {
                           </div>
                           <div className="flex items-center gap-1 text-[#64748B]">
                             <Clock className="h-4 w-4" />
-                            <span>Due: {new Date(request.dueDate).toLocaleDateString()}</span>
+                            <span>{t('purchaseAgent.due', 'Due')}: {new Date(request.dueDate).toLocaleDateString()}</span>
                           </div>
                         </div>
 

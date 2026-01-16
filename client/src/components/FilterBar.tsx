@@ -1,4 +1,5 @@
 import { Search, X, Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,12 +37,13 @@ interface FilterBarProps {
 export function FilterBar({
   searchValue = "",
   onSearchChange,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   filters = [],
   onClearFilters,
   showClearButton = true,
   className,
 }: FilterBarProps) {
+  const { t } = useTranslation();
   const hasActiveFilters =
     searchValue ||
     filters.some((f) => f.value && f.value !== "all" && f.value !== "");
@@ -57,12 +59,12 @@ export function FilterBar({
             />
             <Input
               type="search"
-              placeholder={searchPlaceholder}
+              placeholder={searchPlaceholder || t('common.search', 'Search...')}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] focus:ring-[#0A5ED7] focus:border-[#0A5ED7]"
               data-testid="filter-search-input"
-              aria-label="Search"
+              aria-label={t('common.search', 'Search')}
             />
           </div>
         )}
