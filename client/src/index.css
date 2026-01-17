@@ -381,6 +381,22 @@
     --info-foreground: 150 25% 4%;
     --error: 0 84% 60%;              /* #EF4444 - Red */
     --error-foreground: 0 0% 100%;
+    
+    /* KSA Vision 2030 Motion & Glow Variables */
+    --dur-1: 120ms;
+    --dur-2: 180ms;
+    --dur-3: 240ms;
+    --dur-4: 320ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --glow-green-weak: 0 0 10px rgba(34,197,94,0.14);
+    --glow-green-mid: 0 0 18px rgba(34,197,94,0.20);
+    --glow-green-strong: 0 0 28px rgba(34,197,94,0.28);
+    --glow-gold-weak: 0 0 10px rgba(234,179,8,0.14);
+    --glow-gold-mid: 0 0 18px rgba(234,179,8,0.20);
+    --glow-gold-strong: 0 0 28px rgba(234,179,8,0.28);
+    --shadow-soft: 0 8px 24px rgba(0,0,0,0.45);
   }
 
 }
@@ -396,6 +412,25 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px;
     line-height: 1.5;
+  }
+  
+  /* KSA Vision 2030 - Arabic Language Support */
+  html[lang="ar"] body,
+  html[dir="rtl"] body {
+    font-family: "Cairo", "Tajawal", system-ui, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  
+  /* RTL-safe codes/IDs stay LTR */
+  .code, .vin, .sku, .email, .url, .phone-number {
+    direction: ltr;
+    unicode-bidi: plaintext;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Numbers in tabular form */
+  .num {
+    font-variant-numeric: tabular-nums;
   }
   
   /* Typography Hierarchy */
