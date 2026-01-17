@@ -248,7 +248,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <>
       <SkipLink />
-      <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
+      <div className="flex h-screen bg-background">
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
@@ -265,7 +265,7 @@ export function Layout({ children }: LayoutProps) {
         <aside
           className={`
         fixed lg:static inset-y-0 left-0 z-50 relative
-        bg-white dark:bg-[#0B1F3B] border-r border-[#E2E8F0] dark:border-[#232A36] flex flex-col
+        bg-card border-r border-border flex flex-col
         transition-transform duration-300 ease-in-out
         w-[280px] max-w-[85vw] lg:max-w-none
         ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -282,12 +282,12 @@ export function Layout({ children }: LayoutProps) {
           `}</style>
           {/* Resize Handle */}
           <div
-            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-[#0A5ED7] dark:hover:bg-[#0BB3FF] transition-colors z-10 hidden lg:block"
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary transition-colors z-10 hidden lg:block"
             onMouseDown={() => setIsResizing(true)}
             data-testid="sidebar-resize-handle"
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1 rounded bg-[#E2E8F0] dark:bg-[#232A36] opacity-0 hover:opacity-100 transition-opacity">
-              <GripVertical className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0]" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 p-1 rounded bg-muted opacity-0 hover:opacity-100 transition-opacity">
+              <GripVertical className="w-3 h-3 text-muted-foreground" />
             </div>
           </div>
           {/* Navigation - Compact */}
@@ -310,15 +310,15 @@ export function Layout({ children }: LayoutProps) {
                       className="w-full"
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
-                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors group">
-                        <span className="font-poppins font-bold text-[11px] uppercase text-[#64748B] dark:text-[#9BA4B0] tracking-wide leading-tight text-left whitespace-nowrap">
+                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-primary/10 transition-colors group">
+                        <span className="font-poppins font-bold text-[11px] uppercase text-muted-foreground tracking-wide leading-tight text-left whitespace-nowrap">
                           {groupLabel}
                         </span>
                         <div className="flex-1" />
                         {isExpanded ? (
-                          <ChevronDown className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0] group-hover:text-[#0A5ED7] dark:group-hover:text-[#0BB3FF]" />
+                          <ChevronDown className="w-3 h-3 text-muted-foreground group-hover:text-primary" />
                         ) : (
-                          <ChevronRight className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0] group-hover:text-[#0A5ED7] dark:group-hover:text-[#0BB3FF]" />
+                          <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-primary" />
                         )}
                       </div>
                     </CollapsibleTrigger>
@@ -334,8 +334,8 @@ export function Layout({ children }: LayoutProps) {
                               onClick={() => setMobileMenuOpen(false)}
                               className={`flex items-center gap-2 pl-6 pr-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
                                 isActive
-                                  ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-md"
-                                  : "text-[#0F172A] dark:text-[#E6EAF0] hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
+                                  ? "bg-primary text-primary-foreground shadow-md"
+                                  : "text-foreground hover:bg-primary/10 hover:text-primary"
                               }`}
                               data-testid={`nav-item-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                             >
@@ -355,12 +355,12 @@ export function Layout({ children }: LayoutProps) {
           </nav>
 
           {/* Logout */}
-          <div className="p-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="p-3 border-t border-border">
             <Button
               onClick={handleLogout}
               variant="ghost"
               size="sm"
-              className="w-full justify-start text-[#F97316] hover:text-white hover:bg-[#F97316] dark:hover:bg-[#F97316] h-8 transition-colors"
+              className="w-full justify-start text-destructive hover:text-white hover:bg-destructive h-8 transition-colors"
               data-testid="button-logout"
             >
               <LogOut className="w-4 h-4 mr-2" />
@@ -374,12 +374,12 @@ export function Layout({ children }: LayoutProps) {
         {/* Main Content */}
         <div className="flex-1 flex flex-col lg:ml-0">
           {/* Header - Brand Design */}
-          <header className="h-14 bg-white dark:bg-[#0B1F3B] border-b border-[#E2E8F0] dark:border-[#232A36] px-4 sm:px-6 flex items-center gap-3 shadow-sm">
+          <header className="h-14 bg-card border-b border-border px-4 sm:px-6 flex items-center gap-3 shadow-sm">
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden text-[#0F172A] dark:text-[#E6EAF0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] h-8 w-8"
+              className="lg:hidden text-foreground hover:text-primary h-8 w-8"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={t("common.toggleMobileMenu", "Toggle mobile menu")}
               data-testid="button-mobile-menu"
@@ -403,12 +403,12 @@ export function Layout({ children }: LayoutProps) {
               variant="outline"
               size="sm"
               onClick={() => setQuickActionsOpen(true)}
-              className="gap-2 h-9 border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent transition-all font-poppins"
+              className="gap-2 h-9 border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-transparent transition-all font-poppins"
               data-testid="button-quick-actions"
             >
               <Zap className="w-3.5 h-3.5" />
               <span className="hidden sm:inline text-xs">{t("common.quick_actions", "Quick Actions")}</span>
-              <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] rounded text-[10px] font-mono text-[#64748B] dark:text-[#9BA4B0]">
+              <kbd className="hidden sm:inline-flex px-1 py-0.5 bg-muted border border-border rounded text-[10px] font-mono text-muted-foreground">
                 {navigator.platform.includes("Mac") ? "⌘K" : "Ctrl+K"}
               </kbd>
             </Button>

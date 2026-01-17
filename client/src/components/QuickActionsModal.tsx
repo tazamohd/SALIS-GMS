@@ -223,10 +223,10 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-0 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-quick-actions">
+      <DialogContent className="sm:max-w-[600px] p-0 bg-card border border-border" data-testid="modal-quick-actions">
         <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#0F172A] dark:text-[#E6EAF0] flex items-center gap-2">
-            <Command className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
+          <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-foreground flex items-center gap-2">
+            <Command className="w-5 h-5 text-primary" />
             Quick Actions
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -236,13 +236,13 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
 
         <div className="px-6 pb-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#64748B] dark:text-[#9BA4B0]" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder={t('search.searchActions', 'Search actions...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#94A3B8] dark:placeholder:text-[#6B7280]"
+              className="pl-10 border-border bg-muted text-foreground placeholder:text-muted-foreground"
               data-testid="input-quick-actions-search"
               autoFocus
             />
@@ -252,7 +252,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
         <div className="max-h-[400px] overflow-y-auto">
           {filteredActions.length === 0 ? (
             <div className="px-6 py-8 text-center">
-              <p className="text-[#64748B] dark:text-[#9BA4B0] font-['Poppins',Helvetica]">
+              <p className="text-muted-foreground font-['Poppins',Helvetica]">
                 No actions found for "{searchQuery}"
               </p>
             </div>
@@ -264,17 +264,17 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
                   <button
                     key={action.id}
                     onClick={() => handleActionClick(action.path)}
-                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors text-left"
+                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors text-left"
                     data-testid={`button-${action.id}`}
                   >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-[#0F172A] dark:text-[#E6EAF0] mb-1">
+                      <h3 className="font-['Poppins',Helvetica] font-medium text-sm text-foreground mb-1">
                         {action.label}
                       </h3>
-                      <p className="font-['Poppins',Helvetica] text-xs text-[#64748B] dark:text-[#9BA4B0]">
+                      <p className="font-['Poppins',Helvetica] text-xs text-muted-foreground">
                         {action.description}
                       </p>
                     </div>
@@ -285,12 +285,12 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
           )}
         </div>
 
-        <div className="border-t border-[#E2E8F0] dark:border-[#232A36] px-6 py-3 bg-[#F8FAFC] dark:bg-[#0E1117]">
-          <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-['Poppins',Helvetica] flex items-center gap-2">
-            <kbd className="px-2 py-1 bg-[#E2E8F0] dark:bg-[#232A36] border border-[#CBD5E1] dark:border-[#374151] rounded text-[#0F172A] dark:text-[#E6EAF0] font-mono">
+        <div className="border-t border-border px-6 py-3 bg-muted">
+          <p className="text-xs text-muted-foreground font-['Poppins',Helvetica] flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-background border border-border rounded text-foreground font-mono">
               {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
             </kbd>
-            <kbd className="px-2 py-1 bg-[#E2E8F0] dark:bg-[#232A36] border border-[#CBD5E1] dark:border-[#374151] rounded text-[#0F172A] dark:text-[#E6EAF0] font-mono">
+            <kbd className="px-2 py-1 bg-background border border-border rounded text-foreground font-mono">
               K
             </kbd>
             <span>to open quick actions</span>
