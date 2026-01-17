@@ -32,8 +32,12 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { insertInvoiceSchema, type InsertInvoice, type Garage, type User, type Vehicle } from "@shared/schema";
+import { insertInvoiceSchema, type InsertInvoice, type Garage, type User, type Vehicle, type SparePart } from "@shared/schema";
 import { z } from "zod";
+import { Package, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+const SAUDI_VAT_RATE = 15; // Saudi Arabia VAT rate
 
 const itemSchema = z.object({
   itemType: z.enum(["service", "part", "labor"]),
@@ -41,9 +45,16 @@ const itemSchema = z.object({
   quantity: z.number().min(1, "Quantity must be at least 1"),
   unitPrice: z.number().min(0, "Unit price must be positive"),
   taxRate: z.number().min(0).max(100),
+  sparePartId: z.string().optional(),
+  stockQuantity: z.number().optional(),
 });
 
 type InvoiceItemInput = z.infer<typeof itemSchema>;
+
+interface SparePartWithInventory extends SparePart {
+  stockQuantity?: number;
+  sellingPrice?: string;
+}
 
 interface CreateInvoiceDialogProps {
   open?: boolean;
@@ -66,8 +77,9 @@ export function CreateInvoiceDialog({
     description: "",
     quantity: 1,
     unitPrice: 0,
-    taxRate: 10,
+    taxRate: SAUDI_VAT_RATE,
   });
+  const [selectedPartId, setSelectedPartId] = useState<string>("");
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -77,6 +89,10 @@ export function CreateInvoiceDialog({
 
   const { data: customers } = useQuery<User[]>({
     queryKey: ['/api/customers'],
+  });
+
+  const { data: spareParts } = useQuery<SparePartWithInventory[]>({
+    queryKey: ['/api/spare-parts'],
   });
 
   const form = useForm<InsertInvoice>({
@@ -118,12 +134,13 @@ export function CreateInvoiceDialog({
           (typeof query.queryKey[0] === 'string' && query.queryKey[0].startsWith('/api/invoices'))
       });
       toast({
-        title: "Success",
-        description: "Invoice created successfully",
+        title: t('common.success', 'Success'),
+        description: t('invoices.invoiceCreated', 'Invoice created successfully'),
       });
       form.reset();
       setItems([]);
-      setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 10 });
+      setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: SAUDI_VAT_RATE });
+      setSelectedPartId("");
       setOpen(false);
     },
     onError: (error: any) => {
@@ -138,15 +155,45 @@ export function CreateInvoiceDialog({
   const addItem = () => {
     if (!currentItem.description || currentItem.quantity < 1 || currentItem.unitPrice < 0) {
       toast({
-        title: "Invalid Item",
-        description: "Please fill in all required item fields",
+        title: t('invoices.invalidItem', 'Invalid Item'),
+        description: t('invoices.fillRequiredFields', 'Please fill in all required item fields'),
         variant: "destructive",
       });
       return;
     }
+
+    // Check stock availability for parts
+    if (currentItem.itemType === "part" && currentItem.stockQuantity !== undefined) {
+      if (currentItem.quantity > currentItem.stockQuantity) {
+        toast({
+          title: t('invoices.insufficientStock', 'Insufficient Stock'),
+          description: t('invoices.requestedQtyExceedsStock', 'Requested quantity exceeds available stock ({{available}} available)', { available: currentItem.stockQuantity }),
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     
     setItems([...items, currentItem]);
-    setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 10 });
+    setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: SAUDI_VAT_RATE });
+    setSelectedPartId("");
+  };
+
+  const handlePartSelect = (partId: string) => {
+    setSelectedPartId(partId);
+    const selectedPart = spareParts?.find(p => p.id === partId);
+    if (selectedPart) {
+      const price = selectedPart.sellingPrice ? parseFloat(selectedPart.sellingPrice) : 0;
+      setCurrentItem({
+        ...currentItem,
+        itemType: "part",
+        description: selectedPart.name,
+        unitPrice: price,
+        sparePartId: partId,
+        stockQuantity: selectedPart.stockQuantity || 0,
+        taxRate: SAUDI_VAT_RATE,
+      });
+    }
   };
 
   const removeItem = (index: number) => {
@@ -293,60 +340,132 @@ export function CreateInvoiceDialog({
 
             {/* Items Section */}
             <div className="border-t pt-4">
-              <h3 className="font-semibold mb-3">Invoice Items</h3>
+              <h3 className="font-semibold mb-3">{t('invoices.invoiceItems', 'Invoice Items')}</h3>
               
-              <div className="grid grid-cols-6 gap-2 mb-2">
-                <Select
-                  value={currentItem.itemType}
-                  onValueChange={(value: "service" | "part" | "labor") => setCurrentItem({ ...currentItem, itemType: value })}
-                >
-                  <SelectTrigger data-testid="select-item-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="service">Service</SelectItem>
-                    <SelectItem value="part">Part</SelectItem>
-                    <SelectItem value="labor">Labor</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  placeholder="Description"
-                  value={currentItem.description}
-                  onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
-                  className="col-span-2"
-                  data-testid="input-item-description"
-                />
-                <Input
-                  type="number"
-                  placeholder="Qty"
-                  value={currentItem.quantity}
-                  onChange={(e) => setCurrentItem({ ...currentItem, quantity: parseInt(e.target.value) || 1 })}
-                  data-testid="input-item-quantity"
-                />
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Price"
-                  value={currentItem.unitPrice}
-                  onChange={(e) => setCurrentItem({ ...currentItem, unitPrice: parseFloat(e.target.value) || 0 })}
-                  data-testid="input-item-price"
-                />
-                <Button type="button" onClick={addItem} data-testid="button-add-item">
-                  <Plus className="w-4 h-4" />
-                </Button>
+              <div className="space-y-3 mb-4">
+                {/* Item Type Selection */}
+                <div className="grid grid-cols-6 gap-2">
+                  <Select
+                    value={currentItem.itemType}
+                    onValueChange={(value: "service" | "part" | "labor") => {
+                      setCurrentItem({ ...currentItem, itemType: value, description: "", unitPrice: 0 });
+                      setSelectedPartId("");
+                    }}
+                  >
+                    <SelectTrigger data-testid="select-item-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="service">{t('invoices.service', 'Service')}</SelectItem>
+                      <SelectItem value="part">{t('invoices.part', 'Part')}</SelectItem>
+                      <SelectItem value="labor">{t('invoices.labor', 'Labor')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Part Selector - shown only when item type is "part" */}
+                  {currentItem.itemType === "part" ? (
+                    <Select
+                      value={selectedPartId}
+                      onValueChange={handlePartSelect}
+                    >
+                      <SelectTrigger className="col-span-2" data-testid="select-spare-part">
+                        <SelectValue placeholder={t('invoices.selectPart', 'Select a part...')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(spareParts ?? []).map((part) => (
+                          <SelectItem key={part.id} value={part.id}>
+                            <div className="flex items-center gap-2">
+                              <Package className="w-3 h-3" />
+                              <span>{part.name}</span>
+                              {part.stockQuantity !== undefined && (
+                                <Badge 
+                                  variant={part.stockQuantity > 0 ? "secondary" : "destructive"}
+                                  className="ml-1 text-xs"
+                                >
+                                  {part.stockQuantity > 0 
+                                    ? t('invoices.inStock', '{{count}} in stock', { count: part.stockQuantity })
+                                    : t('invoices.outOfStock', 'Out of stock')
+                                  }
+                                </Badge>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      placeholder={t('invoices.description', 'Description')}
+                      value={currentItem.description}
+                      onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
+                      className="col-span-2"
+                      data-testid="input-item-description"
+                    />
+                  )}
+                  
+                  <Input
+                    type="number"
+                    placeholder={t('invoices.qty', 'Qty')}
+                    value={currentItem.quantity}
+                    onChange={(e) => setCurrentItem({ ...currentItem, quantity: parseInt(e.target.value) || 1 })}
+                    data-testid="input-item-quantity"
+                  />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder={t('invoices.price', 'Price')}
+                    value={currentItem.unitPrice}
+                    onChange={(e) => setCurrentItem({ ...currentItem, unitPrice: parseFloat(e.target.value) || 0 })}
+                    data-testid="input-item-price"
+                  />
+                  <Button type="button" onClick={addItem} data-testid="button-add-item">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Stock availability indicator for selected part */}
+                {currentItem.itemType === "part" && selectedPartId && (
+                  <div className="flex items-center gap-2 text-sm px-2 py-1 rounded bg-muted">
+                    {currentItem.stockQuantity && currentItem.stockQuantity > 0 ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        <span className="text-green-700 dark:text-green-400">
+                          {t('invoices.availableStock', '{{count}} units available in inventory', { count: currentItem.stockQuantity })}
+                        </span>
+                        {currentItem.unitPrice > 0 && (
+                          <span className="ml-auto text-muted-foreground">
+                            {t('invoices.suggestedPrice', 'Suggested price: SAR {{price}}', { price: currentItem.unitPrice.toFixed(2) })}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-4 h-4 text-amber-600" />
+                        <span className="text-amber-700 dark:text-amber-400">
+                          {t('invoices.lowOrNoStock', 'Low or no stock available - consider reordering')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {items.length > 0 && (
                 <div className="mt-4 space-y-2">
                   {items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded" data-testid={`item-row-${index}`}>
-                      <div className="flex-1">
-                        <span className="font-medium capitalize">{item.itemType}: {item.description}</span>
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded" data-testid={`item-row-${index}`}>
+                      <div className="flex-1 flex items-center gap-2">
+                        {item.itemType === "part" && <Package className="w-4 h-4 text-primary" />}
+                        <span className="font-medium capitalize">
+                          {item.itemType === "service" ? t('invoices.service', 'Service') :
+                           item.itemType === "part" ? t('invoices.part', 'Part') :
+                           t('invoices.labor', 'Labor')}: {item.description}
+                        </span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-sm">Qty: {item.quantity}</span>
-                        <span className="text-sm">@ ${item.unitPrice.toFixed(2)}</span>
-                        <span className="font-medium">${(item.quantity * item.unitPrice).toFixed(2)}</span>
+                        <span className="text-sm">{t('invoices.qty', 'Qty')}: {item.quantity}</span>
+                        <span className="text-sm">@ SAR {item.unitPrice.toFixed(2)}</span>
+                        <span className="font-medium">SAR {(item.quantity * item.unitPrice).toFixed(2)}</span>
                         <Button
                           type="button"
                           variant="ghost"
@@ -364,16 +483,16 @@ export function CreateInvoiceDialog({
                     <div className="flex justify-end gap-8 text-sm">
                       <div className="space-y-1">
                         <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">${subtotal.toFixed(2)}</span>
+                          <span className="text-muted-foreground">{t('invoices.subtotal', 'Subtotal')}:</span>
+                          <span className="font-medium">SAR {subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4">
-                          <span className="text-gray-600">Tax:</span>
-                          <span className="font-medium">${taxAmount.toFixed(2)}</span>
+                          <span className="text-muted-foreground">{t('invoices.vat', 'VAT')} (15%):</span>
+                          <span className="font-medium">SAR {taxAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4 text-base font-bold">
-                          <span>Total:</span>
-                          <span>${total.toFixed(2)}</span>
+                          <span>{t('invoices.total', 'Total')}:</span>
+                          <span>SAR {total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

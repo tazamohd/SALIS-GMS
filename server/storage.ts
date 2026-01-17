@@ -806,6 +806,7 @@ export interface IStorage {
   updateSparePart(id: string, data: Partial<SparePart>): Promise<SparePart>;
   deleteSparePart(id: string): Promise<void>;
   getSparePartInventories(garageId: string, sparePartId?: string): Promise<SparePartInventory[]>;
+  getAllSparePartInventories(): Promise<SparePartInventory[]>;
   createSparePartInventory(data: InsertSparePartInventory): Promise<SparePartInventory>;
   updateSparePartInventory(id: string, data: Partial<SparePartInventory>): Promise<SparePartInventory>;
   
@@ -2429,6 +2430,11 @@ export class DatabaseStorage implements IStorage {
     }
     return await db.select().from(sparePartInventories)
       .where(eq(sparePartInventories.garageId, garageId));
+  }
+
+  async getAllSparePartInventories(): Promise<SparePartInventory[]> {
+    return await db.select().from(sparePartInventories)
+      .where(eq(sparePartInventories.isEnabled, true));
   }
 
   async createSparePartInventory(data: InsertSparePartInventory): Promise<SparePartInventory> {
