@@ -21,20 +21,22 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 
-const bookingSchema = z.object({
-  vehicleId: z.string().min(1, "Please select a vehicle"),
-  scheduledDate: z.date({ required_error: "Please select a date" }),
-  serviceType: z.string().min(1, "Please describe the service needed"),
+const createBookingSchema = (t: (key: string, fallback: string) => string) => z.object({
+  vehicleId: z.string().min(1, t('clientAppointments.validation.selectVehicle', 'Please select a vehicle')),
+  scheduledDate: z.date({ required_error: t('clientAppointments.validation.selectDate', 'Please select a date') }),
+  serviceType: z.string().min(1, t('clientAppointments.validation.describeService', 'Please describe the service needed')),
   notes: z.string().optional(),
 });
 
-type BookingFormValues = z.infer<typeof bookingSchema>;
+type BookingFormValues = z.infer<ReturnType<typeof createBookingSchema>>;
 
 export default function ClientAppointments() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const bookingSchema = createBookingSchema(t);
 
   const { data: vehicles, isLoading: vehiclesLoading } = useQuery({
     queryKey: ["/api/vehicles", user?.id],
@@ -106,15 +108,15 @@ export default function ClientAppointments() {
       setDialogOpen(false);
       form.reset();
       toast({
-        title: "Appointment Booked",
-        description: "Your service appointment has been scheduled successfully.",
+        title: t('clientAppointments.appointmentBooked', 'Appointment Booked'),
+        description: t('clientAppointments.appointmentSuccess', 'Your service appointment has been scheduled successfully.'),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to book appointment. Please try again.",
+        title: t('common.error', 'Error'),
+        description: t('clientAppointments.bookingFailed', 'Failed to book appointment. Please try again.'),
       });
     },
   });
@@ -125,7 +127,7 @@ export default function ClientAppointments() {
 
   const getVehicleInfo = (vehicleId: string) => {
     const vehicle = myVehicles.find((v: any) => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : "Unknown Vehicle";
+    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : t('clientAppointments.unknownVehicle', 'Unknown Vehicle');
   };
 
   return (
@@ -133,24 +135,24 @@ export default function ClientAppointments() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
-            Appointments
+            {t('clientAppointments.title', 'Appointments')}
           </h1>
           <p className="text-[#64748B] mt-1">
-            View and manage your service appointments
+            {t('clientAppointments.description', 'View and manage your service appointments')}
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-book-new">
               <Plus className="h-4 w-4 mr-2" />
-              Book Appointment
+              {t('clientAppointments.bookAppointment', 'Book Appointment')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <DialogHeader>
-              <DialogTitle className="text-[#0B1F3B] dark:text-white">Book Service Appointment</DialogTitle>
+              <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.bookServiceAppointment', 'Book Service Appointment')}</DialogTitle>
               <DialogDescription className="text-[#64748B]">
-                Schedule a service appointment for your vehicle
+                {t('clientAppointments.scheduleAppointment', 'Schedule a service appointment for your vehicle')}
               </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -160,11 +162,11 @@ export default function ClientAppointments() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Vehicle</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.vehicle', 'Vehicle')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
-                            <SelectValue placeholder="Select vehicle" />
+                            <SelectValue placeholder={t('clientAppointments.selectVehicle', 'Select vehicle')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -185,7 +187,7 @@ export default function ClientAppointments() {
                   name="scheduledDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Date & Time</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.dateTime', 'Date & Time')}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -226,10 +228,10 @@ export default function ClientAppointments() {
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Service Type</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.serviceType', 'Service Type')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Describe the service needed (e.g., Oil change, Brake inspection)"
+                          placeholder={t('clientAppointments.serviceTypePlaceholder', 'Describe the service needed (e.g., Oil change, Brake inspection)')}
                           className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-service-type"
@@ -245,10 +247,10 @@ export default function ClientAppointments() {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Additional Notes (Optional)</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.additionalNotes', 'Additional Notes (Optional)')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Any additional information..."
+                          placeholder={t('clientAppointments.additionalInfo', 'Any additional information...')}
                           className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
                           {...field}
                           data-testid="input-notes"
@@ -267,7 +269,7 @@ export default function ClientAppointments() {
                     className="flex-1 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                     data-testid="button-cancel"
                   >
-                    Cancel
+                    {t('common.cancel', 'Cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -275,7 +277,7 @@ export default function ClientAppointments() {
                     className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                     data-testid="button-submit"
                   >
-                    {createMutation.isPending ? "Booking..." : "Book Appointment"}
+                    {createMutation.isPending ? t('clientAppointments.booking', 'Booking...') : t('clientAppointments.bookAppointment', 'Book Appointment')}
                   </Button>
                 </div>
               </form>
@@ -286,8 +288,8 @@ export default function ClientAppointments() {
 
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-upcoming">
         <CardHeader>
-          <CardTitle className="text-[#0B1F3B] dark:text-white">Upcoming Appointments</CardTitle>
-          <CardDescription className="text-[#64748B]">Your scheduled service appointments</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.upcomingAppointments', 'Upcoming Appointments')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('clientAppointments.scheduledAppointments', 'Your scheduled service appointments')}</CardDescription>
         </CardHeader>
         <CardContent>
           {appointmentsLoading ? (
@@ -339,7 +341,7 @@ export default function ClientAppointments() {
                     </div>
                     {appointment.notes && (
                       <p className="text-sm text-[#64748B] italic">
-                        Note: {appointment.notes}
+                        {t('clientAppointments.note', 'Note')}: {appointment.notes}
                       </p>
                     )}
                   </div>
@@ -352,8 +354,8 @@ export default function ClientAppointments() {
 
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-past">
         <CardHeader>
-          <CardTitle className="text-[#0B1F3B] dark:text-white">Past Appointments</CardTitle>
-          <CardDescription className="text-[#64748B]">Your appointment history</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('clientAppointments.pastAppointments', 'Past Appointments')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('clientAppointments.appointmentHistory', 'Your appointment history')}</CardDescription>
         </CardHeader>
         <CardContent>
           {appointmentsLoading ? (

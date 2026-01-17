@@ -187,7 +187,7 @@ export default function WelcomePage() {
       </main>
 
       <footer className="p-6 text-center text-sm text-[#64748B]">
-        <p>&copy; {new Date().getFullYear()} SALIS AUTO. {t('welcome.allRightsReserved', 'All rights reserved.')}</p>
+        <p>&copy; {new Date().getFullYear()} {t('app.name', 'SALIS AUTO')}. {t('welcome.allRightsReserved', 'All rights reserved.')}</p>
       </footer>
     </div>
   );

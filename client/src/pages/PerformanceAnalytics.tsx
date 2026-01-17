@@ -24,10 +24,10 @@ export default function PerformanceAnalytics() {
   ];
 
   const technicianData = [
-    { name: "John Doe", efficiency: 95, jobs: 45 },
-    { name: "Jane Smith", efficiency: 88, jobs: 38 },
-    { name: "Mike Johnson", efficiency: 92, jobs: 42 },
-    { name: "Sarah Williams", efficiency: 85, jobs: 35 },
+    { name: t('sample.technicianName1', 'Mohammed Hassan'), efficiency: 95, jobs: 45 },
+    { name: t('sample.technicianName2', 'Ahmed Al-Rashid'), efficiency: 88, jobs: 38 },
+    { name: t('sample.technicianName3', 'Khalid Ibrahim'), efficiency: 92, jobs: 42 },
+    { name: t('sample.technicianName4', 'Omar Al-Farsi'), efficiency: 85, jobs: 35 },
   ];
 
   const serviceTypeData = [

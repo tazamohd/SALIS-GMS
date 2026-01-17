@@ -554,7 +554,7 @@ export default function CustomerFeedback() {
                           </div>
                           <div>
                             <p className="text-2xl font-bold font-montserrat">{count}</p>
-                            <p className="text-sm text-[#64748B] capitalize">{sentiment} ({percentage}%)</p>
+                            <p className="text-sm text-[#64748B] capitalize">{t(`customers.feedback.${sentiment}`, sentiment)} ({percentage}%)</p>
                           </div>
                         </div>
                       </CardContent>
@@ -574,7 +574,7 @@ export default function CustomerFeedback() {
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: SENTIMENT_COLORS[sentiment as keyof typeof SENTIMENT_COLORS] }} 
                         />
-                        <span className="font-medium capitalize">{sentiment}</span>
+                        <span className="font-medium capitalize">{t(`customers.feedback.${sentiment}`, sentiment)}</span>
                         <Badge variant="secondary">{items.length}</Badge>
                       </div>
                       {items.slice(0, 3).map((item: any) => (
@@ -773,7 +773,7 @@ function FeedbackCard({
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-gray-400" />
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {customer?.firstName || 'Unknown'} {customer?.lastName || 'Customer'}
+                  {customer?.firstName || t('common.unknown', 'Unknown')} {customer?.lastName || t('common.customer', 'Customer')}
                 </span>
               </div>
               <StarRating rating={f.overallRating} />

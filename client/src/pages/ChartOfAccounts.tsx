@@ -434,6 +434,7 @@ interface AccountTreeNodeProps {
 }
 
 function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(level < 2);
   const hasChildren = account.children && account.children.length > 0;
 
@@ -482,7 +483,7 @@ function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
 
           <Badge variant="outline" className={getTypeColor(account.type)}>
             {getTypeIcon(account.type)}
-            <span className="ml-1 capitalize">{account.type}</span>
+            <span className="ml-1 capitalize">{t(`accounting.${account.type}`, account.type)}</span>
           </Badge>
 
           <span className={`font-mono text-sm font-medium w-32 text-right ${
@@ -492,7 +493,7 @@ function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
           </span>
 
           <Badge variant={account.isActive ? "default" : "secondary"} className="w-16 justify-center">
-            {account.isActive ? "Active" : "Inactive"}
+            {account.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
           </Badge>
         </div>
 

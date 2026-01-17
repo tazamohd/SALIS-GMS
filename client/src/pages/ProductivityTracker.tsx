@@ -26,10 +26,10 @@ export default function ProductivityTracker() {
   ];
 
   const technicianStats = [
-    { name: "John Doe", completed: 12, pending: 3, avgTime: "2.3h", efficiency: 94 },
-    { name: "Jane Smith", completed: 10, pending: 2, avgTime: "2.5h", efficiency: 91 },
-    { name: "Mike Johnson", completed: 11, pending: 4, avgTime: "2.1h", efficiency: 96 },
-    { name: "Sarah Williams", completed: 9, pending: 1, avgTime: "2.8h", efficiency: 88 },
+    { name: t('sample.technicianName1', 'Ahmed Al-Rashid'), completed: 12, pending: 3, avgTime: "2.3h", efficiency: 94 },
+    { name: t('sample.technicianName2', 'Fatima Hassan'), completed: 10, pending: 2, avgTime: "2.5h", efficiency: 91 },
+    { name: t('sample.technicianName3', 'Omar Khalid'), completed: 11, pending: 4, avgTime: "2.1h", efficiency: 96 },
+    { name: t('sample.technicianName4', 'Sara Mohammed'), completed: 9, pending: 1, avgTime: "2.8h", efficiency: 88 },
   ];
 
   const metrics = [
@@ -182,7 +182,7 @@ export default function ProductivityTracker() {
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-[#0B1F3B] dark:text-white">Mike Johnson</p>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('sample.technicianName3', 'Omar Khalid')}</p>
                 <p className="text-sm text-[#64748B]">96% {t('productivity.efficiency', 'efficiency')}</p>
               </div>
             </div>

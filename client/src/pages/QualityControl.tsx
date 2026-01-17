@@ -8,18 +8,18 @@ export default function QualityControl() {
   const { t } = useTranslation();
 
   const inspections = [
-    { id: "QC-001", vehicle: "Toyota Camry 2024", service: "Engine Overhaul", technician: "Ahmed Hassan", status: "passed", score: 98, date: "2026-01-07" },
-    { id: "QC-002", vehicle: "BMW X5 2023", service: "Brake Replacement", technician: "Mohammed Ali", status: "passed", score: 95, date: "2026-01-07" },
-    { id: "QC-003", vehicle: "Honda Accord 2022", service: "AC Service", technician: "Khalid Omar", status: "pending", score: 0, date: "2026-01-07" },
-    { id: "QC-004", vehicle: "Mercedes C-Class 2024", service: "Transmission Repair", technician: "Omar Fahad", status: "failed", score: 72, date: "2026-01-06" },
-    { id: "QC-005", vehicle: "Nissan Altima 2023", service: "Full Service", technician: "Ali Saeed", status: "passed", score: 92, date: "2026-01-06" },
+    { id: "QC-001", vehicle: "Toyota Camry 2024", service: t('services.engineOverhaul', 'Engine Overhaul'), technician: t('sample.technicianName5', 'Ahmed Hassan'), status: "passed", score: 98, date: "2026-01-07" },
+    { id: "QC-002", vehicle: "BMW X5 2023", service: t('services.brakeReplacement', 'Brake Replacement'), technician: t('sample.technicianName6', 'Mohammed Ali'), status: "passed", score: 95, date: "2026-01-07" },
+    { id: "QC-003", vehicle: "Honda Accord 2022", service: t('services.acService', 'AC Service'), technician: t('sample.technicianName7', 'Khalid Omar'), status: "pending", score: 0, date: "2026-01-07" },
+    { id: "QC-004", vehicle: "Mercedes C-Class 2024", service: t('services.transmissionRepair', 'Transmission Repair'), technician: t('sample.technicianName8', 'Omar Fahad'), status: "failed", score: 72, date: "2026-01-06" },
+    { id: "QC-005", vehicle: "Nissan Altima 2023", service: t('services.fullService', 'Full Service'), technician: t('sample.technicianName9', 'Ali Saeed'), status: "passed", score: 92, date: "2026-01-06" },
   ];
 
   const getStatusBadge = (status: string, id: string) => {
     switch (status) {
-      case "passed": return <Badge data-testid={`status-passed-${id}`} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"><CheckCircle className="w-3 h-3 mr-1" />Passed</Badge>;
-      case "pending": return <Badge data-testid={`status-pending-${id}`} className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"><AlertTriangle className="w-3 h-3 mr-1" />Pending</Badge>;
-      case "failed": return <Badge data-testid={`status-failed-${id}`} className="bg-red-500/20 text-red-400 border-red-500/30"><XCircle className="w-3 h-3 mr-1" />Failed</Badge>;
+      case "passed": return <Badge data-testid={`status-passed-${id}`} className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"><CheckCircle className="w-3 h-3 mr-1" />{t('qualityControl.passed', 'Passed')}</Badge>;
+      case "pending": return <Badge data-testid={`status-pending-${id}`} className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30"><AlertTriangle className="w-3 h-3 mr-1" />{t('qualityControl.pending', 'Pending')}</Badge>;
+      case "failed": return <Badge data-testid={`status-failed-${id}`} className="bg-red-500/20 text-red-400 border-red-500/30"><XCircle className="w-3 h-3 mr-1" />{t('qualityControl.failed', 'Failed')}</Badge>;
       default: return <Badge>{status}</Badge>;
     }
   };
@@ -34,7 +34,7 @@ export default function QualityControl() {
           </div>
           <Button data-testid="button-new-inspection" className="bg-sky-500 hover:bg-sky-600 text-white">
             <ClipboardCheck className="w-4 h-4 mr-2" />
-            New Inspection
+            {t('qualityControl.newInspection', 'New Inspection')}
           </Button>
         </div>
 
@@ -45,7 +45,7 @@ export default function QualityControl() {
                 <div className="p-2 rounded-lg bg-sky-500/20"><ClipboardCheck className="w-5 h-5 text-sky-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-total-inspections">156</p>
-                  <p className="text-sm text-gray-400">Total Inspections</p>
+                  <p className="text-sm text-gray-400">{t('qualityControl.totalInspections', 'Total Inspections')}</p>
                 </div>
               </div>
             </CardContent>
@@ -56,7 +56,7 @@ export default function QualityControl() {
                 <div className="p-2 rounded-lg bg-emerald-500/20"><CheckCircle className="w-5 h-5 text-emerald-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-passed">142</p>
-                  <p className="text-sm text-gray-400">Passed</p>
+                  <p className="text-sm text-gray-400">{t('qualityControl.passed', 'Passed')}</p>
                 </div>
               </div>
             </CardContent>
@@ -67,7 +67,7 @@ export default function QualityControl() {
                 <div className="p-2 rounded-lg bg-red-500/20"><XCircle className="w-5 h-5 text-red-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-failed">8</p>
-                  <p className="text-sm text-gray-400">Failed</p>
+                  <p className="text-sm text-gray-400">{t('qualityControl.failed', 'Failed')}</p>
                 </div>
               </div>
             </CardContent>
@@ -78,7 +78,7 @@ export default function QualityControl() {
                 <div className="p-2 rounded-lg bg-purple-500/20"><Settings className="w-5 h-5 text-purple-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-pass-rate">91.0%</p>
-                  <p className="text-sm text-gray-400">Pass Rate</p>
+                  <p className="text-sm text-gray-400">{t('qualityControl.passRate', 'Pass Rate')}</p>
                 </div>
               </div>
             </CardContent>
@@ -87,8 +87,8 @@ export default function QualityControl() {
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-recent-inspections">
           <CardHeader>
-            <CardTitle className="text-white">Recent Inspections</CardTitle>
-            <CardDescription className="text-gray-400">Quality control inspection results</CardDescription>
+            <CardTitle className="text-white">{t('qualityControl.recentInspections', 'Recent Inspections')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('qualityControl.inspectionResults', 'Quality control inspection results')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -106,7 +106,7 @@ export default function QualityControl() {
                   <div className="flex items-center gap-6">
                     <div className="text-right">
                       <p className="text-sm text-white">{inspection.date}</p>
-                      {inspection.score > 0 && <p data-testid={`text-score-${inspection.id}`} className={`text-sm font-bold ${inspection.score >= 90 ? 'text-emerald-400' : inspection.score >= 80 ? 'text-yellow-400' : 'text-red-400'}`}>Score: {inspection.score}%</p>}
+                      {inspection.score > 0 && <p data-testid={`text-score-${inspection.id}`} className={`text-sm font-bold ${inspection.score >= 90 ? 'text-emerald-400' : inspection.score >= 80 ? 'text-yellow-400' : 'text-red-400'}`}>{t('qualityControl.score', 'Score')}: {inspection.score}%</p>}
                     </div>
                     {getStatusBadge(inspection.status, inspection.id)}
                     <Button data-testid={`button-view-${inspection.id}`} variant="ghost" size="sm" className="text-gray-400 hover:text-white">

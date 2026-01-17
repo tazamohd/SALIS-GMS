@@ -82,7 +82,6 @@ export default function Vehicles() {
       mileage: 0,
       engineType: "",
       transmissionType: "",
-      nationality: "",
       notes: "",
       isActive: true,
     },
@@ -594,34 +593,6 @@ export default function Vehicles() {
                   </FormItem>
                 )}
               />
-
-              {/* Nationality Dropdown - bound to form */}
-              <FormField
-                control={form.control}
-                name="nationality"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.nationality', 'Nationality')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
-                      <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-nationality">
-                          <SelectValue placeholder={t('vehicles.selectNationality', 'Select nationality')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] max-h-[300px]">
-                        <ScrollArea className="h-[280px]">
-                          {nationalities.map((nat) => (
-                            <SelectItem key={nat.id} value={nat.name}>
-                              {nat.name}
-                            </SelectItem>
-                          ))}
-                        </ScrollArea>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             {/* Mileage */}
@@ -870,15 +841,15 @@ export default function Vehicles() {
         <RoleBadge size="md" />
         {canCreate('vehicles') ? (
           <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            You can add and manage vehicles
+            {t('vehicles.canAddAndManage', 'You can add and manage vehicles')}
           </span>
         ) : canEdit('vehicles') ? (
           <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-            You can update vehicle information
+            {t('vehicles.canUpdateInfo', 'You can update vehicle information')}
           </span>
         ) : (
           <span className="text-xs text-zinc-500 flex items-center gap-1">
-            <Shield className="w-3 h-3" /> View only - contact a manager to modify vehicle records
+            <Shield className="w-3 h-3" /> {t('vehicles.viewOnlyAccess', 'View only - contact a manager to modify vehicle records')}
           </span>
         )}
       </div>
@@ -991,7 +962,7 @@ export default function Vehicles() {
                         </Button>
                       ) : (
                         <span className="flex-1 text-xs text-zinc-500 flex items-center justify-center gap-1">
-                          <Shield className="w-3 h-3" /> No edit access
+                          <Shield className="w-3 h-3" /> {t('vehicles.noEditAccess', 'No edit access')}
                         </span>
                       )}
                       {canDelete('vehicles') ? (

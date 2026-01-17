@@ -393,12 +393,12 @@ export default function ServiceBayDashboard() {
                     
                     <div className="text-center mb-2">
                       <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{bay.bayNumber}</h3>
-                      <p className="text-xs text-[#64748B] capitalize">{bay.bayType}</p>
+                      <p className="text-xs text-[#64748B] capitalize">{t(`serviceBay.bayTypes.${bay.bayType}`, bay.bayType || 'general')}</p>
                     </div>
                     
                     <div className="flex items-center justify-center gap-1 mb-2">
                       {getBayStatusIcon(bay.status || 'unknown')}
-                      <span className="text-sm capitalize text-[#0B1F3B] dark:text-gray-300">{bay.status}</span>
+                      <span className="text-sm capitalize text-[#0B1F3B] dark:text-gray-300">{t(`serviceBay.statuses.${bay.status}`, bay.status || 'unknown')}</span>
                     </div>
                     
                     {bay.currentSession && (

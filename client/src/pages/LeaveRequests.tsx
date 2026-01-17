@@ -100,7 +100,7 @@ export default function LeaveRequests() {
                     </div>
                     <div>
                       <p className="font-medium text-white" data-testid={`text-employee-${request.id}`}>{request.employee}</p>
-                      <p className="text-sm text-gray-400">{request.type} • {request.reason}</p>
+                      <p className="text-sm text-gray-400">{t(`leaveRequests.types.${request.type.toLowerCase().replace(/\s+/g, '')}`, request.type)} • {request.reason}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">

@@ -6,11 +6,11 @@ export default function ProfitMarginAnalysis() {
   const { t } = useTranslation();
 
   const services = [
-    { name: "Engine Repair", revenue: 45000, cost: 28000, margin: 37.8 },
-    { name: "Oil Change", revenue: 12000, cost: 4000, margin: 66.7 },
-    { name: "Brake Service", revenue: 28000, cost: 15000, margin: 46.4 },
-    { name: "AC Service", revenue: 18000, cost: 9000, margin: 50.0 },
-    { name: "Transmission", revenue: 35000, cost: 22000, margin: 37.1 },
+    { name: t('services.engineRepair', 'Engine Repair'), revenue: 45000, cost: 28000, margin: 37.8 },
+    { name: t('services.oilChange', 'Oil Change'), revenue: 12000, cost: 4000, margin: 66.7 },
+    { name: t('services.brakeService', 'Brake Service'), revenue: 28000, cost: 15000, margin: 46.4 },
+    { name: t('services.acService', 'AC Service'), revenue: 18000, cost: 9000, margin: 50.0 },
+    { name: t('services.transmission', 'Transmission'), revenue: 35000, cost: 22000, margin: 37.1 },
   ];
 
   return (
@@ -27,8 +27,8 @@ export default function ProfitMarginAnalysis() {
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-emerald-500/20"><DollarSign className="w-5 h-5 text-emerald-400" /></div>
                 <div>
-                  <p className="text-2xl font-bold text-white" data-testid="text-total-revenue">SAR 138K</p>
-                  <p className="text-sm text-gray-400">Total Revenue</p>
+                  <p className="text-2xl font-bold text-white" data-testid="text-total-revenue">{t('common.currencySAR', 'SAR')} 138K</p>
+                  <p className="text-sm text-gray-400">{t('profitMargin.totalRevenue', 'Total Revenue')}</p>
                 </div>
               </div>
             </CardContent>
@@ -38,8 +38,8 @@ export default function ProfitMarginAnalysis() {
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-red-500/20"><TrendingDown className="w-5 h-5 text-red-400" /></div>
                 <div>
-                  <p className="text-2xl font-bold text-white" data-testid="text-total-costs">SAR 78K</p>
-                  <p className="text-sm text-gray-400">Total Costs</p>
+                  <p className="text-2xl font-bold text-white" data-testid="text-total-costs">{t('common.currencySAR', 'SAR')} 78K</p>
+                  <p className="text-sm text-gray-400">{t('profitMargin.totalCosts', 'Total Costs')}</p>
                 </div>
               </div>
             </CardContent>
@@ -49,8 +49,8 @@ export default function ProfitMarginAnalysis() {
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-sky-500/20"><TrendingUp className="w-5 h-5 text-sky-400" /></div>
                 <div>
-                  <p className="text-2xl font-bold text-white" data-testid="text-gross-profit">SAR 60K</p>
-                  <p className="text-sm text-gray-400">Gross Profit</p>
+                  <p className="text-2xl font-bold text-white" data-testid="text-gross-profit">{t('common.currencySAR', 'SAR')} 60K</p>
+                  <p className="text-sm text-gray-400">{t('profitMargin.grossProfit', 'Gross Profit')}</p>
                 </div>
               </div>
             </CardContent>
@@ -61,7 +61,7 @@ export default function ProfitMarginAnalysis() {
                 <div className="p-2 rounded-lg bg-purple-500/20"><Target className="w-5 h-5 text-purple-400" /></div>
                 <div>
                   <p className="text-2xl font-bold text-white" data-testid="text-avg-margin">43.5%</p>
-                  <p className="text-sm text-gray-400">Avg Margin</p>
+                  <p className="text-sm text-gray-400">{t('profitMargin.avgMargin', 'Avg Margin')}</p>
                 </div>
               </div>
             </CardContent>
@@ -70,8 +70,8 @@ export default function ProfitMarginAnalysis() {
 
         <Card className="glass-card border-white/10 bg-white/5 backdrop-blur-xl" data-testid="card-service-margins">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2"><BarChart3 className="w-5 h-5 text-sky-400" /> Service Profit Margins</CardTitle>
-            <CardDescription className="text-gray-400">Breakdown of profit margins by service type</CardDescription>
+            <CardTitle className="text-white flex items-center gap-2"><BarChart3 className="w-5 h-5 text-sky-400" /> {t('profitMargin.serviceProfitMargins', 'Service Profit Margins')}</CardTitle>
+            <CardDescription className="text-gray-400">{t('profitMargin.breakdownByServiceType', 'Breakdown of profit margins by service type')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -84,9 +84,9 @@ export default function ProfitMarginAnalysis() {
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-400">Revenue: <span className="text-emerald-400" data-testid={`text-revenue-${idx}`}>SAR {service.revenue.toLocaleString()}</span></span>
-                    <span className="text-gray-400">Cost: <span className="text-red-400" data-testid={`text-cost-${idx}`}>SAR {service.cost.toLocaleString()}</span></span>
-                    <span className="text-gray-400">Profit: <span className="text-sky-400" data-testid={`text-profit-${idx}`}>SAR {(service.revenue - service.cost).toLocaleString()}</span></span>
+                    <span className="text-gray-400">{t('profitMargin.revenue', 'Revenue')}: <span className="text-emerald-400" data-testid={`text-revenue-${idx}`}>{t('common.currencySAR', 'SAR')} {service.revenue.toLocaleString()}</span></span>
+                    <span className="text-gray-400">{t('profitMargin.cost', 'Cost')}: <span className="text-red-400" data-testid={`text-cost-${idx}`}>{t('common.currencySAR', 'SAR')} {service.cost.toLocaleString()}</span></span>
+                    <span className="text-gray-400">{t('profitMargin.profit', 'Profit')}: <span className="text-sky-400" data-testid={`text-profit-${idx}`}>{t('common.currencySAR', 'SAR')} {(service.revenue - service.cost).toLocaleString()}</span></span>
                   </div>
                   <div className="mt-2 h-2 bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-sky-500 to-emerald-500 rounded-full" style={{ width: `${service.margin}%` }} />

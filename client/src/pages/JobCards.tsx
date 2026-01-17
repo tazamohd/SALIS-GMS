@@ -56,10 +56,10 @@ const jobCardFormSchema = insertJobCardSchema.extend({
   totalCost: z.string().optional(),
   scheduledDate: z.string().optional(),
   vehicleInfo: z.object({
-    make: z.string().min(1, "Make is required"),
-    model: z.string().min(1, "Model is required"),
-    year: z.string().min(1, "Year is required"),
-    licensePlate: z.string().min(1, "License plate is required"),
+    make: z.string().min(1),
+    model: z.string().min(1),
+    year: z.string().min(1),
+    licensePlate: z.string().min(1),
     vin: z.string().optional(),
   }),
 }).omit({

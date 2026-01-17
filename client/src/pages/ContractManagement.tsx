@@ -276,8 +276,8 @@ export default function ContractManagement() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="utilized" fill={COLORS.info} name="Utilized %" />
-                    <Bar dataKey="remaining" fill={COLORS.success} name="Remaining %" />
+                    <Bar dataKey="utilized" fill={COLORS.info} name={t('payments.contracts.utilizedPercent', 'Utilized %')} />
+                    <Bar dataKey="remaining" fill={COLORS.success} name={t('payments.contracts.remainingPercent', 'Remaining %')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -296,9 +296,9 @@ export default function ContractManagement() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="met" stackId="a" fill={COLORS.success} name="Met" />
-                    <Bar dataKey="warning" stackId="a" fill={COLORS.warning} name="Warning" />
-                    <Bar dataKey="breached" stackId="a" fill={COLORS.error} name="Breached" />
+                    <Bar dataKey="met" stackId="a" fill={COLORS.success} name={t('payments.contracts.met', 'Met')} />
+                    <Bar dataKey="warning" stackId="a" fill={COLORS.warning} name={t('payments.contracts.warning', 'Warning')} />
+                    <Bar dataKey="breached" stackId="a" fill={COLORS.error} name={t('payments.contracts.breached', 'Breached')} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -661,7 +661,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
                       <span className="text-sm font-medium">{metric.metricType}</span>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Target: {metric.targetValue} | Actual: {metric.actualValue}
+                      {t('payments.contracts.target', 'Target')}: {metric.targetValue} | {t('payments.contracts.actual', 'Actual')}: {metric.actualValue}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       {format(new Date(metric.incidentDate), "MMM dd, yyyy HH:mm")}
@@ -683,7 +683,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
             ))}
             {slaMetrics.length === 0 && (
               <p className="text-center text-muted-foreground py-4">
-                No SLA metrics recorded
+                {t('payments.contracts.noSlaMetrics', 'No SLA metrics recorded')}
               </p>
             )}
           </div>
@@ -728,7 +728,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                       <Badge>{renewal.status}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {renewal.contract.fleetGroup?.companyName || "Unknown Fleet"}
+                      {renewal.contract.fleetGroup?.companyName || t('payments.contracts.unknownFleet', 'Unknown Fleet')}
                     </p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
@@ -752,7 +752,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                     </div>
                     {renewal.notificationSentAt && (
                       <p className="text-xs text-muted-foreground">
-                        Notification sent: {format(new Date(renewal.notificationSentAt), "MMM dd, yyyy HH:mm")}
+                        {t('payments.contracts.notificationSent', 'Notification sent')}: {format(new Date(renewal.notificationSentAt), "MMM dd, yyyy HH:mm")}
                       </p>
                     )}
                   </div>

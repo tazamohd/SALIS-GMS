@@ -258,7 +258,7 @@ export default function CustomerLoyalty() {
                           <Star className="h-8 w-8 text-salis-gray dark:text-salis-gray-light" />
                           <div>
                             <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-tier-${account.id}`}>
-                              {account.currentTier || "Bronze"} {t('customers.loyalty.member', 'Member')}
+                              {account.currentTier || t('customers.loyalty.bronze', 'Bronze')} {t('customers.loyalty.member', 'Member')}
                             </p>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-member-points-${account.id}`}>
                               {account.currentPoints ?? 0} {t('customers.loyalty.points', 'points')}
@@ -268,7 +268,7 @@ export default function CustomerLoyalty() {
                         <div className="text-right">
                           <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.totalEarned', 'Total Earned')}</p>
                           <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-total-${account.id}`}>
-                            {account.totalPointsEarned ?? 0} pts
+                            {account.totalPointsEarned ?? 0} {t('customers.loyalty.pts', 'pts')}
                           </p>
                         </div>
                       </div>

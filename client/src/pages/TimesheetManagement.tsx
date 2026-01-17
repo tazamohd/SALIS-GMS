@@ -108,9 +108,9 @@ export default function TimesheetManagement() {
 
   const columns = [
     {
-      header: t('timesheet.columns.date', 'Date'),
-      accessorKey: "date",
-      cell: (row: Timesheet) => (
+      key: "date",
+      label: t('timesheet.columns.date', 'Date'),
+      render: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-date-${row.id}`}>
           <Calendar className="w-4 h-4 text-[#64748B]" />
           <span className="text-[#0B1F3B] dark:text-white">{new Date(row.date).toLocaleDateString()}</span>
@@ -118,9 +118,9 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: t('timesheet.columns.technician', 'Technician'),
-      accessorKey: "technicianName",
-      cell: (row: Timesheet) => (
+      key: "technicianName",
+      label: t('timesheet.columns.technician', 'Technician'),
+      render: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-tech-${row.id}`}>
           <User className="w-4 h-4 text-[#64748B]" />
           <span className="text-[#0B1F3B] dark:text-white">{row.technicianName}</span>
@@ -128,23 +128,23 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: t('timesheet.columns.clockIn', 'Clock In'),
-      accessorKey: "clockIn",
-      cell: (row: Timesheet) => (
+      key: "clockIn",
+      label: t('timesheet.columns.clockIn', 'Clock In'),
+      render: (row: Timesheet) => (
         <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`timesheet-in-${row.id}`}>{row.clockIn}</span>
       ),
     },
     {
-      header: t('timesheet.columns.clockOut', 'Clock Out'),
-      accessorKey: "clockOut",
-      cell: (row: Timesheet) => (
+      key: "clockOut",
+      label: t('timesheet.columns.clockOut', 'Clock Out'),
+      render: (row: Timesheet) => (
         <span className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`timesheet-out-${row.id}`}>{row.clockOut}</span>
       ),
     },
     {
-      header: t('timesheet.columns.hoursWorked', 'Hours Worked'),
-      accessorKey: "hoursWorked",
-      cell: (row: Timesheet) => (
+      key: "hoursWorked",
+      label: t('timesheet.columns.hoursWorked', 'Hours Worked'),
+      render: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-hours-${row.id}`}>
           <Clock className="w-4 h-4 text-[#64748B]" />
           <span className="font-semibold text-[#0B1F3B] dark:text-white">{row.hoursWorked}{t('timesheet.hours', 'h')}</span>
@@ -152,9 +152,9 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: t('timesheet.columns.totalPay', 'Total Pay'),
-      accessorKey: "totalPay",
-      cell: (row: Timesheet) => (
+      key: "totalPay",
+      label: t('timesheet.columns.totalPay', 'Total Pay'),
+      render: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-pay-${row.id}`}>
           <DollarSign className="w-4 h-4 text-[#64748B]" />
           <span className="font-semibold text-[#0B1F3B] dark:text-white">${row.totalPay.toFixed(2)}</span>
@@ -162,18 +162,18 @@ export default function TimesheetManagement() {
       ),
     },
     {
-      header: t('timesheet.columns.status', 'Status'),
-      accessorKey: "status",
-      cell: (row: Timesheet) => (
+      key: "status",
+      label: t('timesheet.columns.status', 'Status'),
+      render: (row: Timesheet) => (
         <Badge className={`${getStatusBadge(row.status)} border-0 capitalize`} data-testid={`timesheet-status-${row.id}`}>
           {getStatusLabel(row.status)}
         </Badge>
       ),
     },
     {
-      header: t('timesheet.columns.actions', 'Actions'),
-      accessorKey: "actions",
-      cell: (row: Timesheet) => (
+      key: "actions",
+      label: t('timesheet.columns.actions', 'Actions'),
+      render: (row: Timesheet) => (
         <div className="flex gap-2">
           {row.status === "pending" && (
             <>

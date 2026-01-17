@@ -340,7 +340,7 @@ export default function VehiclesEnhanced() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Toyota" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
+                        <Input {...field} placeholder={t('vehicles.makePlaceholder', 'e.g. Toyota')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -354,7 +354,7 @@ export default function VehiclesEnhanced() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.model', 'Model')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Camry" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-model" />
+                        <Input {...field} placeholder={t('vehicles.modelPlaceholder', 'e.g. Camry')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-model" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -388,7 +388,7 @@ export default function VehiclesEnhanced() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.licensePlate', 'License Plate')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="ABC123" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-license-plate" />
+                        <Input {...field} placeholder={t('vehicles.licensePlatePlaceholder', 'e.g. ABC123')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-license-plate" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

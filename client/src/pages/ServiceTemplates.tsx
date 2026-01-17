@@ -39,18 +39,18 @@ import { Plus, Clock, DollarSign, CheckCircle, XCircle, Eye, Pencil, Trash2, Wre
 import { z } from "zod";
 import { StandardPageLayout } from "@/components/layouts";
 
-const formSchema = insertServiceTemplateSchema.extend({
-  garageId: z.string().min(1, "Garage is required"),
-  name: z.string().min(1, "Name is required"),
-  category: z.string().min(1, "Category is required"),
+const createFormSchema = (t: (key: string, fallback: string) => string) => insertServiceTemplateSchema.extend({
+  garageId: z.string().min(1, t('serviceTemplates.validation.garageRequired', 'Garage is required')),
+  name: z.string().min(1, t('serviceTemplates.validation.nameRequired', 'Name is required')),
+  category: z.string().min(1, t('serviceTemplates.validation.categoryRequired', 'Category is required')),
   taskSteps: z.array(z.object({
     stepName: z.string(),
     description: z.string().optional(),
     estimatedMinutes: z.number().optional(),
-  })).min(1, "At least one task step is required"),
+  })).min(1, t('serviceTemplates.validation.taskStepsRequired', 'At least one task step is required')),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
 export default function ServiceTemplates() {
   const { t } = useTranslation();
@@ -63,6 +63,8 @@ export default function ServiceTemplates() {
   const [taskSteps, setTaskSteps] = useState<Array<{ stepName: string; description?: string; estimatedMinutes?: number }>>([
     { stepName: "", description: "", estimatedMinutes: 0 }
   ]);
+
+  const formSchema = createFormSchema(t);
 
   const { data: garages } = useQuery<any[]>({
     queryKey: ["/api/garages"],

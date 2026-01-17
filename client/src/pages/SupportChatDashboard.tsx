@@ -503,10 +503,10 @@ export default function SupportChatDashboard() {
                           </p>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className={`text-[10px] ${getStatusColor(ticket.status)}`}>
-                              {ticket.status.replace('_', ' ')}
+                              {t(`supportDashboard.statuses.${ticket.status}`, ticket.status.replace('_', ' '))}
                             </Badge>
                             <Badge variant="outline" className={`text-[10px] ${getPriorityColor(ticket.priority)}`}>
-                              {ticket.priority}
+                              {t(`supportDashboard.priorities.${ticket.priority}`, ticket.priority)}
                             </Badge>
                           </div>
                         </button>
@@ -538,10 +538,10 @@ export default function SupportChatDashboard() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium text-[#0A5ED7]">#{selectedTicket.ticketNumber}</span>
                           <Badge variant="outline" className={`text-[10px] ${getStatusColor(selectedTicket.status)}`}>
-                            {selectedTicket.status.replace('_', ' ')}
+                            {t(`supportDashboard.statuses.${selectedTicket.status}`, selectedTicket.status.replace('_', ' '))}
                           </Badge>
                           <Badge variant="outline" className={`text-[10px] ${getPriorityColor(selectedTicket.priority)}`}>
-                            {selectedTicket.priority}
+                            {t(`supportDashboard.priorities.${selectedTicket.priority}`, selectedTicket.priority)}
                           </Badge>
                         </div>
                         <h3 className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">

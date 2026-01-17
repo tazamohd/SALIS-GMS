@@ -214,7 +214,7 @@ export default function TrialBalance() {
                   <TableCell className="font-medium">{account.name}</TableCell>
                   <TableCell>
                     <Badge className={getAccountTypeBadge(account.type)}>
-                      {account.type}
+                      {t(`accounting.${account.type.toLowerCase()}Type`, account.type)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-mono">
@@ -253,7 +253,7 @@ export default function TrialBalance() {
             <Card key={type} data-testid={`card-summary-${type.toLowerCase()}`} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Badge className={getAccountTypeBadge(type)}>{type}</Badge>
+                  <Badge className={getAccountTypeBadge(type)}>{t(`accounting.${type.toLowerCase()}Type`, type)}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>

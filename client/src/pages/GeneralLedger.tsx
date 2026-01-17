@@ -275,7 +275,7 @@ export default function GeneralLedger() {
                   <TableCell className="font-medium">{account.name}</TableCell>
                   <TableCell>
                     <Badge className={getAccountTypeBadge(account.type)}>
-                      {account.type}
+                      {t(`accounting.${account.type.toLowerCase()}Type`, account.type)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right text-green-600">
@@ -405,7 +405,7 @@ export default function GeneralLedger() {
                     <div>
                       <p className="font-medium">{entry.account}</p>
                       <Badge className={`text-xs ${getAccountTypeBadge(entry.accountType)}`}>
-                        {entry.accountType}
+                        {t(`accounting.${entry.accountType.toLowerCase()}Type`, entry.accountType)}
                       </Badge>
                     </div>
                   </TableCell>
@@ -477,7 +477,7 @@ export default function GeneralLedger() {
             <Card key={type} data-testid={`card-type-${type.toLowerCase()}`}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Badge className={getAccountTypeBadge(type)}>{type}</Badge>
+                  <Badge className={getAccountTypeBadge(type)}>{t(`accounting.${type.toLowerCase()}Type`, type)}</Badge>
                   <span className="text-muted-foreground text-sm">
                     ({typeAccounts.length} {t('common.accounts', 'accounts')})
                   </span>

@@ -14,7 +14,15 @@ export default function StaffScheduling() {
     { name: "Omar Fahad", shifts: ["OFF", "08:00-16:00", "08:00-16:00", "14:00-22:00", "14:00-22:00", "OFF", "OFF"] },
   ];
 
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const days = [
+    t('staffScheduling.days.sun', 'Sun'),
+    t('staffScheduling.days.mon', 'Mon'),
+    t('staffScheduling.days.tue', 'Tue'),
+    t('staffScheduling.days.wed', 'Wed'),
+    t('staffScheduling.days.thu', 'Thu'),
+    t('staffScheduling.days.fri', 'Fri'),
+    t('staffScheduling.days.sat', 'Sat')
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#050510] via-[#0a0a1a] to-[#050510] p-6" data-testid="staff-scheduling-page">
@@ -26,7 +34,7 @@ export default function StaffScheduling() {
           </div>
           <Button data-testid="button-add-shift" className="bg-sky-500 hover:bg-sky-600 text-white">
             <Plus className="w-4 h-4 mr-2" />
-            Add Shift
+            {t('staffScheduling.addShift', 'Add Shift')}
           </Button>
         </div>
 
@@ -41,8 +49,8 @@ export default function StaffScheduling() {
             </Button>
           </div>
           <div className="flex gap-4">
-            <Badge data-testid="badge-morning" className="bg-sky-500/20 text-sky-400"><Clock className="w-3 h-3 mr-1" /> Morning: 08:00-16:00</Badge>
-            <Badge data-testid="badge-evening" className="bg-purple-500/20 text-purple-400"><Clock className="w-3 h-3 mr-1" /> Evening: 14:00-22:00</Badge>
+            <Badge data-testid="badge-morning" className="bg-sky-500/20 text-sky-400"><Clock className="w-3 h-3 mr-1" /> {t('staffScheduling.morning', 'Morning')}: 08:00-16:00</Badge>
+            <Badge data-testid="badge-evening" className="bg-purple-500/20 text-purple-400"><Clock className="w-3 h-3 mr-1" /> {t('staffScheduling.evening', 'Evening')}: 14:00-22:00</Badge>
           </div>
         </div>
 
@@ -52,7 +60,7 @@ export default function StaffScheduling() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left p-4 text-gray-400 font-medium w-48">Employee</th>
+                    <th className="text-left p-4 text-gray-400 font-medium w-48">{t('staffScheduling.employee', 'Employee')}</th>
                     {days.map((day, idx) => (
                       <th key={idx} data-testid={`header-day-${idx}`} className="text-center p-4 text-gray-400 font-medium">{day}</th>
                     ))}
@@ -72,7 +80,7 @@ export default function StaffScheduling() {
                       {emp.shifts.map((shift, i) => (
                         <td key={i} className="p-4 text-center">
                           {shift === "OFF" ? (
-                            <Badge data-testid={`shift-off-${idx}-${i}`} variant="outline" className="border-gray-600 text-gray-500">OFF</Badge>
+                            <Badge data-testid={`shift-off-${idx}-${i}`} variant="outline" className="border-gray-600 text-gray-500">{t('staffScheduling.off', 'OFF')}</Badge>
                           ) : (
                             <Badge data-testid={`shift-${idx}-${i}`} className={shift.startsWith("08") ? "bg-sky-500/20 text-sky-400" : "bg-purple-500/20 text-purple-400"}>
                               {shift}

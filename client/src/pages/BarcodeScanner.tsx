@@ -190,12 +190,12 @@ export default function BarcodeScanner() {
                     <div>
                       <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{getItemName(scan)}</h3>
                       <p className="text-sm text-[#64748B]">
-                        {scan.barcodeData} • {scan.location || "Unknown location"}
+                        {scan.barcodeData} • {scan.location || t('inventory.unknownLocation', 'Unknown location')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-[#64748B]">{scan.scannedBy || "Unknown"}</p>
+                    <p className="text-sm text-[#64748B]">{scan.scannedBy || t('common.unknown', 'Unknown')}</p>
                     <p className="text-xs text-[#64748B]">
                       {scan.createdAt ? new Date(scan.createdAt).toLocaleTimeString() : ""}
                     </p>

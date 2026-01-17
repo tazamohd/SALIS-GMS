@@ -13,11 +13,11 @@ export default function StaffPerformanceReview() {
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
   const performanceData = [
-    { name: "John Smith", efficiency: 92, quality: 88, punctuality: 95, teamwork: 90 },
-    { name: "Sarah Johnson", efficiency: 88, quality: 94, punctuality: 92, teamwork: 89 },
-    { name: "Mike Chen", efficiency: 85, quality: 87, punctuality: 88, teamwork: 92 },
-    { name: "Emily Davis", efficiency: 90, quality: 91, punctuality: 90, teamwork: 88 },
-    { name: "David Wilson", efficiency: 87, quality: 89, punctuality: 86, teamwork: 91 },
+    { name: t('samples.staffName1', 'Ahmed Al-Rashid'), efficiency: 92, quality: 88, punctuality: 95, teamwork: 90 },
+    { name: t('samples.staffName2', 'Fatima Abdullah'), efficiency: 88, quality: 94, punctuality: 92, teamwork: 89 },
+    { name: t('samples.staffName3', 'Omar Khalid'), efficiency: 85, quality: 87, punctuality: 88, teamwork: 92 },
+    { name: t('samples.staffName4', 'Sara Ibrahim'), efficiency: 90, quality: 91, punctuality: 90, teamwork: 88 },
+    { name: t('samples.staffName5', 'Mohammed Hassan'), efficiency: 87, quality: 89, punctuality: 86, teamwork: 91 },
   ];
 
   const monthlyTrends = [
@@ -30,9 +30,9 @@ export default function StaffPerformanceReview() {
   ];
 
   const topPerformers = [
-    { name: "John Smith", role: t('staffReview.roles.seniorTechnician', 'Senior Technician'), score: 91.2, tasks: 145 },
-    { name: "Sarah Johnson", role: t('staffReview.roles.leadMechanic', 'Lead Mechanic'), score: 90.8, tasks: 132 },
-    { name: "Emily Davis", role: t('staffReview.roles.technician', 'Technician'), score: 89.8, tasks: 128 },
+    { name: t('samples.staffName1', 'Ahmed Al-Rashid'), role: t('staffReview.roles.seniorTechnician', 'Senior Technician'), score: 91.2, tasks: 145 },
+    { name: t('samples.staffName2', 'Fatima Abdullah'), role: t('staffReview.roles.leadMechanic', 'Lead Mechanic'), score: 90.8, tasks: 132 },
+    { name: t('samples.staffName4', 'Sara Ibrahim'), role: t('staffReview.roles.technician', 'Technician'), score: 89.8, tasks: 128 },
   ];
 
   const kpiData = [
@@ -146,40 +146,6 @@ export default function StaffPerformanceReview() {
       icon={Award}
       filters={filters}
       sections={sections}
-    >
-      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-            <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
-            {t('staffReview.topPerformers', 'Top Performers')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topPerformers.map((performer, index) => (
-              <div
-                key={performer.name}
-                className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
-                data-testid={`performer-${index}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-bold text-white">
-                    #{index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{performer.name}</p>
-                    <p className="text-sm text-[#64748B]">{performer.role}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{performer.score}</p>
-                  <p className="text-sm text-[#64748B]">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </AnalyticsPage>
+    />
   );
 }

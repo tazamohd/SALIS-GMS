@@ -30,7 +30,7 @@ export default function VoiceCommandInterface() {
   const recentCommands = [
     { time: t('voiceCommands.twoMinAgo', '2 min ago'), command: t('voiceCommands.showDashboard', 'Show dashboard'), status: "success" },
     { time: t('voiceCommands.fiveMinAgo', '5 min ago'), command: t('voiceCommands.createJobCard', 'Create job card'), status: "success" },
-    { time: t('voiceCommands.tenMinAgo', '10 min ago'), command: "Search customer John", status: "success" },
+    { time: t('voiceCommands.tenMinAgo', '10 min ago'), command: t('voiceCommands.searchCustomerJohn', 'Search customer John'), status: "success" },
     { time: t('voiceCommands.fifteenMinAgo', '15 min ago'), command: t('voiceCommands.showAppointments', 'Show appointments'), status: "failed" },
   ];
 

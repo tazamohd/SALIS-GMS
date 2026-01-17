@@ -75,7 +75,7 @@ export default function MultiLocationDashboard() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white text-lg" data-testid={`text-location-name-${location.id}`}>{location.name}</CardTitle>
                   <Badge data-testid={`status-${location.status}-${location.id}`} className={location.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}>
-                    {location.status}
+                    {t(`statusLabels.${location.status}`, location.status)}
                   </Badge>
                 </div>
                 <CardDescription className="text-gray-400 flex items-center gap-1">

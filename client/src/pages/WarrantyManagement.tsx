@@ -608,7 +608,7 @@ export default function WarrantyManagement() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.warranty.warrantyNumber', 'Warranty Number')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="WRN-001" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                        <Input placeholder="WRN-001" {...field} value={field.value ?? ''} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -711,7 +711,7 @@ export default function WarrantyManagement() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payments.warranty.claimNumber', 'Claim Number')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="CLM-001" {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+                        <Input placeholder="CLM-001" {...field} value={field.value ?? ''} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

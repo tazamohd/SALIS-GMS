@@ -47,21 +47,21 @@ import {
 import { format, differenceInDays } from "date-fns";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
-// Mock data for demonstration
-const mockEmployees = [
-  { id: "1", employeeNumber: "EMP001", firstName: "Mohammed", lastName: "Al-Rashid", email: "m.alrashid@salisauto.com", phone: "+966 55 123 4567", department: "Service", position: "Senior Technician", status: "active", hireDate: "2021-03-15", avatar: null },
-  { id: "2", employeeNumber: "EMP002", firstName: "Ahmed", lastName: "Hassan", email: "a.hassan@salisauto.com", phone: "+966 55 234 5678", department: "Service", position: "Technician", status: "active", hireDate: "2022-06-01", avatar: null },
-  { id: "3", employeeNumber: "EMP003", firstName: "Fatima", lastName: "Abdullah", email: "f.abdullah@salisauto.com", phone: "+966 55 345 6789", department: "Administration", position: "HR Manager", status: "active", hireDate: "2020-01-10", avatar: null },
-  { id: "4", employeeNumber: "EMP004", firstName: "Omar", lastName: "Khalid", email: "o.khalid@salisauto.com", phone: "+966 55 456 7890", department: "Parts", position: "Parts Specialist", status: "on_leave", hireDate: "2022-09-20", avatar: null },
-  { id: "5", employeeNumber: "EMP005", firstName: "Sara", lastName: "Ibrahim", email: "s.ibrahim@salisauto.com", phone: "+966 55 567 8901", department: "Finance", position: "Accountant", status: "active", hireDate: "2021-08-15", avatar: null },
+// Mock data for demonstration - names are translated using t() in components
+const getMockEmployees = (t: any) => [
+  { id: "1", employeeNumber: "EMP001", firstName: t('samples.firstName1', 'Mohammed'), lastName: t('samples.lastName1', 'Al-Rashid'), email: "m.alrashid@salisauto.com", phone: "+966 55 123 4567", department: "Service", position: t('samples.position.seniorTechnician', 'Senior Technician'), status: "active", hireDate: "2021-03-15", avatar: null },
+  { id: "2", employeeNumber: "EMP002", firstName: t('samples.firstName2', 'Ahmed'), lastName: t('samples.lastName2', 'Hassan'), email: "a.hassan@salisauto.com", phone: "+966 55 234 5678", department: "Service", position: t('samples.position.technician', 'Technician'), status: "active", hireDate: "2022-06-01", avatar: null },
+  { id: "3", employeeNumber: "EMP003", firstName: t('samples.firstName3', 'Fatima'), lastName: t('samples.lastName3', 'Abdullah'), email: "f.abdullah@salisauto.com", phone: "+966 55 345 6789", department: "Administration", position: t('samples.position.hrManager', 'HR Manager'), status: "active", hireDate: "2020-01-10", avatar: null },
+  { id: "4", employeeNumber: "EMP004", firstName: t('samples.firstName4', 'Omar'), lastName: t('samples.lastName4', 'Khalid'), email: "o.khalid@salisauto.com", phone: "+966 55 456 7890", department: "Parts", position: t('samples.position.partsSpecialist', 'Parts Specialist'), status: "on_leave", hireDate: "2022-09-20", avatar: null },
+  { id: "5", employeeNumber: "EMP005", firstName: t('samples.firstName5', 'Sara'), lastName: t('samples.lastName5', 'Ibrahim'), email: "s.ibrahim@salisauto.com", phone: "+966 55 567 8901", department: "Finance", position: t('samples.position.accountant', 'Accountant'), status: "active", hireDate: "2021-08-15", avatar: null },
 ];
 
-const mockDepartments = [
-  { id: "1", name: "Service", nameAr: "الخدمة", code: "SVC", employeeCount: 15, manager: "Mohammed Al-Rashid", budget: 250000 },
-  { id: "2", name: "Parts", nameAr: "القطع", code: "PRT", employeeCount: 8, manager: "Omar Khalid", budget: 150000 },
-  { id: "3", name: "Finance", nameAr: "المالية", code: "FIN", employeeCount: 5, manager: "Sara Ibrahim", budget: 100000 },
-  { id: "4", name: "Administration", nameAr: "الإدارة", code: "ADM", employeeCount: 6, manager: "Fatima Abdullah", budget: 120000 },
-  { id: "5", name: "Marketing", nameAr: "التسويق", code: "MKT", employeeCount: 4, manager: "Khalid Ahmed", budget: 80000 },
+const getMockDepartments = (t: any) => [
+  { id: "1", name: t('samples.department.service', 'Service'), nameAr: "الخدمة", code: "SVC", employeeCount: 15, manager: t('samples.staffName1', 'Mohammed Al-Rashid'), budget: 250000 },
+  { id: "2", name: t('samples.department.parts', 'Parts'), nameAr: "القطع", code: "PRT", employeeCount: 8, manager: t('samples.staffName3', 'Omar Khalid'), budget: 150000 },
+  { id: "3", name: t('samples.department.finance', 'Finance'), nameAr: "المالية", code: "FIN", employeeCount: 5, manager: t('samples.staffName4', 'Sara Ibrahim'), budget: 100000 },
+  { id: "4", name: t('samples.department.administration', 'Administration'), nameAr: "الإدارة", code: "ADM", employeeCount: 6, manager: t('samples.staffName2', 'Fatima Abdullah'), budget: 120000 },
+  { id: "5", name: t('samples.department.marketing', 'Marketing'), nameAr: "التسويق", code: "MKT", employeeCount: 4, manager: t('samples.staffName6', 'Khalid Ahmed'), budget: 80000 },
 ];
 
 const mockLeaveTypes = [
@@ -72,11 +72,11 @@ const mockLeaveTypes = [
   { id: "5", name: "Hajj Leave", nameAr: "إجازة حج", defaultDays: 15, color: "#8b5cf6", isPaid: true },
 ];
 
-const mockLeaveRequests = [
-  { id: "1", employee: "Ahmed Hassan", type: "Annual Leave", startDate: "2024-12-20", endDate: "2024-12-27", days: 5, status: "pending", reason: "Family vacation" },
-  { id: "2", employee: "Omar Khalid", type: "Sick Leave", startDate: "2024-12-15", endDate: "2024-12-17", days: 2, status: "approved", reason: "Medical appointment" },
-  { id: "3", employee: "Sara Ibrahim", type: "Emergency Leave", startDate: "2024-12-18", endDate: "2024-12-19", days: 1, status: "approved", reason: "Family emergency" },
-  { id: "4", employee: "Mohammed Al-Rashid", type: "Annual Leave", startDate: "2025-01-05", endDate: "2025-01-12", days: 5, status: "pending", reason: "Personal travel" },
+const getMockLeaveRequests = (t: any) => [
+  { id: "1", employee: t('samples.staffName7', 'Ahmed Hassan'), type: t('samples.leaveType.annual', 'Annual Leave'), startDate: "2024-12-20", endDate: "2024-12-27", days: 5, status: "pending", reason: t('samples.leaveReason.familyVacation', 'Family vacation') },
+  { id: "2", employee: t('samples.staffName3', 'Omar Khalid'), type: t('samples.leaveType.sick', 'Sick Leave'), startDate: "2024-12-15", endDate: "2024-12-17", days: 2, status: "approved", reason: t('samples.leaveReason.medical', 'Medical appointment') },
+  { id: "3", employee: t('samples.staffName4', 'Sara Ibrahim'), type: t('samples.leaveType.emergency', 'Emergency Leave'), startDate: "2024-12-18", endDate: "2024-12-19", days: 1, status: "approved", reason: t('samples.leaveReason.familyEmergency', 'Family emergency') },
+  { id: "4", employee: t('samples.staffName1', 'Mohammed Al-Rashid'), type: t('samples.leaveType.annual', 'Annual Leave'), startDate: "2025-01-05", endDate: "2025-01-12", days: 5, status: "pending", reason: t('samples.leaveReason.personalTravel', 'Personal travel') },
 ];
 
 const mockJobPostings = [
@@ -85,11 +85,11 @@ const mockJobPostings = [
   { id: "3", title: "Customer Service Representative", department: "Administration", location: "Riyadh", type: "full_time", status: "on_hold", applicants: 25, posted: "2024-11-15", salary: "4,500 - 6,000 SAR" },
 ];
 
-const mockCandidates = [
-  { id: "1", name: "Faisal Al-Qahtani", position: "Senior Automotive Technician", stage: "interview", rating: 4, email: "faisal@email.com", phone: "+966 50 111 2222", experience: "8 years" },
-  { id: "2", name: "Nora Al-Saud", position: "Parts Inventory Specialist", stage: "screening", rating: 3, email: "nora@email.com", phone: "+966 50 333 4444", experience: "3 years" },
-  { id: "3", name: "Tariq Hassan", position: "Senior Automotive Technician", stage: "offer", rating: 5, email: "tariq@email.com", phone: "+966 50 555 6666", experience: "10 years" },
-  { id: "4", name: "Layla Ahmed", position: "Customer Service Representative", stage: "applied", rating: 0, email: "layla@email.com", phone: "+966 50 777 8888", experience: "2 years" },
+const getMockCandidates = (t: any) => [
+  { id: "1", name: t('samples.candidateName1', 'Faisal Al-Qahtani'), position: t('samples.position.seniorAutomotiveTechnician', 'Senior Automotive Technician'), stage: "interview", rating: 4, email: "faisal@email.com", phone: "+966 50 111 2222", experience: t('samples.experience.8years', '8 years') },
+  { id: "2", name: t('samples.candidateName2', 'Nora Al-Saud'), position: t('samples.position.partsInventorySpecialist', 'Parts Inventory Specialist'), stage: "screening", rating: 3, email: "nora@email.com", phone: "+966 50 333 4444", experience: t('samples.experience.3years', '3 years') },
+  { id: "3", name: t('samples.candidateName3', 'Tariq Hassan'), position: t('samples.position.seniorAutomotiveTechnician', 'Senior Automotive Technician'), stage: "offer", rating: 5, email: "tariq@email.com", phone: "+966 50 555 6666", experience: t('samples.experience.10years', '10 years') },
+  { id: "4", name: t('samples.candidateName4', 'Layla Ahmed'), position: t('samples.position.customerServiceRep', 'Customer Service Representative'), stage: "applied", rating: 0, email: "layla@email.com", phone: "+966 50 777 8888", experience: t('samples.experience.2years', '2 years') },
 ];
 
 const mockBenefitPlans = [
@@ -151,6 +151,9 @@ function EmployeesTab({ garageId }: { garageId: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
+
+  const mockEmployees = getMockEmployees(t);
+  const mockDepartments = getMockDepartments(t);
 
   const filteredEmployees = mockEmployees.filter(emp => {
     const matchesSearch = `${emp.firstName} ${emp.lastName} ${emp.email}`.toLowerCase().includes(searchQuery.toLowerCase());
@@ -333,6 +336,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
 
 function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
   const { t } = useTranslation();
+  const mockDepartments = getMockDepartments(t);
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
@@ -393,11 +397,11 @@ function AttendanceTab({ garageId }: { garageId: string }) {
   const [isOnBreak, setIsOnBreak] = useState(false);
 
   const mockAttendance = [
-    { id: "1", employee: "Mohammed Al-Rashid", date: "2024-12-15", clockIn: "08:00 AM", clockOut: "05:30 PM", totalHours: "8.5", status: "present" },
-    { id: "2", employee: "Ahmed Hassan", date: "2024-12-15", clockIn: "08:15 AM", clockOut: "05:00 PM", totalHours: "7.75", status: "present" },
-    { id: "3", employee: "Omar Khalid", date: "2024-12-15", clockIn: "-", clockOut: "-", totalHours: "-", status: "absent" },
-    { id: "4", employee: "Sara Ibrahim", date: "2024-12-15", clockIn: "09:00 AM", clockOut: "-", totalHours: "-", status: "present" },
-    { id: "5", employee: "Fatima Abdullah", date: "2024-12-15", clockIn: "07:45 AM", clockOut: "04:45 PM", totalHours: "8", status: "present" },
+    { id: "1", employee: t('samples.staffName1', 'Mohammed Al-Rashid'), date: "2024-12-15", clockIn: "08:00 AM", clockOut: "05:30 PM", totalHours: "8.5", status: "present" },
+    { id: "2", employee: t('samples.staffName7', 'Ahmed Hassan'), date: "2024-12-15", clockIn: "08:15 AM", clockOut: "05:00 PM", totalHours: "7.75", status: "present" },
+    { id: "3", employee: t('samples.staffName3', 'Omar Khalid'), date: "2024-12-15", clockIn: "-", clockOut: "-", totalHours: "-", status: "absent" },
+    { id: "4", employee: t('samples.staffName4', 'Sara Ibrahim'), date: "2024-12-15", clockIn: "09:00 AM", clockOut: "-", totalHours: "-", status: "present" },
+    { id: "5", employee: t('samples.staffName2', 'Fatima Abdullah'), date: "2024-12-15", clockIn: "07:45 AM", clockOut: "04:45 PM", totalHours: "8", status: "present" },
   ];
 
   return (
@@ -537,6 +541,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
 function LeaveManagementTab({ garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
+  const mockLeaveRequests = getMockLeaveRequests(t);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -977,6 +982,8 @@ function TrainingTab({ garageId }: { garageId: string }) {
 function RecruitmentTab({ garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [showPostDialog, setShowPostDialog] = useState(false);
+  const mockDepartments = getMockDepartments(t);
+  const mockCandidates = getMockCandidates(t);
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -1262,6 +1269,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
 
 function OrganizationTab({ garageId }: { garageId: string }) {
   const { t } = useTranslation();
+  const mockDepartments = getMockDepartments(t);
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

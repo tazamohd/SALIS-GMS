@@ -101,10 +101,10 @@ export default function LoyaltyProgram() {
   ];
 
   const members: LoyaltyMember[] = [
-    { id: "1", customerName: "Ahmed Al-Rashid", email: "ahmed@example.com", tierName: "Gold", tierColor: "#FFD700", currentPoints: 7540, lifetimePoints: 12340, pointsToNextTier: 7460, memberSince: "2023-01-15" },
-    { id: "2", customerName: "Fatima Hassan", email: "fatima@example.com", tierName: "Platinum", tierColor: "#E5E4E2", currentPoints: 18200, lifetimePoints: 25600, pointsToNextTier: 0, memberSince: "2022-06-20" },
-    { id: "3", customerName: "Mohammed Khalid", email: "mohammed@example.com", tierName: "Silver", tierColor: "#C0C0C0", currentPoints: 2340, lifetimePoints: 4500, pointsToNextTier: 2660, memberSince: "2023-08-10" },
-    { id: "4", customerName: "Sara Abdullah", email: "sara@example.com", tierName: "Bronze", tierColor: "#CD7F32", currentPoints: 450, lifetimePoints: 450, pointsToNextTier: 550, memberSince: "2024-02-01" },
+    { id: "1", customerName: t('sample.customerName1', 'Ahmed Al-Rashid'), email: "ahmed@example.com", tierName: "Gold", tierColor: "#FFD700", currentPoints: 7540, lifetimePoints: 12340, pointsToNextTier: 7460, memberSince: "2023-01-15" },
+    { id: "2", customerName: t('sample.customerName2', 'Fatima Hassan'), email: "fatima@example.com", tierName: "Platinum", tierColor: "#E5E4E2", currentPoints: 18200, lifetimePoints: 25600, pointsToNextTier: 0, memberSince: "2022-06-20" },
+    { id: "3", customerName: t('sample.customerName3', 'Mohammed Khalid'), email: "mohammed@example.com", tierName: "Silver", tierColor: "#C0C0C0", currentPoints: 2340, lifetimePoints: 4500, pointsToNextTier: 2660, memberSince: "2023-08-10" },
+    { id: "4", customerName: t('sample.customerName4', 'Sara Abdullah'), email: "sara@example.com", tierName: "Bronze", tierColor: "#CD7F32", currentPoints: 450, lifetimePoints: 450, pointsToNextTier: 550, memberSince: "2024-02-01" },
   ];
 
   const offers: LoyaltyOffer[] = [

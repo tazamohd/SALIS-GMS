@@ -66,14 +66,13 @@ export default function SafetyIncidents() {
               incidentDate: new Date().toISOString(),
               incidentType: 'near_miss',
               severity: 'minor',
-              location: 'Service Bay 1',
-              description: 'Sample incident description',
+              location: String(t('safety.sampleLocation', 'Service Bay 1')),
+              description: String(t('safety.sampleDescription', 'Sample incident description')),
               involvedPersons: ['current-user'],
               witnesses: [],
-              immediateActions: 'Area secured and cleaned',
+              immediateActions: String(t('safety.sampleImmediateActions', 'Area secured and cleaned')),
             });
           },
-          className: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white",
         },
       ]}
     >
