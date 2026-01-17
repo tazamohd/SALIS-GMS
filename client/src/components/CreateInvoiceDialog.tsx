@@ -45,8 +45,21 @@ const itemSchema = z.object({
 
 type InvoiceItemInput = z.infer<typeof itemSchema>;
 
-export function CreateInvoiceDialog() {
-  const [open, setOpen] = useState(false);
+interface CreateInvoiceDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
+}
+
+export function CreateInvoiceDialog({ 
+  open: externalOpen, 
+  onOpenChange: externalOnOpenChange,
+  showTrigger = true 
+}: CreateInvoiceDialogProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
   const [items, setItems] = useState<InvoiceItemInput[]>([]);
   const [currentItem, setCurrentItem] = useState<InvoiceItemInput>({
     itemType: "service",
@@ -175,12 +188,14 @@ export function CreateInvoiceDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-invoice">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Invoice
-        </Button>
-      </DialogTrigger>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-invoice">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Invoice
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t('dialogs.createInvoice', 'Create Invoice')}</DialogTitle>

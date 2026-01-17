@@ -224,7 +224,11 @@ export function Invoices() {
         mode="controlled"
       />
       
-      {isCreateDialogOpen && <CreateInvoiceDialog />}
+      <CreateInvoiceDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen}
+        showTrigger={false}
+      />
     </>
   );
 }
