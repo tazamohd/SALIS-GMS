@@ -1,4 +1,7 @@
-/* KSA Vision 2030 Design System - Light & Dark Modes */
+/* ============================================
+   SalisAuto Command Center Design System
+   Vision 2030 - Deep Space & Corporate Steel
+   ============================================ */
 /* Typography - Google Fonts with Arabic Support */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
 
@@ -14,69 +17,85 @@
 
 :root {
   /* ============================================
-     SalisEngine.AI Design System v2.0
-     Theme: Deep Space & Corporate Steel
+     SalisAuto Command Center Design Tokens
+     Vision 2030 Smart City Control Room Aesthetic
      ============================================ */
   
-  /* Core Backgrounds - Deep Space */
-  --bg-dark: #050510;              /* Primary background - near-black void */
-  --bg-deep: #0b0b1a;              /* Deeper recessed areas, sidebars */
-  --bg-card: rgba(15, 23, 42, 0.6); /* Slate-tinted glass for UI cards */
+  /* Core Backgrounds - Dark Obsidian */
+  --bg-dark: #0B0F0D;              /* Primary background - Dark Obsidian */
+  --bg-deep: #0E1411;              /* Secondary background - Deep Obsidian */
+  --bg-card: #141A17;              /* Charcoal Panels - Card surfaces */
+  --bg-surface-1: #141A17;         /* Surface Level 1 */
+  --bg-surface-2: #1C2420;         /* Surface Level 2 */
+  --bg-surface-3: #24302A;         /* Surface Level 3 */
   
-  /* Brand Accents (Logo Matched) */
-  --accent-primary: #0ea5e9;        /* Sky Blue - Primary actions, active tabs, main glows */
-  --accent-secondary: #f97316;      /* Orange - Highlights, data logs, secondary CTA */
-  --accent-dark-blue: #1e3a8a;      /* Deep blue for gradients and borders */
-  --accent-silver: #e2e8f0;         /* Subtitle text, inactive borders, "Steel" look */
+  /* Brand Accents - Saudi Vision 2030 */
+  --accent-primary: #22C55E;        /* Saudi Green - Primary actions */
+  --accent-secondary: #EAB308;      /* Electric Yellow/Gold - Performance badges */
+  --accent-primary-hover: #16A34A;  /* Saudi Green darker */
+  --accent-secondary-hover: #CA8A04; /* Gold darker */
   
-  /* Functional Colors */
-  --accent-success: #10b981;        /* System Online, success logs, completed tasks */
-  --accent-error: #ef4444;          /* Error logs, critical alerts, delete actions */
+  /* Semantic Colors */
+  --accent-success: #22C55E;        /* Success - Saudi Green */
+  --accent-warning: #F59E0B;        /* Warning - Amber */
+  --accent-error: #EF4444;          /* Error - Soft Red */
+  --accent-info: #06B6D4;           /* Info - Cyan/Teal */
   
-  /* Brand Gradient */
-  --gradient-main: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
-  --gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  /* Brand Gradients */
+  --gradient-main: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  --gradient-gold: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(34,197,94,0.3) 0%, rgba(11,15,13,0) 100%);
   
-  /* Glass Variables - Physical Glass Effect */
-  --glass-border: rgba(255, 255, 255, 0.08);    /* Subtle white edge */
+  /* Glass Variables - Command Center Glass Effect */
+  --glass-border: rgba(255, 255, 255, 0.10);    /* Grid border */
   --glass-surface: rgba(255, 255, 255, 0.03);   /* Base transparency */
   --glass-highlight: rgba(255, 255, 255, 0.08); /* Top-down lighting */
-  --glass-heavy: rgba(15, 23, 42, 0.85);        /* Almost opaque */
+  --glass-heavy: rgba(20, 26, 23, 0.95);        /* Almost opaque */
   
-  /* Glow Effects */
-  --glow-primary: 0 0 25px rgba(14, 165, 233, 0.3);
-  --glow-secondary: 0 0 20px rgba(249, 115, 22, 0.25);
-  --glow-success: 0 0 20px rgba(16, 185, 129, 0.25);
-  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
+  /* Glow Effects - Vision 2030 */
+  --glow-primary: 0 0 24px rgba(34, 197, 94, 0.25);   /* Green glow */
+  --glow-secondary: 0 0 24px rgba(234, 179, 8, 0.25); /* Gold glow */
+  --glow-success: 0 0 20px rgba(34, 197, 94, 0.25);   /* Success glow */
+  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);     /* Error glow */
+  --glow-info: 0 0 20px rgba(6, 182, 212, 0.25);      /* Info glow */
+  
+  /* Text Colors */
+  --text-primary: #E5E7EB;          /* Soft white - High contrast */
+  --text-secondary: #9CA3AF;        /* Muted gray - Secondary info */
+  --text-muted: #6B7280;            /* Muted - Tertiary info */
+  --text-disabled: #4B5563;         /* Disabled state */
+  
+  /* Chart & Data Visualization */
+  --chart-primary: #22C55E;         /* Primary line - Green */
+  --chart-secondary: #EAB308;       /* Secondary line - Gold */
+  --chart-grid: rgba(255, 255, 255, 0.06); /* Ultra-low opacity grid */
   
   /* Legacy SALIS compatibility */
-  --salis-blue-start: #0ea5e9;
-  --salis-blue-end: #1e3a8a;
-  --salis-blue-gradient: var(--gradient-main);
-  --salis-navy: #0b0b1a;
-  --salis-orange: #f97316;
+  --salis-green: #22C55E;
+  --salis-gold: #EAB308;
+  --salis-navy: #0B0F0D;
   
   /* Dark Mode Neutrals - Deep Space */
-  --salis-bg-dark: #050510;
-  --salis-surface-dark: rgba(15, 23, 42, 0.6);
-  --salis-border-dark: rgba(255, 255, 255, 0.08);
-  --salis-text-primary-dark: #e2e8f0;
-  --salis-text-muted-dark: #94a3b8;
+  --salis-bg-dark: #0B0F0D;
+  --salis-surface-dark: #141A17;
+  --salis-border-dark: rgba(255, 255, 255, 0.10);
+  --salis-text-primary-dark: #E5E7EB;
+  --salis-text-muted-dark: #9CA3AF;
   
   /* Light Mode Neutrals - Corporate Steel */
-  --salis-bg-light: #f1f5f9;
-  --salis-surface-light: #ffffff;
-  --salis-border-light: #cbd5e1;
-  --salis-text-primary-light: #0f172a;
-  --salis-text-muted-light: #64748b;
+  --salis-bg-light: #F8FAF9;
+  --salis-surface-light: #FFFFFF;
+  --salis-border-light: #D1D5DB;
+  --salis-text-primary-light: #0F172A;
+  --salis-text-muted-light: #475569;
   
   /* Legacy compatibility */
-  --salis-black: #050510;
-  --salis-white: #ffffff;
-  --salis-gray: #94a3b8;
-  --salis-gray-light: #cbd5e1;
-  --salis-gray-dark: #1e293b;
-  --salis-50-black: #64748b;
+  --salis-black: #0B0F0D;
+  --salis-white: #FFFFFF;
+  --salis-gray: #9CA3AF;
+  --salis-gray-light: #D1D5DB;
+  --salis-gray-dark: #1C2420;
+  --salis-50-black: #6B7280;
 
   /* Typography Variables - Inter Primary */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -477,10 +496,11 @@
 
 @layer components {
   /* ============================================
-     SalisEngine.AI Component Library
+     SalisAuto Command Center Component Library
+     Vision 2030 Smart City Control Room UI
      ============================================ */
   
-  /* Gradient Text Utility */
+  /* Gradient Text Utility - Saudi Green */
   .text-gradient-salis {
     background: var(--gradient-main);
     -webkit-background-clip: text;
@@ -488,14 +508,28 @@
     -webkit-text-fill-color: transparent;
   }
   
-  /* GlowButton - Primary */
+  /* Gradient Text Utility - Gold */
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* ============================================
+     Command Center Button System
+     ============================================ */
+  
+  /* GlowButton - Primary (Saudi Green) */
   .btn-primary {
-    background: var(--gradient-main);
-    color: #ffffff;
+    background: var(--accent-primary);
+    color: var(--bg-dark);
     border: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-2) var(--ease-out);
     position: relative;
     overflow: hidden;
+    min-height: 44px;
+    min-width: 44px;
   }
   
   .btn-primary::before {
@@ -504,10 +538,11 @@
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity var(--dur-2);
   }
   
   .btn-primary:hover {
+    background: var(--accent-primary-hover);
     transform: translateY(-2px);
     box-shadow: var(--glow-primary);
   }
@@ -516,25 +551,64 @@
     opacity: 1;
   }
   
-  /* GlowButton - Secondary/Ghost */
+  .btn-primary:active {
+    transform: translateY(1px) scale(0.99);
+  }
+  
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+  
+  /* GlowButton - Secondary/Ghost (Saudi Green outline) */
   .btn-secondary {
     background-color: transparent;
     color: var(--accent-primary);
     border: 1.5px solid var(--accent-primary);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-2) var(--ease-out);
+    min-height: 44px;
+    min-width: 44px;
   }
   
   .btn-secondary:hover {
-    background-color: rgba(14, 165, 233, 0.1);
+    background-color: rgba(34, 197, 94, 0.1);
     box-shadow: var(--glow-primary);
     transform: translateY(-2px);
+  }
+  
+  .btn-secondary:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+  
+  /* GlowButton - Gold (Performance actions) */
+  .btn-gold {
+    background: var(--accent-secondary);
+    color: var(--bg-dark);
+    border: none;
+    transition: all var(--dur-2) var(--ease-out);
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .btn-gold:hover {
+    background: var(--accent-secondary-hover);
+    box-shadow: var(--glow-secondary);
+    transform: translateY(-2px);
+  }
+  
+  .btn-gold:focus-visible {
+    outline: 2px solid var(--accent-secondary);
+    outline-offset: 2px;
   }
   
   /* GlowButton - Danger */
   .btn-danger {
     background-color: var(--accent-error);
     color: #ffffff;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-2) var(--ease-out);
+    min-height: 44px;
+    min-width: 44px;
   }
   
   .btn-danger:hover {
@@ -543,9 +617,18 @@
     transform: translateY(-2px);
   }
   
+  .btn-danger:focus-visible {
+    outline: 2px solid var(--accent-error);
+    outline-offset: 2px;
+  }
+  
+  /* ============================================
+     Command Center Card System
+     ============================================ */
+  
   /* GlassCard - Physical Glass Effect */
   .glass-card {
-    @apply rounded-xl transition-all duration-300;
+    @apply rounded-xl;
     background: var(--glass-heavy);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -553,14 +636,90 @@
     box-shadow: 
       inset 0 1px 0 0 var(--glass-highlight),
       0 4px 24px -1px rgba(0, 0, 0, 0.3);
+    transition: transform var(--dur-2) var(--ease-out),
+                box-shadow var(--dur-2) var(--ease-out),
+                border-color var(--dur-2) var(--ease-out);
   }
   
   .glass-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     box-shadow: 
       inset 0 1px 0 0 var(--glass-highlight),
       var(--glow-primary),
       0 8px 32px -2px rgba(0, 0, 0, 0.4);
+  }
+  
+  .glass-card.is-active {
+    box-shadow: var(--glow-green-mid);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+  
+  /* Charcoal Panel - Command Center Surfaces */
+  .charcoal-panel {
+    @apply rounded-xl;
+    background: var(--bg-surface-1);
+    border: none;
+    transition: transform var(--dur-2) var(--ease-out),
+                box-shadow var(--dur-2) var(--ease-out);
+  }
+  
+  .charcoal-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-primary);
+  }
+  
+  /* Command Center KPI Card */
+  .kpi-card {
+    @apply rounded-xl p-6;
+    background: var(--bg-surface-1);
+    border: 1px solid var(--glass-border);
+    transition: all var(--dur-2) var(--ease-out);
+  }
+  
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-primary);
+    border-color: rgba(34, 197, 94, 0.2);
+  }
+  
+  .kpi-card .kpi-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  
+  .kpi-card .kpi-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  
+  /* Performance Badge (Gold) */
+  .badge-performance {
+    background: rgba(234, 179, 8, 0.15);
+    color: var(--accent-secondary);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  /* Live Indicator */
+  .live-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    box-shadow: var(--glow-green-weak);
+    animation: pulse-glow 2s infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; box-shadow: var(--glow-green-weak); }
+    50% { opacity: 0.7; box-shadow: var(--glow-green-mid); }
   }
   
   /* Brand Card - Legacy Compatibility */
