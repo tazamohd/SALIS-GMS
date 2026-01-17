@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-export type Theme = "light" | "dark" | "system" | "kingdom-future" | "neural-dark";
+export type Theme = "light" | "dark" | "system";
 
 interface ThemeContextType {
   theme: Theme;
@@ -19,15 +19,9 @@ function getResolvedTheme(theme: Theme): string {
 
 function applyTheme(theme: Theme) {
   const root = window.document.documentElement;
-  root.classList.remove("light", "dark", "kingdom-future", "neural-dark");
-  
-  if (theme === "kingdom-future" || theme === "neural-dark") {
-    root.classList.add("dark");
-    root.classList.add(theme);
-  } else {
-    const resolvedTheme = getResolvedTheme(theme);
-    root.classList.add(resolvedTheme);
-  }
+  root.classList.remove("light", "dark");
+  const resolvedTheme = getResolvedTheme(theme);
+  root.classList.add(resolvedTheme);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

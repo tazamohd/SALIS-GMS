@@ -1,0 +1,105 @@
+{
+  "name": "KSA Vision Dark Neon",
+  "background": "#0B0F0D",
+  "foreground": "#E5E7EB",
+  "tableAccent": "#22C55E",
+  "dataColors": [
+    "#22C55E",
+    "#EAB308",
+    "#06B6D4",
+    "#EF4444",
+    "#A78BFA",
+    "#F97316",
+    "#60A5FA",
+    "#34D399"
+  ],
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "show": true,
+            "fontFamily": "Inter",
+            "fontSize": 14,
+            "color": {
+              "solid": {
+                "color": "#E5E7EB"
+              }
+            }
+          }
+        ],
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#141A17"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "legend": [
+          {
+            "show": true,
+            "labelColor": {
+              "solid": {
+                "color": "#9CA3AF"
+              }
+            },
+            "titleColor": {
+              "solid": {
+                "color": "#E5E7EB"
+              }
+            },
+            "fontFamily": "Inter",
+            "fontSize": 12
+          }
+        ],
+        "categoryAxis": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#9CA3AF"
+              }
+            },
+            "gridlineColor": {
+              "solid": {
+                "color": "#1F2A24"
+              }
+            },
+            "fontFamily": "Inter",
+            "fontSize": 12
+          }
+        ],
+        "valueAxis": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#9CA3AF"
+              }
+            },
+            "gridlineColor": {
+              "solid": {
+                "color": "#1F2A24"
+              }
+            },
+            "fontFamily": "Inter",
+            "fontSize": 12
+          }
+        ],
+        "labels": [
+          {
+            "color": {
+              "solid": {
+                "color": "#E5E7EB"
+              }
+            },
+            "fontFamily": "Inter",
+            "fontSize": 12
+          }
+        ]
+      }
+    }
+  }
+}

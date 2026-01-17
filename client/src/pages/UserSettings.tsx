@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { User, Bell, Shield, Palette, Save, Sun, Moon, Monitor, Sparkles, Cpu, Check } from "lucide-react";
+import { User, Bell, Shield, Palette, Save, Sun, Moon, Monitor, Check } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 import { RoleBadge } from "@/components/RoleBadge";
 import { useTheme, type Theme } from "@/hooks/useTheme";
@@ -16,10 +16,8 @@ export default function UserSettings() {
 
   const THEMES: { id: Theme; labelKey: string; descKey: string; icon: typeof Sun; color: string }[] = [
     { id: "light", labelKey: "userSettings.themeLight", descKey: "userSettings.themeLightDesc", icon: Sun, color: "text-amber-500" },
-    { id: "dark", labelKey: "userSettings.themeDark", descKey: "userSettings.themeDarkDesc", icon: Moon, color: "text-sky-400" },
+    { id: "dark", labelKey: "userSettings.themeDark", descKey: "userSettings.themeDarkDesc", icon: Moon, color: "text-emerald-400" },
     { id: "system", labelKey: "userSettings.themeSystem", descKey: "userSettings.themeSystemDesc", icon: Monitor, color: "text-gray-400" },
-    { id: "kingdom-future", labelKey: "userSettings.themeKingdomFuture", descKey: "userSettings.themeKingdomFutureDesc", icon: Sparkles, color: "text-emerald-500" },
-    { id: "neural-dark", labelKey: "userSettings.themeNeuralDark", descKey: "userSettings.themeNeuralDarkDesc", icon: Cpu, color: "text-purple-500" },
   ];
 
   return (

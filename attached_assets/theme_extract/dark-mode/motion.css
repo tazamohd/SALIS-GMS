@@ -1,0 +1,18 @@
+/* Motion primitives */
+.card {
+  transition: transform var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out),
+              background-color var(--dur-2) var(--ease-out);
+}
+.card:hover { transform: translateY(-2px); }
+.card.is-active { box-shadow: var(--glow-green-mid); }
+
+.button {
+  transition: transform var(--dur-1) var(--ease-out),
+              box-shadow var(--dur-1) var(--ease-out),
+              background-color var(--dur-1) var(--ease-out);
+}
+.button:active { transform: translateY(1px) scale(0.99); }
+.button.is-primary:hover { box-shadow: var(--glow-green-weak); }
+.button.is-performance:hover { box-shadow: var(--glow-gold-weak); }
