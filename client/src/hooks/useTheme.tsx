@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, ReactNode } from "react";
 
-export type Theme = "light" | "dark" | "system";
+export type Theme = "light";
 
 interface ThemeContextType {
   theme: Theme;
@@ -10,56 +10,19 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-function getResolvedTheme(theme: Theme): string {
-  if (theme === "system") {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-  return theme;
-}
-
-function applyTheme(theme: Theme) {
-  const root = window.document.documentElement;
-  root.classList.remove("light", "dark");
-  const resolvedTheme = getResolvedTheme(theme);
-  root.classList.add(resolvedTheme);
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("theme") as Theme;
-      return stored || "system";
-    }
-    return "system";
-  });
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("dark");
+    root.classList.add("light");
+  }, []);
 
-  const [resolvedTheme, setResolvedTheme] = useState<string>(() => getResolvedTheme(theme));
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
-    applyTheme(newTheme);
-    setResolvedTheme(getResolvedTheme(newTheme));
+  const setTheme = (_theme: Theme) => {
+    // Only light theme supported
   };
 
-  useEffect(() => {
-    applyTheme(theme);
-    setResolvedTheme(getResolvedTheme(theme));
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      if (theme === "system") {
-        applyTheme(theme);
-        setResolvedTheme(getResolvedTheme(theme));
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeContext.Provider value={{ theme: "light", setTheme, resolvedTheme: "light" }}>
       {children}
     </ThemeContext.Provider>
   );
