@@ -1,9 +1,9 @@
 /* ============================================
-   SalisAuto Command Center Design System
-   Vision 2030 - Deep Space & Corporate Steel
+   Kingdom Future Design System
+   "Heritage Meets Horizon" - Saudi Vision 2030
    ============================================ */
 /* Typography - Google Fonts with Arabic Support */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,80 +17,93 @@
 
 :root {
   /* ============================================
-     SalisAuto Command Center Design Tokens
-     Vision 2030 Smart City Control Room Aesthetic
+     Kingdom Future Design Tokens
+     "Heritage Meets Horizon" - Saudi Vision 2030
      ============================================ */
   
-  /* Core Backgrounds - Dark Obsidian */
-  --bg-dark: #0B0F0D;              /* Primary background - Dark Obsidian */
-  --bg-deep: #0E1411;              /* Secondary background - Deep Obsidian */
-  --bg-card: #141A17;              /* Charcoal Panels - Card surfaces */
+  /* Primary - Emerald (Growth, Prosperity, National Identity) */
+  --kf-emerald-neon: #00E676;
+  --kf-emerald-print: #00AA55;
+  
+  /* Secondary - Royal Gold (Wealth, Prestige, Heritage) */
+  --kf-gold-bright: #F2C94C;
+  --kf-gold-rich: #D4AF37;
+  
+  /* Core Backgrounds */
+  --bg-dark: #040B06;              /* Deep Black/Green Void */
+  --bg-deep: #0E1411;              /* Secondary background */
+  --bg-card: #141A17;              /* Card surfaces */
   --bg-surface-1: #141A17;         /* Surface Level 1 */
   --bg-surface-2: #1C2420;         /* Surface Level 2 */
   --bg-surface-3: #24302A;         /* Surface Level 3 */
   
-  /* Brand Accents - Saudi Vision 2030 */
-  --accent-primary: #22C55E;        /* Saudi Green - Primary actions */
-  --accent-secondary: #EAB308;      /* Electric Yellow/Gold - Performance badges */
-  --accent-primary-hover: #16A34A;  /* Saudi Green darker */
-  --accent-secondary-hover: #CA8A04; /* Gold darker */
+  /* Brand Accents - Kingdom Future */
+  --accent-primary: #00E676;        /* Neon Emerald - Primary actions */
+  --accent-secondary: #F2C94C;      /* Bright Gold - Performance badges */
+  --accent-primary-hover: #00AA55;  /* Print Emerald */
+  --accent-secondary-hover: #D4AF37; /* Rich Gold */
   
   /* Semantic Colors */
-  --accent-success: #22C55E;        /* Success - Saudi Green */
+  --accent-success: #00E676;        /* Success - Neon Emerald */
   --accent-warning: #F59E0B;        /* Warning - Amber */
   --accent-error: #EF4444;          /* Error - Soft Red */
   --accent-info: #06B6D4;           /* Info - Cyan/Teal */
   
   /* Brand Gradients */
-  --gradient-main: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
-  --gradient-gold: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
-  --gradient-chart: linear-gradient(180deg, rgba(34,197,94,0.3) 0%, rgba(11,15,13,0) 100%);
+  --gradient-main: linear-gradient(135deg, #00E676 0%, #00AA55 100%);
+  --gradient-gold: linear-gradient(135deg, #F2C94C 0%, #D4AF37 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(0,230,118,0.3) 0%, rgba(4,11,6,0) 100%);
   
-  /* Glass Variables - Command Center Glass Effect */
-  --glass-border: rgba(255, 255, 255, 0.10);    /* Grid border */
-  --glass-surface: rgba(255, 255, 255, 0.03);   /* Base transparency */
-  --glass-highlight: rgba(255, 255, 255, 0.08); /* Top-down lighting */
-  --glass-heavy: rgba(20, 26, 23, 0.95);        /* Almost opaque */
+  /* Glass Variables - Glassmorphism */
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-surface: rgba(255, 255, 255, 0.05);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
+  --glass-heavy: rgba(20, 26, 23, 0.95);
+  --kf-glass-bg: rgba(255, 255, 255, 0.05);
+  --kf-glass-border: rgba(255, 255, 255, 0.10);
+  --kf-glass-blur: 12px;
   
-  /* Glow Effects - Vision 2030 */
-  --glow-primary: 0 0 24px rgba(34, 197, 94, 0.25);   /* Green glow */
-  --glow-secondary: 0 0 24px rgba(234, 179, 8, 0.25); /* Gold glow */
-  --glow-success: 0 0 20px rgba(34, 197, 94, 0.25);   /* Success glow */
-  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);     /* Error glow */
-  --glow-info: 0 0 20px rgba(6, 182, 212, 0.25);      /* Info glow */
+  /* Glow Effects - Kingdom Future */
+  --glow-primary: 0 0 15px rgba(0, 230, 118, 0.5);
+  --glow-secondary: 0 0 15px rgba(242, 201, 76, 0.5);
+  --glow-success: 0 0 20px rgba(0, 230, 118, 0.25);
+  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
+  --glow-info: 0 0 20px rgba(6, 182, 212, 0.25);
+  --kf-glow-emerald: 0 0 15px rgba(0, 230, 118, 0.5);
+  --kf-glow-gold: 0 0 15px rgba(242, 201, 76, 0.5);
   
   /* Text Colors */
-  --text-primary: #E5E7EB;          /* Soft white - High contrast */
-  --text-secondary: #9CA3AF;        /* Muted gray - Secondary info */
+  --text-primary: #FAFAFA;          /* Off-White */
+  --text-secondary: #9CA3AF;        /* Muted gray */
   --text-muted: #6B7280;            /* Muted - Tertiary info */
   --text-disabled: #4B5563;         /* Disabled state */
   
   /* Chart & Data Visualization */
-  --chart-primary: #22C55E;         /* Primary line - Green */
-  --chart-secondary: #EAB308;       /* Secondary line - Gold */
-  --chart-grid: rgba(255, 255, 255, 0.06); /* Ultra-low opacity grid */
+  --chart-primary: #00E676;         /* Primary line - Neon Emerald */
+  --chart-secondary: #F2C94C;       /* Secondary line - Bright Gold */
+  --chart-grid: rgba(255, 255, 255, 0.06);
   
   /* Legacy SALIS compatibility */
-  --salis-green: #22C55E;
-  --salis-gold: #EAB308;
-  --salis-navy: #0B0F0D;
+  --salis-green: #00E676;
+  --salis-gold: #F2C94C;
+  --salis-navy: #040B06;
   
-  /* Dark Mode Neutrals - Deep Space */
-  --salis-bg-dark: #0B0F0D;
+  /* Dark Mode Neutrals */
+  --salis-bg-dark: #040B06;
   --salis-surface-dark: #141A17;
   --salis-border-dark: rgba(255, 255, 255, 0.10);
-  --salis-text-primary-dark: #E5E7EB;
+  --salis-text-primary-dark: #FAFAFA;
   --salis-text-muted-dark: #9CA3AF;
   
-  /* Light Mode Neutrals - Corporate Steel */
-  --salis-bg-light: #F8FAF9;
+  /* Light Mode Neutrals */
+  --salis-bg-light: #F4FBF7;
   --salis-surface-light: #FFFFFF;
-  --salis-border-light: #D1D5DB;
-  --salis-text-primary-light: #0F172A;
+  --salis-border-light: rgba(0, 0, 0, 0.05);
+  --salis-text-primary-light: #071F12;
   --salis-text-muted-light: #475569;
   
   /* Legacy compatibility */
-  --salis-black: #0B0F0D;
+  --salis-black: #040B06;
   --salis-white: #FFFFFF;
   --salis-gray: #9CA3AF;
   --salis-gray-light: #D1D5DB;
@@ -291,117 +304,63 @@
 }
 
 @layer base {
-  :root {
-    /* ============================================
-       LIGHT MODE - KSA Vision 2030 Light Theme
-       ============================================ */
+  /* ============================================
+     KINGDOM FUTURE: "The Night Sky" (Dark Mode)
+     For: Dashboards, Monitoring, Executive Views
+     ============================================ */
+  :root,
+  [data-theme="kingdom-future"] {
+    /* Background - Deep Black/Green Void */
+    --background: 150 30% 2%;           /* #040B06 */
+    --foreground: 0 0% 98%;             /* #FAFAFA */
     
-    /* Background - Clean Light */
-    --background: 150 20% 98%;       /* #F8FAF9 - Light sage */
-    --foreground: 217 33% 17%;       /* #0F172A - Dark slate */
-
-    /* Muted - Recessed Areas */
-    --muted: 150 13% 94%;            /* #EEF2F0 - Muted sage */
-    --muted-foreground: 215 19% 35%; /* #475569 - Medium slate */
-
-    /* Accent - Gold */
-    --accent: 45 93% 47%;            /* #EAB308 - Vision Gold */
-    --accent-foreground: 217 33% 17%;
-
-    /* Popover - Pure White */
-    --popover: 0 0% 100%;            /* White */
-    --popover-foreground: 217 33% 17%;
-
-    /* Border */
-    --border: 220 13% 83%;           /* #D1D5DB - Light border */
-    --input: 150 12% 95%;            /* #F1F5F3 - Input bg */
-
-    /* Card - White Surface */
-    --card: 0 0% 100%;               /* White surface */
-    --card-foreground: 217 33% 17%;
-
-    /* Primary - Vision Green #22C55E */
-    --primary: 142 71% 45%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Secondary - Vision Gold #EAB308 */
-    --secondary: 45 93% 47%;
-    --secondary-foreground: 217 33% 17%;
-
-    /* Destructive - Red #EF4444 */
+    /* Surface - Glassmorphism */
+    --card: 150 14% 9%;                 /* Dark glass surface */
+    --card-foreground: 0 0% 98%;
+    
+    /* Muted - Recessed areas */
+    --muted: 150 20% 6%;
+    --muted-foreground: 220 9% 65%;     /* #9CA3AF */
+    
+    /* Popover */
+    --popover: 150 25% 5%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Border - Translucent white */
+    --border: 0 0% 100% / 0.10;
+    --input: 150 20% 8%;
+    
+    /* Primary - Neon Emerald #00E676 */
+    --primary: 145 100% 45%;
+    --primary-foreground: 150 30% 2%;
+    
+    /* Secondary - Bright Gold #F2C94C */
+    --secondary: 44 87% 63%;
+    --secondary-foreground: 150 30% 2%;
+    
+    /* Accent */
+    --accent: 44 87% 63%;
+    --accent-foreground: 150 30% 2%;
+    
+    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-
-    --ring: 142 71% 45%;             /* Vision Green ring */
+    
+    /* Ring */
+    --ring: 145 100% 45%;
     --radius: 0.5rem;
     
-    /* Semantic Colors - Light Mode */
-    --success: 142 71% 45%;          /* #22C55E - Vision Green */
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;           /* #F59E0B - Amber */
-    --warning-foreground: 217 33% 17%;
-    --info: 188 94% 43%;             /* #06B6D4 - Cyan */
-    --info-foreground: 0 0% 100%;
-    --error: 0 84% 60%;              /* #EF4444 - Red */
-    --error-foreground: 0 0% 100%;
-  }
-
-  .dark {
-    /* ============================================
-       DARK MODE - KSA Vision 2030 Dark Neon Theme
-       Saudi Arabia Vision 2030 Inspired Design
-       ============================================ */
-    
-    /* Background - Deep Green-Black */
-    --background: 150 25% 4%;        /* #0B0F0D - Deep forest void */
-    --foreground: 220 14% 90%;       /* #E5E7EB - Light gray */
-
-    /* Muted - Secondary Background */
-    --muted: 150 19% 7%;             /* #0E1411 - Dark recessed */
-    --muted-foreground: 218 11% 65%; /* #9CA3AF - Medium gray */
-
-    /* Accent - Vision Gold */
-    --accent: 45 93% 47%;            /* #EAB308 - Gold accent */
-    --accent-foreground: 150 25% 4%;
-
-    /* Popover - Surface 1 */
-    --popover: 150 14% 9%;           /* #141A17 - Dark surface */
-    --popover-foreground: 220 14% 90%;
-
-    /* Border - Subtle Grid */
-    --border: 0 0% 100% / 0.10;      /* White 10% - grid border */
-    --input: 150 13% 13%;            /* #1C2420 - Input bg */
-
-    /* Card - Surface 2 */
-    --card: 150 14% 9%;              /* #141A17 - Card surface */
-    --card-foreground: 220 14% 90%;
-
-    /* Primary - Vision Green #22C55E */
-    --primary: 142 71% 45%;
-    --primary-foreground: 150 25% 4%;
-
-    /* Secondary - Vision Gold #EAB308 */
-    --secondary: 45 93% 47%;
-    --secondary-foreground: 150 25% 4%;
-
-    /* Destructive - Red #EF4444 */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --ring: 142 71% 45%;             /* Vision Green glow ring */
-    --radius: 0.5rem;
-    
-    /* Semantic Colors - Dark Mode (KSA Vision 2030) */
-    --success: 142 71% 45%;          /* #22C55E - Vision Green */
-    --success-foreground: 150 25% 4%;
-    --warning: 38 92% 50%;           /* #F59E0B - Amber */
-    --warning-foreground: 150 25% 4%;
-    --info: 188 94% 43%;             /* #06B6D4 - Cyan */
-    --info-foreground: 150 25% 4%;
-    --error: 0 84% 60%;              /* #EF4444 - Red */
+    /* Semantic Colors */
+    --success: 145 100% 45%;
+    --success-foreground: 150 30% 2%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 150 30% 2%;
+    --info: 188 94% 43%;
+    --info-foreground: 150 30% 2%;
+    --error: 0 84% 60%;
     --error-foreground: 0 0% 100%;
     
-    /* KSA Vision 2030 Motion & Glow Variables */
+    /* Motion & Glow Variables */
     --dur-1: 120ms;
     --dur-2: 180ms;
     --dur-3: 240ms;
@@ -409,13 +368,105 @@
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-    --glow-green-weak: 0 0 10px rgba(34,197,94,0.14);
-    --glow-green-mid: 0 0 18px rgba(34,197,94,0.20);
-    --glow-green-strong: 0 0 28px rgba(34,197,94,0.28);
-    --glow-gold-weak: 0 0 10px rgba(234,179,8,0.14);
-    --glow-gold-mid: 0 0 18px rgba(234,179,8,0.20);
-    --glow-gold-strong: 0 0 28px rgba(234,179,8,0.28);
+    --glow-green-weak: 0 0 10px rgba(0,230,118,0.14);
+    --glow-green-mid: 0 0 18px rgba(0,230,118,0.20);
+    --glow-green-strong: 0 0 28px rgba(0,230,118,0.28);
+    --glow-gold-weak: 0 0 10px rgba(242,201,76,0.14);
+    --glow-gold-mid: 0 0 18px rgba(242,201,76,0.20);
+    --glow-gold-strong: 0 0 28px rgba(242,201,76,0.28);
     --shadow-soft: 0 8px 24px rgba(0,0,0,0.45);
+  }
+
+  /* ============================================
+     KINGDOM FUTURE LIGHT: "The Morning Sun"
+     For: Public Portals, Forms, Daylight Reading
+     ============================================ */
+  [data-theme="kingdom-future-light"] {
+    /* Background - Very Light Mint/White */
+    --background: 150 30% 97%;          /* #F4FBF7 */
+    --foreground: 150 60% 8%;           /* #071F12 - Deep Forest Green */
+    
+    /* Surface - Crystalline Glass */
+    --card: 0 0% 100%;                  /* Pure white */
+    --card-foreground: 150 60% 8%;
+    
+    /* Muted */
+    --muted: 150 20% 94%;
+    --muted-foreground: 150 30% 35%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 60% 8%;
+    
+    /* Border - Subtle grey/green */
+    --border: 150 10% 85%;
+    --input: 150 20% 95%;
+    
+    /* Primary - Print Emerald #00AA55 */
+    --primary: 152 100% 33%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Rich Gold #D4AF37 */
+    --secondary: 43 56% 52%;
+    --secondary-foreground: 150 60% 8%;
+    
+    /* Accent */
+    --accent: 43 56% 52%;
+    --accent-foreground: 150 60% 8%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Ring */
+    --ring: 152 100% 33%;
+    --radius: 0.5rem;
+    
+    /* Semantic Colors */
+    --success: 152 100% 33%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 150 60% 8%;
+    --info: 188 94% 43%;
+    --info-foreground: 0 0% 100%;
+    --error: 0 84% 60%;
+    --error-foreground: 0 0% 100%;
+    
+    /* Light Mode Glass Variables */
+    --kf-glass-bg: rgba(255, 255, 255, 0.70);
+    --kf-glass-border: rgba(0, 0, 0, 0.05);
+    
+    /* Light Mode Glow - Subdued */
+    --glow-green-weak: 0 4px 10px rgba(0,170,85,0.08);
+    --glow-green-mid: 0 4px 15px rgba(0,170,85,0.12);
+    --glow-green-strong: 0 4px 20px rgba(0,170,85,0.18);
+    --glow-gold-weak: 0 4px 10px rgba(212,175,55,0.08);
+    --glow-gold-mid: 0 4px 15px rgba(212,175,55,0.12);
+    --glow-gold-strong: 0 4px 20px rgba(212,175,55,0.18);
+    --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  /* Legacy .dark class support */
+  .dark {
+    --background: 150 30% 2%;
+    --foreground: 0 0% 98%;
+    --card: 150 14% 9%;
+    --card-foreground: 0 0% 98%;
+    --muted: 150 20% 6%;
+    --muted-foreground: 220 9% 65%;
+    --popover: 150 25% 5%;
+    --popover-foreground: 0 0% 98%;
+    --border: 0 0% 100% / 0.10;
+    --input: 150 20% 8%;
+    --primary: 145 100% 45%;
+    --primary-foreground: 150 30% 2%;
+    --secondary: 44 87% 63%;
+    --secondary-foreground: 150 30% 2%;
+    --accent: 44 87% 63%;
+    --accent-foreground: 150 30% 2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 145 100% 45%;
   }
 
 }
@@ -427,13 +478,28 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px;
     line-height: 1.5;
   }
   
-  /* KSA Vision 2030 - Arabic Language Support */
+  /* Kingdom Future - Radial Background Gradients */
+  [data-theme="kingdom-future"] body {
+    background: 
+      radial-gradient(ellipse at 20% 80%, rgba(0, 230, 118, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(242, 201, 76, 0.02) 0%, transparent 50%),
+      hsl(var(--background));
+  }
+  
+  [data-theme="kingdom-future-light"] body {
+    background: 
+      radial-gradient(ellipse at 20% 80%, rgba(0, 170, 85, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+      hsl(var(--background));
+  }
+  
+  /* Kingdom Future - Arabic Language Support */
   html[lang="ar"] body,
   html[dir="rtl"] body {
     font-family: "Cairo", "Tajawal", system-ui, Arial, sans-serif;
@@ -496,11 +562,59 @@
 
 @layer components {
   /* ============================================
-     SalisAuto Command Center Component Library
-     Vision 2030 Smart City Control Room UI
+     Kingdom Future Component Library
+     "Heritage Meets Horizon" - Saudi Vision 2030
      ============================================ */
   
-  /* Gradient Text Utility - Saudi Green */
+  /* ============================================
+     Glass Card - Adapts to Theme
+     ============================================ */
+  .glass-card {
+    background: var(--kf-glass-bg);
+    backdrop-filter: blur(var(--kf-glass-blur));
+    -webkit-backdrop-filter: blur(var(--kf-glass-blur));
+    border: 1px solid var(--kf-glass-border);
+    border-radius: var(--radius);
+  }
+  
+  /* ============================================
+     Neon Text Effects
+     ============================================ */
+  .neon-text {
+    color: hsl(var(--primary));
+    text-shadow: var(--kf-glow-emerald);
+  }
+  
+  .neon-gold {
+    color: hsl(var(--secondary));
+    text-shadow: var(--kf-glow-gold);
+  }
+  
+  /* ============================================
+     Display Font
+     ============================================ */
+  .font-display {
+    font-family: 'Outfit', sans-serif;
+  }
+  
+  /* ============================================
+     Glow Effects on Interactive Elements
+     ============================================ */
+  .glow-on-hover:hover {
+    box-shadow: var(--kf-glow-emerald);
+  }
+  
+  .active-glow {
+    box-shadow: var(--kf-glow-emerald);
+  }
+  
+  .glow-gold-on-hover:hover {
+    box-shadow: var(--kf-glow-gold);
+  }
+  
+  /* ============================================
+     Gradient Text Utilities
+     ============================================ */
   .text-gradient-salis {
     background: var(--gradient-main);
     -webkit-background-clip: text;
@@ -508,7 +622,6 @@
     -webkit-text-fill-color: transparent;
   }
   
-  /* Gradient Text Utility - Gold */
   .text-gradient-gold {
     background: var(--gradient-gold);
     -webkit-background-clip: text;

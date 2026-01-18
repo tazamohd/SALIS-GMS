@@ -1,28 +1,48 @@
-import { createContext, useContext, useEffect, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-export type Theme = "light";
+export type Theme = "kingdom-future" | "kingdom-future-light";
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   resolvedTheme: string;
+  isDark: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("dark");
-    root.classList.add("light");
-  }, []);
+function applyTheme(theme: Theme) {
+  const root = window.document.documentElement;
+  root.setAttribute("data-theme", theme);
+  root.classList.remove("light", "dark");
+  root.classList.add(theme === "kingdom-future" ? "dark" : "light");
+}
 
-  const setTheme = (_theme: Theme) => {
-    // Only light theme supported
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("theme") as Theme;
+      if (stored === "kingdom-future" || stored === "kingdom-future-light") {
+        return stored;
+      }
+    }
+    return "kingdom-future"; // Default to dark mode
+  });
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem("theme", newTheme);
+    applyTheme(newTheme);
   };
 
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  const isDark = theme === "kingdom-future";
+
   return (
-    <ThemeContext.Provider value={{ theme: "light", setTheme, resolvedTheme: "light" }}>
+    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme: theme, isDark }}>
       {children}
     </ThemeContext.Provider>
   );
