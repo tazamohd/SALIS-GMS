@@ -64,12 +64,11 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 function SentimentBadge({ sentiment, score }: { sentiment: string; score?: number }) {
-  const { t } = useTranslation();
   const config: Record<string, { icon: typeof ThumbsUp; color: string; label: string }> = {
-    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: t('feedback.positive', 'Positive') },
-    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: t('feedback.neutral', 'Neutral') },
-    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: t('feedback.negative', 'Negative') },
-    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: t('feedback.unanalyzed', 'Unanalyzed') },
+    positive: { icon: ThumbsUp, color: "bg-green-500/10 text-green-600 dark:text-green-400", label: "إيجابي" },
+    neutral: { icon: Minus, color: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400", label: "محايد" },
+    negative: { icon: ThumbsDown, color: "bg-red-500/10 text-red-600 dark:text-red-400", label: "سلبي" },
+    unanalyzed: { icon: Brain, color: "bg-gray-500/10 text-gray-600 dark:text-gray-400", label: "غير محلل" },
   };
 
   const { icon: Icon, color, label } = config[sentiment] || config.unanalyzed;
@@ -240,9 +239,9 @@ export default function CustomerFeedback() {
 
   const categoryData = analytics?.categoryRatings
     ? [
-        { category: t('feedback.waitTime', 'Wait Time'), rating: parseFloat(analytics.categoryRatings.waitTime) || 0 },
-        { category: t('feedback.quality', 'Quality'), rating: parseFloat(analytics.categoryRatings.quality) || 0 },
-        { category: t('feedback.communication', 'Communication'), rating: parseFloat(analytics.categoryRatings.communication) || 0 },
+        { category: "Wait Time", rating: parseFloat(analytics.categoryRatings.waitTime) || 0 },
+        { category: "Quality", rating: parseFloat(analytics.categoryRatings.quality) || 0 },
+        { category: "Communication", rating: parseFloat(analytics.categoryRatings.communication) || 0 },
       ]
     : [];
 
@@ -470,7 +469,7 @@ export default function CustomerFeedback() {
                   {filteredFeedback.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>{t('feedback.noFeedbackFound', 'No feedback found matching your filters.')}</p>
+                      <p>No feedback found matching your filters.</p>
                     </div>
                   )}
                 </div>
@@ -554,7 +553,7 @@ export default function CustomerFeedback() {
                           </div>
                           <div>
                             <p className="text-2xl font-bold font-montserrat">{count}</p>
-                            <p className="text-sm text-[#64748B] capitalize">{t(`customers.feedback.${sentiment}`, sentiment)} ({percentage}%)</p>
+                            <p className="text-sm text-[#64748B] capitalize">{sentiment} ({percentage}%)</p>
                           </div>
                         </div>
                       </CardContent>
@@ -574,7 +573,7 @@ export default function CustomerFeedback() {
                           className="w-3 h-3 rounded-full" 
                           style={{ backgroundColor: SENTIMENT_COLORS[sentiment as keyof typeof SENTIMENT_COLORS] }} 
                         />
-                        <span className="font-medium capitalize">{t(`customers.feedback.${sentiment}`, sentiment)}</span>
+                        <span className="font-medium capitalize">{sentiment}</span>
                         <Badge variant="secondary">{items.length}</Badge>
                       </div>
                       {items.slice(0, 3).map((item: any) => (
@@ -758,7 +757,6 @@ function FeedbackCard({
   isAnalyzing: boolean;
   expanded?: boolean;
 }) {
-  const { t } = useTranslation();
   const f = item.feedback;
   const customer = item.customer;
   const vehicle = item.vehicle;
@@ -773,7 +771,7 @@ function FeedbackCard({
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-gray-400" />
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {customer?.firstName || t('common.unknown', 'Unknown')} {customer?.lastName || t('common.customer', 'Customer')}
+                  {customer?.firstName || 'Unknown'} {customer?.lastName || 'Customer'}
                 </span>
               </div>
               <StarRating rating={f.overallRating} />
@@ -795,7 +793,7 @@ function FeedbackCard({
             )}
 
             <p className={`text-gray-600 dark:text-gray-300 ${expanded ? '' : 'line-clamp-2'}`}>
-              "{f.comments || t('feedback.noCommentsProvided', 'No comments provided')}"
+              "{f.comments || 'No comments provided'}"
             </p>
 
             {f.sentimentKeywords && (f.sentimentKeywords as string[]).length > 0 && (
@@ -808,11 +806,11 @@ function FeedbackCard({
 
             {f.response && (
               <div className="mt-3 p-3 bg-gray-100 dark:bg-salis-gray-dark/50 rounded-lg">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('feedback.response', 'Response')}:</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Response:</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{f.response}</p>
                 {f.respondedAt && (
                   <p className="text-xs text-gray-400 mt-1">
-                    {t('feedback.responded', 'Responded')} {format(new Date(f.respondedAt), 'MMM d, yyyy')}
+                    Responded {format(new Date(f.respondedAt), 'MMM d, yyyy')}
                   </p>
                 )}
               </div>
@@ -821,7 +819,7 @@ function FeedbackCard({
             <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
               <span>{format(new Date(f.submittedAt), 'MMM d, yyyy h:mm a')}</span>
               {technician && (
-                <span>{t('feedback.technician', 'Technician')}: {technician.firstName} {technician.lastName}</span>
+                <span>Technician: {technician.firstName} {technician.lastName}</span>
               )}
             </div>
           </div>
@@ -837,7 +835,7 @@ function FeedbackCard({
                 data-testid={`button-analyze-${f.id}`}
               >
                 <Brain className="h-3.5 w-3.5 mr-1" />
-                {t('feedback.analyze', 'Analyze')}
+                Analyze
               </Button>
             )}
             {!f.response && (
@@ -849,7 +847,7 @@ function FeedbackCard({
                 data-testid={`button-respond-${f.id}`}
               >
                 <Send className="h-3.5 w-3.5 mr-1" />
-                {t('feedback.respond', 'Respond')}
+                Respond
               </Button>
             )}
             {f.isFlagged ? (
@@ -861,7 +859,7 @@ function FeedbackCard({
                 data-testid={`button-unflag-${f.id}`}
               >
                 <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                {t('feedback.unflag', 'Unflag')}
+                Unflag
               </Button>
             ) : (
               <Button 
@@ -872,7 +870,7 @@ function FeedbackCard({
                 data-testid={`button-flag-${f.id}`}
               >
                 <Flag className="h-3.5 w-3.5 mr-1" />
-                {t('feedback.flag', 'Flag')}
+                Flag
               </Button>
             )}
           </div>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function ArabicLanguageToggle() {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   
   const currentLang = i18n.language?.split('-')[0] || 'en';
   const isArabic = currentLang === 'ar';
@@ -29,13 +29,13 @@ export function ArabicLanguageToggle() {
           : "bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-salis-gray-dark"
       )}
       data-testid="button-arabic-toggle"
-      title={isArabic ? t('languageToggle.switchToEnglish', 'Switch to English') : t('languageToggle.switchToArabic', 'Switch to Arabic')}
+      title={isArabic ? "Switch to English" : "التبديل إلى العربية"}
     >
       <span className="text-sm font-semibold">
-        {isArabic ? "EN" : t('languageToggle.ar', 'AR')}
+        {isArabic ? "EN" : "عربي"}
       </span>
       <span className="hidden sm:inline text-xs opacity-70">
-        {isArabic ? t('languages.english', 'English') : t('languages.arabic', 'Arabic')}
+        {isArabic ? "English" : "العربية"}
       </span>
     </Button>
   );

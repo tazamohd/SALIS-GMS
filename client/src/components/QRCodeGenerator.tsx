@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,6 @@ export function QRCodeGenerator({
   vehicleId,
   onGenerated 
 }: QRCodeGeneratorProps) {
-  const { t } = useTranslation();
   const [tokenType, setTokenType] = useState<string>("appointment");
   const [expiresInHours, setExpiresInHours] = useState<number>(24);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -111,11 +109,11 @@ export function QRCodeGenerator({
           </style>
         </head>
         <body>
-          <h1>${t('app.name', 'SALIS AUTO')}</h1>
-          <p>${t('qrCode.appointmentCheckIn', 'Appointment Check-In QR Code')}</p>
-          <img src="${generatedQR.qrCodeImageUrl}" alt="${t('qrCode.qrCode', 'QR Code')}" />
-          <p>${t('qrCode.scanUponArrival', 'Scan this code upon arrival')}</p>
-          <p>${t('qrCode.expires', 'Expires')}: ${new Date(generatedQR.expiresAt).toLocaleString()}</p>
+          <h1>SALIS AUTO</h1>
+          <p>Appointment Check-In QR Code</p>
+          <img src="${generatedQR.qrCodeImageUrl}" alt="QR Code" />
+          <p>Scan this code upon arrival</p>
+          <p>Expires: ${new Date(generatedQR.expiresAt).toLocaleString()}</p>
         </body>
       </html>
     `);
@@ -126,9 +124,9 @@ export function QRCodeGenerator({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{t('qrCode.generateQRCode', 'Generate QR Code')}</CardTitle>
+        <CardTitle>Generate QR Code</CardTitle>
         <CardDescription>
-          {t('qrCode.createQRCodeDescription', 'Create a QR code for quick check-in')}
+          Create a QR code for quick check-in
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -141,15 +139,15 @@ export function QRCodeGenerator({
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="appointment">{t('qrCode.appointmentCheckIn', 'Appointment Check-In')}</SelectItem>
-                  <SelectItem value="vehicle_dropoff">{t('qrCode.vehicleDropoff', 'Vehicle Drop-off')}</SelectItem>
-                  <SelectItem value="loyalty_card">{t('qrCode.loyaltyCard', 'Loyalty Card')}</SelectItem>
+                  <SelectItem value="appointment">Appointment Check-In</SelectItem>
+                  <SelectItem value="vehicle_dropoff">Vehicle Drop-off</SelectItem>
+                  <SelectItem value="loyalty_card">Loyalty Card</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="expiresInHours">{t('qrCode.expiresInHours', 'Expires In (Hours)')}</Label>
+              <Label htmlFor="expiresInHours">Expires In (Hours)</Label>
               <Input
                 id="expiresInHours"
                 type="number"

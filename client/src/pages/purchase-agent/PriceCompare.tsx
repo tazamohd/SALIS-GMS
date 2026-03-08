@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,7 +31,6 @@ import {
 import type { SupplierPriceList, Supplier, SparePart } from "@shared/schema";
 
 export default function PurchaseAgentPriceCompare() {
-  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPart, setSelectedPart] = useState<string>("");
 
@@ -169,7 +167,7 @@ export default function PurchaseAgentPriceCompare() {
                   <SelectValue placeholder="Filter by part" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('purchaseAgent.allParts', 'All Parts')}</SelectItem>
+                  <SelectItem value="">All Parts</SelectItem>
                   {uniquePartNames.map((name) => (
                     <SelectItem key={name} value={name}>
                       {name}

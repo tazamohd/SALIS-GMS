@@ -653,7 +653,7 @@ export default function CostCenters() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('costCenters.title', 'Cost Centers')}
-        description={t('costCenters.description', 'Track budget allocation and actual spend by department')}
+        description={t('costCenters.description', 'مراكز التكلفة - Track budget allocation and actual spend by department')}
         defaultTab="overview"
         tabs={tabs}
       />

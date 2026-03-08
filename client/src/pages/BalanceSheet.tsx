@@ -35,47 +35,47 @@ import {
   PieChart,
 } from "lucide-react";
 
+const currentAssets = [
+  { code: "1100", name: "Cash & Cash Equivalents", amount: 155500, previousAmount: 142000 },
+  { code: "1200", name: "Accounts Receivable", amount: 89500, previousAmount: 78000 },
+  { code: "1210", name: "Less: Allowance for Doubtful Accounts", amount: -4500, previousAmount: -3500 },
+  { code: "1300", name: "Inventory - Spare Parts", amount: 125000, previousAmount: 118000 },
+  { code: "1400", name: "Prepaid Expenses", amount: 15000, previousAmount: 12000 },
+  { code: "1450", name: "Other Current Assets", amount: 8500, previousAmount: 6500 },
+];
+
+const nonCurrentAssets = [
+  { code: "1500", name: "Property & Equipment", amount: 450000, previousAmount: 450000 },
+  { code: "1550", name: "Less: Accumulated Depreciation", amount: -67500, previousAmount: -45000 },
+  { code: "1600", name: "Vehicles", amount: 180000, previousAmount: 180000 },
+  { code: "1650", name: "Less: Accumulated Depreciation - Vehicles", amount: -36000, previousAmount: -24000 },
+  { code: "1700", name: "Intangible Assets", amount: 25000, previousAmount: 25000 },
+  { code: "1750", name: "Less: Accumulated Amortization", amount: -5000, previousAmount: -2500 },
+];
+
+const currentLiabilities = [
+  { code: "2100", name: "Accounts Payable", amount: 78500, previousAmount: 65000 },
+  { code: "2200", name: "Accrued Expenses", amount: 25000, previousAmount: 22000 },
+  { code: "2300", name: "VAT Payable", amount: 18500, previousAmount: 15500 },
+  { code: "2400", name: "Unearned Revenue", amount: 12000, previousAmount: 8000 },
+  { code: "2500", name: "Current Portion of Long-term Debt", amount: 24000, previousAmount: 24000 },
+];
+
+const nonCurrentLiabilities = [
+  { code: "2600", name: "Long-term Bank Loan", amount: 76000, previousAmount: 100000 },
+  { code: "2700", name: "Deferred Tax Liabilities", amount: 8500, previousAmount: 6500 },
+];
+
+const equity = [
+  { code: "3100", name: "Share Capital", amount: 300000, previousAmount: 300000 },
+  { code: "3200", name: "Retained Earnings - Beginning", amount: 125000, previousAmount: 95000 },
+  { code: "3300", name: "Current Year Net Income", amount: 141000, previousAmount: 125000 },
+  { code: "3400", name: "Dividends Declared", amount: -50000, previousAmount: -30000 },
+];
+
 export default function BalanceSheet() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01-31");
-
-  const currentAssets = [
-    { code: "1100", name: t('accounting.accounts.cashEquivalents', 'Cash & Cash Equivalents'), amount: 155500, previousAmount: 142000 },
-    { code: "1200", name: t('accounting.accounts.accountsReceivable', 'Accounts Receivable'), amount: 89500, previousAmount: 78000 },
-    { code: "1210", name: t('accounting.accounts.allowanceDoubtful', 'Less: Allowance for Doubtful Accounts'), amount: -4500, previousAmount: -3500 },
-    { code: "1300", name: t('accounting.accounts.inventorySpareParts', 'Inventory - Spare Parts'), amount: 125000, previousAmount: 118000 },
-    { code: "1400", name: t('accounting.accounts.prepaidExpenses', 'Prepaid Expenses'), amount: 15000, previousAmount: 12000 },
-    { code: "1450", name: t('accounting.accounts.otherCurrentAssets', 'Other Current Assets'), amount: 8500, previousAmount: 6500 },
-  ];
-
-  const nonCurrentAssets = [
-    { code: "1500", name: t('accounting.accounts.propertyEquipment', 'Property & Equipment'), amount: 450000, previousAmount: 450000 },
-    { code: "1550", name: t('accounting.accounts.accumulatedDepreciation', 'Less: Accumulated Depreciation'), amount: -67500, previousAmount: -45000 },
-    { code: "1600", name: t('accounting.accounts.vehicles', 'Vehicles'), amount: 180000, previousAmount: 180000 },
-    { code: "1650", name: t('accounting.accounts.accumulatedDepreciationVehicles', 'Less: Accumulated Depreciation - Vehicles'), amount: -36000, previousAmount: -24000 },
-    { code: "1700", name: t('accounting.accounts.intangibleAssets', 'Intangible Assets'), amount: 25000, previousAmount: 25000 },
-    { code: "1750", name: t('accounting.accounts.accumulatedAmortization', 'Less: Accumulated Amortization'), amount: -5000, previousAmount: -2500 },
-  ];
-
-  const currentLiabilities = [
-    { code: "2100", name: t('accounting.accounts.accountsPayable', 'Accounts Payable'), amount: 78500, previousAmount: 65000 },
-    { code: "2200", name: t('accounting.accounts.accruedExpenses', 'Accrued Expenses'), amount: 25000, previousAmount: 22000 },
-    { code: "2300", name: t('accounting.accounts.vatPayable', 'VAT Payable'), amount: 18500, previousAmount: 15500 },
-    { code: "2400", name: t('accounting.accounts.unearnedRevenue', 'Unearned Revenue'), amount: 12000, previousAmount: 8000 },
-    { code: "2500", name: t('accounting.accounts.currentPortionLongTermDebt', 'Current Portion of Long-term Debt'), amount: 24000, previousAmount: 24000 },
-  ];
-
-  const nonCurrentLiabilities = [
-    { code: "2600", name: t('accounting.accounts.longTermBankLoan', 'Long-term Bank Loan'), amount: 76000, previousAmount: 100000 },
-    { code: "2700", name: t('accounting.accounts.deferredTaxLiabilities', 'Deferred Tax Liabilities'), amount: 8500, previousAmount: 6500 },
-  ];
-
-  const equity = [
-    { code: "3100", name: t('accounting.accounts.shareCapital', 'Share Capital'), amount: 300000, previousAmount: 300000 },
-    { code: "3200", name: t('accounting.accounts.retainedEarningsBeginning', 'Retained Earnings - Beginning'), amount: 125000, previousAmount: 95000 },
-    { code: "3300", name: t('accounting.accounts.currentYearNetIncome', 'Current Year Net Income'), amount: 141000, previousAmount: 125000 },
-    { code: "3400", name: t('accounting.accounts.dividendsDeclared', 'Dividends Declared'), amount: -50000, previousAmount: -30000 },
-  ];
 
   const totalCurrentAssets = currentAssets.reduce((sum, item) => sum + item.amount, 0);
   const totalNonCurrentAssets = nonCurrentAssets.reduce((sum, item) => sum + item.amount, 0);
@@ -126,7 +126,7 @@ export default function BalanceSheet() {
         <CardHeader className="text-center border-b">
           <CardTitle className="text-xl">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base">
-            {t('accounting.balanceSheet', 'Balance Sheet')}
+            {t('accounting.balanceSheet', 'Balance Sheet')} (الميزانية العمومية)
           </CardDescription>
           <p className="text-sm text-muted-foreground">
             {t('accounting.asOf', 'As of')} {period === "2024-01-31" ? t('accounting.dates.jan2024', 'January 31, 2024') : period}
@@ -538,7 +538,7 @@ export default function BalanceSheet() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.balanceSheetTitle', 'Balance Sheet')}
+      title={t('accounting.balanceSheetTitle', 'Balance Sheet - الميزانية العمومية')}
       description={t('accounting.balanceSheetDescription', 'Financial position statement')}
       icon={Scale}
       tabs={tabs}

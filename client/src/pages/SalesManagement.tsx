@@ -64,24 +64,24 @@ import {
 } from "lucide-react";
 
 const saleSchema = z.object({
-  invoiceNumber: z.string().min(1),
-  customer: z.string().min(1),
-  type: z.string().min(1),
-  amount: z.string().min(1),
-  date: z.string().min(1),
-  paymentMethod: z.string().min(1),
-  status: z.string().min(1),
+  invoiceNumber: z.string().min(1, "Invoice number is required"),
+  customer: z.string().min(1, "Customer is required"),
+  type: z.string().min(1, "Sale type is required"),
+  amount: z.string().min(1, "Amount is required"),
+  date: z.string().min(1, "Date is required"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
+  status: z.string().min(1, "Status is required"),
 });
 
 type SaleFormData = z.infer<typeof saleSchema>;
 
-const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
+const sampleSales = [
   {
     id: "1",
     invoiceNumber: "INV-2024-0156",
-    customer: t('sample.customerName5', 'Mohammed Al-Rashid'),
+    customer: "Mohammed Al-Rashid",
     type: "Service",
-    description: t('sample.serviceDesc1', 'Full engine service - Toyota Camry'),
+    description: "Full engine service - Toyota Camry",
     amount: 2850,
     date: "2024-01-28",
     paymentMethod: "Card",
@@ -90,9 +90,9 @@ const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
   {
     id: "2",
     invoiceNumber: "INV-2024-0157",
-    customer: t('sample.customerName2', 'Fatima Hassan'),
+    customer: "Fatima Hassan",
     type: "Parts",
-    description: t('sample.serviceDesc2', 'Brake pads and rotors - Honda Accord'),
+    description: "Brake pads and rotors - Honda Accord",
     amount: 1450,
     date: "2024-01-28",
     paymentMethod: "Cash",
@@ -101,9 +101,9 @@ const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
   {
     id: "3",
     invoiceNumber: "INV-2024-0158",
-    customer: t('sample.customerName6', 'Ahmed Ibrahim'),
+    customer: "Ahmed Ibrahim",
     type: "Service",
-    description: t('sample.serviceDesc3', 'AC repair and recharge - BMW X5'),
+    description: "AC repair and recharge - BMW X5",
     amount: 3200,
     date: "2024-01-27",
     paymentMethod: "Card",
@@ -112,9 +112,9 @@ const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
   {
     id: "4",
     invoiceNumber: "INV-2024-0159",
-    customer: t('sample.customerName4', 'Sara Abdullah'),
+    customer: "Sara Abdullah",
     type: "Parts",
-    description: t('sample.serviceDesc4', 'Oil filter and engine oil - Mercedes C200'),
+    description: "Oil filter and engine oil - Mercedes C200",
     amount: 680,
     date: "2024-01-27",
     paymentMethod: "Cash",
@@ -123,9 +123,9 @@ const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
   {
     id: "5",
     invoiceNumber: "INV-2024-0160",
-    customer: t('sample.customerName7', 'Khalid Al-Mutairi'),
+    customer: "Khalid Al-Mutairi",
     type: "Service",
-    description: t('sample.serviceDesc5', 'Transmission service - Nissan Patrol'),
+    description: "Transmission service - Nissan Patrol",
     amount: 4500,
     date: "2024-01-26",
     paymentMethod: "Transfer",
@@ -133,21 +133,21 @@ const getSampleSales = (t: (key: string, defaultValue: string) => string) => [
   },
 ];
 
-const getMonthlySales = (t: (key: string, defaultValue: string) => string) => [
-  { month: t('months.aug2023', 'Aug 2023'), services: 145000, parts: 89000, total: 234000 },
-  { month: t('months.sep2023', 'Sep 2023'), services: 152000, parts: 95000, total: 247000 },
-  { month: t('months.oct2023', 'Oct 2023'), services: 168000, parts: 102000, total: 270000 },
-  { month: t('months.nov2023', 'Nov 2023'), services: 175000, parts: 110000, total: 285000 },
-  { month: t('months.dec2023', 'Dec 2023'), services: 198000, parts: 125000, total: 323000 },
-  { month: t('months.jan2024', 'Jan 2024'), services: 185000, parts: 118000, total: 303000 },
+const monthlySales = [
+  { month: "Aug 2023", services: 145000, parts: 89000, total: 234000 },
+  { month: "Sep 2023", services: 152000, parts: 95000, total: 247000 },
+  { month: "Oct 2023", services: 168000, parts: 102000, total: 270000 },
+  { month: "Nov 2023", services: 175000, parts: 110000, total: 285000 },
+  { month: "Dec 2023", services: 198000, parts: 125000, total: 323000 },
+  { month: "Jan 2024", services: 185000, parts: 118000, total: 303000 },
 ];
 
-const getTopProducts = (t: (key: string, defaultValue: string) => string) => [
-  { name: t('services.engineOilChange', 'Engine Oil Change'), category: t('common.service', 'Service'), revenue: 45000, units: 150 },
-  { name: t('services.brakePadReplacement', 'Brake Pad Replacement'), category: t('common.service', 'Service'), revenue: 38000, units: 95 },
-  { name: t('services.acService', 'AC Service'), category: t('common.service', 'Service'), revenue: 32000, units: 64 },
-  { name: t('parts.genuineBrakePads', 'Genuine Brake Pads'), category: t('common.parts', 'Parts'), revenue: 28000, units: 280 },
-  { name: t('parts.airFilters', 'Air Filters'), category: t('common.parts', 'Parts'), revenue: 22000, units: 440 },
+const topProducts = [
+  { name: "Engine Oil Change", category: "Service", revenue: 45000, units: 150 },
+  { name: "Brake Pad Replacement", category: "Service", revenue: 38000, units: 95 },
+  { name: "AC Service", category: "Service", revenue: 32000, units: 64 },
+  { name: "Genuine Brake Pads", category: "Parts", revenue: 28000, units: 280 },
+  { name: "Air Filters", category: "Parts", revenue: 22000, units: 440 },
 ];
 
 export default function SalesManagement() {
@@ -155,10 +155,6 @@ export default function SalesManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-
-  const sampleSales = getSampleSales(t);
-  const monthlySales = getMonthlySales(t);
-  const topProducts = getTopProducts(t);
 
   const form = useForm<SaleFormData>({
     resolver: zodResolver(saleSchema),
@@ -221,7 +217,7 @@ export default function SalesManagement() {
             <div className="text-2xl font-bold text-[#0A5ED7] dark:text-[#0BB3FF]">
               SAR {serviceRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.serviceRevenueAr', 'Service Revenue')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.serviceRevenueAr', 'إيرادات الخدمات')}</p>
           </CardContent>
         </Card>
 
@@ -233,7 +229,7 @@ export default function SalesManagement() {
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               SAR {partsRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.partsRevenueAr', 'Parts Revenue')}</p>
+            <p className="text-xs text-[#64748B] mt-1">{t('salesManagement.partsRevenueAr', 'إيرادات قطع الغيار')}</p>
           </CardContent>
         </Card>
 
@@ -252,7 +248,7 @@ export default function SalesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.monthlySalesTrend', 'Monthly Sales Trend')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('salesManagement.monthlySalesTrendDesc', 'Monthly sales trend - Last 6 months')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.monthlySalesTrendDesc', 'اتجاه المبيعات الشهرية - Last 6 months')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -272,7 +268,7 @@ export default function SalesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.topSellingProducts', 'Top Selling Products')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('salesManagement.topSellingProductsAr', 'Top Selling Products')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('salesManagement.topSellingProductsAr', 'أفضل المنتجات مبيعاً')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -289,7 +285,7 @@ export default function SalesManagement() {
                     <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{product.name}</TableCell>
                     <TableCell>
                       <Badge variant={product.category === "Service" ? "default" : "secondary"} className={product.category === "Service" ? "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF] border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}>
-                        {product.category === "Service" ? t('salesManagement.service', 'Service') : t('salesManagement.parts', 'Parts')}
+                        {product.category}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-[#0B1F3B] dark:text-white">SAR {product.revenue.toLocaleString()}</TableCell>
@@ -304,7 +300,7 @@ export default function SalesManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('salesManagement.relatedFinancialModulesDesc', 'Related financial modules - Quick access to related accounting')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('salesManagement.relatedFinancialModulesDesc', 'الوحدات المالية ذات الصلة - Quick access to related accounting')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -316,7 +312,7 @@ export default function SalesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.expensesManagement', 'Expenses Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('salesManagement.expensesManagementAr', 'Expenses')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.expensesManagementAr', 'المصروفات')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('salesManagement.expensesManagementDesc', 'Track and manage all business expenses and budgets')}</p>
@@ -332,7 +328,7 @@ export default function SalesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('salesManagement.invoices', 'Invoices')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('salesManagement.invoicesAr', 'Invoices')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('salesManagement.invoicesAr', 'الفواتير')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('salesManagement.invoicesDesc', 'Manage customer invoices and payment tracking')}</p>
@@ -352,7 +348,7 @@ export default function SalesManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.salesTransactions', 'Sales Transactions')}</CardTitle>
-              <CardDescription className="text-[#64748B]">{t('salesManagement.salesTransactionsDesc', 'Sales transactions - All sales records')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('salesManagement.salesTransactionsDesc', 'معاملات المبيعات - All sales records')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -364,7 +360,7 @@ export default function SalesManagement() {
               <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-sale">
                 <DialogHeader>
                   <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('salesManagement.recordNewSale', 'Record New Sale')}</DialogTitle>
-                  <DialogDescription className="text-[#64748B]">{t('salesManagement.recordNewSaleAr', 'Record a new sale transaction')}</DialogDescription>
+                  <DialogDescription className="text-[#64748B]">{t('salesManagement.recordNewSaleAr', 'تسجيل عملية بيع جديدة')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -549,19 +545,14 @@ export default function SalesManagement() {
                   <TableCell className="text-[#64748B]">{sale.description}</TableCell>
                   <TableCell>
                     <Badge className={sale.type === "Service" ? "bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0A5ED7]/20 dark:text-[#0BB3FF] border-0" : "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-0"}>
-                      {sale.type === "Service" ? t('salesManagement.service', 'Service') : t('salesManagement.parts', 'Parts')}
+                      {sale.type}
                     </Badge>
                   </TableCell>
                   <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">SAR {sale.amount.toLocaleString()}</TableCell>
-                  <TableCell className="text-[#64748B]">
-                    {sale.paymentMethod === "Cash" ? t('salesManagement.cash', 'Cash') : 
-                     sale.paymentMethod === "Card" ? t('salesManagement.card', 'Card') : 
-                     sale.paymentMethod === "Transfer" ? t('salesManagement.bankTransfer', 'Bank Transfer') : 
-                     t('salesManagement.credit', 'Credit')}
-                  </TableCell>
+                  <TableCell className="text-[#64748B]">{sale.paymentMethod}</TableCell>
                   <TableCell>
                     <Badge className={sale.status === "Completed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-0"}>
-                      {sale.status === "Completed" ? t('statusLabels.completed', 'Completed') : t('statusLabels.pending', 'Pending')}
+                      {sale.status}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -576,7 +567,7 @@ export default function SalesManagement() {
   return (
     <TabsPageLayout
       title={t('salesManagement.title', 'Sales Management')}
-      description={t('salesManagement.description', 'Track sales, revenue, and performance')}
+      description={t('salesManagement.description', 'إدارة المبيعات - Track sales, revenue, and performance')}
       icon={ShoppingCart}
       defaultTab="overview"
       tabs={[

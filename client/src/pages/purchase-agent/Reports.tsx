@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,6 @@ import {
 import type { PurchaseOrder, Supplier, SparePart, SparePartInventory, SupplierPerformance } from "@shared/schema";
 
 export default function PurchaseAgentReports() {
-  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState("30d");
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -133,10 +131,10 @@ export default function PurchaseAgentReports() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7d">{t('purchaseAgent.last7Days', 'Last 7 days')}</SelectItem>
-              <SelectItem value="30d">{t('purchaseAgent.last30Days', 'Last 30 days')}</SelectItem>
-              <SelectItem value="90d">{t('purchaseAgent.last90Days', 'Last 90 days')}</SelectItem>
-              <SelectItem value="1y">{t('purchaseAgent.lastYear', 'Last year')}</SelectItem>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="1y">Last year</SelectItem>
             </SelectContent>
           </Select>
         </div>

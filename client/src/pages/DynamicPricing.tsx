@@ -219,7 +219,7 @@ export default function DynamicPricing() {
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                       {loadingServices ? (
-                        <SelectItem value="loading" disabled>{t('common.loading', 'Loading...')}</SelectItem>
+                        <SelectItem value="loading" disabled>Loading...</SelectItem>
                       ) : (
                         serviceTypes?.map((service) => (
                           <SelectItem key={service.value} value={service.value}>
@@ -271,7 +271,7 @@ export default function DynamicPricing() {
                     </SelectTrigger>
                     <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                       {loadingClasses ? (
-                        <SelectItem value="loading" disabled>{t('common.loading', 'Loading...')}</SelectItem>
+                        <SelectItem value="loading" disabled>Loading...</SelectItem>
                       ) : (
                         vehicleClasses?.map((vc) => (
                           <SelectItem key={vc.value} value={vc.value}>

@@ -34,8 +34,8 @@ type PaymentWithDetails = {
 };
 
 const paymentFormSchema = z.object({
-  invoiceId: z.string().min(1),
-  amount: z.string().min(1),
+  invoiceId: z.string().min(1, "Invoice is required"),
+  amount: z.string().min(1, "Amount is required"),
   paymentMethod: z.enum(["cash", "card", "transfer", "check"]),
   referenceNumber: z.string().optional(),
   notes: z.string().optional(),

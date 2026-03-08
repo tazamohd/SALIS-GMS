@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Send, Star, ThumbsUp, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { queryClient } from "@/lib/queryClient";
@@ -17,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 export default function ReviewChat() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { t } = useTranslation();
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(0);
@@ -153,7 +151,7 @@ export default function ReviewChat() {
                 ) : activeJobs.length === 0 ? (
                   <div className="text-center py-8 text-[#64748B] text-sm">
                     <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>{t('clientPortal.noActiveServices', 'No active services')}</p>
+                    <p>No active services</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -221,7 +219,7 @@ export default function ReviewChat() {
                         ) : (
                           <div className="text-center py-12 text-[#64748B]">
                             <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                            <p>{t('clientPortal.noMessagesYet', 'No messages yet. Start the conversation!')}</p>
+                            <p>No messages yet. Start the conversation!</p>
                           </div>
                         )}
                       </div>
@@ -257,7 +255,7 @@ export default function ReviewChat() {
                   <div className="flex items-center justify-center h-96 text-[#64748B]">
                     <div className="text-center">
                       <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                      <p>{t('clientPortal.selectActiveService', 'Select an active service to start chatting')}</p>
+                      <p>Select an active service to start chatting</p>
                     </div>
                   </div>
                 )}
@@ -334,7 +332,7 @@ export default function ReviewChat() {
               {completedJobs.length === 0 && (
                 <div className="text-center py-12 text-[#64748B]">
                   <Star className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>{t('clientPortal.noCompletedServicesToReview', 'No completed services to review')}</p>
+                  <p>No completed services to review</p>
                 </div>
               )}
             </CardContent>

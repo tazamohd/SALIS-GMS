@@ -25,28 +25,28 @@ interface DashboardPageProps {
 
 const colorSchemes: Record<string, { gradient: string; bg: string; border: string; text: string }> = {
   primary: {
-    gradient: 'from-primary to-primary/80',
-    bg: 'bg-primary/10',
-    border: 'border-primary/20',
-    text: 'text-primary'
+    gradient: 'from-[#0A5ED7] to-[#0BB3FF]',
+    bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20',
+    border: 'border-[#0A5ED7]/20 dark:border-[#0BB3FF]/30',
+    text: 'text-[#0A5ED7] dark:text-[#0BB3FF]'
   },
   secondary: {
-    gradient: 'from-secondary to-secondary/80',
-    bg: 'bg-secondary/10',
-    border: 'border-secondary/20',
-    text: 'text-secondary'
+    gradient: 'from-[#0B1F3B] to-[#0A5ED7]',
+    bg: 'bg-[#0B1F3B]/10 dark:bg-[#0B1F3B]/20',
+    border: 'border-[#0B1F3B]/20 dark:border-[#0A5ED7]/30',
+    text: 'text-[#0B1F3B] dark:text-[#E6EAF0]'
   },
   tertiary: {
-    gradient: 'from-info to-primary',
-    bg: 'bg-info/10',
-    border: 'border-info/20',
-    text: 'text-info'
+    gradient: 'from-[#0BB3FF] to-[#0A5ED7]',
+    bg: 'bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20',
+    border: 'border-[#0BB3FF]/20 dark:border-[#0A5ED7]/30',
+    text: 'text-[#0BB3FF] dark:text-[#0BB3FF]'
   },
   muted: {
-    gradient: 'from-muted-foreground to-primary',
-    bg: 'bg-muted',
-    border: 'border-border',
-    text: 'text-muted-foreground'
+    gradient: 'from-[#64748B] to-[#0A5ED7]',
+    bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20',
+    border: 'border-[#64748B]/20 dark:border-[#64748B]/30',
+    text: 'text-[#64748B] dark:text-[#9BA4B0]'
   },
 };
 
@@ -79,7 +79,7 @@ export function DashboardPage({
               data-testid={`metric-card-${idx}`}
             >
               <div className={cn(
-                "h-full bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-200",
+                "h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200",
               )}>
                 <div className="flex items-start justify-between">
                   <div className="space-y-3">
@@ -90,7 +90,7 @@ export function DashboardPage({
                       <span className={cn("text-sm font-medium", scheme.text)}>{metric.label}</span>
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-3xl font-black text-foreground font-montserrat">
+                      <h3 className="text-3xl font-black text-gray-900 dark:text-white font-montserrat">
                         {metric.value}
                       </h3>
                       {metric.trend && (

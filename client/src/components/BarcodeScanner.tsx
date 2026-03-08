@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +19,6 @@ interface BarcodeScannerProps {
 
 export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
   const { toast } = useToast();
-  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -117,7 +115,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{t('dialogs.scanBarcode', 'Scan Barcode')}</DialogTitle>
+          <DialogTitle>Scan Barcode</DialogTitle>
           <DialogDescription>
             Point your camera at a barcode to scan it
           </DialogDescription>

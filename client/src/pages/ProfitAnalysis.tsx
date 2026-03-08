@@ -64,10 +64,10 @@ export default function ProfitAnalysis() {
   ];
 
   const technicianPerformance = [
-    { name: t('sample.technicianName1', 'Ahmed Al-Rashid'), revenue: 48500, jobs: 124, avgMargin: 38.2 },
-    { name: t('sample.technicianName2', 'Fatima Hassan'), revenue: 45200, jobs: 118, avgMargin: 35.8 },
-    { name: t('sample.technicianName3', 'Omar Khalid'), revenue: 41800, jobs: 105, avgMargin: 32.4 },
-    { name: t('sample.technicianName4', 'Sara Mohammed'), revenue: 39600, jobs: 98, avgMargin: 34.1 },
+    { name: "John Smith", revenue: 48500, jobs: 124, avgMargin: 38.2 },
+    { name: "Sarah Johnson", revenue: 45200, jobs: 118, avgMargin: 35.8 },
+    { name: "Mike Davis", revenue: 41800, jobs: 105, avgMargin: 32.4 },
+    { name: "Emily Brown", revenue: 39600, jobs: 98, avgMargin: 34.1 },
   ];
 
   const costBreakdown = [
@@ -78,10 +78,10 @@ export default function ProfitAnalysis() {
   ];
 
   const topCustomers = [
-    { name: t('sample.customerName1', 'Al-Faisal Fleet Services'), revenue: 125800, visits: 48, ltv: 245000 },
-    { name: t('sample.customerName2', 'Saudi Auto Group'), revenue: 98500, visits: 32, ltv: 185000 },
-    { name: t('sample.customerName3', 'Al-Rashid Motors'), revenue: 87300, visits: 28, ltv: 152000 },
-    { name: t('sample.customerName4', 'Gulf Transport Co.'), revenue: 76200, visits: 24, ltv: 138000 },
+    { name: "ABC Fleet Services", revenue: 125800, visits: 48, ltv: 245000 },
+    { name: "Smith Auto Group", revenue: 98500, visits: 32, ltv: 185000 },
+    { name: "Johnson Motors", revenue: 87300, visits: 28, ltv: 152000 },
+    { name: "Davis Transport", revenue: 76200, visits: 24, ltv: 138000 },
   ];
 
   const headerContent = (

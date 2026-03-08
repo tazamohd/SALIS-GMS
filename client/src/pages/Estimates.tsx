@@ -45,17 +45,6 @@ export function Estimates() {
     return colors[status] || "bg-[#64748B]/10 text-[#64748B]";
   };
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      draft: t('statusLabels.draft', 'Draft'),
-      sent: t('statusLabels.sent', 'Sent'),
-      accepted: t('statusLabels.accepted', 'Accepted'),
-      declined: t('statusLabels.declined', 'Declined'),
-      expired: t('statusLabels.expired', 'Expired'),
-    };
-    return labels[status] || status;
-  };
-
   const columns = [
     {
       key: "estimateNumber",
@@ -100,7 +89,7 @@ export function Estimates() {
           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(estimate.status)}`}
           data-testid={`status-${estimate.id}`}
         >
-          {getStatusLabel(estimate.status)}
+          {estimate.status}
         </span>
       ),
     },
@@ -137,11 +126,11 @@ export function Estimates() {
           label: t('common.status', 'Status'),
           options: [
             { value: "all", label: t('estimates.allStatus', 'All Status') },
-            { value: "draft", label: t('statusLabels.draft', 'Draft') },
-            { value: "sent", label: t('statusLabels.sent', 'Sent') },
-            { value: "accepted", label: t('statusLabels.accepted', 'Accepted') },
-            { value: "declined", label: t('statusLabels.declined', 'Declined') },
-            { value: "expired", label: t('statusLabels.expired', 'Expired') },
+            { value: "draft", label: t('common.draft', 'Draft') },
+            { value: "sent", label: t('estimates.sent', 'Sent') },
+            { value: "accepted", label: t('estimates.accepted', 'Accepted') },
+            { value: "declined", label: t('estimates.declined', 'Declined') },
+            { value: "expired", label: t('estimates.expired', 'Expired') },
           ],
           defaultValue: statusFilter,
         },

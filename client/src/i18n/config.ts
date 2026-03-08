@@ -25,7 +25,7 @@ const getInitialLanguage = (): string => {
   if (saved && supportedLanguages.some(lang => lang.code === saved)) {
     return saved;
   }
-  return 'ar'; // Arabic as default language
+  return 'en';
 };
 
 const initialLanguage = getInitialLanguage();

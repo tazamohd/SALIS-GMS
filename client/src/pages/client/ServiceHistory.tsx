@@ -7,12 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign, Wrench, Filter } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export default function ServiceHistory() {
   const { user } = useAuth();
-  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedVehicle, setSelectedVehicle] = useState("all");
@@ -151,7 +149,7 @@ export default function ServiceHistory() {
           ) : filteredJobCards.length === 0 ? (
             <div className="text-center py-12 text-[#64748B]">
               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>{t('clientPortal.noServiceRecordsFound', 'No service records found')}</p>
+              <p>No service records found</p>
             </div>
           ) : (
             <div className="space-y-4">

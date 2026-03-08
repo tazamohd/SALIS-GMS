@@ -1196,7 +1196,7 @@ export default function VendorSupplierPortal() {
                       <Input
                         {...field}
                         value={field.value ?? ""}
-                        placeholder={t('vendor.paymentTermsPlaceholder', 'e.g., net30, net60, cod')}
+                        placeholder="e.g., net30, net60, cod"
                         data-testid="input-payment-terms"
                         className="bg-white dark:bg-[#0E1117] text-[#0B1F3B] dark:text-white border-[#E2E8F0] dark:border-[#232A36]"
                       />

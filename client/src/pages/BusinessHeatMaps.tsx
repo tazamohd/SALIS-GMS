@@ -61,10 +61,10 @@ export default function BusinessHeatMaps() {
   ];
 
   const technicianUtilization = [
-    { name: t('sample.technicianName1', 'Ahmed Al-Rashid'), utilization: [92, 88, 95, 90, 87, 78, 0] },
-    { name: t('sample.technicianName2', 'Fatima Hassan'), utilization: [88, 92, 86, 91, 89, 82, 0] },
-    { name: t('sample.technicianName3', 'Omar Khalid'), utilization: [85, 87, 83, 88, 90, 75, 0] },
-    { name: t('sample.technicianName4', 'Sara Mohammed'), utilization: [90, 86, 91, 85, 88, 80, 0] },
+    { name: "John Smith", utilization: [92, 88, 95, 90, 87, 78, 0] },
+    { name: "Sarah Johnson", utilization: [88, 92, 86, 91, 89, 82, 0] },
+    { name: "Mike Davis", utilization: [85, 87, 83, 88, 90, 75, 0] },
+    { name: "Emily Brown", utilization: [90, 86, 91, 85, 88, 80, 0] },
   ];
 
   const getHeatColor = (value: number, max: number = 100) => {

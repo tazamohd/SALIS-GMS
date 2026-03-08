@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from 'react-i18next';
-import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2, FileText, AlertCircle, DollarSign, ClipboardList, Send, CheckCircle, Clock, XCircle, Eye, Shield, Plus } from "lucide-react";
+import { Users, Search, Car, Phone, Mail, MessageSquare, Building2, Trash2, FileText, AlertCircle, DollarSign, ClipboardList, Send, CheckCircle, Clock, XCircle, Eye } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,14 +22,11 @@ import { AddCustomerNoteDialog } from "@/components/AddCustomerNoteDialog";
 import { AddCustomerDialog } from "@/components/AddCustomerDialog";
 import { JobCardDetailsDialog } from "@/components/JobCardDetailsDialog";
 import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
-import { usePermissions } from "@/hooks/usePermissions";
-import { RoleBadge } from "@/components/RoleBadge";
 import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
 export function Customers() {
   const { t } = useTranslation();
-  const { canCreate, canEdit, canDelete, canView, hasPermission, getRoleDisplayName } = usePermissions();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
@@ -229,7 +226,7 @@ export function Customers() {
           label: (
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4" />
-              <span>{selectedGarageId === "all" ? t('customers.allGarages', 'All Garages') : garages?.find(g => g.id === selectedGarageId)?.name || t('customers.selectGarage', 'Select Garage')}</span>
+              <span>{selectedGarageId === "all" ? "All Garages" : garages?.find(g => g.id === selectedGarageId)?.name || "Select Garage"}</span>
             </div>
           ) as any,
           onClick: () => {},
@@ -239,7 +236,7 @@ export function Customers() {
             <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
               <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage-filter">
                 <Building2 className="w-4 h-4 mr-2" />
-                <SelectValue placeholder={t('customers.allGarages', 'All Garages')} />
+                <SelectValue placeholder="All Garages" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23]">
                 <SelectItem value="all">{t('customers.allGarages', 'All Garages')}</SelectItem>
@@ -262,24 +259,6 @@ export function Customers() {
         } as any,
       ]}
     >
-      {/* Role-Based Access Indicator */}
-      <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-white/50 dark:bg-[#151A23]/50 border border-[#E2E8F0] dark:border-[#232A36]">
-        <RoleBadge size="md" />
-        {canCreate('customers') ? (
-          <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            {t('permissions.canCreateCustomers', 'You can create and manage customer profiles')}
-          </span>
-        ) : canEdit('customers') ? (
-          <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-            {t('permissions.canEditCustomers', 'You can update customer information')}
-          </span>
-        ) : (
-          <span className="text-xs text-zinc-500 flex items-center gap-1">
-            <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContactManagerCustomers', 'View only - Contact manager to edit customer records')}
-          </span>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] p-4 text-white">
           <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10" />
@@ -558,16 +537,14 @@ export function Customers() {
                                     )}
                                   </div>
                                 </div>
-                                {canDelete('vehicles') && (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => deleteVehicleMutation.mutate(vehicle.id)}
-                                    data-testid={`button-delete-vehicle-${vehicle.id}`}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                )}
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => deleteVehicleMutation.mutate(vehicle.id)}
+                                  data-testid={`button-delete-vehicle-${vehicle.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
                               </div>
                             </div>
                           ))}

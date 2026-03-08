@@ -196,21 +196,24 @@ export default function DashboardWidgets() {
 
   const createWidgetMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/dashboard/widgets', 'POST', data);
+      return apiRequest('/api/dashboard/widgets', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
       setIsAddDialogOpen(false);
       setNewWidget({ title: '', widgetType: 'kpi', dataSource: 'invoices' });
       toast({
-        title: t('dashboardWidgets.widgetCreated', 'Widget Created'),
-        description: t('dashboardWidgets.widgetCreatedDesc', 'Your new dashboard widget has been added.'),
+        title: "Widget Created",
+        description: "Your new dashboard widget has been added.",
       });
     },
     onError: () => {
       toast({
-        title: t('common.error', 'Error'),
-        description: t('dashboardWidgets.failedToCreateWidget', 'Failed to create widget. Please try again.'),
+        title: "Error",
+        description: "Failed to create widget. Please try again.",
         variant: "destructive",
       });
     },
@@ -218,7 +221,10 @@ export default function DashboardWidgets() {
 
   const updateWidgetMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, 'PATCH', data);
+      return apiRequest(`/api/dashboard/widgets/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -227,19 +233,21 @@ export default function DashboardWidgets() {
 
   const deleteWidgetMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, 'DELETE');
+      return apiRequest(`/api/dashboard/widgets/${id}`, {
+        method: 'DELETE',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
       toast({
-        title: t('dashboardWidgets.widgetDeleted', 'Widget Deleted'),
-        description: t('dashboardWidgets.widgetDeletedDesc', 'The widget has been removed from your dashboard.'),
+        title: "Widget Deleted",
+        description: "The widget has been removed from your dashboard.",
       });
     },
     onError: () => {
       toast({
-        title: t('common.error', 'Error'),
-        description: t('dashboardWidgets.failedToDeleteWidget', 'Failed to delete widget. Please try again.'),
+        title: "Error",
+        description: "Failed to delete widget. Please try again.",
         variant: "destructive",
       });
     },
@@ -247,12 +255,15 @@ export default function DashboardWidgets() {
 
   const updatePositionsMutation = useMutation({
     mutationFn: async (positions: { id: string; position: any }[]) => {
-      return apiRequest('/api/dashboard/widgets/positions', 'PATCH', { positions });
+      return apiRequest('/api/dashboard/widgets/positions', {
+        method: 'PATCH',
+        body: JSON.stringify({ positions }),
+      });
     },
     onSuccess: () => {
       toast({
-        title: t('dashboardWidgets.layoutSaved', 'Layout Saved'),
-        description: t('dashboardWidgets.layoutSavedDesc', 'Widget positions have been updated.'),
+        title: "Layout Saved",
+        description: "Widget positions have been updated.",
       });
     },
   });
@@ -277,8 +288,8 @@ export default function DashboardWidgets() {
   const handleToggleWidget = (id: string, isActive: boolean) => {
     updateWidgetMutation.mutate({ id, data: { isActive } });
     toast({
-      title: isActive ? t('dashboardWidgets.widgetEnabled', 'Widget Enabled') : t('dashboardWidgets.widgetDisabled', 'Widget Disabled'),
-      description: isActive ? t('dashboardWidgets.widgetEnabledDesc', 'Widget will now appear on your dashboard.') : t('dashboardWidgets.widgetDisabledDesc', 'Widget has been hidden from your dashboard.'),
+      title: isActive ? "Widget Enabled" : "Widget Disabled",
+      description: isActive ? "Widget will now appear on your dashboard." : "Widget has been hidden from your dashboard.",
     });
   };
 
@@ -289,8 +300,8 @@ export default function DashboardWidgets() {
   const handleAddWidget = () => {
     if (!newWidget.title.trim()) {
       toast({
-        title: t('common.error', 'Error'),
-        description: t('dashboardWidgets.pleaseEnterTitle', 'Please enter a widget title.'),
+        title: "Error",
+        description: "Please enter a widget title.",
         variant: "destructive",
       });
       return;
@@ -314,7 +325,7 @@ export default function DashboardWidgets() {
   return (
     <StandardPageLayout
       title={t('dashboard.customizeWidgets', 'Customize Dashboard Widgets')}
-      description={t('dashboardWidgets.personalizeDescription', 'Personalize your dashboard by adding, removing, and rearranging widgets')}
+      description="Personalize your dashboard by adding, removing, and rearranging widgets"
       icon={LayoutDashboard}
     >
       <div className="space-y-6">
@@ -323,7 +334,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.totalWidgets', 'Total Widgets')}</p>
+                  <p className="text-sm text-[#64748B]">Total Widgets</p>
                   <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{widgets.length}</p>
                 </div>
                 <LayoutDashboard className="h-8 w-8 text-[#0A5ED7]" />
@@ -335,7 +346,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.activeWidgets', 'Active Widgets')}</p>
+                  <p className="text-sm text-[#64748B]">Active Widgets</p>
                   <p className="text-2xl font-bold text-green-600">{activeWidgetsCount}</p>
                 </div>
                 <Eye className="h-8 w-8 text-green-500" />
@@ -347,7 +358,7 @@ export default function DashboardWidgets() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">{t('dashboardWidgets.hiddenWidgets', 'Hidden Widgets')}</p>
+                  <p className="text-sm text-[#64748B]">Hidden Widgets</p>
                   <p className="text-2xl font-bold text-[#64748B]">{widgets.length - activeWidgetsCount}</p>
                 </div>
                 <EyeOff className="h-8 w-8 text-[#64748B]" />
@@ -362,10 +373,10 @@ export default function DashboardWidgets() {
               <div>
                 <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
                   <Settings className="h-5 w-5 text-[#64748B]" />
-                  {t('dashboardWidgets.yourWidgets', 'Your Widgets')}
+                  Your Widgets
                 </CardTitle>
                 <CardDescription className="text-[#64748B]">
-                  {t('dashboardWidgets.dragToReorder', 'Drag to reorder, toggle visibility, or remove widgets')}
+                  Drag to reorder, toggle visibility, or remove widgets
                 </CardDescription>
               </div>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -377,24 +388,24 @@ export default function DashboardWidgets() {
                 </DialogTrigger>
                 <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                   <DialogHeader>
-                    <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.addNewWidget', 'Add New Widget')}</DialogTitle>
+                    <DialogTitle className="text-[#0B1F3B] dark:text-white">Add New Widget</DialogTitle>
                     <DialogDescription className="text-[#64748B]">
-                      {t('dashboardWidgets.createCustomWidget', 'Create a custom widget for your dashboard')}
+                      Create a custom widget for your dashboard
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.widgetTitle', 'Widget Title')}</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Widget Title</Label>
                       <Input
                         value={newWidget.title}
                         onChange={(e) => setNewWidget({ ...newWidget, title: e.target.value })}
-                        placeholder={t('dashboardWidgets.widgetTitlePlaceholder', 'e.g., Monthly Revenue')}
+                        placeholder="e.g., Monthly Revenue"
                         className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                         data-testid="input-widget-title"
                       />
                     </div>
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.widgetType', 'Widget Type')}</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Widget Type</Label>
                       <Select value={newWidget.widgetType} onValueChange={(v) => setNewWidget({ ...newWidget, widgetType: v })}>
                         <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-widget-type">
                           <SelectValue />
@@ -402,29 +413,29 @@ export default function DashboardWidgets() {
                         <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="kpi">
                             <span className="flex items-center gap-2">
-                              <TrendingUp className="h-4 w-4" /> {t('widgets.widgetTypes.kpi', 'KPI')}
+                              <TrendingUp className="h-4 w-4" /> KPI Card
                             </span>
                           </SelectItem>
                           <SelectItem value="chart">
                             <span className="flex items-center gap-2">
-                              <BarChart3 className="h-4 w-4" /> {t('dashboardWidgets.chart', 'Chart')}
+                              <BarChart3 className="h-4 w-4" /> Chart
                             </span>
                           </SelectItem>
                           <SelectItem value="table">
                             <span className="flex items-center gap-2">
-                              <Table className="h-4 w-4" /> {t('dashboardWidgets.table', 'Table')}
+                              <Table className="h-4 w-4" /> Table
                             </span>
                           </SelectItem>
                           <SelectItem value="metric">
                             <span className="flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" /> {t('dashboardWidgets.metric', 'Metric')}
+                              <DollarSign className="h-4 w-4" /> Metric
                             </span>
                           </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-[#0B1F3B] dark:text-white">{t('dashboardWidgets.dataSource', 'Data Source')}</Label>
+                      <Label className="text-[#0B1F3B] dark:text-white">Data Source</Label>
                       <Select value={newWidget.dataSource} onValueChange={(v) => setNewWidget({ ...newWidget, dataSource: v })}>
                         <SelectTrigger className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-data-source">
                           <SelectValue />
@@ -432,22 +443,22 @@ export default function DashboardWidgets() {
                         <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                           <SelectItem value="invoices">
                             <span className="flex items-center gap-2">
-                              <DollarSign className="h-4 w-4" /> {t('dashboardWidgets.invoices', 'Invoices')}
+                              <DollarSign className="h-4 w-4" /> Invoices
                             </span>
                           </SelectItem>
                           <SelectItem value="customers">
                             <span className="flex items-center gap-2">
-                              <Users className="h-4 w-4" /> {t('dashboardWidgets.customers', 'Customers')}
+                              <Users className="h-4 w-4" /> Customers
                             </span>
                           </SelectItem>
                           <SelectItem value="job_cards">
                             <span className="flex items-center gap-2">
-                              <Wrench className="h-4 w-4" /> {t('dashboardWidgets.jobCards', 'Job Cards')}
+                              <Wrench className="h-4 w-4" /> Job Cards
                             </span>
                           </SelectItem>
                           <SelectItem value="inventory">
                             <span className="flex items-center gap-2">
-                              <Package className="h-4 w-4" /> {t('dashboardWidgets.inventory', 'Inventory')}
+                              <Package className="h-4 w-4" /> Inventory
                             </span>
                           </SelectItem>
                         </SelectContent>
@@ -456,7 +467,7 @@ export default function DashboardWidgets() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
-                      {t('common.cancel', 'Cancel')}
+                      Cancel
                     </Button>
                     <Button 
                       className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" 
@@ -465,7 +476,7 @@ export default function DashboardWidgets() {
                       data-testid="button-save-widget"
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      {t('common.save', 'Save')}
+                      Save Widget
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -479,8 +490,8 @@ export default function DashboardWidgets() {
               ) : widgets.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-[#64748B]">
                   <LayoutDashboard className="h-12 w-12 mb-4 opacity-50" />
-                  <p>{t('dashboardWidgets.noWidgetsConfigured', 'No widgets configured')}</p>
-                  <p className="text-sm">{t('dashboardWidgets.addWidgetsToCustomize', 'Add widgets to customize your dashboard')}</p>
+                  <p>No widgets configured</p>
+                  <p className="text-sm">Add widgets to customize your dashboard</p>
                 </div>
               ) : (
                 <DndContext
@@ -512,10 +523,10 @@ export default function DashboardWidgets() {
             <CardHeader>
               <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-purple-500" />
-                {t('presetWidgets.title', 'Preset Widgets')}
+                Preset Widgets
               </CardTitle>
               <CardDescription className="text-[#64748B]">
-                {t('presetWidgets.description', 'Quick-add common widget configurations')}
+                Quick-add popular widget configurations
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -551,7 +562,7 @@ export default function DashboardWidgets() {
 
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-widget-tips">
           <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('dashboard.widgetTips', 'Widget Tips')}</CardTitle>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">Widget Tips</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -561,25 +572,25 @@ export default function DashboardWidgets() {
                   {t('dashboard.dragToReorder', 'Drag to Reorder')}
                 </h4>
                 <p className="text-sm text-[#0A5ED7]/70 dark:text-[#0BB3FF]/70">
-                  {t('dashboard.dragToReorderDesc', 'Use the drag handle to reorder widgets according to your preference.')}
+                  Use the drag handle to rearrange widgets in your preferred order.
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-green-100 dark:bg-green-900/20">
                 <h4 className="font-medium text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  {t('dashboard.toggleVisibility', 'Toggle Visibility')}
+                  Toggle Visibility
                 </h4>
                 <p className="text-sm text-green-700 dark:text-green-400">
-                  {t('dashboard.toggleVisibilityDesc', 'Hide widgets you do not need without deleting them.')}
+                  Hide widgets you don't need without deleting them.
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-purple-100 dark:bg-purple-900/20">
                 <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  {t('dashboard.quickAdd', 'Quick Add')}
+                  Quick Add
                 </h4>
                 <p className="text-sm text-purple-700 dark:text-purple-400">
-                  {t('dashboard.quickAddDesc', 'Click on preset widgets to add them instantly to your dashboard.')}
+                  Click preset widgets to instantly add them to your dashboard.
                 </p>
               </div>
             </div>

@@ -140,7 +140,7 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                <SelectItem value="UTC">{t('settings.utc', 'UTC')}</SelectItem>
+                <SelectItem value="UTC">UTC</SelectItem>
                 <SelectItem value="America/New_York">{t('settings.easternTime', 'Eastern Time')}</SelectItem>
                 <SelectItem value="America/Chicago">{t('settings.centralTime', 'Central Time')}</SelectItem>
                 <SelectItem value="America/Denver">{t('settings.mountainTime', 'Mountain Time')}</SelectItem>
@@ -162,9 +162,9 @@ function GeneralSettingsTab({ settings, onUpdate }: { settings: UserSettings; on
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                <SelectItem value="MM/DD/YYYY">{t('settings.dateFormatMMDDYYYY', 'MM/DD/YYYY')}</SelectItem>
-                <SelectItem value="DD/MM/YYYY">{t('settings.dateFormatDDMMYYYY', 'DD/MM/YYYY')}</SelectItem>
-                <SelectItem value="YYYY-MM-DD">{t('settings.dateFormatYYYYMMDD', 'YYYY-MM-DD')}</SelectItem>
+                <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -233,15 +233,15 @@ function LanguageSettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-              <SelectItem value="en">{t('languages.english', 'English')}</SelectItem>
-              <SelectItem value="ar">{t('languages.arabic', 'Arabic')}</SelectItem>
-              <SelectItem value="es">{t('languages.spanish', 'Spanish')}</SelectItem>
-              <SelectItem value="fr">{t('languages.french', 'French')}</SelectItem>
-              <SelectItem value="de">{t('languages.german', 'German')}</SelectItem>
-              <SelectItem value="it">{t('languages.italian', 'Italian')}</SelectItem>
-              <SelectItem value="pt">{t('languages.portuguese', 'Portuguese')}</SelectItem>
-              <SelectItem value="zh">{t('languages.chinese', 'Chinese')}</SelectItem>
-              <SelectItem value="ja">{t('languages.japanese', 'Japanese')}</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ar">العربية</SelectItem>
+              <SelectItem value="es">Español</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="de">Deutsch</SelectItem>
+              <SelectItem value="it">Italiano</SelectItem>
+              <SelectItem value="pt">Português</SelectItem>
+              <SelectItem value="zh">中文</SelectItem>
+              <SelectItem value="ja">日本語</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-sm text-[#64748B]">
@@ -282,7 +282,7 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
               <SelectItem value="CNY">CNY - {t('settings.chineseYuan', 'Chinese Yuan')} (¥)</SelectItem>
               <SelectItem value="INR">INR - {t('settings.indianRupee', 'Indian Rupee')} (₹)</SelectItem>
               <SelectItem value="SAR">SAR - {t('settings.saudiRiyal', 'Saudi Riyal')} (﷼)</SelectItem>
-              <SelectItem value="AED">AED - {t('settings.emiratiDirham', 'Emirati Dirham')}</SelectItem>
+              <SelectItem value="AED">AED - {t('settings.emiratiDirham', 'Emirati Dirham')} (د.إ)</SelectItem>
             </SelectContent>
           </Select>
         </div>

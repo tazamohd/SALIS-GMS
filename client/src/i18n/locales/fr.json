@@ -164,33 +164,5 @@
       "calendar": "Calendrier",
       "tasks": "Liste des tâches"
     }
-  },
-  "social": {
-    "totalPosts": "Total des publications",
-    "totalReviews": "Total des avis",
-    "avgRating": "Note moyenne",
-    "responseRate": "Taux de réponse",
-    "followers": "Abonnés",
-    "socialMediaPosts": "Publications sur les réseaux sociaux",
-    "customerReviews": "Avis des clients",
-    "platform": "Plateforme",
-    "content": "Contenu",
-    "writeYourPost": "Écrivez votre publication...",
-    "scheduleOptional": "Planifier (Optionnel)",
-    "createSocialMediaPost": "Créer une publication sur les réseaux sociaux",
-    "reach": "Portée",
-    "scheduledFor": "Planifié pour",
-    "posts": "Publications",
-    "reviews": "Avis",
-    "responded": "Répondu",
-    "respond": "Répondre",
-    "createPost": "Créer une publication",
-    "pageDescription": "Gérer les publications sur les réseaux sociaux et répondre aux avis des clients",
-    "postCreated": "Publication créée",
-    "postScheduled": "Votre publication a été programmée.",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "googleBusiness": "Google Business",
-    "yelp": "Yelp"
   }
 }

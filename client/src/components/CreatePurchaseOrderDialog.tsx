@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,7 +53,6 @@ export function CreatePurchaseOrderDialog() {
     unitPrice: 0,
   });
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -172,7 +170,7 @@ export function CreatePurchaseOrderDialog() {
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('dialogs.createPurchaseOrder', 'Create Purchase Order')}</DialogTitle>
+          <DialogTitle>Create Purchase Order</DialogTitle>
           <DialogDescription className="sr-only">
             Form to create a new purchase order for ordering parts from suppliers
           </DialogDescription>

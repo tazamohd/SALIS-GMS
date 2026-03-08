@@ -275,7 +275,7 @@ export default function GeneralLedger() {
                   <TableCell className="font-medium">{account.name}</TableCell>
                   <TableCell>
                     <Badge className={getAccountTypeBadge(account.type)}>
-                      {t(`accounting.${account.type.toLowerCase()}Type`, account.type)}
+                      {account.type}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right text-green-600">
@@ -405,7 +405,7 @@ export default function GeneralLedger() {
                     <div>
                       <p className="font-medium">{entry.account}</p>
                       <Badge className={`text-xs ${getAccountTypeBadge(entry.accountType)}`}>
-                        {t(`accounting.${entry.accountType.toLowerCase()}Type`, entry.accountType)}
+                        {entry.accountType}
                       </Badge>
                     </div>
                   </TableCell>
@@ -477,9 +477,9 @@ export default function GeneralLedger() {
             <Card key={type} data-testid={`card-type-${type.toLowerCase()}`}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Badge className={getAccountTypeBadge(type)}>{t(`accounting.${type.toLowerCase()}Type`, type)}</Badge>
+                  <Badge className={getAccountTypeBadge(type)}>{type}</Badge>
                   <span className="text-muted-foreground text-sm">
-                    ({typeAccounts.length} {t('common.accounts', 'accounts')})
+                    ({typeAccounts.length} accounts)
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -611,9 +611,9 @@ export default function GeneralLedger() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pdf">{t('common.formatOptions.pdf', 'PDF')}</SelectItem>
-                  <SelectItem value="excel">{t('common.formatOptions.excel', 'Excel')}</SelectItem>
-                  <SelectItem value="csv">{t('common.formatOptions.csv', 'CSV')}</SelectItem>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="excel">Excel</SelectItem>
+                  <SelectItem value="csv">CSV</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -632,7 +632,7 @@ export default function GeneralLedger() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.generalLedger.title', 'General Ledger')}
+      title={t('accounting.generalLedger.title', 'General Ledger - دفتر الأستاذ العام')}
       description={t('accounting.generalLedger.description', 'Complete record of all financial transactions')}
       icon={BookOpen}
       tabs={tabs}

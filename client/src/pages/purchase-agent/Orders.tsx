@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +44,6 @@ import {
 import type { PurchaseOrder, Supplier } from "@shared/schema";
 
 export default function PurchaseAgentOrders() {
-  const { t } = useTranslation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -195,11 +193,11 @@ export default function PurchaseAgentOrders() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('purchaseAgent.allStatus', 'All Status')}</SelectItem>
-                  <SelectItem value="pending">{t('statusLabels.pending', 'Pending')}</SelectItem>
-                  <SelectItem value="ordered">{t('purchaseAgent.ordered', 'Ordered')}</SelectItem>
-                  <SelectItem value="received">{t('purchaseAgent.received', 'Received')}</SelectItem>
-                  <SelectItem value="cancelled">{t('statusLabels.cancelled', 'Cancelled')}</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="ordered">Ordered</SelectItem>
+                  <SelectItem value="received">Received</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -258,10 +256,10 @@ export default function PurchaseAgentOrders() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">{t('statusLabels.pending', 'Pending')}</SelectItem>
-                            <SelectItem value="ordered">{t('purchaseAgent.ordered', 'Ordered')}</SelectItem>
-                            <SelectItem value="received">{t('purchaseAgent.received', 'Received')}</SelectItem>
-                            <SelectItem value="cancelled">{t('statusLabels.cancelled', 'Cancelled')}</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="ordered">Ordered</SelectItem>
+                            <SelectItem value="received">Received</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
                           </SelectContent>
                         </Select>
                         <Button

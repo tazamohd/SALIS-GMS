@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,6 @@ import { Link } from "wouter";
 import type { SparePart, SparePartInventory } from "@shared/schema";
 
 export default function PurchaseAgentInventory() {
-  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState<string>("all");
 
@@ -87,10 +85,10 @@ export default function PurchaseAgentInventory() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string; icon: any }> = {
-      healthy: { variant: "outline", label: t('purchaseAgent.healthy', 'Healthy'), icon: CheckCircle },
-      warning: { variant: "secondary", label: t('purchaseAgent.warning', 'Warning'), icon: AlertTriangle },
-      low: { variant: "destructive", label: t('purchaseAgent.lowStock', 'Low Stock'), icon: TrendingDown },
-      out_of_stock: { variant: "destructive", label: t('purchaseAgent.outOfStock', 'Out of Stock'), icon: Package },
+      healthy: { variant: "outline", label: "Healthy", icon: CheckCircle },
+      warning: { variant: "secondary", label: "Warning", icon: AlertTriangle },
+      low: { variant: "destructive", label: "Low Stock", icon: TrendingDown },
+      out_of_stock: { variant: "destructive", label: "Out of Stock", icon: Package },
     };
     const { variant, label, icon: Icon } = config[status] || config.healthy;
     return (
@@ -106,10 +104,10 @@ export default function PurchaseAgentInventory() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
-            {t('purchaseAgent.inventoryNeeds', 'Inventory Needs')}
+            Inventory Needs
           </h1>
           <p className="text-[#64748B] mt-1">
-            {t('purchaseAgent.monitorStockLevels', 'Monitor stock levels and identify reorder needs')}
+            Monitor stock levels and identify reorder needs
           </p>
         </div>
       </div>
@@ -123,7 +121,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{spareParts.length}</div>
-                <p className="text-sm text-[#64748B]">{t('purchaseAgent.totalItems', 'Total Items')}</p>
+                <p className="text-sm text-[#64748B]">Total Items</p>
               </div>
             </div>
           </CardContent>
@@ -136,7 +134,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-500">{lowStockItems.length}</div>
-                <p className="text-sm text-[#64748B]">{t('purchaseAgent.needReorder', 'Need Reorder')}</p>
+                <p className="text-sm text-[#64748B]">Need Reorder</p>
               </div>
             </div>
           </CardContent>
@@ -149,7 +147,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-[#F97316]">{outOfStockItems.length}</div>
-                <p className="text-sm text-[#64748B]">{t('purchaseAgent.outOfStock', 'Out of Stock')}</p>
+                <p className="text-sm text-[#64748B]">Out of Stock</p>
               </div>
             </div>
           </CardContent>
@@ -162,7 +160,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-500">{healthyItems.length}</div>
-                <p className="text-sm text-[#64748B]">{t('purchaseAgent.healthyStock', 'Healthy Stock')}</p>
+                <p className="text-sm text-[#64748B]">Healthy Stock</p>
               </div>
             </div>
           </CardContent>
@@ -176,18 +174,18 @@ export default function PurchaseAgentInventory() {
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
                 <CardTitle className="text-red-700 dark:text-red-400">
-                  {t('purchaseAgent.criticalStockAlert', 'Critical Stock Alert')}
+                  Critical Stock Alert
                 </CardTitle>
               </div>
               <Link href="/purchase-agent/orders">
                 <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-create-bulk-order">
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  {t('purchaseAgent.createBulkOrder', 'Create Bulk Order')}
+                  Create Bulk Order
                 </Button>
               </Link>
             </div>
             <CardDescription className="text-[#64748B]">
-              {t('purchaseAgent.itemsRequireAttention', '{{count}} items require immediate attention', { count: lowStockItems.length })}
+              {lowStockItems.length} items require immediate attention
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -209,8 +207,8 @@ export default function PurchaseAgentInventory() {
                     </div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-[#64748B]">
-                        <span>{t('purchaseAgent.current', 'Current')}: {inv?.stockQuantity || 0}</span>
-                        <span>{t('purchaseAgent.min', 'Min')}: {inv?.minThreshold || 0}</span>
+                        <span>Current: {inv?.stockQuantity || 0}</span>
+                        <span>Min: {inv?.minThreshold || 0}</span>
                       </div>
                       <Progress
                         value={getStockLevel(part)}
@@ -232,7 +230,7 @@ export default function PurchaseAgentInventory() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
-                  placeholder={t('purchaseAgent.searchParts', 'Search parts...')}
+                  placeholder="Search parts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
@@ -242,14 +240,14 @@ export default function PurchaseAgentInventory() {
               <Select value={stockFilter} onValueChange={setStockFilter}>
                 <SelectTrigger className="w-44 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-stock-filter">
                   <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder={t('purchaseAgent.stockLevel', 'Stock Level')} />
+                  <SelectValue placeholder="Stock Level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('purchaseAgent.allLevels', 'All Levels')}</SelectItem>
-                  <SelectItem value="low">{t('purchaseAgent.lowStock', 'Low Stock')}</SelectItem>
-                  <SelectItem value="out_of_stock">{t('purchaseAgent.outOfStock', 'Out of Stock')}</SelectItem>
-                  <SelectItem value="warning">{t('purchaseAgent.warning', 'Warning')}</SelectItem>
-                  <SelectItem value="healthy">{t('purchaseAgent.healthy', 'Healthy')}</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
+                  <SelectItem value="low">Low Stock</SelectItem>
+                  <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                  <SelectItem value="warning">Warning</SelectItem>
+                  <SelectItem value="healthy">Healthy</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -257,22 +255,22 @@ export default function PurchaseAgentInventory() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-[#64748B]">{t('purchaseAgent.loadingInventory', 'Loading inventory...')}</div>
+            <div className="text-center py-8 text-[#64748B]">Loading inventory...</div>
           ) : filteredParts.length === 0 ? (
             <div className="text-center py-8 text-[#64748B]">
-              {t('purchaseAgent.noItemsFound', 'No items found')}
+              No items found
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.part', 'Part')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.sku', 'SKU')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.category', 'Category')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.inStock', 'In Stock')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.minLevel', 'Min Level')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('purchaseAgent.stockLevel', 'Stock Level')}</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">SKU</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">In Stock</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Min Level</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Stock Level</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -282,7 +280,7 @@ export default function PurchaseAgentInventory() {
                     <TableRow key={part.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-part-${part.id}`}>
                       <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{part.name}</TableCell>
                       <TableCell className="text-[#64748B]">{part.sku}</TableCell>
-                      <TableCell className="text-[#64748B]">{part.category || t('common.na', 'N/A')}</TableCell>
+                      <TableCell className="text-[#64748B]">{part.category || "N/A"}</TableCell>
                       <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">{inv?.stockQuantity || 0}</TableCell>
                       <TableCell className="text-[#64748B]">{inv?.minThreshold || 0}</TableCell>
                       <TableCell className="w-32">

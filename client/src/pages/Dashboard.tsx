@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge, Settings, Shield, UserCog, Calculator, ShoppingCart, Crown, Calendar, Briefcase } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import { useAuth } from "@/hooks/useAuth";
-import { usePermissions } from "@/hooks/usePermissions";
-import { RoleGate, RoleSection } from "@/components/RoleGate";
-import { RoleIndicator } from "@/components/RoleBadge";
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Area, AreaChart } from "recharts";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
@@ -21,7 +18,6 @@ interface DashboardStats {
 export function Dashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { role, getRoleDisplayName, canView, canCreate, canEdit, canApprove, hasPermission } = usePermissions();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
@@ -99,17 +95,8 @@ export function Dashboard() {
       'body_work': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🎨' },
       'tire_service': { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '⭕' },
     };
-    const serviceTypeLabels: { [key: string]: string } = {
-      'maintenance': t('serviceTypes.maintenance', 'Maintenance'),
-      'repair': t('serviceTypes.repair', 'Repair'),
-      'diagnostic': t('serviceTypes.diagnostic', 'Diagnostic'),
-      'inspection': t('serviceTypes.inspection', 'Inspection'),
-      'body_work': t('serviceTypes.bodyWork', 'Body Work'),
-      'tire_service': t('serviceTypes.tireService', 'Tire Service'),
-    };
-    const key = serviceType.toLowerCase().replace(/\s+/g, '_');
-    const config = types[key] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
-    return { ...config, label: serviceTypeLabels[key] || serviceType };
+    const config = types[serviceType.toLowerCase().replace(/\s+/g, '_')] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '📋' };
+    return { ...config, label: serviceType };
   };
 
   const getStatusBadge = (status: string) => {
@@ -121,16 +108,8 @@ export function Dashboard() {
       'delivered': { bg: 'bg-[#0B1F3B]/10 dark:bg-[#E6EAF0]/10', text: 'text-[#0B1F3B] dark:text-[#E6EAF0]', icon: '🚗' },
       'cancelled': { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '❌' },
     };
-    const statusLabels: { [key: string]: string } = {
-      'pending': t('statusLabels.pending', 'Pending'),
-      'assigned': t('statusLabels.assigned', 'Assigned'),
-      'in_progress': t('statusLabels.inProgress', 'In Progress'),
-      'completed': t('statusLabels.completed', 'Completed'),
-      'delivered': t('statusLabels.delivered', 'Delivered'),
-      'cancelled': t('statusLabels.cancelled', 'Cancelled'),
-    };
     const config = statusColors[status] || { bg: 'bg-[#64748B]/10 dark:bg-[#64748B]/20', text: 'text-[#64748B] dark:text-[#9BA4B0]', icon: '○' };
-    return { ...config, label: statusLabels[status] || status };
+    return { ...config, label: status };
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -140,14 +119,8 @@ export function Dashboard() {
       'medium': { bg: 'bg-[#0BB3FF] dark:bg-[#0891b2]', text: 'text-white', icon: '⭐' },
       'low': { bg: 'bg-[#0A5ED7] dark:bg-[#0952C0]', text: 'text-white', icon: '💙' },
     };
-    const priorityLabels: { [key: string]: string } = {
-      'urgent': t('priorityLabels.urgent', 'Urgent'),
-      'high': t('priorityLabels.high', 'High'),
-      'medium': t('priorityLabels.medium', 'Medium'),
-      'low': t('priorityLabels.low', 'Low'),
-    };
     const config = priorityColors[priority] || { bg: 'bg-[#64748B]', text: 'text-white', icon: '○' };
-    return { ...config, label: priorityLabels[priority] || priority };
+    return { ...config, label: priority };
   };
 
   const shortenId = (id: string) => {
@@ -164,75 +137,8 @@ export function Dashboard() {
   const totalInventoryItems = sparePartInventories.length || 1;
   const inventoryPercentage = Math.round((inStockParts / totalInventoryItems) * 100);
 
-  const isTechnician = role === 'technician';
-  const isCustomer = role === 'customer';
-  const isOwnerOrAdmin = role === 'business_owner' || role === 'system_administrator';
-  const isFinanceRole = role === 'finance_manager' || role === 'accountant';
-  const isHRRole = role === 'hr_manager';
-  const isInventoryRole = role === 'inventory_manager' || role === 'purchase_agent';
-
-  const getRoleIcon = () => {
-    const icons: Record<string, React.ReactNode> = {
-      business_owner: <Crown className="w-8 h-8 text-white" />,
-      system_administrator: <Settings className="w-8 h-8 text-white" />,
-      general_manager: <Briefcase className="w-8 h-8 text-white" />,
-      technician: <Wrench className="w-8 h-8 text-white" />,
-      customer: <Users className="w-8 h-8 text-white" />,
-      purchase_agent: <ShoppingCart className="w-8 h-8 text-white" />,
-      accountant: <Calculator className="w-8 h-8 text-white" />,
-      finance_manager: <DollarSign className="w-8 h-8 text-white" />,
-      hr_manager: <UserCog className="w-8 h-8 text-white" />,
-      inventory_manager: <Package className="w-8 h-8 text-white" />,
-    };
-    return icons[role] || <Sparkles className="w-8 h-8 text-white" />;
-  };
-
-  const getRoleQuickActions = () => {
-    const actions: Record<string, { label: string; href: string; icon: React.ReactNode; variant: 'primary' | 'secondary' }[]> = {
-      business_owner: [
-        { label: t('dashboard.viewReports', 'View Reports'), href: '/reports', icon: <BarChart3 className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.franchiseOverview', 'Franchise Overview'), href: '/franchise-command-center', icon: <Crown className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      system_administrator: [
-        { label: t('dashboard.manageUsers', 'Manage Users'), href: '/staff', icon: <Users className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.systemSettings', 'System Settings'), href: '/user-settings', icon: <Settings className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      technician: [
-        { label: t('dashboard.myTasks', 'My Tasks'), href: '/technician-portal', icon: <Wrench className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.viewJobCards', 'View Job Cards'), href: '/job-cards', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      customer: [
-        { label: t('dashboard.myVehicles', 'My Vehicles'), href: '/vehicles', icon: <Car className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.bookAppointment', 'Book Appointment'), href: '/appointments', icon: <Calendar className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      purchase_agent: [
-        { label: t('dashboard.viewInventory', 'View Inventory'), href: '/inventory', icon: <Package className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.createPO', 'Create Purchase Order'), href: '/purchase-orders', icon: <ShoppingCart className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      accountant: [
-        { label: t('dashboard.viewInvoices', 'View Invoices'), href: '/invoices', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.financialReports', 'Financial Reports'), href: '/reports', icon: <Calculator className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      finance_manager: [
-        { label: t('dashboard.viewInvoices', 'View Invoices'), href: '/invoices', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.budgetManagement', 'Budget Management'), href: '/budget-management', icon: <DollarSign className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      hr_manager: [
-        { label: t('dashboard.viewStaff', 'View Staff'), href: '/staff', icon: <Users className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.hrManagement', 'HR Management'), href: '/hr-management', icon: <UserCog className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-      inventory_manager: [
-        { label: t('dashboard.viewInventory', 'View Inventory'), href: '/inventory', icon: <Package className="w-4 h-4 mr-2" />, variant: 'secondary' },
-        { label: t('dashboard.autoReorder', 'Auto Reorder'), href: '/automated-reordering', icon: <ShoppingCart className="w-4 h-4 mr-2" />, variant: 'primary' },
-      ],
-    };
-    return actions[role] || [
-      { label: t('dashboard.newJobCard', 'New Job Card'), href: '/job-cards', icon: <FileText className="w-4 h-4 mr-2" />, variant: 'secondary' as const },
-      { label: t('dashboard.addVehicle', 'Add Vehicle'), href: '/vehicles', icon: <Car className="w-4 h-4 mr-2" />, variant: 'primary' as const },
-    ];
-  };
-
-  const quickActions = getRoleQuickActions();
+  const role = ((user as any)?.role?.toUpperCase() || (user as User | undefined)?.userType?.toUpperCase() || 'TECHNICIAN');
+  const isTechnician = role === 'TECHNICIAN';
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -244,7 +150,7 @@ export function Dashboard() {
       </div>
 
       <div className="relative p-6 space-y-8">
-        {/* Hero Header - Role-Specific Brand Design */}
+        {/* Hero Header - Brand Design */}
         <div className="relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
@@ -252,92 +158,70 @@ export function Dashboard() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#0A5ED7] rounded-2xl blur-lg opacity-30 dark:opacity-40"></div>
                   <div className="relative p-3 rounded-2xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-2xl shadow-[#0A5ED7]/25">
-                    {getRoleIcon()}
+                    <Sparkles className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
-                      {t('dashboard.title', 'Dashboard')}
-                    </h1>
-                  </div>
+                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
+                    {t('dashboard.title', 'Dashboard')}
+                  </h1>
                   <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
-                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || t('common.user', 'User')}</span>
-                    <span className="mx-2">|</span>
-                    <span className="text-[#0A5ED7] dark:text-[#0BB3FF] font-medium">{getRoleDisplayName()}</span>
+                    {t('common.welcome', 'Welcome back')}, <span className="font-semibold text-[#0B1F3B] dark:text-white">{(user as any)?.fullName || (user as any)?.username || 'User'}</span>
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <RoleIndicator />
-              {quickActions.map((action, idx) => (
-                <Button 
-                  key={idx}
-                  className={action.variant === 'primary' 
-                    ? "relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25"
-                    : "relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg"
-                  } 
-                  asChild
-                >
-                  <Link href={action.href}>
-                    {action.icon}
-                    <span className="relative z-10">{action.label}</span>
-                  </Link>
-                </Button>
-              ))}
+            <div className="flex gap-3">
+              <Button className="relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg" asChild>
+                <Link href="/job-cards">
+                  <FileText className="w-4 h-4 mr-2 relative z-10" />
+                  <span className="relative z-10">{t('dashboard.newJobCard', 'New Job Card')}</span>
+                </Link>
+              </Button>
+              <Button className="relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25" asChild>
+                <Link href="/vehicles">
+                  <Car className="w-4 h-4 mr-2" />
+                  {t('dashboard.addVehicle', 'Add Vehicle')}
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Main Metrics - Role-Based Brand Cards */}
+        {/* Main Metrics - Brand Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Revenue Card - Only visible to roles with financial access */}
-          <RoleGate module="invoices" permission="view_financials" fallback={
-            <div className="group relative" data-testid="card-revenue-restricted">
-              <div className="relative h-full bg-zinc-900/50 rounded-2xl p-6 border border-zinc-800 shadow-sm">
-                <div className="flex items-center justify-center h-full min-h-[120px]">
-                  <div className="text-center">
-                    <Shield className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                    <p className="text-sm text-zinc-500">{t('permissions.financialDataRestricted', 'Financial data restricted')}</p>
-                    <p className="text-xs text-zinc-600">{getRoleDisplayName()} {t('common.access', 'access')}</p>
+          {/* Revenue Card */}
+          <div className="group relative" data-testid="card-revenue">
+            <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
+              <div className="flex items-start justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
+                      <DollarSign className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
+                    </div>
+                    <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
+                      ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                    </h3>
+                    <div className="flex items-center gap-1 text-[#0A5ED7]">
+                      <ArrowUpRight className="w-4 h-4" />
+                      <span className="text-xs font-medium">+12.5%</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center shadow-lg shadow-[#0A5ED7]/20">
+                    <TrendingUp className="w-7 h-7 text-white" />
                   </div>
                 </div>
               </div>
-            </div>
-          }>
-            <div className="group relative" data-testid="card-revenue">
-              <div className="relative h-full bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm hover:shadow-lg hover:border-[#0A5ED7]/30 dark:hover:border-[#0BB3FF]/30 transition-all duration-200">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20">
-                        <DollarSign className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF]" />
-                      </div>
-                      <span className="text-[#64748B] dark:text-[#9BA4B0] text-sm font-medium">{t('dashboard.totalRevenue', 'Total Revenue')}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
-                        ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                      </h3>
-                      <div className="flex items-center gap-1 text-[#0A5ED7]">
-                        <ArrowUpRight className="w-4 h-4" />
-                        <span className="text-xs font-medium">+12.5%</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center shadow-lg shadow-[#0A5ED7]/20">
-                      <TrendingUp className="w-7 h-7 text-white" />
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
-                </div>
+              <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
               </div>
             </div>
-          </RoleGate>
+          </div>
 
           {/* Active Jobs Card */}
           <div className="group relative" data-testid="card-active-jobs">
@@ -353,8 +237,8 @@ export function Dashboard() {
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
                     <div className="flex gap-2">
-                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} {t('statusLabels.pending', 'Pending')}</Badge>
-                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} {t('statusLabels.active', 'Active')}</Badge>
+                      <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} pending</Badge>
+                      <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} active</Badge>
                     </div>
                   </div>
                 </div>
@@ -382,7 +266,7 @@ export function Dashboard() {
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{activeCustomersCount}</h3>
                     <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
                       <Award className="w-4 h-4" />
-                      <span className="text-xs font-medium">+8 {t('common.thisWeek', 'this week')}</span>
+                      <span className="text-xs font-medium">+8 this week</span>
                     </div>
                   </div>
                 </div>
@@ -408,7 +292,7 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{inventoryPercentage}%</h3>
-                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} {t('inventory.inStock', 'in stock')}</p>
+                    <p className="text-[#F97316] text-xs">{inStockParts}/{totalInventoryItems} in stock</p>
                   </div>
                 </div>
                 <div className="relative">
@@ -488,7 +372,7 @@ export function Dashboard() {
                       <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, t('dashboard.revenue', 'Revenue')]}
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                         labelStyle={{ color: '#0B1F3B' }}
                       />
@@ -646,7 +530,7 @@ export function Dashboard() {
                             </Badge>
                           </td>
                           <td className="py-4 px-6 text-[#0B1F3B] dark:text-[#E6EAF0] text-sm">
-                            {vehicleInfo?.customerName || vehicleInfo?.owner || t('common.na', 'N/A')}
+                            {vehicleInfo?.customerName || vehicleInfo?.owner || 'N/A'}
                           </td>
                           <td className="py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-sm">
                             {vehicleInfo?.make} {vehicleInfo?.model}

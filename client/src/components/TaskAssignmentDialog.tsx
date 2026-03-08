@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useTranslation } from "react-i18next";
 
 // Create insert schema from Drizzle table
 const insertTaskAssignmentSchema = createInsertSchema(taskAssignments);
@@ -43,7 +42,6 @@ interface TaskAssignmentDialogProps {
 
 export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssignmentDialogProps) {
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   // For now, we'll use mock technicians since there's no users API endpoint yet
   // In production, this would fetch from /api/users?userType=technician
@@ -69,7 +67,7 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
 
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskAssignmentFormData) => {
-      return await apiRequest(`/api/job-cards/${jobCard.id}/tasks`, 'POST', data);
+      return await apiRequest<InsertTaskAssignment>(`/api/job-cards/${jobCard.id}/tasks`, 'POST', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/job-cards', jobCard.id, 'tasks'] });
@@ -115,9 +113,9 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="taskName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.taskName', 'Task Name')}</FormLabel>
+                    <FormLabel>Task Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('taskAssignment.taskNamePlaceholder', 'e.g., Oil Change')} data-testid="input-task-name" />
+                      <Input {...field} placeholder="e.g., Oil Change" data-testid="input-task-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -129,20 +127,20 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="taskType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.taskType', 'Task Type')}</FormLabel>
+                    <FormLabel>Task Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-task-type">
-                          <SelectValue placeholder={t('taskAssignment.selectType', 'Select type')} />
+                          <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="diagnostic">{t('taskAssignment.types.diagnostic', 'Diagnostic')}</SelectItem>
-                        <SelectItem value="repair">{t('taskAssignment.types.repair', 'Repair')}</SelectItem>
-                        <SelectItem value="assembly">{t('taskAssignment.types.assembly', 'Assembly')}</SelectItem>
-                        <SelectItem value="disassembly">{t('taskAssignment.types.disassembly', 'Disassembly')}</SelectItem>
-                        <SelectItem value="cleaning">{t('taskAssignment.types.cleaning', 'Cleaning')}</SelectItem>
-                        <SelectItem value="inspection">{t('taskAssignment.types.inspection', 'Inspection')}</SelectItem>
+                        <SelectItem value="diagnostic">Diagnostic</SelectItem>
+                        <SelectItem value="repair">Repair</SelectItem>
+                        <SelectItem value="assembly">Assembly</SelectItem>
+                        <SelectItem value="disassembly">Disassembly</SelectItem>
+                        <SelectItem value="cleaning">Cleaning</SelectItem>
+                        <SelectItem value="inspection">Inspection</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -156,11 +154,11 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('common.description', 'Description')}</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder={t('taskAssignment.descriptionPlaceholder', 'Describe the task requirements...')}
+                      placeholder="Describe the task requirements..."
                       rows={3}
                       data-testid="textarea-task-description"
                     />
@@ -176,11 +174,11 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.assignTo', 'Assign To')}</FormLabel>
+                    <FormLabel>Assign To</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-assigned-to">
-                          <SelectValue placeholder={t('taskAssignment.selectTechnician', 'Select technician')} />
+                          <SelectValue placeholder="Select technician" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -201,17 +199,17 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="userType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.userType', 'User Type')}</FormLabel>
+                    <FormLabel>User Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-user-type">
-                          <SelectValue placeholder={t('taskAssignment.selectType', 'Select type')} />
+                          <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="technician">{t('taskAssignment.userTypes.technician', 'Technician')}</SelectItem>
-                        <SelectItem value="assistant">{t('taskAssignment.userTypes.assistant', 'Assistant')}</SelectItem>
-                        <SelectItem value="both">{t('taskAssignment.userTypes.both', 'Both')}</SelectItem>
+                        <SelectItem value="technician">Technician</SelectItem>
+                        <SelectItem value="assistant">Assistant</SelectItem>
+                        <SelectItem value="both">Both</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -226,18 +224,18 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.priority', 'Priority')}</FormLabel>
+                    <FormLabel>Priority</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-task-priority">
-                          <SelectValue placeholder={t('taskAssignment.selectPriority', 'Select priority')} />
+                          <SelectValue placeholder="Select priority" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">{t('taskAssignment.priorities.low', 'Low')}</SelectItem>
-                        <SelectItem value="medium">{t('taskAssignment.priorities.medium', 'Medium')}</SelectItem>
-                        <SelectItem value="high">{t('taskAssignment.priorities.high', 'High')}</SelectItem>
-                        <SelectItem value="urgent">{t('taskAssignment.priorities.urgent', 'Urgent')}</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -250,7 +248,7 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                 name="estimatedMinutes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('taskAssignment.estimatedMinutes', 'Estimated Minutes')}</FormLabel>
+                    <FormLabel>Estimated Minutes</FormLabel>
                     <FormControl>
                       <Input
                         {...field}

@@ -68,7 +68,7 @@ export function PartsAvailability() {
           externalSku: "BRK-PAD-FR-001",
           supplierSource: "tecdoc",
           status: "active",
-          notes: t('partsAvailability.mockNotes.premiumBrakePads', 'Premium brake pads - Front')
+          notes: "Premium brake pads - Front"
         },
         {
           supplierId: "550e8400-e29b-41d4-a716-446655440003",
@@ -81,7 +81,7 @@ export function PartsAvailability() {
           externalSku: "BRK-PAD-FR-002",
           supplierSource: "manual",
           status: "active",
-          notes: t('partsAvailability.mockNotes.standardBrakePads', 'Standard brake pads - Front')
+          notes: "Standard brake pads - Front"
         },
         {
           supplierId: "550e8400-e29b-41d4-a716-446655440001",
@@ -94,7 +94,7 @@ export function PartsAvailability() {
           externalSku: "OIL-FILTER-001",
           supplierSource: "api",
           status: "backordered",
-          notes: t('partsAvailability.mockNotes.oilFilterBackorder', 'Oil filter - On backorder')
+          notes: "Oil filter - On backorder"
         }
       ]
     };

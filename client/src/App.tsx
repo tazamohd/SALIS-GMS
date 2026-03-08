@@ -4,7 +4,6 @@ import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
-import { ThemeProvider } from "@/hooks/useTheme";
 import NotFound from "@/pages/not-found";
 
 import { LoginDashboard } from "@/pages/LoginDashboard";
@@ -240,27 +239,6 @@ import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import AROverlay from "@/pages/AROverlay";
-import ARRepairGuide from "@/pages/ARRepairGuide";
-import BlockchainServiceHistory from "@/pages/BlockchainServiceHistory";
-import GlobalizationLayerPage from "@/pages/GlobalizationLayer";
-import LeaveRequests from "@/pages/LeaveRequests";
-import MobileDeviceManagement from "@/pages/MobileDeviceManagement";
-import MultiLocationDashboard from "@/pages/MultiLocationDashboard";
-import NeuralNetworkPrediction from "@/pages/NeuralNetworkPrediction";
-import ProductivityTracker from "@/pages/ProductivityTracker";
-import ProfitMarginAnalysis from "@/pages/ProfitMarginAnalysis";
-import QualityControl from "@/pages/QualityControl";
-import QuantumComputingOptimization from "@/pages/QuantumComputingOptimization";
-import SmartContracts from "@/pages/SmartContracts";
-import SMSIntegration from "@/pages/SMSIntegration";
-import StaffDirectory from "@/pages/StaffDirectory";
-import StaffScheduling from "@/pages/StaffScheduling";
-import UserSettings from "@/pages/UserSettings";
-import VATSettings from "@/pages/VATSettings";
-import VRShowroom from "@/pages/VRShowroom";
-import ZakatSettings from "@/pages/ZakatSettings";
-import ZATCASettings from "@/pages/ZATCASettings";
 
 function Router() {
   // TEMPORARILY DISABLED: Authentication bypass for development testing
@@ -301,13 +279,6 @@ function Router() {
 
   return (
     <Switch>
-      {/* Public Routes - No Auth Required */}
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/customer-portal" component={CustomerPortal} />
-      <Route path="/track/:token" component={PublicTracking} />
-      <Route path="/landing" component={Landing} />
-
       {/* Root path - show dashboard directly */}
       <Route path="/">
         <Layout>
@@ -1305,126 +1276,6 @@ function Router() {
           <WearableIntegration />
         </Layout>
       </Route>
-      <Route path="/ar-overlay">
-        <Layout>
-          <AROverlay />
-        </Layout>
-      </Route>
-      <Route path="/ar-repair-guide">
-        <Layout>
-          <ARRepairGuide />
-        </Layout>
-      </Route>
-      <Route path="/blockchain-service-history">
-        <Layout>
-          <BlockchainServiceHistory />
-        </Layout>
-      </Route>
-      <Route path="/custom-report-builder">
-        <Layout>
-          <CustomReportBuilder />
-        </Layout>
-      </Route>
-      <Route path="/edge-computing-diagnostics">
-        <Layout>
-          <EdgeComputingDiagnostics />
-        </Layout>
-      </Route>
-      <Route path="/globalization-layer">
-        <Layout>
-          <GlobalizationLayerPage />
-        </Layout>
-      </Route>
-      <Route path="/iso-quality-management">
-        <Layout>
-          <ISOQualityManagement />
-        </Layout>
-      </Route>
-      <Route path="/leave-requests">
-        <Layout>
-          <LeaveRequests />
-        </Layout>
-      </Route>
-      <Route path="/mobile-device-management">
-        <Layout>
-          <MobileDeviceManagement />
-        </Layout>
-      </Route>
-      <Route path="/multi-location-dashboard">
-        <Layout>
-          <MultiLocationDashboard />
-        </Layout>
-      </Route>
-      <Route path="/neural-network-prediction">
-        <Layout>
-          <NeuralNetworkPrediction />
-        </Layout>
-      </Route>
-      <Route path="/productivity-tracker">
-        <Layout>
-          <ProductivityTracker />
-        </Layout>
-      </Route>
-      <Route path="/profit-margin-analysis">
-        <Layout>
-          <ProfitMarginAnalysis />
-        </Layout>
-      </Route>
-      <Route path="/quality-control">
-        <Layout>
-          <QualityControl />
-        </Layout>
-      </Route>
-      <Route path="/quantum-computing-optimization">
-        <Layout>
-          <QuantumComputingOptimization />
-        </Layout>
-      </Route>
-      <Route path="/smart-contracts">
-        <Layout>
-          <SmartContracts />
-        </Layout>
-      </Route>
-      <Route path="/sms-integration">
-        <Layout>
-          <SMSIntegration />
-        </Layout>
-      </Route>
-      <Route path="/staff-directory">
-        <Layout>
-          <StaffDirectory />
-        </Layout>
-      </Route>
-      <Route path="/staff-scheduling">
-        <Layout>
-          <StaffScheduling />
-        </Layout>
-      </Route>
-      <Route path="/user-settings">
-        <Layout>
-          <UserSettings />
-        </Layout>
-      </Route>
-      <Route path="/vat-settings">
-        <Layout>
-          <VATSettings />
-        </Layout>
-      </Route>
-      <Route path="/vr-showroom">
-        <Layout>
-          <VRShowroom />
-        </Layout>
-      </Route>
-      <Route path="/zakat-settings">
-        <Layout>
-          <ZakatSettings />
-        </Layout>
-      </Route>
-      <Route path="/zatca-settings">
-        <Layout>
-          <ZATCASettings />
-        </Layout>
-      </Route>
       
       {/* Client Portal Routes */}
       <Route path="/client">
@@ -1535,16 +1386,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <UndoRedoProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Router />
-            </TooltipProvider>
-          </UndoRedoProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <UndoRedoProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </UndoRedoProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

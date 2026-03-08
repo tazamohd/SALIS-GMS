@@ -406,10 +406,10 @@ export default function Interactive3DParts() {
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]" data-testid="select-category">
                     <Filter className="h-4 w-4 mr-2 text-[#6B7280]" />
-                    <SelectValue placeholder={t("interactive3d.allCategories", "All Categories")} />
+                    <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t("interactive3d.allCategories", "All Categories")}</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((cat) => (
                       <SelectItem key={cat} value={cat || ""}>
                         {cat?.charAt(0).toUpperCase() + cat?.slice(1)}
@@ -694,9 +694,9 @@ export default function Interactive3DParts() {
 
                       <div className="absolute top-4 right-4 bg-white/80 dark:bg-[#151A23]/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[#C9D1DA] dark:border-[#232A36]">
                         <div className="flex items-center gap-4 text-xs text-[#6B7280] dark:text-[#9BA4B0]">
-                          <span>{t("interactive3d.zoom", "Zoom:")} {Math.round(zoom * 100)}%</span>
-                          <span>{t("interactive3d.xAxis", "X:")} {Math.round(rotation.x)}°</span>
-                          <span>{t("interactive3d.yAxis", "Y:")} {Math.round(rotation.y)}°</span>
+                          <span>Zoom: {Math.round(zoom * 100)}%</span>
+                          <span>X: {Math.round(rotation.x)}°</span>
+                          <span>Y: {Math.round(rotation.y)}°</span>
                         </div>
                       </div>
                     </>
@@ -728,27 +728,27 @@ export default function Interactive3DParts() {
                     <TabsContent value="specs" className="mt-4">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.partNumber", "Part Number")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Part Number</p>
                           <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
-                            {selectedPart.partNumber || t("interactive3d.notAvailable", "N/A")}
+                            {selectedPart.partNumber || "N/A"}
                           </p>
                         </div>
                         <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.manufacturer", "Manufacturer")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Manufacturer</p>
                           <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
-                            {selectedPart.manufacturer || t("interactive3d.notAvailable", "N/A")}
+                            {selectedPart.manufacturer || "N/A"}
                           </p>
                         </div>
                         <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.category", "Category")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Category</p>
                           <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0] capitalize">
-                            {selectedPart.category || t("interactive3d.notAvailable", "N/A")}
+                            {selectedPart.category || "N/A"}
                           </p>
                         </div>
                         <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-3 rounded-lg">
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.polygonCount", "Polygon Count")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Polygon Count</p>
                           <p className="text-sm font-medium text-[#2A2F3A] dark:text-[#E6EAF0]">
-                            {selectedPart.polygonCount?.toLocaleString() || t("interactive3d.notAvailable", "N/A")}
+                            {selectedPart.polygonCount?.toLocaleString() || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -757,7 +757,7 @@ export default function Interactive3DParts() {
                       <div className="space-y-3">
                         {selectedPart.compatibility?.brands && (
                           <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.brands", "Brands:")}</span>
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Brands:</span>
                             {selectedPart.compatibility.brands.map((brand: string) => (
                               <Badge key={brand} variant="secondary" className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF]">
                                 {brand}
@@ -767,7 +767,7 @@ export default function Interactive3DParts() {
                         )}
                         {selectedPart.compatibility?.classes && (
                           <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.vehicleClasses", "Vehicle Classes:")}</span>
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Vehicle Classes:</span>
                             {selectedPart.compatibility.classes.map((vehicleClass: string) => (
                               <Badge key={vehicleClass} variant="outline" className="border-[#0A5ED7]/30 text-[#0A5ED7]">
                                 {vehicleClass}
@@ -777,7 +777,7 @@ export default function Interactive3DParts() {
                         )}
                         {selectedPart.compatibility?.modelYears && (
                           <div className="flex flex-wrap gap-2">
-                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.modelYears", "Model Years:")}</span>
+                            <span className="text-sm text-[#6B7280] dark:text-[#9BA4B0]">Model Years:</span>
                             <span className="text-sm text-[#2A2F3A] dark:text-[#E6EAF0]">
                               {selectedPart.compatibility.modelYears[0]} - {selectedPart.compatibility.modelYears[selectedPart.compatibility.modelYears.length - 1]}
                             </span>
@@ -792,14 +792,14 @@ export default function Interactive3DParts() {
                           <p className="text-2xl font-bold text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.viewCount?.toLocaleString() || 0}
                           </p>
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.totalViews", "Total Views")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Total Views</p>
                         </div>
                         <div className="bg-[#E6E9ED] dark:bg-[#0E1117] p-4 rounded-lg text-center">
                           <Download className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7] dark:text-[#0BB3FF]" />
                           <p className="text-2xl font-bold text-[#2A2F3A] dark:text-[#E6EAF0]">
                             {selectedPart.downloadCount?.toLocaleString() || 0}
                           </p>
-                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">{t("interactive3d.downloads", "Downloads")}</p>
+                          <p className="text-xs text-[#6B7280] dark:text-[#9BA4B0]">Downloads</p>
                         </div>
                       </div>
                     </TabsContent>

@@ -42,7 +42,7 @@ interface SalesScript {
   scenario: string;
   scenarioAr: string;
   script: string;
-  objections: { objection: string; objectionKey?: string; response: string; responseKey?: string }[];
+  objections: { objection: string; response: string }[];
 }
 
 const salesProcesses: SalesProcess[] = [
@@ -156,9 +156,7 @@ const salesScripts: SalesScript[] = [
       },
       {
         objection: "I don't have an appointment",
-        objectionKey: "salesGuide.objections.noAppointment",
-        response: "No problem at all! We welcome walk-ins. Depending on your needs, we may be able to assist you right away or schedule a convenient time. What service are you interested in today?",
-        responseKey: "salesGuide.responses.noAppointment"
+        response: "No problem at all! We welcome walk-ins. Depending on your needs, we may be able to assist you right away or schedule a convenient time. What service are you interested in today?"
       }
     ]
   },
@@ -342,12 +340,12 @@ export default function SalesGuide() {
                 <div>
                   <h4 className="font-medium mb-3 text-[#0B1F3B] dark:text-white">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
                   <div className="space-y-3">
-                    {script.objections.map((obj: any, i) => (
+                    {script.objections.map((obj, i) => (
                       <div key={i} className="border-l-4 border-[#E2E8F0] dark:border-[#232A36] pl-4">
-                        <p className="font-medium text-[#F97316]">❝ {obj.objectionKey ? t(obj.objectionKey, obj.objection) : obj.objection}</p>
+                        <p className="font-medium text-[#F97316]">❝ {obj.objection}</p>
                         <p className="mt-1 text-green-600 dark:text-green-400">
                           <ArrowRight className="h-4 w-4 inline mr-1" />
-                          {obj.responseKey ? t(obj.responseKey, obj.response) : obj.response}
+                          {obj.response}
                         </p>
                       </div>
                     ))}
@@ -506,7 +504,7 @@ export default function SalesGuide() {
     <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('salesGuide.title', 'Sales Guide')}
-        description={t('salesGuide.description', 'Comprehensive sales training and resources for service advisors')}
+        description={t('salesGuide.description', 'دليل المبيعات - Comprehensive sales training and resources for service advisors')}
         defaultTab="process"
         tabs={[
           { id: "process", label: t('salesGuide.salesProcess', 'Sales Process'), icon: Target, content: processTab },

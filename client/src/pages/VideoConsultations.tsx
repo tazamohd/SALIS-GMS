@@ -250,9 +250,9 @@ export default function VideoConsultations() {
                   <SelectValue placeholder={t('videoConsultations.selectPlatform', 'Select platform')} />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                  <SelectItem value="zoom">{t('videoConsultations.zoom', 'Zoom')}</SelectItem>
-                  <SelectItem value="teams">{t('videoConsultations.microsoftTeams', 'Microsoft Teams')}</SelectItem>
-                  <SelectItem value="meet">{t('videoConsultations.googleMeet', 'Google Meet')}</SelectItem>
+                  <SelectItem value="zoom">Zoom</SelectItem>
+                  <SelectItem value="teams">Microsoft Teams</SelectItem>
+                  <SelectItem value="meet">Google Meet</SelectItem>
                 </SelectContent>
               </Select>
             </div>

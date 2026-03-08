@@ -481,7 +481,7 @@ export default function PayrollManagement() {
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('payroll.periodName', 'Period Name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder={t('payroll.periodNamePlaceholder', 'Q1 2024')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-period-name" />
+                      <Input {...field} placeholder="Q1 2024" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-period-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

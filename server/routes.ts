@@ -1766,23 +1766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/spare-parts', isAuthenticated, async (req, res) => {
     try {
       const parts = await storage.getSpareParts();
-      // Fetch inventory data to include stock quantities and prices
-      const inventories = await storage.getAllSparePartInventories();
-      
-      // Merge parts with their inventory data (aggregate across all garages)
-      const partsWithInventory = parts.map(part => {
-        const partInventories = inventories.filter(inv => inv.sparePartId === part.id);
-        const totalStock = partInventories.reduce((sum, inv) => sum + (inv.stockQuantity || 0), 0);
-        const sellingPrice = partInventories.length > 0 ? partInventories[0].sellingPrice : null;
-        
-        return {
-          ...part,
-          stockQuantity: totalStock,
-          sellingPrice: sellingPrice,
-        };
-      });
-      
-      res.json(partsWithInventory);
+      res.json(parts);
     } catch (error) {
       console.error("Error fetching spare parts:", error);
       res.status(500).json({ message: "Failed to fetch spare parts" });

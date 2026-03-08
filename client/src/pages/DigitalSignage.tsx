@@ -18,11 +18,11 @@ export default function DigitalSignage() {
   const { toast } = useToast();
   const [openDisplayDialog, setOpenDisplayDialog] = useState(false);
 
-  const { data: displays = [], isLoading: loadingDisplays } = useQuery<any[]>({
+  const { data: displays = [], isLoading: loadingDisplays } = useQuery({
     queryKey: ["/api/signage/displays"],
   });
 
-  const { data: content = [], isLoading: loadingContent } = useQuery<any[]>({
+  const { data: content = [], isLoading: loadingContent } = useQuery({
     queryKey: ["/api/signage/content"],
   });
 
@@ -33,7 +33,10 @@ export default function DigitalSignage() {
       displayType: string;
       resolution: string;
     }) => {
-      return await apiRequest("POST", "/api/signage/displays", displayData);
+      return await apiRequest("/api/signage/displays", {
+        method: "POST",
+        body: JSON.stringify(displayData),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/signage/displays"] });
@@ -229,6 +232,44 @@ export default function DigitalSignage() {
         },
       ]}
       defaultTab="displays"
-    />
+    >
+      <Dialog open={openDisplayDialog} onOpenChange={setOpenDisplayDialog}>
+        <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <DialogHeader>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('signage.addNewDisplay', 'Add New Display')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateDisplay} className="space-y-4">
+            <div>
+              <Label htmlFor="name" className="text-[#0B1F3B] dark:text-white">{t('signage.displayName', 'Display Name')}</Label>
+              <Input id="name" name="name" required placeholder={t('signage.waitingRoomMain', 'Waiting Room Main')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+            </div>
+            <div>
+              <Label htmlFor="location" className="text-[#0B1F3B] dark:text-white">{t('signage.location', 'Location')}</Label>
+              <Input id="location" name="location" required placeholder={t('signage.waitingRoom', 'Waiting Room')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+            </div>
+            <div>
+              <Label htmlFor="displayType" className="text-[#0B1F3B] dark:text-white">{t('signage.displayType', 'Display Type')}</Label>
+              <Select name="displayType" required>
+                <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                  <SelectValue placeholder={t('signage.selectType', 'Select type')} />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                  <SelectItem value="mixed">{t('signage.mixedContent', 'Mixed Content')}</SelectItem>
+                  <SelectItem value="service_status">{t('signage.serviceStatus', 'Service Status')}</SelectItem>
+                  <SelectItem value="promotions">{t('signage.promotions', 'Promotions')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="resolution" className="text-[#0B1F3B] dark:text-white">{t('signage.resolution', 'Resolution')}</Label>
+              <Input id="resolution" name="resolution" required placeholder="1920x1080" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+            </div>
+            <Button type="submit" disabled={createDisplayMutation.isPending} className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+              {t('signage.createDisplay', 'Create Display')}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </TabsPageLayout>
   );
 }

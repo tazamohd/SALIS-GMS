@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { Eye, Trash2, DollarSign, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { calculateVAT, SAUDI_VAT_RATE } from "@shared/vatUtils";
@@ -42,7 +41,6 @@ interface InvoiceDetailsDialogProps {
 }
 
 export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer, children }: InvoiceDetailsDialogProps) {
-  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -75,8 +73,7 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
-      if (!invoice) return;
-      return await apiRequest(`/api/invoices/${invoice.id}`, "PATCH", {
+      return await apiRequest("PATCH", `/api/invoices/${invoice.id}`, {
         status: newStatus,
         sentAt: newStatus === 'sent' && !invoice.sentAt ? new Date() : invoice.sentAt,
       });
@@ -98,14 +95,13 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
         description: error.message || "Failed to update status",
         variant: "destructive",
       });
-      if (invoice) setCurrentStatus(invoice.status);
+      setCurrentStatus(invoice.status);
     },
   });
 
   const deleteInvoiceMutation = useMutation({
     mutationFn: async () => {
-      if (!invoice) return;
-      return await apiRequest(`/api/invoices/${invoice.id}`, "DELETE");
+      return await apiRequest("DELETE", `/api/invoices/${invoice.id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -141,12 +137,11 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
   };
 
   const handleStatusChange = (newStatus: string) => {
-    if (!invoice) return;
     const validStatuses = getValidNextStatuses(invoice.status);
     if (!validStatuses.includes(newStatus)) {
       toast({
-        title: t('common.invalidStatusChange', 'Invalid Status Change'),
-        description: t('invoices.cannotChangeStatus', `Cannot change status from ${invoice.status} to ${newStatus}`),
+        title: "Invalid Status Change",
+        description: `Cannot change status from ${invoice.status} to ${newStatus}`,
         variant: "destructive",
       });
       setCurrentStatus(invoice.status);
@@ -183,7 +178,7 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
         </DialogTrigger>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t('invoices.invoiceDetails', 'Invoice Details')} - {invoice?.invoiceNumber || t('common.loading', 'Loading...')}</DialogTitle>
+            <DialogTitle>Invoice Details - {invoice?.invoiceNumber || 'Loading...'}</DialogTitle>
             <DialogDescription className="sr-only">
               View and manage invoice details, status, items, and payments
             </DialogDescription>
@@ -356,7 +351,7 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('invoices.deleteInvoice', 'Delete Invoice?')}</AlertDialogTitle>
+            <AlertDialogTitle>Delete Invoice?</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete invoice {invoice.invoiceNumber}? This action cannot
               be undone and will also delete all associated line items and payments.

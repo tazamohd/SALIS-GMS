@@ -33,14 +33,14 @@ import {
 import { SiFacebook, SiInstagram, SiGoogle, SiLinkedin, SiX, SiTiktok, SiYoutube } from "react-icons/si";
 import { TabsPageLayout } from "@/components/layouts";
 
-const PLATFORM_CONFIGS = [
-  { id: "google_ads", nameKey: "marketing.platforms.googleAds", defaultName: "Google Ads", icon: SiGoogle, color: "text-red-500", type: "search" },
-  { id: "facebook", nameKey: "marketing.platforms.facebookAds", defaultName: "Facebook Ads", icon: SiFacebook, color: "text-[#0A5ED7]", type: "social" },
-  { id: "instagram", nameKey: "marketing.platforms.instagramAds", defaultName: "Instagram Ads", icon: SiInstagram, color: "text-pink-500", type: "social" },
-  { id: "twitter", nameKey: "marketing.platforms.twitterAds", defaultName: "X (Twitter) Ads", icon: SiX, color: "text-[#0B1F3B] dark:text-white", type: "social" },
-  { id: "linkedin", nameKey: "marketing.platforms.linkedinAds", defaultName: "LinkedIn Ads", icon: SiLinkedin, color: "text-[#0A5ED7]", type: "social" },
-  { id: "tiktok", nameKey: "marketing.platforms.tiktokAds", defaultName: "TikTok Ads", icon: SiTiktok, color: "text-[#0B1F3B] dark:text-white", type: "video" },
-  { id: "youtube", nameKey: "marketing.platforms.youtubeAds", defaultName: "YouTube Ads", icon: SiYoutube, color: "text-red-600", type: "video" },
+const PLATFORMS = [
+  { id: "google_ads", name: "Google Ads", icon: SiGoogle, color: "text-red-500", type: "search" },
+  { id: "facebook", name: "Facebook Ads", icon: SiFacebook, color: "text-[#0A5ED7]", type: "social" },
+  { id: "instagram", name: "Instagram Ads", icon: SiInstagram, color: "text-pink-500", type: "social" },
+  { id: "twitter", name: "X (Twitter) Ads", icon: SiX, color: "text-[#0B1F3B] dark:text-white", type: "social" },
+  { id: "linkedin", name: "LinkedIn Ads", icon: SiLinkedin, color: "text-[#0A5ED7]", type: "social" },
+  { id: "tiktok", name: "TikTok Ads", icon: SiTiktok, color: "text-[#0B1F3B] dark:text-white", type: "video" },
+  { id: "youtube", name: "YouTube Ads", icon: SiYoutube, color: "text-red-600", type: "video" },
 ];
 
 const MOCK_ACCOUNTS = [
@@ -65,12 +65,12 @@ const MOCK_TASKS = [
   { id: "4", title: "Optimize campaign budgets", type: "budget_review", status: "completed", priority: "low", dueDate: "2024-12-15" },
 ];
 
-const getMockConversations = (t: (key: string, defaultValue: string) => string) => [
-  { id: "1", providerId: "facebook", name: t('sample.customerName1', 'Ahmed Al-Rashid'), handle: "@ahmed_rashid", avatar: "", status: "open", unread: 2, lastMessage: t('sample.message1', 'Hi, I saw your ad about the winter service special. Is it still available?'), lastMessageTime: t('sample.timeAgo10min', '10 min ago'), platform: "Messenger" },
-  { id: "2", providerId: "instagram", name: t('sample.customerName8', 'Sara Al-Mansouri'), handle: "@sara_cars", avatar: "", status: "open", unread: 1, lastMessage: t('sample.message2', 'When is the best time to come for an oil change?'), lastMessageTime: t('sample.timeAgo25min', '25 min ago'), platform: "Instagram DM" },
-  { id: "3", providerId: "twitter", name: t('sample.customerName9', 'Mohammed Fahad'), handle: "@mfahad_auto", avatar: "", status: "pending", unread: 0, lastMessage: t('sample.message3', 'Thanks for the quick response!'), lastMessageTime: t('sample.timeAgo1hour', '1 hour ago'), platform: "X DM" },
-  { id: "4", providerId: "facebook", name: t('sample.customerName10', 'Layla Hassan'), handle: "@layla.hassan", avatar: "", status: "open", unread: 3, lastMessage: t('sample.message4', 'Do you offer pickup service for my car?'), lastMessageTime: t('sample.timeAgo2hours', '2 hours ago'), platform: "Messenger" },
-  { id: "5", providerId: "linkedin", name: t('sample.customerName11', 'Khalid Ibrahim'), handle: "Khalid Ibrahim", avatar: "", status: "resolved", unread: 0, lastMessage: t('sample.message5', 'Great, I\'ll schedule the fleet service for next week.'), lastMessageTime: t('sample.timeAgo1day', '1 day ago'), platform: "LinkedIn" },
+const MOCK_CONVERSATIONS = [
+  { id: "1", providerId: "facebook", name: "Ahmed Al-Rashid", handle: "@ahmed_rashid", avatar: "", status: "open", unread: 2, lastMessage: "Hi, I saw your ad about the winter service special. Is it still available?", lastMessageTime: "10 min ago", platform: "Messenger" },
+  { id: "2", providerId: "instagram", name: "Sara Al-Mansouri", handle: "@sara_cars", avatar: "", status: "open", unread: 1, lastMessage: "When is the best time to come for an oil change?", lastMessageTime: "25 min ago", platform: "Instagram DM" },
+  { id: "3", providerId: "twitter", name: "Mohammed Fahad", handle: "@mfahad_auto", avatar: "", status: "pending", unread: 0, lastMessage: "Thanks for the quick response!", lastMessageTime: "1 hour ago", platform: "X DM" },
+  { id: "4", providerId: "facebook", name: "Layla Hassan", handle: "@layla.hassan", avatar: "", status: "open", unread: 3, lastMessage: "Do you offer pickup service for my car?", lastMessageTime: "2 hours ago", platform: "Messenger" },
+  { id: "5", providerId: "linkedin", name: "Khalid Ibrahim", handle: "Khalid Ibrahim", avatar: "", status: "resolved", unread: 0, lastMessage: "Great, I'll schedule the fleet service for next week.", lastMessageTime: "1 day ago", platform: "LinkedIn" },
 ];
 
 const MOCK_MESSAGES = [
@@ -85,12 +85,12 @@ const MOCK_COMMENT_THREADS = [
   { id: "3", providerId: "youtube", postContent: "How to maintain your car's engine: Expert tips from SALIS AUTO", platform: "YouTube", totalComments: 89, unreplied: 15, sentiment: "positive" },
 ];
 
-const getMockComments = (t: (key: string, defaultValue: string) => string) => [
-  { id: "1", threadId: "1", author: t('sample.customerName12', 'Ali Mohammed'), content: t('sample.comment1', 'Great service! I brought my car last week and they did an amazing job.'), likes: 5, sentiment: "positive", hasReplied: true, postedAt: t('sample.timeAgo2hours', '2 hours ago') },
-  { id: "2", threadId: "1", author: t('sample.customerName13', 'Fatima Al-Saud'), content: t('sample.comment2', 'What\'s included in the winter package?'), likes: 2, sentiment: "neutral", hasReplied: false, postedAt: t('sample.timeAgo3hours', '3 hours ago') },
-  { id: "3", threadId: "1", author: t('sample.customerName14', 'Hassan Khalil'), content: t('sample.comment3', 'How much does the full service cost?'), likes: 1, sentiment: "neutral", hasReplied: false, postedAt: t('sample.timeAgo4hours', '4 hours ago') },
-  { id: "4", threadId: "2", author: t('sample.customerName15', 'Noor Ahmed'), content: t('sample.comment4', 'Wow! Amazing transformation 👏'), likes: 12, sentiment: "positive", hasReplied: true, postedAt: t('sample.timeAgo1day', '1 day ago') },
-  { id: "5", threadId: "2", author: t('sample.customerName16', 'Yusuf Ibrahim'), content: t('sample.comment5', 'Is this covered under warranty?'), likes: 3, sentiment: "neutral", hasReplied: false, postedAt: t('sample.timeAgo1day', '1 day ago') },
+const MOCK_COMMENTS = [
+  { id: "1", threadId: "1", author: "Ali Mohammed", content: "Great service! I brought my car last week and they did an amazing job.", likes: 5, sentiment: "positive", hasReplied: true, postedAt: "2 hours ago" },
+  { id: "2", threadId: "1", author: "Fatima Al-Saud", content: "What's included in the winter package?", likes: 2, sentiment: "neutral", hasReplied: false, postedAt: "3 hours ago" },
+  { id: "3", threadId: "1", author: "Hassan Khalil", content: "How much does the full service cost?", likes: 1, sentiment: "neutral", hasReplied: false, postedAt: "4 hours ago" },
+  { id: "4", threadId: "2", author: "Noor Ahmed", content: "Wow! Amazing transformation 👏", likes: 12, sentiment: "positive", hasReplied: true, postedAt: "1 day ago" },
+  { id: "5", threadId: "2", author: "Yusuf Ibrahim", content: "Is this covered under warranty?", likes: 3, sentiment: "neutral", hasReplied: false, postedAt: "1 day ago" },
 ];
 
 export default function MarketingHub() {
@@ -98,11 +98,6 @@ export default function MarketingHub() {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [isConnectDialogOpen, setIsConnectDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-
-  const PLATFORMS = PLATFORM_CONFIGS.map(p => ({
-    ...p,
-    name: t(p.nameKey, p.defaultName)
-  }));
 
   const totalSpend = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.spend, 0);
   const totalBudget = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.budget, 0);
@@ -127,7 +122,7 @@ export default function MarketingHub() {
       completed: "bg-green-600 text-white",
       in_progress: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
     };
-    return <Badge className={statusColors[status] || "bg-[#64748B] text-white"}>{t(`marketing.status.${status}`, status.replace("_", " "))}</Badge>;
+    return <Badge className={statusColors[status] || "bg-[#64748B] text-white"}>{status.replace("_", " ")}</Badge>;
   };
 
   const overviewContent = (
@@ -267,7 +262,7 @@ export default function MarketingHub() {
                     </div>
                   </div>
                   <Badge className={task.priority === "high" ? "bg-[#F97316] text-white" : "bg-[#64748B] text-white"}>
-                    {t(`marketing.priority.${task.priority}`, task.priority)}
+                    {task.priority}
                   </Badge>
                 </div>
               ))}
@@ -527,8 +522,8 @@ export default function MarketingHub() {
           <p className="text-sm text-[#64748B]">{t('marketing.manageConversations', 'Manage all conversations from one place')}</p>
         </div>
         <div className="flex gap-2">
-          <Badge className="bg-green-600 text-white">{t('marketing.open', 'Open')}: {getMockConversations(t).filter(c => c.status === "open").length}</Badge>
-          <Badge className="bg-[#64748B] text-white">{t('marketing.pending', 'Pending')}: {getMockConversations(t).filter(c => c.status === "pending").length}</Badge>
+          <Badge className="bg-green-600 text-white">{t('marketing.open', 'Open')}: {MOCK_CONVERSATIONS.filter(c => c.status === "open").length}</Badge>
+          <Badge className="bg-[#64748B] text-white">{t('marketing.pending', 'Pending')}: {MOCK_CONVERSATIONS.filter(c => c.status === "pending").length}</Badge>
         </div>
       </div>
 
@@ -543,7 +538,7 @@ export default function MarketingHub() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-[#E2E8F0] dark:divide-[#232A36]">
-                {getMockConversations(t).map(conv => {
+                {MOCK_CONVERSATIONS.map(conv => {
                   const platform = getPlatformInfo(conv.providerId);
                   const PlatformIcon = platform.icon;
                   
@@ -570,7 +565,7 @@ export default function MarketingHub() {
                           <p className="text-xs text-[#64748B] truncate">{conv.lastMessage}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge className={conv.status === "open" ? "bg-green-600 text-white" : conv.status === "resolved" ? "bg-[#64748B] text-white" : "bg-[#F97316] text-white"}>
-                              {t(`marketing.conversationStatus.${conv.status}`, conv.status)}
+                              {conv.status}
                             </Badge>
                             {conv.unread > 0 && (
                               <Badge className="bg-red-600 text-white">{conv.unread}</Badge>
@@ -656,7 +651,7 @@ export default function MarketingHub() {
         {MOCK_COMMENT_THREADS.map(thread => {
           const platform = getPlatformInfo(thread.providerId);
           const PlatformIcon = platform.icon;
-          const threadComments = getMockComments(t).filter(c => c.threadId === thread.id);
+          const threadComments = MOCK_COMMENTS.filter(c => c.threadId === thread.id);
           
           return (
             <Card key={thread.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`thread-${thread.id}`}>
@@ -748,7 +743,7 @@ export default function MarketingHub() {
             label: t('marketing.inbox', 'Inbox'),
             icon: MessageCircle,
             content: inboxContent,
-            badge: getMockConversations(t).filter(c => c.unread > 0).length,
+            badge: MOCK_CONVERSATIONS.filter(c => c.unread > 0).length,
           },
           {
             id: "comments",

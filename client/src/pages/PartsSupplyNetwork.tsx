@@ -113,7 +113,7 @@ export default function PartsSupplyNetwork() {
                       <TableCell>{partner.country || 'N/A'}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                          ✅ {t('common.active', 'Active')}
+                          ✅ Active
                         </span>
                       </TableCell>
                     </TableRow>
@@ -232,7 +232,7 @@ export default function PartsSupplyNetwork() {
                       <TableCell>{warehouse.city || 'N/A'}, {warehouse.country || 'N/A'}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                          ✅ {t('common.active', 'Active')}
+                          ✅ Active
                         </span>
                       </TableCell>
                     </TableRow>
@@ -249,8 +249,8 @@ export default function PartsSupplyNetwork() {
   return (
     <>
       <TabsPageLayout
-        title={t('inventory.partsSupplyNetwork', 'Parts Supply Network')}
-        description={t('inventory.manageB2BPartners', 'Manage B2B partners, fulfillment orders, shipments, and warehouse distribution')}
+        title="Parts Supply Network"
+        description="Manage B2B partners, fulfillment orders, shipments, and warehouse distribution"
         icon={Network}
         tabs={tabs}
         defaultTab="partners"
@@ -259,37 +259,37 @@ export default function PartsSupplyNetwork() {
       <Dialog open={showPartnerDialog} onOpenChange={setShowPartnerDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('inventory.addNetworkPartner', 'Add Network Partner')}</DialogTitle>
+            <DialogTitle>Add Network Partner</DialogTitle>
           </DialogHeader>
           <Form {...partnerForm}>
             <form onSubmit={partnerForm.handleSubmit((data) => createPartnerMutation.mutate(data))} className="space-y-4">
               <FormField control={partnerForm.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('inventory.partnerName', 'Partner Name')}</FormLabel>
+                  <FormLabel>Partner Name</FormLabel>
                   <FormControl><Input {...field} placeholder="ACME Parts Co" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={partnerForm.control} name="partnerType" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('inventory.partnerType', 'Type')}</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
-                      <SelectItem value="supplier">{t('inventory.partnerTypes.supplier', 'Supplier')}</SelectItem>
-                      <SelectItem value="distributor">{t('inventory.partnerTypes.distributor', 'Distributor')}</SelectItem>
-                      <SelectItem value="manufacturer">{t('inventory.partnerTypes.manufacturer', 'Manufacturer')}</SelectItem>
+                      <SelectItem value="supplier">Supplier</SelectItem>
+                      <SelectItem value="distributor">Distributor</SelectItem>
+                      <SelectItem value="manufacturer">Manufacturer</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
               )} />
               <FormField control={partnerForm.control} name="country" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('inventory.country', 'Country')}</FormLabel>
+                  <FormLabel>Country</FormLabel>
                   <FormControl><Input {...field} value={field.value || ''} placeholder="United States" /></FormControl>
                 </FormItem>
               )} />
               <Button type="submit" className="w-full" disabled={createPartnerMutation.isPending}>
-                {createPartnerMutation.isPending ? t('inventory.creating', 'Creating...') : t('inventory.createPartner', 'Create Partner')}
+                {createPartnerMutation.isPending ? "Creating..." : "Create Partner"}
               </Button>
             </form>
           </Form>

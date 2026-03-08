@@ -93,14 +93,9 @@ export default function OEMSoftwareSubscriptions() {
       suspended: { bg: 'bg-[#F97316]/10', text: 'text-[#F97316]' },
     };
     const config = statusColors[status] || { bg: 'bg-[#64748B]/10', text: 'text-[#64748B]' };
-    const statusLabels: { [key: string]: string } = {
-      active: t('common.active', 'Active'),
-      expired: t('oem.expired', 'Expired'),
-      suspended: t('oem.suspended', 'Suspended'),
-    };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
-        {statusLabels[status] || status}
+        {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };

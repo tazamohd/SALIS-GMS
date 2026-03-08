@@ -238,10 +238,10 @@ export default function ExpenseTracking() {
                           {category.categoryName}
                         </h3>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins" data-testid={`text-category-code-${category.id}`}>
-                          {t('payments.expenses.code', 'Code')}: {category.categoryCode}
+                          Code: {category.categoryCode}
                         </p>
                         <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins mt-1" data-testid={`text-category-description-${category.id}`}>
-                          {category.description || t('common.noDescription', 'No description')}
+                          {category.description || "No description"}
                         </p>
                       </div>
                       <div className="text-right">

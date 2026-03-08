@@ -94,7 +94,7 @@ export function SmartAssignment() {
       medium: "bg-[#F97316]/10 text-[#F97316]",
       high: "bg-red-500/10 text-red-600"
     };
-    return <Badge className={colors[workload] || "bg-[#64748B]/10 text-[#64748B]"} data-testid={`badge-workload-${workload}`}>{t(`smartAssignment.workload.${workload}`, workload)}</Badge>;
+    return <Badge className={colors[workload] || "bg-[#64748B]/10 text-[#64748B]"} data-testid={`badge-workload-${workload}`}>{workload}</Badge>;
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -151,7 +151,7 @@ export function SmartAssignment() {
                           <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-job-number-${job.id}`}>{job.jobNumber}</p>
                           <p className="text-sm text-[#64748B]">{job.serviceType}</p>
                         </div>
-                        <Badge className={getPriorityBadge(job.priority)} data-testid={`badge-priority-${job.priority}`}>{String(t(`smartAssignment.priority.${job.priority}`, job.priority))}</Badge>
+                        <Badge className={getPriorityBadge(job.priority)} data-testid={`badge-priority-${job.priority}`}>{job.priority}</Badge>
                       </div>
                       <p className="text-sm mt-2 line-clamp-2 text-[#64748B]">{job.description}</p>
                     </CardContent>

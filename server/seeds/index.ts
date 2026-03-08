@@ -5,12 +5,8 @@
  * Note: Individual seed files need to be created for full functionality
  */
 
-import { seedUsers } from "./usersSeed";
-
 // Stub functions for seed modules that need to be implemented
 async function seedCoreData() {
-  console.log('  → Seeding users...');
-  await seedUsers();
   console.log('  → Core data seeding (stub)');
   return { garageId: 'default-garage', branchId: 'default-branch' };
 }

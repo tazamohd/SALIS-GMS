@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +40,6 @@ interface AddVehicleDialogProps {
 export function AddVehicleDialog({ customerId, garageId }: AddVehicleDialogProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   const form = useForm<InsertVehicle>({
     resolver: zodResolver(insertVehicleSchema),
@@ -94,7 +92,7 @@ export function AddVehicleDialog({ customerId, garageId }: AddVehicleDialogProps
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t('dialogs.addNewVehicle', 'Add New Vehicle')}</DialogTitle>
+          <DialogTitle>Add New Vehicle</DialogTitle>
           <DialogDescription className="sr-only">
             Form to add a new vehicle to the customer's account
           </DialogDescription>

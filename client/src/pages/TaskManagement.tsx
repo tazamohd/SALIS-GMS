@@ -77,7 +77,7 @@ export default function TaskManagement() {
       accessorKey: "status",
       cell: (row: JobCard) => (
         <Badge className={`${getStatusBadge(row.status)} border-0`} data-testid={`task-status-${row.id}`}>
-          {t(`statusLabels.${row.status}`, row.status)}
+          {row.status}
         </Badge>
       ),
     },
@@ -86,7 +86,7 @@ export default function TaskManagement() {
       accessorKey: "priority",
       cell: (row: JobCard) => (
         <Badge className={`${getPriorityBadge(row.priority)} border-0`} data-testid={`task-priority-${row.id}`}>
-          {t(`taskManagement.${row.priority}`, row.priority)}
+          {row.priority}
         </Badge>
       ),
     },

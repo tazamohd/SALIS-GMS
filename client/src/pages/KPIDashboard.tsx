@@ -143,7 +143,7 @@ export default function KPIDashboard() {
     ? ((thisMonthJobCards.length - lastMonthJobCards.length) / lastMonthJobCards.length) * 100
     : 0;
 
-  const monthlyComparisonFromApi = [
+  const monthlyComparison = [
     {
       month: lastMonthStart.toLocaleDateString('en-US', { month: 'short' }),
       revenue: lastMonthRevenue,
@@ -164,21 +164,7 @@ export default function KPIDashboard() {
     },
   ];
 
-  const hasApiMonthlyData = monthlyComparisonFromApi.some(m => m.revenue > 0 || m.jobs > 0);
-
-  const sampleMonthlyComparison = [
-    { month: lastMonthStart.toLocaleDateString('en-US', { month: 'short' }), revenue: 142500, jobs: 156, labor: 52000 },
-    { month: thisMonthStart.toLocaleDateString('en-US', { month: 'short' }), revenue: 168200, jobs: 178, labor: 58400 },
-  ];
-
-  const monthlyComparison = hasApiMonthlyData ? monthlyComparisonFromApi : sampleMonthlyComparison;
-
-  const sampleRevenueChange = ((168200 - 142500) / 142500) * 100;
-  const sampleJobsChange = ((178 - 156) / 156) * 100;
-  const displayRevenueChange = hasApiMonthlyData ? revenueChange : sampleRevenueChange;
-  const displayJobsChange = hasApiMonthlyData ? jobsChange : sampleJobsChange;
-
-  const revenueTrendFromApi = Array.from({ length: 30 }, (_, i) => {
+  const revenueTrend = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
     const dayInvoices = invoices.filter((inv: any) => {
       if (!inv.createdAt) return false;
@@ -192,23 +178,6 @@ export default function KPIDashboard() {
       jobs: dayInvoices.length,
     };
   });
-
-  const hasApiRevenueData = revenueTrendFromApi.some(d => d.revenue > 0);
-  
-  const sampleRevenueTrend = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date(now.getTime() - (29 - i) * 24 * 60 * 60 * 1000);
-    const baseRevenue = 4500 + Math.sin(i / 4) * 1500;
-    const weekendFactor = [0, 6].includes(date.getDay()) ? 0.6 : 1;
-    const randomVariation = 0.8 + Math.random() * 0.4;
-    const trendFactor = 1 + (i / 60);
-    return {
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      revenue: Math.round(baseRevenue * weekendFactor * randomVariation * trendFactor),
-      jobs: Math.floor(3 + Math.random() * 5),
-    };
-  });
-
-  const revenueTrend = hasApiRevenueData ? revenueTrendFromApi : sampleRevenueTrend;
 
   const serviceTypes = [
     { name: t('analytics.oilChange', 'Oil Change'), value: 35, color: BRAND_COLORS.primary },
@@ -379,128 +348,109 @@ export default function KPIDashboard() {
         </TabsList>
 
         <TabsContent value="revenue">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-                  <Activity className="h-5 w-5 text-[#0A5ED7]" />
-                  {t('analytics.revenueTrendLast30Days', 'Revenue Trend - Last 30 Days')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={revenueTrend}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={BRAND_COLORS.primary} stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor={BRAND_COLORS.secondary} stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={BRAND_COLORS.darkBorder} />
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fill: '#64748B', fontSize: 10 }}
-                      axisLine={{ stroke: BRAND_COLORS.darkBorder }}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis 
-                      tick={{ fill: '#64748B', fontSize: 10 }}
-                      axisLine={{ stroke: BRAND_COLORS.darkBorder }}
-                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip 
-                      contentStyle={tooltipStyle}
-                      labelStyle={{ color: 'inherit', fontWeight: 'bold' }}
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="revenue" 
-                      stroke={BRAND_COLORS.primary} 
-                      strokeWidth={2}
-                      fillOpacity={1} 
-                      fill="url(#colorRevenue)" 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-[#64748B]">
-                    {t('analytics.total30DayRevenue', 'Total 30-Day Revenue')}: 
-                    <span className="font-bold text-[#0A5ED7] ml-2">
-                      ${revenueTrend.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <Activity className="h-5 w-5 text-[#0A5ED7]" />
+                {t('analytics.revenueTrendLast30Days', 'Revenue Trend - Last 30 Days')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <AreaChart data={revenueTrend}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={BRAND_COLORS.primary} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={BRAND_COLORS.secondary} stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke={BRAND_COLORS.darkBorder} />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fill: '#64748B', fontSize: 12 }}
+                    axisLine={{ stroke: BRAND_COLORS.darkBorder }}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#64748B', fontSize: 12 }}
+                    axisLine={{ stroke: BRAND_COLORS.darkBorder }}
+                  />
+                  <Tooltip 
+                    contentStyle={tooltipStyle}
+                    labelStyle={{ color: 'inherit', fontWeight: 'bold' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke={BRAND_COLORS.primary} 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
-            <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-month-over-month">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-                  <TrendingUp className="h-5 w-5 text-[#0A5ED7]" />
-                  {t('analytics.monthOverMonthComparison', 'Month-over-Month Comparison')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isLoadingJobCards || isLoadingInvoices ? (
-                  <div className="flex items-center justify-center h-[300px]">
-                    <p className="text-[#0B1F3B] dark:text-gray-400" data-testid="text-loading">{t('analytics.loadingComparisonData', 'Loading comparison data...')}</p>
-                  </div>
-                ) : (
-                  <>
-                    <ResponsiveContainer width="100%" height={300} data-testid="chart-month-comparison">
-                      <BarChart data={monthlyComparison}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={BRAND_COLORS.darkBorder} />
-                        <XAxis 
-                          dataKey="month" 
-                          tick={{ fill: '#64748B', fontSize: 12 }}
-                          axisLine={{ stroke: BRAND_COLORS.darkBorder }}
-                        />
-                        <YAxis 
-                          tick={{ fill: '#64748B', fontSize: 10 }}
-                          axisLine={{ stroke: BRAND_COLORS.darkBorder }}
-                          tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                        />
-                        <Tooltip 
-                          contentStyle={tooltipStyle} 
-                          formatter={(value: number, name: string) => [
-                            name === 'Jobs' ? value : `$${value.toLocaleString()}`, 
-                            name
-                          ]}
-                        />
-                        <Legend 
-                          wrapperStyle={{ color: '#64748B' }}
-                          formatter={(value) => <span style={{ color: '#64748B' }}>{value}</span>}
-                        />
-                        <Bar dataKey="revenue" fill={BRAND_COLORS.primary} name={t('analytics.revenue', 'Revenue')} radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="labor" fill={BRAND_COLORS.secondary} name={t('analytics.laborCost', 'Labor Cost')} radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                    <div className="grid grid-cols-3 gap-3 mt-4">
-                      <div className="text-center p-2 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-revenue-change">
-                        <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.revenueChange', 'Revenue Change')}</p>
-                        <p className={`text-lg font-bold ${displayRevenueChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-revenue-change">
-                          {displayRevenueChange >= 0 ? '+' : ''}{displayRevenueChange.toFixed(1)}%
-                        </p>
-                      </div>
-                      <div className="text-center p-2 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-jobs-change">
-                        <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.jobsChange', 'Jobs Change')}</p>
-                        <p className={`text-lg font-bold ${displayJobsChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-jobs-change">
-                          {displayJobsChange >= 0 ? '+' : ''}{displayJobsChange.toFixed(1)}%
-                        </p>
-                      </div>
-                      <div className="text-center p-2 bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20 rounded-lg border border-[#0BB3FF]/20" data-testid="card-labor-total">
-                        <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.thisMonthLabor', 'This Month Labor')}</p>
-                        <p className="text-lg font-bold text-[#0B1F3B] dark:text-white" data-testid="text-labor-total">
-                          ${(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                        </p>
-                      </div>
+          <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] mt-6" data-testid="card-month-over-month">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
+                <TrendingUp className="h-5 w-5 text-[#0A5ED7]" />
+                {t('analytics.monthOverMonthComparison', 'Month-over-Month Comparison')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingJobCards || isLoadingInvoices ? (
+                <div className="flex items-center justify-center h-[350px]">
+                  <p className="text-[#0B1F3B] dark:text-gray-400" data-testid="text-loading">{t('analytics.loadingComparisonData', 'Loading comparison data...')}</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={350} data-testid="chart-month-comparison">
+                    <BarChart data={monthlyComparison}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={BRAND_COLORS.darkBorder} />
+                      <XAxis 
+                        dataKey="month" 
+                        tick={{ fill: '#64748B', fontSize: 12 }}
+                        axisLine={{ stroke: BRAND_COLORS.darkBorder }}
+                      />
+                      <YAxis 
+                        tick={{ fill: '#64748B', fontSize: 12 }}
+                        axisLine={{ stroke: BRAND_COLORS.darkBorder }}
+                      />
+                      <Tooltip contentStyle={tooltipStyle} />
+                      <Legend 
+                        wrapperStyle={{ color: '#64748B' }}
+                        formatter={(value) => <span style={{ color: '#64748B' }}>{value}</span>}
+                      />
+                      <Bar dataKey="revenue" fill={BRAND_COLORS.primary} name={t('analytics.revenue', 'Revenue')} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="jobs" fill={BRAND_COLORS.success} name={t('analytics.jobs', 'Jobs')} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="labor" fill={BRAND_COLORS.secondary} name={t('analytics.laborCost', 'Labor Cost')} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="text-center p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-revenue-change">
+                      <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.revenueChange', 'Revenue Change')}</p>
+                      <p className={`text-lg font-bold ${revenueChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-revenue-change">
+                        {revenueChange >= 0 ? '+' : ''}{revenueChange.toFixed(1)}%
+                      </p>
                     </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                    <div className="text-center p-3 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/20" data-testid="card-jobs-change">
+                      <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.jobsChange', 'Jobs Change')}</p>
+                      <p className={`text-lg font-bold ${jobsChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-jobs-change">
+                        {jobsChange >= 0 ? '+' : ''}{jobsChange.toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20 rounded-lg border border-[#0BB3FF]/20" data-testid="card-labor-total">
+                      <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.thisMonthLabor', 'This Month Labor')}</p>
+                      <p className="text-lg font-bold text-[#0B1F3B] dark:text-white" data-testid="text-labor-total">
+                        ${(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="services">

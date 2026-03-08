@@ -215,18 +215,12 @@ export default function JournalEntries() {
       Rejected: { icon: XCircle, className: "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" },
       Draft: { icon: Edit, className: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200" },
     };
-    const statusLabels: Record<string, string> = {
-      Posted: t('accounting.posted', 'Posted'),
-      Pending: t('common.pending', 'Pending'),
-      Rejected: t('common.rejected', 'Rejected'),
-      Draft: t('common.draft', 'Draft'),
-    };
     const style = styles[status] || styles.Draft;
     const Icon = style.icon;
     return (
       <Badge className={style.className}>
         <Icon className="h-3 w-3 mr-1" />
-        {statusLabels[status] || status}
+        {status}
       </Badge>
     );
   };
@@ -251,13 +245,13 @@ export default function JournalEntries() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[150px]" data-testid="select-status-filter">
-              <SelectValue placeholder={t('common.status', 'Status')} />
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('accounting.allStatus', 'All Status')}</SelectItem>
-              <SelectItem value="posted">{t('accounting.posted', 'Posted')}</SelectItem>
-              <SelectItem value="pending">{t('common.pending', 'Pending')}</SelectItem>
-              <SelectItem value="draft">{t('common.draft', 'Draft')}</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="posted">Posted</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -614,40 +608,40 @@ export default function JournalEntries() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
           {
-            name: t('accounting.templates.customerPayment', 'Customer Payment'),
-            description: t('accounting.templates.customerPaymentDesc', 'Record payment received from customer'),
-            debit: t('accounting.accounts.cash', 'Cash'),
-            credit: t('accounting.accounts.accountsReceivable', 'Accounts Receivable'),
+            name: "Customer Payment",
+            description: "Record payment received from customer",
+            debit: "Cash",
+            credit: "Accounts Receivable",
           },
           {
-            name: t('accounting.templates.supplierPayment', 'Supplier Payment'),
-            description: t('accounting.templates.supplierPaymentDesc', 'Record payment made to supplier'),
-            debit: t('accounting.accounts.accountsPayable', 'Accounts Payable'),
-            credit: t('accounting.accounts.cash', 'Cash'),
+            name: "Supplier Payment",
+            description: "Record payment made to supplier",
+            debit: "Accounts Payable",
+            credit: "Cash",
           },
           {
-            name: t('accounting.templates.serviceRevenue', 'Service Revenue'),
-            description: t('accounting.templates.serviceRevenueDesc', 'Record service income earned'),
-            debit: t('accounting.accounts.accountsReceivable', 'Accounts Receivable'),
-            credit: t('accounting.accounts.serviceRevenue', 'Service Revenue'),
+            name: "Service Revenue",
+            description: "Record service income earned",
+            debit: "Accounts Receivable",
+            credit: "Service Revenue",
           },
           {
-            name: t('accounting.templates.partsPurchase', 'Parts Purchase'),
-            description: t('accounting.templates.partsPurchaseDesc', 'Record spare parts inventory purchase'),
-            debit: t('accounting.accounts.inventory', 'Inventory'),
-            credit: t('accounting.accounts.accountsPayable', 'Accounts Payable'),
+            name: "Parts Purchase",
+            description: "Record spare parts inventory purchase",
+            debit: "Inventory",
+            credit: "Accounts Payable",
           },
           {
-            name: t('accounting.templates.salaryPayment', 'Salary Payment'),
-            description: t('accounting.templates.salaryPaymentDesc', 'Record monthly salary disbursement'),
-            debit: t('accounting.accounts.salariesExpense', 'Salaries Expense'),
-            credit: t('accounting.accounts.cash', 'Cash'),
+            name: "Salary Payment",
+            description: "Record monthly salary disbursement",
+            debit: "Salaries Expense",
+            credit: "Cash",
           },
           {
-            name: t('accounting.templates.depreciationEntry', 'Depreciation Entry'),
-            description: t('accounting.templates.depreciationEntryDesc', 'Record monthly asset depreciation'),
-            debit: t('accounting.accounts.depreciationExpense', 'Depreciation Expense'),
-            credit: t('accounting.accounts.accumulatedDepreciation', 'Accumulated Depreciation'),
+            name: "Depreciation Entry",
+            description: "Record monthly asset depreciation",
+            debit: "Depreciation Expense",
+            credit: "Accumulated Depreciation",
           },
         ].map((template, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-template-${index}`}>
@@ -684,7 +678,7 @@ export default function JournalEntries() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.journalEntries.title', 'Journal Entries')}
+      title={t('accounting.journalEntries.title', 'Journal Entries - القيود اليومية')}
       description={t('accounting.journalEntries.description', 'Record and manage daily accounting transactions')}
       icon={FileText}
       tabs={tabs}

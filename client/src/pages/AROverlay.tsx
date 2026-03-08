@@ -203,7 +203,7 @@ export default function AROverlay() {
                       </div>
                       <Badge variant={session.status === "active" ? "default" : "secondary"} data-testid={`badge-session-status-${session.id}`}>
                         {session.status === "active" ? <Play className="w-3 h-3 mr-1" /> : <Pause className="w-3 h-3 mr-1" />}
-                        {session.status === "active" ? t('arOverlay.statusActive', 'Active') : session.status === "paused" ? t('arOverlay.statusPaused', 'Paused') : t('arOverlay.statusCompleted', 'Completed')}
+                        {session.status}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">{session.vehicleInfo}</p>
@@ -330,7 +330,7 @@ export default function AROverlay() {
                   <Badge variant={device.status === "connected" ? "default" : device.status === "pairing" ? "secondary" : "outline"} data-testid={`badge-device-status-${device.id}`}>
                     {device.status === "connected" && <Wifi className="w-3 h-3 mr-1" />}
                     {device.status === "disconnected" && <WifiOff className="w-3 h-3 mr-1" />}
-                    {device.status === "connected" ? t('arOverlay.statusConnected', 'Connected') : device.status === "pairing" ? t('arOverlay.statusPairing', 'Pairing') : t('arOverlay.statusDisconnected', 'Disconnected')}
+                    {device.status}
                   </Badge>
                 </div>
                 <div className="mt-4 flex items-center justify-between text-sm">
@@ -371,7 +371,7 @@ export default function AROverlay() {
               <div className="flex items-center justify-between">
                 <Badge variant="outline">{instruction.category}</Badge>
                 <Badge className={getDifficultyColor(instruction.difficulty)}>
-                  {instruction.difficulty === "beginner" ? t('arOverlay.difficultyBeginner', 'Beginner') : instruction.difficulty === "intermediate" ? t('arOverlay.difficultyIntermediate', 'Intermediate') : t('arOverlay.difficultyAdvanced', 'Advanced')}
+                  {instruction.difficulty}
                 </Badge>
               </div>
               <CardTitle className="text-lg mt-2">{instruction.title}</CardTitle>

@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter, Shield } from "lucide-react";
+import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { usePermissions } from "@/hooks/usePermissions";
-import { RoleGate } from "@/components/RoleGate";
-import { RoleBadge } from "@/components/RoleBadge";
 import {
   Dialog,
   DialogContent,
@@ -56,10 +53,10 @@ const jobCardFormSchema = insertJobCardSchema.extend({
   totalCost: z.string().optional(),
   scheduledDate: z.string().optional(),
   vehicleInfo: z.object({
-    make: z.string().min(1),
-    model: z.string().min(1),
-    year: z.string().min(1),
-    licensePlate: z.string().min(1),
+    make: z.string().min(1, "Make is required"),
+    model: z.string().min(1, "Model is required"),
+    year: z.string().min(1, "Year is required"),
+    licensePlate: z.string().min(1, "License plate is required"),
     vin: z.string().optional(),
   }),
 }).omit({
@@ -78,7 +75,6 @@ type JobCardFormData = z.infer<typeof jobCardFormSchema>;
 export function JobCards() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { canCreate, canEdit, canApprove, canView, getRoleDisplayName } = usePermissions();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedJobCard, setSelectedJobCard] = useState<JobCard | null>(null);
@@ -217,41 +213,21 @@ export function JobCards() {
     return true;
   });
 
-  const pageActions = canCreate('job_cards') ? [
-    {
-      label: t('jobCards.create', 'Create Job Card'),
-      onClick: () => setIsCreateOpen(true),
-      icon: Plus,
-      variant: "default" as const,
-    },
-  ] : [];
-
   return (
     <>
       <StandardPageLayout
         title={t('jobCards.title', 'Job Cards')}
         description={t('jobCards.description', 'Manage service job cards and track progress')}
         icon={Wrench}
-        actions={pageActions}
+        actions={[
+          {
+            label: t('jobCards.create', 'Create Job Card'),
+            onClick: () => setIsCreateOpen(true),
+            icon: Plus,
+            variant: "default",
+          },
+        ]}
       >
-        {/* Role-Based Access Indicator */}
-        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-white/50 dark:bg-[#151A23]/50 border border-[#E2E8F0] dark:border-[#232A36]">
-          <RoleBadge size="md" />
-          {canCreate('job_cards') ? (
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              {t('permissions.canCreateJobCards', 'You can create and manage job cards')}
-            </span>
-          ) : canEdit('job_cards') ? (
-            <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1">
-              {t('permissions.canEditJobCards', 'You can edit existing job cards')}
-            </span>
-          ) : (
-            <span className="text-xs text-zinc-500 flex items-center gap-1">
-              <Shield className="w-3 h-3" /> {t('permissions.viewOnlyContactManager', 'View only - Contact manager to create job cards')}
-            </span>
-          )}
-        </div>
-
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

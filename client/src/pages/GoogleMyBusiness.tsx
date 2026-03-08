@@ -18,9 +18,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Building, MessageCircle, Star, Send } from "lucide-react";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-const createProfileSchema = (t: (key: string, fallback: string) => string) => z.object({
-  locationName: z.string().min(1, t('gmb.validation.locationNameRequired', 'Location name is required')),
-  locationId: z.string().min(1, t('gmb.validation.locationIdRequired', 'Location ID is required')),
+const profileSchema = z.object({
+  locationName: z.string().min(1, "Location name is required"),
+  locationId: z.string().min(1, "Location ID is required"),
   address: z.string().optional(),
   phone: z.string().optional(),
   website: z.string().optional(),
@@ -29,10 +29,10 @@ const createProfileSchema = (t: (key: string, fallback: string) => string) => z.
   isConnected: z.boolean().default(true),
 });
 
-const createPostSchema = (t: (key: string, fallback: string) => string) => z.object({
-  profileId: z.string().min(1, t('gmb.validation.profileRequired', 'Profile is required')),
+const postSchema = z.object({
+  profileId: z.string().min(1, "Profile is required"),
   postType: z.enum(["update", "offer", "event", "product"]).default("update"),
-  content: z.string().min(1, t('gmb.validation.contentRequired', 'Content is required')),
+  content: z.string().min(1, "Content is required"),
   ctaType: z.enum(["book", "order", "learn_more", "call", "none"]).optional(),
   ctaUrl: z.string().optional(),
   eventTitle: z.string().optional(),
@@ -40,18 +40,15 @@ const createPostSchema = (t: (key: string, fallback: string) => string) => z.obj
   eventEndDate: z.string().optional(),
 });
 
+type ProfileFormData = z.infer<typeof profileSchema>;
+type PostFormData = z.infer<typeof postSchema>;
+
 export default function GoogleMyBusiness() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("profiles");
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
-
-  const profileSchema = createProfileSchema(t);
-  const postSchema = createPostSchema(t);
-
-  type ProfileFormData = z.infer<typeof profileSchema>;
-  type PostFormData = z.infer<typeof postSchema>;
 
   const { data: profiles = [], isLoading: profilesLoading } = useQuery<any[]>({
     queryKey: ["/api/gmb/profiles"],

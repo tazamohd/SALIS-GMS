@@ -60,7 +60,7 @@ export default function BusinessIntelligenceDashboard() {
     queryKey: ["/api/analytics/dashboard-metrics", selectedPeriod],
   });
 
-  const { data: customReports = [] } = useQuery<any[]>({
+  const { data: customReports = [] } = useQuery({
     queryKey: ["/api/analytics/custom-reports"],
   });
 
@@ -255,7 +255,7 @@ export default function BusinessIntelligenceDashboard() {
                         {t('bi.bestTechnician', 'Best Technician')}
                       </span>
                       <span className="font-semibold text-[#0B1F3B] dark:text-white">
-                        {t('bi.sampleTechnician', 'John Smith')}
+                        John Smith
                       </span>
                     </div>
                     <div className="flex justify-between mb-2">
@@ -263,7 +263,7 @@ export default function BusinessIntelligenceDashboard() {
                         {t('bi.revenueGenerated', 'Revenue Generated')}
                       </span>
                       <span className="font-semibold text-[#0B1F3B] dark:text-white">
-                        {t('common.currencySymbol', '$')}48,500
+                        $48,500
                       </span>
                     </div>
                   </div>
@@ -273,7 +273,7 @@ export default function BusinessIntelligenceDashboard() {
                         {t('bi.topCustomer', 'Top Customer')}
                       </span>
                       <span className="font-semibold text-[#0B1F3B] dark:text-white">
-                        {t('bi.sampleCustomer', 'ABC Fleet Services')}
+                        ABC Fleet Services
                       </span>
                     </div>
                     <div className="flex justify-between mb-2">
@@ -281,7 +281,7 @@ export default function BusinessIntelligenceDashboard() {
                         {t('bi.lifetimeValue', 'Lifetime Value')}
                       </span>
                       <span className="font-semibold text-[#0B1F3B] dark:text-white">
-                        {t('common.currencySymbol', '$')}125,800
+                        $125,800
                       </span>
                     </div>
                   </div>

@@ -18,23 +18,21 @@ import { z } from "zod";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const createReminderSchema = (t: (key: string, fallback: string) => string) => z.object({
-  vehicleId: z.string().min(1, t('serviceReminders.validation.selectVehicle', 'Please select a vehicle')),
-  reminderType: z.string().min(1, t('serviceReminders.validation.selectType', 'Please select a reminder type')),
-  dueDate: z.string().min(1, t('serviceReminders.validation.selectDate', 'Please select a due date')),
+const reminderSchema = z.object({
+  vehicleId: z.string().min(1, "Please select a vehicle"),
+  reminderType: z.string().min(1, "Please select a reminder type"),
+  dueDate: z.string().min(1, "Please select a due date"),
   mileageDue: z.string().optional(),
-  description: z.string().min(1, t('serviceReminders.validation.addDescription', 'Please add a description')),
+  description: z.string().min(1, "Please add a description"),
 });
 
-type ReminderFormValues = z.infer<ReturnType<typeof createReminderSchema>>;
+type ReminderFormValues = z.infer<typeof reminderSchema>;
 
 export default function ServiceReminders() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const reminderSchema = createReminderSchema(t);
 
   const { data: vehicles } = useQuery({
     queryKey: ["/api/vehicles", (user as any)?.id],
@@ -87,7 +85,7 @@ export default function ServiceReminders() {
 
   const getVehicleInfo = (vehicleId: string) => {
     const vehicle = myVehicles.find((v: any) => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : t('serviceReminders.unknownVehicle', 'Unknown Vehicle');
+    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : "Unknown Vehicle";
   };
 
   const activeReminders = Array.isArray(reminders)

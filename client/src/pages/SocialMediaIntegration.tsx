@@ -278,21 +278,20 @@ export default function SocialMediaIntegration() {
   ];
 
   return (
-    <>
-      <TabsPageLayout
-        title={t('nav.social_media_integration', 'Social Media & Reviews')}
-        description={t('social.pageDescription', 'Manage social posts and respond to customer reviews')}
-        icon={Share2}
-        primaryAction={{
-          label: t('social.createPost', 'Create Post'),
-          icon: Plus,
-          onClick: () => setIsCreateDialogOpen(true),
-          testId: "button-create-post",
-        }}
-        headerContent={statsContent}
-        tabs={tabs}
-        defaultTab="posts"
-      />
+    <TabsPageLayout
+      title={t('nav.social_media_integration', 'Social Media & Reviews')}
+      description={t('social.pageDescription', 'Manage social posts and respond to customer reviews')}
+      icon={Share2}
+      primaryAction={{
+        label: t('social.createPost', 'Create Post'),
+        icon: Plus,
+        onClick: () => setIsCreateDialogOpen(true),
+        testId: "button-create-post",
+      }}
+      headerContent={statsContent}
+      tabs={tabs}
+      defaultTab="posts"
+    >
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
@@ -306,10 +305,10 @@ export default function SocialMediaIntegration() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                  <SelectItem value="facebook">{t('social.facebook', 'Facebook')}</SelectItem>
-                  <SelectItem value="instagram">{t('social.instagram', 'Instagram')}</SelectItem>
+                  <SelectItem value="facebook">Facebook</SelectItem>
+                  <SelectItem value="instagram">Instagram</SelectItem>
                   <SelectItem value="google">{t('social.googleBusiness', 'Google Business')}</SelectItem>
-                  <SelectItem value="yelp">{t('social.yelp', 'Yelp')}</SelectItem>
+                  <SelectItem value="yelp">Yelp</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -339,6 +338,6 @@ export default function SocialMediaIntegration() {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </TabsPageLayout>
   );
 }

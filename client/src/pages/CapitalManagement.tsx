@@ -601,7 +601,7 @@ export default function CapitalManagement() {
 
   return (
     <TabsPageLayout
-      title={t('capital.capitalManagementTitle', 'Capital Management')}
+      title={t('capital.capitalManagementTitle', 'Capital Management - إدارة رأس المال')}
       description={t('capital.capitalManagementDescription', 'Manage shareholders, capital structure, and contributions')}
       icon={Landmark}
       tabs={tabs}

@@ -38,13 +38,13 @@ import {
 import { CURRENCIES as CURRENCY_CONFIG, PAYMENT_METHODS, getPaymentMethods } from "@/lib/currency";
 
 const CURRENCIES = [
-  { code: 'sar', symbol: 'SAR', name: 'SAR - Saudi Riyal' },
+  { code: 'sar', symbol: 'ر.س', name: 'SAR - Saudi Riyal' },
   { code: 'usd', symbol: '$', name: 'USD - US Dollar' },
-  { code: 'aed', symbol: 'AED', name: 'AED - UAE Dirham' },
-  { code: 'bhd', symbol: 'BHD', name: 'BHD - Bahraini Dinar' },
-  { code: 'kwd', symbol: 'KWD', name: 'KWD - Kuwaiti Dinar' },
-  { code: 'omr', symbol: 'OMR', name: 'OMR - Omani Rial' },
-  { code: 'qar', symbol: 'QAR', name: 'QAR - Qatari Riyal' },
+  { code: 'aed', symbol: 'د.إ', name: 'AED - UAE Dirham' },
+  { code: 'bhd', symbol: 'د.ب', name: 'BHD - Bahraini Dinar' },
+  { code: 'kwd', symbol: 'د.ك', name: 'KWD - Kuwaiti Dinar' },
+  { code: 'omr', symbol: 'ر.ع', name: 'OMR - Omani Rial' },
+  { code: 'qar', symbol: 'ر.ق', name: 'QAR - Qatari Riyal' },
   { code: 'eur', symbol: '€', name: 'EUR - Euro' },
   { code: 'gbp', symbol: '£', name: 'GBP - British Pound' },
 ];
@@ -263,49 +263,56 @@ export default function StripePaymentProcessing() {
                 <div className="w-12 h-12 mx-auto mb-2 bg-[#004D8D] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">mada</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.mada', 'Mada')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mada</p>
+                <p className="text-xs text-[#64748B]">مدى</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xs">STC Pay</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.stcPay', 'STC Pay')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Pay</p>
+                <p className="text-xs text-[#64748B]">إس تي سي باي</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-[#4F008C] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xs">STC</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.stcBank', 'STC Bank')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Bank</p>
+                <p className="text-xs text-[#64748B]">بنك إس تي سي</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-[#1A1F71] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">VISA</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.visa', 'Visa')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Visa</p>
+                <p className="text-xs text-[#64748B]">فيزا</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-gradient-to-r from-[#EB001B] to-[#F79E1B] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xs">MC</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.mastercard', 'Mastercard')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mastercard</p>
+                <p className="text-xs text-[#64748B]">ماستركارد</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-[#006FCF] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xs">AMEX</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.amex', 'American Express')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">American Express</p>
+                <p className="text-xs text-[#64748B]">أمريكان إكسبريس</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
                 <div className="w-12 h-12 mx-auto mb-2 bg-black rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-xs">Pay</span>
                 </div>
-                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.applePay', 'Apple Pay')}</p>
+                <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Apple Pay</p>
+                <p className="text-xs text-[#64748B]">آبل باي</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -313,12 +320,13 @@ export default function StripePaymentProcessing() {
                   <Banknote className="w-6 h-6 text-white" />
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.bankTransfer', 'Bank Transfer')}</p>
+                <p className="text-xs text-[#64748B]">تحويل بنكي</p>
               </div>
             </div>
 
             <div className="mt-4 p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
               <p className="text-sm text-[#64748B]">
-                <strong className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.defaultCurrency', 'Default Currency')}:</strong> {t('payments.currency.sar', 'Saudi Riyal (SAR)')}
+                <strong className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.defaultCurrency', 'Default Currency')}:</strong> Saudi Riyal (SAR) ر.س
                 <span className="mx-2">|</span>
                 <strong className="text-[#0B1F3B] dark:text-white">{t('payments.stripe.supported', 'Supported')}:</strong> SAR, AED, BHD, KWD, OMR, QAR, USD, EUR, GBP
               </p>

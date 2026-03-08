@@ -17,16 +17,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Radio, Activity, AlertTriangle, MapPin, Gauge } from "lucide-react";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-const createAlertSchema = (t: (key: string, fallback: string) => string) => z.object({
-  vehicleId: z.string().min(1, t('telematics.vehicleIdRequired', 'Vehicle ID is required')),
+const alertSchema = z.object({
+  vehicleId: z.string().min(1, "Vehicle ID is required"),
   alertType: z.enum(["speeding", "harsh_braking", "idling", "geofence_violation", "maintenance_due", "low_battery", "engine_fault"]),
   severity: z.enum(["low", "medium", "high", "critical"]),
-  message: z.string().min(1, t('telematics.messageRequired', 'Message is required')),
+  message: z.string().min(1, "Message is required"),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });
 
-type AlertFormData = z.infer<ReturnType<typeof createAlertSchema>>;
+type AlertFormData = z.infer<typeof alertSchema>;
 
 export default function TelematicsIntegration() {
   const { t } = useTranslation();
@@ -42,7 +42,6 @@ export default function TelematicsIntegration() {
     queryKey: ["/api/telematics/alerts"],
   });
 
-  const alertSchema = createAlertSchema(t);
   const alertForm = useForm<AlertFormData>({
     resolver: zodResolver(alertSchema),
     defaultValues: {
@@ -175,10 +174,10 @@ export default function TelematicsIntegration() {
                             <div className="flex items-center gap-3 mb-2">
                               <AlertTriangle className={`h-5 w-5 ${alert.severity === "critical" ? "text-red-600" : "text-[#F97316]"}`} />
                               <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-alert-type-${alert.id}`}>
-                                {String(t(`telematics.alertTypes.${alert.alertType}`, alert.alertType.replace(/_/g, " ").toUpperCase()))}
+                                {alert.alertType.replace(/_/g, " ").toUpperCase()}
                               </h3>
                               <Badge className={getSeverityBadge(alert.severity)} data-testid={`badge-severity-${alert.id}`}>
-                                {String(t(`telematics.severityLevels.${alert.severity}`, alert.severity))}
+                                {alert.severity}
                               </Badge>
                               {alert.isResolved && (
                                 <Badge className="bg-green-500/10 text-green-600" data-testid={`badge-resolved-${alert.id}`}>

@@ -13,10 +13,10 @@ export default function SocialMediaMonitoring() {
   const [selectedPeriod, setSelectedPeriod] = useState("7days");
 
   const platforms = [
-    { id: "facebook", name: t('social.facebook', 'Facebook'), icon: Facebook, color: "text-[#0A5ED7]" },
-    { id: "twitter", name: t('social.twitter', 'Twitter'), icon: Twitter, color: "text-[#0BB3FF]" },
-    { id: "instagram", name: t('social.instagram', 'Instagram'), icon: Instagram, color: "text-pink-500" },
-    { id: "linkedin", name: t('social.linkedin', 'LinkedIn'), icon: Linkedin, color: "text-[#0A5ED7]" },
+    { id: "facebook", name: "Facebook", icon: Facebook, color: "text-[#0A5ED7]" },
+    { id: "twitter", name: "Twitter", icon: Twitter, color: "text-[#0BB3FF]" },
+    { id: "instagram", name: "Instagram", icon: Instagram, color: "text-pink-500" },
+    { id: "linkedin", name: "LinkedIn", icon: Linkedin, color: "text-[#0A5ED7]" },
   ];
 
   const metrics = [

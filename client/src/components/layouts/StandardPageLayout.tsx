@@ -34,11 +34,11 @@ export function StandardPageLayout({
 }: StandardPageLayoutProps) {
   return (
     <div className={cn("flex-1 min-h-screen relative overflow-hidden", className)}>
-      {/* Brand Background - KSA Vision 2030 Theme */}
+      {/* Brand Background - Clean Dark/Light Theme */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-background"></div>
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-primary/5 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-secondary/5 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]"></div>
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-[#0A5ED7]/5 to-transparent dark:from-[#0BB3FF]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#0BB3FF]/5 to-transparent dark:from-[#0A5ED7]/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative p-4 sm:p-6 lg:p-8">

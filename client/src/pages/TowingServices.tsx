@@ -248,7 +248,7 @@ export default function TowingServices() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('customers.customerName', 'Customer Name')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('towing.sampleCustomerName', 'Mohammed Ahmed')} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-customer-name" />
+                        <Input {...field} placeholder="John Doe" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]" data-testid="input-customer-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

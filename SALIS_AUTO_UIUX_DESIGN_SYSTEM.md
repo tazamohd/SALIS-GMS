@@ -1,21 +1,9 @@
-# SalisEngine.AI - UI/UX Design System Documentation
+# SALIS AUTO - UI/UX Design System Documentation
 
-**Version:** 2.0.0 (Logo-Aligned)  
-**Theme:** Deep Space & Corporate Steel  
+**Version:** 2.0  
 **Last Updated:** January 2026  
 **Platform:** Enterprise Automotive ERP  
 **Pages:** 235+ screens  
-
----
-
-## Design Philosophy
-
-The **SalisEngine** aesthetic is built to feel like a high-performance "Command Center" for autonomous AI. It combines the sleek, calculated precision of **corporate steel** with the futuristic, infinite depth of **deep space**.
-
-The palette is strictly derived from the official logo:
-- **Sky Blue (`#0ea5e9`)**: Represents intelligence, clarity, and the core engine
-- **Vibrant Orange (`#f97316`)**: Represents action, execution, and critical data points
-- **Deep Void (`#050510`)**: A backdrop that reduces eye strain and provides contrast for glowing elements
 
 ---
 
@@ -63,83 +51,56 @@ SALIS AUTO is a world-class automotive ERP platform designed for efficient garag
 
 ## 2. Color System
 
-### Core Backgrounds - Deep Space
+### Primary Palette - Logo-Only Colors (Strictly Enforced)
 
-| Variable | Hex | Description |
-|----------|-----|-------------|
-| `--bg-dark` | `#050510` | Primary background - near-black void |
-| `--bg-deep` | `#0b0b1a` | Deeper recessed areas, sidebars |
-| `--bg-card` | `rgba(15, 23, 42, 0.6)` | Slate-tinted glass for UI cards |
+| Color Name | Hex Code | HSL | Usage |
+|------------|----------|-----|-------|
+| **Primary Blue (Start)** | `#0A5ED7` | `214, 90%, 44%` | Primary actions, buttons, links |
+| **Primary Blue (End)** | `#0BB3FF` | `197, 100%, 52%` | Gradient endpoints, success states |
+| **Deep Navy** | `#0B1F3B` | `216, 69%, 14%` | Headers, dark backgrounds, muted text |
+| **Action Orange** | `#F97316` | `24, 95%, 53%` | **WARNINGS ONLY** - Critical alerts, destructive actions |
 
-### Brand Accents (Logo Matched)
-
-| Variable | Hex | Usage |
-|----------|-----|-------|
-| `--accent-primary` | `#0ea5e9` (Sky Blue) | Primary actions, active tabs, main glows |
-| `--accent-secondary` | `#f97316` (Orange) | Highlights, data logs, secondary CTA |
-| `--accent-dark-blue` | `#1e3a8a` | Deep blue for gradients and borders |
-| `--accent-silver` | `#e2e8f0` | Subtitle text, inactive borders, "Steel" look |
-
-### Functional Colors
-
-| Variable | Hex | Usage |
-|----------|-----|-------|
-| `--accent-success` | `#10b981` (Emerald) | System Online, success logs, completed tasks |
-| `--accent-error` | `#ef4444` (Red) | Error logs, critical alerts, delete actions |
-| `--warning` | `#f97316` (Orange) | Warnings, pending states |
-| `--info` | `#0ea5e9` (Sky Blue) | Informational callouts |
-
-### Brand Gradients
+### Brand Blue Gradient
 ```css
---gradient-main: linear-gradient(135deg, #0ea5e9 0%, #1e3a8a 100%);
---gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+--salis-blue-gradient: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
 ```
 Used for: Primary buttons, active states, progress indicators, hero sections
 
-### Glass Variables - Physical Glass Effect
-```css
---glass-border: rgba(255, 255, 255, 0.08);    /* Subtle white edge */
---glass-surface: rgba(255, 255, 255, 0.03);   /* Base transparency */
---glass-highlight: rgba(255, 255, 255, 0.08); /* Top-down lighting */
---glass-heavy: rgba(15, 23, 42, 0.85);        /* Almost opaque */
-```
+### Semantic Color Mapping
 
-### Glow Effects
-```css
---glow-primary: 0 0 25px rgba(14, 165, 233, 0.3);
---glow-secondary: 0 0 20px rgba(249, 115, 22, 0.25);
---glow-success: 0 0 20px rgba(16, 185, 129, 0.25);
---glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
-```
+| Semantic | Light Mode | Dark Mode | Note |
+|----------|------------|-----------|------|
+| Success | `#0A5ED7` (Blue) | `#0BB3FF` (Bright Blue) | NO GREEN - Uses brand blue |
+| Warning | `#F97316` (Orange) | `#F97316` (Orange) | Only use for warnings |
+| Info | `#0BB3FF` (Bright Blue) | `#0A5ED7` (Deep Blue) | Informational callouts |
+| Error/Destructive | `#F97316` (Orange) | `#F97316` (Orange) | Critical errors |
 
-### Light Mode - Corporate Steel
+### Neutral Palette
 
+#### Light Mode Neutrals
 | Token | Hex | Usage |
 |-------|-----|-------|
-| Background | `#f1f5f9` | Slate 100 - Page background |
+| Background | `#E6E9ED` | Page background |
 | Surface | `#FFFFFF` | Cards, dialogs |
-| Border | `#cbd5e1` | Slate 300 - Dividers, outlines |
-| Text Primary | `#0f172a` | Slate 900 - Main text |
-| Text Muted | `#64748b` | Slate 500 - Secondary text |
+| Border | `#C9D1DA` | Dividers, outlines |
+| Text Primary | `#2A2F3A` | Main text |
+| Text Muted | `#6B7280` | Secondary text |
 
-### Dark Mode - Deep Space
-
+#### Dark Mode Neutrals
 | Token | Hex | Usage |
 |-------|-----|-------|
-| Background | `#050510` | Near-black void |
-| Surface | `rgba(15, 23, 42, 0.6)` | Glass card surface |
-| Border | `rgba(255, 255, 255, 0.08)` | Glass edge |
-| Text Primary | `#e2e8f0` | Slate 200 - Main text |
-| Text Muted | `#94a3b8` | Slate 400 - Secondary text |
+| Background | `#0E1117` | Page background |
+| Surface | `#151A23` | Cards, dialogs |
+| Border | `#232A36` | Dividers, outlines |
+| Text Primary | `#E6EAF0` | Main text |
+| Text Muted | `#9BA4B0` | Secondary text |
 
 ### Color Usage Rules
 
-1. **Sky Blue (`#0ea5e9`)** - Primary actions, active states, main glows
-2. **Orange (`#f97316`)** - Secondary CTA, highlights, data emphasis
-3. **Emerald Green (`#10b981`)** - Success states, completed tasks
-4. **Red (`#ef4444`)** - Errors, critical alerts, destructive actions
-5. **Deep Void (`#050510`)** - Dark mode background for maximum contrast
-6. **Glass effects** - Use backdrop blur with subtle white borders for depth
+1. **NEVER use green** - Success states use brand blue
+2. **Orange is for warnings ONLY** - Never use for primary CTAs
+3. **Blue gradient** - Reserved for primary actions and brand elements
+4. **Avoid pure black/white** - Use navy and off-white for softer contrast
 
 ---
 
@@ -625,7 +586,7 @@ const newWidth = Math.min(Math.max(e.clientX, 200), 400);
 
 ---
 
-## 9. Dark Mode Implementation - Deep Space Theme
+## 9. Dark Mode Implementation
 
 ### Theme Toggle
 
@@ -639,77 +600,33 @@ darkMode: ["class"] // in tailwind.config.ts
 document.documentElement.classList.toggle("dark");
 ```
 
-### Color Variables (Dark Mode - Deep Space)
+### Color Variables (Dark Mode)
 
 ```css
 .dark {
-  /* Background - Deep Void */
-  --background: 240 33% 3%;        /* #050510 - Near-black void */
-  --foreground: 210 40% 93%;       /* #e2e8f0 - Slate 200 */
-
-  /* Muted - Recessed Areas */
-  --muted: 240 24% 7%;             /* #0b0b1a - Deep recessed */
-  --muted-foreground: 215 20% 65%; /* #94a3b8 - Slate 400 */
-
-  /* Card - Slate Glass */
-  --card: 222 47% 11% / 0.6;       /* rgba(15, 23, 42, 0.6) */
-  --card-foreground: 210 40% 93%;
-
-  /* Border - Glass Edge */
-  --border: 0 0% 100% / 0.08;      /* White 8% - subtle edge */
-
-  /* Primary - Sky Blue */
-  --primary: 199 89% 48%;          /* #0ea5e9 */
-  --primary-foreground: 240 33% 3%;
-
-  /* Secondary - Orange */
-  --secondary: 24 95% 53%;         /* #f97316 */
-  --secondary-foreground: 0 0% 100%;
-
-  /* Semantic Colors */
-  --success: 160 84% 39%;          /* #10b981 - Emerald */
-  --error: 0 84% 60%;              /* #ef4444 - Red */
-}
-```
-
-### Glassmorphism Effects
-
-The design relies heavily on "Physical Glass" — glass that feels substantial, not just blurry.
-
-```css
-.glass-card {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 4px 24px -1px rgba(0, 0, 0, 0.3);
-}
-```
-
-### Motion & Glows
-
-Elements should "lift" and "glow" upon interaction:
-
-```css
-.hover-lift:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 25px rgba(14, 165, 233, 0.3);
+  --background: 220 20% 5%;       /* #0E1117 */
+  --foreground: 220 20% 93%;      /* #E6EAF0 */
+  --muted: 220 15% 13%;           /* #151A23 */
+  --muted-foreground: 217 14% 65%;/* #9BA4B0 */
+  --card: 220 15% 13%;            /* #151A23 */
+  --border: 220 12% 18%;          /* #232A36 */
+  --primary: 197 100% 52%;        /* #0BB3FF */
+  --secondary: 214 90% 44%;       /* #0A5ED7 */
 }
 ```
 
 ### Dark Mode Best Practices
 
-1. **Use Deep Void background (`#050510`)** - Maximum contrast, reduces eye strain
+1. **Always use explicit dark variants:**
+   ```html
+   <div class="bg-white dark:bg-[#151A23] text-black dark:text-white">
+   ```
 
-2. **Glass card surfaces** - Use `rgba(15, 23, 42, 0.6)` with backdrop blur
+2. **Avoid pure black (#000)** - Use `#0E1117` instead
 
-3. **Subtle white borders** - 8% white (`rgba(255,255,255,0.08)`) for glass edges
+3. **Increase contrast for text** - Use `#E6EAF0` for primary text
 
-4. **Glow effects on hover** - Sky blue glow for interactive elements
-
-5. **High contrast text** - Use `#e2e8f0` (Slate 200) for primary text
+4. **Blue gradient adapts** - Brighter blue (`#0BB3FF`) becomes primary
 
 ---
 

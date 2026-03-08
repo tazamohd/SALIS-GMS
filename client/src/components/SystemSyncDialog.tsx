@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,6 @@ interface ModuleStatus {
 }
 
 export function SystemSyncDialog({ open, onOpenChange }: SystemSyncDialogProps) {
-  const { t } = useTranslation();
   const { data: integrationStatus } = useQuery({
     queryKey: ['/api/integrated/status'],
   });
@@ -57,7 +55,7 @@ export function SystemSyncDialog({ open, onOpenChange }: SystemSyncDialogProps) 
       case "error":
         return <Badge className="bg-red-100 text-red-700 border-red-200">Error</Badge>;
       default:
-        return <Badge variant="outline">{t('common.unknown', 'Unknown')}</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 

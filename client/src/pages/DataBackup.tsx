@@ -63,14 +63,14 @@ type BackupStats = {
   lastBackupDate: string | null;
 };
 
-const getDataTypeOptions = (t: any) => [
-  { id: 'all', label: t('backup.allData', 'All Data'), description: t('backup.allDataDesc', 'Complete system backup') },
-  { id: 'customers', label: t('backup.customers', 'Customers'), description: t('backup.customersDesc', 'Customer profiles and history') },
-  { id: 'vehicles', label: t('backup.vehicles', 'Vehicles'), description: t('backup.vehiclesDesc', 'Vehicle records and service history') },
-  { id: 'job_cards', label: t('backup.jobCards', 'Job Cards'), description: t('backup.jobCardsDesc', 'Work orders and repairs') },
-  { id: 'inventory', label: t('backup.inventory', 'Inventory'), description: t('backup.inventoryDesc', 'Parts and stock levels') },
-  { id: 'financial', label: t('backup.financial', 'Financial'), description: t('backup.financialDesc', 'Invoices and payments') },
-  { id: 'settings', label: t('backup.settings', 'Settings'), description: t('backup.settingsDesc', 'System configuration') },
+const dataTypeOptions = [
+  { id: 'all', label: 'All Data', description: 'Complete system backup' },
+  { id: 'customers', label: 'Customers', description: 'Customer profiles and history' },
+  { id: 'vehicles', label: 'Vehicles', description: 'Vehicle records and service history' },
+  { id: 'job_cards', label: 'Job Cards', description: 'Work orders and repairs' },
+  { id: 'inventory', label: 'Inventory', description: 'Parts and stock levels' },
+  { id: 'financial', label: 'Financial', description: 'Invoices and payments' },
+  { id: 'settings', label: 'Settings', description: 'System configuration' },
 ];
 
 export default function DataBackup() {
@@ -236,14 +236,14 @@ export default function DataBackup() {
       queryClient.invalidateQueries({ queryKey: ['/api/backups'] });
       queryClient.invalidateQueries({ queryKey: ['/api/backups/stats'] });
       toast({
-        title: t('dataBackup.backupDeleted', 'Backup Deleted'),
-        description: t('dataBackup.backupRemoved', 'Backup has been removed.'),
+        title: "Backup Deleted",
+        description: "The backup has been removed.",
       });
     },
     onError: () => {
       toast({
-        title: t('dataBackup.deleteFailed', 'Delete Failed'),
-        description: t('dataBackup.deleteFailedDesc', 'Failed to delete backup. Please try again.'),
+        title: "Delete Failed",
+        description: "Failed to delete backup. Please try again.",
         variant: "destructive",
       });
     },
@@ -270,8 +270,8 @@ export default function DataBackup() {
   };
 
   const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return t('backup.notAvailable', 'N/A');
-    const sizes = [t('backup.bytes', 'Bytes'), t('backup.kb', 'KB'), t('backup.mb', 'MB'), t('backup.gb', 'GB')];
+    if (!bytes) return 'N/A';
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
   };
@@ -279,12 +279,12 @@ export default function DataBackup() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><CheckCircle className="w-3 h-3 mr-1" />{t('dataBackup.completed', 'Completed')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
       case 'pending':
       case 'in_progress':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><Clock className="w-3 h-3 mr-1" />{t('dataBackup.inProgress', 'In Progress')}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><Clock className="w-3 h-3 mr-1" />In Progress</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><XCircle className="w-3 h-3 mr-1" />{t('dataBackup.failed', 'Failed')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><XCircle className="w-3 h-3 mr-1" />Failed</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -314,7 +314,7 @@ export default function DataBackup() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#64748B]">{t('dataBackup.completed', 'Completed')}</p>
+                  <p className="text-sm text-[#64748B]">Completed</p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">{stats?.completedBackups || 0}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500" />
@@ -340,7 +340,7 @@ export default function DataBackup() {
                 <div>
                   <p className="text-sm text-[#64748B]">{t('backup.lastBackup', 'Last Backup')}</p>
                   <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
-                    {stats?.lastBackupDate ? format(new Date(stats.lastBackupDate), 'MMM dd, yyyy') : t('backup.never', 'Never')}
+                    {stats?.lastBackupDate ? format(new Date(stats.lastBackupDate), 'MMM dd, yyyy') : 'Never'}
                   </p>
                 </div>
                 <Calendar className="h-8 w-8 text-[#F97316]" />
@@ -357,7 +357,7 @@ export default function DataBackup() {
                 {t('backup.createBackup', 'Create Backup')}
               </CardTitle>
               <CardDescription className="text-[#64748B]">
-                {t('backup.configureCreateBackup', 'Configure and create a new backup')}
+                Configure and create a new backup
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -381,7 +381,7 @@ export default function DataBackup() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                    <SelectItem value="manual">{t('backup.manualOnly', 'Manual Only')}</SelectItem>
+                    <SelectItem value="manual">Manual Only</SelectItem>
                     <SelectItem value="daily">{t('backup.daily', 'Daily')}</SelectItem>
                     <SelectItem value="weekly">{t('backup.weekly', 'Weekly')}</SelectItem>
                     <SelectItem value="monthly">{t('backup.monthly', 'Monthly')}</SelectItem>
@@ -392,7 +392,7 @@ export default function DataBackup() {
               <div>
                 <Label className="text-[#0B1F3B] dark:text-white mb-2 block">{t('backup.selectData', 'Select Data')}</Label>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {getDataTypeOptions(t).map((option) => (
+                  {dataTypeOptions.map((option) => (
                     <div 
                       key={option.id} 
                       className="flex items-start space-x-2 p-2 rounded-md hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
@@ -437,8 +437,8 @@ export default function DataBackup() {
               {isCreatingBackup && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm text-[#64748B]">
-                    <span>{t('backup.creatingBackup', 'Creating backup...')}</span>
-                    <span>{t('backup.pleaseWait', 'Please wait')}</span>
+                    <span>Creating backup...</span>
+                    <span>Please wait</span>
                   </div>
                   <Progress value={66} className="h-2" />
                 </div>
@@ -454,7 +454,7 @@ export default function DataBackup() {
                   {t('backup.backupHistory', 'Backup History')}
                 </CardTitle>
                 <CardDescription className="text-[#64748B]">
-                  {t('backup.viewManageArchives', 'View and manage your backup archives')}
+                  View and manage your backup archives
                 </CardDescription>
               </div>
               <Button 
@@ -465,7 +465,7 @@ export default function DataBackup() {
                 data-testid="button-refresh-backups"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                {t('common.refresh', 'Refresh')}
+                Refresh
               </Button>
             </CardHeader>
             <CardContent>
@@ -477,18 +477,18 @@ export default function DataBackup() {
                 <div className="flex flex-col items-center justify-center h-48 text-[#64748B]">
                   <Database className="h-12 w-12 mb-4 opacity-50" />
                   <p>{t('backup.noBackups', 'No backups found')}</p>
-                  <p className="text-sm">{t('backup.createFirstBackup', 'Create your first backup to protect your data')}</p>
+                  <p className="text-sm">Create your first backup to protect your data</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-                        <TableHead className="text-[#64748B]">{t('backup.type', 'Type')}</TableHead>
-                        <TableHead className="text-[#64748B]">{t('backup.status', 'Status')}</TableHead>
-                        <TableHead className="text-[#64748B]">{t('backup.size', 'Size')}</TableHead>
-                        <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
-                        <TableHead className="text-[#64748B] text-right">{t('common.actions', 'Actions')}</TableHead>
+                        <TableHead className="text-[#64748B]">Type</TableHead>
+                        <TableHead className="text-[#64748B]">Status</TableHead>
+                        <TableHead className="text-[#64748B]">Size</TableHead>
+                        <TableHead className="text-[#64748B]">Date</TableHead>
+                        <TableHead className="text-[#64748B] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -498,12 +498,12 @@ export default function DataBackup() {
                             {backup.jobType === 'restore' ? (
                               <span className="flex items-center gap-2">
                                 <Upload className="h-4 w-4 text-purple-500" />
-                                {t('backup.restore', 'Restore')}
+                                Restore
                               </span>
                             ) : (
                               <span className="flex items-center gap-2">
                                 <Download className="h-4 w-4 text-[#0A5ED7]" />
-                                {backup.jobType === 'full' ? t('backup.full', 'Full') : t('backup.incremental', 'Incremental')}
+                                {backup.jobType === 'full' ? 'Full' : 'Incremental'}
                               </span>
                             )}
                           </TableCell>
@@ -528,23 +528,24 @@ export default function DataBackup() {
                                       data-testid={`button-restore-${backup.id}`}
                                     >
                                       <Upload className="h-4 w-4 mr-1" />
-                                      {t('backup.restore', 'Restore')}
+                                      Restore
                                     </Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">{t('backup.restoreBackupQuestion', 'Restore Backup?')}</AlertDialogTitle>
+                                      <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">Restore Backup?</AlertDialogTitle>
                                       <AlertDialogDescription className="text-[#64748B]">
-                                        {t('backup.restoreBackupDescription', 'This will restore your data to the state when this backup was created. Current data may be overwritten.')}
+                                        This will restore your data to the state when this backup was created. 
+                                        Current data may be overwritten.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                                      <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">Cancel</AlertDialogCancel>
                                       <AlertDialogAction 
                                         onClick={() => restoreBackupMutation.mutate(backup.id)}
                                         className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                                       >
-                                        {t('backup.restore', 'Restore')}
+                                        Restore
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
                                   </AlertDialogContent>
@@ -563,18 +564,18 @@ export default function DataBackup() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">{t('backup.deleteBackupQuestion', 'Delete Backup?')}</AlertDialogTitle>
+                                    <AlertDialogTitle className="text-[#0B1F3B] dark:text-white">Delete Backup?</AlertDialogTitle>
                                     <AlertDialogDescription className="text-[#64748B]">
-                                      {t('backup.deleteBackupDescription', 'This action cannot be undone. This backup will be permanently deleted.')}
+                                      This action cannot be undone. This backup will be permanently deleted.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                                    <AlertDialogCancel className="border-[#E2E8F0] dark:border-[#232A36]">Cancel</AlertDialogCancel>
                                     <AlertDialogAction 
                                       onClick={() => deleteBackupMutation.mutate(backup.id)}
                                       className="bg-red-600 hover:bg-red-700 text-white"
                                     >
-                                      {t('common.delete', 'Delete')}
+                                      Delete
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>

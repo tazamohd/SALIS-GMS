@@ -624,7 +624,7 @@ export default function RetainedEarnings() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('retainedEarnings.title', 'Retained Earnings')}
-        description={t('retainedEarnings.description', 'Manage reserves, profit allocations, and distributions')}
+        description={t('retainedEarnings.description', 'الأرباح المحتجزة - Manage reserves, profit allocations, and distributions')}
         defaultTab="overview"
         tabs={tabs}
       />

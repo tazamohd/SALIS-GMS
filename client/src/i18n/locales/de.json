@@ -164,33 +164,5 @@
       "calendar": "Kalender",
       "tasks": "Aufgabenliste"
     }
-  },
-  "social": {
-    "totalPosts": "Gesamtbeiträge",
-    "totalReviews": "Gesamtbewertungen",
-    "avgRating": "Durchschnittliche Bewertung",
-    "responseRate": "Antwortquote",
-    "followers": "Follower",
-    "socialMediaPosts": "Beiträge in sozialen Medien",
-    "customerReviews": "Kundenbewertungen",
-    "platform": "Plattform",
-    "content": "Inhalt",
-    "writeYourPost": "Schreibe deinen Beitrag...",
-    "scheduleOptional": "Planen (Optional)",
-    "createSocialMediaPost": "Beitrag in sozialen Medien erstellen",
-    "reach": "Reichweite",
-    "scheduledFor": "Geplant für",
-    "posts": "Beiträge",
-    "reviews": "Bewertungen",
-    "responded": "Beantwortet",
-    "respond": "Antworten",
-    "createPost": "Beitrag erstellen",
-    "pageDescription": "Verwalte Beiträge in sozialen Medien und antworte auf Kundenbewertungen",
-    "postCreated": "Beitrag erstellt",
-    "postScheduled": "Dein Beitrag wurde geplant.",
-    "facebook": "Facebook",
-    "instagram": "Instagram",
-    "googleBusiness": "Google Business",
-    "yelp": "Yelp"
   }
 }

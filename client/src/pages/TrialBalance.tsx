@@ -94,15 +94,15 @@ export default function TrialBalance() {
         <div className="flex gap-4">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[180px]" data-testid="select-period">
-              <SelectValue placeholder={t('common.selectPeriod', 'Select Period')} />
+              <SelectValue placeholder="Select Period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2024-01">{t('accounting.january2024', 'January 2024')}</SelectItem>
-              <SelectItem value="2024-02">{t('accounting.february2024', 'February 2024')}</SelectItem>
-              <SelectItem value="2024-03">{t('accounting.march2024', 'March 2024')}</SelectItem>
-              <SelectItem value="2023-12">{t('accounting.december2023', 'December 2023')}</SelectItem>
-              <SelectItem value="2023-q4">{t('accounting.q42023', 'Q4 2023')}</SelectItem>
-              <SelectItem value="2023">{t('accounting.year2023', 'Year 2023')}</SelectItem>
+              <SelectItem value="2024-01">January 2024</SelectItem>
+              <SelectItem value="2024-02">February 2024</SelectItem>
+              <SelectItem value="2024-03">March 2024</SelectItem>
+              <SelectItem value="2023-12">December 2023</SelectItem>
+              <SelectItem value="2023-q4">Q4 2023</SelectItem>
+              <SelectItem value="2023">Year 2023</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -110,7 +110,7 @@ export default function TrialBalance() {
             onClick={() => setShowAdjusted(!showAdjusted)}
             data-testid="button-toggle-adjusted"
           >
-            {showAdjusted ? t('accounting.adjusted', 'Adjusted') : t('accounting.unadjusted', 'Unadjusted')}
+            {showAdjusted ? "Adjusted" : "Unadjusted"}
           </Button>
         </div>
         <div className="flex gap-2">
@@ -188,7 +188,7 @@ export default function TrialBalance() {
             <div>
               <CardTitle>{t('accounting.trialBalanceReport', 'Trial Balance Report')}</CardTitle>
               <CardDescription>
-                {t('accounting.asOf', 'As of')} {period === "2024-01" ? t('accounting.january312024', 'January 31, 2024') : period}
+                {t('accounting.asOf', 'As of')} {period === "2024-01" ? "January 31, 2024" : period}
               </CardDescription>
             </div>
             <Badge variant={isBalanced ? "default" : "destructive"} className="text-sm">
@@ -214,7 +214,7 @@ export default function TrialBalance() {
                   <TableCell className="font-medium">{account.name}</TableCell>
                   <TableCell>
                     <Badge className={getAccountTypeBadge(account.type)}>
-                      {t(`accounting.${account.type.toLowerCase()}Type`, account.type)}
+                      {account.type}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-mono">
@@ -253,7 +253,7 @@ export default function TrialBalance() {
             <Card key={type} data-testid={`card-summary-${type.toLowerCase()}`} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Badge className={getAccountTypeBadge(type)}>{t(`accounting.${type.toLowerCase()}Type`, type)}</Badge>
+                  <Badge className={getAccountTypeBadge(type)}>{type}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -409,12 +409,12 @@ export default function TrialBalance() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { period: t('accounting.january2024', 'January 2024'), date: "2024-01-31", statusKey: 'balanced', debit: 1159500, credit: 1159500 },
-          { period: t('accounting.december2023', 'December 2023'), date: "2023-12-31", statusKey: 'balanced', debit: 1145000, credit: 1145000 },
-          { period: t('accounting.november2023', 'November 2023'), date: "2023-11-30", statusKey: 'balanced', debit: 1098500, credit: 1098500 },
-          { period: t('accounting.october2023', 'October 2023'), date: "2023-10-31", statusKey: 'balanced', debit: 1056000, credit: 1056000 },
-          { period: t('accounting.september2023', 'September 2023'), date: "2023-09-30", statusKey: 'balanced', debit: 1023500, credit: 1023500 },
-          { period: t('accounting.august2023', 'August 2023'), date: "2023-08-31", statusKey: 'balanced', debit: 989000, credit: 989000 },
+          { period: "January 2024", date: "2024-01-31", status: "Balanced", debit: 1159500, credit: 1159500 },
+          { period: "December 2023", date: "2023-12-31", status: "Balanced", debit: 1145000, credit: 1145000 },
+          { period: "November 2023", date: "2023-11-30", status: "Balanced", debit: 1098500, credit: 1098500 },
+          { period: "October 2023", date: "2023-10-31", status: "Balanced", debit: 1056000, credit: 1056000 },
+          { period: "September 2023", date: "2023-09-30", status: "Balanced", debit: 1023500, credit: 1023500 },
+          { period: "August 2023", date: "2023-08-31", status: "Balanced", debit: 989000, credit: 989000 },
         ].map((item, index) => (
           <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`card-history-${index}`}>
             <CardHeader className="pb-2">
@@ -422,7 +422,7 @@ export default function TrialBalance() {
                 <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{item.period}</CardTitle>
                 <Badge variant="outline" className="text-green-600 border-[#E2E8F0] dark:border-[#232A36]">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  {item.statusKey === 'balanced' ? t('accounting.balanced', 'Balanced') : item.statusKey}
+                  {item.status}
                 </Badge>
               </div>
               <CardDescription className="text-[#64748B]">{item.date}</CardDescription>
@@ -457,7 +457,7 @@ export default function TrialBalance() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.trialBalance.title', 'Trial Balance')}
+      title={t('accounting.trialBalance.title', 'Trial Balance - ميزان المراجعة')}
       description={t('accounting.trialBalance.description', 'Verify debits equal credits across all accounts')}
       icon={Scale}
       tabs={tabs}

@@ -56,29 +56,22 @@ export async function setupAuth(app: Express) {
       },
       async (email, password, done) => {
         try {
-          console.log('Login attempt for email:', email);
           const user = await storage.getUserByEmail(email);
           if (!user) {
-            console.log('Login failed: User not found for email:', email);
             return done(null, false, { message: "Invalid email or password" });
           }
 
-          console.log('User found:', user.email, 'checking password...');
           const isValid = await comparePassword(password, user.password);
           if (!isValid) {
-            console.log('Login failed: Invalid password for email:', email);
             return done(null, false, { message: "Invalid email or password" });
           }
 
           if (!user.isActive) {
-            console.log('Login failed: Account inactive for email:', email);
             return done(null, false, { message: "Account is inactive" });
           }
 
-          console.log('Login successful for email:', email);
           return done(null, user);
         } catch (error) {
-          console.log('Login error:', error);
           return done(error);
         }
       }

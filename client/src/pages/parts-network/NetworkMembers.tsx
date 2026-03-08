@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import {
   Building2,
   Search,
@@ -111,7 +110,6 @@ const sampleMembers: NetworkMember[] = [
 ];
 
 export default function NetworkMembers() {
-  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
@@ -170,8 +168,8 @@ export default function NetworkMembers() {
 
   return (
     <PartsNetworkLayout 
-      title={t("partsNetwork.networkMembers", "Network Members")} 
-      description={t("partsNetwork.networkMembersDescription", "Suppliers, Dealers & Partners")}
+      title="Network Members" 
+      description="أعضاء شبكة قطع الغيار - Suppliers, Dealers & Partners"
     >
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

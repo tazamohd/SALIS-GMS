@@ -5,11 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Download, CreditCard, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next";
 
 export default function ClientInvoices() {
   const { user } = useAuth();
-  const { t } = useTranslation();
 
   const { data: vehicles } = useQuery({
     queryKey: ["/api/vehicles", user?.id],
@@ -194,7 +192,7 @@ export default function ClientInvoices() {
           ) : myInvoices.length === 0 ? (
             <div className="text-center py-12 text-[#64748B]">
               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>{t('clientPortal.noInvoicesYet', 'No invoices yet')}</p>
+              <p>No invoices yet</p>
             </div>
           ) : (
             <div className="space-y-3">

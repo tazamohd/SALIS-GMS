@@ -241,7 +241,7 @@ export default function WorkshopCalendar() {
                               <Clock className="w-3 h-3" />
                               <span>{format(event.startTime, "HH:mm")}</span>
                               <Badge variant="outline" className={`text-[10px] px-1 py-0 ${getStatusColor(event.status)} text-white border-0`}>
-                                {t(`statusLabels.${event.status.replace('-', '_')}`, event.status)}
+                                {event.status}
                               </Badge>
                             </div>
                           </div>
@@ -349,7 +349,7 @@ export default function WorkshopCalendar() {
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-[#64748B]">{t('common.status', 'Status')}:</Label>
-                <Badge className={getStatusBadgeColor(selectedEvent.status)} data-testid="badge-event-status">{t(`statusLabels.${selectedEvent.status.replace('-', '_')}`, selectedEvent.status)}</Badge>
+                <Badge className={getStatusBadgeColor(selectedEvent.status)} data-testid="badge-event-status">{selectedEvent.status}</Badge>
               </div>
             </div>
           )}

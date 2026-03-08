@@ -60,34 +60,34 @@ interface VehicleChecklistData {
 }
 
 const defaultChecklistItems: ChecklistItem[] = [
-  { id: "1", category: "Exterior", item: "bodyCondition", status: "pending", notes: "" },
-  { id: "2", category: "Exterior", item: "windshieldWindows", status: "pending", notes: "" },
-  { id: "3", category: "Exterior", item: "headlightsTaillights", status: "pending", notes: "" },
-  { id: "4", category: "Exterior", item: "turnSignalsHazards", status: "pending", notes: "" },
-  { id: "5", category: "Exterior", item: "mirrorsCondition", status: "pending", notes: "" },
-  { id: "6", category: "Exterior", item: "tireConditionPressure", status: "pending", notes: "" },
-  { id: "7", category: "Exterior", item: "wheelAlignmentVisual", status: "pending", notes: "" },
-  { id: "8", category: "Interior", item: "dashboardWarningLights", status: "pending", notes: "" },
-  { id: "9", category: "Interior", item: "seatBeltsFunctionality", status: "pending", notes: "" },
-  { id: "10", category: "Interior", item: "airConditioningSystem", status: "pending", notes: "" },
-  { id: "11", category: "Interior", item: "heatingSystem", status: "pending", notes: "" },
-  { id: "12", category: "Interior", item: "hornFunctionality", status: "pending", notes: "" },
-  { id: "13", category: "Interior", item: "wipersWashers", status: "pending", notes: "" },
-  { id: "14", category: "Interior", item: "interiorLights", status: "pending", notes: "" },
-  { id: "15", category: "Under Hood", item: "engineOilLevel", status: "pending", notes: "" },
-  { id: "16", category: "Under Hood", item: "coolantLevel", status: "pending", notes: "" },
-  { id: "17", category: "Under Hood", item: "brakeFluidLevel", status: "pending", notes: "" },
-  { id: "18", category: "Under Hood", item: "powerSteeringFluid", status: "pending", notes: "" },
-  { id: "19", category: "Under Hood", item: "batteryCondition", status: "pending", notes: "" },
-  { id: "20", category: "Under Hood", item: "beltsHoses", status: "pending", notes: "" },
-  { id: "21", category: "Under Vehicle", item: "oilLeaks", status: "pending", notes: "" },
-  { id: "22", category: "Under Vehicle", item: "exhaustSystem", status: "pending", notes: "" },
-  { id: "23", category: "Under Vehicle", item: "suspensionComponents", status: "pending", notes: "" },
-  { id: "24", category: "Under Vehicle", item: "brakePadsRotors", status: "pending", notes: "" },
-  { id: "25", category: "Safety", item: "spareTireJack", status: "pending", notes: "" },
-  { id: "26", category: "Safety", item: "firstAidKit", status: "pending", notes: "" },
-  { id: "27", category: "Safety", item: "fireExtinguisher", status: "pending", notes: "" },
-  { id: "28", category: "Safety", item: "warningTriangle", status: "pending", notes: "" },
+  { id: "1", category: "Exterior", item: "Body condition (dents, scratches)", status: "pending", notes: "" },
+  { id: "2", category: "Exterior", item: "Windshield and windows", status: "pending", notes: "" },
+  { id: "3", category: "Exterior", item: "Headlights and taillights", status: "pending", notes: "" },
+  { id: "4", category: "Exterior", item: "Turn signals and hazards", status: "pending", notes: "" },
+  { id: "5", category: "Exterior", item: "Mirrors condition", status: "pending", notes: "" },
+  { id: "6", category: "Exterior", item: "Tire condition and pressure", status: "pending", notes: "" },
+  { id: "7", category: "Exterior", item: "Wheel alignment visual", status: "pending", notes: "" },
+  { id: "8", category: "Interior", item: "Dashboard warning lights", status: "pending", notes: "" },
+  { id: "9", category: "Interior", item: "Seat belts functionality", status: "pending", notes: "" },
+  { id: "10", category: "Interior", item: "Air conditioning system", status: "pending", notes: "" },
+  { id: "11", category: "Interior", item: "Heating system", status: "pending", notes: "" },
+  { id: "12", category: "Interior", item: "Horn functionality", status: "pending", notes: "" },
+  { id: "13", category: "Interior", item: "Wipers and washers", status: "pending", notes: "" },
+  { id: "14", category: "Interior", item: "Interior lights", status: "pending", notes: "" },
+  { id: "15", category: "Under Hood", item: "Engine oil level", status: "pending", notes: "" },
+  { id: "16", category: "Under Hood", item: "Coolant level", status: "pending", notes: "" },
+  { id: "17", category: "Under Hood", item: "Brake fluid level", status: "pending", notes: "" },
+  { id: "18", category: "Under Hood", item: "Power steering fluid", status: "pending", notes: "" },
+  { id: "19", category: "Under Hood", item: "Battery condition", status: "pending", notes: "" },
+  { id: "20", category: "Under Hood", item: "Belts and hoses", status: "pending", notes: "" },
+  { id: "21", category: "Under Vehicle", item: "Oil leaks", status: "pending", notes: "" },
+  { id: "22", category: "Under Vehicle", item: "Exhaust system", status: "pending", notes: "" },
+  { id: "23", category: "Under Vehicle", item: "Suspension components", status: "pending", notes: "" },
+  { id: "24", category: "Under Vehicle", item: "Brake pads and rotors", status: "pending", notes: "" },
+  { id: "25", category: "Safety", item: "Spare tire and jack", status: "pending", notes: "" },
+  { id: "26", category: "Safety", item: "First aid kit", status: "pending", notes: "" },
+  { id: "27", category: "Safety", item: "Fire extinguisher", status: "pending", notes: "" },
+  { id: "28", category: "Safety", item: "Warning triangle", status: "pending", notes: "" },
 ];
 
 const mockChecklists: VehicleChecklistData[] = [
@@ -128,7 +128,7 @@ const mockChecklists: VehicleChecklistData[] = [
     items: defaultChecklistItems.map((item, idx) => ({
       ...item,
       status: idx === 5 ? "fail" : "pass",
-      notes: idx === 5 ? "frontLeftTireNeedsReplacement" : "",
+      notes: idx === 5 ? "Front left tire needs replacement" : "",
     })),
   },
 ];
@@ -413,7 +413,7 @@ export default function VehicleChecklist() {
                 {categories.map((category) => (
                   <div key={category} className="mb-6">
                     <h3 className="font-poppins font-semibold text-sm text-[#64748B] uppercase tracking-wider mb-3 pb-2 border-b border-[#E2E8F0] dark:border-[#232A36]">
-                      {t(`vehicles.checklistCategories.${category}`, category)}
+                      {category}
                     </h3>
                     <div className="space-y-3">
                       {selectedChecklist.items
@@ -426,11 +426,11 @@ export default function VehicleChecklist() {
                             <div className="mt-0.5">{getItemStatusIcon(item.status)}</div>
                             <div className="flex-1">
                               <p className="font-poppins text-sm text-[#0B1F3B] dark:text-white">
-                                {t(`vehicles.checklistItems.${item.item}`, item.item)}
+                                {item.item}
                               </p>
                               {item.notes && (
                                 <p className="font-poppins text-xs text-[#F97316] mt-1">
-                                  {t('common.notes', 'Note')}: {t(`vehicles.checklistItems.${item.notes}`, item.notes)}
+                                  {t('common.notes', 'Note')}: {item.notes}
                                 </p>
                               )}
                             </div>

@@ -1,9 +1,5 @@
-/* ============================================
-   Kingdom Future Design System
-   "Heritage Meets Horizon" - Saudi Vision 2030
-   ============================================ */
-/* Typography - Google Fonts with Arabic Support */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cairo:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
+/* SALIS AUTO Typography - Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,112 +12,50 @@
 }
 
 :root {
-  /* ============================================
-     Kingdom Future Design Tokens
-     "Heritage Meets Horizon" - Saudi Vision 2030
-     ============================================ */
+  /* SALIS AUTO Brand Design System */
   
-  /* Primary - Emerald (Growth, Prosperity, National Identity) */
-  --kf-emerald-neon: #00E676;
-  --kf-emerald-print: #00AA55;
+  /* Primary Brand Colors - Blue Gradient */
+  --salis-blue-start: #0A5ED7;
+  --salis-blue-end: #0BB3FF;
+  --salis-blue-gradient: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
   
-  /* Secondary - Royal Gold (Wealth, Prestige, Heritage) */
-  --kf-gold-bright: #F2C94C;
-  --kf-gold-rich: #D4AF37;
+  /* Deep Navy */
+  --salis-navy: #0B1F3B;
   
-  /* Core Backgrounds */
-  --bg-dark: #040B06;              /* Deep Black/Green Void */
-  --bg-deep: #0E1411;              /* Secondary background */
-  --bg-card: #141A17;              /* Card surfaces */
-  --bg-surface-1: #141A17;         /* Surface Level 1 */
-  --bg-surface-2: #1C2420;         /* Surface Level 2 */
-  --bg-surface-3: #24302A;         /* Surface Level 3 */
-  
-  /* Brand Accents - Kingdom Future */
-  --accent-primary: #00E676;        /* Neon Emerald - Primary actions */
-  --accent-secondary: #F2C94C;      /* Bright Gold - Performance badges */
-  --accent-primary-hover: #00AA55;  /* Print Emerald */
-  --accent-secondary-hover: #D4AF37; /* Rich Gold */
-  
-  /* Semantic Colors */
-  --accent-success: #00E676;        /* Success - Neon Emerald */
-  --accent-warning: #F59E0B;        /* Warning - Amber */
-  --accent-error: #EF4444;          /* Error - Soft Red */
-  --accent-info: #06B6D4;           /* Info - Cyan/Teal */
-  
-  /* Brand Gradients */
-  --gradient-main: linear-gradient(135deg, #00E676 0%, #00AA55 100%);
-  --gradient-gold: linear-gradient(135deg, #F2C94C 0%, #D4AF37 100%);
-  --gradient-chart: linear-gradient(180deg, rgba(0,230,118,0.3) 0%, rgba(4,11,6,0) 100%);
-  
-  /* Glass Variables - Glassmorphism */
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --glass-surface: rgba(255, 255, 255, 0.05);
-  --glass-highlight: rgba(255, 255, 255, 0.08);
-  --glass-heavy: rgba(20, 26, 23, 0.95);
-  --kf-glass-bg: rgba(255, 255, 255, 0.05);
-  --kf-glass-border: rgba(255, 255, 255, 0.10);
-  --kf-glass-blur: 12px;
-  
-  /* Glow Effects - Kingdom Future */
-  --glow-primary: 0 0 15px rgba(0, 230, 118, 0.5);
-  --glow-secondary: 0 0 15px rgba(242, 201, 76, 0.5);
-  --glow-success: 0 0 20px rgba(0, 230, 118, 0.25);
-  --glow-error: 0 0 20px rgba(239, 68, 68, 0.25);
-  --glow-info: 0 0 20px rgba(6, 182, 212, 0.25);
-  --kf-glow-emerald: 0 0 15px rgba(0, 230, 118, 0.5);
-  --kf-glow-gold: 0 0 15px rgba(242, 201, 76, 0.5);
-  
-  /* Text Colors */
-  --text-primary: #FAFAFA;          /* Off-White */
-  --text-secondary: #9CA3AF;        /* Muted gray */
-  --text-muted: #6B7280;            /* Muted - Tertiary info */
-  --text-disabled: #4B5563;         /* Disabled state */
-  
-  /* Chart & Data Visualization */
-  --chart-primary: #00E676;         /* Primary line - Neon Emerald */
-  --chart-secondary: #F2C94C;       /* Secondary line - Bright Gold */
-  --chart-grid: rgba(255, 255, 255, 0.06);
-  
-  /* Legacy SALIS compatibility */
-  --salis-green: #00E676;
-  --salis-gold: #F2C94C;
-  --salis-navy: #040B06;
+  /* Accent Orange - for decisions/warnings/CTAs */
+  --salis-orange: #F97316;
   
   /* Dark Mode Neutrals */
-  --salis-bg-dark: #040B06;
-  --salis-surface-dark: #141A17;
-  --salis-border-dark: rgba(255, 255, 255, 0.10);
-  --salis-text-primary-dark: #FAFAFA;
-  --salis-text-muted-dark: #9CA3AF;
+  --salis-bg-dark: #0E1117;
+  --salis-surface-dark: #151A23;
+  --salis-border-dark: #232A36;
+  --salis-text-primary-dark: #E6EAF0;
+  --salis-text-muted-dark: #9BA4B0;
   
-  /* Light Mode Neutrals */
-  --salis-bg-light: #F4FBF7;
+  /* Light Mode Neutrals - Logo-Only Palette */
+  --salis-bg-light: #E6E9ED;
   --salis-surface-light: #FFFFFF;
-  --salis-border-light: rgba(0, 0, 0, 0.05);
-  --salis-text-primary-light: #071F12;
-  --salis-text-muted-light: #475569;
+  --salis-border-light: #C9D1DA;
+  --salis-text-primary-light: #2A2F3A;
+  --salis-text-muted-light: #6B7280;
   
-  /* Legacy compatibility */
-  --salis-black: #040B06;
+  /* Legacy compatibility - Approved palette only */
+  --salis-black: #0B1F3B;
   --salis-white: #FFFFFF;
-  --salis-gray: #9CA3AF;
-  --salis-gray-light: #D1D5DB;
-  --salis-gray-dark: #1C2420;
-  --salis-50-black: #6B7280;
+  --salis-gray: #9BA4B0;
+  --salis-gray-light: #C9D1DA;
+  --salis-gray-dark: #2A2F3A;
+  --salis-50-black: #9BA4B0;
 
-  /* Typography Variables - Inter Primary */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", monospace;
-  
-  --14-regular-font-family: "Inter", Helvetica;
+  /* SALIS AUTO Typography Variables - Inter Primary */
+  --14-regular-font-family: "Inter", "SF Pro", Helvetica;
   --14-regular-font-size: 14px;
   --14-regular-font-style: normal;
   --14-regular-font-weight: 400;
   --14-regular-letter-spacing: 0px;
   --14-regular-line-height: 140%;
   
-  --body-base-font-family: "Inter", Helvetica;
+  --body-base-font-family: "Inter", "SF Pro", Helvetica;
   --body-base-font-size: 16px;
   --body-base-font-style: normal;
   --body-base-font-weight: 400;
@@ -180,7 +114,7 @@
   --display-large-semibold-font-family: "Inter", Helvetica;
   --display-large-semibold-font-size: 32px;
   --display-large-semibold-font-style: normal;
-  --display-large-semibold-font-weight: 800;
+  --display-large-semibold-font-weight: 700;
   --display-large-semibold-letter-spacing: -0.03em;
   --display-large-semibold-line-height: 1.2;
   
@@ -194,7 +128,7 @@
   --display-small-semibold-font-family: "Inter", Helvetica;
   --display-small-semibold-font-size: 20px;
   --display-small-semibold-font-style: normal;
-  --display-small-semibold-font-weight: 600;
+  --display-small-semibold-font-weight: 500;
   --display-small-semibold-letter-spacing: -0.02em;
   --display-small-semibold-line-height: 1.4;
   
@@ -249,9 +183,9 @@
   --m3-title-small-letter-spacing: 0.01em;
   --m3-title-small-line-height: 20px;
   
-  --shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
-  --shadow-black-lg: 0px 4px 6px -2px rgba(0, 0, 0, 0.1), 0px 12px 16px -4px rgba(0, 0, 0, 0.15);
-  --shadow-black-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.15);
+  --shadow: 0px 1px 3px 1px rgba(1, 1, 1, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+  --shadow-black-lg: 0px 4px 6px -2px rgba(1, 1, 1, 0.05), 0px 12px 16px -4px rgba(1, 1, 1, 0.1);
+  --shadow-black-sm: 0px 1px 2px 0px rgba(1, 1, 1, 0.06), 0px 1px 3px 0px rgba(1, 1, 1, 0.1);
   
   --single-line-body-base-font-family: "Inter", Helvetica;
   --single-line-body-base-font-size: 16px;
@@ -304,171 +238,93 @@
 }
 
 @layer base {
-  /* ============================================
-     KINGDOM FUTURE: "The Night Sky" (Dark Mode)
-     For: Dashboards, Monitoring, Executive Views
-     ============================================ */
-  :root,
-  [data-theme="kingdom-future"] {
-    /* Background - Deep Black/Green Void */
-    --background: 150 30% 2%;           /* #040B06 */
-    --foreground: 0 0% 98%;             /* #FAFAFA */
-    
-    /* Surface - Glassmorphism */
-    --card: 150 14% 9%;                 /* Dark glass surface */
-    --card-foreground: 0 0% 98%;
-    
-    /* Muted - Recessed areas */
-    --muted: 150 20% 6%;
-    --muted-foreground: 220 9% 65%;     /* #9CA3AF */
-    
-    /* Popover */
-    --popover: 150 25% 5%;
-    --popover-foreground: 0 0% 98%;
-    
-    /* Border - Translucent white */
-    --border: 0 0% 100% / 0.10;
-    --input: 150 20% 8%;
-    
-    /* Primary - Neon Emerald #00E676 */
-    --primary: 145 100% 45%;
-    --primary-foreground: 150 30% 2%;
-    
-    /* Secondary - Bright Gold #F2C94C */
-    --secondary: 44 87% 63%;
-    --secondary-foreground: 150 30% 2%;
-    
-    /* Accent */
-    --accent: 44 87% 63%;
-    --accent-foreground: 150 30% 2%;
-    
-    /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    
-    /* Ring */
-    --ring: 145 100% 45%;
-    --radius: 0.5rem;
-    
-    /* Semantic Colors */
-    --success: 145 100% 45%;
-    --success-foreground: 150 30% 2%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 150 30% 2%;
-    --info: 188 94% 43%;
-    --info-foreground: 150 30% 2%;
-    --error: 0 84% 60%;
-    --error-foreground: 0 0% 100%;
-    
-    /* Motion & Glow Variables */
-    --dur-1: 120ms;
-    --dur-2: 180ms;
-    --dur-3: 240ms;
-    --dur-4: 320ms;
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
-    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-    --glow-green-weak: 0 0 10px rgba(0,230,118,0.14);
-    --glow-green-mid: 0 0 18px rgba(0,230,118,0.20);
-    --glow-green-strong: 0 0 28px rgba(0,230,118,0.28);
-    --glow-gold-weak: 0 0 10px rgba(242,201,76,0.14);
-    --glow-gold-mid: 0 0 18px rgba(242,201,76,0.20);
-    --glow-gold-strong: 0 0 28px rgba(242,201,76,0.28);
-    --shadow-soft: 0 8px 24px rgba(0,0,0,0.45);
-  }
+  :root {
+    /* SALIS AUTO Brand Theme - Light Mode (Logo-Only Palette) */
+    --background: 216 14% 91%;  /* #E6E9ED - Silver Light */
+    --foreground: 220 16% 20%;  /* #2A2F3A - Graphite Gray */
 
-  /* ============================================
-     KINGDOM FUTURE LIGHT: "The Morning Sun"
-     For: Public Portals, Forms, Daylight Reading
-     ============================================ */
-  [data-theme="kingdom-future-light"] {
-    /* Background - Very Light Mint/White */
-    --background: 150 30% 97%;          /* #F4FBF7 */
-    --foreground: 150 60% 8%;           /* #071F12 - Deep Forest Green */
-    
-    /* Surface - Crystalline Glass */
-    --card: 0 0% 100%;                  /* Pure white */
-    --card-foreground: 150 60% 8%;
-    
-    /* Muted */
-    --muted: 150 20% 94%;
-    --muted-foreground: 150 30% 35%;
-    
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 150 60% 8%;
-    
-    /* Border - Subtle grey/green */
-    --border: 150 10% 85%;
-    --input: 150 20% 95%;
-    
-    /* Primary - Print Emerald #00AA55 */
-    --primary: 152 100% 33%;
+    --muted: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
+    --muted-foreground: 217 14% 45%;  /* Muted text */
+
+    --accent: 212 14% 82%;  /* Cool Gray Light */
+    --accent-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    --popover: 0 0% 100%;  /* White */
+    --popover-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    --border: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
+    --input: 212 14% 82%;  /* Cool Gray Light */
+
+    --card: 0 0% 100%;  /* White surface */
+    --card-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    /* Primary Blue - Brand Color #0A5ED7 */
+    --primary: 214 90% 44%;
     --primary-foreground: 0 0% 100%;
-    
-    /* Secondary - Rich Gold #D4AF37 */
-    --secondary: 43 56% 52%;
-    --secondary-foreground: 150 60% 8%;
-    
-    /* Accent */
-    --accent: 43 56% 52%;
-    --accent-foreground: 150 60% 8%;
-    
-    /* Destructive */
-    --destructive: 0 84% 60%;
+
+    /* Secondary - Bright Blue #0BB3FF */
+    --secondary: 197 100% 52%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Destructive/Warning Orange - #F97316 (warnings/critical CTAs ONLY) */
+    --destructive: 24 95% 53%;
     --destructive-foreground: 0 0% 100%;
-    
-    /* Ring */
-    --ring: 152 100% 33%;
+
+    --ring: 214 90% 44%;  /* Blue ring */
     --radius: 0.5rem;
     
-    /* Semantic Colors */
-    --success: 152 100% 33%;
+    /* SALIS AUTO Semantic Colors - Light Mode */
+    --success: 214 90% 44%;  /* Blue for success (no green) */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 150 60% 8%;
-    --info: 188 94% 43%;
+    --warning: 24 95% 53%;  /* Orange for warnings */
+    --warning-foreground: 0 0% 100%;
+    --info: 197 100% 52%;  /* Bright blue for info */
     --info-foreground: 0 0% 100%;
-    --error: 0 84% 60%;
-    --error-foreground: 0 0% 100%;
-    
-    /* Light Mode Glass Variables */
-    --kf-glass-bg: rgba(255, 255, 255, 0.70);
-    --kf-glass-border: rgba(0, 0, 0, 0.05);
-    
-    /* Light Mode Glow - Subdued */
-    --glow-green-weak: 0 4px 10px rgba(0,170,85,0.08);
-    --glow-green-mid: 0 4px 15px rgba(0,170,85,0.12);
-    --glow-green-strong: 0 4px 20px rgba(0,170,85,0.18);
-    --glow-gold-weak: 0 4px 10px rgba(212,175,55,0.08);
-    --glow-gold-mid: 0 4px 15px rgba(212,175,55,0.12);
-    --glow-gold-strong: 0 4px 20px rgba(212,175,55,0.18);
-    --shadow-soft: 0 4px 12px rgba(0,0,0,0.08);
   }
 
-  /* Legacy .dark class support */
   .dark {
-    --background: 150 30% 2%;
-    --foreground: 0 0% 98%;
-    --card: 150 14% 9%;
-    --card-foreground: 0 0% 98%;
-    --muted: 150 20% 6%;
-    --muted-foreground: 220 9% 65%;
-    --popover: 150 25% 5%;
-    --popover-foreground: 0 0% 98%;
-    --border: 0 0% 100% / 0.10;
-    --input: 150 20% 8%;
-    --primary: 145 100% 45%;
-    --primary-foreground: 150 30% 2%;
-    --secondary: 44 87% 63%;
-    --secondary-foreground: 150 30% 2%;
-    --accent: 44 87% 63%;
-    --accent-foreground: 150 30% 2%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --ring: 145 100% 45%;
-  }
+    /* SALIS AUTO Brand Theme - Dark Mode (Logo-Only Palette) */
+    --background: 220 20% 5%;  /* #0E1117 - Dark BG */
+    --foreground: 220 20% 93%;  /* #E6EAF0 - Text Primary Dark */
 
+    --muted: 220 15% 13%;  /* #151A23 - Card Surface Dark */
+    --muted-foreground: 217 14% 65%;  /* #9BA4B0 - Text Muted Dark */
+
+    --accent: 220 15% 13%;  /* Card Surface Dark */
+    --accent-foreground: 220 20% 93%;  /* Text Primary Dark */
+
+    --popover: 220 15% 13%;  /* #151A23 */
+    --popover-foreground: 220 20% 93%;
+
+    --border: 220 12% 18%;  /* #232A36 - Border Dark */
+    --input: 220 12% 18%;
+
+    --card: 220 15% 13%;  /* #151A23 - Card Surface Dark */
+    --card-foreground: 220 20% 93%;
+
+    /* Primary Blue - Bright Blue for dark mode */
+    --primary: 197 100% 52%;  /* #0BB3FF */
+    --primary-foreground: 220 20% 5%;
+
+    /* Secondary - Deep Blue */
+    --secondary: 214 90% 44%;  /* #0A5ED7 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Destructive/Warning Orange (warnings/critical CTAs ONLY) */
+    --destructive: 24 95% 53%;  /* #F97316 */
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 197 100% 52%;
+    --radius: 0.5rem;
+    
+    /* SALIS AUTO Semantic Colors - Dark Mode */
+    --success: 197 100% 52%;  /* Bright blue for success (no green) */
+    --success-foreground: 220 20% 5%;
+    --warning: 24 95% 53%;  /* Orange for warnings */
+    --warning-foreground: 0 0% 100%;
+    --info: 214 90% 44%;  /* Deep blue for info */
+    --info-foreground: 0 0% 100%;
+  }
 }
 
 @layer base {
@@ -478,415 +334,120 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', 'SF Pro', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-size: 14px;
     line-height: 1.5;
   }
   
-  /* Kingdom Future - Radial Background Gradients */
-  [data-theme="kingdom-future"] body {
-    background: 
-      radial-gradient(ellipse at 20% 80%, rgba(0, 230, 118, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(242, 201, 76, 0.02) 0%, transparent 50%),
-      hsl(var(--background));
-  }
-  
-  [data-theme="kingdom-future-light"] body {
-    background: 
-      radial-gradient(ellipse at 20% 80%, rgba(0, 170, 85, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
-      hsl(var(--background));
-  }
-  
-  /* Kingdom Future - Arabic Language Support */
-  html[lang="ar"] body,
-  html[dir="rtl"] body {
-    font-family: "Cairo", "Tajawal", system-ui, Arial, sans-serif;
-    line-height: 1.65;
-  }
-  
-  /* RTL-safe codes/IDs stay LTR */
-  .code, .vin, .sku, .email, .url, .phone-number {
-    direction: ltr;
-    unicode-bidi: plaintext;
-    font-variant-numeric: tabular-nums;
-  }
-  
-  /* Numbers in tabular form */
-  .num {
-    font-variant-numeric: tabular-nums;
-  }
-  
-  /* Typography Hierarchy */
+  /* SALIS AUTO Typography Hierarchy - Strict Scale */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-sans);
+    font-family: 'Inter', 'SF Pro', sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   
+  /* H1: 28-32px, bold, tight tracking */
   h1 {
-    font-size: 1.875rem;
-    font-weight: 800;
+    font-size: 1.875rem; /* 30px */
+    font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.2;
   }
   
+  /* H2: 20-24px, medium */
   h2 {
-    font-size: 1.375rem;
-    font-weight: 600;
+    font-size: 1.375rem; /* 22px */
+    font-weight: 500;
     line-height: 1.3;
   }
   
+  /* H3: 16-18px, medium */
   h3 {
-    font-size: 1.0625rem;
-    font-weight: 600;
+    font-size: 1.0625rem; /* 17px */
+    font-weight: 500;
     line-height: 1.4;
   }
   
+  /* Body: 14-15px, regular */
   p, span, div {
-    font-size: 0.875rem;
+    font-size: 0.875rem; /* 14px */
     line-height: 1.5;
   }
   
+  /* Label: 11-12px, uppercase, muted */
   label {
-    font-size: 0.75rem;
+    font-size: 0.75rem; /* 12px */
     font-weight: 500;
     letter-spacing: 0.025em;
   }
   
+  /* Monospace for metrics */
   .font-mono {
-    font-family: var(--font-mono);
+    font-family: 'JetBrains Mono', 'Inter Mono', 'SF Mono', monospace;
   }
 }
 
 @layer components {
-  /* ============================================
-     Kingdom Future Component Library
-     "Heritage Meets Horizon" - Saudi Vision 2030
-     ============================================ */
-  
-  /* ============================================
-     Glass Card - Adapts to Theme
-     ============================================ */
-  .glass-card {
-    background: var(--kf-glass-bg);
-    backdrop-filter: blur(var(--kf-glass-blur));
-    -webkit-backdrop-filter: blur(var(--kf-glass-blur));
-    border: 1px solid var(--kf-glass-border);
-    border-radius: var(--radius);
-  }
-  
-  /* ============================================
-     Neon Text Effects
-     ============================================ */
-  .neon-text {
-    color: hsl(var(--primary));
-    text-shadow: var(--kf-glow-emerald);
-  }
-  
-  .neon-gold {
-    color: hsl(var(--secondary));
-    text-shadow: var(--kf-glow-gold);
-  }
-  
-  /* ============================================
-     Display Font
-     ============================================ */
-  .font-display {
-    font-family: 'Outfit', sans-serif;
-  }
-  
-  /* ============================================
-     Glow Effects on Interactive Elements
-     ============================================ */
-  .glow-on-hover:hover {
-    box-shadow: var(--kf-glow-emerald);
-  }
-  
-  .active-glow {
-    box-shadow: var(--kf-glow-emerald);
-  }
-  
-  .glow-gold-on-hover:hover {
-    box-shadow: var(--kf-glow-gold);
-  }
-  
-  /* ============================================
-     Gradient Text Utilities
-     ============================================ */
+  /* SALIS AUTO Gradient Text Utility - Brand Blue */
   .text-gradient-salis {
-    background: var(--gradient-main);
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   
-  .text-gradient-gold {
-    background: var(--gradient-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  /* ============================================
-     Command Center Button System
-     ============================================ */
-  
-  /* GlowButton - Primary (Saudi Green) */
+  /* SALIS AUTO Primary Button - Gradient Blue */
   .btn-primary {
-    background: var(--accent-primary);
-    color: var(--bg-dark);
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    color: #FFFFFF;
     border: none;
-    transition: all var(--dur-2) var(--ease-out);
-    position: relative;
-    overflow: hidden;
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity var(--dur-2);
+    transition: all 0.2s ease;
   }
   
   .btn-primary:hover {
-    background: var(--accent-primary-hover);
-    transform: translateY(-2px);
-    box-shadow: var(--glow-primary);
+    background: linear-gradient(135deg, #0952C0 0%, #0AA3EE 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10, 94, 215, 0.3);
   }
   
-  .btn-primary:hover::before {
-    opacity: 1;
-  }
-  
-  .btn-primary:active {
-    transform: translateY(1px) scale(0.99);
-  }
-  
-  .btn-primary:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-  }
-  
-  /* GlowButton - Secondary/Ghost (Saudi Green outline) */
+  /* SALIS AUTO Secondary Button - Outline Blue */
   .btn-secondary {
     background-color: transparent;
-    color: var(--accent-primary);
-    border: 1.5px solid var(--accent-primary);
-    transition: all var(--dur-2) var(--ease-out);
-    min-height: 44px;
-    min-width: 44px;
+    color: #0A5ED7;
+    border: 1.5px solid #0A5ED7;
   }
   
   .btn-secondary:hover {
-    background-color: rgba(34, 197, 94, 0.1);
-    box-shadow: var(--glow-primary);
-    transform: translateY(-2px);
+    background-color: rgba(10, 94, 215, 0.1);
   }
   
-  .btn-secondary:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-  }
-  
-  /* GlowButton - Gold (Performance actions) */
-  .btn-gold {
-    background: var(--accent-secondary);
-    color: var(--bg-dark);
-    border: none;
-    transition: all var(--dur-2) var(--ease-out);
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  .btn-gold:hover {
-    background: var(--accent-secondary-hover);
-    box-shadow: var(--glow-secondary);
-    transform: translateY(-2px);
-  }
-  
-  .btn-gold:focus-visible {
-    outline: 2px solid var(--accent-secondary);
-    outline-offset: 2px;
-  }
-  
-  /* GlowButton - Danger */
+  /* SALIS AUTO Danger/Critical Button - Orange */
   .btn-danger {
-    background-color: var(--accent-error);
-    color: #ffffff;
-    transition: all var(--dur-2) var(--ease-out);
-    min-height: 44px;
-    min-width: 44px;
+    background-color: #F97316;
+    color: #FFFFFF;
   }
   
   .btn-danger:hover {
-    background-color: #dc2626;
-    box-shadow: var(--glow-error);
-    transform: translateY(-2px);
+    background-color: #EA580C;
   }
   
-  .btn-danger:focus-visible {
-    outline: 2px solid var(--accent-error);
-    outline-offset: 2px;
-  }
-  
-  /* ============================================
-     Command Center Card System
-     ============================================ */
-  
-  /* GlassCard - Physical Glass Effect */
-  .glass-card {
-    @apply rounded-xl;
-    background: var(--glass-heavy);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    box-shadow: 
-      inset 0 1px 0 0 var(--glass-highlight),
-      0 4px 24px -1px rgba(0, 0, 0, 0.3);
-    transition: transform var(--dur-2) var(--ease-out),
-                box-shadow var(--dur-2) var(--ease-out),
-                border-color var(--dur-2) var(--ease-out);
-  }
-  
-  .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      inset 0 1px 0 0 var(--glass-highlight),
-      var(--glow-primary),
-      0 8px 32px -2px rgba(0, 0, 0, 0.4);
-  }
-  
-  .glass-card.is-active {
-    box-shadow: var(--glow-green-mid);
-    border-color: rgba(34, 197, 94, 0.3);
-  }
-  
-  /* Charcoal Panel - Command Center Surfaces */
-  .charcoal-panel {
-    @apply rounded-xl;
-    background: var(--bg-surface-1);
-    border: none;
-    transition: transform var(--dur-2) var(--ease-out),
-                box-shadow var(--dur-2) var(--ease-out);
-  }
-  
-  .charcoal-panel:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--glow-primary);
-  }
-  
-  /* Command Center KPI Card */
-  .kpi-card {
-    @apply rounded-xl p-6;
-    background: var(--bg-surface-1);
-    border: 1px solid var(--glass-border);
-    transition: all var(--dur-2) var(--ease-out);
-  }
-  
-  .kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--glow-primary);
-    border-color: rgba(34, 197, 94, 0.2);
-  }
-  
-  .kpi-card .kpi-value {
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-  }
-  
-  .kpi-card .kpi-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-secondary);
-  }
-  
-  /* Performance Badge (Gold) */
-  .badge-performance {
-    background: rgba(234, 179, 8, 0.15);
-    color: var(--accent-secondary);
-    border: 1px solid rgba(234, 179, 8, 0.3);
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  
-  /* Live Indicator */
-  .live-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent-primary);
-    box-shadow: var(--glow-green-weak);
-    animation: pulse-glow 2s infinite;
-  }
-  
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 1; box-shadow: var(--glow-green-weak); }
-    50% { opacity: 0.7; box-shadow: var(--glow-green-mid); }
-  }
-  
-  /* Brand Card - Legacy Compatibility */
+  /* Brand Card Styles */
   .brand-card {
-    @apply rounded-xl border transition-all duration-300;
+    @apply rounded-xl border transition-all duration-200;
     background-color: var(--salis-surface-light);
     border-color: var(--salis-border-light);
   }
   
   .dark .brand-card {
-    background: var(--glass-heavy);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-color: var(--glass-border);
-    box-shadow: inset 0 1px 0 0 var(--glass-highlight);
+    background-color: var(--salis-surface-dark);
+    border-color: var(--salis-border-dark);
   }
   
   .brand-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(10, 94, 215, 0.1);
   }
-  
-  .dark .brand-card:hover {
-    box-shadow: 
-      inset 0 1px 0 0 var(--glass-highlight),
-      var(--glow-primary);
-  }
-  
-  /* Console/Terminal Style */
-  .console {
-    background: #0d1117;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: #e6edf3;
-  }
-  
-  .console-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .console-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-  }
-  
-  .console-dot-red { background: #ff5f57; }
-  .console-dot-yellow { background: #febc2e; }
-  .console-dot-green { background: #28c840; }
   
   /* Status Pills */
   .status-pill {
@@ -894,41 +455,28 @@
   }
   
   .status-pill-blue {
-    background-color: rgba(14, 165, 233, 0.15);
-    color: #0ea5e9;
+    background-color: rgba(10, 94, 215, 0.1);
+    color: #0A5ED7;
+  }
+  
+  .dark .status-pill-blue {
+    background-color: rgba(11, 179, 255, 0.15);
+    color: #0BB3FF;
   }
   
   .status-pill-orange {
-    background-color: rgba(249, 115, 22, 0.15);
-    color: #f97316;
-  }
-  
-  .status-pill-green {
-    background-color: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-  }
-  
-  .status-pill-red {
-    background-color: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #F97316;
   }
   
   .status-pill-gray {
-    background-color: rgba(148, 163, 184, 0.15);
-    color: #94a3b8;
+    background-color: rgba(107, 114, 128, 0.1);
+    color: #6B7280;
   }
   
-  /* Neon Strip - Active Navigation */
-  .neon-strip {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 60%;
-    background: var(--accent-primary);
-    border-radius: 0 2px 2px 0;
-    box-shadow: var(--glow-primary);
+  .dark .status-pill-gray {
+    background-color: rgba(155, 164, 176, 0.15);
+    color: #9BA4B0;
   }
   
   /* Enhanced Typography Utilities */
@@ -964,48 +512,38 @@
     line-height: var(--headline-semibold-line-height);
   }
   
-  /* Card Styles */
+  /* Enhanced Card Styles */
   .card-elevated {
     box-shadow: var(--shadow-black-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .card-elevated:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 8px 24px -4px rgba(0, 0, 0, 0.2), 0px 16px 32px -8px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 0px 8px 16px -4px rgba(1, 1, 1, 0.1), 0px 16px 24px -6px rgba(1, 1, 1, 0.15);
   }
   
-  .dark .card-elevated:hover {
-    box-shadow: var(--glow-primary), 0px 16px 32px -8px rgba(0, 0, 0, 0.5);
-  }
-  
-  /* Stat Card */
+  /* Stat Card Styles */
   .stat-card {
     @apply rounded-xl p-8 border-2 transition-all duration-300;
   }
   
-  .dark .stat-card {
-    background: var(--glass-heavy);
-    backdrop-filter: blur(16px);
-    border-color: var(--glass-border);
-  }
-  
   .stat-card-number {
     @apply font-bold text-5xl tracking-tight;
-    font-family: var(--font-mono);
+    font-family: 'JetBrains Mono', 'Inter', monospace;
   }
   
   .stat-card-label {
     @apply font-medium text-sm uppercase tracking-wider;
-    font-family: var(--font-sans);
+    font-family: 'Inter', sans-serif;
   }
   
   .stat-card-subtitle {
     @apply font-normal text-xs;
-    font-family: var(--font-sans);
+    font-family: 'Inter', sans-serif;
   }
   
-  /* Spacing Utilities */
+  /* Improved Spacing Utilities */
   .section-spacing {
     @apply space-y-8;
   }
@@ -1018,7 +556,7 @@
     @apply space-y-4;
   }
   
-  /* Interactive States */
+  /* Interactive States - Hover, Focus, Active */
   .interactive-hover {
     @apply transition-all duration-200 ease-in-out;
   }
@@ -1028,15 +566,10 @@
   }
   
   .interactive-card {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer;
   }
   
-  .interactive-card:hover {
-    transform: translateY(-5px);
-    @apply shadow-lg cursor-pointer;
-  }
-  
-  /* Touch-Friendly Sizing (WCAG 2.1 AA) */
+  /* Touch-Friendly Sizing (WCAG 2.1 AA - minimum 44x44px) */
   .btn-touch {
     @apply min-h-[44px] min-w-[44px] px-4 py-3;
   }
@@ -1045,7 +578,7 @@
     @apply min-h-[44px] px-4 py-3 text-base;
   }
   
-  /* Focus States */
+  /* Accessibility - Focus States */
   .focus-visible-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
@@ -1054,13 +587,13 @@
     @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus-visible-ring;
   }
   
-  /* High Contrast Text */
+  /* High Contrast Text for Accessibility (WCAG AAA) */
   .text-high-contrast {
     @apply text-foreground dark:text-foreground;
     font-weight: 500;
   }
   
-  /* Table Utilities */
+  /* Responsive Table Utilities */
   .table-responsive {
     @apply w-full overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
   }
@@ -1073,7 +606,7 @@
     @apply sticky top-0 bg-background z-10 shadow-sm;
   }
   
-  /* Empty State */
+  /* Empty State Utilities */
   .empty-state-container {
     @apply flex flex-col items-center justify-center py-16 px-4 text-center;
   }
@@ -1090,7 +623,7 @@
     @apply text-sm text-muted-foreground mb-6 max-w-md;
   }
   
-  /* Loading States */
+  /* Loading States - Linear Progress Only (No Spinners) */
   .skeleton {
     @apply animate-pulse bg-muted rounded;
   }
@@ -1104,7 +637,7 @@
     display: block;
     width: 40%;
     height: 100%;
-    background: var(--gradient-main);
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
     animation: linear-progress 1.5s ease-in-out infinite;
   }
   
@@ -1113,7 +646,7 @@
     100% { transform: translateX(350%); }
   }
   
-  /* Page Transitions */
+  /* Page Transition Animations */
   .page-enter {
     opacity: 0;
     transform: translateX(20px);
@@ -1136,20 +669,17 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
   
-  /* Hover Lift with Glow */
+  /* Hover Effects - Lift + Blue Border Glow */
   .hover-lift {
-    @apply transition-all duration-300 ease-out;
+    @apply transition-all duration-200 ease-out;
   }
   
   .hover-lift:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px rgba(11, 179, 255, 0.3), 0 8px 16px rgba(10, 94, 215, 0.15);
   }
   
-  .dark .hover-lift:hover {
-    box-shadow: var(--glow-primary);
-  }
-  
-  /* Chart Animation */
+  /* Chart Animation - Left to Right */
   .chart-animate {
     animation: chart-reveal 0.8s ease-out forwards;
   }
@@ -1165,7 +695,7 @@
     }
   }
   
-  /* Fade In */
+  /* Fade In Animation */
   .fade-in {
     animation: fadeIn 0.3s ease-out forwards;
   }
@@ -1175,7 +705,7 @@
     to { opacity: 1; }
   }
   
-  /* Slide Up */
+  /* Slide Up Animation */
   .slide-up {
     animation: slideUp 0.3s ease-out forwards;
   }
@@ -1191,21 +721,7 @@
     }
   }
   
-  /* Pulse Glow Animation */
-  .pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-  
-  @keyframes pulseGlow {
-    0%, 100% {
-      box-shadow: 0 0 5px rgba(14, 165, 233, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 25px rgba(14, 165, 233, 0.5);
-    }
-  }
-  
-  /* Mobile Responsive */
+  /* Mobile-First Responsive Breakpoints */
   @media (max-width: 768px) {
     .mobile-stack {
       @apply flex-col space-y-2;
@@ -1220,39 +736,26 @@
     }
   }
   
-  /* Smooth Scrolling */
+  /* Smooth Scrolling for Better UX */
   html {
     scroll-behavior: smooth;
   }
   
-  /* Custom Scrollbar - Deep Space Theme */
+  /* Custom Scrollbar for Dark Theme */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
+    @apply bg-muted/20;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    @apply bg-muted rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(14, 165, 233, 0.5);
-  }
-  
-  .dark ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-  }
-  
-  .dark ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
-  }
-  
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: rgba(14, 165, 233, 0.4);
+    @apply bg-muted-foreground;
   }
 }

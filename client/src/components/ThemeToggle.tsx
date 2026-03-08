@@ -1,4 +1,4 @@
-import { Moon, Sun, Monitor } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,23 +6,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme, type Theme } from "@/hooks/useTheme";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
-const THEME_CONFIG: Record<Theme, { labelKey: string; icon: typeof Sun; descKey: string; color: string }> = {
-  light: { labelKey: "userSettings.themeLight", icon: Sun, descKey: "userSettings.themeLightDesc", color: "text-amber-500" },
-  dark: { labelKey: "userSettings.themeDark", icon: Moon, descKey: "userSettings.themeDarkDesc", color: "text-emerald-400" },
-  system: { labelKey: "userSettings.themeSystem", icon: Monitor, descKey: "userSettings.themeSystemDesc", color: "text-gray-400" },
-};
+type Theme = "light" | "dark" | "system";
 
 export function ThemeToggle() {
-  const { t } = useTranslation();
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [theme, setTheme] = useState<Theme>(() => {
+    const stored = localStorage.getItem("theme") as Theme;
+    return stored || "system";
+  });
 
-  const getIcon = () => {
-    if (resolvedTheme === "dark") return <Moon className="h-[1.2rem] w-[1.2rem] text-emerald-400" />;
-    return <Sun className="h-[1.2rem] w-[1.2rem] text-amber-500" />;
-  };
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   return (
     <DropdownMenu>
@@ -33,46 +42,29 @@ export function ThemeToggle() {
           className="h-9 w-9"
           data-testid="button-theme-toggle"
         >
-          {getIcon()}
-          <span className="sr-only">{t('userSettings.toggleTheme', 'Toggle theme')}</span>
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => setTheme("light")}
-          className="flex items-center gap-3"
           data-testid="menu-theme-light"
         >
-          <Sun className="h-4 w-4 text-amber-500" />
-          <div className="flex flex-col">
-            <span className="font-medium">{t('userSettings.themeLight', 'Light')}</span>
-            <span className="text-xs text-muted-foreground">{t('userSettings.themeLightDesc', 'Light mode')}</span>
-          </div>
-          {theme === "light" && <span className="ml-auto text-xs text-primary">{t('common.active', 'Active')}</span>}
+          Light
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme("dark")}
-          className="flex items-center gap-3"
           data-testid="menu-theme-dark"
         >
-          <Moon className="h-4 w-4 text-emerald-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">{t('userSettings.themeDark', 'Dark')}</span>
-            <span className="text-xs text-muted-foreground">{t('userSettings.themeDarkDesc', 'Dark mode')}</span>
-          </div>
-          {theme === "dark" && <span className="ml-auto text-xs text-primary">{t('common.active', 'Active')}</span>}
+          Dark
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme("system")}
-          className="flex items-center gap-3"
           data-testid="menu-theme-system"
         >
-          <Monitor className="h-4 w-4 text-gray-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">{t('userSettings.themeSystem', 'System')}</span>
-            <span className="text-xs text-muted-foreground">{t('userSettings.themeSystemDesc', 'Auto-detect')}</span>
-          </div>
-          {theme === "system" && <span className="ml-auto text-xs text-primary">{t('common.active', 'Active')}</span>}
+          System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

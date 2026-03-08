@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import {
   Send,
@@ -21,7 +20,6 @@ import {
 } from "lucide-react";
 
 export default function PartsNetworkDashboard() {
-  const { t } = useTranslation();
   const { data: stats } = useQuery<{
     openRequests: number;
     pendingQuotes: number;
@@ -99,8 +97,8 @@ export default function PartsNetworkDashboard() {
 
   return (
     <PartsNetworkLayout 
-      title={t("partsNetwork.dashboard", "Parts Network Dashboard")} 
-      description={t("partsNetwork.dashboardDescription", "B2B Marketplace for Automotive Parts")}
+      title="Parts Network Dashboard" 
+      description="B2B Marketplace for Automotive Parts - لوحة تحكم شبكة قطع الغيار"
     >
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">

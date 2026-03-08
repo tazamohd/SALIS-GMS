@@ -145,7 +145,7 @@ export default function IncomeStatement() {
         <CardHeader className="text-center border-b">
           <CardTitle className="text-xl">{t('app.name', 'SALIS AUTO')}</CardTitle>
           <CardDescription className="text-base">
-            {t('incomeStatement.title', 'Income Statement')}
+            {t('incomeStatement.title', 'Income Statement')} (قائمة الدخل)
           </CardDescription>
           <p className="text-sm text-muted-foreground">
             {t('incomeStatement.forPeriodEnding', 'For the Period Ending January 31, 2024')}
@@ -564,7 +564,7 @@ export default function IncomeStatement() {
 
   return (
     <TabsPageLayout
-      title={t('incomeStatement.title', 'Income Statement')}
+      title={t('incomeStatement.title', 'Income Statement - قائمة الدخل')}
       description={t('incomeStatement.description', 'Profit and Loss statement for the period')}
       icon={TrendingUp}
       tabs={tabs}

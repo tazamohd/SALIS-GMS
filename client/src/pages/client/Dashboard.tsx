@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next";
 
 interface ServiceRecommendation {
   id: string;
@@ -25,7 +24,6 @@ interface ServiceRecommendation {
 
 export default function ClientDashboard() {
   const { user } = useAuth();
-  const { t } = useTranslation();
 
   const { data: vehicles, isLoading: vehiclesLoading } = useQuery({
     queryKey: ["/api/vehicles", user?.id],
@@ -268,7 +266,7 @@ export default function ClientDashboard() {
             ) : upcomingAppointments.length === 0 ? (
               <div className="text-center py-8 text-[#64748B]">
                 <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>{t('clientPortal.noUpcomingServices', 'No upcoming services')}</p>
+                <p>No upcoming services</p>
                 <Link href="/client/appointments">
                   <Button variant="link" className="mt-2 text-[#0A5ED7]" data-testid="button-book-first">
                     Book your first appointment
@@ -330,7 +328,7 @@ export default function ClientDashboard() {
             {activeReminders.length === 0 ? (
               <div className="text-center py-8 text-[#64748B]">
                 <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>{t('clientPortal.noActiveReminders', 'No active reminders')}</p>
+                <p>No active reminders</p>
                 <Link href="/client/reminders">
                   <Button variant="link" className="mt-2 text-[#0A5ED7]" data-testid="button-add-reminder">
                     Set up a reminder
@@ -407,7 +405,7 @@ export default function ClientDashboard() {
           ) : myInvoices.length === 0 ? (
             <div className="text-center py-8 text-[#64748B]">
               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>{t('clientPortal.noInvoicesYet', 'No invoices yet')}</p>
+              <p>No invoices yet</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-3">

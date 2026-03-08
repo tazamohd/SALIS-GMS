@@ -299,7 +299,7 @@ export default function AutomatedReordering() {
                 <span className="text-sm text-[#64748B]">{t('autoReorder.modelAccuracy', 'Model Accuracy')}</span>
               </div>
               <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-model-accuracy">94.7%</p>
-              <p className="text-xs text-[#0A5ED7] mt-1">↑ 2.3% {t('common.vsLastMonth', 'vs last month')}</p>
+              <p className="text-xs text-[#0A5ED7] mt-1">↑ 2.3% vs last month</p>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-predictions-today">
               <div className="flex items-center gap-3 mb-2">
@@ -309,7 +309,7 @@ export default function AutomatedReordering() {
                 <span className="text-sm text-[#64748B]">{t('autoReorder.predictionsToday', 'Predictions Today')}</span>
               </div>
               <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-predictions-today">247</p>
-              <p className="text-xs text-[#0BB3FF] mt-1">{t('autoReorder.processingRealTime', 'Processing in real-time')}</p>
+              <p className="text-xs text-[#0BB3FF] mt-1">Processing in real-time</p>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-avg-lead-time">
               <div className="flex items-center gap-3 mb-2">
@@ -319,7 +319,7 @@ export default function AutomatedReordering() {
                 <span className="text-sm text-[#64748B]">{t('autoReorder.avgLeadTime', 'Avg Lead Time')}</span>
               </div>
               <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-avg-lead-time">3.2d</p>
-              <p className="text-xs text-[#6366F1] mt-1">{t('autoReorder.optimizedDelivery', 'Optimized delivery')}</p>
+              <p className="text-xs text-[#6366F1] mt-1">Optimized delivery</p>
             </div>
           </div>
 
@@ -866,7 +866,7 @@ export default function AutomatedReordering() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="font-bold text-[#0A5ED7]">{t('common.sar', 'SAR')} {order.estimatedCost?.toLocaleString()}</p>
+                      <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
                       <Badge 
                         className={currentStatus === 'approved' 
                           ? 'bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30' 
@@ -939,7 +939,7 @@ export default function AutomatedReordering() {
                 </div>
                 <div className="p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
                   <p className="text-xs text-[#64748B] mb-1">{t('autoReorder.estimatedCost', 'Estimated Cost')}</p>
-                  <p className="text-lg font-bold text-[#0A5ED7]">{t('common.sar', 'SAR')} {viewingOrder.estimatedCost?.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-[#0A5ED7]">SAR {viewingOrder.estimatedCost?.toLocaleString()}</p>
                 </div>
               </div>
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -166,7 +165,6 @@ const mockDeliveries: DeliveryRecord[] = [
 ];
 
 export default function DeliveryTracking() {
-  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [selectedDelivery, setSelectedDelivery] = useState<DeliveryRecord | null>(null);
@@ -282,10 +280,10 @@ export default function DeliveryTracking() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
-              <TabsTrigger value="all" data-testid="tab-all">{t('common.all', 'All')}</TabsTrigger>
-              <TabsTrigger value="in_transit" data-testid="tab-in-transit">{t('statusLabels.inTransit', 'In Transit')}</TabsTrigger>
-              <TabsTrigger value="delivered" data-testid="tab-delivered">{t('statusLabels.delivered', 'Delivered')}</TabsTrigger>
-              <TabsTrigger value="delayed" data-testid="tab-delayed">{t('purchaseAgent.delayed', 'Delayed')}</TabsTrigger>
+              <TabsTrigger value="all" data-testid="tab-all">All</TabsTrigger>
+              <TabsTrigger value="in_transit" data-testid="tab-in-transit">In Transit</TabsTrigger>
+              <TabsTrigger value="delivered" data-testid="tab-delivered">Delivered</TabsTrigger>
+              <TabsTrigger value="delayed" data-testid="tab-delayed">Delayed</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="space-y-4">

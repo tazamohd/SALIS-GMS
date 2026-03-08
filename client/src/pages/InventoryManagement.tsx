@@ -3,9 +3,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { usePermissions } from "@/hooks/usePermissions";
-import { RoleGate } from "@/components/RoleGate";
-import { RoleBadge } from "@/components/RoleBadge";
 import {
   Package,
   AlertTriangle,
@@ -18,7 +15,6 @@ import {
   Plus,
   CheckCircle,
   XCircle,
-  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,7 +48,6 @@ import { EmptyState } from "@/components/ui/empty-state";
 export default function InventoryManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { canCreate, canEdit, canDelete, canView, hasPermission, getRoleDisplayName } = usePermissions();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedGarageId, setSelectedGarageId] = useState<string>("");
@@ -491,21 +486,7 @@ export default function InventoryManagement() {
   );
 
   const headerContent = (
-    <div className="flex gap-2 items-center">
-      <RoleBadge size="md" />
-      {hasPermission('inventory', 'manage_inventory') ? (
-        <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 px-2 py-1 rounded bg-emerald-900/20">
-          {t('inventory.fullManagementAccess', 'Full inventory management access')}
-        </span>
-      ) : canEdit('inventory') ? (
-        <span className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 px-2 py-1 rounded bg-blue-900/20">
-          {t('inventory.canUpdateStock', 'Can update stock levels')}
-        </span>
-      ) : (
-        <span className="text-xs text-zinc-500 flex items-center gap-1 px-2 py-1 rounded bg-zinc-800/50">
-          <Shield className="w-3 h-3" /> {t('common.viewOnly', 'View only')}
-        </span>
-      )}
+    <div className="flex gap-2">
       <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
         <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
           <SelectValue placeholder={t('inventory.selectGarage', 'Select Garage')} />
@@ -570,7 +551,7 @@ export default function InventoryManagement() {
         ]}
       />
       <BarcodeScanner
-        open={isScannerOpen}
+        isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onScan={handleBarcodeScan}
       />

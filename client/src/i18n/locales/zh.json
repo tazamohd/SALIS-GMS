@@ -164,33 +164,5 @@
       "calendar": "日历",
       "tasks": "任务列表"
     }
-  },
-  "social": {
-    "totalPosts": "总发布数",
-    "totalReviews": "总评价数",
-    "avgRating": "平均评分",
-    "responseRate": "回复率",
-    "followers": "粉丝",
-    "socialMediaPosts": "社交媒体发布",
-    "customerReviews": "客户评价",
-    "platform": "平台",
-    "content": "内容",
-    "writeYourPost": "写下你的发布内容...",
-    "scheduleOptional": "安排（可选）",
-    "createSocialMediaPost": "创建社交媒体发布",
-    "reach": "覆盖范围",
-    "scheduledFor": "计划于",
-    "posts": "发布",
-    "reviews": "评价",
-    "responded": "已回复",
-    "respond": "回复",
-    "createPost": "创建发布",
-    "pageDescription": "管理社交媒体发布并回复客户评价",
-    "postCreated": "发布已创建",
-    "postScheduled": "您的发布已安排。",
-    "facebook": "脸书",
-    "instagram": "Instagram",
-    "googleBusiness": "谷歌商家",
-    "yelp": "Yelp"
   }
 }
