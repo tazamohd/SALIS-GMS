@@ -678,7 +678,7 @@ export default function JournalEntries() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.journalEntries.title', 'Journal Entries - القيود اليومية')}
+      title={t('accounting.journalEntries.title', 'Journal Entries')}
       description={t('accounting.journalEntries.description', 'Record and manage daily accounting transactions')}
       icon={FileText}
       tabs={tabs}

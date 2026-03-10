@@ -457,7 +457,7 @@ export default function TrialBalance() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.trialBalance.title', 'Trial Balance - ميزان المراجعة')}
+      title={t('accounting.trialBalance.title', 'Trial Balance')}
       description={t('accounting.trialBalance.description', 'Verify debits equal credits across all accounts')}
       icon={Scale}
       tabs={tabs}

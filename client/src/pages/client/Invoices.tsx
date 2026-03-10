@@ -6,8 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, Download, CreditCard, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
+import { useTranslation } from "react-i18next";
+
 export default function ClientInvoices() {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const { data: vehicles } = useQuery({
     queryKey: ["/api/vehicles", user?.id],
@@ -40,7 +43,7 @@ export default function ClientInvoices() {
 
   const getVehicleInfo = (vehicleId: string) => {
     const vehicle = myVehicles.find((v: any) => v.id === vehicleId);
-    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : "Unknown Vehicle";
+    return vehicle ? `${vehicle.make} ${vehicle.model} - ${vehicle.licensePlate}` : t('nav.unknown_vehicle', 'Unknown Vehicle');
   };
 
   const getStatusIcon = (status: string) => {
@@ -71,17 +74,17 @@ export default function ClientInvoices() {
     <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
       <div>
         <h1 className="text-3xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-page-title">
-          Invoices & Payments
+          {t('nav.invoices_payments', 'Invoices & Payments')}
         </h1>
         <p className="text-[#64748B] mt-1">
-          View and manage your service invoices
+          {t('nav.view_manage_invoices', 'View and manage your service invoices')}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-pending">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Pending Payments</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('nav.pending_payments', 'Pending Payments')}</CardTitle>
             <AlertCircle className="h-4 w-4 text-[#F97316]" />
           </CardHeader>
           <CardContent>
@@ -89,14 +92,14 @@ export default function ClientInvoices() {
               ${totalPending.toFixed(2)}
             </div>
             <p className="text-xs text-[#64748B] mt-1">
-              {pendingInvoices.length} invoice{pendingInvoices.length !== 1 ? "s" : ""}
+              {pendingInvoices.length} {t('common.invoice', 'invoice')}{pendingInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-paid">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Total Paid</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('nav.total_paid', 'Total Paid')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -104,14 +107,14 @@ export default function ClientInvoices() {
               ${totalPaid.toFixed(2)}
             </div>
             <p className="text-xs text-[#64748B] mt-1">
-              {paidInvoices.length} invoice{paidInvoices.length !== 1 ? "s" : ""}
+              {paidInvoices.length} {t('common.invoice', 'invoice')}{paidInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-stat-total">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">All Time Total</CardTitle>
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('nav.all_time_total', 'All Time Total')}</CardTitle>
             <FileText className="h-4 w-4 text-[#64748B]" />
           </CardHeader>
           <CardContent>
@@ -119,7 +122,7 @@ export default function ClientInvoices() {
               ${myInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.totalAmount || "0"), 0).toFixed(2)}
             </div>
             <p className="text-xs text-[#64748B] mt-1">
-              {myInvoices.length} total invoice{myInvoices.length !== 1 ? "s" : ""}
+              {myInvoices.length} {t('common.total_invoice', 'total invoice')}{myInvoices.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
@@ -128,8 +131,8 @@ export default function ClientInvoices() {
       {pendingInvoices.length > 0 && (
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-pending-invoices">
           <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">Pending Invoices</CardTitle>
-            <CardDescription className="text-[#64748B]">Invoices awaiting payment</CardDescription>
+            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('nav.pending_invoices', 'Pending Invoices')}</CardTitle>
+            <CardDescription className="text-[#64748B]">{t('nav.invoices_awaiting_payment', 'Invoices awaiting payment')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {pendingInvoices.map((invoice: any) => (
@@ -142,7 +145,7 @@ export default function ClientInvoices() {
                 <div className="flex-1 space-y-2">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-[#0B1F3B] dark:text-white">Invoice #{invoice.invoiceNumber}</p>
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">{t('common.invoice', 'Invoice')} #{invoice.invoiceNumber}</p>
                       <p className="text-sm text-[#64748B]">
                         {getVehicleInfo(invoice.vehicleId)}
                       </p>
@@ -151,9 +154,9 @@ export default function ClientInvoices() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-[#64748B]">
-                      Issued: {new Date(invoice.issueDate).toLocaleDateString()}
+                      {t('common.issued', 'Issued')}: {new Date(invoice.issueDate).toLocaleDateString()}
                       {invoice.dueDate && (
-                        <> • Due: {new Date(invoice.dueDate).toLocaleDateString()}</>
+                        <> • {t('common.due', 'Due')}: {new Date(invoice.dueDate).toLocaleDateString()}</>
                       )}
                     </div>
                     <div className="text-xl font-bold text-[#0B1F3B] dark:text-white">
@@ -163,11 +166,11 @@ export default function ClientInvoices() {
                   <div className="flex gap-2">
                     <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid={`button-pay-${invoice.id}`}>
                       <CreditCard className="h-4 w-4 mr-2" />
-                      Pay Now
+                      {t('nav.pay_now', 'Pay Now')}
                     </Button>
                     <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid={`button-download-${invoice.id}`}>
                       <Download className="h-4 w-4 mr-2" />
-                      Download
+                      {t('nav.download', 'Download')}
                     </Button>
                   </div>
                 </div>
@@ -179,8 +182,8 @@ export default function ClientInvoices() {
 
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="card-all-invoices">
         <CardHeader>
-          <CardTitle className="text-[#0B1F3B] dark:text-white">All Invoices</CardTitle>
-          <CardDescription className="text-[#64748B]">Complete invoice history</CardDescription>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('nav.all_invoices', 'All Invoices')}</CardTitle>
+          <CardDescription className="text-[#64748B]">{t('nav.complete_invoice_history', 'Complete invoice history')}</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -192,7 +195,7 @@ export default function ClientInvoices() {
           ) : myInvoices.length === 0 ? (
             <div className="text-center py-12 text-[#64748B]">
               <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No invoices yet</p>
+              <p>{t('nav.no_invoices_yet', 'No invoices yet')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -211,7 +214,7 @@ export default function ClientInvoices() {
                       <div className="flex items-center gap-4">
                         {getStatusIcon(invoice.status)}
                         <div>
-                          <p className="font-medium text-[#0B1F3B] dark:text-white">Invoice #{invoice.invoiceNumber}</p>
+                          <p className="font-medium text-[#0B1F3B] dark:text-white">{t('common.invoice', 'Invoice')} #{invoice.invoiceNumber}</p>
                           <p className="text-sm text-[#64748B]">
                             {getVehicleInfo(invoice.vehicleId)}
                           </p>

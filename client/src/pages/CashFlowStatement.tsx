@@ -472,7 +472,7 @@ export default function CashFlowStatement() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.cashFlowStatementTitle', 'Cash Flow Statement - قائمة التدفقات النقدية')}
+      title={t('accounting.cashFlowStatementTitle', 'Cash Flow Statement')}
       description={t('accounting.cashFlowStatementDescription', 'Track cash inflows and outflows')}
       icon={Banknote}
       tabs={tabs}

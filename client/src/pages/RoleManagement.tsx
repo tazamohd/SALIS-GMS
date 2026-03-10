@@ -649,7 +649,7 @@ export default function RoleManagement() {
                     <Input
                       value={newRole.nameAr}
                       onChange={(e) => setNewRole(prev => ({ ...prev, nameAr: e.target.value }))}
-                      placeholder={t('roles.enterRoleNameAr', 'أدخل اسم الدور')}
+                      placeholder={t('roles.enterRoleNameAr', 'Enter Role Name Ar')}
                       className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right"
                       dir="rtl"
                       data-testid="input-role-name-ar"

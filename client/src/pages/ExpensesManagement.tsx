@@ -236,7 +236,7 @@ export default function ExpensesManagement() {
                 <div className="text-2xl font-bold text-[#F97316]">
                   SAR {totalExpenses.toLocaleString()}
                 </div>
-                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalExpensesAr', 'إجمالي المصروفات')}</p>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalExpensesAr', 'Total Expenses Ar')}</p>
               </div>
               <div className="p-2 rounded-xl bg-[#F97316]/10">
                 <TrendingDown className="h-6 w-6 text-[#F97316]" />
@@ -255,7 +255,7 @@ export default function ExpensesManagement() {
                 <div className="text-2xl font-bold text-[#F97316]">
                   SAR {pendingExpenses.toLocaleString()}
                 </div>
-                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.pendingPaymentsAr', 'المدفوعات المعلقة')}</p>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.pendingPaymentsAr', 'Pending Payments Ar')}</p>
               </div>
               <div className="p-2 rounded-xl bg-[#F97316]/10">
                 <Clock className="h-6 w-6 text-[#F97316]" />
@@ -303,7 +303,7 @@ export default function ExpensesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.monthlyTrend', 'Monthly Expense Trend')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyTrendAr', 'اتجاه المصروفات الشهرية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyTrendAr', 'Monthly Trend Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -323,7 +323,7 @@ export default function ExpensesManagement() {
         <Card className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('payments.expenses.expenseByCategory', 'Expense by Category')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.expenseByCategoryAr', 'المصروفات حسب الفئة')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.expenseByCategoryAr', 'Expense By Category Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -363,7 +363,7 @@ export default function ExpensesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('sales.management', 'Sales Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('sales.managementAr', 'المبيعات')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('sales.managementAr', 'Management Ar')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('sales.description', 'Track revenue, transactions, and sales performance')}</p>
@@ -381,7 +381,7 @@ export default function ExpensesManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('invoices.title', 'Invoices')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('invoices.titleAr', 'الفواتير')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('invoices.titleAr', 'Title Ar')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('invoices.description', 'Manage customer invoices and payment tracking')}</p>
@@ -413,7 +413,7 @@ export default function ExpensesManagement() {
               <DialogContent className="max-w-2xl" data-testid="modal-add-expense">
                 <DialogHeader>
                   <DialogTitle>{t('payments.expenses.recordNewExpense', 'Record New Expense')}</DialogTitle>
-                  <DialogDescription>{t('payments.expenses.recordNewExpenseAr', 'تسجيل مصروف جديد')}</DialogDescription>
+                  <DialogDescription>{t('payments.expenses.recordNewExpenseAr', 'Record New Expense Ar')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -655,7 +655,7 @@ export default function ExpensesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR 166,000</div>
-                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalBudgetAr', 'الميزانية الإجمالية')}</p>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.totalBudgetAr', 'Total Budget Ar')}</p>
               </div>
               <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]">
                 <DollarSign className="h-6 w-6 text-white" />
@@ -672,7 +672,7 @@ export default function ExpensesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-[#F97316]">SAR 122,650</div>
-                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.spentAr', 'المصروف')}</p>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.spentAr', 'Spent Ar')}</p>
               </div>
               <div className="p-2 rounded-xl bg-[#F97316]/10">
                 <TrendingDown className="h-6 w-6 text-[#F97316]" />
@@ -689,7 +689,7 @@ export default function ExpensesManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-2xl font-bold text-[#0A5ED7]">SAR 43,350</div>
-                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.remainingAr', 'المتبقي')}</p>
+                <p className="text-xs text-[#64748B] mt-1">{t('payments.expenses.remainingAr', 'Remaining Ar')}</p>
               </div>
               <div className="p-2 rounded-xl bg-[#0A5ED7]/10">
                 <CheckCircle className="h-6 w-6 text-[#0A5ED7]" />
@@ -765,7 +765,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.monthlyExpenseReport', 'Monthly Expense Report')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyExpenseReportAr', 'تقرير المصروفات الشهري')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.monthlyExpenseReportAr', 'Monthly Expense Report Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10" variant="outline" data-testid="button-generate-monthly">
@@ -782,7 +782,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.categoryAnalysis', 'Category Analysis')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.categoryAnalysisAr', 'تحليل الفئات')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.categoryAnalysisAr', 'Category Analysis Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-category">
@@ -799,7 +799,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.vendorReport', 'Vendor Report')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.vendorReportAr', 'تقرير الموردين')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.vendorReportAr', 'Vendor Report Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-vendor">
@@ -816,7 +816,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.budgetVariance', 'Budget Variance')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.budgetVarianceAr', 'تحليل فروقات الميزانية')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.budgetVarianceAr', 'Budget Variance Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-budget">
@@ -833,7 +833,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.taxDeductible', 'Tax Deductible')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.taxDeductibleAr', 'المصروفات المخصومة ضريبياً')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.taxDeductibleAr', 'Tax Deductible Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-tax">
@@ -850,7 +850,7 @@ export default function ExpensesManagement() {
               </div>
               <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('payments.expenses.receiptSummary', 'Receipt Summary')}</CardTitle>
             </div>
-            <CardDescription className="text-[#64748B]">{t('payments.expenses.receiptSummaryAr', 'ملخص الإيصالات')}</CardDescription>
+            <CardDescription className="text-[#64748B]">{t('payments.expenses.receiptSummaryAr', 'Receipt Summary Ar')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-generate-receipts">

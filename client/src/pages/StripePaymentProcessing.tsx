@@ -264,7 +264,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-sm">mada</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mada</p>
-                <p className="text-xs text-[#64748B]">مدى</p>
+                <p className="text-xs text-[#64748B]">{t('payment.mada', 'Mada')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -272,7 +272,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-xs">STC Pay</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Pay</p>
-                <p className="text-xs text-[#64748B]">إس تي سي باي</p>
+                <p className="text-xs text-[#64748B]">{t('payment.stc_pay', 'stc pay')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -280,7 +280,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-xs">STC</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">STC Bank</p>
-                <p className="text-xs text-[#64748B]">بنك إس تي سي</p>
+                <p className="text-xs text-[#64748B]">{t('payment.stc_bank', 'stc bank')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -288,7 +288,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-sm">VISA</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Visa</p>
-                <p className="text-xs text-[#64748B]">فيزا</p>
+                <p className="text-xs text-[#64748B]">{t('payment.visa', 'Visa')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -296,7 +296,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-xs">MC</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Mastercard</p>
-                <p className="text-xs text-[#64748B]">ماستركارد</p>
+                <p className="text-xs text-[#64748B]">{t('payment.mastercard', 'Mastercard')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -304,7 +304,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-xs">AMEX</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">American Express</p>
-                <p className="text-xs text-[#64748B]">أمريكان إكسبريس</p>
+                <p className="text-xs text-[#64748B]">{t('payment.american_express', 'American Express')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -312,7 +312,7 @@ export default function StripePaymentProcessing() {
                   <span className="text-white font-bold text-xs">Pay</span>
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">Apple Pay</p>
-                <p className="text-xs text-[#64748B]">آبل باي</p>
+                <p className="text-xs text-[#64748B]">{t('payment.apple_pay', 'Apple Pay')}</p>
               </div>
 
               <div className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg text-center hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-colors bg-white dark:bg-[#0E1117]">
@@ -320,7 +320,7 @@ export default function StripePaymentProcessing() {
                   <Banknote className="w-6 h-6 text-white" />
                 </div>
                 <p className="font-medium text-sm text-[#0B1F3B] dark:text-white">{t('payments.methods.bankTransfer', 'Bank Transfer')}</p>
-                <p className="text-xs text-[#64748B]">تحويل بنكي</p>
+                <p className="text-xs text-[#64748B]">{t('payment.bank_transfer', 'Bank Transfer')}</p>
               </div>
             </div>
 

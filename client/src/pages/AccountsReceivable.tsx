@@ -597,7 +597,7 @@ export default function AccountsReceivable() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.accountsReceivableTitle', 'Accounts Receivable - الحسابات المدينة')}
+      title={t('accounting.accountsReceivableTitle', 'Accounts Receivable')}
       description={t('accounting.accountsReceivableDescription', 'Manage customer invoices and collections')}
       icon={Users}
       tabs={tabs}

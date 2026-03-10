@@ -631,7 +631,7 @@ export default function BudgetManagement() {
 
   return (
     <TabsPageLayout
-      title={t('budget.budgetManagementTitle', 'Budget Management - إدارة الميزانية')}
+      title={t('budget.budgetManagementTitle', 'Budget Management')}
       description={t('budget.budgetManagementDescription', 'Plan, track, and manage budgets')}
       icon={Calculator}
       tabs={tabs}

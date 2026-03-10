@@ -632,7 +632,7 @@ export default function GeneralLedger() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.generalLedger.title', 'General Ledger - دفتر الأستاذ العام')}
+      title={t('accounting.generalLedger.title', 'General Ledger')}
       description={t('accounting.generalLedger.description', 'Complete record of all financial transactions')}
       icon={BookOpen}
       tabs={tabs}

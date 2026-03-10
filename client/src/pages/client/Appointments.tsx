@@ -29,8 +29,11 @@ const bookingSchema = z.object({
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
 
+import { useTranslation } from "react-i18next";
+
 export default function ClientAppointments() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -158,7 +161,7 @@ export default function ClientAppointments() {
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Vehicle</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('nav.vehicle', 'Vehicle')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
@@ -183,7 +186,7 @@ export default function ClientAppointments() {
                   name="scheduledDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Date & Time</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('nav.date_time', 'Date & Time')}</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -198,7 +201,7 @@ export default function ClientAppointments() {
                               {field.value ? (
                                 <span className="text-[#0B1F3B] dark:text-white">{format(field.value, "PPP")}</span>
                               ) : (
-                                <span>Pick a date</span>
+                                <span>{t('nav.pick_a_date', 'Pick a date')}</span>
                               )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
@@ -224,7 +227,7 @@ export default function ClientAppointments() {
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">Service Type</FormLabel>
+                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('nav.service_type', 'Service Type')}</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Describe the service needed (e.g., Oil change, Brake inspection)"
@@ -296,7 +299,7 @@ export default function ClientAppointments() {
           ) : upcomingAppointments.length === 0 ? (
             <div className="text-center py-12 text-[#64748B]">
               <CalendarIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No upcoming appointments</p>
+              <p>{t('nav.no_upcoming_appointments', 'No upcoming appointments')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -362,7 +365,7 @@ export default function ClientAppointments() {
           ) : pastAppointments.length === 0 ? (
             <div className="text-center py-8 text-[#64748B]">
               <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>No past appointments</p>
+              <p>{t('nav.no_past_appointments', 'No past appointments')}</p>
             </div>
           ) : (
             <div className="space-y-3">

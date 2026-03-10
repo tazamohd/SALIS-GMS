@@ -87,6 +87,113 @@ SALIS AUTO is a world-class, enterprise-grade Automotive ERP platform built for 
 | [Compliance Guide](./07-professional/compliance-guide.md) | ZATCA, VAT, Zakat, ISO standards |
 | [Integration Guide](./07-professional/integration-guide.md) | Third-party integrations catalog |
 
+### 08 — User Guides & Manuals
+| Document | Description |
+|----------|-------------|
+| [Quick Start Guide](./08-guides/QUICK-START-GUIDE.md) | Fast-track setup and first login |
+| [Training Quick Start](./08-guides/TRAINING_QUICK_START.md) | Role-based onboarding walkthrough |
+| [User Manual](./08-guides/USER-MANUAL.md) | Complete end-user manual |
+| [Administrator Guide](./08-guides/ADMINISTRATOR-GUIDE.md) | System administration reference |
+| [Admin User Manual](./08-guides/USER_MANUAL_ADMIN.md) | Detailed admin manual |
+| [Staff Users Guide](./08-guides/STAFF-USERS-GUIDE.md) | Staff-specific guidance |
+| [Portal Access Guide](./08-guides/PORTAL-ACCESS-GUIDE.md) | Customer & technician portal access |
+| [Portal Links Final](./08-guides/PORTAL-LINKS-FINAL.md) | All portal URL references |
+
+### 09 — Features & Modules Catalog
+| Document | Description |
+|----------|-------------|
+| [Feature Catalog](./09-features/FEATURE-CATALOG.md) | Complete list of all 156+ features |
+| [Feature Comparison & Bugs](./09-features/FEATURE_COMPARISON_AND_BUGS.md) | Feature audit and known issues |
+| [Detailed Module Comparison](./09-features/DETAILED_MODULE_COMPARISON.md) | Module-by-module comparison |
+| [Platform Completion Report](./09-features/PLATFORM-COMPLETION-REPORT.md) | Completion status by module |
+| [Platform Status](./09-features/PLATFORM_STATUS.md) | Current platform health and status |
+| [Sidebar Modules](./09-features/SIDEBAR_MODULES.md) | Sidebar navigation module listing |
+| [Sidebar Organization](./09-features/SIDEBAR_ORGANIZATION.md) | Sidebar structure and groupings |
+| [Platform Navigation Guide](./09-features/PLATFORM-NAVIGATION-GUIDE.md) | Navigation flow and shortcuts |
+
+### 10 — Technical Reference
+| Document | Description |
+|----------|-------------|
+| [Technology Stack](./10-technical/TECHNOLOGY_STACK.md) | Full tech stack details |
+| [Tech Guidelines](./10-technical/TECH_GUIDELINES.md) | Coding standards and conventions |
+| [Project Structure](./10-technical/PROJECT_STRUCTURE.md) | Directory and file layout |
+| [System Overview](./10-technical/SYSTEM-OVERVIEW.md) | High-level system overview |
+| [API Reference](./10-technical/API_REFERENCE.md) | REST API endpoints documentation |
+| [API Reference Swagger](./10-technical/API_REFERENCE_SWAGGER.md) | OpenAPI/Swagger specification |
+| [Mobile API Reference](./10-technical/MOBILE_API_REFERENCE.md) | Mobile app API documentation |
+| [Authentication Guide](./10-technical/AUTHENTICATION_GUIDE.md) | Auth flows, JWT, sessions |
+| [Security Audit Checklist](./10-technical/SECURITY_AUDIT_CHECKLIST.md) | Security review checklist |
+| [Backup & Recovery](./10-technical/BACKUP_RECOVERY_PROCEDURES.md) | Backup and disaster recovery |
+| [Monitoring & Logging](./10-technical/MONITORING_LOGGING_GUIDE.md) | Observability and log management |
+
+### 11 — UI Screens Reference
+| Document | Description |
+|----------|-------------|
+| [UI Screens Reference](./11-ui-screens/UI_SCREENS_REFERENCE.md) | Master reference for all 235 screens |
+| [UI Coverage Checklist](./11-ui-screens/ui-coverage-checklist.md) | Screen coverage and audit checklist |
+| [Component Library Guide](./11-ui-screens/COMPONENT_LIBRARY_GUIDE.md) | Component catalog and usage |
+| [Design System](./11-ui-screens/design-system.md) | Visual design tokens and principles |
+| [Component Map](./11-ui-screens/component-map.md) | Component hierarchy and relationships |
+| [Workflow Diagrams](./11-ui-screens/WORKFLOW_DIAGRAMS.md) | Process flow diagrams for all modules |
+
+### 12 — Compliance & Security
+| Document | Description |
+|----------|-------------|
+| [Saudi Arabia Features](./12-compliance/SAUDI_ARABIA_FEATURES.md) | KSA-specific features and regulations |
+| [Audit Trail Guide](./12-compliance/AUDIT_TRAIL_GUIDE.md) | Audit logging and trail management |
+| [Client Portal Security](./12-compliance/CLIENT_PORTAL_SECURITY.md) | Client portal security policies |
+| [Technician Portal Security](./12-compliance/TECHNICIAN_PORTAL_SECURITY.md) | Technician portal security policies |
+
+### 13 — Module-Specific Documentation
+| Document | Description |
+|----------|-------------|
+| [Accounting Modules](./13-modules/ACCOUNTING_MODULES.md) | Accounting module deep-dive |
+| [Phase 8 Mobile Apps](./13-modules/PHASE_8_MOBILE_APPS.md) | Phase 8 mobile app specifications |
+| [Phase 11 Mobile Web Apps](./13-modules/PHASE_11_MOBILE_WEB_APPS.md) | Phase 11 mobile web app specs |
+| [Phases 5–8 Plan](./13-modules/PHASES_5-8_IMPLEMENTATION_PLAN.md) | Implementation plan for phases 5–8 |
+| [Advanced Reporting](./13-modules/ADVANCED_REPORTING_SYSTEM.md) | Custom reports and analytics system |
+| [Notification System](./13-modules/NOTIFICATION_SYSTEM.md) | In-app notifications architecture |
+| [Multilanguage System](./13-modules/MULTILANGUAGE_SYSTEM.md) | i18n, Arabic RTL, and translation system |
+| [Keyboard Shortcuts Guide](./13-modules/KEYBOARD_SHORTCUTS_GUIDE.md) | All keyboard shortcuts reference |
+
+### 14 — Testing & QA
+| Document | Description |
+|----------|-------------|
+| [Testing Report](./14-testing/TESTING_REPORT.md) | Comprehensive test results |
+| [Testing Strategy Guide](./14-testing/TESTING_STRATEGY_GUIDE.md) | QA methodology and test plans |
+| [Comprehensive Test Report](./14-testing/COMPREHENSIVE_TEST_REPORT.md) | Full test coverage report |
+| [Issues Found](./14-testing/ISSUES_FOUND.md) | Bug tracker and known issues |
+| [Review Summary](./14-testing/REVIEW_SUMMARY.md) | Code and UX review summary |
+
+### 15 — Business & Marketing
+| Document | Description |
+|----------|-------------|
+| [Audience Pain Points](./15-business/AUDIENCE_PAIN_POINTS.md) | Target audience analysis |
+| [Video Script Outlines](./15-business/VIDEO_SCRIPT_OUTLINES.md) | Demo and marketing video scripts |
+| [White Label Customization](./15-business/WHITE_LABEL_CUSTOMIZATION.md) | White-labeling guide |
+| [Custom Domain Setup](./15-business/CUSTOM-DOMAIN-SETUP-GUIDE.md) | Domain configuration guide |
+
+### 16 — Operations & DevOps
+| Document | Description |
+|----------|-------------|
+| [Data Seeding Guide](./16-operations/DATA-SEEDING-GUIDE.md) | Database seeding and test data |
+| [Deployment Guide](./16-operations/DEPLOYMENT_GUIDE.md) | Production deployment procedures |
+| [RBAC Documentation](./16-operations/RBAC-DOCUMENTATION.md) | Role-based access control details |
+| [User-UI Access Matrix](./16-operations/USER-UI-ACCESS-MATRIX.md) | Role-to-screen access matrix |
+
+### 17 — References & Archives
+| Document | Description |
+|----------|-------------|
+| [FAQ](./17-references/FAQ.md) | Frequently asked questions |
+| [Troubleshooting Guide](./17-references/TROUBLESHOOTING-GUIDE.md) | Troubleshooting and debugging guide |
+| [Documentation Index](./17-references/DOCUMENTATION-INDEX.md) | Master documentation index |
+| [Documentation Summary](./17-references/DOCUMENTATION-SUMMARY.md) | Documentation overview summary |
+| [SALIS AUTO Documentation](./17-references/SALIS_AUTO_DOCUMENTATION.md) | Legacy documentation reference |
+| [Complete Application Description](./17-references/SALIS_AUTO_COMPLETE_APPLICATION_DESCRIPTION.md) | Full platform description |
+| [Complete Project Documentation](./17-references/SALIS_AUTO_COMPLETE_PROJECT_DOCUMENTATION.md) | Comprehensive project docs |
+| [Project Overview](./17-references/PROJECT_OVERVIEW.md) | Project scope and summary |
+| [Release Notes](./17-references/RELEASE_NOTES.md) | Version history and changelog |
+
 ---
 
 ## Quick Start

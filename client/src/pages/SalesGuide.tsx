@@ -504,7 +504,7 @@ export default function SalesGuide() {
     <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('salesGuide.title', 'Sales Guide')}
-        description={t('salesGuide.description', 'دليل المبيعات - Comprehensive sales training and resources for service advisors')}
+        description={t('salesGuide.description', 'Comprehensive sales training and resources for service advisors')}
         defaultTab="process"
         tabs={[
           { id: "process", label: t('salesGuide.salesProcess', 'Sales Process'), icon: Target, content: processTab },

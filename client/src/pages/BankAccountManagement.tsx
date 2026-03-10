@@ -477,7 +477,7 @@ export default function BankAccountManagement() {
     <div className="p-6 space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('bankAccounts.title', 'Bank Account Management')}
-        description={t('bankAccounts.description', 'إدارة الحسابات البنكية - Manage bank accounts, transactions, and reconciliation')}
+        description={t('bankAccounts.description', 'Manage bank accounts, transactions, and reconciliation')}
         defaultTab="accounts"
         tabs={[
           { id: "accounts", label: t('bankAccounts.bankAccounts', 'Bank Accounts'), icon: Building2, content: accountsTab },

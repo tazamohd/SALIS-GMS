@@ -260,7 +260,7 @@ export default function AssetsManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('assets.fixedAssetsRegister', 'Fixed Assets Register')}</CardTitle>
-              <CardDescription className="text-[#64748B]">{t('assets.fixedAssetsDescription', 'سجل الأصول الثابتة - Track all company fixed assets')}</CardDescription>
+              <CardDescription className="text-[#64748B]">{t('assets.fixedAssetsDescription', 'Track all company fixed assets')}</CardDescription>
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -272,7 +272,7 @@ export default function AssetsManagement() {
               <DialogContent className="max-w-2xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-add-asset">
                 <DialogHeader>
                   <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('assets.addNewAsset', 'Add New Asset')}</DialogTitle>
-                  <DialogDescription className="text-[#64748B]">{t('assets.addNewAssetDescription', 'إضافة أصل جديد - Register a new fixed asset')}</DialogDescription>
+                  <DialogDescription className="text-[#64748B]">{t('assets.addNewAssetDescription', 'Register a new fixed asset')}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -512,7 +512,7 @@ export default function AssetsManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('assets.relatedFinancialModules', 'Related Financial Modules')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('assets.relatedFinancialModulesDescription', 'الوحدات المالية ذات الصلة - Quick access to balance sheet items')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('assets.relatedFinancialModulesDescription', 'Quick access to balance sheet items')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -524,7 +524,7 @@ export default function AssetsManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('assets.liabilitiesObligations', 'Liabilities & Obligations')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('assets.liabilitiesArabic', 'الخصوم')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('assets.liabilitiesArabic', 'Liabilities Arabic')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('assets.liabilitiesDescription', 'Manage company debts, loans, and financial obligations')}</p>
@@ -540,7 +540,7 @@ export default function AssetsManagement() {
                     <ExternalLink className="h-4 w-4 text-[#64748B]" />
                   </div>
                   <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('assets.equityManagement', 'Equity Management')}</CardTitle>
-                  <CardDescription className="text-[#64748B]">{t('assets.equityArabic', 'حقوق الملكية')}</CardDescription>
+                  <CardDescription className="text-[#64748B]">{t('assets.equityArabic', 'Equity Arabic')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-[#64748B]">{t('assets.equityDescription', 'Track owner\'s capital, investments, and retained earnings')}</p>
@@ -558,7 +558,7 @@ export default function AssetsManagement() {
       <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-[#0B1F3B] dark:text-white">{t('assets.depreciationSchedule', 'Depreciation Schedule')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('assets.depreciationScheduleDescription', 'جدول الإهلاك - 5-year depreciation forecast')}</CardDescription>
+          <CardDescription className="text-[#64748B]">{t('assets.depreciationScheduleDescription', '5-year depreciation forecast')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -605,7 +605,7 @@ export default function AssetsManagement() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('assets.title', 'Assets Management')}
-        description={t('assets.description', 'إدارة الأصول - Track and manage all company fixed assets')}
+        description={t('assets.description', 'Track and manage all company fixed assets')}
         defaultTab="fixed-assets"
         tabs={tabs}
       />

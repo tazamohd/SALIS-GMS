@@ -360,11 +360,11 @@ export default function LiveDeliveryTracking() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button className="flex-1" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-call-driver">
+                <Button className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-call-driver">
                   <Phone className="h-4 w-4 mr-2" />
                   Call
                 </Button>
-                <Button className="flex-1" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-message-driver">
+                <Button className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-message-driver">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Message
                 </Button>
@@ -429,7 +429,7 @@ export default function LiveDeliveryTracking() {
                   <p className="text-sm text-[#64748B]">{delivery.storeKeeperPhone}</p>
                 </div>
               </div>
-              <Button className="w-full mt-4" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-notify-storekeeper">
+              <Button className="w-full mt-4 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-notify-storekeeper">
                 <Phone className="h-4 w-4 mr-2" />
                 Notify Store Keeper
               </Button>

@@ -538,7 +538,7 @@ export default function BalanceSheet() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.balanceSheetTitle', 'Balance Sheet - الميزانية العمومية')}
+      title={t('accounting.balanceSheetTitle', 'Balance Sheet')}
       description={t('accounting.balanceSheetDescription', 'Financial position statement')}
       icon={Scale}
       tabs={tabs}
