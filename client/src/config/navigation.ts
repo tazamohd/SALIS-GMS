@@ -84,7 +84,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'ADVISOR' | 'TECHNICIAN' | 'ACCOUNTANT';
+export type UserRole = 'PLATFORM_ADMIN' | 'ADMIN' | 'MANAGER' | 'ADVISOR' | 'TECHNICIAN' | 'ACCOUNTANT';
 export type SubscriptionPlan = 'STARTER' | 'PRO' | 'ENTERPRISE';
 
 export interface NavItem {
@@ -105,6 +105,23 @@ export interface NavGroup {
 }
 
 export const navigationConfig: NavGroup[] = [
+  {
+    title: "Platform Administration",
+    icon: Crown,
+    roles: ['PLATFORM_ADMIN'],
+    items: [
+      { title: "Platform Overview", href: "/platform-admin", icon: LayoutDashboard, roles: ['PLATFORM_ADMIN'] },
+      { title: "Garage Management", href: "/platform-admin/garages", icon: Building2, roles: ['PLATFORM_ADMIN'] },
+      { title: "Supplier Management", href: "/platform-admin/suppliers", icon: Truck, roles: ['PLATFORM_ADMIN'] },
+      { title: "E-Commerce Stores", href: "/platform-admin/stores", icon: Store, roles: ['PLATFORM_ADMIN'] },
+      { title: "User Management", href: "/platform-admin/users", icon: Users, roles: ['PLATFORM_ADMIN'] },
+      { title: "Help & Support", href: "/platform-admin/support", icon: MessageSquare, roles: ['PLATFORM_ADMIN'] },
+      { title: "Platform Analytics", href: "/platform-admin/analytics", icon: BarChart3, roles: ['PLATFORM_ADMIN'] },
+      { title: "RBAC & Roles", href: "/platform-admin/roles", icon: Shield, roles: ['PLATFORM_ADMIN'] },
+      { title: "System Health", href: "/platform-admin/system", icon: Activity, roles: ['PLATFORM_ADMIN'] },
+      { title: "Billing & Subscriptions", href: "/platform-admin/billing", icon: CreditCard, roles: ['PLATFORM_ADMIN'] },
+    ],
+  },
   {
     title: "Dashboard & Overview",
     icon: Home,
@@ -420,7 +437,8 @@ export function hasRequiredRole(
 ): boolean {
   if (!allowedRoles || allowedRoles.length === 0) return true;
   if (!userRole) return false;
-  if (userRole === 'ADMIN') return true;
+  if (userRole === 'PLATFORM_ADMIN') return true;
+  if (userRole === 'ADMIN') return allowedRoles.some(r => r !== 'PLATFORM_ADMIN') || allowedRoles.includes('ADMIN');
   return allowedRoles.includes(userRole);
 }
 

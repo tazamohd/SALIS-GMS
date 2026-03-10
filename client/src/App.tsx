@@ -239,40 +239,33 @@ import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import PlatformAdmin from "@/pages/PlatformAdmin";
 
 function Router() {
-  // TEMPORARILY DISABLED: Authentication bypass for development testing
-  // const { isAuthenticated, isLoading } = useAuth();
-  
-  const { data: user } = useQuery<User>({
-    queryKey: ['/api/auth/user'],
-    // enabled: isAuthenticated,
-  });
+  const { isAuthenticated, isLoading, user } = useAuth();
 
-  // TEMPORARILY DISABLED: Loading check bypassed
-  // if (isLoading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-  //         <p className="mt-4 text-gray-600">Loading...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+          <p className="mt-4 text-sm text-[#64748B]">Loading SALIS AUTO...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // TEMPORARILY DISABLED: Authentication bypass - remove this comment block to re-enable auth
-  // if (!isAuthenticated) {
-  //   return (
-  //     <Switch>
-  //       <Route path="/login" component={Login} />
-  //       <Route path="/register" component={Register} />
-  //       <Route path="/customer-portal" component={CustomerPortal} />
-  //       <Route path="/track/:token" component={PublicTracking} />
-  //       <Route component={Landing} />
-  //     </Switch>
-  //   );
-  // }
+  if (!isAuthenticated) {
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/track/:token" component={PublicTracking} />
+        <Route path="/customer-portal" component={CustomerPortal} />
+        <Route component={Login} />
+      </Switch>
+    );
+  }
 
   // Check if user is a customer
   const isCustomer = user?.userType === 'customer';
@@ -736,6 +729,14 @@ function Router() {
           <RoleManagement />
         </Layout>
       </Route>
+
+      {/* Platform Administration Routes */}
+      <Route path="/platform-admin/:tab?">
+        <Layout>
+          <PlatformAdmin />
+        </Layout>
+      </Route>
+
       <Route path="/data-backup">
         <Layout>
           <DataBackup />

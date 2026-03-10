@@ -193,7 +193,27 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   // Get user role and plan for filtering navigation
-  const userRole: UserRole = ((user as any)?.role?.toUpperCase() || 
+  // Map various DB role formats to the canonical UserRole types
+  const dbRole = (user as any)?.role;
+  const roleMap: Record<string, UserRole> = {
+    'PLATFORM_ADMIN': 'PLATFORM_ADMIN',
+    'platform_admin': 'PLATFORM_ADMIN',
+    'ADMIN': 'ADMIN',
+    'admin': 'ADMIN',
+    'system_administrator': 'ADMIN',
+    'SYSTEM_ADMINISTRATOR': 'ADMIN',
+    'MANAGER': 'MANAGER',
+    'manager': 'MANAGER',
+    'service_manager': 'MANAGER',
+    'ADVISOR': 'ADVISOR',
+    'advisor': 'ADVISOR',
+    'service_advisor': 'ADVISOR',
+    'TECHNICIAN': 'TECHNICIAN',
+    'technician': 'TECHNICIAN',
+    'ACCOUNTANT': 'ACCOUNTANT',
+    'accountant': 'ACCOUNTANT',
+  };
+  const userRole: UserRole = (dbRole ? (roleMap[dbRole] || dbRole.toUpperCase() as UserRole) : 
     ((user as any)?.userType === 'admin' ? 'ADMIN' : 'ADVISOR')) as UserRole;
   
   // Subscription plan comes from user object (included by /api/user endpoint)
@@ -284,6 +304,26 @@ export function Layout({ children }: LayoutProps) {
               <GripVertical className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0]" />
             </div>
           </div>
+          {/* User Role Badge */}
+          {user && (
+            <div className="px-3 pt-3 pb-1">
+              <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-[10px] font-bold">
+                    {((user as any)?.fullName || (user as any)?.email || 'U').charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-[#0F172A] dark:text-white truncate">
+                    {(user as any)?.fullName || (user as any)?.email?.split('@')[0]}
+                  </p>
+                  <p className="text-[10px] text-[#64748B] dark:text-[#9BA4B0] truncate uppercase tracking-wide">
+                    {userRole === 'PLATFORM_ADMIN' ? '⭐ Platform Admin' : userRole}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Navigation - Compact */}
           <nav className="flex-1 p-3 overflow-y-auto">
             <div className="space-y-0.5">
@@ -305,7 +345,7 @@ export function Layout({ children }: LayoutProps) {
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors group">
-                        <span className="font-poppins font-bold text-[11px] uppercase text-[#64748B] dark:text-[#9BA4B0] tracking-wide leading-tight text-left whitespace-nowrap">
+                        <span className="font-poppins font-extrabold text-[13px] uppercase text-[#0F172A] dark:text-[#C8D6E8] tracking-wider leading-tight text-left whitespace-nowrap">
                           {groupLabel}
                         </span>
                         <div className="flex-1" />
