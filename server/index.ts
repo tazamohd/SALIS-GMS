@@ -15,9 +15,11 @@ import { registerRoutes } from "./routes/index";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeChatWebSocket } from "./websocket";
 import rateLimit from "express-rate-limit";
+import { requestId } from "./middleware/requestId";
 
 const app = express();
-app.use(express.json());
+app.use(requestId);
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // Security headers

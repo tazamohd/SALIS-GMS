@@ -1,9 +1,4 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
 import * as schema from "@shared/schema";
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,13 +6,41 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 5_000,
-});
-export const db = drizzle({ client: pool, schema });
+const isNeon = process.env.DATABASE_URL.includes('neon.tech');
+
+// Use standard pg Pool for local dev, Neon serverless Pool for production
+let pool: any;
+let db: any;
+
+if (isNeon) {
+  // Production: Neon serverless driver with WebSocket support
+  const { Pool: NeonPool, neonConfig } = await import('@neondatabase/serverless');
+  const { drizzle: drizzleNeon } = await import('drizzle-orm/neon-serverless');
+  const ws = await import('ws');
+  neonConfig.webSocketConstructor = ws.default;
+
+  pool = new NeonPool({
+    connectionString: process.env.DATABASE_URL,
+    max: 20,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 5_000,
+  });
+  db = drizzleNeon({ client: pool, schema });
+} else {
+  // Local development: standard pg driver (no WebSocket needed)
+  const pg = await import('pg');
+  const { drizzle: drizzleNode } = await import('drizzle-orm/node-postgres');
+
+  pool = new pg.default.Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 20,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 5_000,
+  });
+  db = drizzleNode({ client: pool, schema });
+}
+
+export { pool, db };
 
 export async function checkDatabaseHealth(): Promise<boolean> {
   try {

@@ -23,8 +23,25 @@ export function csrfTokenRoute(req: Request, res: Response): void {
 
 const SKIP_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
+// Auth entry points are exempt from CSRF - they create sessions and are
+// protected by rate limiting instead. CSRF protects actions within an
+// authenticated session, not the session creation itself.
+// Paths checked against req.originalUrl (full path including mount prefix)
+const CSRF_EXEMPT_PATHS = new Set([
+  "/api/login",
+  "/api/register",
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/customer-portal/login",
+]);
+
 export function validateCsrfToken(req: Request, res: Response, next: NextFunction): void {
   if (SKIP_METHODS.has(req.method)) {
+    return next();
+  }
+
+  // Use originalUrl so path matching works regardless of Express mount prefix
+  if (CSRF_EXEMPT_PATHS.has(req.originalUrl.split("?")[0])) {
     return next();
   }
 
