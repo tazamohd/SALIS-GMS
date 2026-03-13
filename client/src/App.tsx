@@ -28,6 +28,7 @@ import Suppliers from "@/pages/Suppliers";
 import InventoryManagement from "@/pages/InventoryManagement";
 import { PartsAvailability } from "@/pages/PartsAvailability";
 import { SmartAssignment } from "@/pages/SmartAssignment";
+import { SkipToContent } from "@/components/SkipToContent";
 import CallCenter from "@/pages/CallCenter";
 import SupportChatDashboard from "@/pages/SupportChatDashboard";
 import { TechnicianPortal } from "@/pages/TechnicianPortal";
@@ -1390,6 +1391,7 @@ function App() {
       <AuthProvider>
         <UndoRedoProvider>
           <TooltipProvider>
+            <SkipToContent />
             <Toaster />
             <Router />
           </TooltipProvider>

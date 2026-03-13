@@ -6,17 +6,23 @@ import fs from "fs";
 import { setupAuth } from "../auth";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
+import healthRouter from "./health";
+import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
+
+  // Health check endpoints (no auth required)
+  app.use(healthRouter);
+  console.log("✅ Health Check Routes Loaded");
 
   // Serve static public directory for landing page assets
   const publicPath = path.join(process.cwd(), "public");
   if (fs.existsSync(publicPath)) {
     app.use("/public", express.static(publicPath));
   }
-  
+
   // Public API routes (no auth required) - mounted at /api/public
   app.use("/api/public", publicRoutes);
   console.log("✅ Public API Routes Loaded");
@@ -58,6 +64,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // CSRF protection (after auth so session is available)
+  app.get("/api/csrf-token", generateCsrfToken);
+  app.use("/api", validateCsrfToken);
+  console.log("✅ CSRF Protection Enabled");
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
