@@ -11,5 +11,17 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+});
 export const db = drizzle({ client: pool, schema });
+
+export async function checkDatabaseHealth(): Promise<boolean> {
+  try {
+    const client = await pool.connect();
+    try { await client.query('SELECT 1'); return true; } finally { client.release(); }
+  } catch { return false; }
+}

@@ -88,10 +88,10 @@ export async function setupAuth(app: Express) {
       if (!user) {
         return done(null, false);
       }
-      
+
       // Debug log to verify user properties
       console.log('deserializeUser - user garageId:', (user as any).garageId, 'role:', (user as any).role);
-      
+
       // Enrich user with subscription plan from garage (Drizzle returns camelCase)
       let subscriptionPlan = 'STARTER';
       const garageId = (user as any).garageId;
@@ -106,7 +106,7 @@ export async function setupAuth(app: Express) {
           console.error('Error fetching garage for subscription plan:', garageError);
         }
       }
-      
+
       const enrichedUser = { ...user, subscriptionPlan };
       console.log('deserializeUser - enriched subscriptionPlan:', subscriptionPlan);
       done(null, enrichedUser);
@@ -123,12 +123,24 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  
+
   // Development bypass - disabled by default for security
   if (AUTH_BYPASS_ENABLED) {
     console.warn('Auth bypass enabled - development only');
     return next();
   }
-  
+
   res.status(401).json({ message: "Unauthorized" });
 };
+
+export async function invalidateUserSessions(userId: string): Promise<void> {
+  try {
+    const { pool } = await import('./db');
+    await pool.query(
+      `DELETE FROM sessions WHERE sess::jsonb -> 'passport' ->> 'user' = $1`,
+      [userId]
+    );
+  } catch (error) {
+    console.error('Error invalidating sessions for user:', userId, error);
+  }
+}

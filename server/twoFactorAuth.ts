@@ -1,6 +1,34 @@
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 
+const twoFaAttempts = new Map<string, { count: number; lockedUntil: number }>();
+const MAX_2FA_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
+
+export function is2FALockedOut(userId: string): boolean {
+  const entry = twoFaAttempts.get(userId);
+  if (!entry) return false;
+  if (entry.lockedUntil > Date.now()) return true;
+  twoFaAttempts.delete(userId);
+  return false;
+}
+
+export function record2FAFailure(userId: string): boolean {
+  const entry = twoFaAttempts.get(userId) || { count: 0, lockedUntil: 0 };
+  entry.count++;
+  if (entry.count >= MAX_2FA_ATTEMPTS) {
+    entry.lockedUntil = Date.now() + LOCKOUT_DURATION_MS;
+    twoFaAttempts.set(userId, entry);
+    return true;
+  }
+  twoFaAttempts.set(userId, entry);
+  return false;
+}
+
+export function clear2FAAttempts(userId: string): void {
+  twoFaAttempts.delete(userId);
+}
+
 export interface TwoFactorSetup {
   secret: string;
   qrCodeUrl: string;
@@ -18,7 +46,7 @@ export async function generateTwoFactorSecret(userEmail: string): Promise<TwoFac
   const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url || '');
 
   // Generate backup codes (10 codes)
-  const backupCodes = Array.from({ length: 10 }, () => 
+  const backupCodes = Array.from({ length: 10 }, () =>
     generateBackupCode()
   );
 
