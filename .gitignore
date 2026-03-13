@@ -4,3 +4,10 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Sensitive files
+user_credentials.csv
+.env
+.env.*
+*.pem
+*.key
