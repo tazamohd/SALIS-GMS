@@ -14,6 +14,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes/index";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeChatWebSocket } from "./websocket";
+import { initializeEngine } from "./engine";
 import rateLimit from "express-rate-limit";
 import { requestId } from "./middleware/requestId";
 
@@ -90,6 +91,10 @@ app.use((req, res, next) => {
   // Initialize WebSocket server for real-time chat
   initializeChatWebSocket(server);
   log("WebSocket server initialized");
+
+  // Initialize Workflow Engine (state machines, event bus, cross-module triggers)
+  initializeEngine();
+  log("Workflow Engine initialized");
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

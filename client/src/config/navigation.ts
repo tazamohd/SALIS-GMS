@@ -127,6 +127,8 @@ export const navigationConfig: NavGroup[] = [
     icon: Home,
     items: [
       { title: "Dashboard", href: "/", icon: Home },
+      { title: "Command Center", href: "/command-center", icon: Target },
+      { title: "AI Insights", href: "/ai-insights", icon: Target },
       { title: "KPI Dashboard", href: "/kpi-dashboard", icon: Target },
       { title: "Service Bay Monitor", href: "/service-bay-dashboard", icon: Wrench },
       { title: "Auto Reordering", href: "/automated-reordering", icon: PackageSearch },

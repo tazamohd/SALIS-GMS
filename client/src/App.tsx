@@ -150,6 +150,8 @@ import MLFraudDetection from "@/pages/MLFraudDetection";
 import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
 import TireManagement from "@/pages/TireManagement";
 import KPIDashboard from "@/pages/KPIDashboard";
+import CommandCenter from "@/pages/CommandCenter";
+import AIInsights from "@/pages/AIInsights";
 import AppointmentReminders from "@/pages/AppointmentReminders";
 import CustomReportBuilder from "@/pages/CustomReportBuilder";
 import VINDecoder from "@/pages/VINDecoder";
@@ -385,6 +387,16 @@ function Router() {
       <Route path="/kpi-dashboard">
         <Layout>
           <KPIDashboard />
+        </Layout>
+      </Route>
+      <Route path="/command-center">
+        <Layout>
+          <CommandCenter />
+        </Layout>
+      </Route>
+      <Route path="/ai-insights">
+        <Layout>
+          <AIInsights />
         </Layout>
       </Route>
       <Route path="/appointment-reminders">

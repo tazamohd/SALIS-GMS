@@ -7,6 +7,9 @@ import { setupAuth } from "../auth";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import healthRouter from "./health";
+import commandCenterRouter from "./command-center";
+import workflowRouter from "./workflow";
+import aiInsightsRouter from "./ai-insights";
 import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
@@ -73,6 +76,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Load new modular routes with priority
   app.use("/api", authRoutes);
   console.log("✅ Auth Module Loaded");
+
+  // Command Center, Workflow Engine & AI Intelligence routes
+  app.use("/api", commandCenterRouter);
+  app.use("/api", workflowRouter);
+  app.use("/api", aiInsightsRouter);
+  console.log("✅ Command Center, Workflow Engine & AI Intelligence Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
