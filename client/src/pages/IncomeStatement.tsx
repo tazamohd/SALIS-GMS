@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
@@ -37,60 +38,53 @@ import {
   PieChart,
 } from "lucide-react";
 
-const revenueData = [
-  { code: "4100", name: "Service Revenue", amount: 356000, previousAmount: 312000 },
-  { code: "4200", name: "Parts Sales Revenue", amount: 89000, previousAmount: 78500 },
-  { code: "4300", name: "Diagnostic Services", amount: 45000, previousAmount: 38000 },
-  { code: "4400", name: "Warranty Claims Revenue", amount: 28000, previousAmount: 22000 },
-  { code: "4500", name: "Other Income", amount: 12000, previousAmount: 9500 },
-];
-
-const costOfGoodsSold = [
-  { code: "5100", name: "Cost of Parts Sold", amount: 78500, previousAmount: 68000 },
-  { code: "5110", name: "Direct Labor - Technicians", amount: 95000, previousAmount: 88000 },
-  { code: "5120", name: "Consumables & Materials", amount: 15500, previousAmount: 14000 },
-];
-
-const operatingExpenses = [
-  { code: "5200", name: "Salaries & Wages - Admin", amount: 50000, previousAmount: 48000 },
-  { code: "5300", name: "Rent Expense", amount: 36000, previousAmount: 36000 },
-  { code: "5400", name: "Utilities Expense", amount: 28500, previousAmount: 26000 },
-  { code: "5500", name: "Depreciation Expense", amount: 22500, previousAmount: 22500 },
-  { code: "5600", name: "Insurance Expense", amount: 14000, previousAmount: 14000 },
-  { code: "5700", name: "Marketing & Advertising", amount: 18000, previousAmount: 15000 },
-  { code: "5800", name: "Professional Fees", amount: 8500, previousAmount: 7500 },
-  { code: "5900", name: "Office Supplies", amount: 4500, previousAmount: 4000 },
-  { code: "5950", name: "Repairs & Maintenance", amount: 12000, previousAmount: 10000 },
-];
-
-const otherItems = [
-  { code: "6100", name: "Interest Expense", amount: 8500, previousAmount: 9000 },
-  { code: "6200", name: "Bank Charges", amount: 2500, previousAmount: 2200 },
-];
+type LineItem = { code: string; name: string; amount: number; previousAmount: number };
 
 export default function IncomeStatement() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01");
   const [compareWith, setCompareWith] = useState("previous");
 
+  const { data, isLoading } = useQuery<{
+    revenue: {
+      grossRevenue: LineItem[];
+    };
+    costOfGoodsSold: LineItem[];
+    operatingExpenses: LineItem[];
+    otherExpenses: LineItem[];
+    grossProfit: number;
+    netIncome: number;
+    grossMargin: number;
+    operatingIncome: number;
+    operatingMargin: number;
+    netMargin: number;
+  }>({
+    queryKey: ["/api/financial/income-statement"],
+  });
+
+  const revenueData = data?.revenue?.grossRevenue ?? [];
+  const costOfGoodsSold = data?.costOfGoodsSold ?? [];
+  const operatingExpenses = data?.operatingExpenses ?? [];
+  const otherItems = data?.otherExpenses ?? [];
+
   const totalRevenue = revenueData.reduce((sum, item) => sum + item.amount, 0);
   const totalPreviousRevenue = revenueData.reduce((sum, item) => sum + item.previousAmount, 0);
   const totalCOGS = costOfGoodsSold.reduce((sum, item) => sum + item.amount, 0);
   const totalPreviousCOGS = costOfGoodsSold.reduce((sum, item) => sum + item.previousAmount, 0);
-  const grossProfit = totalRevenue - totalCOGS;
+  const grossProfit = data?.grossProfit ?? (totalRevenue - totalCOGS);
   const previousGrossProfit = totalPreviousRevenue - totalPreviousCOGS;
   const totalOperatingExpenses = operatingExpenses.reduce((sum, item) => sum + item.amount, 0);
   const previousOperatingExpenses = operatingExpenses.reduce((sum, item) => sum + item.previousAmount, 0);
-  const operatingIncome = grossProfit - totalOperatingExpenses;
+  const operatingIncome = data?.operatingIncome ?? (grossProfit - totalOperatingExpenses);
   const previousOperatingIncome = previousGrossProfit - previousOperatingExpenses;
   const totalOtherExpenses = otherItems.reduce((sum, item) => sum + item.amount, 0);
   const previousOtherExpenses = otherItems.reduce((sum, item) => sum + item.previousAmount, 0);
-  const netIncome = operatingIncome - totalOtherExpenses;
+  const netIncome = data?.netIncome ?? (operatingIncome - totalOtherExpenses);
   const previousNetIncome = previousOperatingIncome - previousOtherExpenses;
 
-  const grossMargin = (grossProfit / totalRevenue) * 100;
-  const operatingMargin = (operatingIncome / totalRevenue) * 100;
-  const netMargin = (netIncome / totalRevenue) * 100;
+  const grossMargin = data?.grossMargin ?? (totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0);
+  const operatingMargin = data?.operatingMargin ?? (totalRevenue > 0 ? (operatingIncome / totalRevenue) * 100 : 0);
+  const netMargin = data?.netMargin ?? (totalRevenue > 0 ? (netIncome / totalRevenue) * 100 : 0);
 
   const getChangeIndicator = (current: number, previous: number) => {
     const change = ((current - previous) / previous) * 100;

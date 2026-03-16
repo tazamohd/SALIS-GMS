@@ -10,6 +10,9 @@ import healthRouter from "./health";
 import commandCenterRouter from "./command-center";
 import workflowRouter from "./workflow";
 import aiInsightsRouter from "./ai-insights";
+import financialRouter from "./financial";
+import workflowHooksRouter from "./workflow-hooks";
+import saudiRouter from "./saudi";
 import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
@@ -81,7 +84,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", commandCenterRouter);
   app.use("/api", workflowRouter);
   app.use("/api", aiInsightsRouter);
-  console.log("✅ Command Center, Workflow Engine & AI Intelligence Loaded");
+  app.use("/api", financialRouter);
+  app.use("/api", workflowHooksRouter);
+  app.use("/api", saudiRouter);
+  console.log("✅ Command Center, Workflow Engine, AI Intelligence, Financial, Workflow Hooks & Saudi Compliance Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

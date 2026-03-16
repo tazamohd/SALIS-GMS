@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -71,113 +72,36 @@ const paymentSchema = z.object({
 
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
-const receivables = [
-  {
-    id: "AR-001",
-    customerId: "CUST-001",
-    customerName: "Ahmed Al-Rashid",
-    invoiceNumber: "INV-2024-0089",
-    invoiceDate: "2024-01-15",
-    dueDate: "2024-02-14",
-    originalAmount: 15000,
-    paidAmount: 0,
-    balanceDue: 15000,
-    daysOverdue: 0,
-    status: "Current",
-    email: "ahmed@example.com",
-    phone: "+966 50 123 4567",
-  },
-  {
-    id: "AR-002",
-    customerId: "CUST-002",
-    customerName: "Fatima Al-Hassan",
-    invoiceNumber: "INV-2024-0078",
-    invoiceDate: "2024-01-08",
-    dueDate: "2024-02-07",
-    originalAmount: 8500,
-    paidAmount: 4000,
-    balanceDue: 4500,
-    daysOverdue: 0,
-    status: "Current",
-    email: "fatima@example.com",
-    phone: "+966 55 234 5678",
-  },
-  {
-    id: "AR-003",
-    customerId: "CUST-003",
-    customerName: "Khalid Motors",
-    invoiceNumber: "INV-2024-0065",
-    invoiceDate: "2023-12-20",
-    dueDate: "2024-01-19",
-    originalAmount: 25000,
-    paidAmount: 0,
-    balanceDue: 25000,
-    daysOverdue: 12,
-    status: "Overdue",
-    email: "accounts@khalidmotors.com",
-    phone: "+966 11 456 7890",
-  },
-  {
-    id: "AR-004",
-    customerId: "CUST-004",
-    customerName: "Mohammed Transport Co",
-    invoiceNumber: "INV-2024-0052",
-    invoiceDate: "2023-12-10",
-    dueDate: "2024-01-09",
-    originalAmount: 18500,
-    paidAmount: 10000,
-    balanceDue: 8500,
-    daysOverdue: 22,
-    status: "Overdue",
-    email: "billing@mtransport.com",
-    phone: "+966 12 567 8901",
-  },
-  {
-    id: "AR-005",
-    customerId: "CUST-005",
-    customerName: "Sara Al-Mahmoud",
-    invoiceNumber: "INV-2024-0045",
-    invoiceDate: "2023-11-25",
-    dueDate: "2023-12-25",
-    originalAmount: 12000,
-    paidAmount: 0,
-    balanceDue: 12000,
-    daysOverdue: 37,
-    status: "Past Due",
-    email: "sara.m@email.com",
-    phone: "+966 50 678 9012",
-  },
-  {
-    id: "AR-006",
-    customerId: "CUST-006",
-    customerName: "Al-Faisal Trading",
-    invoiceNumber: "INV-2024-0032",
-    invoiceDate: "2023-10-15",
-    dueDate: "2023-11-14",
-    originalAmount: 35000,
-    paidAmount: 20000,
-    balanceDue: 15000,
-    daysOverdue: 78,
-    status: "Delinquent",
-    email: "finance@alfaisal.com",
-    phone: "+966 13 789 0123",
-  },
-];
-
-const customers = [
-  { id: "CUST-001", name: "Ahmed Al-Rashid" },
-  { id: "CUST-002", name: "Fatima Al-Hassan" },
-  { id: "CUST-003", name: "Khalid Motors" },
-  { id: "CUST-004", name: "Mohammed Transport Co" },
-  { id: "CUST-005", name: "Sara Al-Mahmoud" },
-  { id: "CUST-006", name: "Al-Faisal Trading" },
-];
-
 export default function AccountsReceivable() {
   const { t } = useTranslation();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const { data, isLoading } = useQuery<{
+    invoices: Array<{
+      id: string;
+      customerId: string;
+      customerName: string;
+      invoiceNumber: string;
+      invoiceDate: string;
+      dueDate: string;
+      originalAmount: number;
+      paidAmount: number;
+      balanceDue: number;
+      daysOverdue: number;
+      status: string;
+      email: string;
+      phone: string;
+    }>;
+    aging: Array<{ label: string; amount: number; percentage: number }>;
+    totalOutstanding: number;
+  }>({
+    queryKey: ["/api/financial/accounts-receivable"],
+  });
+
+  const receivables = data?.invoices ?? [];
+  const customers = receivables.map((r) => ({ id: r.customerId, name: r.customerName }));
 
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
@@ -191,13 +115,13 @@ export default function AccountsReceivable() {
     },
   });
 
-  const onSubmit = (data: PaymentFormData) => {
-    console.log("Record payment:", data);
+  const onSubmit = (formData: PaymentFormData) => {
+    console.log("Record payment:", formData);
     setIsPaymentDialogOpen(false);
     form.reset();
   };
 
-  const totalReceivables = receivables.reduce((sum, r) => sum + r.balanceDue, 0);
+  const totalReceivables = data?.totalOutstanding ?? receivables.reduce((sum, r) => sum + r.balanceDue, 0);
   const currentReceivables = receivables.filter((r) => r.status === "Current").reduce((sum, r) => sum + r.balanceDue, 0);
   const overdueReceivables = receivables.filter((r) => r.status !== "Current").reduce((sum, r) => sum + r.balanceDue, 0);
   const avgDaysOverdue = Math.round(
@@ -531,12 +455,12 @@ export default function AccountsReceivable() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[
-              { label: t('accounting.aging.current', 'Current (0-30 days)'), amount: 19500, percentage: 24 },
-              { label: t('accounting.aging.31to60', '31-60 days'), amount: 33500, percentage: 42 },
-              { label: t('accounting.aging.61to90', '61-90 days'), amount: 12000, percentage: 15 },
-              { label: t('accounting.aging.over90', 'Over 90 days'), amount: 15000, percentage: 19 },
-            ].map((item, index) => (
+            {(data?.aging ?? [
+              { label: t('accounting.aging.current', 'Current (0-30 days)'), amount: 0, percentage: 0 },
+              { label: t('accounting.aging.31to60', '31-60 days'), amount: 0, percentage: 0 },
+              { label: t('accounting.aging.61to90', '61-90 days'), amount: 0, percentage: 0 },
+              { label: t('accounting.aging.over90', 'Over 90 days'), amount: 0, percentage: 0 },
+            ]).map((item, index) => (
               <div key={index}>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm text-[#0B1F3B] dark:text-white">{item.label}</span>

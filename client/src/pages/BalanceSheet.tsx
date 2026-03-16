@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,64 +36,50 @@ import {
   PieChart,
 } from "lucide-react";
 
-const currentAssets = [
-  { code: "1100", name: "Cash & Cash Equivalents", amount: 155500, previousAmount: 142000 },
-  { code: "1200", name: "Accounts Receivable", amount: 89500, previousAmount: 78000 },
-  { code: "1210", name: "Less: Allowance for Doubtful Accounts", amount: -4500, previousAmount: -3500 },
-  { code: "1300", name: "Inventory - Spare Parts", amount: 125000, previousAmount: 118000 },
-  { code: "1400", name: "Prepaid Expenses", amount: 15000, previousAmount: 12000 },
-  { code: "1450", name: "Other Current Assets", amount: 8500, previousAmount: 6500 },
-];
-
-const nonCurrentAssets = [
-  { code: "1500", name: "Property & Equipment", amount: 450000, previousAmount: 450000 },
-  { code: "1550", name: "Less: Accumulated Depreciation", amount: -67500, previousAmount: -45000 },
-  { code: "1600", name: "Vehicles", amount: 180000, previousAmount: 180000 },
-  { code: "1650", name: "Less: Accumulated Depreciation - Vehicles", amount: -36000, previousAmount: -24000 },
-  { code: "1700", name: "Intangible Assets", amount: 25000, previousAmount: 25000 },
-  { code: "1750", name: "Less: Accumulated Amortization", amount: -5000, previousAmount: -2500 },
-];
-
-const currentLiabilities = [
-  { code: "2100", name: "Accounts Payable", amount: 78500, previousAmount: 65000 },
-  { code: "2200", name: "Accrued Expenses", amount: 25000, previousAmount: 22000 },
-  { code: "2300", name: "VAT Payable", amount: 18500, previousAmount: 15500 },
-  { code: "2400", name: "Unearned Revenue", amount: 12000, previousAmount: 8000 },
-  { code: "2500", name: "Current Portion of Long-term Debt", amount: 24000, previousAmount: 24000 },
-];
-
-const nonCurrentLiabilities = [
-  { code: "2600", name: "Long-term Bank Loan", amount: 76000, previousAmount: 100000 },
-  { code: "2700", name: "Deferred Tax Liabilities", amount: 8500, previousAmount: 6500 },
-];
-
-const equity = [
-  { code: "3100", name: "Share Capital", amount: 300000, previousAmount: 300000 },
-  { code: "3200", name: "Retained Earnings - Beginning", amount: 125000, previousAmount: 95000 },
-  { code: "3300", name: "Current Year Net Income", amount: 141000, previousAmount: 125000 },
-  { code: "3400", name: "Dividends Declared", amount: -50000, previousAmount: -30000 },
-];
-
 export default function BalanceSheet() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState("2024-01-31");
 
-  const totalCurrentAssets = currentAssets.reduce((sum, item) => sum + item.amount, 0);
-  const totalNonCurrentAssets = nonCurrentAssets.reduce((sum, item) => sum + item.amount, 0);
-  const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+  const { data: bsData } = useQuery({
+    queryKey: ["/api/financial/balance-sheet"],
+    queryFn: async () => {
+      const res = await fetch("/api/financial/balance-sheet", { credentials: "include" });
+      if (!res.ok) return null;
+      return res.json();
+    },
+  });
 
-  const totalCurrentLiabilities = currentLiabilities.reduce((sum, item) => sum + item.amount, 0);
-  const totalNonCurrentLiabilities = nonCurrentLiabilities.reduce((sum, item) => sum + item.amount, 0);
-  const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
+  const currentAssets = Object.entries(bsData?.assets?.current || {}).map(([name, amount]) => ({
+    code: "", name, amount: Number(amount) || 0, previousAmount: 0,
+  }));
+  const nonCurrentAssets = Object.entries(bsData?.assets?.nonCurrent || {}).map(([name, amount]) => ({
+    code: "", name, amount: Number(amount) || 0, previousAmount: 0,
+  }));
+  const totalCurrentAssets = bsData?.assets?.totalCurrent || 0;
+  const totalNonCurrentAssets = bsData?.assets?.totalNonCurrent || 0;
+  const totalAssets = bsData?.assets?.totalAssets || 0;
 
-  const totalEquity = equity.reduce((sum, item) => sum + item.amount, 0);
+  const currentLiabilities = Object.entries(bsData?.liabilities?.current || {}).map(([name, amount]) => ({
+    code: "", name, amount: Number(amount) || 0, previousAmount: 0,
+  }));
+  const nonCurrentLiabilities = Object.entries(bsData?.liabilities?.nonCurrent || {}).map(([name, amount]) => ({
+    code: "", name, amount: Number(amount) || 0, previousAmount: 0,
+  }));
+  const totalCurrentLiabilities = bsData?.liabilities?.totalCurrentLiabilities || 0;
+  const totalNonCurrentLiabilities = bsData?.liabilities?.totalNonCurrentLiabilities || 0;
+  const totalLiabilities = bsData?.liabilities?.totalLiabilities || 0;
+
+  const equity = Object.entries(bsData?.equity?.items || {}).map(([name, amount]) => ({
+    code: "", name, amount: Number(amount) || 0, previousAmount: 0,
+  }));
+  const totalEquity = bsData?.equity?.totalEquity || 0;
+
   const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
-
-  const previousTotalAssets = [...currentAssets, ...nonCurrentAssets].reduce((sum, item) => sum + item.previousAmount, 0);
+  const previousTotalAssets = 0;
 
   const isBalanced = totalAssets === totalLiabilitiesAndEquity;
-  const currentRatio = totalCurrentAssets / totalCurrentLiabilities;
-  const debtRatio = (totalLiabilities / totalAssets) * 100;
+  const currentRatio = totalCurrentLiabilities ? totalCurrentAssets / totalCurrentLiabilities : 0;
+  const debtRatio = totalAssets ? (totalLiabilities / totalAssets) * 100 : 0;
 
   const balanceSheetTab = (
     <div className="space-y-6">

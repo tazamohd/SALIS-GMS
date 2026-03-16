@@ -341,6 +341,7 @@ export const navigationConfig: NavGroup[] = [
     title: "Compliance & Safety",
     icon: Shield,
     items: [
+      { title: "Saudi Compliance (ZATCA/GOSI)", href: "/saudi-compliance", icon: Shield },
       { title: "Compliance Management", href: "/compliance-management", icon: Shield },
       { title: "Environmental Compliance", href: "/environmental-compliance", icon: Recycle },
       { title: "ISO Quality", href: "/iso-quality", icon: BadgeCheck },

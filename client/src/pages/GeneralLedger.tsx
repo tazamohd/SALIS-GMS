@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,119 +40,7 @@ import {
   Layers,
 } from "lucide-react";
 
-const ledgerEntries = [
-  {
-    id: "GL-2024-001",
-    date: "2024-01-25",
-    journalRef: "JE-2024-0125",
-    account: "1100 - Cash",
-    accountType: "Asset",
-    description: "Customer payment received - Invoice #INV-2024-0089",
-    debit: 15000,
-    credit: 0,
-    balance: 245000,
-    postedBy: "Ahmed Al-Salem",
-  },
-  {
-    id: "GL-2024-002",
-    date: "2024-01-25",
-    journalRef: "JE-2024-0125",
-    account: "1200 - Accounts Receivable",
-    accountType: "Asset",
-    description: "Customer payment received - Invoice #INV-2024-0089",
-    debit: 0,
-    credit: 15000,
-    balance: 89500,
-    postedBy: "Ahmed Al-Salem",
-  },
-  {
-    id: "GL-2024-003",
-    date: "2024-01-24",
-    journalRef: "JE-2024-0124",
-    account: "4100 - Service Revenue",
-    accountType: "Revenue",
-    description: "Engine repair service - Job Card #JC-2024-0156",
-    debit: 0,
-    credit: 8500,
-    balance: 156000,
-    postedBy: "Fatima Al-Hassan",
-  },
-  {
-    id: "GL-2024-004",
-    date: "2024-01-24",
-    journalRef: "JE-2024-0124",
-    account: "1200 - Accounts Receivable",
-    accountType: "Asset",
-    description: "Service invoice issued - Invoice #INV-2024-0092",
-    debit: 8500,
-    credit: 0,
-    balance: 104500,
-    postedBy: "Fatima Al-Hassan",
-  },
-  {
-    id: "GL-2024-005",
-    date: "2024-01-23",
-    journalRef: "JE-2024-0123",
-    account: "5100 - Parts Cost",
-    accountType: "Expense",
-    description: "Spare parts purchase - PO #PO-2024-0078",
-    debit: 12500,
-    credit: 0,
-    balance: 78500,
-    postedBy: "Khalid Al-Rashid",
-  },
-  {
-    id: "GL-2024-006",
-    date: "2024-01-23",
-    journalRef: "JE-2024-0123",
-    account: "2100 - Accounts Payable",
-    accountType: "Liability",
-    description: "Spare parts purchase - PO #PO-2024-0078",
-    debit: 0,
-    credit: 12500,
-    balance: 45600,
-    postedBy: "Khalid Al-Rashid",
-  },
-  {
-    id: "GL-2024-007",
-    date: "2024-01-22",
-    journalRef: "JE-2024-0122",
-    account: "5200 - Utilities Expense",
-    accountType: "Expense",
-    description: "Monthly electricity bill payment",
-    debit: 4500,
-    credit: 0,
-    balance: 28500,
-    postedBy: "Sara Al-Mahmoud",
-  },
-  {
-    id: "GL-2024-008",
-    date: "2024-01-22",
-    journalRef: "JE-2024-0122",
-    account: "1100 - Cash",
-    accountType: "Asset",
-    description: "Monthly electricity bill payment",
-    debit: 0,
-    credit: 4500,
-    balance: 230000,
-    postedBy: "Sara Al-Mahmoud",
-  },
-];
-
-const accountSummaries = [
-  { code: "1100", name: "Cash", type: "Asset", debitTotal: 245000, creditTotal: 89500, balance: 155500 },
-  { code: "1200", name: "Accounts Receivable", type: "Asset", debitTotal: 156000, creditTotal: 78500, balance: 77500 },
-  { code: "1300", name: "Inventory", type: "Asset", debitTotal: 89000, creditTotal: 45000, balance: 44000 },
-  { code: "1500", name: "Fixed Assets", type: "Asset", debitTotal: 450000, creditTotal: 0, balance: 450000 },
-  { code: "2100", name: "Accounts Payable", type: "Liability", debitTotal: 35000, creditTotal: 78500, balance: 43500 },
-  { code: "2200", name: "Accrued Expenses", type: "Liability", debitTotal: 12000, creditTotal: 25000, balance: 13000 },
-  { code: "3100", name: "Share Capital", type: "Equity", debitTotal: 0, creditTotal: 500000, balance: 500000 },
-  { code: "3200", name: "Retained Earnings", type: "Equity", debitTotal: 0, creditTotal: 125000, balance: 125000 },
-  { code: "4100", name: "Service Revenue", type: "Revenue", debitTotal: 0, creditTotal: 356000, balance: 356000 },
-  { code: "4200", name: "Parts Sales", type: "Revenue", debitTotal: 0, creditTotal: 89000, balance: 89000 },
-  { code: "5100", name: "Parts Cost", type: "Expense", debitTotal: 78500, creditTotal: 0, balance: 78500 },
-  { code: "5200", name: "Utilities Expense", type: "Expense", debitTotal: 28500, creditTotal: 0, balance: 28500 },
-];
+// Data is fetched from /api/financial/general-ledger and /api/financial/trial-balance
 
 export default function GeneralLedger() {
   const { t } = useTranslation();
@@ -159,8 +48,49 @@ export default function GeneralLedger() {
   const [accountFilter, setAccountFilter] = useState("all");
   const [dateRange, setDateRange] = useState("this-month");
 
-  const totalDebits = ledgerEntries.reduce((sum, entry) => sum + entry.debit, 0);
-  const totalCredits = ledgerEntries.reduce((sum, entry) => sum + entry.credit, 0);
+  // Fetch real GL data from API
+  const { data: glData } = useQuery({
+    queryKey: ["/api/financial/general-ledger"],
+    queryFn: async () => {
+      const res = await fetch("/api/financial/general-ledger", { credentials: "include" });
+      if (!res.ok) return { entries: [], summary: { totalDebits: 0, totalCredits: 0, isBalanced: true, entryCount: 0 } };
+      return res.json();
+    },
+  });
+
+  const { data: tbData } = useQuery({
+    queryKey: ["/api/financial/trial-balance"],
+    queryFn: async () => {
+      const res = await fetch("/api/financial/trial-balance", { credentials: "include" });
+      if (!res.ok) return { accounts: [] };
+      return res.json();
+    },
+  });
+
+  const ledgerEntries = (glData?.entries || []).map((e: any) => ({
+    id: e.id,
+    date: e.date ? new Date(e.date).toISOString().split("T")[0] : "",
+    journalRef: e.reference || "",
+    account: e.account || "",
+    accountType: e.category || "Asset",
+    description: e.description || "",
+    debit: e.debit || 0,
+    credit: e.credit || 0,
+    balance: 0,
+    postedBy: "",
+  }));
+
+  const accountSummaries = (tbData?.accounts || []).map((a: any) => ({
+    code: a.code,
+    name: a.name,
+    type: a.type,
+    debitTotal: a.debit || 0,
+    creditTotal: a.credit || 0,
+    balance: Math.abs((a.debit || 0) - (a.credit || 0)),
+  }));
+
+  const totalDebits = glData?.summary?.totalDebits ?? ledgerEntries.reduce((sum: number, entry: any) => sum + entry.debit, 0);
+  const totalCredits = glData?.summary?.totalCredits ?? ledgerEntries.reduce((sum: number, entry: any) => sum + entry.credit, 0);
 
   const getAccountTypeBadge = (type: string) => {
     const colors: Record<string, string> = {

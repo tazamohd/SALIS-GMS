@@ -152,6 +152,7 @@ import TireManagement from "@/pages/TireManagement";
 import KPIDashboard from "@/pages/KPIDashboard";
 import CommandCenter from "@/pages/CommandCenter";
 import AIInsights from "@/pages/AIInsights";
+import SaudiComplianceDashboard from "@/pages/SaudiComplianceDashboard";
 import AppointmentReminders from "@/pages/AppointmentReminders";
 import CustomReportBuilder from "@/pages/CustomReportBuilder";
 import VINDecoder from "@/pages/VINDecoder";
@@ -392,6 +393,11 @@ function Router() {
       <Route path="/command-center">
         <Layout>
           <CommandCenter />
+        </Layout>
+      </Route>
+      <Route path="/saudi-compliance">
+        <Layout>
+          <SaudiComplianceDashboard />
         </Layout>
       </Route>
       <Route path="/ai-insights">

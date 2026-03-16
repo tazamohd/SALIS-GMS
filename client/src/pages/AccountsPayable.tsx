@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -70,107 +71,35 @@ const paymentSchema = z.object({
 
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
-const payables = [
-  {
-    id: "AP-001",
-    vendorId: "VND-001",
-    vendorName: "AutoParts Supplier Co",
-    invoiceNumber: "VND-INV-2024-0156",
-    invoiceDate: "2024-01-20",
-    dueDate: "2024-02-19",
-    originalAmount: 28500,
-    paidAmount: 0,
-    balanceDue: 28500,
-    daysUntilDue: 18,
-    status: "Current",
-    paymentTerms: "Net 30",
-  },
-  {
-    id: "AP-002",
-    vendorId: "VND-002",
-    vendorName: "Saudi Electricity Company",
-    invoiceNumber: "SEC-2024-0125",
-    invoiceDate: "2024-01-25",
-    dueDate: "2024-02-10",
-    originalAmount: 4500,
-    paidAmount: 0,
-    balanceDue: 4500,
-    daysUntilDue: 9,
-    status: "Due Soon",
-    paymentTerms: "Net 15",
-  },
-  {
-    id: "AP-003",
-    vendorId: "VND-003",
-    vendorName: "Premium Oil Distributors",
-    invoiceNumber: "POD-2024-0089",
-    invoiceDate: "2024-01-15",
-    dueDate: "2024-01-30",
-    originalAmount: 15000,
-    paidAmount: 0,
-    balanceDue: 15000,
-    daysUntilDue: -2,
-    status: "Overdue",
-    paymentTerms: "Net 15",
-  },
-  {
-    id: "AP-004",
-    vendorId: "VND-004",
-    vendorName: "Equipment Leasing Corp",
-    invoiceNumber: "ELC-2024-0012",
-    invoiceDate: "2024-01-01",
-    dueDate: "2024-01-31",
-    originalAmount: 8500,
-    paidAmount: 0,
-    balanceDue: 8500,
-    daysUntilDue: -1,
-    status: "Overdue",
-    paymentTerms: "Net 30",
-  },
-  {
-    id: "AP-005",
-    vendorId: "VND-005",
-    vendorName: "Office Supplies Ltd",
-    invoiceNumber: "OSL-2024-0045",
-    invoiceDate: "2024-01-18",
-    dueDate: "2024-02-17",
-    originalAmount: 2500,
-    paidAmount: 1000,
-    balanceDue: 1500,
-    daysUntilDue: 16,
-    status: "Current",
-    paymentTerms: "Net 30",
-  },
-  {
-    id: "AP-006",
-    vendorId: "VND-006",
-    vendorName: "Insurance Provider SA",
-    invoiceNumber: "IP-2024-Q1",
-    invoiceDate: "2024-01-01",
-    dueDate: "2024-01-15",
-    originalAmount: 14000,
-    paidAmount: 14000,
-    balanceDue: 0,
-    daysUntilDue: 0,
-    status: "Paid",
-    paymentTerms: "Net 15",
-  },
-];
-
-const vendors = [
-  { id: "VND-001", name: "AutoParts Supplier Co" },
-  { id: "VND-002", name: "Saudi Electricity Company" },
-  { id: "VND-003", name: "Premium Oil Distributors" },
-  { id: "VND-004", name: "Equipment Leasing Corp" },
-  { id: "VND-005", name: "Office Supplies Ltd" },
-  { id: "VND-006", name: "Insurance Provider SA" },
-];
-
 export default function AccountsPayable() {
   const { t } = useTranslation();
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const { data, isLoading } = useQuery<{
+    purchaseOrders: Array<{
+      id: string;
+      vendorId: string;
+      vendorName: string;
+      invoiceNumber: string;
+      invoiceDate: string;
+      dueDate: string;
+      originalAmount: number;
+      paidAmount: number;
+      balanceDue: number;
+      daysUntilDue: number;
+      status: string;
+      paymentTerms: string;
+    }>;
+    aging: Array<{ label: string; amount: number; percentage: number }>;
+    totalPayable: number;
+  }>({
+    queryKey: ["/api/financial/accounts-payable"],
+  });
+
+  const payables = data?.purchaseOrders ?? [];
+  const vendors = payables.map((p) => ({ id: p.vendorId, name: p.vendorName }));
 
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(paymentSchema),
@@ -184,14 +113,14 @@ export default function AccountsPayable() {
     },
   });
 
-  const onSubmit = (data: PaymentFormData) => {
-    console.log("Make payment:", data);
+  const onSubmit = (formData: PaymentFormData) => {
+    console.log("Make payment:", formData);
     setIsPaymentDialogOpen(false);
     form.reset();
   };
 
   const unpaidPayables = payables.filter((p) => p.status !== "Paid");
-  const totalPayables = unpaidPayables.reduce((sum, p) => sum + p.balanceDue, 0);
+  const totalPayables = data?.totalPayable ?? unpaidPayables.reduce((sum, p) => sum + p.balanceDue, 0);
   const currentPayables = unpaidPayables.filter((p) => p.status === "Current").reduce((sum, p) => sum + p.balanceDue, 0);
   const overduePayables = unpaidPayables.filter((p) => p.status === "Overdue").reduce((sum, p) => sum + p.balanceDue, 0);
   const dueSoonPayables = unpaidPayables.filter((p) => p.status === "Due Soon").reduce((sum, p) => sum + p.balanceDue, 0);
