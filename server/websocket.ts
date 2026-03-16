@@ -238,7 +238,7 @@ export class ChatWebSocketServer {
       }
 
       const userId = session.passport.user;
-      console.log(`Session validated for user: ${userId}`);
+      // Session validated for WebSocket auth
 
       // Get user from storage to derive garageId
       const { storage } = await import('./storage');
@@ -261,7 +261,7 @@ export class ChatWebSocketServer {
       this.clients.get(userId)!.add(ws);
 
       this.send(ws, { type: 'auth_success', data: { userId: user.id, garageId: user.garageId } });
-      console.log(`✅ User ${user.id} authenticated via WebSocket (session-based)`);
+      // WebSocket authentication successful
     } catch (error) {
       console.error('WebSocket authentication error:', error);
       this.sendError(ws, 'Authentication failed');

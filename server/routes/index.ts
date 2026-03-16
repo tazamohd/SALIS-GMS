@@ -16,6 +16,19 @@ import saudiRouter from "./saudi";
 import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
+// Import domain-based route modules
+import { technicianRoutes } from "./technicians.routes";
+import { jobCardsRoutes } from "./jobcards.routes";
+import { customerRoutes } from "./customers.routes";
+import { vehicleRoutes } from "./vehicles.routes";
+import { inventoryRoutes } from "./inventory.routes";
+import { invoiceRoutes } from "./invoices.routes";
+import { schedulingRoutes } from "./scheduling.routes";
+import { fleetRoutes } from "./fleet.routes";
+import { reportsRoutes } from "./reports.routes";
+import { settingsRoutes } from "./settings.routes";
+import { miscRoutes } from "./misc.routes";
+
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
 
@@ -43,17 +56,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(404).send("Landing page not found");
     }
   });
-  
+
   // SSR middleware for bots on root - runs before Vite takes over
   app.use((req, res, next) => {
     if (req.path !== "/" && req.path !== "") {
       return next();
     }
-    
+
     const userAgent = req.headers["user-agent"] || "";
     const isBot = /bot|crawl|spider|scrape|gptbot|chatgpt|anthropic|claude|perplexity|bingbot|googlebot|yandex|baidu|duckduck|facebookexternalhit|twitterbot|linkedinbot|slackbot|telegrambot|discordbot/i.test(userAgent);
     const forceSSR = req.query.ssr === "true";
-    
+
     // Serve static HTML for bots only
     if (isBot || forceSSR) {
       const htmlPath = path.join(process.cwd(), "public", "index.html");
@@ -89,9 +102,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", saudiRouter);
   console.log("✅ Command Center, Workflow Engine, AI Intelligence, Financial, Workflow Hooks & Saudi Compliance Loaded");
 
+  // Load domain-based route modules
+  app.use("/api", technicianRoutes);
+  console.log("✅ Technician Management Routes Loaded");
+
+  app.use("/api", jobCardsRoutes);
+  console.log("✅ Job Cards Routes Loaded");
+
+  app.use("/api", customerRoutes);
+  console.log("✅ Customer Management Routes Loaded");
+
+  app.use("/api", vehicleRoutes);
+  console.log("✅ Vehicle Management Routes Loaded");
+
+  app.use("/api", inventoryRoutes);
+  console.log("✅ Inventory Management Routes Loaded");
+
+  app.use("/api", invoiceRoutes);
+  console.log("✅ Invoice & Payment Routes Loaded");
+
+  app.use("/api", schedulingRoutes);
+  console.log("✅ Scheduling & Appointments Routes Loaded");
+
+  app.use("/api", fleetRoutes);
+  console.log("✅ Fleet Management Routes Loaded");
+
+  app.use("/api", reportsRoutes);
+  console.log("✅ Reports & Analytics Routes Loaded");
+
+  app.use("/api", settingsRoutes);
+  console.log("✅ Settings & Configuration Routes Loaded");
+
+  app.use("/api", miscRoutes);
+  console.log("✅ Miscellaneous Routes Loaded");
+
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
   console.log("⚠️ Legacy Routes Loaded (Background)");
-  
+
   return server;
 }

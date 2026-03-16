@@ -90,8 +90,7 @@ export async function setupAuth(app: Express) {
         return done(null, false);
       }
 
-      // Debug log to verify user properties
-      console.log('deserializeUser - user garageId:', (user as any).garageId, 'role:', (user as any).role);
+      // User properties available for enrichment
 
       // Enrich user with subscription plan from garage (Drizzle returns camelCase)
       let subscriptionPlan = 'STARTER';
@@ -99,7 +98,7 @@ export async function setupAuth(app: Express) {
       if (garageId) {
         try {
           const [garage] = await db.select().from(garages).where(eq(garages.id, garageId));
-          console.log('deserializeUser - garage found:', garage ? 'yes' : 'no', 'subscriptionPlan:', (garage as any)?.subscriptionPlan);
+          // Garage subscription plan resolved
           if (garage && (garage as any).subscriptionPlan) {
             subscriptionPlan = (garage as any).subscriptionPlan;
           }
@@ -109,7 +108,6 @@ export async function setupAuth(app: Express) {
       }
 
       const enrichedUser = { ...user, subscriptionPlan };
-      console.log('deserializeUser - enriched subscriptionPlan:', subscriptionPlan);
       done(null, enrichedUser);
     } catch (error) {
       done(null, false);
@@ -117,20 +115,10 @@ export async function setupAuth(app: Express) {
   });
 }
 
-// Feature flag for auth bypass during development
-const AUTH_BYPASS_ENABLED = process.env.AUTH_BYPASS === 'true';
-
 export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-
-  // Development bypass - disabled by default for security
-  if (AUTH_BYPASS_ENABLED) {
-    console.warn('Auth bypass enabled - development only');
-    return next();
-  }
-
   res.status(401).json({ message: "Unauthorized" });
 };
 
@@ -142,6 +130,6 @@ export async function invalidateUserSessions(userId: string): Promise<void> {
       [userId]
     );
   } catch (error) {
-    console.error('Error invalidating sessions for user:', userId, error);
+    console.error('Error invalidating sessions:', error);
   }
 }

@@ -1,249 +1,327 @@
+import { lazy, Suspense } from "react";
 import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
-import NotFound from "@/pages/not-found";
 
-import { LoginDashboard } from "@/pages/LoginDashboard";
+// Layout components (loaded eagerly as they're always needed)
 import { Layout } from "@/components/Layout";
 import { CustomerPortalLayout } from "@/components/CustomerPortalLayout";
-import { Dashboard } from "@/pages/Dashboard";
-import { TasksManagement } from "@/pages/TasksManagement";
-import { Appointments } from "@/pages/Appointments";
-import { Customers } from "@/pages/Customers";
-import VehiclesEnhanced from "@/pages/VehiclesEnhanced";
-import { PurchaseOrders } from "@/pages/PurchaseOrders";
-import { Invoices } from "@/pages/Invoices";
-import Payments from "@/pages/Payments";
-import { Estimates } from "@/pages/Estimates";
-import { Reports } from "@/pages/Reports";
-import { JobCards } from "@/pages/JobCards";
-import { Profile } from "@/pages/Profile";
-import ServiceTemplates from "@/pages/ServiceTemplates";
-import Tools from "@/pages/Tools";
-import SpareParts from "@/pages/SpareParts";
-import Suppliers from "@/pages/Suppliers";
-import InventoryManagement from "@/pages/InventoryManagement";
-import { PartsAvailability } from "@/pages/PartsAvailability";
-import { SmartAssignment } from "@/pages/SmartAssignment";
 import { SkipToContent } from "@/components/SkipToContent";
-import CallCenter from "@/pages/CallCenter";
-import SupportChatDashboard from "@/pages/SupportChatDashboard";
-import { TechnicianPortal } from "@/pages/TechnicianPortal";
-import TechnicianManagement from "@/pages/TechnicianManagement";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
-import TechnicianDashboard from "@/pages/technician/Dashboard";
-import TechnicianMyJobs from "@/pages/technician/MyJobs";
-import TechnicianTimeClock from "@/pages/technician/TimeClock";
-import TechnicianPartsLookup from "@/pages/technician/PartsLookup";
-import TechnicianJobDocumentation from "@/pages/technician/JobDocumentation";
-import TechnicianProfile from "@/pages/technician/Profile";
-import TechnicianAttendance from "@/pages/technician/Attendance";
-import TechnicianServiceGuides from "@/pages/technician/ServiceGuides";
-import TechnicianSoftware from "@/pages/technician/TechnicalSoftware";
-import TechnicianMobilePortal from "@/pages/mobile/TechnicianMobilePortal";
 import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
-import PurchaseAgentDashboard from "@/pages/purchase-agent/Dashboard";
-import PurchaseAgentOrders from "@/pages/purchase-agent/Orders";
-import PurchaseAgentSuppliers from "@/pages/purchase-agent/Suppliers";
-import PurchaseAgentInventory from "@/pages/purchase-agent/Inventory";
-import PurchaseAgentPriceCompare from "@/pages/purchase-agent/PriceCompare";
-import PurchaseAgentTracking from "@/pages/purchase-agent/Tracking";
-import PurchaseAgentReports from "@/pages/purchase-agent/Reports";
-import PurchaseAgentTaskInbox from "@/pages/purchase-agent/TaskInbox";
-import PurchaseAgentQuotationManagement from "@/pages/purchase-agent/QuotationManagement";
-import PurchaseAgentPaymentTracking from "@/pages/purchase-agent/PaymentTracking";
-import PurchaseAgentDeliveryTracking from "@/pages/purchase-agent/DeliveryTracking";
-import PurchaseAgentLiveDeliveryTracking from "@/pages/purchase-agent/LiveDeliveryTracking";
-import Notifications from "@/pages/Notifications";
-import Landing from "@/pages/Landing";
-import WelcomePage from "@/pages/WelcomePage";
-import PublicTracking from "@/pages/PublicTracking";
-import Calendar from "@/pages/Calendar";
-import FinancialSettings from "@/pages/FinancialSettings";
-import RefundManagement from "@/pages/RefundManagement";
-import DataImportExport from "@/pages/DataImportExport";
-import BusinessIntelligence from "@/pages/BusinessIntelligence";
-import HRManagement from "@/pages/HRManagement";
-import AIAutomation from "@/pages/AIAutomation";
-import Integrations from "@/pages/Integrations";
-import Security from "@/pages/Security";
-import Settings from "@/pages/Settings";
-import RoleManagement from "@/pages/RoleManagement";
-import Chat from "@/pages/Chat";
-import FleetManagement from "@/pages/FleetManagement";
-import FleetTracking from "@/pages/FleetTracking";
-import ContractManagement from "@/pages/ContractManagement";
-import WarrantyManagement from "@/pages/WarrantyManagement";
-import VehicleInspections from "@/pages/VehicleInspections";
-import VehicleChecklist from "@/pages/VehicleChecklist";
-import TowingAssistance from "@/pages/TowingAssistance";
-import LoanerVehicles from "@/pages/LoanerVehicles";
-import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
-import MarketingAutomation from "@/pages/MarketingAutomation";
-import MarketingHub from "@/pages/MarketingHub";
-import CustomerLoyalty from "@/pages/CustomerLoyalty";
-import DocumentManagement from "@/pages/DocumentManagement";
-import FranchiseManagement from "@/pages/FranchiseManagement";
-import GlobalizationLayer from "@/pages/GlobalizationLayer";
-import PartsSupplyNetwork from "@/pages/PartsSupplyNetwork";
-import DiagnosticsOBDHub from "@/pages/DiagnosticsOBDHub";
-import OEMSoftwareSubscriptions from "@/pages/OEMSoftwareSubscriptions";
-import AIChatbot from "@/pages/AIChatbot";
-import AIChatbotAssistant from "@/pages/AIChatbotAssistant";
-import PredictiveMaintenance from "@/pages/PredictiveMaintenance";
-import PredictiveDiagnostics from "@/pages/PredictiveDiagnostics";
-import SmartPartsRecommendations from "@/pages/SmartPartsRecommendations";
-import VoiceCommands from "@/pages/VoiceCommands";
-import DocumentOCR from "@/pages/DocumentOCR";
-import SmartDamageAssessment from "@/pages/SmartDamageAssessment";
-import IntelligentPriceOptimizer from "@/pages/IntelligentPriceOptimizer";
-import SmartInventoryForecasting from "@/pages/SmartInventoryForecasting";
-import AIServiceAdvisor from "@/pages/AIServiceAdvisor";
-import VehicleHealthMonitoring from "@/pages/VehicleHealthMonitoring";
-import BusinessIntelligenceDashboard from "@/pages/BusinessIntelligenceDashboard";
-import ProfitAnalysis from "@/pages/ProfitAnalysis";
-import CustomerLTVAnalysis from "@/pages/CustomerLTVAnalysis";
-import BusinessHeatMaps from "@/pages/BusinessHeatMaps";
-import AccountingIntegration from "@/pages/AccountingIntegration";
-import EmailMarketingCampaigns from "@/pages/EmailMarketingCampaigns";
-import SocialMediaIntegration from "@/pages/SocialMediaIntegration";
-import VideoConsultations from "@/pages/VideoConsultations";
-import PartsMarketplace from "@/pages/PartsMarketplace";
-import StripePaymentProcessing from "@/pages/StripePaymentProcessing";
-import LiveServiceTracking from "@/pages/LiveServiceTracking";
-import VideoEstimates from "@/pages/VideoEstimates";
-import DigitalVehicleWalkaround from "@/pages/DigitalVehicleWalkaround";
-import CustomerReviewsRatings from "@/pages/CustomerReviewsRatings";
-import ReferralProgram from "@/pages/ReferralProgram";
-import AIScheduling from "@/pages/AIScheduling";
-import PartsAutoReorder from "@/pages/PartsAutoReorder";
-import TimeClockPayroll from "@/pages/TimeClockPayroll";
-import EquipmentCalibration from "@/pages/EquipmentCalibration";
-import RoutingOptimizer from "@/pages/RoutingOptimizer";
-import SafetyIncidents from "@/pages/SafetyIncidents";
-import EnvironmentalCompliance from "@/pages/EnvironmentalCompliance";
-import ISOQualityManagement from "@/pages/ISOQualityManagement";
-import InsuranceClaims from "@/pages/InsuranceClaims";
-import BarcodeScanner from "@/pages/BarcodeScanner";
-import DigitalSignage from "@/pages/DigitalSignage";
-import KioskCheckIn from "@/pages/KioskCheckIn";
-import SecurityCameras from "@/pages/SecurityCameras";
-import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
-import EmergingTechnologies from "@/pages/EmergingTechnologies";
-import Interactive3DParts from "@/pages/Interactive3DParts";
-import NextGenTechnologies from "@/pages/NextGenTechnologies";
-import IoTDashboard from "@/pages/IoTDashboard";
-import ServiceBayDashboard from "@/pages/ServiceBayDashboard";
-import AutomatedReordering from "@/pages/AutomatedReordering";
-import LoyaltyProgram from "@/pages/LoyaltyProgram";
-import WorkshopCalendar from "@/pages/WorkshopCalendar";
-import ComputerVisionQC from "@/pages/ComputerVisionQC";
-import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
-import DynamicPricing from "@/pages/DynamicPricing";
-import VehicleTracking from "@/pages/VehicleTracking";
-import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
-import DroneInspection from "@/pages/DroneInspection";
-import MLFraudDetection from "@/pages/MLFraudDetection";
-import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
-import TireManagement from "@/pages/TireManagement";
-import KPIDashboard from "@/pages/KPIDashboard";
-import CommandCenter from "@/pages/CommandCenter";
-import AIInsights from "@/pages/AIInsights";
-import SaudiComplianceDashboard from "@/pages/SaudiComplianceDashboard";
-import AppointmentReminders from "@/pages/AppointmentReminders";
-import CustomReportBuilder from "@/pages/CustomReportBuilder";
-import VINDecoder from "@/pages/VINDecoder";
-import TechnicianLeaderboards from "@/pages/TechnicianLeaderboards";
-import PayrollManagement from "@/pages/PayrollManagement";
-import ExpenseTracking from "@/pages/ExpenseTracking";
-import TowingServices from "@/pages/TowingServices";
-import VehicleStorage from "@/pages/VehicleStorage";
-import TelematicsIntegration from "@/pages/TelematicsIntegration";
-import KnowledgeBase from "@/pages/KnowledgeBase";
-import TrainingLMS from "@/pages/TrainingLMS";
-import GoogleMyBusiness from "@/pages/GoogleMyBusiness";
-import ComplianceManagement from "@/pages/ComplianceManagement";
-import SocialMediaMonitoring from "@/pages/SocialMediaMonitoring";
-import StaffPerformanceReview from "@/pages/StaffPerformanceReview";
-import SustainableEnergyMonitoring from "@/pages/SustainableEnergyMonitoring";
-import TaskManagement from "@/pages/TaskManagement";
-import TechnicianPerformance from "@/pages/TechnicianPerformance";
-import TimesheetManagement from "@/pages/TimesheetManagement";
-import VehicleHistory from "@/pages/VehicleHistory";
-import CustomerFeedback from "@/pages/CustomerFeedback";
-import DataBackup from "@/pages/DataBackup";
-import DashboardWidgets from "@/pages/DashboardWidgets";
-import Vehicles from "@/pages/Vehicles";
-import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
-import WearableIntegration from "@/pages/WearableIntegration";
-import BankAccountManagement from "@/pages/BankAccountManagement";
-import InternalWarehouse from "@/pages/InternalWarehouse";
-import LossAccount from "@/pages/LossAccount";
-import SalesGuide from "@/pages/SalesGuide";
-import AssetsManagement from "@/pages/AssetsManagement";
-import LiabilitiesManagement from "@/pages/LiabilitiesManagement";
-import SalesManagement from "@/pages/SalesManagement";
-import ExpensesManagement from "@/pages/ExpensesManagement";
-import EquityManagement from "@/pages/EquityManagement";
-import CapitalManagement from "@/pages/CapitalManagement";
-import PartnersCurrentAccount from "@/pages/PartnersCurrentAccount";
-import RetainedEarnings from "@/pages/RetainedEarnings";
-import ChartOfAccounts from "@/pages/ChartOfAccounts";
-import GeneralLedger from "@/pages/GeneralLedger";
-import JournalEntries from "@/pages/JournalEntries";
-import TrialBalance from "@/pages/TrialBalance";
-import IncomeStatement from "@/pages/IncomeStatement";
-import BalanceSheet from "@/pages/BalanceSheet";
-import CashFlowStatement from "@/pages/CashFlowStatement";
-import AccountsReceivable from "@/pages/AccountsReceivable";
-import AccountsPayable from "@/pages/AccountsPayable";
-import CostCenters from "@/pages/CostCenters";
-import BudgetManagement from "@/pages/BudgetManagement";
-import PartsNetworkLayout from "@/pages/parts-network/PartsNetworkLayout";
-import PartsNetworkDashboard from "@/pages/parts-network/PartsNetworkDashboard";
-import SendQuotationRequest from "@/pages/parts-network/SendQuotationRequest";
-import MyRequests from "@/pages/parts-network/MyRequests";
-import IncomingRequests from "@/pages/parts-network/IncomingRequests";
-import QuotationsList from "@/pages/parts-network/QuotationsList";
-import NetworkMembers from "@/pages/parts-network/NetworkMembers";
-import NetworkOrders from "@/pages/parts-network/NetworkOrders";
-import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
-import ClientDashboard from "@/pages/client/Dashboard";
-import ClientVehicles from "@/pages/client/Vehicles";
-import ClientAppointments from "@/pages/client/Appointments";
-import ClientInvoices from "@/pages/client/Invoices";
-import ClientProfile from "@/pages/client/Profile";
-import ClientServiceHistory from "@/pages/client/ServiceHistory";
-import ClientLiveTracking from "@/pages/client/LiveTracking";
-import ClientReminders from "@/pages/client/ServiceReminders";
-import ClientReviewChat from "@/pages/client/ReviewChat";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
-import CustomerMobileHome from "@/pages/mobile/CustomerMobileHome";
-import CustomerMobileBooking from "@/pages/mobile/CustomerMobileBooking";
-import CustomerMobileVehicles from "@/pages/mobile/CustomerMobileVehicles";
-import CustomerMobilePayments from "@/pages/mobile/CustomerMobilePayments";
-import CustomerMobileProfile from "@/pages/mobile/CustomerMobileProfile";
-import TechnicianMobileHome from "@/pages/mobile/TechnicianMobileHome";
-import TechnicianMobileJobs from "@/pages/mobile/TechnicianMobileJobs";
-import TechnicianMobileClock from "@/pages/mobile/TechnicianMobileClock";
-import TechnicianMobileLookup from "@/pages/mobile/TechnicianMobileLookup";
-import TechnicianMobileProfile from "@/pages/mobile/TechnicianMobileProfile";
-import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
-import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
-import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
-import { CustomerCommunications } from "@/pages/customer/CustomerCommunications";
-import CustomerPortal from "@/pages/CustomerPortal";
+
+// Core pages (loaded eagerly)
 import { useAuth } from "@/hooks/useAuth";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import type { User } from "@shared/schema";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import PlatformAdmin from "@/pages/PlatformAdmin";
+
+// Loading Fallback Component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117]">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+      <p className="mt-4 text-sm text-[#64748B]">Loading...</p>
+    </div>
+  </div>
+);
+
+// ============================================
+// Authentication Pages (Lazy Loaded)
+// ============================================
+const NotFound = lazy(() => import("@/pages/not-found"));
+const Login = lazy(() => import("@/pages/Login"));
+const Register = lazy(() => import("@/pages/Register"));
+const LoginDashboard = lazy(() => import("@/pages/LoginDashboard").then(m => ({ default: m.LoginDashboard })));
+const PlatformAdmin = lazy(() => import("@/pages/PlatformAdmin"));
+const Landing = lazy(() => import("@/pages/Landing"));
+const WelcomePage = lazy(() => import("@/pages/WelcomePage"));
+const PublicTracking = lazy(() => import("@/pages/PublicTracking"));
+const CustomerPortal = lazy(() => import("@/pages/CustomerPortal"));
+
+// ============================================
+// Core Management Pages (Lazy Loaded)
+// ============================================
+const Dashboard = lazy(() => import("@/pages/Dashboard").then(m => ({ default: m.Dashboard })));
+const TasksManagement = lazy(() => import("@/pages/TasksManagement").then(m => ({ default: m.TasksManagement })));
+const Appointments = lazy(() => import("@/pages/Appointments").then(m => ({ default: m.Appointments })));
+const Customers = lazy(() => import("@/pages/Customers").then(m => ({ default: m.Customers })));
+const VehiclesEnhanced = lazy(() => import("@/pages/VehiclesEnhanced"));
+const Vehicles = lazy(() => import("@/pages/Vehicles"));
+const Profile = lazy(() => import("@/pages/Profile").then(m => ({ default: m.Profile })));
+const Notifications = lazy(() => import("@/pages/Notifications"));
+const Calendar = lazy(() => import("@/pages/Calendar"));
+const Chat = lazy(() => import("@/pages/Chat"));
+
+// ============================================
+// Financial & Billing Pages (Lazy Loaded)
+// ============================================
+const PurchaseOrders = lazy(() => import("@/pages/PurchaseOrders").then(m => ({ default: m.PurchaseOrders })));
+const Invoices = lazy(() => import("@/pages/Invoices").then(m => ({ default: m.Invoices })));
+const Payments = lazy(() => import("@/pages/Payments"));
+const Estimates = lazy(() => import("@/pages/Estimates").then(m => ({ default: m.Estimates })));
+const Reports = lazy(() => import("@/pages/Reports").then(m => ({ default: m.Reports })));
+const RefundManagement = lazy(() => import("@/pages/RefundManagement"));
+const FinancialSettings = lazy(() => import("@/pages/FinancialSettings"));
+const PayrollManagement = lazy(() => import("@/pages/PayrollManagement"));
+const TimeClockPayroll = lazy(() => import("@/pages/TimeClockPayroll"));
+const StripePaymentProcessing = lazy(() => import("@/pages/StripePaymentProcessing"));
+
+// Accounting Module
+const BankAccountManagement = lazy(() => import("@/pages/BankAccountManagement"));
+const InternalWarehouse = lazy(() => import("@/pages/InternalWarehouse"));
+const LossAccount = lazy(() => import("@/pages/LossAccount"));
+const SalesGuide = lazy(() => import("@/pages/SalesGuide"));
+const AssetsManagement = lazy(() => import("@/pages/AssetsManagement"));
+const LiabilitiesManagement = lazy(() => import("@/pages/LiabilitiesManagement"));
+const SalesManagement = lazy(() => import("@/pages/SalesManagement"));
+const ExpensesManagement = lazy(() => import("@/pages/ExpensesManagement"));
+const EquityManagement = lazy(() => import("@/pages/EquityManagement"));
+const CapitalManagement = lazy(() => import("@/pages/CapitalManagement"));
+const PartnersCurrentAccount = lazy(() => import("@/pages/PartnersCurrentAccount"));
+const RetainedEarnings = lazy(() => import("@/pages/RetainedEarnings"));
+const ChartOfAccounts = lazy(() => import("@/pages/ChartOfAccounts"));
+const GeneralLedger = lazy(() => import("@/pages/GeneralLedger"));
+const JournalEntries = lazy(() => import("@/pages/JournalEntries"));
+const TrialBalance = lazy(() => import("@/pages/TrialBalance"));
+const IncomeStatement = lazy(() => import("@/pages/IncomeStatement"));
+const BalanceSheet = lazy(() => import("@/pages/BalanceSheet"));
+const CashFlowStatement = lazy(() => import("@/pages/CashFlowStatement"));
+const AccountsReceivable = lazy(() => import("@/pages/AccountsReceivable"));
+const AccountsPayable = lazy(() => import("@/pages/AccountsPayable"));
+const CostCenters = lazy(() => import("@/pages/CostCenters"));
+const BudgetManagement = lazy(() => import("@/pages/BudgetManagement"));
+const AccountingIntegration = lazy(() => import("@/pages/AccountingIntegration"));
+
+// ============================================
+// Service & Job Management Pages (Lazy Loaded)
+// ============================================
+const JobCards = lazy(() => import("@/pages/JobCards").then(m => ({ default: m.JobCards })));
+const ServiceTemplates = lazy(() => import("@/pages/ServiceTemplates"));
+const CallCenter = lazy(() => import("@/pages/CallCenter"));
+const SupportChatDashboard = lazy(() => import("@/pages/SupportChatDashboard"));
+const TechnicianManagement = lazy(() => import("@/pages/TechnicianManagement"));
+const TechnicianPortal = lazy(() => import("@/pages/TechnicianPortal").then(m => ({ default: m.TechnicianPortal })));
+const TechnicianPerformance = lazy(() => import("@/pages/TechnicianPerformance"));
+const TechnicianLeaderboards = lazy(() => import("@/pages/TechnicianLeaderboards"));
+const ExpenseTracking = lazy(() => import("@/pages/ExpenseTracking"));
+const TimesheetManagement = lazy(() => import("@/pages/TimesheetManagement"));
+
+// ============================================
+// Parts & Inventory Management (Lazy Loaded)
+// ============================================
+const SpareParts = lazy(() => import("@/pages/SpareParts"));
+const Suppliers = lazy(() => import("@/pages/Suppliers"));
+const InventoryManagement = lazy(() => import("@/pages/InventoryManagement"));
+const PartsAvailability = lazy(() => import("@/pages/PartsAvailability").then(m => ({ default: m.PartsAvailability })));
+const SmartAssignment = lazy(() => import("@/pages/SmartAssignment").then(m => ({ default: m.SmartAssignment })));
+const Tools = lazy(() => import("@/pages/Tools"));
+const PartsAutoReorder = lazy(() => import("@/pages/PartsAutoReorder"));
+const AutomatedReordering = lazy(() => import("@/pages/AutomatedReordering"));
+const SmartPartsRecommendations = lazy(() => import("@/pages/SmartPartsRecommendations"));
+const SmartPartsRecommender = lazy(() => import("@/pages/SmartPartsRecommender"));
+const PartsMarketplace = lazy(() => import("@/pages/PartsMarketplace"));
+const PartsSupplyNetwork = lazy(() => import("@/pages/PartsSupplyNetwork"));
+
+// ============================================
+// Vehicle Management Pages (Lazy Loaded)
+// ============================================
+const FleetManagement = lazy(() => import("@/pages/FleetManagement"));
+const FleetTracking = lazy(() => import("@/pages/FleetTracking"));
+const VehicleInspections = lazy(() => import("@/pages/VehicleInspections"));
+const VehicleChecklist = lazy(() => import("@/pages/VehicleChecklist"));
+const TowingAssistance = lazy(() => import("@/pages/TowingAssistance"));
+const LoanerVehicles = lazy(() => import("@/pages/LoanerVehicles"));
+const TireManagement = lazy(() => import("@/pages/TireManagement"));
+const VehicleTracking = lazy(() => import("@/pages/VehicleTracking"));
+const VehicleHistory = lazy(() => import("@/pages/VehicleHistory"));
+const ContractManagement = lazy(() => import("@/pages/ContractManagement"));
+const WarrantyManagement = lazy(() => import("@/pages/WarrantyManagement"));
+const TowingServices = lazy(() => import("@/pages/TowingServices"));
+const VehicleStorage = lazy(() => import("@/pages/VehicleStorage"));
+
+// ============================================
+// AI & Advanced Features (Lazy Loaded)
+// ============================================
+const AIChatbot = lazy(() => import("@/pages/AIChatbot"));
+const AIChatbotAssistant = lazy(() => import("@/pages/AIChatbotAssistant"));
+const PredictiveMaintenance = lazy(() => import("@/pages/PredictiveMaintenance"));
+const PredictiveDiagnostics = lazy(() => import("@/pages/PredictiveDiagnostics"));
+const VoiceCommands = lazy(() => import("@/pages/VoiceCommands"));
+const DocumentOCR = lazy(() => import("@/pages/DocumentOCR"));
+const SmartDamageAssessment = lazy(() => import("@/pages/SmartDamageAssessment"));
+const IntelligentPriceOptimizer = lazy(() => import("@/pages/IntelligentPriceOptimizer"));
+const SmartInventoryForecasting = lazy(() => import("@/pages/SmartInventoryForecasting"));
+const AIServiceAdvisor = lazy(() => import("@/pages/AIServiceAdvisor"));
+const VehicleHealthMonitoring = lazy(() => import("@/pages/VehicleHealthMonitoring"));
+const AIAutomation = lazy(() => import("@/pages/AIAutomation"));
+const AIScheduling = lazy(() => import("@/pages/AIScheduling"));
+const AIInsights = lazy(() => import("@/pages/AIInsights"));
+const DiagnosticsOBDHub = lazy(() => import("@/pages/DiagnosticsOBDHub"));
+const VoiceCommandInterface = lazy(() => import("@/pages/VoiceCommandInterface"));
+const DocumentManagement = lazy(() => import("@/pages/DocumentManagement"));
+const DataImportExport = lazy(() => import("@/pages/DataImportExport"));
+const BusinessIntelligence = lazy(() => import("@/pages/BusinessIntelligence"));
+const BusinessIntelligenceDashboard = lazy(() => import("@/pages/BusinessIntelligenceDashboard"));
+const ProfitAnalysis = lazy(() => import("@/pages/ProfitAnalysis"));
+const CustomerLTVAnalysis = lazy(() => import("@/pages/CustomerLTVAnalysis"));
+const BusinessHeatMaps = lazy(() => import("@/pages/BusinessHeatMaps"));
+const DynamicPricing = lazy(() => import("@/pages/DynamicPricing"));
+const ComputerVisionQC = lazy(() => import("@/pages/ComputerVisionQC"));
+const DigitalTwinViewer = lazy(() => import("@/pages/DigitalTwinViewer"));
+const DroneInspection = lazy(() => import("@/pages/DroneInspection"));
+const MLFraudDetection = lazy(() => import("@/pages/MLFraudDetection"));
+const EdgeComputingDiagnostics = lazy(() => import("@/pages/EdgeComputingDiagnostics"));
+const IoTDashboard = lazy(() => import("@/pages/IoTDashboard"));
+const KPIDashboard = lazy(() => import("@/pages/KPIDashboard"));
+const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+const CustomReportBuilder = lazy(() => import("@/pages/CustomReportBuilder"));
+
+// ============================================
+// Marketing & Customer Engagement (Lazy Loaded)
+// ============================================
+const MarketingAutomation = lazy(() => import("@/pages/MarketingAutomation"));
+const MarketingHub = lazy(() => import("@/pages/MarketingHub"));
+const CustomerLoyalty = lazy(() => import("@/pages/CustomerLoyalty"));
+const EmailMarketingCampaigns = lazy(() => import("@/pages/EmailMarketingCampaigns"));
+const SocialMediaIntegration = lazy(() => import("@/pages/SocialMediaIntegration"));
+const CustomerReviewsRatings = lazy(() => import("@/pages/CustomerReviewsRatings"));
+const ReferralProgram = lazy(() => import("@/pages/ReferralProgram"));
+const CustomerFeedback = lazy(() => import("@/pages/CustomerFeedback"));
+const GoogleMyBusiness = lazy(() => import("@/pages/GoogleMyBusiness"));
+const SocialMediaMonitoring = lazy(() => import("@/pages/SocialMediaMonitoring"));
+const LoyaltyProgram = lazy(() => import("@/pages/LoyaltyProgram"));
+
+// ============================================
+// Technician Portal Pages (Lazy Loaded)
+// ============================================
+const TechnicianDashboard = lazy(() => import("@/pages/technician/Dashboard"));
+const TechnicianMyJobs = lazy(() => import("@/pages/technician/MyJobs"));
+const TechnicianTimeClock = lazy(() => import("@/pages/technician/TimeClock"));
+const TechnicianPartsLookup = lazy(() => import("@/pages/technician/PartsLookup"));
+const TechnicianJobDocumentation = lazy(() => import("@/pages/technician/JobDocumentation"));
+const TechnicianProfile = lazy(() => import("@/pages/technician/Profile"));
+const TechnicianAttendance = lazy(() => import("@/pages/technician/Attendance"));
+const TechnicianServiceGuides = lazy(() => import("@/pages/technician/ServiceGuides"));
+const TechnicianSoftware = lazy(() => import("@/pages/technician/TechnicalSoftware"));
+const TechnicianMobilePortal = lazy(() => import("@/pages/mobile/TechnicianMobilePortal"));
+
+// ============================================
+// Purchase Agent Portal Pages (Lazy Loaded)
+// ============================================
+const PurchaseAgentDashboard = lazy(() => import("@/pages/purchase-agent/Dashboard"));
+const PurchaseAgentOrders = lazy(() => import("@/pages/purchase-agent/Orders"));
+const PurchaseAgentSuppliers = lazy(() => import("@/pages/purchase-agent/Suppliers"));
+const PurchaseAgentInventory = lazy(() => import("@/pages/purchase-agent/Inventory"));
+const PurchaseAgentPriceCompare = lazy(() => import("@/pages/purchase-agent/PriceCompare"));
+const PurchaseAgentTracking = lazy(() => import("@/pages/purchase-agent/Tracking"));
+const PurchaseAgentReports = lazy(() => import("@/pages/purchase-agent/Reports"));
+const PurchaseAgentTaskInbox = lazy(() => import("@/pages/purchase-agent/TaskInbox"));
+const PurchaseAgentQuotationManagement = lazy(() => import("@/pages/purchase-agent/QuotationManagement"));
+const PurchaseAgentPaymentTracking = lazy(() => import("@/pages/purchase-agent/PaymentTracking"));
+const PurchaseAgentDeliveryTracking = lazy(() => import("@/pages/purchase-agent/DeliveryTracking"));
+const PurchaseAgentLiveDeliveryTracking = lazy(() => import("@/pages/purchase-agent/LiveDeliveryTracking"));
+
+// ============================================
+// Customer & Client Portal Pages (Lazy Loaded)
+// ============================================
+const CustomerDashboard = lazy(() => import("@/pages/customer/CustomerDashboard").then(m => ({ default: m.CustomerDashboard })));
+const CustomerAppointments = lazy(() => import("@/pages/customer/CustomerAppointments").then(m => ({ default: m.CustomerAppointments })));
+const CustomerInvoices = lazy(() => import("@/pages/customer/CustomerInvoices").then(m => ({ default: m.CustomerInvoices })));
+const CustomerVehicles = lazy(() => import("@/pages/customer/CustomerVehicles").then(m => ({ default: m.CustomerVehicles })));
+const CustomerCommunications = lazy(() => import("@/pages/customer/CustomerCommunications").then(m => ({ default: m.CustomerCommunications })));
+
+const ClientDashboard = lazy(() => import("@/pages/client/Dashboard"));
+const ClientVehicles = lazy(() => import("@/pages/client/Vehicles"));
+const ClientAppointments = lazy(() => import("@/pages/client/Appointments"));
+const ClientInvoices = lazy(() => import("@/pages/client/Invoices"));
+const ClientProfile = lazy(() => import("@/pages/client/Profile"));
+const ClientServiceHistory = lazy(() => import("@/pages/client/ServiceHistory"));
+const ClientLiveTracking = lazy(() => import("@/pages/client/LiveTracking"));
+const ClientReminders = lazy(() => import("@/pages/client/ServiceReminders"));
+const ClientReviewChat = lazy(() => import("@/pages/client/ReviewChat"));
+
+// ============================================
+// Mobile App Pages (Lazy Loaded)
+// ============================================
+const CustomerMobileHome = lazy(() => import("@/pages/mobile/CustomerMobileHome"));
+const CustomerMobileBooking = lazy(() => import("@/pages/mobile/CustomerMobileBooking"));
+const CustomerMobileVehicles = lazy(() => import("@/pages/mobile/CustomerMobileVehicles"));
+const CustomerMobilePayments = lazy(() => import("@/pages/mobile/CustomerMobilePayments"));
+const CustomerMobileProfile = lazy(() => import("@/pages/mobile/CustomerMobileProfile"));
+
+const TechnicianMobileHome = lazy(() => import("@/pages/mobile/TechnicianMobileHome"));
+const TechnicianMobileJobs = lazy(() => import("@/pages/mobile/TechnicianMobileJobs"));
+const TechnicianMobileClock = lazy(() => import("@/pages/mobile/TechnicianMobileClock"));
+const TechnicianMobileLookup = lazy(() => import("@/pages/mobile/TechnicianMobileLookup"));
+const TechnicianMobileProfile = lazy(() => import("@/pages/mobile/TechnicianMobileProfile"));
+
+// ============================================
+// Parts Network Pages (Lazy Loaded)
+// ============================================
+const PartsNetworkLayout = lazy(() => import("@/pages/parts-network/PartsNetworkLayout"));
+const PartsNetworkDashboard = lazy(() => import("@/pages/parts-network/PartsNetworkDashboard"));
+const SendQuotationRequest = lazy(() => import("@/pages/parts-network/SendQuotationRequest"));
+const MyRequests = lazy(() => import("@/pages/parts-network/MyRequests"));
+const IncomingRequests = lazy(() => import("@/pages/parts-network/IncomingRequests"));
+const QuotationsList = lazy(() => import("@/pages/parts-network/QuotationsList"));
+const NetworkMembers = lazy(() => import("@/pages/parts-network/NetworkMembers"));
+const NetworkOrders = lazy(() => import("@/pages/parts-network/NetworkOrders"));
+
+// ============================================
+// Admin & Settings Pages (Lazy Loaded)
+// ============================================
+const Settings = lazy(() => import("@/pages/Settings"));
+const RoleManagement = lazy(() => import("@/pages/RoleManagement"));
+const Security = lazy(() => import("@/pages/Security"));
+const Integrations = lazy(() => import("@/pages/Integrations"));
+const HRManagement = lazy(() => import("@/pages/HRManagement"));
+
+// ============================================
+// Specialized Features (Lazy Loaded)
+// ============================================
+const FranchiseManagement = lazy(() => import("@/pages/FranchiseManagement"));
+const GlobalizationLayer = lazy(() => import("@/pages/GlobalizationLayer"));
+const OEMSoftwareSubscriptions = lazy(() => import("@/pages/OEMSoftwareSubscriptions"));
+const VendorSupplierPortal = lazy(() => import("@/pages/VendorSupplierPortal"));
+const VideoConsultations = lazy(() => import("@/pages/VideoConsultations"));
+const LiveServiceTracking = lazy(() => import("@/pages/LiveServiceTracking"));
+const VideoEstimates = lazy(() => import("@/pages/VideoEstimates"));
+const DigitalVehicleWalkaround = lazy(() => import("@/pages/DigitalVehicleWalkaround"));
+const EquipmentCalibration = lazy(() => import("@/pages/EquipmentCalibration"));
+const RoutingOptimizer = lazy(() => import("@/pages/RoutingOptimizer"));
+const SafetyIncidents = lazy(() => import("@/pages/SafetyIncidents"));
+const EnvironmentalCompliance = lazy(() => import("@/pages/EnvironmentalCompliance"));
+const ISOQualityManagement = lazy(() => import("@/pages/ISOQualityManagement"));
+const InsuranceClaims = lazy(() => import("@/pages/InsuranceClaims"));
+const BarcodeScanner = lazy(() => import("@/pages/BarcodeScanner"));
+const DigitalSignage = lazy(() => import("@/pages/DigitalSignage"));
+const KioskCheckIn = lazy(() => import("@/pages/KioskCheckIn"));
+const SecurityCameras = lazy(() => import("@/pages/SecurityCameras"));
+const LicensePlateRecognition = lazy(() => import("@/pages/LicensePlateRecognition"));
+const EmergingTechnologies = lazy(() => import("@/pages/EmergingTechnologies"));
+const Interactive3DParts = lazy(() => import("@/pages/Interactive3DParts"));
+const NextGenTechnologies = lazy(() => import("@/pages/NextGenTechnologies"));
+const ServiceBayDashboard = lazy(() => import("@/pages/ServiceBayDashboard"));
+const WorkshopCalendar = lazy(() => import("@/pages/WorkshopCalendar"));
+const VINDecoder = lazy(() => import("@/pages/VINDecoder"));
+const TelematicsIntegration = lazy(() => import("@/pages/TelematicsIntegration"));
+const KnowledgeBase = lazy(() => import("@/pages/KnowledgeBase"));
+const TrainingLMS = lazy(() => import("@/pages/TrainingLMS"));
+const ComplianceManagement = lazy(() => import("@/pages/ComplianceManagement"));
+const StaffPerformanceReview = lazy(() => import("@/pages/StaffPerformanceReview"));
+const SustainableEnergyMonitoring = lazy(() => import("@/pages/SustainableEnergyMonitoring"));
+const TaskManagement = lazy(() => import("@/pages/TaskManagement"));
+const DataBackup = lazy(() => import("@/pages/DataBackup"));
+const DashboardWidgets = lazy(() => import("@/pages/DashboardWidgets"));
+const WearableIntegration = lazy(() => import("@/pages/WearableIntegration"));
+const SaudiComplianceDashboard = lazy(() => import("@/pages/SaudiComplianceDashboard"));
+const AppointmentReminders = lazy(() => import("@/pages/AppointmentReminders"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -261,13 +339,15 @@ function Router() {
 
   if (!isAuthenticated) {
     return (
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/track/:token" component={PublicTracking} />
-        <Route path="/customer-portal" component={CustomerPortal} />
-        <Route component={Login} />
-      </Switch>
+      <Suspense fallback={<LoadingFallback />}>
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/track/:token" component={PublicTracking} />
+          <Route path="/customer-portal" component={CustomerPortal} />
+          <Route component={Login} />
+        </Switch>
+      </Suspense>
     );
   }
 
@@ -275,7 +355,8 @@ function Router() {
   const isCustomer = user?.userType === 'customer';
 
   return (
-    <Switch>
+    <Suspense fallback={<LoadingFallback />}>
+      <Switch>
       {/* Root path - show dashboard directly */}
       <Route path="/">
         <Layout>
@@ -1399,7 +1480,8 @@ function Router() {
       </Route>
       
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </Suspense>
   );
 }
 
