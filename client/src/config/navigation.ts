@@ -226,6 +226,7 @@ export const navigationConfig: NavGroup[] = [
     icon: HardHat,
     items: [
       { title: "Technician Portal", href: "/technician-portal", icon: HardHat },
+      { title: "Technician App", href: "/technician-app", icon: TabletSmartphone },
       { title: "Technician Management", href: "/technician-management", icon: Users },
       { title: "Live Service Tracking", href: "/live-service-tracking", icon: Eye },
       { title: "Routing Optimizer", href: "/routing-optimizer", icon: Route },

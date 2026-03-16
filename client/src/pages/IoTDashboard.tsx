@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { DashboardPage } from '@/components/layouts';
@@ -54,17 +54,55 @@ export default function IoTDashboard() {
   const { t } = useTranslation();
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const { toast } = useToast();
+  const wsRef = useRef<WebSocket | null>(null);
+  const [liveSensorData, setLiveSensorData] = useState<Record<string, SensorReading> | null>(null);
+
+  // WebSocket connection for real-time sensor data
+  useEffect(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
+    wsRef.current = ws;
+
+    ws.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'sensor_update') {
+          setLiveSensorData(data.readings);
+          // Invalidate queries to refresh summary counts
+          queryClient.invalidateQueries({ queryKey: ['/api/iot/dashboard/summary'] });
+        }
+        if (data.type === 'alert_update') {
+          queryClient.invalidateQueries({ queryKey: ['/api/iot/alerts'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/iot/dashboard/summary'] });
+        }
+      } catch {
+        // ignore malformed messages
+      }
+    };
+
+    ws.onerror = () => {
+      // WebSocket error - will fall back to polling
+    };
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, []);
 
   const { data: summary, isLoading: summaryLoading } = useQuery<IoTSummary>({
     queryKey: ['/api/iot/dashboard/summary'],
+    refetchInterval: 10000,
   });
 
   const { data: sensors = [], isLoading: sensorsLoading } = useQuery<IoTSensor[]>({
     queryKey: ['/api/iot/sensors'],
+    refetchInterval: 10000,
   });
 
   const { data: alerts = [], isLoading: alertsLoading } = useQuery<IoTAlert[]>({
     queryKey: ['/api/iot/alerts'],
+    refetchInterval: 10000,
   });
 
   const { data: vehicles = [] } = useQuery<Vehicle[]>({
@@ -74,7 +112,11 @@ export default function IoTDashboard() {
   const { data: latestReadings } = useQuery<Record<string, SensorReading>>({
     queryKey: ['/api/iot/vehicles', selectedVehicleId, 'latest-readings'],
     enabled: !!selectedVehicleId,
+    refetchInterval: 10000,
   });
+
+  // Merge live WebSocket data with fetched readings
+  const effectiveReadings = liveSensorData || latestReadings;
 
   const acknowledgeAlertMutation = useMutation({
     mutationFn: async (alertId: string) => {
@@ -319,9 +361,9 @@ export default function IoTDashboard() {
                               </p>
                             </div>
                           </div>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="border-[#E2E8F0] dark:border-[#232A36]"
                             data-testid={`button-acknowledge-${alert.id}`}
                             onClick={() => acknowledgeAlertMutation.mutate(alert.id)}
@@ -343,7 +385,7 @@ export default function IoTDashboard() {
           </Card>
         </TabsContent>
 
-        {selectedVehicleId && latestReadings && (
+        {selectedVehicleId && effectiveReadings && (
           <TabsContent value="live">
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardHeader>
@@ -354,7 +396,7 @@ export default function IoTDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {Object.entries(latestReadings).map(([sensorType, reading]) => (
+                  {Object.entries(effectiveReadings).map(([sensorType, reading]) => (
                     <div key={sensorType} className="flex justify-between items-center p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
                       <span className="font-medium capitalize text-[#0B1F3B] dark:text-white">{sensorType.replace(/_/g, ' ')}</span>
                       <div className="text-right">

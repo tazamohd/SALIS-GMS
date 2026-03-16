@@ -13,6 +13,9 @@ import aiInsightsRouter from "./ai-insights";
 import financialRouter from "./financial";
 import workflowHooksRouter from "./workflow-hooks";
 import saudiRouter from "./saudi";
+import iotRouter from "./iot";
+import customerPortalRouter from "./customer-portal";
+import franchiseRouter from "./franchise";
 import { generateCsrfToken, validateCsrfToken } from "../middleware/csrf";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
@@ -28,6 +31,7 @@ import { fleetRoutes } from "./fleet.routes";
 import { reportsRoutes } from "./reports.routes";
 import { settingsRoutes } from "./settings.routes";
 import { miscRoutes } from "./misc.routes";
+import technicianMobileRouter from "./technician-mobile";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -100,7 +104,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", financialRouter);
   app.use("/api", workflowHooksRouter);
   app.use("/api", saudiRouter);
-  console.log("✅ Command Center, Workflow Engine, AI Intelligence, Financial, Workflow Hooks & Saudi Compliance Loaded");
+  app.use("/api", iotRouter);
+  console.log("✅ Command Center, Workflow Engine, AI Intelligence, Financial, Workflow Hooks, Saudi Compliance & IoT Loaded");
 
   // Load domain-based route modules
   app.use("/api", technicianRoutes);
@@ -135,6 +140,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api", miscRoutes);
   console.log("✅ Miscellaneous Routes Loaded");
+
+  app.use("/api", customerPortalRouter);
+  console.log("✅ Customer Portal Self-Service Routes Loaded");
+
+  app.use("/api", franchiseRouter);
+  console.log("✅ Franchise Management Routes Loaded");
+
+  app.use("/api", technicianMobileRouter);
+  console.log("✅ Technician Mobile App Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

@@ -1,11 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Box, RotateCcw, Eye, Layers, Activity, Settings } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Box, RotateCcw, Eye, Layers, Activity, Settings, Loader2 } from 'lucide-react';
 import { TabsPageLayout } from '@/components/layouts';
+
+interface Vehicle {
+  id: string;
+  make: string;
+  model: string;
+  licensePlate: string;
+  year?: number;
+}
+
+interface VehicleDetail {
+  id: string;
+  make: string;
+  model: string;
+  licensePlate: string;
+  year?: number;
+  mileage?: number;
+  status?: string;
+}
+
+interface ServiceHistoryEntry {
+  id: string;
+  date: string;
+  type: string;
+  description: string;
+  nextServiceDate?: string;
+}
+
+interface SensorStats {
+  label: string;
+  value: string;
+  status: string;
+  color: string;
+}
 
 export default function DigitalTwinViewer() {
   const { t } = useTranslation();
@@ -13,6 +48,9 @@ export default function DigitalTwinViewer() {
   const [rotationY, setRotationY] = useState(45);
   const [zoom, setZoom] = useState(100);
   const [activeLayer, setActiveLayer] = useState('all');
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [liveStats, setLiveStats] = useState<SensorStats[] | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const resetView = () => {
     setRotationX(20);
@@ -20,12 +58,65 @@ export default function DigitalTwinViewer() {
     setZoom(100);
   };
 
-  const vehicleStats = [
+  // Fetch list of vehicles
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useQuery<Vehicle[]>({
+    queryKey: ['/api/vehicles'],
+  });
+
+  // Fetch selected vehicle details
+  const { data: vehicleDetail } = useQuery<VehicleDetail>({
+    queryKey: ['/api/vehicles', selectedVehicleId],
+    enabled: !!selectedVehicleId,
+  });
+
+  // Fetch service history for selected vehicle
+  const { data: serviceHistory = [] } = useQuery<ServiceHistoryEntry[]>({
+    queryKey: ['/api/service-history', { vehicleId: selectedVehicleId }],
+    enabled: !!selectedVehicleId,
+  });
+
+  // WebSocket connection for live sensor updates
+  useEffect(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
+    wsRef.current = ws;
+
+    ws.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'sensor_update') {
+          setLiveStats(data.stats);
+        }
+      } catch {
+        // ignore malformed messages
+      }
+    };
+
+    ws.onerror = () => {
+      // WebSocket error - will use fallback data
+    };
+
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, []);
+
+  // Derive stats from live data, vehicle detail, or defaults
+  const defaultStats: SensorStats[] = [
     { label: t('digitalTwin.engineTemp', 'Engine Temp'), value: '92°C', status: 'normal', color: 'text-green-500' },
     { label: t('digitalTwin.oilPressure', 'Oil Pressure'), value: '45 PSI', status: 'normal', color: 'text-green-500' },
     { label: t('digitalTwin.battery', 'Battery'), value: '12.6V', status: 'normal', color: 'text-green-500' },
     { label: t('digitalTwin.tirePressure', 'Tire Pressure'), value: '32 PSI', status: 'warning', color: 'text-[#F97316]' },
   ];
+
+  const vehicleStats = liveStats || defaultStats;
+
+  // Derive last service and next service from service history
+  const lastService = serviceHistory.length > 0
+    ? serviceHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+    : null;
+  const nextServiceDue = lastService?.nextServiceDate || null;
 
   const viewerTab = (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -45,6 +136,52 @@ export default function DigitalTwinViewer() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Vehicle Selector */}
+          <div className="mb-4">
+            <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
+              <SelectTrigger className="w-full bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="vehicle-selector">
+                <SelectValue placeholder={vehiclesLoading ? t('common.loading', 'Loading...') : t('digitalTwin.selectVehicle', 'Select a vehicle...')} />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.isArray(vehicles) && vehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.make} {vehicle.model} {vehicle.year ? `(${vehicle.year})` : ''} - {vehicle.licensePlate}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Vehicle Info Bar */}
+          {vehicleDetail && (
+            <div className="mb-4 flex flex-wrap gap-4 p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="text-sm text-[#0B1F3B] dark:text-white">
+                <span className="text-[#64748B]">{t('digitalTwin.vehicle', 'Vehicle')}:</span>{' '}
+                {vehicleDetail.make} {vehicleDetail.model}
+              </div>
+              {vehicleDetail.mileage && (
+                <div className="text-sm text-[#0B1F3B] dark:text-white">
+                  <span className="text-[#64748B]">{t('digitalTwin.mileage', 'Mileage')}:</span>{' '}
+                  {vehicleDetail.mileage.toLocaleString()} km
+                </div>
+              )}
+              {lastService && (
+                <div className="text-sm text-[#0B1F3B] dark:text-white">
+                  <span className="text-[#64748B]">{t('digitalTwin.lastService', 'Last Service')}:</span>{' '}
+                  {new Date(lastService.date).toLocaleDateString()}
+                </div>
+              )}
+              {nextServiceDue && (
+                <div className="text-sm text-[#0B1F3B] dark:text-white">
+                  <span className="text-[#64748B]">{t('digitalTwin.nextServiceDue', 'Next Service Due')}:</span>{' '}
+                  <Badge variant="outline" className="text-[#F97316] border-[#F97316]/30">
+                    {new Date(nextServiceDue).toLocaleDateString()}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="relative bg-gradient-to-b from-[#0E1117] to-[#151A23] rounded-lg p-8 h-[500px] flex items-center justify-center overflow-hidden border border-[#232A36]">
             <div
               className="relative transition-transform duration-300"
@@ -59,7 +196,7 @@ export default function DigitalTwinViewer() {
                   <div className="absolute bottom-4 left-4 w-12 h-12 bg-[#0E1117] rounded-full border-2 border-[#232A36]" />
                   <div className="absolute bottom-4 right-4 w-12 h-12 bg-[#0E1117] rounded-full border-2 border-[#232A36]" />
                 </div>
-                
+
                 {(activeLayer === 'sensors' || activeLayer === 'all') && (
                   <>
                     <div className="absolute top-2 left-1/2 w-3 h-3 bg-green-400 rounded-full animate-pulse" title={t('digitalTwin.frontSensor', 'Front sensor')} />
@@ -201,8 +338,31 @@ export default function DigitalTwinViewer() {
   );
 
   const historyTab = (
-    <div className="text-center py-8 text-[#64748B]">
-      <p>{t('digitalTwin.noSimulationHistory', 'No simulation history available')}</p>
+    <div>
+      {serviceHistory.length === 0 ? (
+        <div className="text-center py-8 text-[#64748B]">
+          <p>{selectedVehicleId ? t('digitalTwin.noServiceHistory', 'No service history for this vehicle') : t('digitalTwin.selectVehicleForHistory', 'Select a vehicle to view service history')}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {serviceHistory.map((entry) => (
+            <div key={entry.id} className="p-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-[#0B1F3B] dark:text-white">{entry.type}</span>
+                <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
+                  {new Date(entry.date).toLocaleDateString()}
+                </Badge>
+              </div>
+              <p className="text-sm text-[#64748B]">{entry.description}</p>
+              {entry.nextServiceDate && (
+                <p className="text-xs text-[#F97316] mt-1">
+                  {t('digitalTwin.nextServiceDue', 'Next Service Due')}: {new Date(entry.nextServiceDate).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 

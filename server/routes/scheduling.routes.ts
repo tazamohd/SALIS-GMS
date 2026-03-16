@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { optimizeSchedule, generateScheduleReport } from "../services/scheduling-optimizer";
 
 const router = Router();
 
@@ -262,5 +263,118 @@ router.get("/time-slots", isAuthenticated, async (req, res) => {
 // TODO: Implement recurring appointments
 // - POST /api/recurring-appointments
 // - GET /api/recurring-appointments
+
+// ─── AI Scheduling Optimization Routes ───────────────────────────────
+
+// In-memory store for optimization history and rules
+const optimizationHistory: any[] = [];
+
+const defaultSchedulingRules = [
+  { id: '1', ruleName: 'Skill-Based Assignment', description: 'Match technicians to jobs based on skill compatibility', priority: 1, isActive: true },
+  { id: '2', ruleName: 'Load Balancing', description: 'Distribute work evenly across available technicians', priority: 2, isActive: true },
+  { id: '3', ruleName: 'Priority Escalation', description: 'Assign urgent jobs first to the best available technician', priority: 3, isActive: true },
+  { id: '4', ruleName: 'Efficiency Preference', description: 'Prefer technicians with higher historical efficiency ratings', priority: 4, isActive: false },
+];
+
+// POST /api/scheduling/optimize - Run AI schedule optimization
+router.post("/scheduling/optimize", isAuthenticated, async (req: any, res) => {
+  try {
+    const { technicians: inputTechs, jobs: inputJobs } = req.body;
+
+    // Use provided data or generate demo data from storage
+    let technicians = inputTechs;
+    let jobs = inputJobs;
+
+    if (!technicians || !Array.isArray(technicians) || technicians.length === 0) {
+      // Generate sample technicians for demo
+      technicians = [
+        { id: 't1', name: 'Ahmed Al-Rashid', skills: ['engine', 'transmission', 'diagnostics'], currentLoad: 2, maxLoad: 5, availability: true, efficiency: 0.92 },
+        { id: 't2', name: 'Mohammed Khalil', skills: ['electrical', 'ac', 'diagnostics'], currentLoad: 1, maxLoad: 5, availability: true, efficiency: 0.85 },
+        { id: 't3', name: 'Omar Farouk', skills: ['bodywork', 'paint', 'detailing'], currentLoad: 3, maxLoad: 5, availability: true, efficiency: 0.78 },
+        { id: 't4', name: 'Khalid Nasser', skills: ['brakes', 'suspension', 'alignment'], currentLoad: 0, maxLoad: 5, availability: true, efficiency: 0.95 },
+        { id: 't5', name: 'Yusuf Ibrahim', skills: ['engine', 'oil-change', 'tire'], currentLoad: 4, maxLoad: 5, availability: true, efficiency: 0.88 },
+      ];
+    }
+
+    if (!jobs || !Array.isArray(jobs) || jobs.length === 0) {
+      // Generate sample jobs for demo
+      jobs = [
+        { id: 'j1', type: 'Engine Repair', requiredSkills: ['engine', 'diagnostics'], estimatedHours: 4, priority: 'urgent', vehicleInfo: 'Toyota Camry 2022' },
+        { id: 'j2', type: 'AC Service', requiredSkills: ['ac', 'electrical'], estimatedHours: 2, priority: 'high', vehicleInfo: 'Honda Accord 2023' },
+        { id: 'j3', type: 'Brake Replacement', requiredSkills: ['brakes'], estimatedHours: 3, priority: 'medium', vehicleInfo: 'Nissan Altima 2021' },
+        { id: 'j4', type: 'Full Detailing', requiredSkills: ['detailing', 'paint'], estimatedHours: 5, priority: 'low', vehicleInfo: 'BMW X5 2023' },
+        { id: 'j5', type: 'Transmission Check', requiredSkills: ['transmission', 'diagnostics'], estimatedHours: 3, priority: 'high', vehicleInfo: 'Ford F-150 2022' },
+        { id: 'j6', type: 'Wheel Alignment', requiredSkills: ['alignment', 'suspension'], estimatedHours: 1, priority: 'medium', vehicleInfo: 'Hyundai Sonata 2023' },
+      ];
+    }
+
+    // Run AI optimization
+    const assignments = optimizeSchedule(technicians, jobs);
+    const report = generateScheduleReport(technicians, assignments);
+
+    // Generate AI suggestions
+    const suggestions: string[] = [];
+    if (report.averageScore < 60) {
+      suggestions.push('Consider cross-training technicians to improve skill coverage and assignment scores.');
+    }
+    const overloaded = report.technicianUtilization.filter(t => t.utilization > 90);
+    if (overloaded.length > 0) {
+      suggestions.push(`${overloaded.map(t => t.name).join(', ')} ${overloaded.length === 1 ? 'is' : 'are'} near full capacity. Consider redistributing workload or hiring additional staff.`);
+    }
+    const underutilized = report.technicianUtilization.filter(t => t.utilization < 30);
+    if (underutilized.length > 0) {
+      suggestions.push(`${underutilized.map(t => t.name).join(', ')} ${underutilized.length === 1 ? 'has' : 'have'} low utilization. Consider assigning more tasks or cross-department support.`);
+    }
+    if (assignments.length > 0) {
+      suggestions.push(`Successfully optimized ${assignments.length} job assignments with an average match score of ${report.averageScore}%.`);
+    }
+
+    // Build utilization map for history
+    const utilizationMap: Record<string, string> = {};
+    report.technicianUtilization.forEach(t => {
+      utilizationMap[t.name] = String(t.utilization);
+    });
+
+    // Store in history
+    const historyEntry = {
+      id: `opt-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      appointmentsOptimized: assignments.length,
+      efficiencyGain: report.averageScore > 0 ? ((report.averageScore / 100) * 25).toFixed(1) : '0',
+      technicianUtilization: utilizationMap,
+      suggestions,
+      assignments,
+      report,
+    };
+    optimizationHistory.unshift(historyEntry);
+    // Keep only last 20 entries
+    if (optimizationHistory.length > 20) optimizationHistory.length = 20;
+
+    res.json(historyEntry);
+  } catch (error) {
+    console.error("Error running scheduling optimization:", error);
+    res.status(500).json({ message: "Failed to run scheduling optimization" });
+  }
+});
+
+// GET /api/scheduling/rules - Get scheduling rules
+router.get("/scheduling/rules", isAuthenticated, async (_req, res) => {
+  try {
+    res.json(defaultSchedulingRules);
+  } catch (error) {
+    console.error("Error fetching scheduling rules:", error);
+    res.status(500).json({ message: "Failed to fetch scheduling rules" });
+  }
+});
+
+// GET /api/scheduling/history - Get optimization history
+router.get("/scheduling/history", isAuthenticated, async (_req, res) => {
+  try {
+    res.json(optimizationHistory);
+  } catch (error) {
+    console.error("Error fetching optimization history:", error);
+    res.status(500).json({ message: "Failed to fetch optimization history" });
+  }
+});
 
 export const schedulingRoutes = router;

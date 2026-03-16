@@ -322,6 +322,7 @@ const DashboardWidgets = lazy(() => import("@/pages/DashboardWidgets"));
 const WearableIntegration = lazy(() => import("@/pages/WearableIntegration"));
 const SaudiComplianceDashboard = lazy(() => import("@/pages/SaudiComplianceDashboard"));
 const AppointmentReminders = lazy(() => import("@/pages/AppointmentReminders"));
+const TechnicianMobileApp = lazy(() => import("@/pages/TechnicianMobile"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -1454,9 +1455,9 @@ function Router() {
       
       {/* Technician Mobile App Routes */}
       <Route path="/technician-app">
-        <TechnicianMobileLayout>
-          <TechnicianMobileHome />
-        </TechnicianMobileLayout>
+        <Layout>
+          <TechnicianMobileApp />
+        </Layout>
       </Route>
       <Route path="/technician-app/jobs">
         <TechnicianMobileLayout>

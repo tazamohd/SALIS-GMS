@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Building2, FileText, TrendingUp, DollarSign, Plus, Edit, Trash2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Building2, FileText, TrendingUp, DollarSign, Plus, Edit, Trash2, MapPin, Wrench, Users, Package, BarChart3 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -19,6 +20,16 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertFranchiseGroupSchema, insertFranchiseContractSchema, insertFranchiseKpiSchema, insertRevenueSharingRuleSchema } from "@shared/schema";
 import { z } from "zod";
 import { TabsPageLayout } from "@/components/layouts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 type InsertFranchiseGroup = z.infer<typeof insertFranchiseGroupSchema>;
 type InsertFranchiseContract = z.infer<typeof insertFranchiseContractSchema>;
@@ -76,7 +87,7 @@ type RevenueSharingRule = {
 export default function FranchiseManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("groups");
+  const [activeTab, setActiveTab] = useState("locations");
   const [showGroupDialog, setShowGroupDialog] = useState(false);
   const [showContractDialog, setShowContractDialog] = useState(false);
   const [showKpiDialog, setShowKpiDialog] = useState(false);
@@ -97,6 +108,41 @@ export default function FranchiseManagement() {
   const { data: revenueSharingRules = [], isLoading: rulesLoading } = useQuery<RevenueSharingRule[]>({
     queryKey: ["/api/revenue-sharing-rules"],
   });
+
+  // Multi-location analytics queries
+  const { data: analyticsData, isLoading: loadingAnalytics } = useQuery<{
+    revenueByLocation: Array<{ location: string; revenue: number; invoiceCount: number }>;
+    jobsByLocation: Array<{ location: string; totalJobs: number; completedJobs: number; activeJobs: number }>;
+    customersByLocation: Array<{ location: string; customers: number }>;
+    summary: { totalLocations: number; totalRevenue: number; totalJobs: number; totalCustomers: number };
+  }>({ queryKey: ["/api/franchise/analytics"] });
+
+  const { data: locationsData, isLoading: loadingLocations } = useQuery<{
+    locations: Array<{ id: number; name: string; address: string; phone: string; email: string; isActive: boolean; createdAt: string }>;
+  }>({ queryKey: ["/api/franchise/locations"] });
+
+  const { data: performanceData, isLoading: loadingPerformance } = useQuery<{
+    performance: Array<{ location: string; revenue: number; jobs: number; completed: number; completionRate: number }>;
+  }>({ queryKey: ["/api/franchise/performance"] });
+
+  const { data: inventoryData, isLoading: loadingInventory } = useQuery<{
+    inventory: Array<{ location: string; partName: string; partNumber: string; stockQuantity: number; minQuantity: number; sellingPrice: number }>;
+  }>({ queryKey: ["/api/franchise/inventory-sharing"] });
+
+  const analytics = analyticsData || {
+    revenueByLocation: [], jobsByLocation: [], customersByLocation: [],
+    summary: { totalLocations: 0, totalRevenue: 0, totalJobs: 0, totalCustomers: 0 },
+  };
+  const locations = locationsData?.locations || [];
+  const performance = performanceData?.performance || [];
+  const inventory = inventoryData?.inventory || [];
+
+  const revenueChartData = analytics.revenueByLocation.map((r) => ({
+    name: r.location, revenue: Number(r.revenue || 0), invoices: Number(r.invoiceCount || 0),
+  }));
+  const jobsChartData = analytics.jobsByLocation.map((j) => ({
+    name: j.location, completed: Number(j.completedJobs || 0), active: Number(j.activeJobs || 0), total: Number(j.totalJobs || 0),
+  }));
 
   const groupForm = useForm<InsertFranchiseGroup>({
     resolver: zodResolver(insertFranchiseGroupSchema),
@@ -315,6 +361,242 @@ export default function FranchiseManagement() {
   };
 
   const tabsConfig = [
+    {
+      id: "locations",
+      label: t('franchise.locationOverview', 'Location Overview'),
+      icon: MapPin,
+      content: (
+        <div className="space-y-6">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-[#0A5ED7]/10"><Building2 className="w-5 h-5 text-[#0A5ED7]" /></div>
+                  <div><div className="text-2xl font-bold text-gray-900 dark:text-white">{analytics.summary.totalLocations}</div><div className="text-xs text-gray-500">{t('franchise.totalLocations', 'Total Locations')}</div></div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-[#10B981]/10"><DollarSign className="w-5 h-5 text-[#10B981]" /></div>
+                  <div><div className="text-2xl font-bold text-gray-900 dark:text-white">SAR {analytics.summary.totalRevenue.toLocaleString()}</div><div className="text-xs text-gray-500">{t('franchise.totalRevenue', 'Total Revenue')}</div></div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-[#0BB3FF]/10"><Wrench className="w-5 h-5 text-[#0BB3FF]" /></div>
+                  <div><div className="text-2xl font-bold text-gray-900 dark:text-white">{analytics.summary.totalJobs}</div><div className="text-xs text-gray-500">{t('franchise.totalJobs', 'Total Jobs')}</div></div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-[#6366F1]/10"><Users className="w-5 h-5 text-[#6366F1]" /></div>
+                  <div><div className="text-2xl font-bold text-gray-900 dark:text-white">{analytics.summary.totalCustomers}</div><div className="text-xs text-gray-500">{t('franchise.totalCustomers', 'Total Customers')}</div></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Location Cards */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('franchise.locations', 'Locations')}</h3>
+            {loadingLocations ? (
+              <div className="text-sm text-gray-500">{t('common.loading', 'Loading...')}</div>
+            ) : locations.length === 0 ? (
+              <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+                <CardContent className="py-12 text-center text-gray-500">{t('franchise.noLocationsFound', 'No locations found. Add garages to enable franchise management.')}</CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {locations.map((loc) => {
+                  const locRevenue = analytics.revenueByLocation.find((r) => r.location === loc.name);
+                  const locJobs = analytics.jobsByLocation.find((j) => j.location === loc.name);
+                  const locCustomers = analytics.customersByLocation.find((c) => c.location === loc.name);
+                  return (
+                    <Card key={loc.id} className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23] hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-base font-semibold text-[#0B1F3B] dark:text-white">{loc.name}</CardTitle>
+                          <Badge variant={loc.isActive ? "default" : "secondary"}>{loc.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}</Badge>
+                        </div>
+                        {loc.address && <div className="flex items-center gap-1 text-sm text-gray-500"><MapPin className="w-3 h-3" />{loc.address}</div>}
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-3 gap-3 text-center">
+                          <div><div className="text-lg font-bold text-[#0A5ED7]">{Number(locRevenue?.revenue || 0).toLocaleString()}</div><div className="text-xs text-gray-500">Revenue (SAR)</div></div>
+                          <div><div className="text-lg font-bold text-[#0BB3FF]">{Number(locJobs?.totalJobs || 0)}</div><div className="text-xs text-gray-500">Jobs</div></div>
+                          <div><div className="text-lg font-bold text-[#6366F1]">{Number(locCustomers?.customers || 0)}</div><div className="text-xs text-gray-500">Customers</div></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardHeader><CardTitle className="flex items-center gap-2 text-base text-[#0B1F3B] dark:text-white"><BarChart3 className="w-5 h-5 text-[#0A5ED7]" />{t('franchise.revenueByLocation', 'Revenue by Location')}</CardTitle></CardHeader>
+              <CardContent>
+                {revenueChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={revenueChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip formatter={(value: number) => [`SAR ${value.toLocaleString()}`, "Revenue"]} />
+                      <Bar dataKey="revenue" fill="#0A5ED7" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center text-gray-400 text-sm">{t('franchise.noRevenueData', 'No revenue data available')}</div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+              <CardHeader><CardTitle className="flex items-center gap-2 text-base text-[#0B1F3B] dark:text-white"><Wrench className="w-5 h-5 text-[#0BB3FF]" />{t('franchise.jobsByLocation', 'Jobs by Location')}</CardTitle></CardHeader>
+              <CardContent>
+                {jobsChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={jobsChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-20} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="completed" fill="#10B981" name={t('franchise.completed', 'Completed')} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="active" fill="#0BB3FF" name={t('franchise.active', 'Active')} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[300px] flex items-center justify-center text-gray-400 text-sm">{t('franchise.noJobData', 'No job data available')}</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "performance",
+      label: t('franchise.performanceComparison', 'Performance'),
+      icon: TrendingUp,
+      content: (
+        <div className="space-y-4">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base text-[#0B1F3B] dark:text-white">
+                <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
+                {t('franchise.locationPerformanceComparison', 'Location Performance Comparison')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingPerformance ? (
+                <div className="text-sm text-gray-500">{t('common.loading', 'Loading...')}</div>
+              ) : performance.length === 0 ? (
+                <div className="py-8 text-center text-gray-400 text-sm">{t('franchise.noPerformanceData', 'No performance data available')}</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.revenueSAR', 'Revenue (SAR)')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.totalJobsLabel', 'Total Jobs')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.completedLabel', 'Completed')}</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-500 w-48">{t('franchise.completionRate', 'Completion Rate')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {performance.map((row, idx) => (
+                        <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1A1F2E]">
+                          <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{row.location}</td>
+                          <td className="py-3 px-4 text-right font-semibold text-[#0A5ED7]">{Number(row.revenue || 0).toLocaleString()}</td>
+                          <td className="py-3 px-4 text-right">{Number(row.jobs || 0)}</td>
+                          <td className="py-3 px-4 text-right">{Number(row.completed || 0)}</td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <Progress value={Number(row.completionRate || 0)} className="h-2 flex-1" />
+                              <span className="text-xs font-medium w-10 text-right">{Number(row.completionRate || 0)}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ),
+    },
+    {
+      id: "inventory-sharing",
+      label: t('franchise.inventorySharing', 'Inventory Sharing'),
+      icon: Package,
+      content: (
+        <div className="space-y-4">
+          <Card className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base text-[#0B1F3B] dark:text-white">
+                <Package className="w-5 h-5 text-[#6366F1]" />
+                {t('franchise.crossLocationInventory', 'Cross-Location Inventory Availability')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingInventory ? (
+                <div className="text-sm text-gray-500">{t('common.loading', 'Loading...')}</div>
+              ) : inventory.length === 0 ? (
+                <div className="py-8 text-center text-gray-400 text-sm">{t('franchise.noInventoryData', 'No cross-location inventory data available')}</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.partName', 'Part Name')}</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.partNumber', 'Part Number')}</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.stock', 'Stock')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.minQty', 'Min Qty')}</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.priceSAR', 'Price (SAR)')}</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('common.status', 'Status')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventory.map((item, idx) => {
+                        const isLow = Number(item.stockQuantity) <= Number(item.minQuantity);
+                        return (
+                          <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1A1F2E]">
+                            <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{item.partName}</td>
+                            <td className="py-3 px-4 text-gray-500">{item.partNumber}</td>
+                            <td className="py-3 px-4">{item.location}</td>
+                            <td className="py-3 px-4 text-right font-semibold">{Number(item.stockQuantity)}</td>
+                            <td className="py-3 px-4 text-right">{Number(item.minQuantity)}</td>
+                            <td className="py-3 px-4 text-right">{Number(item.sellingPrice || 0).toLocaleString()}</td>
+                            <td className="py-3 px-4">
+                              <Badge variant={isLow ? "destructive" : "default"}>{isLow ? t('franchise.lowStock', 'Low Stock') : t('franchise.inStock', 'In Stock')}</Badge>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ),
+    },
     {
       id: "groups",
       label: t('franchise.franchiseGroups', 'Franchise Groups'),
