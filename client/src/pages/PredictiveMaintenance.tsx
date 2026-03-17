@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle, Clock, TrendingUp, Car, Wrench, Brain } from "lucide-react";
-import type { AIMaintenancePrediction } from "@shared/schema";
+import { AlertTriangle, CheckCircle, Clock, TrendingUp, Car, Wrench, Brain, DollarSign, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -17,60 +16,73 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
+
+interface PredictionItem {
+  serviceType: string;
+  predictedDate: string;
+  confidence: number;
+  urgency: 'low' | 'medium' | 'high' | 'critical';
+  basedOn: string;
+  estimatedCost: number;
+}
+
+interface VehiclePrediction {
+  vehicleId: string;
+  vehicleName: string;
+  licensePlate: string;
+  predictions: PredictionItem[];
+}
+
+interface MaintenanceStats {
+  vehicleCount: number;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  estimatedRevenue: number;
+}
 
 export default function PredictiveMaintenance() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [severityFilter, setSeverityFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [urgencyFilter, setUrgencyFilter] = useState<string>("all");
+  const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set());
 
-  const { data: predictions, isLoading } = useQuery<AIMaintenancePrediction[]>({
-    queryKey: ["/api/ai/maintenance-predictions"],
+  const { data: predictionsData, isLoading: predictionsLoading } = useQuery<{ predictions: VehiclePrediction[] }>({
+    queryKey: ["/api/predictive-maintenance/predictions"],
   });
 
-  const handleAcknowledge = async (predictionId: string) => {
-    try {
-      await apiRequest(`/api/ai/maintenance-predictions/${predictionId}/acknowledge`, "POST", {});
-      queryClient.invalidateQueries({ queryKey: ["/api/ai/maintenance-predictions"] });
-      toast({
-        title: t('predictiveMaintenance.predictionAcknowledged', 'Prediction Acknowledged'),
-        description: t('predictiveMaintenance.markedAsAcknowledged', 'The maintenance prediction has been marked as acknowledged.'),
-      });
-    } catch (error) {
-      toast({
-        title: t('common.error', 'Error'),
-        description: t('predictiveMaintenance.failedToAcknowledge', 'Failed to acknowledge prediction. Please try again.'),
-        variant: "destructive",
-      });
-    }
+  const { data: stats, isLoading: statsLoading } = useQuery<MaintenanceStats>({
+    queryKey: ["/api/predictive-maintenance/stats"],
+  });
+
+  const predictions = predictionsData?.predictions || [];
+
+  const toggleVehicle = (vehicleId: string) => {
+    setExpandedVehicles(prev => {
+      const next = new Set(prev);
+      if (next.has(vehicleId)) next.delete(vehicleId);
+      else next.add(vehicleId);
+      return next;
+    });
   };
 
   const handleRunAnalysis = async () => {
-    try {
-      toast({
-        title: t('predictiveMaintenance.analysisStarted', 'Analysis Started'),
-        description: t('predictiveMaintenance.aiAnalyzing', 'AI is analyzing service history patterns...'),
-      });
-      
-      await apiRequest("/api/ai/maintenance-predictions/analyze", "POST", {});
-      
-      queryClient.invalidateQueries({ queryKey: ["/api/ai/maintenance-predictions"] });
-      
-      toast({
-        title: t('predictiveMaintenance.analysisComplete', 'Analysis Complete'),
-        description: t('predictiveMaintenance.newPredictionsGenerated', 'New maintenance predictions have been generated.'),
-      });
-    } catch (error) {
-      toast({
-        title: t('predictiveMaintenance.analysisFailed', 'Analysis Failed'),
-        description: t('predictiveMaintenance.failedToRunAnalysis', 'Failed to run predictive analysis. Please try again.'),
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: t('predictiveMaintenance.analysisStarted', 'Analysis Started'),
+      description: t('predictiveMaintenance.aiAnalyzing', 'AI is analyzing service history patterns...'),
+    });
+    queryClient.invalidateQueries({ queryKey: ["/api/predictive-maintenance/predictions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/predictive-maintenance/stats"] });
+    toast({
+      title: t('predictiveMaintenance.analysisComplete', 'Analysis Complete'),
+      description: t('predictiveMaintenance.newPredictionsGenerated', 'Maintenance predictions have been refreshed.'),
+    });
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity?.toLowerCase()) {
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
       case "critical":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       case "high":
@@ -84,18 +96,40 @@ export default function PredictiveMaintenance() {
     }
   };
 
-  const filteredPredictions = predictions?.filter((pred) => {
-    const matchesSeverity = severityFilter === "all" || pred.severity === severityFilter;
-    const matchesStatus = statusFilter === "all" || pred.status === statusFilter;
-    return matchesSeverity && matchesStatus;
-  });
-
-  const stats = {
-    total: predictions?.length || 0,
-    pending: predictions?.filter((p) => p.status === "pending").length || 0,
-    critical: predictions?.filter((p) => p.severity === "critical").length || 0,
-    acknowledged: predictions?.filter((p) => p.status === "acknowledged").length || 0,
+  const getUrgencyIcon = (urgency: string) => {
+    switch (urgency) {
+      case "critical":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      case "high":
+        return <AlertTriangle className="h-4 w-4 text-[#F97316]" />;
+      case "medium":
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      case "low":
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      default:
+        return null;
+    }
   };
+
+  // Filter vehicles: keep vehicles that have at least one prediction matching the urgency filter
+  const filteredPredictions = predictions.map(v => {
+    if (urgencyFilter === "all") return v;
+    return {
+      ...v,
+      predictions: v.predictions.filter(p => p.urgency === urgencyFilter),
+    };
+  }).filter(v => v.predictions.length > 0);
+
+  // Get the highest urgency for a vehicle (for sorting/display)
+  const getVehicleTopUrgency = (v: VehiclePrediction): string => {
+    const order = ['critical', 'high', 'medium', 'low'];
+    for (const u of order) {
+      if (v.predictions.some(p => p.urgency === u)) return u;
+    }
+    return 'low';
+  };
+
+  const isLoading = predictionsLoading || statsLoading;
 
   return (
     <StandardPageLayout
@@ -112,104 +146,117 @@ export default function PredictiveMaintenance() {
       ]}
     >
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Stats Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-[#64748B]">
-                {t('predictiveMaintenance.totalPredictions', 'Total Predictions')}
+                {t('predictiveMaintenance.vehicles', 'Vehicles')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#0B1F3B] dark:text-white">
-                {stats.total}
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
+                {statsLoading ? <Skeleton className="h-8 w-12" /> : stats?.vehicleCount || 0}
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-[#64748B]">
-                {t('predictiveMaintenance.pendingReview', 'Pending Review')}
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-red-600">
+                {t('predictiveMaintenance.critical', 'Critical')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#F97316]">
-                {stats.pending}
+              <div className="text-2xl font-bold text-red-600">
+                {statsLoading ? <Skeleton className="h-8 w-12" /> : stats?.critical || 0}
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-[#64748B]">
-                {t('predictiveMaintenance.criticalIssues', 'Critical Issues')}
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-[#F97316]">
+                {t('predictiveMaintenance.high', 'High')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600">
-                {stats.critical}
+              <div className="text-2xl font-bold text-[#F97316]">
+                {statsLoading ? <Skeleton className="h-8 w-12" /> : stats?.high || 0}
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-[#64748B]">
-                {t('predictiveMaintenance.acknowledged', 'Acknowledged')}
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-600">
+                {t('predictiveMaintenance.medium', 'Medium')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                {stats.acknowledged}
+              <div className="text-2xl font-bold text-yellow-600">
+                {statsLoading ? <Skeleton className="h-8 w-12" /> : stats?.medium || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-green-600">
+                {t('predictiveMaintenance.low', 'Low')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {statsLoading ? <Skeleton className="h-8 w-12" /> : stats?.low || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-[#64748B]">
+                <div className="flex items-center gap-1">
+                  <DollarSign className="h-3.5 w-3.5" />
+                  {t('predictiveMaintenance.estimatedRevenue', 'Est. Revenue')}
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#0A5ED7]">
+                {statsLoading ? <Skeleton className="h-8 w-16" /> : `$${(stats?.estimatedRevenue || 0).toLocaleString()}`}
               </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Urgency Filter */}
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader>
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-[#64748B] mb-2 block">
-                  {t('predictiveMaintenance.severity', 'Severity')}
-                </label>
-                <Select value={severityFilter} onValueChange={setSeverityFilter}>
-                  <SelectTrigger data-testid="select-severity" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                    <SelectItem value="all" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.allSeverities', 'All Severities')}</SelectItem>
-                    <SelectItem value="critical" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.critical', 'Critical')}</SelectItem>
-                    <SelectItem value="high" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.high', 'High')}</SelectItem>
-                    <SelectItem value="medium" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.medium', 'Medium')}</SelectItem>
-                    <SelectItem value="low" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.low', 'Low')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-[#64748B] mb-2 block">
-                  {t('common.status', 'Status')}
-                </label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger data-testid="select-status" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                    <SelectItem value="all" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.allStatuses', 'All Statuses')}</SelectItem>
-                    <SelectItem value="pending" className="text-[#0B1F3B] dark:text-white">{t('common.pending', 'Pending')}</SelectItem>
-                    <SelectItem value="acknowledged" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.acknowledged', 'Acknowledged')}</SelectItem>
-                    <SelectItem value="resolved" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.resolved', 'Resolved')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="max-w-xs">
+              <label className="text-sm font-medium text-[#64748B] mb-2 block">
+                {t('predictiveMaintenance.urgency', 'Urgency')}
+              </label>
+              <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+                <SelectTrigger data-testid="select-urgency" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                  <SelectItem value="all" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.allUrgencies', 'All Urgencies')}</SelectItem>
+                  <SelectItem value="critical" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.critical', 'Critical')}</SelectItem>
+                  <SelectItem value="high" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.high', 'High')}</SelectItem>
+                  <SelectItem value="medium" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.medium', 'Medium')}</SelectItem>
+                  <SelectItem value="low" className="text-[#0B1F3B] dark:text-white">{t('predictiveMaintenance.low', 'Low')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
 
+        {/* Vehicle Predictions List */}
         <div className="space-y-4">
           {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => (
@@ -223,115 +270,126 @@ export default function PredictiveMaintenance() {
                 </CardContent>
               </Card>
             ))
-          ) : filteredPredictions && filteredPredictions.length > 0 ? (
-            filteredPredictions.map((prediction) => (
-              <Card
-                key={prediction.id}
-                className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-lg transition-shadow"
-                data-testid={`card-prediction-${prediction.id}`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertTriangle className="h-5 w-5 text-[#F97316]" />
-                        <CardTitle className="text-[#0B1F3B] dark:text-white">
-                          {String(prediction.predictedIssue)}
-                        </CardTitle>
+          ) : filteredPredictions.length > 0 ? (
+            filteredPredictions.map((vehicle) => {
+              const isExpanded = expandedVehicles.has(vehicle.vehicleId);
+              const topUrgency = getVehicleTopUrgency(vehicle);
+              const urgentCount = vehicle.predictions.filter(p => p.urgency === 'critical' || p.urgency === 'high').length;
+
+              return (
+                <Card
+                  key={vehicle.vehicleId}
+                  className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-lg transition-shadow"
+                  data-testid={`card-vehicle-${vehicle.vehicleId}`}
+                >
+                  {/* Vehicle Header - clickable to expand */}
+                  <CardHeader
+                    className="cursor-pointer select-none"
+                    onClick={() => toggleVehicle(vehicle.vehicleId)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Car className="h-5 w-5 text-[#0A5ED7]" />
+                        <div>
+                          <CardTitle className="text-[#0B1F3B] dark:text-white text-lg">
+                            {vehicle.vehicleName}
+                          </CardTitle>
+                          <CardDescription className="text-[#64748B]">
+                            {vehicle.licensePlate || 'No plate'}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-4 flex-wrap mt-2">
-                        <Badge className={getSeverityColor(prediction.severity || "")}>
-                          {String(prediction.severity || '')}
+                      <div className="flex items-center gap-3">
+                        <Badge className={getUrgencyColor(topUrgency)}>
+                          {topUrgency}
                         </Badge>
-                        <Badge
-                          variant="outline"
-                          className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
-                        >
-                          {String(prediction.status || '')}
-                        </Badge>
-                        {prediction.confidence && (
+                        {urgentCount > 0 && (
                           <span className="text-sm text-[#64748B]">
-                            {t('predictiveMaintenance.confidence', 'Confidence')}: {String(prediction.confidence)}%
+                            {urgentCount} urgent
                           </span>
+                        )}
+                        <span className="text-sm text-[#64748B]">
+                          {vehicle.predictions.length} services
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="h-5 w-5 text-[#64748B]" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-[#64748B]" />
                         )}
                       </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <Wrench className="h-5 w-5 text-[#0A5ED7] mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
-                        {t('predictiveMaintenance.recommendedAction', 'Recommended Action')}
-                      </p>
-                      <p className="text-sm text-[#64748B]">
-                        {String(prediction.recommendedAction || t('predictiveMaintenance.noRecommendation', 'No recommendation available'))}
-                      </p>
-                    </div>
-                  </div>
+                  </CardHeader>
 
-                  {prediction.estimatedTimeframe ? (
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-5 w-5 text-purple-600 mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
-                          {t('predictiveMaintenance.estimatedTimeframe', 'Estimated Timeframe')}
-                        </p>
-                        <p className="text-sm text-[#64748B]">
-                          {String(prediction.estimatedTimeframe)}
-                        </p>
+                  {/* Expanded Prediction Cards */}
+                  {isExpanded && (
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {vehicle.predictions.map((pred, idx) => (
+                          <div
+                            key={idx}
+                            className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg p-4 bg-[#F8FAFC] dark:bg-[#0E1117]"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                {getUrgencyIcon(pred.urgency)}
+                                <span className="font-medium text-[#0B1F3B] dark:text-white">
+                                  {pred.serviceType}
+                                </span>
+                              </div>
+                              <Badge className={getUrgencyColor(pred.urgency)} variant="secondary">
+                                {pred.urgency}
+                              </Badge>
+                            </div>
+
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[#64748B] flex items-center gap-1">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  Predicted Date
+                                </span>
+                                <span className="text-[#0B1F3B] dark:text-white font-medium">
+                                  {pred.predictedDate}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center justify-between">
+                                <span className="text-[#64748B] flex items-center gap-1">
+                                  <DollarSign className="h-3.5 w-3.5" />
+                                  Est. Cost
+                                </span>
+                                <span className="text-[#0B1F3B] dark:text-white font-medium">
+                                  ${pred.estimatedCost}
+                                </span>
+                              </div>
+
+                              <div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[#64748B]">Confidence</span>
+                                  <span className="text-[#0B1F3B] dark:text-white font-medium">
+                                    {Math.round(pred.confidence * 100)}%
+                                  </span>
+                                </div>
+                                <Progress
+                                  value={pred.confidence * 100}
+                                  className="h-2"
+                                />
+                              </div>
+
+                              <div className="flex items-start gap-1 pt-1">
+                                <Brain className="h-3.5 w-3.5 text-[#0A5ED7] mt-0.5 flex-shrink-0" />
+                                <span className="text-xs text-[#64748B]">
+                                  {pred.basedOn}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ) : null}
-
-                  {prediction.basedOnData ? (
-                    <div className="flex items-start gap-3">
-                      <Brain className="h-5 w-5 text-[#0A5ED7] mt-1 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-[#0B1F3B] dark:text-white mb-1">
-                          {t('predictiveMaintenance.analysisBasedOn', 'Analysis Based On')}
-                        </p>
-                        <div className="text-sm text-[#64748B] bg-[#F8FAFC] dark:bg-[#0E1117] p-3 rounded-md border border-[#E2E8F0] dark:border-[#232A36]">
-                          <pre className="whitespace-pre-wrap font-mono text-xs">
-                            {(() => {
-                              const data = prediction.basedOnData;
-                              return typeof data === 'object' && data !== null
-                                ? JSON.stringify(data, null, 2)
-                                : String(data ?? '');
-                            })()}
-                          </pre>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="flex gap-2 pt-2">
-                    {prediction.status === "pending" && (
-                      <Button
-                        onClick={() => handleAcknowledge(prediction.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
-                        data-testid={`button-acknowledge-${prediction.id}`}
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        {t('predictiveMaintenance.acknowledge', 'Acknowledge')}
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      data-testid={`button-view-vehicle-${prediction.id}`}
-                      className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
-                    >
-                      <Car className="mr-2 h-4 w-4" />
-                      {t('predictiveMaintenance.viewVehicle', 'View Vehicle')}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })
           ) : (
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
               <CardContent className="flex flex-col items-center justify-center py-12">

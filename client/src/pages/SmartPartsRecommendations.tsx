@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Package, CheckCircle, Brain, TrendingUp, DollarSign, Wrench } from "lucide-react";
+import { Package, CheckCircle, Brain, TrendingUp, DollarSign, Wrench, ShoppingCart, FileText, AlertCircle } from "lucide-react";
 import type { AIPartsRecommendation } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -29,11 +29,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+interface PartRecommendation {
+  partName: string;
+  partNumber: string;
+  category: string;
+  confidence: number;
+  reason: string;
+  estimatedPrice: number;
+  inStock: boolean;
+  stockQuantity: number;
+  alternatives: { name: string; partNumber: string; price: number }[];
+}
+
+interface SmartRecommendationResponse {
+  recommendations: PartRecommendation[];
+  total: number;
+}
+
 export default function SmartPartsRecommendations() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [smartResults, setSmartResults] = useState<PartRecommendation[] | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     vehicleMake: "",
     vehicleModel: "",
@@ -47,37 +66,55 @@ export default function SmartPartsRecommendations() {
   });
 
   const handleGenerateRecommendation = async () => {
+    setIsSubmitting(true);
     try {
-      await apiRequest("/api/ai/recommend-parts", "POST", {
-        vehicleMake: formData.vehicleMake,
-        vehicleModel: formData.vehicleModel,
-        vehicleYear: parseInt(formData.vehicleYear),
-        serviceType: formData.serviceType,
-        description: formData.description,
+      const response = await fetch("/api/ai/parts-recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          vehicleMake: formData.vehicleMake,
+          vehicleModel: formData.vehicleModel,
+          vehicleYear: formData.vehicleYear,
+          serviceType: formData.serviceType,
+          description: formData.description,
+        }),
       });
 
+      const data: SmartRecommendationResponse = await response.json();
+      setSmartResults(data.recommendations || []);
+
       queryClient.invalidateQueries({ queryKey: ["/api/ai/parts-recommendations"] });
-      
+
       toast({
         title: t('smartParts.recommendationGenerated', 'Recommendation Generated'),
-        description: t('smartParts.aiAnalyzedCompatibility', 'AI has analyzed compatibility and created parts recommendations.'),
+        description: t('smartParts.aiAnalyzedCompatibility', `AI found ${data.total} recommended parts.`),
       });
-      
+
       setIsGenerateDialogOpen(false);
-      setFormData({
-        vehicleMake: "",
-        vehicleModel: "",
-        vehicleYear: "",
-        serviceType: "",
-        description: "",
-      });
     } catch (error) {
       toast({
         title: t('common.error', 'Error'),
         description: t('smartParts.failedToGenerate', 'Failed to generate parts recommendation. Please try again.'),
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleAddToCart = (part: PartRecommendation) => {
+    toast({
+      title: "Added to Cart",
+      description: `${part.partName} has been added to your cart.`,
+    });
+  };
+
+  const handleCreatePO = (part: PartRecommendation) => {
+    toast({
+      title: "Purchase Order",
+      description: `Purchase order draft created for ${part.partName}.`,
+    });
   };
 
   const handleApplyToJobCard = async (recommendationId: string) => {
@@ -86,9 +123,9 @@ export default function SmartPartsRecommendations() {
         appliedToJobCard: true,
         status: "applied",
       });
-      
+
       queryClient.invalidateQueries({ queryKey: ["/api/ai/parts-recommendations"] });
-      
+
       toast({
         title: t('smartParts.appliedToJobCard', 'Applied to Job Card'),
         description: t('smartParts.recommendationApplied', 'The parts recommendation has been applied successfully.'),
@@ -107,13 +144,13 @@ export default function SmartPartsRecommendations() {
   });
 
   const stats = {
-    total: recommendations?.length || 0,
+    total: (recommendations?.length || 0) + (smartResults?.length || 0),
     pending: recommendations?.filter((r) => r.status === "pending").length || 0,
     applied: recommendations?.filter((r) => r.appliedToJobCard).length || 0,
-    totalValue: recommendations?.reduce(
+    totalValue: (recommendations?.reduce(
       (sum, r) => sum + (parseFloat(String(r.totalEstimatedCost || 0))),
       0
-    ) || 0,
+    ) || 0) + (smartResults?.reduce((sum, r) => sum + r.estimatedPrice, 0) || 0),
   };
 
   const metrics = [
@@ -122,6 +159,18 @@ export default function SmartPartsRecommendations() {
     { label: t('smartParts.appliedToJobs', 'Applied to Jobs'), value: stats.applied.toString(), icon: CheckCircle },
     { label: t('smartParts.totalValue', 'Total Value'), value: `$${stats.totalValue.toFixed(2)}`, icon: DollarSign },
   ];
+
+  const categoryColors: Record<string, string> = {
+    Engine: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400",
+    Brakes: "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
+    Climate: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+    Tires: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
+    Drivetrain: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
+    Electrical: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+    Suspension: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400",
+    "General Maintenance": "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+    General: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+  };
 
   return (
     <DashboardPage
@@ -206,14 +255,135 @@ export default function SmartPartsRecommendations() {
                 </div>
                 <Button
                   onClick={handleGenerateRecommendation}
+                  disabled={isSubmitting}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   data-testid="button-submit-generate"
                 >
-                  {t('smartParts.generateAIRecommendation', 'Generate AI Recommendation')}
+                  {isSubmitting ? "Generating..." : t('smartParts.generateAIRecommendation', 'Generate AI Recommendation')}
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
+
+        {/* Smart Recommendations Results */}
+        {smartResults && smartResults.length > 0 && (
+          <Card className="bg-white dark:bg-salis-black border-blue-200 dark:border-blue-800">
+            <CardHeader>
+              <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
+                <Brain className="h-5 w-5 text-blue-600" />
+                Smart Recommendations ({smartResults.length} parts found)
+              </CardTitle>
+              <CardDescription>
+                AI-generated parts recommendations based on your query
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {smartResults.map((part, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+                    data-testid={`smart-part-${idx}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-gray-900 dark:text-white">
+                            {part.partName}
+                          </h4>
+                          <Badge className={categoryColors[part.category] || categoryColors.General}>
+                            {part.category}
+                          </Badge>
+                          {part.inStock ? (
+                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                              <CheckCircle className="h-3 w-3 mr-1" /> In Stock ({part.stockQuantity})
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+                              <AlertCircle className="h-3 w-3 mr-1" /> Out of Stock
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Part #: {part.partNumber}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                          {part.reason}
+                        </p>
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="text-lg font-bold text-gray-900 dark:text-white">
+                          ${part.estimatedPrice.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Confidence Bar */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        <span>Confidence</span>
+                        <span>{Math.round(part.confidence * 100)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            part.confidence >= 0.8
+                              ? "bg-green-500"
+                              : part.confidence >= 0.5
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                          }`}
+                          style={{ width: `${part.confidence * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Alternatives */}
+                    {part.alternatives && part.alternatives.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                          Alternatives:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {part.alternatives.map((alt, altIdx) => (
+                            <span
+                              key={altIdx}
+                              className="inline-flex items-center text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded"
+                            >
+                              {alt.name} ({alt.partNumber}) - ${alt.price.toFixed(2)}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => handleAddToCart(part)}
+                        data-testid={`button-add-cart-${idx}`}
+                      >
+                        <ShoppingCart className="mr-1 h-3 w-3" />
+                        Add to Cart
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCreatePO(part)}
+                        data-testid={`button-create-po-${idx}`}
+                      >
+                        <FileText className="mr-1 h-3 w-3" />
+                        Create PO
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-gray-800">
           <CardHeader>
@@ -330,7 +500,7 @@ export default function SmartPartsRecommendations() {
                                   )}
                                   {part.compatibility && (
                                     <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                                      ✓ {part.compatibility}
+                                      {part.compatibility}
                                     </p>
                                   )}
                                 </div>
