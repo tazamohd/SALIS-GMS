@@ -6,6 +6,11 @@ import fs from "fs";
 import { setupAuth } from "../auth";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
+import predictiveMaintenanceRoutes from "./predictive-maintenance";
+import partsRecommendationsRoutes from "./parts-recommendations";
+import reportsRoutes from "./reports";
+import notificationCenterRoutes from "./notifications";
+import auditRoutes from "./audit";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -62,6 +67,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Load new modular routes with priority
   app.use("/api", authRoutes);
   console.log("✅ Auth Module Loaded");
+
+  // Predictive maintenance routes
+  app.use("/api", predictiveMaintenanceRoutes);
+  console.log("✅ Predictive Maintenance Routes Loaded");
+
+  // Smart Parts Recommendations routes
+  app.use("/api", partsRecommendationsRoutes);
+  console.log("✅ Parts Recommendations Routes Loaded");
+
+  // Advanced Reports routes
+  app.use("/api", reportsRoutes);
+  console.log("✅ Advanced Reports Routes Loaded");
+
+  // Notification Center routes
+  app.use("/api/notification-center", notificationCenterRoutes);
+  console.log("✅ Notification Center Routes Loaded");
+
+  // Audit Trail routes
+  app.use("/api", auditRoutes);
+  console.log("✅ Audit Trail Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

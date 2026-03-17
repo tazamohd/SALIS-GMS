@@ -240,6 +240,11 @@ import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import PlatformAdmin from "@/pages/PlatformAdmin";
+import AdvancedReports from "@/pages/AdvancedReports";
+import { lazy, Suspense } from "react";
+
+const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
+const AuditTrail = lazy(() => import("@/pages/AuditTrail"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -672,6 +677,13 @@ function Router() {
       <Route path="/notifications">
         <Layout>
           <Notifications />
+        </Layout>
+      </Route>
+      <Route path="/notification-center">
+        <Layout>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7]"></div></div>}>
+            <NotificationCenter />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/calendar">
@@ -1227,6 +1239,13 @@ function Router() {
           <ComplianceManagement />
         </Layout>
       </Route>
+      <Route path="/audit-trail">
+        <Layout>
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <AuditTrail />
+          </Suspense>
+        </Layout>
+      </Route>
       <Route path="/social-media-monitoring">
         <Layout>
           <SocialMediaMonitoring />
@@ -1379,6 +1398,12 @@ function Router() {
         </TechnicianMobileLayout>
       </Route>
       
+      <Route path="/advanced-reports">
+        <Layout>
+          <AdvancedReports />
+        </Layout>
+      </Route>
+
       <Route component={NotFound} />
     </Switch>
   );
