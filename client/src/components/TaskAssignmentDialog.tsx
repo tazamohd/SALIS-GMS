@@ -67,7 +67,7 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
 
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskAssignmentFormData) => {
-      return await apiRequest<InsertTaskAssignment>(`/api/job-cards/${jobCard.id}/tasks`, 'POST', data);
+      return await apiRequest('POST', `/api/job-cards/${jobCard.id}/tasks`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/job-cards', jobCard.id, 'tasks'] });

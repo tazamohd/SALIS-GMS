@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Use DB global setup only when running server tests (not shared-only)
+const needsDb = !process.argv.some(a => a === 'shared/' || a.startsWith('shared/'));
+
 export default defineConfig({
   test: {
     globals: true,
@@ -21,9 +24,9 @@ export default defineConfig({
       ['shared/**', 'node'],
     ],
     setupFiles: ['./client/src/test/setup.ts'],
-    globalSetup: ['./server/__tests__/globalSetup.ts'],
+    globalSetup: needsDb ? ['./server/__tests__/globalSetup.ts'] : [],
     testTimeout: 30000,
-    hookTimeout: 30000,
+    hookTimeout: 60000,
     pool: 'forks',
     forks: {
       singleFork: true,

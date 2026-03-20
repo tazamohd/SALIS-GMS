@@ -38,7 +38,7 @@ export default function Home() {
               <Avatar className="h-16 w-16 border-2 border-[#E2E8F0] dark:border-[#232A36]">
                 <AvatarImage src={user?.profileImageUrl || ''} />
                 <AvatarFallback className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white font-semibold">
-                  {getInitials(user?.firstName, user?.lastName)}
+                  {getInitials(user?.firstName ?? undefined, user?.lastName ?? undefined)}
                 </AvatarFallback>
               </Avatar>
               <div>

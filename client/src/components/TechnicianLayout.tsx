@@ -16,7 +16,8 @@ import {
 import { cn } from "@/lib/utils";
 
 export function TechnicianLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, logoutMutation } = useAuth();
+  const logout = () => logoutMutation.mutate();
   const [location] = useLocation();
 
   const navigation = [

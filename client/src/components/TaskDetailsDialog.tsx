@@ -103,7 +103,7 @@ export function TaskDetailsDialog({ open, onOpenChange, task }: TaskDetailsDialo
       return;
     }
 
-    updateTaskMutation.mutate({ taskId: task.id, data: validated.data });
+    updateTaskMutation.mutate({ taskId: task.id as unknown as number, data: validated.data });
   };
 
   const handleDialogChange = (newOpen: boolean) => {

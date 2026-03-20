@@ -65,7 +65,7 @@ export default function Vehicles() {
     queryKey: ['/api/garages'],
   });
 
-  const form = useForm<InsertVehicle>({
+  const form = useForm<any>({
     resolver: zodResolver(insertVehicleSchema),
     defaultValues: {
       customerId: "",

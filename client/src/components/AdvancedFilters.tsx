@@ -152,7 +152,7 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {new Date(preset.createdAt).toLocaleDateString()}
+                    {new Date(preset.createdAt as unknown as string).toLocaleDateString()}
                   </div>
                 </div>
               </div>

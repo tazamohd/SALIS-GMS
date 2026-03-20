@@ -57,7 +57,7 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
     enabled: open && !!effectiveInvoiceId && !propInvoice,
   });
 
-  const invoice = propInvoice || fetchedInvoice;
+  const invoice = propInvoice || fetchedInvoice!;
   const [currentStatus, setCurrentStatus] = useState(invoice?.status || 'draft');
 
   const { data: items } = useQuery<InvoiceItem[]>({
@@ -73,9 +73,9 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
 
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatus: string) => {
-      return await apiRequest("PATCH", `/api/invoices/${invoice.id}`, {
+      return await apiRequest("PATCH", `/api/invoices/${invoice!.id}`, {
         status: newStatus,
-        sentAt: newStatus === 'sent' && !invoice.sentAt ? new Date() : invoice.sentAt,
+        sentAt: newStatus === 'sent' && !invoice!.sentAt ? new Date() : invoice!.sentAt,
       });
     },
     onSuccess: () => {

@@ -151,15 +151,12 @@ export default function Suppliers() {
         title={t('inventory.suppliers', 'Suppliers')}
         description={t('inventory.manageSupplierNetwork', 'Manage your supplier network')}
         icon={Building2}
-        headerAction={
-          <Button 
-            onClick={() => setIsCreateOpen(true)} 
-            data-testid="button-create-supplier"
-            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
-          >
-            <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
-          </Button>
-        }
+        actions={[{
+          label: t('inventory.addSupplier', 'Add Supplier'),
+          onClick: () => setIsCreateOpen(true),
+          icon: Plus,
+          variant: 'default' as const,
+        }]}
       >
         <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1 max-w-md">
