@@ -84,6 +84,7 @@ import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
 import MarketingAutomation from "@/pages/MarketingAutomation";
 import MarketingHub from "@/pages/MarketingHub";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
+import CRMLoyalty from "@/pages/CRMLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
 import FranchiseManagement from "@/pages/FranchiseManagement";
 import GlobalizationLayer from "@/pages/GlobalizationLayer";
@@ -245,6 +246,8 @@ import { lazy, Suspense } from "react";
 
 const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
 const AuditTrail = lazy(() => import("@/pages/AuditTrail"));
+const HRPayroll = lazy(() => import("@/pages/HRPayroll"));
+const QualityControl = lazy(() => import("@/pages/QualityControl"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -429,6 +432,11 @@ function Router() {
       <Route path="/customer-loyalty">
         <Layout>
           <CustomerLoyalty />
+        </Layout>
+      </Route>
+      <Route path="/crm-loyalty">
+        <Layout>
+          <CRMLoyalty />
         </Layout>
       </Route>
       <Route path="/document-management">
@@ -714,6 +722,13 @@ function Router() {
       <Route path="/hr-management">
         <Layout>
           <HRManagement />
+        </Layout>
+      </Route>
+      <Route path="/hr-payroll">
+        <Layout>
+          <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A5ED7]" /></div>}>
+            <HRPayroll />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/ai-automation">
@@ -1067,6 +1082,13 @@ function Router() {
       <Route path="/routing-optimizer">
         <Layout>
           <RoutingOptimizer />
+        </Layout>
+      </Route>
+      <Route path="/quality-control">
+        <Layout>
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <QualityControl />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/safety-incidents">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge, CalendarPlus, Receipt, BoxesIcon, ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -7,12 +7,65 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
 import { useAuth } from "@/hooks/useAuth";
-import { XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Area, AreaChart } from "recharts";
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, Area, AreaChart, LineChart, Line } from "recharts";
 import type { JobCard, User, Invoice, SparePart } from "@shared/schema";
 
 interface DashboardStats {
   jobStatus: { name: string; value: number; status: string }[];
   revenue: { month: string; revenue: number }[];
+}
+
+interface DashboardSummary {
+  todayRevenue: number;
+  jobsInProgress: number;
+  pendingJobs: number;
+  completedToday: number;
+  appointmentsToday: number;
+  pendingInvoices: number;
+  outstandingAmount: number;
+  lowStockItems: number;
+  technicianUtilization: number;
+  activeTechnicians: number;
+  totalTechnicians: number;
+}
+
+interface RecentActivityItem {
+  type: string;
+  description: string;
+  timestamp: string;
+  entityId: string;
+  entityType: string;
+  status: string;
+}
+
+interface TrendData {
+  revenue: { data: { week: string; revenue: number }[]; change: number };
+  jobs: { data: { week: string; jobs: number }[]; change: number };
+  visits: { data: { week: string; visits: number }[]; change: number };
+}
+
+function MiniSparkline({ data, dataKey, color }: { data: any[]; dataKey: string; color: string }) {
+  if (!data || data.length === 0) return null;
+  return (
+    <div className="w-20 h-8">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function TrendIndicator({ change }: { change: number }) {
+  if (change === 0) return <span className="text-xs text-[#64748B]">--</span>;
+  const isUp = change > 0;
+  return (
+    <div className={`flex items-center gap-0.5 ${isUp ? 'text-emerald-500' : 'text-red-500'}`}>
+      {isUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+      <span className="text-xs font-semibold">{isUp ? '+' : ''}{change}%</span>
+    </div>
+  );
 }
 
 export function Dashboard() {
@@ -65,6 +118,25 @@ export function Dashboard() {
   const { data: dashboardStats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/stats/dashboard'],
     retry: false,
+  });
+
+  // New aggregated dashboard queries
+  const { data: summary } = useQuery<DashboardSummary>({
+    queryKey: ['/api/dashboard/summary'],
+    retry: false,
+    refetchInterval: 30000,
+  });
+
+  const { data: recentActivity } = useQuery<{ activities: RecentActivityItem[] }>({
+    queryKey: ['/api/dashboard/recent-activity'],
+    retry: false,
+    refetchInterval: 30000,
+  });
+
+  const { data: trends } = useQuery<TrendData>({
+    queryKey: ['/api/dashboard/trends'],
+    retry: false,
+    refetchInterval: 60000,
   });
 
   const PIE_COLORS = ['#0A5ED7', '#0BB3FF', '#0A5ED7', '#F97316', '#64748B'];
@@ -205,9 +277,9 @@ export function Dashboard() {
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
                       ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </h3>
-                    <div className="flex items-center gap-1 text-[#0A5ED7]">
-                      <ArrowUpRight className="w-4 h-4" />
-                      <span className="text-xs font-medium">+12.5%</span>
+                    <div className="flex items-center gap-2">
+                      <TrendIndicator change={trends?.revenue?.change ?? 0} />
+                      <MiniSparkline data={trends?.revenue?.data ?? []} dataKey="revenue" color="#0A5ED7" />
                     </div>
                   </div>
                 </div>
@@ -236,9 +308,13 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{repairCount + checkInCount}</h3>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
                       <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30 text-xs">{checkInCount} pending</Badge>
                       <Badge className="bg-[#0BB3FF]/10 text-[#0BB3FF] border-[#0BB3FF]/30 text-xs">{repairCount} active</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <TrendIndicator change={trends?.jobs?.change ?? 0} />
+                      <MiniSparkline data={trends?.jobs?.data ?? []} dataKey="jobs" color="#0BB3FF" />
                     </div>
                   </div>
                 </div>
@@ -264,9 +340,9 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">{activeCustomersCount}</h3>
-                    <div className="flex items-center gap-1 text-[#0A5ED7] dark:text-[#0BB3FF]">
-                      <Award className="w-4 h-4" />
-                      <span className="text-xs font-medium">+8 this week</span>
+                    <div className="flex items-center gap-2">
+                      <TrendIndicator change={trends?.visits?.change ?? 0} />
+                      <MiniSparkline data={trends?.visits?.data ?? []} dataKey="visits" color="#0B1F3B" />
                     </div>
                   </div>
                 </div>
@@ -603,9 +679,125 @@ export function Dashboard() {
             )}
           </div>
         </div>
+        {/* Quick Actions */}
+        <div className="group relative">
+          <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2 rounded-xl bg-gradient-to-r from-[#0BB3FF] to-[#06B6D4] shadow-lg shadow-[#0BB3FF]/25">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.quickActions', 'Quick Actions')}</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Button className="h-auto py-4 flex flex-col gap-2 bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10 hover:bg-[#0A5ED7]/15 dark:hover:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border border-[#0A5ED7]/20 dark:border-[#0BB3FF]/20" variant="outline" asChild>
+                <Link href="/job-cards">
+                  <ClipboardList className="w-6 h-6" />
+                  <span className="text-sm font-medium">{t('dashboard.newJobCard', 'New Job Card')}</span>
+                </Link>
+              </Button>
+              <Button className="h-auto py-4 flex flex-col gap-2 bg-[#0BB3FF]/5 dark:bg-[#0BB3FF]/10 hover:bg-[#0BB3FF]/15 dark:hover:bg-[#0BB3FF]/20 text-[#0BB3FF] border border-[#0BB3FF]/20" variant="outline" asChild>
+                <Link href="/appointments">
+                  <CalendarPlus className="w-6 h-6" />
+                  <span className="text-sm font-medium">{t('dashboard.newAppointment', 'New Appointment')}</span>
+                </Link>
+              </Button>
+              <Button className="h-auto py-4 flex flex-col gap-2 bg-[#F97316]/5 dark:bg-[#F97316]/10 hover:bg-[#F97316]/15 dark:hover:bg-[#F97316]/20 text-[#F97316] border border-[#F97316]/20" variant="outline" asChild>
+                <Link href="/invoices">
+                  <Receipt className="w-6 h-6" />
+                  <span className="text-sm font-medium">{t('dashboard.newInvoice', 'New Invoice')}</span>
+                </Link>
+              </Button>
+              <Button className="h-auto py-4 flex flex-col gap-2 bg-[#0B1F3B]/5 dark:bg-[#E6EAF0]/5 hover:bg-[#0B1F3B]/10 dark:hover:bg-[#E6EAF0]/10 text-[#0B1F3B] dark:text-[#E6EAF0] border border-[#0B1F3B]/20 dark:border-[#E6EAF0]/20" variant="outline" asChild>
+                <Link href="/spare-parts">
+                  <BoxesIcon className="w-6 h-6" />
+                  <span className="text-sm font-medium">{t('dashboard.checkInventory', 'Check Inventory')}</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity Feed */}
+        <div className="group relative">
+          <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2 rounded-xl bg-gradient-to-r from-[#0A5ED7] to-[#0952C0] shadow-lg shadow-[#0A5ED7]/25">
+                <Activity className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.recentActivity', 'Recent Activity')}</h3>
+              <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30 ml-auto">{t('dashboard.live', 'Live')}</Badge>
+            </div>
+            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+              {(!recentActivity?.activities || recentActivity.activities.length === 0) ? (
+                <div className="text-center py-8 text-[#64748B] dark:text-[#9BA4B0]">
+                  {t('dashboard.noRecentActivity', 'No recent activity to display')}
+                </div>
+              ) : (
+                recentActivity.activities.map((item, idx) => {
+                  const typeColors: Record<string, { bg: string; text: string }> = {
+                    job_update: { bg: 'bg-[#0A5ED7]/10', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]' },
+                    payment: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400' },
+                    appointment: { bg: 'bg-[#0BB3FF]/10', text: 'text-[#0BB3FF]' },
+                    invoice: { bg: 'bg-[#F97316]/10', text: 'text-[#F97316]' },
+                  };
+                  const colors = typeColors[item.type] || typeColors.job_update;
+                  const timeAgo = (() => {
+                    if (!item.timestamp) return '';
+                    const diff = Date.now() - new Date(item.timestamp).getTime();
+                    const mins = Math.floor(diff / 60000);
+                    if (mins < 1) return 'just now';
+                    if (mins < 60) return `${mins}m ago`;
+                    const hrs = Math.floor(mins / 60);
+                    if (hrs < 24) return `${hrs}h ago`;
+                    return `${Math.floor(hrs / 24)}d ago`;
+                  })();
+
+                  return (
+                    <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/20 dark:hover:border-[#0BB3FF]/20 transition-colors">
+                      <Badge className={`${colors.bg} ${colors.text} border-0 shrink-0 text-xs`}>
+                        {item.type.replace('_', ' ')}
+                      </Badge>
+                      <span className="text-sm text-[#0B1F3B] dark:text-[#E6EAF0] flex-1 truncate">{item.description}</span>
+                      <span className="text-xs text-[#64748B] dark:text-[#9BA4B0] shrink-0">{timeAgo}</span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Live KPI Summary Bar */}
+        {summary && (
+          <div className="group relative">
+            <div className="relative bg-white dark:bg-[#151A23] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#232A36] shadow-sm">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/25">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.todaySnapshot', "Today's Snapshot")}</h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {[
+                  { label: "Today's Revenue", value: `$${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
+                  { label: 'Jobs In Progress', value: summary.jobsInProgress, color: 'text-[#0A5ED7] dark:text-[#0BB3FF]' },
+                  { label: 'Appointments', value: summary.appointmentsToday, color: 'text-[#0BB3FF]' },
+                  { label: 'Pending Invoices', value: summary.pendingInvoices, color: 'text-[#F97316]' },
+                  { label: 'Low Stock', value: summary.lowStockItems, color: summary.lowStockItems > 0 ? 'text-red-500' : 'text-emerald-500' },
+                  { label: 'Tech Utilization', value: `${summary.technicianUtilization}%`, color: 'text-[#0B1F3B] dark:text-[#E6EAF0]' },
+                ].map((kpi, idx) => (
+                  <div key={idx} className="text-center p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
+                    <div className={`text-2xl font-black font-montserrat ${kpi.color}`}>{kpi.value}</div>
+                    <div className="text-xs text-[#64748B] dark:text-[#9BA4B0] mt-1">{kpi.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      <TaskDetailsDialog 
+      <TaskDetailsDialog
         open={taskDetailsOpen}
         onOpenChange={setTaskDetailsOpen}
         task={selectedTask}

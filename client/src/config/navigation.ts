@@ -81,6 +81,7 @@ import {
   BadgeCheck,
   ShieldAlert,
   Briefcase,
+  Heart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -309,6 +310,7 @@ export const navigationConfig: NavGroup[] = [
     items: [
       { title: "Customer Portal", href: "/customer-portal", icon: Users },
       { title: "Customer Loyalty", href: "/customer-loyalty", icon: Trophy },
+      { title: "CRM & Loyalty", href: "/crm-loyalty", icon: Heart },
       { title: "Service Reminders", href: "/service-reminders", icon: Bell },
       { title: "Email Marketing", href: "/email-marketing", icon: Mail },
       { title: "Email Campaigns", href: "/email-marketing-campaigns", icon: Mail },
@@ -328,6 +330,7 @@ export const navigationConfig: NavGroup[] = [
     roles: ['ADMIN', 'MANAGER'],
     items: [
       { title: "HR Management", href: "/hr-management", icon: UserCog },
+      { title: "HR & Payroll", href: "/hr-payroll", icon: Briefcase },
       { title: "Payroll Management", href: "/payroll-management", icon: DollarSign },
       { title: "Timeclock/Payroll", href: "/timeclock-payroll", icon: Timer },
       { title: "Timesheet Management", href: "/timesheet-management", icon: Clock },
@@ -346,6 +349,7 @@ export const navigationConfig: NavGroup[] = [
       { title: "Saudi Compliance (ZATCA/GOSI)", href: "/saudi-compliance", icon: Shield },
       { title: "Compliance Management", href: "/compliance-management", icon: Shield },
       { title: "Environmental Compliance", href: "/environmental-compliance", icon: Recycle },
+      { title: "Quality Control", href: "/quality-control", icon: ClipboardCheck },
       { title: "ISO Quality", href: "/iso-quality", icon: BadgeCheck },
       { title: "Safety Incidents", href: "/safety-incidents", icon: ShieldAlert },
       { title: "Safety Alerts", href: "/safety-alerts", icon: AlertTriangle },

@@ -18,7 +18,27 @@ export default function CommandCenter() {
 
   const { data, isLoading, error } = useQuery<CommandCenterData>({
     queryKey: ["/api/command-center/live"],
-    refetchInterval: 30000, // Auto-refresh every 30 seconds
+    refetchInterval: 15000, // Auto-refresh every 15 seconds
+  });
+
+  // System health monitoring
+  const { data: systemHealth } = useQuery<{
+    apiResponseTime: number;
+    activeConnections: number;
+    dbQueryCount: number;
+    uptime: number;
+  }>({
+    queryKey: ["/api/command-center/health"],
+    refetchInterval: 15000,
+    retry: false,
+    queryFn: async () => {
+      const start = performance.now();
+      const res = await fetch("/api/command-center/health");
+      const elapsed = Math.round(performance.now() - start);
+      if (!res.ok) return { apiResponseTime: elapsed, activeConnections: 0, dbQueryCount: 0, uptime: 0 };
+      const body = await res.json();
+      return { ...body, apiResponseTime: elapsed };
+    },
   });
 
   if (isLoading) {
@@ -70,6 +90,42 @@ export default function CommandCenter() {
           ))}
         </div>
       )}
+
+      {/* System Health Section */}
+      <Card className="border-l-4 border-l-emerald-500">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">System Health</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold">
+                {systemHealth?.apiResponseTime ?? '--'}
+                <span className="text-sm font-normal text-muted-foreground">ms</span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">API Response Time</div>
+              <div className={`mt-1 h-1.5 rounded-full ${
+                (systemHealth?.apiResponseTime ?? 0) < 200 ? 'bg-emerald-500' :
+                (systemHealth?.apiResponseTime ?? 0) < 500 ? 'bg-amber-500' : 'bg-red-500'
+              }`} style={{ width: `${Math.min(100, ((systemHealth?.apiResponseTime ?? 0) / 10))}%` }} />
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold">{systemHealth?.activeConnections ?? '--'}</div>
+              <div className="text-xs text-muted-foreground mt-1">Active WebSocket Connections</div>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold">{systemHealth?.dbQueryCount ?? '--'}</div>
+              <div className="text-xs text-muted-foreground mt-1">DB Queries (last min)</div>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="text-2xl font-bold">
+                {systemHealth?.uptime ? `${Math.floor(systemHealth.uptime / 3600)}h` : '--'}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">Uptime</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Department KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -235,18 +291,38 @@ export default function CommandCenter() {
 }
 
 function AlertBanner({ alert }: { alert: AlertItem }) {
-  const severityStyles = {
-    critical: 'bg-destructive/10 border-destructive text-destructive',
-    warning: 'bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400',
-    info: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400',
+  const severityStyles: Record<string, { container: string; badge: string; icon: string }> = {
+    critical: {
+      container: 'bg-red-500/10 border-red-500 text-red-700 dark:text-red-400 animate-pulse',
+      badge: 'bg-red-500 text-white hover:bg-red-600',
+      icon: '!!!',
+    },
+    warning: {
+      container: 'bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400',
+      badge: 'bg-amber-500 text-white hover:bg-amber-600',
+      icon: '!!',
+    },
+    info: {
+      container: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400',
+      badge: 'bg-blue-500 text-white hover:bg-blue-600',
+      icon: 'i',
+    },
   };
 
+  const styles = severityStyles[alert.severity] || severityStyles.info;
+
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-lg border ${severityStyles[alert.severity]}`}>
-      <Badge variant={alert.severity === 'critical' ? 'destructive' : 'outline'} className="shrink-0">
+    <div className={`flex items-center gap-3 p-3 rounded-lg border-l-4 border ${styles.container}`}>
+      <Badge className={`shrink-0 ${styles.badge}`}>
+        {alert.severity.toUpperCase()}
+      </Badge>
+      <Badge variant="outline" className="shrink-0">
         {alert.department}
       </Badge>
-      <span className="text-sm font-medium">{alert.message}</span>
+      <span className="text-sm font-medium flex-1">{alert.message}</span>
+      {alert.severity === 'critical' && (
+        <span className="text-xs font-bold text-red-600 dark:text-red-400 shrink-0">REQUIRES ATTENTION</span>
+      )}
     </div>
   );
 }

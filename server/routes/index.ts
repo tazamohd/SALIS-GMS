@@ -12,6 +12,11 @@ import reportsRoutes from "./reports";
 import notificationCenterRoutes from "./notifications";
 import auditRoutes from "./audit";
 import marketingRoutes from "./marketing";
+import crmRoutes from "./crm";
+import hrPayrollRoutes from "./hr-payroll";
+import inventoryManagementRoutes from "./inventory-management";
+import dashboardRoutes from "./dashboard";
+import qualityControlRoutes from "./quality-control";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -92,6 +97,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Marketing Hub routes
   app.use("/api", marketingRoutes);
   console.log("✅ Marketing Hub Routes Loaded");
+
+  // CRM & Loyalty Program routes
+  app.use("/api", crmRoutes);
+  console.log("✅ CRM & Loyalty Routes Loaded");
+
+  // HR & Payroll routes
+  app.use("/api", hrPayrollRoutes);
+  console.log("✅ HR & Payroll Routes Loaded");
+
+  // Inventory & Supply Chain Management routes
+  app.use("/api", inventoryManagementRoutes);
+  console.log("✅ Inventory Management Routes Loaded");
+
+  // Dashboard aggregation routes
+  app.use("/api", dashboardRoutes);
+  console.log("✅ Dashboard Routes Loaded");
+
+  // Quality Control & Inspections routes
+  app.use("/api/qc", qualityControlRoutes);
+  console.log("✅ Quality Control Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

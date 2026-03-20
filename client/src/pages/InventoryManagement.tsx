@@ -1,20 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   Package,
+  Warehouse,
   AlertTriangle,
-  Settings,
+  Truck,
+  RefreshCw,
+  DollarSign,
   TrendingUp,
-  History,
-  ArrowRightLeft,
-  Search as SearchIcon,
-  Barcode,
-  Plus,
+  ShoppingCart,
+  Star,
+  Clock,
+  Phone,
+  Mail,
+  MapPin,
   CheckCircle,
   XCircle,
+  Search as SearchIcon,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,527 +39,684 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { BarcodeScanner } from "@/components/BarcodeScanner";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+
+const CHART_COLORS = ["#0A5ED7", "#0BB3FF", "#F97316", "#10B981", "#8B5CF6", "#EC4899", "#F59E0B", "#6366F1"];
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+}
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === "in_stock") {
+    return (
+      <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0">
+        <CheckCircle className="w-3 h-3 mr-1" />
+        In Stock
+      </Badge>
+    );
+  }
+  if (status === "low") {
+    return (
+      <Badge className="bg-[#F97316]/10 text-[#F97316] border-0">
+        <AlertTriangle className="w-3 h-3 mr-1" />
+        Low Stock
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-0">
+      <XCircle className="w-3 h-3 mr-1" />
+      Out of Stock
+    </Badge>
+  );
+}
 
 export default function InventoryManagement() {
-  const { t } = useTranslation();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedGarageId, setSelectedGarageId] = useState<string>("");
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [scannedBarcode, setScannedBarcode] = useState<string>("");
+  const [stockSearch, setStockSearch] = useState("");
+  const [reorderingItems, setReorderingItems] = useState<Set<string>>(new Set());
 
-  const { data: garages = [] } = useQuery<any[]>({
-    queryKey: ["/api/garages"],
+  // ---- Data Queries ----
+
+  const { data: overview, isLoading: overviewLoading } = useQuery<any>({
+    queryKey: ["/api/inventory/overview"],
   });
 
-  useEffect(() => {
-    if (garages.length > 0 && !selectedGarageId) {
-      setSelectedGarageId(garages[0].id);
-    }
-  }, [garages, selectedGarageId]);
-
-  const { data: spareParts = [], isLoading: isSparePartsLoading } = useQuery<any[]>({
-    queryKey: ["/api/spare-parts"],
+  const { data: itemsData, isLoading: itemsLoading } = useQuery<any>({
+    queryKey: ["/api/inventory/items"],
   });
 
-  const { data: stockAlerts = [] } = useQuery<any[]>({
-    queryKey: ["/api/stock-alerts", selectedGarageId],
-    enabled: !!selectedGarageId,
+  const { data: lowStockData, isLoading: lowStockLoading } = useQuery<any>({
+    queryKey: ["/api/inventory/low-stock"],
   });
 
-  const { data: reorderSettings = [] } = useQuery<any[]>({
-    queryKey: ["/api/reorder-settings", selectedGarageId],
-    enabled: !!selectedGarageId,
+  const { data: suppliersData } = useQuery<any>({
+    queryKey: ["/api/inventory/suppliers"],
   });
 
-  const { data: inventoryTransfers = [] } = useQuery<any[]>({
-    queryKey: ["/api/inventory-transfers", selectedGarageId],
-    enabled: !!selectedGarageId,
+  const { data: turnoverData } = useQuery<any>({
+    queryKey: ["/api/inventory/turnover"],
   });
 
-  const acknowledgeMutation = useMutation({
-    mutationFn: (alertId: string) =>
-      apiRequest("POST", `/api/stock-alerts/${alertId}/acknowledge`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/stock-alerts", selectedGarageId] });
+  const { data: valuationData } = useQuery<any>({
+    queryKey: ["/api/inventory/valuation"],
+  });
+
+  // ---- Reorder Mutation ----
+
+  const reorderMutation = useMutation({
+    mutationFn: async (payload: { supplierId: string; items: any[]; notes?: string }) => {
+      const res = await apiRequest("POST", "/api/inventory/reorder", payload);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/overview"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/low-stock"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory/items"] });
       toast({
-        title: t('inventory.alertAcknowledged', 'Alert Acknowledged'),
-        description: t('inventory.alertAcknowledgedDesc', 'Stock alert has been acknowledged successfully'),
+        title: "Purchase Order Created",
+        description: data.message || "Reorder submitted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Reorder Failed",
+        description: "Could not create the purchase order. Please try again.",
+        variant: "destructive",
       });
     },
   });
 
-  const handleBarcodeScan = (barcode: string) => {
-    setScannedBarcode(barcode);
-    setIsScannerOpen(false);
-    
-    const part = spareParts.find((p: any) => p.barcode === barcode);
-    if (part) {
-      setSearchQuery(part.name);
+  const handleReorderItem = (item: any) => {
+    const suppliersList = suppliersData?.suppliers || [];
+    const defaultSupplier = suppliersList[0];
+    if (!defaultSupplier) {
       toast({
-        title: t('inventory.partFound', 'Part Found'),
-        description: t('inventory.partFoundDesc', 'Found: {{name}} ({{sku}})', { name: part.name, sku: part.sku }),
-      });
-    } else {
-      toast({
-        title: t('inventory.partNotFound', 'Part Not Found'),
-        description: t('inventory.partNotFoundDesc', 'No part found with this barcode. Try TecDoc search.'),
+        title: "No Supplier",
+        description: "Please add a supplier before creating reorders.",
         variant: "destructive",
       });
+      return;
     }
+
+    setReorderingItems((prev) => new Set(prev).add(item.inventoryId || item.sparePartId));
+
+    reorderMutation.mutate(
+      {
+        supplierId: defaultSupplier.id,
+        items: [
+          {
+            partName: item.partName,
+            partNumber: item.partNumber,
+            quantity: item.suggestedReorderQty || item.minThreshold * 2,
+            unitPrice: item.costPrice || 0,
+          },
+        ],
+        notes: `Reorder for ${item.partName} - low stock alert`,
+      },
+      {
+        onSettled: () => {
+          setReorderingItems((prev) => {
+            const next = new Set(prev);
+            next.delete(item.inventoryId || item.sparePartId);
+            return next;
+          });
+        },
+      }
+    );
   };
 
+  const handleBulkReorder = () => {
+    const lowItems = lowStockData?.items || [];
+    const suppliersList = suppliersData?.suppliers || [];
+    const defaultSupplier = suppliersList[0];
+
+    if (!defaultSupplier) {
+      toast({ title: "No Supplier", description: "Please add a supplier first.", variant: "destructive" });
+      return;
+    }
+
+    if (lowItems.length === 0) {
+      toast({ title: "Nothing to Reorder", description: "No items are below threshold." });
+      return;
+    }
+
+    const poItems = lowItems.map((item: any) => ({
+      partName: item.partName,
+      partNumber: item.partNumber,
+      quantity: item.suggestedReorderQty || item.minThreshold * 2,
+      unitPrice: item.costPrice || 0,
+    }));
+
+    reorderMutation.mutate({
+      supplierId: defaultSupplier.id,
+      items: poItems,
+      notes: `Bulk reorder - ${lowItems.length} items below threshold`,
+    });
+  };
+
+  // ---- Derived data ----
+
+  const items = itemsData?.items || [];
+  const lowStockItems = lowStockData?.items || [];
+  const suppliersList = suppliersData?.suppliers || [];
+  const turnover = turnoverData?.turnover || [];
+  const categoryBreakdown = overview?.categoryBreakdown || [];
+  const valuation = valuationData || {};
+
+  const filteredItems = items.filter(
+    (item: any) =>
+      stockSearch === "" ||
+      item.partName?.toLowerCase().includes(stockSearch.toLowerCase()) ||
+      item.partNumber?.toLowerCase().includes(stockSearch.toLowerCase()) ||
+      item.category?.toLowerCase().includes(stockSearch.toLowerCase())
+  );
+
+  // ========== TAB: OVERVIEW ==========
   const overviewContent = (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="relative overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
           <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-          <CardHeader className="pb-3 relative">
-            <CardTitle className="text-sm font-medium text-white/90">{t('inventory.totalParts', 'Total Parts')}</CardTitle>
+          <CardHeader className="pb-2 relative">
+            <CardTitle className="text-sm font-medium text-white/90">Total Items</CardTitle>
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold">{spareParts.length}</div>
-            <p className="text-xs text-white/70 mt-1">{t('inventory.activeItems', 'Active items')}</p>
+            <div className="text-3xl font-bold">{overview?.totalItems ?? 0}</div>
+            <p className="text-xs text-white/70 mt-1">Active inventory items</p>
           </CardContent>
         </Card>
-        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-[#F97316]/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <CardHeader className="pb-3 relative">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.lowStockAlerts', 'Low Stock Alerts')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-2xl font-bold text-[#F97316]">
-              {stockAlerts.filter((a: any) => a.alertStatus === "active").length}
-            </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('inventory.requiresAttention', 'Requires attention')}</p>
-          </CardContent>
-        </Card>
-        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <CardHeader className="pb-3 relative">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.pendingTransfers', 'Pending Transfers')}</CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
-              {inventoryTransfers.filter((tr: any) => tr.transferStatus === "pending").length}
-            </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('inventory.awaitingApproval', 'Awaiting approval')}</p>
-          </CardContent>
-        </Card>
+
         <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <CardHeader className="pb-3 relative">
-            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">{t('inventory.autoReorderEnabled', 'Auto-Reorder Enabled')}</CardTitle>
+          <CardHeader className="pb-2 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Total Value</CardTitle>
           </CardHeader>
           <CardContent className="relative">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {reorderSettings.filter((r: any) => r.isAutoReorderEnabled).length}
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+              {formatCurrency(overview?.totalValue ?? 0)}
             </div>
-            <p className="text-xs text-[#64748B] mt-1">{t('inventory.activeRules', 'Active rules')}</p>
+            <p className="text-xs text-[#64748B] mt-1">Inventory at cost</p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-[#F97316]/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="pb-2 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Low Stock Alerts</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-[#F97316]">{overview?.lowStockCount ?? 0}</div>
+            <p className="text-xs text-[#64748B] mt-1">Items below threshold</p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-red-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="pb-2 relative">
+            <CardTitle className="text-sm font-medium text-[#0B1F3B] dark:text-white">Out of Stock</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-red-600 dark:text-red-400">{overview?.outOfStockCount ?? 0}</div>
+            <p className="text-xs text-[#64748B] mt-1">Needs immediate reorder</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-        <CardHeader>
-          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.inventorySummary', 'Inventory Summary')}</CardTitle>
-          <CardDescription className="text-[#64748B]">{t('inventory.quickOverview', 'Quick overview of parts inventory')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isSparePartsLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-[#64748B]">{t('inventory.loadingInventory', 'Loading inventory...')}</p>
-            </div>
-          ) : spareParts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-                <Package className="w-10 h-10 text-white" />
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Stock Health by Category - Bar Chart */}
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-[#0A5ED7]" />
+              Stock by Category
+            </CardTitle>
+            <CardDescription className="text-[#64748B]">Quantity distribution across categories</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {categoryBreakdown.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={categoryBreakdown}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                  <XAxis dataKey="category" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #E2E8F0", borderRadius: "8px" }}
+                  />
+                  <Bar dataKey="totalQuantity" fill="#0A5ED7" radius={[4, 4, 0, 0]} name="Quantity" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-[#64748B]">
+                No category data available
               </div>
-              <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('inventory.noPartsFound', 'No Parts Found')}</h3>
-              <p className="text-[#64748B] mb-4">{t('inventory.noPartsDesc', 'Get started by adding items to your stock.')}</p>
-              <Button 
-                onClick={() => setIsScannerOpen(true)}
-                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
-                data-testid="button-scan-barcode"
-              >
-                <Barcode className="mr-2 h-4 w-4" />
-                {t('inventory.scanBarcode', 'Scan Barcode')}
-              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Value Distribution - Pie Chart */}
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-600" />
+              Value Distribution
+            </CardTitle>
+            <CardDescription className="text-[#64748B]">Inventory value by category</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {categoryBreakdown.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={categoryBreakdown}
+                    dataKey="totalValue"
+                    nameKey="category"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label={({ category, percent }) =>
+                      `${category} (${(percent * 100).toFixed(0)}%)`
+                    }
+                  >
+                    {categoryBreakdown.map((_: any, idx: number) => (
+                      <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(val: number) => formatCurrency(val)} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-[#64748B]">
+                No valuation data available
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Inventory Valuation Summary */}
+      {valuation.totalCostValue !== undefined && (
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
+              Valuation Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <div className="text-sm text-[#64748B]">Cost Value</div>
+                <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">{formatCurrency(valuation.totalCostValue ?? 0)}</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <div className="text-sm text-[#64748B]">Selling Value</div>
+                <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">{formatCurrency(valuation.totalSellingValue ?? 0)}</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <div className="text-sm text-[#64748B]">Potential Profit</div>
+                <div className="text-lg font-bold text-green-600">{formatCurrency(valuation.potentialProfit ?? 0)}</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <div className="text-sm text-[#64748B]">Total Quantity</div>
+                <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">{valuation.totalQuantity ?? 0}</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <div className="text-sm text-[#64748B]">Total SKUs</div>
+                <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">{valuation.totalItems ?? 0}</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Turnover Analysis */}
+      {turnover.length > 0 && (
+        <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white flex items-center gap-2">
+              <RefreshCw className="w-5 h-5 text-[#8B5CF6]" />
+              Turnover Analysis
+            </CardTitle>
+            <CardDescription className="text-[#64748B]">Inventory movement speed by category</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={turnover}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                <XAxis dataKey="category" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Bar dataKey="turnoverRatio" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Turnover Ratio" />
+                <Bar dataKey="totalStock" fill="#0BB3FF" radius={[4, 4, 0, 0]} name="Total Stock" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+
+  // ========== TAB: STOCK LEVELS ==========
+  const stockLevelsContent = (
+    <div className="space-y-4">
+      <div className="relative">
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#64748B] h-4 w-4" />
+        <Input
+          placeholder="Search by name, part number, or category..."
+          value={stockSearch}
+          onChange={(e) => setStockSearch(e.target.value)}
+          className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+        />
+      </div>
+
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <CardContent className="p-0">
+          {itemsLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
+              <p className="text-[#64748B]">Loading inventory items...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="w-12 h-12 text-[#64748B] mx-auto mb-3" />
+              <p className="text-[#64748B]">No inventory items found</p>
             </div>
           ) : (
-            <>
-              <div className="relative mb-4">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#64748B] h-4 w-4" />
-                <Input
-                  placeholder={t('inventory.searchParts', 'Search parts...')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
-                  data-testid="input-search-parts"
-                />
-              </div>
-              <Table>
-                <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
-                  <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
-                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.partName', 'Part Name')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.sku', 'SKU')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.stockStatus', 'Stock Status')}</TableHead>
+            <Table>
+              <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part Name</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part Number</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Quantity</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Min Threshold</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Reorder Point</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Unit Cost</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Line Value</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item: any) => (
+                  <TableRow key={item.inventoryId} className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{item.partName}</TableCell>
+                    <TableCell className="text-[#64748B] font-mono text-sm">{item.partNumber}</TableCell>
+                    <TableCell>
+                      <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0BB3FF]/10 dark:text-[#0BB3FF] border-0">
+                        {item.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-[#0B1F3B] dark:text-white">{item.stockQuantity}</TableCell>
+                    <TableCell className="text-right text-[#64748B]">{item.minThreshold}</TableCell>
+                    <TableCell className="text-right text-[#64748B]">{item.reorderPoint}</TableCell>
+                    <TableCell><StatusBadge status={item.status} /></TableCell>
+                    <TableCell className="text-right text-[#64748B]">{formatCurrency(item.costPrice)}</TableCell>
+                    <TableCell className="text-right font-medium text-[#0B1F3B] dark:text-white">{formatCurrency(item.lineValue)}</TableCell>
+                    <TableCell>
+                      {(item.status === "low" || item.status === "out_of_stock") && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                          onClick={() => handleReorderItem(item)}
+                          disabled={reorderingItems.has(item.inventoryId || item.sparePartId)}
+                        >
+                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          {reorderingItems.has(item.inventoryId || item.sparePartId) ? "Ordering..." : "Reorder"}
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {spareParts
-                    .filter((part: any) =>
-                      searchQuery === "" ||
-                      part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      part.sku.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .slice(0, 10)
-                    .map((part: any) => (
-                      <TableRow key={part.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-part-${part.id}`}>
-                        <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{part.name}</TableCell>
-                        <TableCell className="text-[#64748B]">{part.sku}</TableCell>
-                        <TableCell>
-                          <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0BB3FF]/10 dark:text-[#0BB3FF] border-0">{part.category}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0">{t('inventory.inStock', 'In Stock')}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
     </div>
   );
 
-  const alertsContent = (
-    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.stockAlerts', 'Stock Alerts')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('inventory.stockAlertsDesc', 'Low stock and out-of-stock notifications')}</CardDescription>
-          </div>
-          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-alert">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('inventory.createAlert', 'Create Alert')}
-          </Button>
+  // ========== TAB: SUPPLIERS ==========
+  const suppliersContent = (
+    <div className="space-y-4">
+      {suppliersList.length === 0 ? (
+        <div className="text-center py-16">
+          <Truck className="w-16 h-16 text-[#64748B] mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">No Suppliers Found</h3>
+          <p className="text-[#64748B]">Add suppliers to track performance and manage orders.</p>
         </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
-            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.alertType', 'Alert Type')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.currentStock', 'Current Stock')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.threshold', 'Threshold')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {stockAlerts.map((alert: any) => (
-              <TableRow key={alert.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-alert-${alert.id}`}>
-                <TableCell>
-                  <Badge className={alert.alertType === "out_of_stock" ? "bg-red-500/10 text-red-700 dark:text-red-400 border-0" : "bg-[#F97316]/10 text-[#F97316] border-0"}>
-                    {alert.alertType === "out_of_stock" ? t('inventory.outOfStock', 'Out of Stock') : t('inventory.lowStock', 'Low Stock')}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-[#0B1F3B] dark:text-white">{alert.sparePartId}</TableCell>
-                <TableCell className="text-[#64748B]">{alert.currentQuantity}</TableCell>
-                <TableCell className="text-[#64748B]">{alert.threshold}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={
-                      alert.alertStatus === "active"
-                        ? "bg-red-500/10 text-red-700 dark:text-red-400 border-0"
-                        : alert.alertStatus === "acknowledged"
-                        ? "bg-[#64748B]/10 text-[#64748B] border-0"
-                        : "bg-green-500/10 text-green-700 dark:text-green-400 border-0"
-                    }
-                  >
-                    {alert.alertStatus}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {alert.alertStatus === "active" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
-                      onClick={() => acknowledgeMutation.mutate(alert.id)}
-                      data-testid={`button-acknowledge-${alert.id}`}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      {t('inventory.acknowledge', 'Acknowledge')}
-                    </Button>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {suppliersList.map((supplier: any) => (
+            <Card key={supplier.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{supplier.name}</CardTitle>
+                    {supplier.contactPerson && (
+                      <CardDescription className="text-[#64748B]">{supplier.contactPerson}</CardDescription>
+                    )}
+                  </div>
+                  {supplier.overallRating !== null && supplier.overallRating > 0 && (
+                    <div className="flex items-center gap-1 bg-[#F97316]/10 text-[#F97316] px-2 py-1 rounded-full">
+                      <Star className="w-3.5 h-3.5 fill-current" />
+                      <span className="text-sm font-semibold">{supplier.overallRating.toFixed(1)}</span>
+                    </div>
                   )}
-                </TableCell>
-              </TableRow>
-            ))}
-            {stockAlerts.length === 0 && (
-              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell colSpan={6} className="text-center text-[#64748B]">
-                  {t('inventory.noStockAlerts', 'No stock alerts found')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Contact Info */}
+                <div className="space-y-1.5 text-sm">
+                  {supplier.email && (
+                    <div className="flex items-center gap-2 text-[#64748B]">
+                      <Mail className="w-3.5 h-3.5" />
+                      <span className="truncate">{supplier.email}</span>
+                    </div>
+                  )}
+                  {supplier.phone && (
+                    <div className="flex items-center gap-2 text-[#64748B]">
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{supplier.phone}</span>
+                    </div>
+                  )}
+                  {(supplier.city || supplier.country) && (
+                    <div className="flex items-center gap-2 text-[#64748B]">
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>{[supplier.city, supplier.country].filter(Boolean).join(", ")}</span>
+                    </div>
+                  )}
+                </div>
 
-  const reorderContent = (
-    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.autoReorderSettings', 'Automatic Reorder Settings')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('inventory.autoReorderDesc', 'Configure automatic reordering rules for parts')}</CardDescription>
-          </div>
-          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-reorder-rule">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('inventory.addRule', 'Add Rule')}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
-            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.reorderPoint', 'Reorder Point')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.reorderQuantity', 'Reorder Quantity')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.supplier', 'Supplier')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.lastReorder', 'Last Reorder')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {reorderSettings.map((setting: any) => (
-              <TableRow key={setting.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-reorder-${setting.id}`}>
-                <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{setting.sparePartId}</TableCell>
-                <TableCell className="text-[#64748B]">{setting.reorderPoint}</TableCell>
-                <TableCell className="text-[#64748B]">{setting.reorderQuantity}</TableCell>
-                <TableCell className="text-[#64748B]">{setting.supplierId}</TableCell>
-                <TableCell>
-                  <Badge className={setting.isAutoReorderEnabled ? "bg-green-500/10 text-green-700 dark:text-green-400 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}>
-                    {setting.isAutoReorderEnabled ? t('common.enable', 'Enabled') : t('common.disable', 'Disabled')}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-[#64748B]">
-                  {setting.lastReorderDate
-                    ? new Date(setting.lastReorderDate).toLocaleDateString()
-                    : t('inventory.never', 'Never')}
-                </TableCell>
-              </TableRow>
-            ))}
-            {reorderSettings.length === 0 && (
-              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell colSpan={6} className="text-center text-[#64748B]">
-                  {t('inventory.noReorderRules', 'No reorder rules configured')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
+                {/* Performance Metrics */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E2E8F0] dark:border-[#232A36]">
+                  <div className="text-center p-2 rounded bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <div className="text-xs text-[#64748B]">On-Time Delivery</div>
+                    <div className="text-sm font-bold text-[#0B1F3B] dark:text-white">
+                      {supplier.onTimeDeliveryRate !== null ? `${supplier.onTimeDeliveryRate}%` : "N/A"}
+                    </div>
+                  </div>
+                  <div className="text-center p-2 rounded bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <div className="text-xs text-[#64748B]">Avg Lead Time</div>
+                    <div className="text-sm font-bold text-[#0B1F3B] dark:text-white">
+                      {supplier.averageLeadTime !== null ? `${supplier.averageLeadTime} days` : "N/A"}
+                    </div>
+                  </div>
+                  <div className="text-center p-2 rounded bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <div className="text-xs text-[#64748B]">Quality Score</div>
+                    <div className="text-sm font-bold text-[#0B1F3B] dark:text-white">
+                      {supplier.qualityScore !== null ? `${supplier.qualityScore}/100` : "N/A"}
+                    </div>
+                  </div>
+                  <div className="text-center p-2 rounded bg-[#F8FAFC] dark:bg-[#0E1117]">
+                    <div className="text-xs text-[#64748B]">Total Orders</div>
+                    <div className="text-sm font-bold text-[#0B1F3B] dark:text-white">{supplier.totalOrders}</div>
+                  </div>
+                </div>
 
-  const transfersContent = (
-    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.inventoryTransfers', 'Inventory Transfers')}</CardTitle>
-            <CardDescription className="text-[#64748B]">{t('inventory.inventoryTransfersDesc', 'Multi-location inventory movement tracking')}</CardDescription>
-          </div>
-          <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-transfer">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('inventory.newTransfer', 'New Transfer')}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
-            <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.transferNumber', 'Transfer #')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.part', 'Part')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('inventory.fromTo', 'From → To')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.quantity', 'Quantity')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {inventoryTransfers.map((transfer: any) => (
-              <TableRow key={transfer.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-transfer-${transfer.id}`}>
-                <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{transfer.transferNumber}</TableCell>
-                <TableCell className="text-[#64748B]">{transfer.sparePartId}</TableCell>
-                <TableCell className="text-[#64748B]">
-                  {transfer.fromGarageId} → {transfer.toGarageId}
-                </TableCell>
-                <TableCell className="text-[#64748B]">{transfer.quantity}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={
-                      transfer.transferStatus === "completed"
-                        ? "bg-green-500/10 text-green-700 dark:text-green-400 border-0"
-                        : transfer.transferStatus === "in_transit"
-                        ? "bg-[#0A5ED7]/10 text-[#0A5ED7] border-0"
-                        : "bg-[#64748B]/10 text-[#64748B] border-0"
-                    }
-                  >
-                    {transfer.transferStatus}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-[#64748B]">
-                  {new Date(transfer.createdAt).toLocaleDateString()}
-                </TableCell>
-              </TableRow>
-            ))}
-            {inventoryTransfers.length === 0 && (
-              <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell colSpan={6} className="text-center text-[#64748B]">
-                  {t('inventory.noTransfers', 'No transfers found')}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-
-  const pricingContent = (
-    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-      <CardHeader>
-        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.pricingHistory', 'Pricing History')}</CardTitle>
-        <CardDescription className="text-[#64748B]">{t('inventory.pricingHistoryDesc', 'Track price changes over time')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="text-center py-12">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-            <TrendingUp className="w-10 h-10 text-white" />
-          </div>
-          <p className="text-[#64748B]">
-            {t('inventory.selectPartPricing', 'Select a part to view pricing history')}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const auditContent = (
-    <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-      <CardHeader>
-        <CardTitle className="text-[#0B1F3B] dark:text-white">{t('inventory.auditTrail', 'Inventory Audit Trail')}</CardTitle>
-        <CardDescription className="text-[#64748B]">{t('inventory.auditTrailDesc', 'Complete history of inventory changes')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="text-center py-12">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-            <History className="w-10 h-10 text-white" />
-          </div>
-          <p className="text-[#64748B]">
-            {t('inventory.auditTrailInfo', 'Audit trail will display all inventory movements and changes')}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const headerContent = (
-    <div className="flex gap-2">
-      <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
-        <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage">
-          <SelectValue placeholder={t('inventory.selectGarage', 'Select Garage')} />
-        </SelectTrigger>
-        <SelectContent>
-          {garages.map((garage) => (
-            <SelectItem key={garage.id} value={garage.id}>
-              {garage.name}
-            </SelectItem>
+                {supplier.paymentTerms && (
+                  <div className="pt-1">
+                    <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {supplier.paymentTerms}
+                    </Badge>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           ))}
-        </SelectContent>
-      </Select>
+        </div>
+      )}
+    </div>
+  );
+
+  // ========== TAB: AUTO-REORDER ==========
+  const autoReorderContent = (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">Items Needing Reorder</h3>
+          <p className="text-sm text-[#64748B]">
+            {lowStockItems.length} item{lowStockItems.length !== 1 ? "s" : ""} below minimum threshold
+          </p>
+        </div>
+        <Button
+          onClick={handleBulkReorder}
+          disabled={lowStockItems.length === 0 || reorderMutation.isPending}
+          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" />
+          {reorderMutation.isPending ? "Processing..." : `Bulk Reorder All (${lowStockItems.length})`}
+        </Button>
+      </div>
+
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <CardContent className="p-0">
+          {lowStockLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
+              <p className="text-[#64748B]">Checking stock levels...</p>
+            </div>
+          ) : lowStockItems.length === 0 ? (
+            <div className="text-center py-16">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white mb-2">All Stock Levels Healthy</h3>
+              <p className="text-[#64748B]">No items are currently below their minimum threshold.</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
+                <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part Name</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Part Number</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Current Stock</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Min Threshold</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Suggested Order Qty</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Est. Cost</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {lowStockItems.map((item: any) => {
+                  const suggestedQty = item.suggestedReorderQty || item.minThreshold * 2;
+                  const estCost = suggestedQty * (item.costPrice || 0);
+                  const itemKey = item.inventoryId || item.sparePartId;
+
+                  return (
+                    <TableRow key={itemKey} className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                      <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{item.partName}</TableCell>
+                      <TableCell className="text-[#64748B] font-mono text-sm">{item.partNumber}</TableCell>
+                      <TableCell>
+                        <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:bg-[#0BB3FF]/10 dark:text-[#0BB3FF] border-0">
+                          {item.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-red-600">{item.stockQuantity}</TableCell>
+                      <TableCell className="text-right text-[#64748B]">{item.minThreshold}</TableCell>
+                      <TableCell className="text-right font-semibold text-[#0B1F3B] dark:text-white">{suggestedQty}</TableCell>
+                      <TableCell className="text-right text-[#64748B]">{formatCurrency(estCost)}</TableCell>
+                      <TableCell><StatusBadge status={item.status} /></TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          onClick={() => handleReorderItem(item)}
+                          disabled={reorderingItems.has(itemKey)}
+                          className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
+                        >
+                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          {reorderingItems.has(itemKey) ? "Ordering..." : "Create PO"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 
   return (
-    <>
-      <TabsPageLayout
-        title={t('inventory.inventoryPartsManagement', 'Inventory & Parts Management')}
-        description={t('inventory.inventoryPartsDesc', 'Advanced inventory control with stock alerts, auto-reordering, and multi-location transfers')}
-        icon={Package}
-        headerContent={headerContent}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        tabs={[
-          {
-            id: "overview",
-            label: t('inventory.overview', 'Overview'),
-            icon: Package,
-            content: overviewContent,
-          },
-          {
-            id: "alerts",
-            label: t('inventory.alerts', 'Alerts'),
-            icon: AlertTriangle,
-            content: alertsContent,
-          },
-          {
-            id: "reorder",
-            label: t('inventory.autoReorder', 'Auto-Reorder'),
-            icon: Settings,
-            content: reorderContent,
-          },
-          {
-            id: "transfers",
-            label: t('inventory.transfers', 'Transfers'),
-            icon: ArrowRightLeft,
-            content: transfersContent,
-          },
-          {
-            id: "pricing",
-            label: t('inventory.pricing', 'Pricing'),
-            icon: TrendingUp,
-            content: pricingContent,
-          },
-          {
-            id: "audit",
-            label: t('inventory.audit', 'Audit'),
-            icon: History,
-            content: auditContent,
-          },
-        ]}
-      />
-      <BarcodeScanner
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScan={handleBarcodeScan}
-      />
-    </>
+    <TabsPageLayout
+      title="Inventory & Supply Chain"
+      description="Complete inventory management with stock monitoring, supplier performance, and automated reordering"
+      icon={Warehouse}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      tabs={[
+        {
+          id: "overview",
+          label: "Overview",
+          icon: Package,
+          content: overviewContent,
+          badge: overview?.lowStockCount && overview.lowStockCount > 0 ? overview.lowStockCount : undefined,
+        },
+        {
+          id: "stock-levels",
+          label: "Stock Levels",
+          icon: BarChart3,
+          content: stockLevelsContent,
+          badge: items.length || undefined,
+        },
+        {
+          id: "suppliers",
+          label: "Suppliers",
+          icon: Truck,
+          content: suppliersContent,
+          badge: suppliersList.length || undefined,
+        },
+        {
+          id: "auto-reorder",
+          label: "Auto-Reorder",
+          icon: RefreshCw,
+          content: autoReorderContent,
+          badge: lowStockItems.length > 0 ? lowStockItems.length : undefined,
+        },
+      ]}
+    />
   );
 }
