@@ -80,6 +80,7 @@ import {
   Recycle,
   BadgeCheck,
   ShieldAlert,
+  ShieldCheck,
   Briefcase,
   Heart,
 } from "lucide-react";
@@ -252,6 +253,7 @@ export const navigationConfig: NavGroup[] = [
     icon: DollarSign,
     roles: ['ADMIN', 'MANAGER', 'ACCOUNTANT'],
     items: [
+      { title: "Estimates & Quotations", href: "/estimates-quotations", icon: Receipt },
       { title: "Invoices", href: "/invoices", icon: FileText },
       { title: "Expense Tracking", href: "/expense-tracking", icon: Receipt },
       { title: "Expenses Management", href: "/expenses-management", icon: Receipt },
@@ -322,6 +324,9 @@ export const navigationConfig: NavGroup[] = [
       { title: "Social Monitoring", href: "/social-media-monitoring", icon: Search },
       { title: "Sales Management", href: "/sales-management", icon: DollarSign },
       { title: "Sales Guide", href: "/sales-guide", icon: BookOpen },
+      { title: "Warranty & Contracts", href: "/warranty-contracts", icon: ShieldCheck },
+      { title: "Self-Service Kiosk", href: "/kiosk", icon: TabletSmartphone },
+      { title: "Fleet Management", href: "/fleet-management", icon: Truck },
     ],
   },
   {
@@ -391,12 +396,20 @@ export const navigationConfig: NavGroup[] = [
     ],
   },
   {
+    title: "Communication & Messaging",
+    icon: MessageSquare,
+    items: [
+      { title: "Call Center", href: "/call-center", icon: Radio },
+      { title: "Support Chat", href: "/support-chat-dashboard", icon: MessageSquare },
+      { title: "WhatsApp Business", href: "/whatsapp", icon: MessageSquare },
+      { title: "Video Consultations", href: "/video-consultations", icon: Video },
+    ],
+  },
+  {
     title: "AI & Automation Hub",
     icon: Brain,
     items: [
       { title: "AI Automation", href: "/ai-automation", icon: Brain },
-      { title: "Call Center", href: "/call-center", icon: Radio },
-      { title: "Support Chat", href: "/support-chat-dashboard", icon: MessageSquare },
       { title: "Parts Availability", href: "/parts-availability", icon: RefreshCw },
       { title: "AI Chatbot", href: "/ai-chatbot", icon: MessageSquare },
       { title: "AI Chatbot Assistant", href: "/ai-chatbot-assistant", icon: Brain },

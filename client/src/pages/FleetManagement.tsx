@@ -1,35 +1,7 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -39,785 +11,708 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import {
-  Plus,
-  Pencil,
-  Trash2,
   Building2,
   Car,
-  FileText,
-  DollarSign,
   Calendar,
+  BarChart3,
+  Plus,
+  Truck,
+  DollarSign,
+  Gauge,
+  AlertTriangle,
+  Wrench,
+  Clock,
+  Users,
+  TrendingUp,
 } from "lucide-react";
-import { format } from "date-fns";
-import {
-  insertFleetGroupSchema,
-  insertFleetVehicleSchema,
-  insertFleetContractSchema,
-  insertFleetPricingTierSchema,
-  insertFleetMaintenanceScheduleSchema,
-  type FleetGroup,
-  type FleetVehicle,
-  type FleetContract,
-  type FleetPricingTier,
-  type FleetMaintenanceSchedule,
-} from "@shared/schema";
-import { useAuth } from "@/hooks/useAuth";
-import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
-const fleetGroupFormSchema = insertFleetGroupSchema.extend({
-  discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
-});
+// ── Types ──
 
-const fleetVehicleFormSchema = insertFleetVehicleSchema.extend({
-  averageMonthlyMileage: z.string().optional().transform(val => val ? parseInt(val) : undefined),
-});
+interface FleetAccount {
+  id: string;
+  companyName: string;
+  contactPerson: string;
+  contactEmail: string;
+  contactPhone: string;
+  contractStatus: 'active' | 'pending' | 'expired';
+  monthlySpend: number;
+  totalSpend: number;
+  vehicleCount: number;
+  activeJobs: number;
+  discountPercentage: number;
+}
 
-const fleetContractFormSchema = insertFleetContractSchema.extend({
-  maxVehicles: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
-  discountPercentage: z.string().optional().transform(val => val ? parseFloat(val) : undefined),
-  startDate: z.string().min(1, "Start date required"),
-  endDate: z.string().min(1, "End date required"),
-});
+interface FleetVehicle {
+  id: string;
+  fleetAccountId: string;
+  companyName: string;
+  plateNumber: string;
+  make: string;
+  model: string;
+  year: number;
+  status: 'active' | 'in_service' | 'scheduled' | 'inactive';
+  mileage: number;
+  lastServiceDate: string;
+  lastServiceType: string;
+  nextServiceDue: string;
+  nextServiceType: string;
+  avgMonthlyCost: number;
+  totalSpend: number;
+}
 
-const pricingTierFormSchema = insertFleetPricingTierSchema.extend({
-  garageId: z.string().min(1, "Garage ID required"),
-  minVehicles: z.string().min(1, "Required").transform(val => parseInt(val)),
-  maxVehicles: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
-  discountPercentage: z.string().min(1, "Required").transform(val => parseFloat(val)),
-  applicableServices: z.string().optional().transform(val => val ? val.split(",").map(s => s.trim()).filter(Boolean) : undefined),
-});
+interface MaintenanceEntry {
+  id: string;
+  vehicleId: string;
+  fleetAccountId: string;
+  serviceType: string;
+  scheduledDate: string;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'overdue';
+  estimatedCost: number;
+  notes: string;
+  plateNumber: string;
+  vehicleName: string;
+  companyName: string;
+}
 
-const maintenanceScheduleFormSchema = insertFleetMaintenanceScheduleSchema.extend({
-  intervalMileage: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
-  intervalMonths: z.string().optional().transform(val => val && val !== "" ? parseInt(val) : undefined),
-  estimatedCost: z.string().optional().transform(val => val && val !== "" ? parseFloat(val) : undefined),
-});
+interface AnalyticsData {
+  summary: {
+    totalAccounts: number;
+    totalVehicles: number;
+    activeVehicles: number;
+    inService: number;
+    totalRevenue: number;
+    avgCostPerVehicle: number;
+    avgMileage: number;
+    overdueMaintenanceCount: number;
+  };
+  revenuePerAccount: { accountId: string; companyName: string; totalRevenue: number; vehicleCount: number; avgCostPerVehicle: number }[];
+  serviceByMake: { make: string; vehicleCount: number; totalCost: number; avgCost: number }[];
+  costTrend: { month: string; totalCost: number; vehiclesServiced: number }[];
+}
 
-type FleetGroupFormData = z.input<typeof fleetGroupFormSchema>;
-type FleetVehicleFormData = z.input<typeof fleetVehicleFormSchema>;
-type FleetContractFormData = z.input<typeof fleetContractFormSchema>;
-type PricingTierFormData = z.input<typeof pricingTierFormSchema>;
-type MaintenanceScheduleFormData = z.input<typeof maintenanceScheduleFormSchema>;
+// ── Helpers ──
+
+function formatCurrency(amount: number) {
+  return `SAR ${amount.toLocaleString()}`;
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return "--";
+  return new Date(dateStr).toLocaleDateString("en-SA", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function getStatusBadge(status: string) {
+  const styles: Record<string, string> = {
+    active: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0",
+    in_service: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0",
+    scheduled: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-0",
+    inactive: "bg-slate-500/10 text-slate-500 border-0",
+    pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-0",
+    expired: "bg-red-500/10 text-red-600 dark:text-red-400 border-0",
+    overdue: "bg-red-500/10 text-red-600 dark:text-red-400 border-0",
+    completed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0",
+    in_progress: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-0",
+  };
+  const labels: Record<string, string> = {
+    active: "Active",
+    in_service: "In Service",
+    scheduled: "Scheduled",
+    inactive: "Inactive",
+    pending: "Pending",
+    expired: "Expired",
+    overdue: "Overdue",
+    completed: "Completed",
+    in_progress: "In Progress",
+  };
+  return <Badge className={styles[status] || ""}>{labels[status] || status}</Badge>;
+}
+
+// ── Bar chart component (simple SVG) ──
+
+function SimpleBarChart({ data, labelKey, valueKey, color }: { data: any[]; labelKey: string; valueKey: string; color: string }) {
+  if (!data || data.length === 0) return <div className="text-center text-[#64748B] py-8">No data available</div>;
+  const maxVal = Math.max(...data.map(d => d[valueKey]));
+  return (
+    <div className="space-y-3">
+      {data.map((item, i) => {
+        const pct = maxVal > 0 ? (item[valueKey] / maxVal) * 100 : 0;
+        return (
+          <div key={i} className="space-y-1">
+            <div className="flex justify-between text-sm">
+              <span className="text-[#0B1F3B] dark:text-white font-medium">{item[labelKey]}</span>
+              <span className="text-[#64748B]">{typeof item[valueKey] === 'number' ? formatCurrency(item[valueKey]) : item[valueKey]}</span>
+            </div>
+            <div className="h-6 w-full bg-[#F1F5F9] dark:bg-[#1E2530] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}88)` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Main Component ──
 
 export default function FleetManagement() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [selectedTab, setSelectedTab] = useState("groups");
-  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
-  const [isVehicleDialogOpen, setIsVehicleDialogOpen] = useState(false);
-  const [isContractDialogOpen, setIsContractDialogOpen] = useState(false);
-  const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false);
-  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
-  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
-  const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
-  const [editingContractId, setEditingContractId] = useState<string | null>(null);
-  const [editingPricingId, setEditingPricingId] = useState<string | null>(null);
-  const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
-  const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  const [selectedTab, setSelectedTab] = useState("accounts");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newCompanyName, setNewCompanyName] = useState("");
+  const [newContactPerson, setNewContactPerson] = useState("");
+  const [newContactEmail, setNewContactEmail] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
 
-  const { data: fleetGroups = [], isLoading: groupsLoading } = useQuery<FleetGroup[]>({
-    queryKey: ["/api/fleet/groups"],
+  // ── Data queries ──
+
+  const { data: accountsData, isLoading: accountsLoading } = useQuery<{ accounts: FleetAccount[] }>({
+    queryKey: ["/api/fleet/accounts"],
   });
 
-  const { data: fleetVehicles = [] } = useQuery<any[]>({
-    queryKey: ["/api/fleet/vehicles/group", selectedGroupId],
-    enabled: !!selectedGroupId && selectedTab === "vehicles",
+  const { data: vehiclesData, isLoading: vehiclesLoading } = useQuery<{ vehicles: FleetVehicle[] }>({
+    queryKey: ["/api/fleet/vehicles"],
   });
 
-  const { data: allVehicles = [] } = useQuery<any[]>({
-    queryKey: ["/api/vehicles"],
-    enabled: isVehicleDialogOpen,
+  const { data: scheduleData, isLoading: scheduleLoading } = useQuery<{ schedule: MaintenanceEntry[] }>({
+    queryKey: ["/api/fleet/maintenance-schedule"],
   });
 
-  const { data: contracts = [] } = useQuery<FleetContract[]>({
-    queryKey: ["/api/fleet/contracts/group", selectedGroupId],
-    enabled: !!selectedGroupId && selectedTab === "contracts",
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery<AnalyticsData>({
+    queryKey: ["/api/fleet/analytics"],
   });
 
-  const { data: pricingTiers = [] } = useQuery<FleetPricingTier[]>({
-    queryKey: ["/api/fleet/pricing-tiers"],
-  });
+  const accounts = accountsData?.accounts || [];
+  const vehicles = vehiclesData?.vehicles || [];
+  const schedule = scheduleData?.schedule || [];
+  const analytics = analyticsData || null;
 
-  const { data: schedules = [] } = useQuery<FleetMaintenanceSchedule[]>({
-    queryKey: ["/api/fleet/maintenance-schedules/group", selectedGroupId],
-    enabled: !!selectedGroupId && selectedTab === "schedules",
-  });
+  // ── Create account handler ──
 
-  const groupForm = useForm<FleetGroupFormData>({
-    resolver: zodResolver(fleetGroupFormSchema),
-    defaultValues: {
-      fleetName: "",
-      companyName: "",
-      contactPerson: "",
-      contactEmail: "",
-      contactPhone: "",
-      billingAddress: "",
-      taxId: "",
-      discountPercentage: "0",
-      paymentTerms: "net_30",
-      preferredPaymentMethod: "",
-      notes: "",
-    },
-  });
-
-  const vehicleForm = useForm<FleetVehicleFormData>({
-    resolver: zodResolver(fleetVehicleFormSchema),
-    defaultValues: {
-      fleetGroupId: "",
-      vehicleId: "",
-      averageMonthlyMileage: "",
-      notes: "",
-    },
-  });
-
-  const contractForm = useForm<FleetContractFormData>({
-    resolver: zodResolver(fleetContractFormSchema),
-    defaultValues: {
-      fleetGroupId: "",
-      contractNumber: "",
-      contractType: "standard",
-      startDate: "",
-      endDate: "",
-      maxVehicles: "",
-      discountPercentage: "0",
-      billingCycle: "monthly",
-      terms: "",
-    },
-  });
-
-  const pricingForm = useForm<PricingTierFormData>({
-    resolver: zodResolver(pricingTierFormSchema),
-    defaultValues: {
-      garageId: (user as any)?.garageId || "",
-      tierName: "",
-      minVehicles: "",
-      maxVehicles: "",
-      discountPercentage: "",
-      applicableServices: "",
-      isActive: true,
-    },
-  });
-
-  const scheduleForm = useForm<MaintenanceScheduleFormData>({
-    resolver: zodResolver(maintenanceScheduleFormSchema),
-    defaultValues: {
-      fleetGroupId: "",
-      scheduleName: "",
-      description: "",
-      serviceType: "",
-      intervalType: "mileage",
-      intervalMileage: "",
-      intervalMonths: "",
-      estimatedCost: "",
-    },
-  });
-
-  const groupMutation = useMutation({
-    mutationFn: async (data: FleetGroupFormData) => {
-      const parsed = fleetGroupFormSchema.parse(data);
-      if (editingGroupId) {
-        return await apiRequest("PATCH", `/api/fleet/groups/${editingGroupId}`, parsed);
-      }
-      return await apiRequest("POST", "/api/fleet/groups", parsed);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/groups"] });
-      setIsGroupDialogOpen(false);
-      setEditingGroupId(null);
-      groupForm.reset();
-      toast({
-        title: editingGroupId ? t('vehicles.fleetGroupUpdated', 'Fleet Group Updated') : t('vehicles.fleetGroupCreated', 'Fleet Group Created'),
-        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
+  async function handleCreateAccount() {
+    if (!newCompanyName.trim()) {
+      toast({ title: "Validation Error", description: "Company name is required", variant: "destructive" });
+      return;
+    }
+    try {
+      await apiRequest("POST", "/api/fleet/accounts", {
+        companyName: newCompanyName,
+        contactPerson: newContactPerson,
+        contactEmail: newContactEmail,
+        contactPhone: newContactPhone,
       });
-    },
-  });
+      queryClient.invalidateQueries({ queryKey: ["/api/fleet/accounts"] });
+      setIsCreateDialogOpen(false);
+      setNewCompanyName("");
+      setNewContactPerson("");
+      setNewContactEmail("");
+      setNewContactPhone("");
+      toast({ title: "Fleet Account Created", description: `${newCompanyName} has been added successfully.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to create fleet account", variant: "destructive" });
+    }
+  }
 
-  const vehicleMutation = useMutation({
-    mutationFn: async (data: FleetVehicleFormData) => {
-      const parsed = fleetVehicleFormSchema.parse(data);
-      if (editingVehicleId) {
-        return await apiRequest("PATCH", `/api/fleet/vehicles/${editingVehicleId}`, parsed);
-      }
-      return await apiRequest("POST", "/api/fleet/vehicles", parsed);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/vehicles/group"] });
-      setIsVehicleDialogOpen(false);
-      setEditingVehicleId(null);
-      vehicleForm.reset();
-      toast({
-        title: editingVehicleId ? t('vehicles.fleetVehicleUpdated', 'Fleet Vehicle Updated') : t('vehicles.fleetVehicleAdded', 'Fleet Vehicle Added'),
-        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
-      });
-    },
-  });
+  // ── Tab 1: Fleet Accounts ──
 
-  const contractMutation = useMutation({
-    mutationFn: async (data: FleetContractFormData) => {
-      const parsed = fleetContractFormSchema.parse(data);
-      if (editingContractId) {
-        return await apiRequest("PATCH", `/api/fleet/contracts/${editingContractId}`, parsed);
-      }
-      return await apiRequest("POST", "/api/fleet/contracts", parsed);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/contracts/group"] });
-      setIsContractDialogOpen(false);
-      setEditingContractId(null);
-      contractForm.reset();
-      toast({
-        title: editingContractId ? t('vehicles.contractUpdated', 'Contract Updated') : t('vehicles.contractCreated', 'Contract Created'),
-        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
-      });
-    },
-  });
-
-  const pricingMutation = useMutation({
-    mutationFn: async (data: PricingTierFormData) => {
-      const parsed = pricingTierFormSchema.parse(data);
-      if (editingPricingId) {
-        return await apiRequest("PATCH", `/api/fleet/pricing-tiers/${editingPricingId}`, parsed);
-      }
-      return await apiRequest("POST", "/api/fleet/pricing-tiers", parsed);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/pricing-tiers"] });
-      setIsPricingDialogOpen(false);
-      setEditingPricingId(null);
-      pricingForm.reset();
-      toast({
-        title: editingPricingId ? t('vehicles.pricingTierUpdated', 'Pricing Tier Updated') : t('vehicles.pricingTierCreated', 'Pricing Tier Created'),
-        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
-      });
-    },
-  });
-
-  const scheduleMutation = useMutation({
-    mutationFn: async (data: MaintenanceScheduleFormData) => {
-      const parsed = maintenanceScheduleFormSchema.parse(data);
-      if (editingScheduleId) {
-        return await apiRequest("PATCH", `/api/fleet/maintenance-schedules/${editingScheduleId}`, parsed);
-      }
-      return await apiRequest("POST", "/api/fleet/maintenance-schedules", parsed);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/maintenance-schedules/group"] });
-      setIsScheduleDialogOpen(false);
-      setEditingScheduleId(null);
-      scheduleForm.reset();
-      toast({
-        title: editingScheduleId ? t('vehicles.scheduleUpdated', 'Schedule Updated') : t('vehicles.scheduleCreated', 'Schedule Created'),
-        description: t('vehicles.changesSavedSuccessfully', 'Changes saved successfully'),
-      });
-    },
-  });
-
-  const deleteGroupMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/groups/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/groups"] });
-      toast({ title: t('vehicles.fleetGroupDeleted', 'Fleet Group Deleted'), description: t('vehicles.groupRemovedSuccessfully', 'Group removed successfully') });
-    },
-  });
-
-  const deleteVehicleMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/vehicles/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/vehicles/group"] });
-      toast({ title: t('vehicles.fleetVehicleRemoved', 'Fleet Vehicle Removed'), description: t('vehicles.vehicleRemovedFromFleet', 'Vehicle removed from fleet') });
-    },
-  });
-
-  const deleteContractMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/contracts/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/contracts/group"] });
-      toast({ title: t('vehicles.contractDeleted', 'Contract Deleted'), description: t('vehicles.contractRemovedSuccessfully', 'Contract removed successfully') });
-    },
-  });
-
-  const deletePricingMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/pricing-tiers/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/pricing-tiers"] });
-      toast({ title: t('vehicles.pricingTierDeleted', 'Pricing Tier Deleted'), description: t('vehicles.tierRemovedSuccessfully', 'Tier removed successfully') });
-    },
-  });
-
-  const deleteScheduleMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/fleet/maintenance-schedules/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/fleet/maintenance-schedules/group"] });
-      toast({ title: t('vehicles.scheduleDeleted', 'Schedule Deleted'), description: t('vehicles.scheduleRemovedSuccessfully', 'Schedule removed successfully') });
-    },
-  });
-
-  const handleEditGroup = (group: FleetGroup) => {
-    setEditingGroupId(group.id);
-    groupForm.reset({
-      fleetName: group.fleetName,
-      companyName: group.companyName || "",
-      contactPerson: group.contactPerson || "",
-      contactEmail: group.contactEmail || "",
-      contactPhone: group.contactPhone || "",
-      billingAddress: group.billingAddress || "",
-      taxId: group.taxId || "",
-      discountPercentage: group.discountPercentage?.toString() || "0",
-      paymentTerms: group.paymentTerms || "net_30",
-      preferredPaymentMethod: group.preferredPaymentMethod || "",
-      notes: group.notes || "",
-    });
-    setIsGroupDialogOpen(true);
-  };
-
-  const handleEditVehicle = (vehicle: any) => {
-    setEditingVehicleId(vehicle.fleetVehicle.id);
-    vehicleForm.reset({
-      fleetGroupId: vehicle.fleetVehicle.fleetGroupId,
-      vehicleId: vehicle.fleetVehicle.vehicleId,
-      averageMonthlyMileage: vehicle.fleetVehicle.averageMonthlyMileage?.toString() || "",
-      notes: vehicle.fleetVehicle.notes || "",
-    });
-    setIsVehicleDialogOpen(true);
-  };
-
-  const handleEditContract = (contract: FleetContract) => {
-    setEditingContractId(contract.id);
-    contractForm.reset({
-      fleetGroupId: contract.fleetGroupId,
-      contractNumber: contract.contractNumber,
-      contractType: contract.contractType,
-      startDate: contract.startDate ? format(new Date(contract.startDate), "yyyy-MM-dd") : "",
-      endDate: contract.endDate ? format(new Date(contract.endDate), "yyyy-MM-dd") : "",
-      maxVehicles: contract.maxVehicles?.toString() || "",
-      discountPercentage: contract.discountPercentage?.toString() || "0",
-      billingCycle: contract.billingCycle || "monthly",
-      terms: contract.terms || "",
-    });
-    setIsContractDialogOpen(true);
-  };
-
-  const handleEditPricing = (tier: FleetPricingTier) => {
-    setEditingPricingId(tier.id);
-    pricingForm.reset({
-      garageId: tier.garageId,
-      tierName: tier.tierName,
-      minVehicles: tier.minVehicles.toString(),
-      maxVehicles: tier.maxVehicles?.toString() || "",
-      discountPercentage: tier.discountPercentage.toString(),
-      applicableServices: tier.applicableServices?.join(", ") || "",
-      isActive: tier.isActive,
-    });
-    setIsPricingDialogOpen(true);
-  };
-
-  const handleEditSchedule = (schedule: FleetMaintenanceSchedule) => {
-    setEditingScheduleId(schedule.id);
-    scheduleForm.reset({
-      fleetGroupId: schedule.fleetGroupId,
-      scheduleName: schedule.scheduleName,
-      description: schedule.description || "",
-      serviceType: schedule.serviceType,
-      intervalType: schedule.intervalType,
-      intervalMileage: schedule.intervalMileage?.toString() || "",
-      intervalMonths: schedule.intervalMonths?.toString() || "",
-      estimatedCost: schedule.estimatedCost?.toString() || "",
-    });
-    setIsScheduleDialogOpen(true);
-  };
-
-  const renderFleetGroupsContent = () => (
-    <div className="space-y-4">
+  const renderAccountsTab = () => (
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
-          {t('vehicles.fleetGroups', 'Fleet Groups')}
+        <h2 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
+          Fleet Accounts ({accounts.length})
         </h2>
         <Button
-          onClick={() => {
-            setEditingGroupId(null);
-            groupForm.reset();
-            setIsGroupDialogOpen(true);
-          }}
+          onClick={() => setIsCreateDialogOpen(true)}
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
-          data-testid="button-create-fleet-group"
         >
           <Plus className="mr-2 h-4 w-4" />
-          {t('vehicles.addFleetGroup', 'Add Fleet Group')}
+          New Fleet Account
         </Button>
       </div>
 
-      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.fleetName', 'Fleet Name')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.company', 'Company')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.contactPerson', 'Contact Person')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.contactEmail', 'Contact Email')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('common.discount', 'Discount')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('common.status', 'Status')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">{t('common.actions', 'Actions')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {groupsLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-[#64748B]">
-                  {t('vehicles.loadingFleetGroups', 'Loading fleet groups...')}
-                </TableCell>
-              </TableRow>
-            ) : fleetGroups.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-[#64748B] py-8">
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-                      <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                    {t('vehicles.noFleetGroupsFound', 'No fleet groups found. Create one to get started.')}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              fleetGroups.map((group) => (
-                <TableRow key={group.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid={`row-fleet-group-${group.id}`}>
-                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">
-                    {group.fleetName}
-                  </TableCell>
-                  <TableCell className="text-[#64748B]">{group.companyName || "—"}</TableCell>
-                  <TableCell className="text-[#64748B]">{group.contactPerson || "—"}</TableCell>
-                  <TableCell className="text-[#64748B]">{group.contactEmail || "—"}</TableCell>
-                  <TableCell className="text-[#64748B]">{group.discountPercentage}%</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={group.isActive ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"}
-                    >
-                      {group.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditGroup(group)}
-                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
-                        data-testid={`button-edit-fleet-group-${group.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteGroupMutation.mutate(group.id)}
-                        className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
-                        data-testid={`button-delete-fleet-group-${group.id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-
-  const renderFleetVehiclesContent = () => (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">
-          {t('vehicles.fleetVehicles', 'Fleet Vehicles')}
-        </h2>
-        <div className="flex gap-4">
-          <Select value={selectedGroupId} onValueChange={setSelectedGroupId}>
-            <SelectTrigger className="w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle-fleet-group">
-              <SelectValue placeholder={t('vehicles.selectFleetGroup', 'Select Fleet Group')} />
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-              {fleetGroups.map((group) => (
-                <SelectItem key={group.id} value={group.id}>
-                  {group.fleetName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={() => {
-              setEditingVehicleId(null);
-              vehicleForm.reset({ fleetGroupId: selectedGroupId });
-              setIsVehicleDialogOpen(true);
-            }}
-            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
-            disabled={!selectedGroupId}
-            data-testid="button-add-fleet-vehicle"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('vehicles.addVehicle', 'Add Vehicle')}
-          </Button>
+      {accountsLoading ? (
+        <div className="text-center py-12 text-[#64748B]">Loading fleet accounts...</div>
+      ) : accounts.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
+            <Building2 className="w-8 h-8 text-white" />
+          </div>
+          <p className="text-[#64748B]">No fleet accounts yet. Create one to get started.</p>
         </div>
-      </div>
-
-      <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23]">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.vehicle', 'Vehicle')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.makeModel', 'Make/Model')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.licensePlate', 'License Plate')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.avgMonthlyMileage', 'Avg. Monthly Mileage')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">{t('vehicles.assignedDate', 'Assigned Date')}</TableHead>
-              <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">{t('common.actions', 'Actions')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!selectedGroupId ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-[#64748B] py-8">
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-                      <Car className="w-8 h-8 text-white" />
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {accounts.map((account) => (
+            <Card key={account.id} className="border border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23] hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] flex items-center justify-center text-white font-bold text-lg shadow">
+                      {account.companyName.charAt(0)}
                     </div>
-                    {t('vehicles.selectFleetGroupToViewVehicles', 'Select a fleet group to view vehicles')}
+                    <div>
+                      <CardTitle className="text-[#0B1F3B] dark:text-white text-base">
+                        {account.companyName}
+                      </CardTitle>
+                      <p className="text-xs text-[#64748B] mt-0.5">{account.contactPerson}</p>
+                    </div>
                   </div>
-                </TableCell>
-              </TableRow>
-            ) : fleetVehicles.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-[#64748B] py-8">
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 mb-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full flex items-center justify-center">
-                      <Car className="w-8 h-8 text-white" />
+                  {getStatusBadge(account.contractStatus)}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Car className="w-4 h-4 text-[#0A5ED7]" />
+                    <div>
+                      <p className="text-xs text-[#64748B]">Vehicles</p>
+                      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{account.vehicleCount}</p>
                     </div>
-                    {t('vehicles.noVehiclesAssignedToFleet', 'No vehicles assigned to this fleet group')}
                   </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              fleetVehicles.map((vehicle: any) => (
-                <TableRow key={vehicle.fleetVehicle.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid={`row-fleet-vehicle-${vehicle.fleetVehicle.id}`}>
-                  <TableCell className="font-medium text-[#0B1F3B] dark:text-white">
-                    {vehicle.vehicle?.year} {vehicle.vehicle?.make} {vehicle.vehicle?.model}
-                  </TableCell>
-                  <TableCell className="text-[#64748B]">
-                    {vehicle.vehicle?.make} {vehicle.vehicle?.model}
-                  </TableCell>
-                  <TableCell className="text-[#64748B]">{vehicle.vehicle?.licensePlate || "—"}</TableCell>
-                  <TableCell className="text-[#64748B]">
-                    {vehicle.fleetVehicle.averageMonthlyMileage ? `${vehicle.fleetVehicle.averageMonthlyMileage.toLocaleString()} km` : "—"}
-                  </TableCell>
-                  <TableCell className="text-[#64748B]">
-                    {vehicle.fleetVehicle.assignedDate ? format(new Date(vehicle.fleetVehicle.assignedDate), "MMM dd, yyyy") : "—"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditVehicle(vehicle)}
-                        className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
-                        data-testid={`button-edit-fleet-vehicle-${vehicle.fleetVehicle.id}`}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteVehicleMutation.mutate(vehicle.fleetVehicle.id)}
-                        className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
-                        data-testid={`button-delete-fleet-vehicle-${vehicle.fleetVehicle.id}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <div className="flex items-center gap-2">
+                    <Wrench className="w-4 h-4 text-amber-500" />
+                    <div>
+                      <p className="text-xs text-[#64748B]">Active Jobs</p>
+                      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{account.activeJobs}</p>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-emerald-500" />
+                    <div>
+                      <p className="text-xs text-[#64748B]">Monthly Spend</p>
+                      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{formatCurrency(account.monthlySpend)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-[#0BB3FF]" />
+                    <div>
+                      <p className="text-xs text-[#64748B]">Total Spend</p>
+                      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{formatCurrency(account.totalSpend)}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-[#E2E8F0] dark:border-[#232A36] flex justify-between items-center text-xs text-[#64748B]">
+                  <span>Discount: {account.discountPercentage}%</span>
+                  <span>{account.contactEmail}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
+
+  // ── Tab 2: Vehicles ──
+
+  const renderVehiclesTab = () => (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
+        All Fleet Vehicles ({vehicles.length})
+      </h2>
+
+      {vehiclesLoading ? (
+        <div className="text-center py-12 text-[#64748B]">Loading vehicles...</div>
+      ) : (
+        <div className="border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-white dark:bg-[#151A23] overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Plate #</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Make / Model</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Fleet Account</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Status</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Mileage</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Last Service</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Next Service Due</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Avg Monthly Cost</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {vehicles.map((v) => (
+                <TableRow key={v.id} className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
+                  <TableCell className="font-mono font-semibold text-[#0B1F3B] dark:text-white">{v.plateNumber}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">
+                    {v.year} {v.make} {v.model}
+                  </TableCell>
+                  <TableCell className="text-[#64748B]">{v.companyName}</TableCell>
+                  <TableCell>{getStatusBadge(v.status)}</TableCell>
+                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">{v.mileage.toLocaleString()} km</TableCell>
+                  <TableCell>
+                    <div>
+                      <span className="text-[#0B1F3B] dark:text-white text-sm">{formatDate(v.lastServiceDate)}</span>
+                      <br />
+                      <span className="text-xs text-[#64748B]">{v.lastServiceType}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <span className="text-[#0B1F3B] dark:text-white text-sm">{formatDate(v.nextServiceDue)}</span>
+                      <br />
+                      <span className="text-xs text-[#64748B]">{v.nextServiceType}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(v.avgMonthlyCost)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Tab 3: Maintenance Schedule (calendar-style by week) ──
+
+  const renderMaintenanceTab = () => {
+    // Group entries by week
+    const weekGroups = new Map<string, MaintenanceEntry[]>();
+    for (const entry of schedule) {
+      const d = new Date(entry.scheduledDate);
+      const dayOfWeek = d.getDay();
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - dayOfWeek);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      const key = `${weekStart.toISOString().slice(0, 10)}_${weekEnd.toISOString().slice(0, 10)}`;
+      if (!weekGroups.has(key)) weekGroups.set(key, []);
+      weekGroups.get(key)!.push(entry);
+    }
+    const sortedWeeks = Array.from(weekGroups.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+    return (
+      <div className="space-y-6">
+        <h2 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
+          Upcoming Maintenance Schedule ({schedule.length} services)
+        </h2>
+
+        {scheduleLoading ? (
+          <div className="text-center py-12 text-[#64748B]">Loading schedule...</div>
+        ) : sortedWeeks.length === 0 ? (
+          <div className="text-center py-12 text-[#64748B]">No upcoming maintenance scheduled.</div>
+        ) : (
+          <div className="space-y-6">
+            {sortedWeeks.map(([weekKey, entries]) => {
+              const [startStr, endStr] = weekKey.split("_");
+              const weekLabel = `${formatDate(startStr)} - ${formatDate(endStr)}`;
+              const totalCost = entries.reduce((s, e) => s + e.estimatedCost, 0);
+              return (
+                <div key={weekKey} className="border border-[#E2E8F0] dark:border-[#232A36] rounded-xl bg-white dark:bg-[#151A23] overflow-hidden">
+                  <div className="px-5 py-3 bg-gradient-to-r from-[#F8FAFC] to-[#EEF2FF] dark:from-[#0E1117] dark:to-[#151A23] border-b border-[#E2E8F0] dark:border-[#232A36] flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[#0A5ED7]" />
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white text-sm">{weekLabel}</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-[#64748B]">
+                      <span>{entries.length} service{entries.length !== 1 ? 's' : ''}</span>
+                      <span className="font-medium text-[#0B1F3B] dark:text-white">{formatCurrency(totalCost)}</span>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-[#E2E8F0] dark:divide-[#232A36]">
+                    {entries.map((entry) => (
+                      <div key={entry.id} className="px-5 py-3 flex items-center justify-between hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-[#0A5ED7]/10 flex items-center justify-center">
+                            <Wrench className="w-5 h-5 text-[#0A5ED7]" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                              {entry.serviceType}
+                            </p>
+                            <p className="text-xs text-[#64748B]">
+                              {entry.plateNumber} - {entry.vehicleName} ({entry.companyName})
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-sm text-[#0B1F3B] dark:text-white">{formatDate(entry.scheduledDate)}</span>
+                          {getStatusBadge(entry.status)}
+                          <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{formatCurrency(entry.estimatedCost)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ── Tab 4: Analytics ──
+
+  const renderAnalyticsTab = () => {
+    if (analyticsLoading || !analytics) {
+      return <div className="text-center py-12 text-[#64748B]">Loading analytics...</div>;
+    }
+
+    const { summary, revenuePerAccount, serviceByMake, costTrend } = analytics;
+
+    return (
+      <div className="space-y-6">
+        {/* Summary cards */}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-[#0A5ED7]/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-[#0A5ED7]" />
+                </div>
+                <div>
+                  <p className="text-xs text-[#64748B]">Fleet Accounts</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{summary.totalAccounts}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-[#64748B]">Total Vehicles</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{summary.totalVehicles}</p>
+                  <p className="text-xs text-emerald-500">{summary.activeVehicles} active, {summary.inService} in service</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-[#64748B]">Avg Cost / Vehicle</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatCurrency(summary.avgCostPerVehicle)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-[#64748B]">Overdue Maintenance</p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{summary.overdueMaintenanceCount}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts row */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Revenue per fleet account */}
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <CardTitle className="text-[#0B1F3B] dark:text-white text-base flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#0A5ED7]" />
+                Revenue by Fleet Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleBarChart data={revenuePerAccount} labelKey="companyName" valueKey="totalRevenue" color="#0A5ED7" />
+            </CardContent>
+          </Card>
+
+          {/* Service frequency by vehicle make */}
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <CardTitle className="text-[#0B1F3B] dark:text-white text-base flex items-center gap-2">
+                <Car className="w-4 h-4 text-emerald-500" />
+                Service Cost by Vehicle Make
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SimpleBarChart data={serviceByMake} labelKey="make" valueKey="totalCost" color="#10b981" />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Cost trend */}
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white text-base flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-[#0BB3FF]" />
+              Monthly Cost Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-end gap-3 h-48">
+              {costTrend.map((month, i) => {
+                const maxCost = Math.max(...costTrend.map(m => m.totalCost));
+                const heightPct = maxCost > 0 ? (month.totalCost / maxCost) * 100 : 0;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs text-[#0B1F3B] dark:text-white font-medium">{formatCurrency(month.totalCost)}</span>
+                    <div className="w-full flex items-end" style={{ height: '140px' }}>
+                      <div
+                        className="w-full rounded-t-md transition-all duration-500"
+                        style={{
+                          height: `${heightPct}%`,
+                          background: `linear-gradient(180deg, #0A5ED7, #0BB3FF)`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs text-[#64748B] whitespace-nowrap">{month.month.split(' ')[0]}</span>
+                    <span className="text-[10px] text-[#64748B]">{month.vehiclesServiced} svc</span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Detailed table: avg cost per vehicle by account */}
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+          <CardHeader>
+            <CardTitle className="text-[#0B1F3B] dark:text-white text-base flex items-center gap-2">
+              <Gauge className="w-4 h-4 text-amber-500" />
+              Fleet Account Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Company</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Vehicles</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Total Revenue</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Avg Cost / Vehicle</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {revenuePerAccount.map((row) => (
+                  <TableRow key={row.accountId} className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                    <TableCell className="text-[#0B1F3B] dark:text-white font-medium">{row.companyName}</TableCell>
+                    <TableCell className="text-right text-[#64748B]">{row.vehicleCount}</TableCell>
+                    <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(row.totalRevenue)}</TableCell>
+                    <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(row.avgCostPerVehicle)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  // ── Render ──
 
   return (
     <>
       <TabsPageLayout
-        title={t('vehicles.fleetManagement', 'Fleet Management')}
-        description={t('vehicles.manageFleetGroupsVehiclesContracts', 'Manage fleet groups, vehicles, and contracts')}
-        icon={Building2}
+        title="Fleet Management"
+        description="Manage corporate and fleet customer accounts, vehicles, maintenance, and analytics"
+        icon={Truck}
         tabs={[
           {
-            id: "groups",
-            label: t('vehicles.groups', 'Groups'),
+            id: "accounts",
+            label: "Fleet Accounts",
             icon: Building2,
-            content: renderFleetGroupsContent(),
+            content: renderAccountsTab(),
+            badge: accounts.length || undefined,
           },
           {
             id: "vehicles",
-            label: t('vehicles.vehicles', 'Vehicles'),
+            label: "Vehicles",
             icon: Car,
-            content: renderFleetVehiclesContent(),
+            content: renderVehiclesTab(),
+            badge: vehicles.length || undefined,
+          },
+          {
+            id: "maintenance",
+            label: "Maintenance Schedule",
+            icon: Clock,
+            content: renderMaintenanceTab(),
+            badge: schedule.length || undefined,
+          },
+          {
+            id: "analytics",
+            label: "Analytics",
+            icon: BarChart3,
+            content: renderAnalyticsTab(),
           },
         ]}
         activeTab={selectedTab}
         onTabChange={setSelectedTab}
       />
 
-      <Dialog open={isGroupDialogOpen} onOpenChange={setIsGroupDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">
-              {editingGroupId ? t('vehicles.editFleetGroup', 'Edit Fleet Group') : t('vehicles.createFleetGroup', 'Create Fleet Group')}
-            </DialogTitle>
-            <DialogDescription className="text-[#64748B]">
-              {t('vehicles.fleetGroupDescription', 'Manage fleet group information and settings')}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...groupForm}>
-            <form onSubmit={groupForm.handleSubmit((data) => groupMutation.mutate(data))} className="space-y-4">
-              <FormField
-                control={groupForm.control}
-                name="fleetName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.fleetName', 'Fleet Name')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-fleet-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={groupForm.control}
-                name="companyName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.companyName', 'Company Name')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-company-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={groupForm.control}
-                  name="contactPerson"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.contactPerson', 'Contact Person')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-contact-person" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={groupForm.control}
-                  name="contactEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.contactEmail', 'Contact Email')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" value={field.value || ""} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-contact-email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={groupForm.control}
-                name="discountPercentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.discountPercentage', 'Discount Percentage')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" step="0.1" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-discount" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsGroupDialogOpen(false)} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10">
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button type="submit" disabled={groupMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white">
-                  {groupMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isVehicleDialogOpen} onOpenChange={setIsVehicleDialogOpen}>
+      {/* Create Fleet Account Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">
-              {editingVehicleId ? t('vehicles.editFleetVehicle', 'Edit Fleet Vehicle') : t('vehicles.addFleetVehicle', 'Add Fleet Vehicle')}
-            </DialogTitle>
+            <DialogTitle className="text-[#0B1F3B] dark:text-white">Create Fleet Account</DialogTitle>
           </DialogHeader>
-          <Form {...vehicleForm}>
-            <form onSubmit={vehicleForm.handleSubmit((data) => vehicleMutation.mutate(data))} className="space-y-4">
-              <FormField
-                control={vehicleForm.control}
-                name="vehicleId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-vehicle">
-                          <SelectValue placeholder={t('vehicles.selectVehicle', 'Select vehicle')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                        {allVehicles.map((v: any) => (
-                          <SelectItem key={v.id} value={v.id}>
-                            {v.year} {v.make} {v.model} - {v.licensePlate}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+          <div className="space-y-4">
+            <div>
+              <Label className="text-[#0B1F3B] dark:text-white">Company Name *</Label>
+              <Input
+                value={newCompanyName}
+                onChange={(e) => setNewCompanyName(e.target.value)}
+                placeholder="Enter company name"
+                className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
-              <FormField
-                control={vehicleForm.control}
-                name="averageMonthlyMileage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.avgMonthlyMileage', 'Average Monthly Mileage')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-mileage" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            <div>
+              <Label className="text-[#0B1F3B] dark:text-white">Contact Person</Label>
+              <Input
+                value={newContactPerson}
+                onChange={(e) => setNewContactPerson(e.target.value)}
+                placeholder="Primary contact name"
+                className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               />
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsVehicleDialogOpen(false)} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10">
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button type="submit" disabled={vehicleMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white">
-                  {vehicleMutation.isPending ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-[#0B1F3B] dark:text-white">Email</Label>
+                <Input
+                  value={newContactEmail}
+                  onChange={(e) => setNewContactEmail(e.target.value)}
+                  placeholder="email@company.com"
+                  type="email"
+                  className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-[#0B1F3B] dark:text-white">Phone</Label>
+                <Input
+                  value={newContactPhone}
+                  onChange={(e) => setNewContactPhone(e.target.value)}
+                  placeholder="+966 5x xxx xxxx"
+                  className="mt-1 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10">
+              Cancel
+            </Button>
+            <Button onClick={handleCreateAccount} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white">
+              Create Account
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

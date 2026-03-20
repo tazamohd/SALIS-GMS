@@ -18,6 +18,7 @@ import { PurchaseOrders } from "@/pages/PurchaseOrders";
 import { Invoices } from "@/pages/Invoices";
 import Payments from "@/pages/Payments";
 import { Estimates } from "@/pages/Estimates";
+import EstimatesQuotations from "@/pages/EstimatesQuotations";
 import { Reports } from "@/pages/Reports";
 import { JobCards } from "@/pages/JobCards";
 import { Profile } from "@/pages/Profile";
@@ -76,6 +77,7 @@ import FleetManagement from "@/pages/FleetManagement";
 import FleetTracking from "@/pages/FleetTracking";
 import ContractManagement from "@/pages/ContractManagement";
 import WarrantyManagement from "@/pages/WarrantyManagement";
+import WarrantyContracts from "@/pages/WarrantyContracts";
 import VehicleInspections from "@/pages/VehicleInspections";
 import VehicleChecklist from "@/pages/VehicleChecklist";
 import TowingAssistance from "@/pages/TowingAssistance";
@@ -83,6 +85,7 @@ import LoanerVehicles from "@/pages/LoanerVehicles";
 import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
 import MarketingAutomation from "@/pages/MarketingAutomation";
 import MarketingHub from "@/pages/MarketingHub";
+import WhatsAppIntegration from "@/pages/WhatsAppIntegration";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
 import CRMLoyalty from "@/pages/CRMLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
@@ -130,6 +133,7 @@ import InsuranceClaims from "@/pages/InsuranceClaims";
 import BarcodeScanner from "@/pages/BarcodeScanner";
 import DigitalSignage from "@/pages/DigitalSignage";
 import KioskCheckIn from "@/pages/KioskCheckIn";
+import SelfServiceKiosk from "@/pages/SelfServiceKiosk";
 import SecurityCameras from "@/pages/SecurityCameras";
 import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
 import EmergingTechnologies from "@/pages/EmergingTechnologies";
@@ -364,6 +368,11 @@ function Router() {
           <WarrantyManagement />
         </Layout>
       </Route>
+      <Route path="/warranty-contracts">
+        <Layout>
+          <WarrantyContracts />
+        </Layout>
+      </Route>
       <Route path="/vehicle-inspections">
         <Layout>
           <VehicleInspections />
@@ -464,6 +473,11 @@ function Router() {
           <Estimates />
         </Layout>
       </Route>
+      <Route path="/estimates-quotations">
+        <Layout>
+          <EstimatesQuotations />
+        </Layout>
+      </Route>
       <Route path="/reports">
         <Layout>
           <Reports />
@@ -512,6 +526,11 @@ function Router() {
       <Route path="/support-chat-dashboard">
         <Layout>
           <SupportChatDashboard />
+        </Layout>
+      </Route>
+      <Route path="/whatsapp">
+        <Layout>
+          <WhatsAppIntegration />
         </Layout>
       </Route>
       <Route path="/suppliers">
@@ -1125,6 +1144,9 @@ function Router() {
         <Layout>
           <KioskCheckIn />
         </Layout>
+      </Route>
+      <Route path="/kiosk">
+        <SelfServiceKiosk />
       </Route>
       <Route path="/security-cameras">
         <Layout>
