@@ -1,14 +1,5 @@
-// Environment variable validation
-const REQUIRED_ENV = ['DATABASE_URL', 'SESSION_SECRET'] as const;
-const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
-if (missing.length > 0) {
-  console.error(`❌ Missing required environment variables: ${missing.join(', ')}`);
-  process.exit(1);
-}
-
-if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
-  process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-}
+// Validate environment variables on startup (fails fast if required vars missing)
+import "./config";
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes/index";

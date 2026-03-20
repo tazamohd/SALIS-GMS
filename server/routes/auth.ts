@@ -8,7 +8,8 @@ const router = Router();
 
 // Subscription plan is now included in req.user via passport.deserializeUser
 router.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json(req.user);
+  const { password: _, ...userWithoutPassword } = req.user as any;
+  res.status(200).json(userWithoutPassword);
 });
 
 router.post("/logout", (req, res, next) => {
@@ -20,7 +21,8 @@ router.post("/logout", (req, res, next) => {
 
 router.get("/user", (req, res) => {
   if (req.isAuthenticated()) {
-    return res.json(req.user);
+    const { password: _, ...userWithoutPassword } = req.user as any;
+    return res.json(userWithoutPassword);
   }
   res.status(401).json({ message: "Not authenticated" });
 });

@@ -147,7 +147,7 @@ import AutomatedReordering from "@/pages/AutomatedReordering";
 import LoyaltyProgram from "@/pages/LoyaltyProgram";
 import WorkshopCalendar from "@/pages/WorkshopCalendar";
 import ComputerVisionQC from "@/pages/ComputerVisionQC";
-import SmartPartsRecommender from "@/pages/SmartPartsRecommender";
+// SmartPartsRecommender merged into SmartPartsRecommendations
 import DynamicPricing from "@/pages/DynamicPricing";
 import VehicleTracking from "@/pages/VehicleTracking";
 import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
@@ -172,7 +172,7 @@ import ComplianceManagement from "@/pages/ComplianceManagement";
 import SocialMediaMonitoring from "@/pages/SocialMediaMonitoring";
 import StaffPerformanceReview from "@/pages/StaffPerformanceReview";
 import SustainableEnergyMonitoring from "@/pages/SustainableEnergyMonitoring";
-import TaskManagement from "@/pages/TaskManagement";
+// TaskManagement merged into TasksManagement
 import TechnicianPerformance from "@/pages/TechnicianPerformance";
 import TimesheetManagement from "@/pages/TimesheetManagement";
 import VehicleHistory from "@/pages/VehicleHistory";
@@ -180,7 +180,7 @@ import CustomerFeedback from "@/pages/CustomerFeedback";
 import DataBackup from "@/pages/DataBackup";
 import DashboardWidgets from "@/pages/DashboardWidgets";
 import Vehicles from "@/pages/Vehicles";
-import VoiceCommandInterface from "@/pages/VoiceCommandInterface";
+// VoiceCommandInterface merged into VoiceCommands
 import WearableIntegration from "@/pages/WearableIntegration";
 import BankAccountManagement from "@/pages/BankAccountManagement";
 import InternalWarehouse from "@/pages/InternalWarehouse";
@@ -1234,7 +1234,7 @@ function Router() {
       </Route>
       <Route path="/smart-parts-recommender">
         <Layout>
-          <SmartPartsRecommender />
+          <SmartPartsRecommendations />
         </Layout>
       </Route>
       <Route path="/dynamic-pricing">
@@ -1336,7 +1336,7 @@ function Router() {
       </Route>
       <Route path="/task-management">
         <Layout>
-          <TaskManagement />
+          <TasksManagement />
         </Layout>
       </Route>
       <Route path="/technician-performance">
@@ -1361,7 +1361,7 @@ function Router() {
       </Route>
       <Route path="/voice-command-interface">
         <Layout>
-          <VoiceCommandInterface />
+          <VoiceCommands />
         </Layout>
       </Route>
       <Route path="/wearable-integration">

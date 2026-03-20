@@ -2366,8 +2366,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
 
+      // Coerce date strings from JSON
+      const body = { ...req.body };
+      if (typeof body.serviceDate === 'string') body.serviceDate = new Date(body.serviceDate);
+
       const validationResult = insertVehicleServiceHistorySchema.safeParse({
-        ...req.body,
+        ...body,
         vehicleId: id,
         performedBy: userId
       });
@@ -3947,8 +3951,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertInvoiceSchema } = await import("@shared/schema");
       const userId = req.user?.id || 'default-user';
-      
-      const validationResult = insertInvoiceSchema.safeParse(req.body);
+
+      // Coerce date strings from JSON to Date objects
+      const body = { ...req.body };
+      if (typeof body.dueDate === 'string') body.dueDate = new Date(body.dueDate);
+      if (typeof body.invoiceDate === 'string') body.invoiceDate = new Date(body.invoiceDate);
+
+      const validationResult = insertInvoiceSchema.safeParse(body);
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -3982,6 +3991,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Coerce date strings from JSON
+      if (typeof invoice.dueDate === 'string') invoice.dueDate = new Date(invoice.dueDate);
+      if (typeof invoice.invoiceDate === 'string') invoice.invoiceDate = new Date(invoice.invoiceDate);
+
       const invoiceValidation = insertInvoiceSchema.safeParse(invoice);
       if (!invoiceValidation.success) {
         return res.status(400).json(sanitizeZodError(invoiceValidation.error));
