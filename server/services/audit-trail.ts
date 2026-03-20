@@ -1,3 +1,6 @@
+import { db } from '../db';
+import { sql } from 'drizzle-orm';
+
 export interface AuditEntry {
   id: string;
   timestamp: string;
@@ -13,22 +16,62 @@ export interface AuditEntry {
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
-// In-memory audit log (would be DB table in production)
-const auditLog: AuditEntry[] = [];
-let nextId = 1;
-
-export function logAudit(entry: Omit<AuditEntry, 'id' | 'timestamp'>): AuditEntry {
-  const audit: AuditEntry = {
-    id: String(nextId++),
-    timestamp: new Date().toISOString(),
-    ...entry,
-  };
-  auditLog.unshift(audit);
-  if (auditLog.length > 1000) auditLog.length = 1000;
-  return audit;
+// Auto-create table if not exists
+async function ensureTable() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS audit_log (
+      id SERIAL PRIMARY KEY,
+      timestamp TIMESTAMP DEFAULT NOW(),
+      user_id TEXT NOT NULL,
+      user_name TEXT NOT NULL,
+      action TEXT NOT NULL,
+      resource TEXT NOT NULL,
+      resource_id TEXT,
+      details TEXT,
+      ip_address TEXT,
+      user_agent TEXT,
+      garage_id TEXT NOT NULL,
+      severity TEXT NOT NULL DEFAULT 'low'
+    )
+  `);
 }
 
-export function getAuditLog(options?: {
+let tableReady = false;
+async function init() {
+  if (!tableReady) {
+    await ensureTable();
+    tableReady = true;
+  }
+}
+
+function rowToAuditEntry(row: any): AuditEntry {
+  return {
+    id: String(row.id),
+    timestamp: row.timestamp instanceof Date ? row.timestamp.toISOString() : String(row.timestamp),
+    userId: row.user_id,
+    userName: row.user_name,
+    action: row.action,
+    resource: row.resource,
+    resourceId: row.resource_id || '',
+    details: row.details || '',
+    ipAddress: row.ip_address || '',
+    userAgent: row.user_agent || '',
+    garageId: row.garage_id,
+    severity: row.severity as AuditEntry['severity'],
+  };
+}
+
+export async function logAudit(entry: Omit<AuditEntry, 'id' | 'timestamp'>): Promise<AuditEntry> {
+  await init();
+  const result = await db.execute(sql`
+    INSERT INTO audit_log (user_id, user_name, action, resource, resource_id, details, ip_address, user_agent, garage_id, severity)
+    VALUES (${entry.userId}, ${entry.userName}, ${entry.action}, ${entry.resource}, ${entry.resourceId}, ${entry.details}, ${entry.ipAddress}, ${entry.userAgent}, ${entry.garageId}, ${entry.severity})
+    RETURNING *
+  `);
+  return rowToAuditEntry(result.rows[0]);
+}
+
+export async function getAuditLog(options?: {
   garageId?: string;
   userId?: string;
   resource?: string;
@@ -38,51 +81,111 @@ export function getAuditLog(options?: {
   to?: string;
   limit?: number;
   offset?: number;
-}): { entries: AuditEntry[]; total: number } {
-  let filtered = [...auditLog];
-  if (options?.garageId) filtered = filtered.filter(e => e.garageId === options.garageId);
-  if (options?.userId) filtered = filtered.filter(e => e.userId === options.userId);
-  if (options?.resource) filtered = filtered.filter(e => e.resource === options.resource);
-  if (options?.action) filtered = filtered.filter(e => e.action === options.action);
-  if (options?.severity) filtered = filtered.filter(e => e.severity === options.severity);
-  if (options?.from) filtered = filtered.filter(e => e.timestamp >= options.from!);
-  if (options?.to) filtered = filtered.filter(e => e.timestamp <= options.to!);
-
-  const total = filtered.length;
-  const offset = options?.offset || 0;
+}): Promise<{ entries: AuditEntry[]; total: number }> {
+  await init();
   const limit = options?.limit || 50;
+  const offset = options?.offset || 0;
 
-  return { entries: filtered.slice(offset, offset + limit), total };
+  // Build conditions
+  const conditions: ReturnType<typeof sql>[] = [];
+  if (options?.garageId) conditions.push(sql`garage_id = ${options.garageId}`);
+  if (options?.userId) conditions.push(sql`user_id = ${options.userId}`);
+  if (options?.resource) conditions.push(sql`resource = ${options.resource}`);
+  if (options?.action) conditions.push(sql`action = ${options.action}`);
+  if (options?.severity) conditions.push(sql`severity = ${options.severity}`);
+  if (options?.from) conditions.push(sql`timestamp >= ${options.from}::timestamp`);
+  if (options?.to) conditions.push(sql`timestamp <= ${options.to}::timestamp`);
+
+  let whereClause = sql`1=1`;
+  for (const cond of conditions) {
+    whereClause = sql`${whereClause} AND ${cond}`;
+  }
+
+  const countResult = await db.execute(sql`
+    SELECT COUNT(*) as count FROM audit_log WHERE ${whereClause}
+  `);
+  const total = Number(countResult.rows[0].count);
+
+  const result = await db.execute(sql`
+    SELECT * FROM audit_log WHERE ${whereClause}
+    ORDER BY timestamp DESC LIMIT ${limit} OFFSET ${offset}
+  `);
+
+  return { entries: result.rows.map(rowToAuditEntry), total };
 }
 
-export function getAuditStats(garageId: string) {
-  const entries = auditLog.filter(e => e.garageId === garageId);
-  const last24h = entries.filter(e => new Date(e.timestamp) > new Date(Date.now() - 86400000));
+export async function getAuditStats(garageId: string) {
+  await init();
 
+  // Total entries for this garage
+  const totalResult = await db.execute(sql`
+    SELECT COUNT(*) as count FROM audit_log WHERE garage_id = ${garageId}
+  `);
+  const total = Number(totalResult.rows[0].count);
+
+  // Last 24h count
+  const last24hResult = await db.execute(sql`
+    SELECT COUNT(*) as count FROM audit_log
+    WHERE garage_id = ${garageId} AND timestamp > NOW() - INTERVAL '24 hours'
+  `);
+  const last24h = Number(last24hResult.rows[0].count);
+
+  // Action counts (last 24h)
+  const actionResult = await db.execute(sql`
+    SELECT action, COUNT(*) as count FROM audit_log
+    WHERE garage_id = ${garageId} AND timestamp > NOW() - INTERVAL '24 hours'
+    GROUP BY action
+  `);
   const actionCounts: Record<string, number> = {};
-  const resourceCounts: Record<string, number> = {};
-  const severityCounts = { low: 0, medium: 0, high: 0, critical: 0 };
+  for (const row of actionResult.rows) {
+    actionCounts[row.action as string] = Number(row.count);
+  }
 
-  last24h.forEach(e => {
-    actionCounts[e.action] = (actionCounts[e.action] || 0) + 1;
-    resourceCounts[e.resource] = (resourceCounts[e.resource] || 0) + 1;
-    severityCounts[e.severity]++;
-  });
+  // Resource counts (last 24h)
+  const resourceResult = await db.execute(sql`
+    SELECT resource, COUNT(*) as count FROM audit_log
+    WHERE garage_id = ${garageId} AND timestamp > NOW() - INTERVAL '24 hours'
+    GROUP BY resource
+  `);
+  const resourceCounts: Record<string, number> = {};
+  for (const row of resourceResult.rows) {
+    resourceCounts[row.resource as string] = Number(row.count);
+  }
+
+  // Severity counts (last 24h)
+  const severityResult = await db.execute(sql`
+    SELECT severity, COUNT(*) as count FROM audit_log
+    WHERE garage_id = ${garageId} AND timestamp > NOW() - INTERVAL '24 hours'
+    GROUP BY severity
+  `);
+  const severityCounts: Record<string, number> = { low: 0, medium: 0, high: 0, critical: 0 };
+  for (const row of severityResult.rows) {
+    severityCounts[row.severity as string] = Number(row.count);
+  }
+
+  // Top users (last 24h)
+  const topUsersResult = await db.execute(sql`
+    SELECT user_name, COUNT(*) as count FROM audit_log
+    WHERE garage_id = ${garageId} AND timestamp > NOW() - INTERVAL '24 hours'
+    GROUP BY user_name ORDER BY count DESC LIMIT 5
+  `);
+  const topUsers = topUsersResult.rows.map((row: any) => ({
+    name: row.user_name as string,
+    count: Number(row.count),
+  }));
 
   return {
-    total: entries.length,
-    last24h: last24h.length,
+    total,
+    last24h,
     actionCounts,
     resourceCounts,
     severityCounts,
-    topUsers: Object.entries(
-      last24h.reduce((acc: Record<string, number>, e) => { acc[e.userName] = (acc[e.userName] || 0) + 1; return acc; }, {})
-    ).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count })),
+    topUsers,
   };
 }
 
 // Seed demo audit entries
-export function seedAuditLog(garageId: string) {
+export async function seedAuditLog(garageId: string) {
   const demoEntries = [
     { userId: '1', userName: 'Admin', action: 'LOGIN', resource: 'auth', resourceId: '1', details: 'Successful login', severity: 'low' as const },
     { userId: '2', userName: 'Mohammed', action: 'CREATE', resource: 'job_card', resourceId: 'JC-1042', details: 'Created job card for Toyota Camry', severity: 'low' as const },
@@ -96,5 +199,12 @@ export function seedAuditLog(garageId: string) {
     { userId: '3', userName: 'Sara', action: 'UPDATE', resource: 'job_card', resourceId: 'JC-1038', details: 'Status changed to completed', severity: 'low' as const },
   ];
 
-  demoEntries.forEach(e => logAudit({ ...e, ipAddress: '192.168.1.' + Math.floor(Math.random() * 255), userAgent: 'Mozilla/5.0', garageId }));
+  for (const e of demoEntries) {
+    await logAudit({
+      ...e,
+      ipAddress: '192.168.1.' + Math.floor(Math.random() * 255),
+      userAgent: 'Mozilla/5.0',
+      garageId,
+    });
+  }
 }

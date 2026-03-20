@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { 
-  LayoutDashboard, 
-  Link as LinkIcon, 
-  Plus, 
-  TrendingUp, 
-  DollarSign, 
-  Eye, 
+import {
+  LayoutDashboard,
+  Link as LinkIcon,
+  Plus,
+  TrendingUp,
+  DollarSign,
+  Eye,
   MousePointer,
   BarChart3,
   Settings,
@@ -43,67 +44,60 @@ const PLATFORMS = [
   { id: "youtube", name: "YouTube Ads", icon: SiYoutube, color: "text-red-600", type: "video" },
 ];
 
-const MOCK_ACCOUNTS = [
-  { id: "1", providerId: "google_ads", name: "SALIS AUTO - Search Campaigns", status: "connected", spend: 4520.50, budget: 5000, impressions: 125000, clicks: 3200, conversions: 85 },
-  { id: "2", providerId: "facebook", name: "SALIS AUTO - Social Media", status: "connected", spend: 2150.00, budget: 3000, impressions: 89000, clicks: 2100, conversions: 42 },
-  { id: "3", providerId: "instagram", name: "SALIS AUTO - Instagram Brand", status: "connected", spend: 1850.00, budget: 2500, impressions: 67000, clicks: 1850, conversions: 28 },
-  { id: "4", providerId: "linkedin", name: "SALIS AUTO - B2B Outreach", status: "pending", spend: 0, budget: 1500, impressions: 0, clicks: 0, conversions: 0 },
-];
-
-const MOCK_CAMPAIGNS = [
-  { id: "1", accountId: "1", name: "Winter Service Promotion", objective: "conversions", status: "active", budget: 1500, spent: 1280.50, impressions: 45000, clicks: 1200, conversions: 32, ctr: 2.67, cpc: 1.07 },
-  { id: "2", accountId: "1", name: "Oil Change Special", objective: "traffic", status: "active", budget: 800, spent: 650.00, impressions: 28000, clicks: 890, conversions: 18, ctr: 3.18, cpc: 0.73 },
-  { id: "3", accountId: "2", name: "New Customer Acquisition", objective: "leads", status: "active", budget: 1200, spent: 980.00, impressions: 52000, clicks: 1450, conversions: 25, ctr: 2.79, cpc: 0.68 },
-  { id: "4", accountId: "3", name: "Brand Awareness - Stories", objective: "awareness", status: "paused", budget: 500, spent: 320.00, impressions: 35000, clicks: 650, conversions: 8, ctr: 1.86, cpc: 0.49 },
-  { id: "5", accountId: "1", name: "Summer Tire Sale", objective: "conversions", status: "draft", budget: 2000, spent: 0, impressions: 0, clicks: 0, conversions: 0, ctr: 0, cpc: 0 },
-];
-
-const MOCK_TASKS = [
-  { id: "1", title: "Set up LinkedIn Ads account", type: "account_setup", status: "pending", priority: "high", dueDate: "2024-12-20" },
-  { id: "2", title: "Review Google Ads performance", type: "performance_review", status: "in_progress", priority: "medium", dueDate: "2024-12-18" },
-  { id: "3", title: "Create new Facebook ad creatives", type: "creative_review", status: "pending", priority: "medium", dueDate: "2024-12-22" },
-  { id: "4", title: "Optimize campaign budgets", type: "budget_review", status: "completed", priority: "low", dueDate: "2024-12-15" },
-];
-
-const MOCK_CONVERSATIONS = [
-  { id: "1", providerId: "facebook", name: "Ahmed Al-Rashid", handle: "@ahmed_rashid", avatar: "", status: "open", unread: 2, lastMessage: "Hi, I saw your ad about the winter service special. Is it still available?", lastMessageTime: "10 min ago", platform: "Messenger" },
-  { id: "2", providerId: "instagram", name: "Sara Al-Mansouri", handle: "@sara_cars", avatar: "", status: "open", unread: 1, lastMessage: "When is the best time to come for an oil change?", lastMessageTime: "25 min ago", platform: "Instagram DM" },
-  { id: "3", providerId: "twitter", name: "Mohammed Fahad", handle: "@mfahad_auto", avatar: "", status: "pending", unread: 0, lastMessage: "Thanks for the quick response!", lastMessageTime: "1 hour ago", platform: "X DM" },
-  { id: "4", providerId: "facebook", name: "Layla Hassan", handle: "@layla.hassan", avatar: "", status: "open", unread: 3, lastMessage: "Do you offer pickup service for my car?", lastMessageTime: "2 hours ago", platform: "Messenger" },
-  { id: "5", providerId: "linkedin", name: "Khalid Ibrahim", handle: "Khalid Ibrahim", avatar: "", status: "resolved", unread: 0, lastMessage: "Great, I'll schedule the fleet service for next week.", lastMessageTime: "1 day ago", platform: "LinkedIn" },
-];
-
-const MOCK_MESSAGES = [
-  { id: "1", conversationId: "1", direction: "inbound", content: "Hi, I saw your ad about the winter service special. Is it still available?", time: "10:30 AM" },
-  { id: "2", conversationId: "1", direction: "outbound", content: "Hello Ahmed! Yes, our Winter Service Special is still available until December 31st. Would you like to book an appointment?", time: "10:35 AM" },
-  { id: "3", conversationId: "1", direction: "inbound", content: "Yes please! What times are available this Saturday?", time: "10:38 AM" },
-];
-
-const MOCK_COMMENT_THREADS = [
-  { id: "1", providerId: "facebook", postContent: "Winter is here! Get your car ready with our comprehensive winter service package...", platform: "Facebook", totalComments: 12, unreplied: 3, sentiment: "positive" },
-  { id: "2", providerId: "instagram", postContent: "Before & After: Watch this amazing transformation of a 2020 BMW...", platform: "Instagram", totalComments: 45, unreplied: 8, sentiment: "mixed" },
-  { id: "3", providerId: "youtube", postContent: "How to maintain your car's engine: Expert tips from SALIS AUTO", platform: "YouTube", totalComments: 89, unreplied: 15, sentiment: "positive" },
-];
-
-const MOCK_COMMENTS = [
-  { id: "1", threadId: "1", author: "Ali Mohammed", content: "Great service! I brought my car last week and they did an amazing job.", likes: 5, sentiment: "positive", hasReplied: true, postedAt: "2 hours ago" },
-  { id: "2", threadId: "1", author: "Fatima Al-Saud", content: "What's included in the winter package?", likes: 2, sentiment: "neutral", hasReplied: false, postedAt: "3 hours ago" },
-  { id: "3", threadId: "1", author: "Hassan Khalil", content: "How much does the full service cost?", likes: 1, sentiment: "neutral", hasReplied: false, postedAt: "4 hours ago" },
-  { id: "4", threadId: "2", author: "Noor Ahmed", content: "Wow! Amazing transformation 👏", likes: 12, sentiment: "positive", hasReplied: true, postedAt: "1 day ago" },
-  { id: "5", threadId: "2", author: "Yusuf Ibrahim", content: "Is this covered under warranty?", likes: 3, sentiment: "neutral", hasReplied: false, postedAt: "1 day ago" },
-];
-
 export default function MarketingHub() {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState("overview");
   const [isConnectDialogOpen, setIsConnectDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
 
-  const totalSpend = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.spend, 0);
-  const totalBudget = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.budget, 0);
-  const totalImpressions = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.impressions, 0);
-  const totalClicks = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.clicks, 0);
-  const totalConversions = MOCK_ACCOUNTS.reduce((sum, acc) => sum + acc.conversions, 0);
+  const { data: accountsData } = useQuery<{ accounts: any[] }>({
+    queryKey: ['/api/marketing/accounts'],
+    queryFn: async () => {
+      const response = await fetch('/api/marketing/accounts');
+      if (!response.ok) throw new Error('Failed to fetch accounts');
+      return response.json();
+    },
+  });
+  const accounts = accountsData?.accounts ?? [];
+
+  const { data: campaignsData } = useQuery<{ campaigns: any[] }>({
+    queryKey: ['/api/marketing/campaigns'],
+    queryFn: async () => {
+      const response = await fetch('/api/marketing/campaigns');
+      if (!response.ok) throw new Error('Failed to fetch campaigns');
+      return response.json();
+    },
+  });
+  const campaigns = campaignsData?.campaigns ?? [];
+
+  const { data: tasksData } = useQuery<{ tasks: any[] }>({
+    queryKey: ['/api/marketing/tasks'],
+    queryFn: async () => {
+      const response = await fetch('/api/marketing/tasks');
+      if (!response.ok) throw new Error('Failed to fetch tasks');
+      return response.json();
+    },
+  });
+  const tasks = tasksData?.tasks ?? [];
+
+  const { data: socialData } = useQuery<{ conversations: any[]; messages: any[]; commentThreads: any[]; comments: any[] }>({
+    queryKey: ['/api/marketing/social'],
+    queryFn: async () => {
+      const response = await fetch('/api/marketing/social');
+      if (!response.ok) throw new Error('Failed to fetch social data');
+      return response.json();
+    },
+  });
+  const conversations = socialData?.conversations ?? [];
+  const messages = socialData?.messages ?? [];
+  const commentThreads = socialData?.commentThreads ?? [];
+  const comments = socialData?.comments ?? [];
+
+  const totalSpend = accounts.reduce((sum: number, acc: any) => sum + (acc.spend || 0), 0);
+  const totalBudget = accounts.reduce((sum: number, acc: any) => sum + (acc.budget || 0), 0);
+  const totalImpressions = accounts.reduce((sum: number, acc: any) => sum + (acc.impressions || 0), 0);
+  const totalClicks = accounts.reduce((sum: number, acc: any) => sum + (acc.clicks || 0), 0);
+  const totalConversions = accounts.reduce((sum: number, acc: any) => sum + (acc.conversions || 0), 0);
   const avgCTR = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : "0";
 
   const getPlatformInfo = (providerId: string) => {
@@ -191,7 +185,7 @@ export default function MarketingHub() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {MOCK_ACCOUNTS.map(account => {
+              {accounts.map(account => {
                 const platform = getPlatformInfo(account.providerId);
                 const PlatformIcon = platform.icon;
                 const spendPercent = (account.spend / account.budget) * 100;
@@ -244,7 +238,7 @@ export default function MarketingHub() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {MOCK_TASKS.filter(t => t.status !== "completed").map(task => (
+              {tasks.filter(t => t.status !== "completed").map(task => (
                 <div 
                   key={task.id} 
                   className="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors"
@@ -281,8 +275,8 @@ export default function MarketingHub() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {MOCK_CAMPAIGNS.filter(c => c.status === "active").map(campaign => {
-              const account = MOCK_ACCOUNTS.find(a => a.id === campaign.accountId);
+            {campaigns.filter(c => c.status === "active").map(campaign => {
+              const account = accounts.find(a => a.id === campaign.accountId);
               const platform = account ? getPlatformInfo(account.providerId) : null;
               const PlatformIcon = platform?.icon || LayoutDashboard;
               
@@ -342,7 +336,7 @@ export default function MarketingHub() {
 
       <div className="grid gap-4">
         {PLATFORMS.map(platform => {
-          const accounts = MOCK_ACCOUNTS.filter(a => a.providerId === platform.id);
+          const accounts = accounts.filter(a => a.providerId === platform.id);
           const PlatformIcon = platform.icon;
           
           return (
@@ -459,8 +453,8 @@ export default function MarketingHub() {
       </div>
 
       <div className="space-y-3">
-        {MOCK_CAMPAIGNS.map(campaign => {
-          const account = MOCK_ACCOUNTS.find(a => a.id === campaign.accountId);
+        {campaigns.map(campaign => {
+          const account = accounts.find(a => a.id === campaign.accountId);
           const platform = account ? getPlatformInfo(account.providerId) : null;
           const PlatformIcon = platform?.icon || LayoutDashboard;
           const budgetPercent = (campaign.spent / campaign.budget) * 100;
@@ -522,8 +516,8 @@ export default function MarketingHub() {
           <p className="text-sm text-[#64748B]">{t('marketing.manageConversations', 'Manage all conversations from one place')}</p>
         </div>
         <div className="flex gap-2">
-          <Badge className="bg-green-600 text-white">{t('marketing.open', 'Open')}: {MOCK_CONVERSATIONS.filter(c => c.status === "open").length}</Badge>
-          <Badge className="bg-[#64748B] text-white">{t('marketing.pending', 'Pending')}: {MOCK_CONVERSATIONS.filter(c => c.status === "pending").length}</Badge>
+          <Badge className="bg-green-600 text-white">{t('marketing.open', 'Open')}: {conversations.filter(c => c.status === "open").length}</Badge>
+          <Badge className="bg-[#64748B] text-white">{t('marketing.pending', 'Pending')}: {conversations.filter(c => c.status === "pending").length}</Badge>
         </div>
       </div>
 
@@ -538,7 +532,7 @@ export default function MarketingHub() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-[#E2E8F0] dark:divide-[#232A36]">
-                {MOCK_CONVERSATIONS.map(conv => {
+                {conversations.map(conv => {
                   const platform = getPlatformInfo(conv.providerId);
                   const PlatformIcon = platform.icon;
                   
@@ -608,7 +602,7 @@ export default function MarketingHub() {
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-4 mb-4">
-                {MOCK_MESSAGES.map(msg => (
+                {messages.map(msg => (
                   <div 
                     key={msg.id}
                     className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
@@ -644,14 +638,14 @@ export default function MarketingHub() {
           <h3 className="text-lg font-semibold text-[#0B1F3B] dark:text-white">{t('marketing.commentManagement', 'Comment Management')}</h3>
           <p className="text-sm text-[#64748B]">{t('marketing.respondToComments', 'Respond to comments across all platforms')}</p>
         </div>
-        <Badge className="bg-[#F97316] text-white">{t('marketing.unreplied', 'Unreplied')}: {MOCK_COMMENT_THREADS.reduce((sum, t) => sum + t.unreplied, 0)}</Badge>
+        <Badge className="bg-[#F97316] text-white">{t('marketing.unreplied', 'Unreplied')}: {commentThreads.reduce((sum: number, thread: any) => sum + (thread.unreplied || 0), 0)}</Badge>
       </div>
 
       <div className="space-y-4">
-        {MOCK_COMMENT_THREADS.map(thread => {
+        {commentThreads.map(thread => {
           const platform = getPlatformInfo(thread.providerId);
           const PlatformIcon = platform.icon;
-          const threadComments = MOCK_COMMENTS.filter(c => c.threadId === thread.id);
+          const threadComments = comments.filter(c => c.threadId === thread.id);
           
           return (
             <Card key={thread.id} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`thread-${thread.id}`}>
@@ -743,14 +737,14 @@ export default function MarketingHub() {
             label: t('marketing.inbox', 'Inbox'),
             icon: MessageCircle,
             content: inboxContent,
-            badge: MOCK_CONVERSATIONS.filter(c => c.unread > 0).length,
+            badge: conversations.filter(c => c.unread > 0).length,
           },
           {
             id: "comments",
             label: t('marketing.comments', 'Comments'),
             icon: MessageCircle,
             content: commentsContent,
-            badge: MOCK_COMMENT_THREADS.reduce((sum, t) => sum + t.unreplied, 0),
+            badge: commentThreads.reduce((sum: number, thread: any) => sum + (thread.unreplied || 0), 0),
           },
         ]}
         activeTab={selectedTab}

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { validate } from '../middleware/validate';
+import { technicianClockSchema, technicianJobUpdateSchema, partsRequestSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -24,7 +26,7 @@ router.get('/technician/my-jobs/:techId', async (req, res) => {
 });
 
 // POST /api/technician/clock - Clock in/out
-router.post('/technician/clock', async (req, res) => {
+router.post('/technician/clock', validate(technicianClockSchema), async (req, res) => {
   const { technicianId, action, timestamp } = req.body;
   try {
     await db.execute(sql`
@@ -43,7 +45,7 @@ router.post('/technician/clock', async (req, res) => {
 });
 
 // POST /api/technician/job-update - Update job status/notes
-router.post('/technician/job-update', async (req, res) => {
+router.post('/technician/job-update', validate(technicianJobUpdateSchema), async (req, res) => {
   const { jobId, status, notes, technicianId } = req.body;
   try {
     await db.execute(sql`
@@ -56,7 +58,7 @@ router.post('/technician/job-update', async (req, res) => {
 });
 
 // POST /api/technician/parts-request - Request parts for a job
-router.post('/technician/parts-request', async (req, res) => {
+router.post('/technician/parts-request', validate(partsRequestSchema), async (req, res) => {
   const { jobId, technicianId, partName, quantity, urgency, notes } = req.body;
   res.json({
     success: true,

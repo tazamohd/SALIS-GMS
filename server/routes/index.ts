@@ -11,6 +11,7 @@ import partsRecommendationsRoutes from "./parts-recommendations";
 import reportsRoutes from "./reports";
 import notificationCenterRoutes from "./notifications";
 import auditRoutes from "./audit";
+import marketingRoutes from "./marketing";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -87,6 +88,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Audit Trail routes
   app.use("/api", auditRoutes);
   console.log("✅ Audit Trail Routes Loaded");
+
+  // Marketing Hub routes
+  app.use("/api", marketingRoutes);
+  console.log("✅ Marketing Hub Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

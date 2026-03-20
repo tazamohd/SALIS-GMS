@@ -1,37 +1,40 @@
 import { Router } from 'express';
 import { getNotifications, markAsRead, markAllAsRead, getUnreadCount, deleteNotification, createNotification, getPreferences, updatePreferences } from '../services/notification-center';
+import { validate } from '../middleware/validate';
+import { notificationPreferencesSchema } from '../schemas/validation';
 
 const router = Router();
 
-router.get('/notifications', (req, res) => {
+router.get('/notifications', async (req, res) => {
   const userId = (req as any).user?.id || '1';
   const { unreadOnly, category, limit } = req.query;
-  const notifs = getNotifications(userId, {
+  const notifs = await getNotifications(userId, {
     unreadOnly: unreadOnly === 'true',
     category: category as string,
     limit: limit ? Number(limit) : 50,
   });
-  res.json({ notifications: notifs, unreadCount: getUnreadCount(userId) });
+  const unreadCount = await getUnreadCount(userId);
+  res.json({ notifications: notifs, unreadCount });
 });
 
-router.get('/notifications/unread-count', (req, res) => {
+router.get('/notifications/unread-count', async (req, res) => {
   const userId = (req as any).user?.id || '1';
-  res.json({ count: getUnreadCount(userId) });
+  res.json({ count: await getUnreadCount(userId) });
 });
 
-router.post('/notifications/:id/read', (req, res) => {
-  markAsRead(req.params.id);
+router.post('/notifications/:id/read', async (req, res) => {
+  await markAsRead(req.params.id);
   res.json({ success: true });
 });
 
-router.post('/notifications/read-all', (req, res) => {
+router.post('/notifications/read-all', async (req, res) => {
   const userId = (req as any).user?.id || '1';
-  const count = markAllAsRead(userId);
+  const count = await markAllAsRead(userId);
   res.json({ success: true, markedCount: count });
 });
 
-router.delete('/notifications/:id', (req, res) => {
-  deleteNotification(req.params.id);
+router.delete('/notifications/:id', async (req, res) => {
+  await deleteNotification(req.params.id);
   res.json({ success: true });
 });
 
@@ -40,14 +43,14 @@ router.get('/notifications/preferences', (req, res) => {
   res.json({ preferences: getPreferences(userId) });
 });
 
-router.put('/notifications/preferences', (req, res) => {
+router.put('/notifications/preferences', validate(notificationPreferencesSchema), (req, res) => {
   const userId = (req as any).user?.id || '1';
   updatePreferences(userId, req.body.preferences);
   res.json({ success: true });
 });
 
 // Demo: seed some notifications
-router.post('/notifications/seed', (req, res) => {
+router.post('/notifications/seed', async (req, res) => {
   const userId = (req as any).user?.id || '1';
   const garageId = (req as any).user?.garageId || '1';
   const demos = [
@@ -57,7 +60,9 @@ router.post('/notifications/seed', (req, res) => {
     { title: 'Appointment Tomorrow', message: 'Ahmed Al-Rashid - AC Service at 10:00 AM', type: 'info' as const, category: 'Appointment Reminders', actionUrl: '/appointments' },
     { title: 'Overdue Invoice', message: 'Invoice #INV-2024-076 is 15 days overdue', type: 'error' as const, category: 'Payment Received', actionUrl: '/invoices' },
   ];
-  demos.forEach(d => createNotification({ userId, garageId, ...d }));
+  for (const d of demos) {
+    await createNotification({ userId, garageId, ...d });
+  }
   res.json({ success: true, count: demos.length });
 });
 

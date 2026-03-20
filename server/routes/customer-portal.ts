@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { validate } from '../middleware/validate';
+import { bookAppointmentSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -45,7 +47,7 @@ router.get('/portal/invoices/:customerId', async (req, res) => {
 });
 
 // POST /api/portal/appointments - Book appointment
-router.post('/portal/appointments', async (req, res) => {
+router.post('/portal/appointments', validate(bookAppointmentSchema), async (req, res) => {
   const { customerId, vehicleId, serviceType, preferredDate, preferredTime, notes } = req.body;
   try {
     const result = await db.execute(sql`

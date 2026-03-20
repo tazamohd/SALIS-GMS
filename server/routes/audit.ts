@@ -3,10 +3,10 @@ import { getAuditLog, getAuditStats, seedAuditLog } from '../services/audit-trai
 
 const router = Router();
 
-router.get('/audit/log', (req, res) => {
+router.get('/audit/log', async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { userId, resource, action, severity, from, to, limit, offset } = req.query;
-  const result = getAuditLog({
+  const result = await getAuditLog({
     garageId,
     userId: userId as string,
     resource: resource as string,
@@ -20,14 +20,14 @@ router.get('/audit/log', (req, res) => {
   res.json(result);
 });
 
-router.get('/audit/stats', (req, res) => {
+router.get('/audit/stats', async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
-  res.json(getAuditStats(garageId));
+  res.json(await getAuditStats(garageId));
 });
 
-router.post('/audit/seed', (req, res) => {
+router.post('/audit/seed', async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
-  seedAuditLog(garageId);
+  await seedAuditLog(garageId);
   res.json({ success: true, message: 'Demo audit entries created' });
 });
 
