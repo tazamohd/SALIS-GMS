@@ -21,8 +21,16 @@ export async function setup() {
   } else {
     const dataDir = "./pg-test-data";
 
-    if (fs.existsSync(dataDir)) {
-      fs.rmSync(dataDir, { recursive: true, force: true });
+    // Force clean slate - retry removal if locked
+    for (let i = 0; i < 3; i++) {
+      try {
+        if (fs.existsSync(dataDir)) {
+          fs.rmSync(dataDir, { recursive: true, force: true });
+        }
+        break;
+      } catch {
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
 
     pg = new EmbeddedPostgres({
@@ -33,7 +41,16 @@ export async function setup() {
       persistent: false,
     });
 
-    await pg.initialise();
+    try {
+      await pg.initialise();
+    } catch (err: any) {
+      // If init fails (dir exists), try starting directly
+      if (err.message?.includes("already exist")) {
+        console.log("Data dir exists, attempting direct start...");
+      } else {
+        throw err;
+      }
+    }
     await pg.start();
 
     try {

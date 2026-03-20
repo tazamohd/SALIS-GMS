@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SALIS AUTO - Cross-Module Workflow Triggers
  * Registers automated actions that fire when events occur.

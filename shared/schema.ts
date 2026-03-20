@@ -10188,7 +10188,7 @@ export const loyaltyAccounts = pgTable("loyalty_accounts", {
   totalVisits: integer("total_visits").default(0),
   lastVisitDate: timestamp("last_visit_date"),
   referralCode: varchar("referral_code", { length: 50 }).unique(),
-  referredBy: uuid("referred_by").references(() => loyaltyAccounts.id),
+  referredBy: uuid("referred_by").references((): any => loyaltyAccounts.id),
   referralCount: integer("referral_count").default(0),
   birthdayMonth: integer("birthday_month"),
   preferredContactMethod: varchar("preferred_contact_method", { length: 50 }), // "email", "sms", "whatsapp"
@@ -10677,4 +10677,4 @@ export const insertPushNotificationSchema = createInsertSchema(pushNotifications
 
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
-export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences);

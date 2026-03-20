@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from "react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";

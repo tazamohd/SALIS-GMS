@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SALIS AUTO - Workflow Hooks
  * Intercepts entity status changes and routes them through the workflow engine

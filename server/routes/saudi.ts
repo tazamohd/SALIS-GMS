@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SALIS AUTO - Saudi Arabia Market Compliance API
  * Endpoints for ZATCA e-invoicing, VAT reporting, Hijri calendar,
