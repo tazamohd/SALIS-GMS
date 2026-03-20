@@ -1,660 +1,654 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardPage } from "@/components/layouts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { TabsPageLayout } from "@/components/layouts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Folder, AlertTriangle, Archive } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  FileText,
+  FileSpreadsheet,
+  FileImage,
+  File,
+  Upload,
+  FolderOpen,
+  Search,
+  Download,
+  Trash2,
+  HardDrive,
+  Files,
+  Clock,
+  X,
+} from "lucide-react";
 import { format } from "date-fns";
 
-const categorySchema = z.object({
-  name: z.string().min(1, "Category name is required"),
-  description: z.string().optional(),
-  iconName: z.string().optional(),
-  colorCode: z.string().optional(),
-});
+// ── Types ────────────────────────────────────────────────────────────
 
-const documentSchema = z.object({
-  categoryId: z.string().min(1, "Category is required"),
-  documentName: z.string().min(1, "Document name is required"),
-  documentType: z.string().min(1, "Document type is required"),
-  documentUrl: z.string().min(1, "Document URL is required"),
-  relatedType: z.enum(["customer", "vehicle", "job_card", "invoice", "general"]),
-  relatedId: z.string().optional(),
-  expirationDate: z.string().optional(),
-  description: z.string().optional(),
-  status: z.enum(["active", "archived", "expired"]).default("active"),
-});
+interface Document {
+  id: string;
+  name: string;
+  type: string;
+  category: string;
+  size: number;
+  uploadedBy: string;
+  date: string;
+  tags: string[];
+  description: string;
+}
 
-type CategoryFormData = z.infer<typeof categorySchema>;
-type DocumentFormData = z.infer<typeof documentSchema>;
+interface Category {
+  id: string;
+  label: string;
+  icon: string;
+  color: string;
+  documentCount: number;
+  totalSize: number;
+  totalSizeFormatted: string;
+  recentUploads: { id: string; name: string; date: string }[];
+}
+
+interface Stats {
+  totalDocuments: number;
+  totalStorage: number;
+  totalStorageFormatted: string;
+  byCategory: {
+    category: string;
+    label: string;
+    count: number;
+    size: number;
+    sizeFormatted: string;
+  }[];
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+function getTypeIcon(type: string) {
+  switch (type.toLowerCase()) {
+    case "pdf":
+      return <FileText className="h-4 w-4 text-red-500" />;
+    case "docx":
+    case "doc":
+      return <FileText className="h-4 w-4 text-blue-500" />;
+    case "xlsx":
+    case "xls":
+      return <FileSpreadsheet className="h-4 w-4 text-green-500" />;
+    case "png":
+    case "jpg":
+    case "jpeg":
+      return <FileImage className="h-4 w-4 text-purple-500" />;
+    default:
+      return <File className="h-4 w-4 text-gray-500" />;
+  }
+}
+
+function getCategoryBadgeColor(category: string): string {
+  const colors: Record<string, string> = {
+    invoices: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    contracts: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+    insurance: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    "vehicle-docs": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+    "employee-docs": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    compliance: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+  };
+  return colors[category] || "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+}
+
+function getCategoryLabel(category: string): string {
+  const labels: Record<string, string> = {
+    invoices: "Invoices",
+    contracts: "Contracts",
+    insurance: "Insurance",
+    "vehicle-docs": "Vehicle Docs",
+    "employee-docs": "Employee Docs",
+    compliance: "Compliance",
+  };
+  return labels[category] || category;
+}
+
+// ── Component ────────────────────────────────────────────────────────
 
 export default function DocumentManagement() {
-  const { t } = useTranslation();
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState("documents");
-  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] = useState(false);
-  const [isCreateDocumentDialogOpen, setIsCreateDocumentDialogOpen] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<any[]>({
-    queryKey: ["/api/document-categories"],
-  });
+  // Upload form state
+  const [uploadName, setUploadName] = useState("");
+  const [uploadType, setUploadType] = useState("pdf");
+  const [uploadCategory, setUploadCategory] = useState("");
+  const [uploadDescription, setUploadDescription] = useState("");
+  const [uploadTags, setUploadTags] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
-  const { data: documents = [], isLoading: documentsLoading } = useQuery<any[]>({
-    queryKey: ["/api/documents", categoryFilter, statusFilter],
-    queryFn: () => {
+  // ── Queries ──────────────────────────────────────────────────────
+
+  const { data: documents = [], isLoading: docsLoading } = useQuery<Document[]>({
+    queryKey: ["/api/documents", searchQuery, categoryFilter],
+    queryFn: async () => {
       const params = new URLSearchParams();
-      if (categoryFilter) params.append("categoryId", categoryFilter);
-      if (statusFilter) params.append("status", statusFilter);
-      return fetch(`/api/documents?${params}`).then(r => r.json());
-    }
-  });
-
-  const { data: expiringDocuments = [] } = useQuery<any[]>({
-    queryKey: ["/api/documents/expiring"],
-    queryFn: () => fetch("/api/documents/expiring?daysAhead=30").then(r => r.json()),
-  });
-
-  const categoryForm = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      iconName: "FileText",
-      colorCode: "#0A5ED7",
-    }
-  });
-
-  const documentForm = useForm<DocumentFormData>({
-    resolver: zodResolver(documentSchema),
-    defaultValues: {
-      categoryId: "",
-      documentName: "",
-      documentType: "",
-      documentUrl: "",
-      relatedType: "general",
-      relatedId: "",
-      expirationDate: "",
-      description: "",
-      status: "active",
-    }
-  });
-
-  const createCategoryMutation = useMutation({
-    mutationFn: (data: CategoryFormData) => apiRequest("POST", "/api/document-categories", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/document-categories"] });
-      toast({ title: t('common.success', 'Success'), description: t('documents.categoryCreated', 'Category created successfully') });
-      setIsCreateCategoryDialogOpen(false);
-      categoryForm.reset();
+      if (searchQuery) params.append("search", searchQuery);
+      if (categoryFilter && categoryFilter !== "all") params.append("category", categoryFilter);
+      const res = await fetch(`/api/documents?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch documents");
+      return res.json();
     },
-    onError: () => {
-      toast({ title: t('common.error', 'Error'), description: t('documents.categoryCreateFailed', 'Failed to create category'), variant: "destructive" });
-    }
   });
 
-  const createDocumentMutation = useMutation({
-    mutationFn: (data: DocumentFormData) => apiRequest("POST", "/api/documents", data),
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["/api/documents/categories"],
+  });
+
+  const { data: stats } = useQuery<Stats>({
+    queryKey: ["/api/documents/stats"],
+  });
+
+  // ── Mutations ────────────────────────────────────────────────────
+
+  const uploadMutation = useMutation({
+    mutationFn: (data: Partial<Document>) => apiRequest("POST", "/api/documents", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: t('common.success', 'Success'), description: t('documents.documentCreated', 'Document created successfully') });
-      setIsCreateDocumentDialogOpen(false);
-      documentForm.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/documents/categories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents/stats"] });
+      toast({ title: "Document uploaded", description: "Document metadata saved successfully." });
+      // Reset form
+      setUploadName("");
+      setUploadType("pdf");
+      setUploadCategory("");
+      setUploadDescription("");
+      setUploadTags("");
+      setUploadedFileName("");
     },
     onError: () => {
-      toast({ title: t('common.error', 'Error'), description: t('documents.documentCreateFailed', 'Failed to create document'), variant: "destructive" });
-    }
+      toast({ title: "Upload failed", description: "Failed to save document metadata.", variant: "destructive" });
+    },
   });
 
-  const deleteCategoryMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/document-categories/${id}`, undefined),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/document-categories"] });
-      toast({ title: t('common.success', 'Success'), description: t('documents.categoryDeleted', 'Category deleted successfully') });
-    }
-  });
-
-  const deleteDocumentMutation = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/documents/${id}`, undefined),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/documents/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      toast({ title: t('common.success', 'Success'), description: t('documents.documentDeleted', 'Document deleted successfully') });
-    }
+      queryClient.invalidateQueries({ queryKey: ["/api/documents/categories"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents/stats"] });
+      toast({ title: "Document deleted", description: "Document has been removed." });
+    },
   });
 
-  const onSubmitCategory = (data: CategoryFormData) => {
-    createCategoryMutation.mutate(data);
+  // ── Drag & Drop Handlers (UI only) ──────────────────────────────
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setUploadedFileName(file.name);
+      if (!uploadName) setUploadName(file.name.replace(/\.[^.]+$/, ""));
+      const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
+      setUploadType(ext);
+    }
+  }, [uploadName]);
+
+  const handleUploadSubmit = () => {
+    if (!uploadName || !uploadCategory) {
+      toast({ title: "Missing fields", description: "Name and category are required.", variant: "destructive" });
+      return;
+    }
+    uploadMutation.mutate({
+      name: uploadName,
+      type: uploadType,
+      category: uploadCategory,
+      size: Math.floor(Math.random() * 2_000_000) + 100_000, // stub size
+      tags: uploadTags.split(",").map((t) => t.trim()).filter(Boolean),
+      description: uploadDescription,
+    });
   };
 
-  const onSubmitDocument = (data: DocumentFormData) => {
-    createDocumentMutation.mutate(data);
-  };
+  // ── Metrics ──────────────────────────────────────────────────────
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      active: "bg-green-600 text-white",
-      archived: "bg-[#64748B] text-white",
-      expired: "bg-[#F97316] text-white",
-    };
-    return colors[status] || "bg-[#64748B] text-white";
-  };
-
-  const isExpiringSoon = (expirationDate: string | null) => {
-    if (!expirationDate) return false;
-    const expDate = new Date(expirationDate);
-    const daysUntilExpiry = Math.ceil((expDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
-  };
-
-  const tabs = [
+  const metrics = [
     {
-      id: "documents",
-      label: t('documents.documents', 'Documents'),
-      icon: FileText,
-      content: (
-        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
-          <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.documentLibrary', 'Document Library')}</CardTitle>
-            <CardDescription className="text-[#64748B]">
-              {t('documents.manageDocuments', 'Manage all your documents in one place')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4 mb-4">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-category-filter">
-                  <SelectValue placeholder={t('documents.filterByCategory', 'Filter by category')} />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                  <SelectItem value="">{t('documents.allCategories', 'All Categories')}</SelectItem>
-                  {categories.map((cat: any) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
-                  <SelectValue placeholder={t('documents.filterByStatus', 'Filter by status')} />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                  <SelectItem value="">{t('documents.allStatuses', 'All Statuses')}</SelectItem>
-                  <SelectItem value="active">{t('common.active', 'Active')}</SelectItem>
-                  <SelectItem value="archived">{t('documents.archived', 'Archived')}</SelectItem>
-                  <SelectItem value="expired">{t('documents.expired', 'Expired')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {documentsLoading ? (
-              <p className="text-[#64748B]" data-testid="text-loading">{t('documents.loadingDocuments', 'Loading documents...')}</p>
-            ) : documents.length === 0 ? (
-              <p className="text-[#64748B]" data-testid="text-no-documents">{t('documents.noDocuments', 'No documents found')}</p>
-            ) : (
-              <div className="grid gap-4">
-                {documents.map((doc: any) => (
-                  <Card 
-                    key={doc.id} 
-                    className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23]"
-                    data-testid={`card-document-${doc.id}`}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <FileText className="h-5 w-5 text-[#0A5ED7]" />
-                            <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-document-name-${doc.id}`}>
-                              {doc.documentName}
-                            </h3>
-                            <Badge className={getStatusColor(doc.status)} data-testid={`badge-status-${doc.id}`}>
-                              {doc.status}
-                            </Badge>
-                            {isExpiringSoon(doc.expirationDate) && (
-                              <Badge className="bg-[#F97316] text-white" data-testid={`badge-expiring-${doc.id}`}>
-                                <AlertTriangle className="h-3 w-3 mr-1" />
-                                {t('documents.expiringSoon', 'Expiring Soon')}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-[#64748B] mb-3" data-testid={`text-document-type-${doc.id}`}>
-                            {doc.documentType}
-                          </p>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-[#64748B]">{t('documents.relatedTo', 'Related To')}</p>
-                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-related-type-${doc.id}`}>
-                                {doc.relatedType}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-[#64748B]">{t('documents.uploaded', 'Uploaded')}</p>
-                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-created-${doc.id}`}>
-                                {doc.createdAt ? format(new Date(doc.createdAt), "MMM dd, yyyy") : "N/A"}
-                              </p>
-                            </div>
-                            {doc.expirationDate && (
-                              <div>
-                                <p className="text-[#64748B]">{t('documents.expires', 'Expires')}</p>
-                                <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-expiration-${doc.id}`}>
-                                  {format(new Date(doc.expirationDate), "MMM dd, yyyy")}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => window.open(doc.documentUrl, "_blank")}
-                            className="border-[#E2E8F0] dark:border-[#232A36]"
-                            data-testid={`button-view-${doc.id}`}
-                          >
-                            {t('common.view', 'View')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              if (confirm(t('documents.confirmDeleteDocument', 'Delete this document?'))) {
-                                deleteDocumentMutation.mutate(doc.id);
-                              }
-                            }}
-                            className="border-[#E2E8F0] dark:border-[#232A36] text-[#F97316] hover:text-red-700"
-                            data-testid={`button-delete-${doc.id}`}
-                          >
-                            {t('common.delete', 'Delete')}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ),
+      label: "Total Documents",
+      value: stats?.totalDocuments ?? documents.length,
+      icon: Files,
+      color: "primary",
     },
     {
-      id: "categories",
-      label: t('documents.categories', 'Categories'),
-      icon: Folder,
-      content: (
-        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
-          <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.documentCategories', 'Document Categories')}</CardTitle>
-            <CardDescription className="text-[#64748B]">
-              {t('documents.organizeDocuments', 'Organize documents into categories')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {categoriesLoading ? (
-              <p className="text-[#64748B]" data-testid="text-loading-categories">{t('documents.loadingCategories', 'Loading categories...')}</p>
-            ) : categories.length === 0 ? (
-              <p className="text-[#64748B]" data-testid="text-no-categories">{t('documents.noCategories', 'No categories found')}</p>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {categories.map((category: any) => (
-                  <Card 
-                    key={category.id} 
-                    className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors bg-white dark:bg-[#151A23]"
-                    data-testid={`card-category-${category.id}`}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <Folder className="h-6 w-6 text-[#0A5ED7]" />
-                          <div>
-                            <h3 className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-category-name-${category.id}`}>
-                              {category.name}
-                            </h3>
-                            <p className="text-sm text-[#64748B]" data-testid={`text-category-description-${category.id}`}>
-                              {category.description || t('documents.noDescription', 'No description')}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            if (confirm(t('documents.confirmDeleteCategory', 'Delete this category?'))) {
-                              deleteCategoryMutation.mutate(category.id);
-                            }
-                          }}
-                          className="text-[#F97316] hover:text-red-700"
-                          data-testid={`button-delete-category-${category.id}`}
-                        >
-                          {t('common.delete', 'Delete')}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ),
+      label: "Storage Used",
+      value: stats?.totalStorageFormatted ?? "0 B",
+      icon: HardDrive,
+      color: "secondary",
     },
     {
-      id: "expiring",
-      label: t('documents.expiring', 'Expiring'),
-      icon: AlertTriangle,
-      badge: expiringDocuments.length,
-      content: (
-        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
-          <CardHeader>
-            <CardTitle className="text-[#0B1F3B] dark:text-white">{t('documents.expiringDocuments', 'Expiring Documents')}</CardTitle>
-            <CardDescription className="text-[#64748B]">
-              {t('documents.documentsExpiringWithin30Days', 'Documents expiring within the next 30 days')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {expiringDocuments.length === 0 ? (
-              <p className="text-[#64748B]" data-testid="text-no-expiring">{t('documents.noExpiringDocuments', 'No expiring documents')}</p>
-            ) : (
-              <div className="grid gap-4">
-                {expiringDocuments.map((doc: any) => {
-                  const daysUntilExpiry = Math.ceil((new Date(doc.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                  return (
-                    <Card 
-                      key={doc.id} 
-                      className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]"
-                      data-testid={`card-expiring-${doc.id}`}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-4">
-                            <AlertTriangle className="h-6 w-6 text-[#F97316]" />
-                            <div>
-                              <p className="font-semibold text-[#0B1F3B] dark:text-white" data-testid={`text-expiring-name-${doc.id}`}>
-                                {doc.documentName}
-                              </p>
-                              <p className="text-sm text-[#64748B]">
-                                {t('documents.expiresIn', 'Expires in')} {daysUntilExpiry} {t('documents.days', 'days')} ({format(new Date(doc.expirationDate), "MMM dd, yyyy")})
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() => window.open(doc.documentUrl, "_blank")}
-                            className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
-                            data-testid={`button-view-expiring-${doc.id}`}
-                          >
-                            {t('common.view', 'View')}
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ),
+      label: "Categories",
+      value: categories.length,
+      icon: FolderOpen,
+      color: "tertiary",
+    },
+    {
+      label: "Recent Uploads",
+      value: documents.filter(
+        (d) => new Date(d.date).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
+      ).length,
+      icon: Clock,
+      color: "muted",
     },
   ];
 
+  // ── Render ───────────────────────────────────────────────────────
+
   return (
-    <>
-      <TabsPageLayout
-        title={t('documents.title', 'Document Management')}
-        description={t('documents.pageDescription', 'Centralized document storage with expiration tracking and access logging')}
-        icon={FileText}
-        tabs={tabs}
-        defaultTab="documents"
-        activeTab={selectedTab}
-        onTabChange={setSelectedTab}
-        secondaryActions={[
-          {
-            label: t('documents.newCategory', 'New Category'),
-            icon: Folder,
-            onClick: () => setIsCreateCategoryDialogOpen(true),
-            variant: "outline",
-            testId: "button-create-category",
-          },
-          {
-            label: t('documents.uploadDocument', 'Upload Document'),
-            icon: FileText,
-            onClick: () => setIsCreateDocumentDialogOpen(true),
-            variant: "default",
-            testId: "button-create-document",
-          },
-        ]}
-      />
+    <DashboardPage
+      title="Document Management"
+      description="Centralized document storage, categorization, and management"
+      icon={FileText}
+      metrics={metrics}
+    >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
+          <TabsTrigger value="all" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
+            <Files className="h-4 w-4 mr-2" />
+            All Documents
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
+            <Upload className="h-4 w-4 mr-2" />
+            Upload
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
+            <FolderOpen className="h-4 w-4 mr-2" />
+            Categories
+          </TabsTrigger>
+        </TabsList>
 
-      <Dialog open={isCreateCategoryDialogOpen} onOpenChange={setIsCreateCategoryDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('documents.createDocumentCategory', 'Create Document Category')}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">
-              {t('documents.createCategoryDescription', 'Create a new category to organize your documents')}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...categoryForm}>
-            <form onSubmit={categoryForm.handleSubmit(onSubmitCategory)} className="space-y-4">
-              <FormField
-                control={categoryForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.categoryName', 'Category Name')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('documents.categoryNamePlaceholder', 'Insurance Documents')} data-testid="input-category-name" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+        {/* ── All Documents Tab ────────────────────────────────────── */}
+        <TabsContent value="all" className="space-y-4">
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row gap-4 justify-between">
+                <div>
+                  <CardTitle className="text-[#0B1F3B] dark:text-white">All Documents</CardTitle>
+                  <CardDescription className="text-[#64748B]">
+                    Browse and manage all uploaded documents
+                  </CardDescription>
+                </div>
+                <div className="flex gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
+                    <Input
+                      placeholder="Search documents..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                    />
+                  </div>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-44 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="invoices">Invoices</SelectItem>
+                      <SelectItem value="contracts">Contracts</SelectItem>
+                      <SelectItem value="insurance">Insurance</SelectItem>
+                      <SelectItem value="vehicle-docs">Vehicle Docs</SelectItem>
+                      <SelectItem value="employee-docs">Employee Docs</SelectItem>
+                      <SelectItem value="compliance">Compliance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {docsLoading ? (
+                <p className="text-[#64748B] py-8 text-center">Loading documents...</p>
+              ) : documents.length === 0 ? (
+                <p className="text-[#64748B] py-8 text-center">No documents found.</p>
+              ) : (
+                <div className="rounded-md border border-[#E2E8F0] dark:border-[#232A36] overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                        <TableHead className="text-[#64748B] font-semibold">Name</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold">Type</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold">Category</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold">Size</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold">Uploaded By</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold">Date</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {documents.map((doc) => (
+                        <TableRow
+                          key={doc.id}
+                          className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]/50"
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-[#0B1F3B] dark:text-white">
+                                {doc.name}
+                              </span>
+                            </div>
+                            {doc.tags.length > 0 && (
+                              <div className="flex gap-1 mt-1 flex-wrap">
+                                {doc.tags.slice(0, 3).map((tag) => (
+                                  <Badge
+                                    key={tag}
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0 border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]"
+                                  >
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
+                              {getTypeIcon(doc.type)}
+                              <span className="uppercase text-xs font-medium text-[#64748B]">
+                                {doc.type}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getCategoryBadgeColor(doc.category)}>
+                              {getCategoryLabel(doc.category)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-[#64748B]">{formatBytes(doc.size)}</TableCell>
+                          <TableCell className="text-[#0B1F3B] dark:text-white">{doc.uploadedBy}</TableCell>
+                          <TableCell className="text-[#64748B]">
+                            {format(new Date(doc.date), "MMM dd, yyyy")}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-[#0A5ED7] hover:text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
+                                title="Download"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                title="Delete"
+                                onClick={() => {
+                                  if (confirm(`Delete "${doc.name}"?`)) {
+                                    deleteMutation.mutate(doc.id);
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ── Upload Tab ───────────────────────────────────────────── */}
+        <TabsContent value="upload" className="space-y-4">
+          <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardHeader>
+              <CardTitle className="text-[#0B1F3B] dark:text-white">Upload Document</CardTitle>
+              <CardDescription className="text-[#64748B]">
+                Drag and drop files or fill in document metadata
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Drag & Drop Zone (UI only) */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`
+                  border-2 border-dashed rounded-lg p-10 text-center transition-colors cursor-pointer
+                  ${isDragOver
+                    ? "border-[#0A5ED7] bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10"
+                    : "border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/50"
+                  }
+                `}
+                onClick={() => {
+                  // Stub: clicking would open file picker
+                  toast({ title: "File Upload", description: "File upload is a UI stub. Fill in the metadata fields below." });
+                }}
+              >
+                <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragOver ? "text-[#0A5ED7]" : "text-[#64748B]"}`} />
+                {uploadedFileName ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <FileText className="h-5 w-5 text-[#0A5ED7]" />
+                    <span className="text-[#0B1F3B] dark:text-white font-medium">{uploadedFileName}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setUploadedFileName("");
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-[#0B1F3B] dark:text-white font-medium">
+                      Drag & drop your file here
+                    </p>
+                    <p className="text-sm text-[#64748B] mt-1">
+                      or click to browse. Supports PDF, DOCX, XLSX, PNG, JPG
+                    </p>
+                  </>
                 )}
-              />
+              </div>
 
-              <FormField
-                control={categoryForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder={t('documents.descriptionPlaceholder', 'For storing insurance-related documents...')} rows={3} data-testid="input-category-description" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Metadata Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                    Document Name *
+                  </label>
+                  <Input
+                    value={uploadName}
+                    onChange={(e) => setUploadName(e.target.value)}
+                    placeholder="e.g. Invoice #2024-0200"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  />
+                </div>
 
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateCategoryDialogOpen(false)}
-                  className="border-[#E2E8F0] dark:border-[#232A36]"
-                  data-testid="button-cancel-category"
-                >
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createCategoryMutation.isPending}
-                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
-                  data-testid="button-submit-category"
-                >
-                  {createCategoryMutation.isPending ? t('common.creating', 'Creating...') : t('common.create', 'Create')}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                    Category *
+                  </label>
+                  <Select value={uploadCategory} onValueChange={setUploadCategory}>
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectItem value="invoices">Invoices</SelectItem>
+                      <SelectItem value="contracts">Contracts</SelectItem>
+                      <SelectItem value="insurance">Insurance</SelectItem>
+                      <SelectItem value="vehicle-docs">Vehicle Documents</SelectItem>
+                      <SelectItem value="employee-docs">Employee Documents</SelectItem>
+                      <SelectItem value="compliance">Compliance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-      <Dialog open={isCreateDocumentDialogOpen} onOpenChange={setIsCreateDocumentDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <DialogHeader>
-            <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('documents.uploadDocument', 'Upload Document')}</DialogTitle>
-            <DialogDescription className="text-[#64748B]">
-              {t('documents.uploadDocumentDescription', 'Add a new document to the library')}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...documentForm}>
-            <form onSubmit={documentForm.handleSubmit(onSubmitDocument)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={documentForm.control}
-                  name="documentName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentName', 'Document Name')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t('documents.documentNamePlaceholder', 'Insurance Policy')} data-testid="input-document-name" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                    File Type
+                  </label>
+                  <Select value={uploadType} onValueChange={setUploadType}>
+                    <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                      <SelectItem value="pdf">PDF</SelectItem>
+                      <SelectItem value="docx">DOCX</SelectItem>
+                      <SelectItem value="xlsx">XLSX</SelectItem>
+                      <SelectItem value="png">PNG</SelectItem>
+                      <SelectItem value="jpg">JPG</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <FormField
-                  control={documentForm.control}
-                  name="categoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.category', 'Category')}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-document-category" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
-                            <SelectValue placeholder={t('documents.selectCategory', 'Select category')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                          {categories.map((cat: any) => (
-                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                    Tags
+                  </label>
+                  <Input
+                    value={uploadTags}
+                    onChange={(e) => setUploadTags(e.target.value)}
+                    placeholder="comma-separated, e.g. invoice, toyota, service"
+                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#0B1F3B] dark:text-white">
+                  Description
+                </label>
+                <Textarea
+                  value={uploadDescription}
+                  onChange={(e) => setUploadDescription(e.target.value)}
+                  placeholder="Brief description of the document..."
+                  rows={3}
+                  className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={documentForm.control}
-                  name="documentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentType', 'Document Type')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t('documents.documentTypePlaceholder', 'PDF')} data-testid="input-document-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={documentForm.control}
-                  name="relatedType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.relatedTo', 'Related To')}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-related-type" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-                          <SelectItem value="general">{t('documents.general', 'General')}</SelectItem>
-                          <SelectItem value="customer">{t('documents.customer', 'Customer')}</SelectItem>
-                          <SelectItem value="vehicle">{t('documents.vehicle', 'Vehicle')}</SelectItem>
-                          <SelectItem value="job_card">{t('documents.jobCard', 'Job Card')}</SelectItem>
-                          <SelectItem value="invoice">{t('documents.invoice', 'Invoice')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleUploadSubmit}
+                  disabled={uploadMutation.isPending}
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white px-8"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
+                </Button>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              <FormField
-                control={documentForm.control}
-                name="documentUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.documentUrl', 'Document URL')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder={t('documents.documentUrlPlaceholder', 'https://...')} data-testid="input-document-url" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        {/* ── Categories Tab ───────────────────────────────────────── */}
+        <TabsContent value="categories" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((cat) => (
+              <Card
+                key={cat.id}
+                className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23] hover:border-[#0A5ED7] dark:hover:border-[#0A5ED7] transition-colors"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="h-10 w-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${cat.color}15` }}
+                    >
+                      <FolderOpen className="h-5 w-5" style={{ color: cat.color }} />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base text-[#0B1F3B] dark:text-white">
+                        {cat.label}
+                      </CardTitle>
+                      <CardDescription className="text-[#64748B] text-sm">
+                        {cat.documentCount} document{cat.documentCount !== 1 ? "s" : ""}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[#64748B]">Total Size</span>
+                    <span className="font-semibold text-[#0B1F3B] dark:text-white">
+                      {cat.totalSizeFormatted}
+                    </span>
+                  </div>
 
-              <FormField
-                control={documentForm.control}
-                name="expirationDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('documents.expirationDate', 'Expiration Date')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="date" data-testid="input-expiration-date" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  {cat.recentUploads.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-[#64748B] uppercase tracking-wide mb-2">
+                        Recent Uploads
+                      </p>
+                      <div className="space-y-1.5">
+                        {cat.recentUploads.map((upload) => (
+                          <div
+                            key={upload.id}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span className="text-[#0B1F3B] dark:text-white truncate max-w-[180px]">
+                              {upload.name}
+                            </span>
+                            <span className="text-xs text-[#64748B]">
+                              {format(new Date(upload.date), "MMM dd")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              <FormField
-                control={documentForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder={t('documents.descriptionPlaceholder', 'Document description...')} rows={2} data-testid="input-document-description" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateDocumentDialogOpen(false)}
-                  className="border-[#E2E8F0] dark:border-[#232A36]"
-                  data-testid="button-cancel-document"
-                >
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createDocumentMutation.isPending}
-                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
-                  data-testid="button-submit-document"
-                >
-                  {createDocumentMutation.isPending ? t('common.uploading', 'Uploading...') : t('common.upload', 'Upload')}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-[#E2E8F0] dark:border-[#232A36] text-[#0A5ED7]"
+                    onClick={() => {
+                      setCategoryFilter(cat.id);
+                      setActiveTab("all");
+                    }}
+                  >
+                    View Documents
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </DashboardPage>
   );
 }

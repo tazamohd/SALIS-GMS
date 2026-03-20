@@ -63,6 +63,7 @@ import WelcomePage from "@/pages/WelcomePage";
 import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
+import CurrencySettings from "@/pages/CurrencySettings";
 import RefundManagement from "@/pages/RefundManagement";
 import DataImportExport from "@/pages/DataImportExport";
 import BusinessIntelligence from "@/pages/BusinessIntelligence";
@@ -86,6 +87,7 @@ import VendorSupplierPortal from "@/pages/VendorSupplierPortal";
 import MarketingAutomation from "@/pages/MarketingAutomation";
 import MarketingHub from "@/pages/MarketingHub";
 import WhatsAppIntegration from "@/pages/WhatsAppIntegration";
+import SMSCampaigns from "@/pages/SMSCampaigns";
 import CustomerLoyalty from "@/pages/CustomerLoyalty";
 import CRMLoyalty from "@/pages/CRMLoyalty";
 import DocumentManagement from "@/pages/DocumentManagement";
@@ -246,6 +248,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import PlatformAdmin from "@/pages/PlatformAdmin";
 import AdvancedReports from "@/pages/AdvancedReports";
+import SupplierPortal from "@/pages/SupplierPortal";
+import APIDocs from "@/pages/APIDocs";
 import { lazy, Suspense } from "react";
 
 const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
@@ -428,6 +432,11 @@ function Router() {
           <VendorSupplierPortal />
         </Layout>
       </Route>
+      <Route path="/supplier-portal">
+        <Layout>
+          <SupplierPortal />
+        </Layout>
+      </Route>
       <Route path="/marketing-automation">
         <Layout>
           <MarketingAutomation />
@@ -449,6 +458,11 @@ function Router() {
         </Layout>
       </Route>
       <Route path="/document-management">
+        <Layout>
+          <DocumentManagement />
+        </Layout>
+      </Route>
+      <Route path="/documents">
         <Layout>
           <DocumentManagement />
         </Layout>
@@ -531,6 +545,11 @@ function Router() {
       <Route path="/whatsapp">
         <Layout>
           <WhatsAppIntegration />
+        </Layout>
+      </Route>
+      <Route path="/sms-campaigns">
+        <Layout>
+          <SMSCampaigns />
         </Layout>
       </Route>
       <Route path="/suppliers">
@@ -721,6 +740,11 @@ function Router() {
       <Route path="/financial-settings">
         <Layout>
           <FinancialSettings />
+        </Layout>
+      </Route>
+      <Route path="/currency-settings">
+        <Layout>
+          <CurrencySettings />
         </Layout>
       </Route>
       <Route path="/refund-management">
@@ -1138,6 +1162,11 @@ function Router() {
       <Route path="/digital-signage">
         <Layout>
           <DigitalSignage />
+        </Layout>
+      </Route>
+      <Route path="/api-docs">
+        <Layout>
+          <APIDocs />
         </Layout>
       </Route>
       <Route path="/kiosk-checkin">

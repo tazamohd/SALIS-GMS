@@ -22,6 +22,11 @@ import kioskRoutes from "./kiosk";
 import estimatesRoutes from "./estimates";
 import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
+import smsCampaignRoutes from "./sms-campaigns";
+import documentRoutes from "./documents";
+import supplierPortalRoutes from "./supplier-portal";
+import currencyRoutes from "./currency";
+import apiDocsRoutes from "./api-docs";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -142,6 +147,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // WhatsApp Business Integration routes
   app.use("/api", whatsappRoutes);
   console.log("✅ WhatsApp Business Routes Loaded");
+
+  // SMS Campaign Management routes
+  app.use("/api", smsCampaignRoutes);
+  console.log("✅ SMS Campaign Routes Loaded");
+
+  // Document Management routes
+  app.use("/api", documentRoutes);
+  console.log("✅ Document Management Routes Loaded");
+
+  // Supplier Portal routes
+  app.use("/api", supplierPortalRoutes);
+  console.log("✅ Supplier Portal Routes Loaded");
+
+  // Multi-Currency Management routes
+  app.use("/api", currencyRoutes);
+  console.log("✅ Multi-Currency Routes Loaded");
+
+  // API Documentation routes
+  app.use("/api", apiDocsRoutes);
+  console.log("✅ API Documentation Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
