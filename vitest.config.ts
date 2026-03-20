@@ -23,6 +23,7 @@ export default defineConfig({
     setupFiles: ['./client/src/test/setup.ts'],
     globalSetup: ['./server/__tests__/globalSetup.ts'],
     testTimeout: 30000,
+    hookTimeout: 30000,
     pool: 'forks',
     forks: {
       singleFork: true,
