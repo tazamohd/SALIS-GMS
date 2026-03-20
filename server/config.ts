@@ -1,7 +1,9 @@
 /**
  * Centralized environment configuration.
- * Validates required vars on import and exports a typed config object.
+ * Loads .env file, validates required vars on import, and exports a typed config object.
  */
+import dotenv from 'dotenv';
+dotenv.config();
 
 const REQUIRED = ['DATABASE_URL', 'SESSION_SECRET'] as const;
 

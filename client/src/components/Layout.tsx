@@ -87,6 +87,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ArabicLanguageToggle } from "@/components/ArabicLanguageToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { QuickActionsModal } from "@/components/QuickActionsModal";
 import { SmartSearch } from "@/components/SmartSearch";
@@ -104,13 +105,14 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { UserSettings, Garage } from "@shared/schema";
-import { 
-  navigationConfig, 
+import {
+  navigationConfig,
   filterNavigationByAccess,
   type NavGroup,
   type UserRole,
   type SubscriptionPlan
 } from "@/config/navigation";
+import { filterNavByRole, getRoleDisplayLabel, getRoleBadgeColor } from "@/lib/roleAccess";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -224,7 +226,9 @@ export function Layout({ children }: LayoutProps) {
     : 'STARTER';
   
   // Filter navigation based on role and plan - no loading state needed since plan is in user object
-  const filteredNavigation = filterNavigationByAccess(navigationConfig, userRole, userPlan);
+  const roleAndPlanFiltered = filterNavigationByAccess(navigationConfig, userRole, userPlan);
+  // Apply additional group-level role filtering
+  const filteredNavigation = filterNavByRole(roleAndPlanFiltered, userRole);
   
   // Helper function to convert navigation title to translation key
   const getNavKey = (title: string): string => {
@@ -317,9 +321,9 @@ export function Layout({ children }: LayoutProps) {
                   <p className="text-xs font-semibold text-[#0F172A] dark:text-white truncate">
                     {(user as any)?.fullName || (user as any)?.email?.split('@')[0]}
                   </p>
-                  <p className="text-[10px] text-[#64748B] dark:text-[#9BA4B0] truncate uppercase tracking-wide">
-                    {userRole === 'PLATFORM_ADMIN' ? '⭐ Platform Admin' : userRole}
-                  </p>
+                  <span className={`inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-full tracking-wide ${getRoleBadgeColor(userRole)}`}>
+                    {getRoleDisplayLabel(userRole)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -388,8 +392,9 @@ export function Layout({ children }: LayoutProps) {
             </div>
           </nav>
 
-          {/* Logout */}
-          <div className="p-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
+          {/* Language Toggle & Logout */}
+          <div className="p-3 border-t border-[#E2E8F0] dark:border-[#232A36] space-y-2">
+            <LanguageToggle />
             <Button
               onClick={handleLogout}
               variant="ghost"

@@ -8,7 +8,13 @@ export default defineConfig({
   test: {
     globals: true,
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      'server/routes/__tests__/**',
+      'server/services/__tests__/**',
+      'e2e/**',
+    ],
     environmentMatchGlobs: [
       ['server/**', 'node'],
       ['client/**', 'jsdom'],

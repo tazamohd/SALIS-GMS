@@ -20,6 +20,7 @@ import {
   Activity,
   Shield,
   UserIcon,
+  Database,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -121,6 +122,7 @@ export const navigationConfig: NavGroup[] = [
     icon: Settings,
     items: [
       { title: "Settings", href: "/settings", icon: Settings },
+      { title: "Backup & Export", href: "/data-backup", icon: Database, roles: ['ADMIN', 'MANAGER'] },
       { title: "Profile", href: "/profile", icon: UserIcon },
     ],
   },

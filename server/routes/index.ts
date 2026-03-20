@@ -27,6 +27,9 @@ import documentRoutes from "./documents";
 import supplierPortalRoutes from "./supplier-portal";
 import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
+import backupRoutes from "./backup";
+import exportRoutes from "./export";
+import healthRoutes from "./health";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -74,6 +77,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     next();
   });
+
+  // Health check routes (no auth required, mounted before auth middleware)
+  app.use("/api", healthRoutes);
+  console.log("✅ Health Check Routes Loaded");
 
   // Set up authentication middleware first (session, passport)
   await setupAuth(app);
@@ -167,6 +174,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Documentation routes
   app.use("/api", apiDocsRoutes);
   console.log("✅ API Documentation Routes Loaded");
+
+  // Data Backup routes
+  app.use("/api", backupRoutes);
+  console.log("✅ Data Backup Routes Loaded");
+
+  // Data Export routes
+  app.use("/api", exportRoutes);
+  console.log("✅ Data Export Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

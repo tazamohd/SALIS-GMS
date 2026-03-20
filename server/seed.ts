@@ -1,5 +1,5 @@
 import { db } from './db';
-import { 
+import {
   garages, branches, users, customerProfiles, technicianProfiles,
   vehicles, jobCards, appointments, spareParts, sparePartInventories,
   invoices, payments, estimates, serviceReminders, maintenanceSchedules,
@@ -7,24 +7,73 @@ import {
   commissions, employeeAttendance, shiftTemplates, shiftAssignments,
   performanceReviews, trainings, employeeTrainings, stockAlerts,
   paymentPlans, installments, taxConfigurations, discountsPromotions,
-  savedFilterPresets, notifications
+  savedFilterPresets, notifications, roles, featureFlags
 } from '@shared/schema';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
+import bcrypt from 'bcrypt';
+
+// ── Feature flag definitions ───────────────────────────────────────
+const CORE_FLAGS = [
+  'job_cards', 'customers', 'vehicles', 'invoices', 'estimates',
+  'appointments', 'inventory', 'payments', 'reports', 'fleet',
+  'technicians', 'settings',
+];
+const EXPERIMENTAL_FLAGS = [
+  'ai_features', 'iot_dashboard', 'blockchain', 'ar_vr',
+  'advanced_finance', 'hr_module', 'call_center', 'marketing',
+  'emerging_tech', 'digital_twin', 'franchise', 'supplier_portal',
+];
+
+// ── System roles ───────────────────────────────────────────────────
+const SYSTEM_ROLES = [
+  { name: 'admin', scope: 'global' },
+  { name: 'manager', scope: 'garage' },
+  { name: 'technician', scope: 'garage' },
+  { name: 'receptionist', scope: 'garage' },
+  { name: 'accountant', scope: 'garage' },
+  { name: 'customer', scope: 'self' },
+];
 
 async function seed() {
-  console.log('🌱 Starting database seeding...');
+  console.log('Starting database seeding...\n');
 
   try {
+    // ── Step 0: Seed system roles ──────────────────────────────────
+    for (const role of SYSTEM_ROLES) {
+      const existing = await db.select().from(roles).where(eq(roles.name, role.name));
+      if (existing.length === 0) {
+        await db.insert(roles).values({ name: role.name, scope: role.scope, isSystemRole: true });
+        console.log(`  Created role: ${role.name}`);
+      }
+    }
+
     // Get or create garage
     const [garage] = await db.select().from(garages).limit(1);
     const garageId = garage?.id || (await db.insert(garages).values({
-      name: 'AutoCare Pro Garage',
-      country: 'United States',
-      city: 'Los Angeles',
+      name: 'SLIS Garage',
+      country: 'Saudi Arabia',
+      city: 'Riyadh',
       licenseNumber: 'GAR-2025-001',
       workingHours: '8:00 AM - 6:00 PM',
       isActive: true,
+      subscriptionPlan: 'PROFESSIONAL',
     }).returning())[0].id;
+
+    // ── Seed feature flags ─────────────────────────────────────────
+    const existingFlags = await db.select().from(featureFlags).where(eq(featureFlags.garageId, garageId));
+    const existingFlagNames = new Set(existingFlags.map((f: any) => f.flagName));
+    const allFlags = [
+      ...CORE_FLAGS.map(f => ({ flagName: f, isEnabled: true })),
+      ...EXPERIMENTAL_FLAGS.map(f => ({ flagName: f, isEnabled: false })),
+    ];
+    let flagsCreated = 0;
+    for (const flag of allFlags) {
+      if (!existingFlagNames.has(flag.flagName)) {
+        await db.insert(featureFlags).values({ garageId, flagName: flag.flagName, isEnabled: flag.isEnabled, source: 'seed' });
+        flagsCreated++;
+      }
+    }
+    console.log(`  Feature flags: ${flagsCreated} created, ${existingFlagNames.size} already existed`);
 
     console.log('✅ Garage created/found:', garageId);
 
@@ -38,10 +87,23 @@ async function seed() {
 
     console.log('✅ Branch created/found:', branchId);
 
-    // Get current user
-    const [currentUser] = await db.select().from(users).limit(1);
+    // Create or find admin user
+    const adminEmail = 'admin@slis.sa';
+    let [currentUser] = await db.select().from(users).where(eq(users.email, adminEmail));
     if (!currentUser) {
-      throw new Error('No user found. Please log in first.');
+      const hashedPassword = await bcrypt.hash('Admin@2024!', 10);
+      [currentUser] = await db.insert(users).values({
+        email: adminEmail,
+        password: hashedPassword,
+        fullName: 'System Administrator',
+        userType: 'admin',
+        role: 'ADMIN',
+        garageId,
+        isActive: true,
+      }).returning();
+      console.log(`  Created admin user: ${adminEmail}`);
+    } else {
+      console.log(`  Admin user '${adminEmail}' already exists`);
     }
     const userId = currentUser.id;
 
@@ -434,12 +496,12 @@ async function seed() {
 
     console.log('✅ Created commission rules and commissions');
 
-    // Create tax configurations
+    // Create tax configurations (Saudi VAT 15%)
     await db.insert(taxConfigurations).values({
       garageId,
-      taxName: 'State Sales Tax',
+      taxName: 'Saudi VAT',
       taxType: 'percentage',
-      taxRate: '8.00',
+      taxRate: '15.00',
       isDefault: true,
       applicableCategories: ['service', 'parts', 'labor'],
       isActive: true,

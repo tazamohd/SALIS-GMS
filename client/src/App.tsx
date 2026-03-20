@@ -251,6 +251,8 @@ import AdvancedReports from "@/pages/AdvancedReports";
 import SupplierPortal from "@/pages/SupplierPortal";
 import APIDocs from "@/pages/APIDocs";
 import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { PageSkeleton } from "@/components/LoadingSkeleton";
 
 const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
 const AuditTrail = lazy(() => import("@/pages/AuditTrail"));
@@ -727,7 +729,7 @@ function Router() {
       </Route>
       <Route path="/notification-center">
         <Layout>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7]"></div></div>}>
+          <Suspense fallback={<PageSkeleton />}>
             <NotificationCenter />
           </Suspense>
         </Layout>
@@ -769,7 +771,7 @@ function Router() {
       </Route>
       <Route path="/hr-payroll">
         <Layout>
-          <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A5ED7]" /></div>}>
+          <Suspense fallback={<PageSkeleton />}>
             <HRPayroll />
           </Suspense>
         </Layout>
@@ -1129,7 +1131,7 @@ function Router() {
       </Route>
       <Route path="/quality-control">
         <Layout>
-          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+          <Suspense fallback={<PageSkeleton />}>
             <QualityControl />
           </Suspense>
         </Layout>
@@ -1314,7 +1316,7 @@ function Router() {
       </Route>
       <Route path="/audit-trail">
         <Layout>
-          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+          <Suspense fallback={<PageSkeleton />}>
             <AuditTrail />
           </Suspense>
         </Layout>
@@ -1489,7 +1491,9 @@ function App() {
         <UndoRedoProvider>
           <TooltipProvider>
             <Toaster />
-            <Router />
+            <ErrorBoundary>
+              <Router />
+            </ErrorBoundary>
           </TooltipProvider>
         </UndoRedoProvider>
       </AuthProvider>
