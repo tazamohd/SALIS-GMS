@@ -30,6 +30,8 @@ import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";
 import exportRoutes from "./export";
 import healthRoutes from "./health";
+import { customerRoutes } from "./customers.routes";
+import { schedulingRoutes } from "./scheduling.routes";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -182,6 +184,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Data Export routes
   app.use("/api", exportRoutes);
   console.log("✅ Data Export Routes Loaded");
+
+  // Core domain routes (extracted from monolith)
+  app.use("/api", customerRoutes);
+  console.log("✅ Customer Routes Loaded");
+
+  app.use("/api", schedulingRoutes);
+  console.log("✅ Scheduling Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
