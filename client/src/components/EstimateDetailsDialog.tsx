@@ -33,11 +33,15 @@ import type { Estimate, EstimateItem, User } from "@shared/schema";
 
 interface EstimateDetailsDialogProps {
   estimateId: string;
-  children: ReactNode;
+  children?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsDialogProps) {
-  const [open, setOpen] = useState(false);
+export function EstimateDetailsDialog({ estimateId, children, open: controlledOpen, onOpenChange }: EstimateDetailsDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -190,15 +194,19 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
-  if (!estimate) return null;
-
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          {children}
-        </DialogTrigger>
+        {children && (
+          <DialogTrigger asChild>
+            {children}
+          </DialogTrigger>
+        )}
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {!estimate ? (
+            <div className="flex items-center justify-center py-8 text-muted-foreground">Loading...</div>
+          ) : (
+            <>
           <DialogHeader>
             <DialogTitle>Estimate Details - {estimate.estimateNumber}</DialogTitle>
             <DialogDescription className="sr-only">
@@ -327,6 +335,8 @@ export function EstimateDetailsDialog({ estimateId, children }: EstimateDetailsD
               </Button>
             </div>
           </div>
+          </>
+          )}
         </DialogContent>
       </Dialog>
 

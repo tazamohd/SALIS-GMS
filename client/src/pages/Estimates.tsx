@@ -12,6 +12,8 @@ export function Estimates() {
   const { t } = useTranslation();
   const [selectedGarageId, setSelectedGarageId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedEstimate, setSelectedEstimate] = useState<Estimate | null>(null);
 
   const { data: garages } = useQuery<Garage[]>({
     queryKey: ['/api/garages'],
@@ -103,7 +105,7 @@ export function Estimates() {
       actions={[
         {
           label: t('estimates.createEstimate', 'Create Estimate'),
-          onClick: () => {},
+          onClick: () => setIsCreateDialogOpen(true),
           icon: Plus,
         },
       ]}
@@ -139,13 +141,24 @@ export function Estimates() {
         if (id === "garageId") setSelectedGarageId(value);
         if (id === "status") setStatusFilter(value);
       }}
-      onRowClick={(estimate) => {}}
+      onRowClick={(estimate) => setSelectedEstimate(estimate)}
       emptyState={{
         icon: FileText,
         title: t('estimates.noEstimates', 'No Estimates'),
         description: t('estimates.noEstimatesDescription', 'Create your first estimate to start quoting customers'),
       }}
-      additionalContent={<CreateEstimateDialog />}
+      additionalContent={
+        <>
+          <CreateEstimateDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+          {selectedEstimate && (
+            <EstimateDetailsDialog
+              estimateId={selectedEstimate.id}
+              open={!!selectedEstimate}
+              onOpenChange={(open) => { if (!open) setSelectedEstimate(null); }}
+            />
+          )}
+        </>
+      }
     />
   );
 }

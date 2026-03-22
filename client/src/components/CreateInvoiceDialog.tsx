@@ -52,7 +52,7 @@ export function CreateInvoiceDialog() {
     description: "",
     quantity: 1,
     unitPrice: 0,
-    taxRate: 10,
+    taxRate: 15, // Saudi VAT 15%
   });
   const { toast } = useToast();
 
@@ -108,7 +108,7 @@ export function CreateInvoiceDialog() {
       });
       form.reset();
       setItems([]);
-      setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 10 });
+      setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 15 });
       setOpen(false);
     },
     onError: (error: any) => {
@@ -131,7 +131,7 @@ export function CreateInvoiceDialog() {
     }
     
     setItems([...items, currentItem]);
-    setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 10 });
+    setCurrentItem({ itemType: "service", description: "", quantity: 1, unitPrice: 0, taxRate: 15 });
   };
 
   const removeItem = (index: number) => {

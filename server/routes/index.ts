@@ -29,6 +29,7 @@ import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";
 import exportRoutes from "./export";
+import featureFlagRoutes from "./feature-flags";
 import healthRoutes from "./health";
 import { customerRoutes } from "./customers.routes";
 import { schedulingRoutes } from "./scheduling.routes";
@@ -184,6 +185,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Data Export routes
   app.use("/api", exportRoutes);
   console.log("✅ Data Export Routes Loaded");
+
+  // Feature Flags routes
+  app.use("/api", featureFlagRoutes);
+  console.log("✅ Feature Flags Routes Loaded");
 
   // Core domain routes (extracted from monolith)
   app.use("/api", customerRoutes);

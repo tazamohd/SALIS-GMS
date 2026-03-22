@@ -43,8 +43,15 @@ const itemSchema = z.object({
 
 type EstimateItemInput = z.infer<typeof itemSchema>;
 
-export function CreateEstimateDialog() {
-  const [open, setOpen] = useState(false);
+interface CreateEstimateDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: CreateEstimateDialogProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [items, setItems] = useState<EstimateItemInput[]>([]);
   const [currentItem, setCurrentItem] = useState<EstimateItemInput>({
     itemType: "service",
