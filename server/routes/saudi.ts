@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Saudi Arabia Market Compliance API
  * Endpoints for ZATCA e-invoicing, VAT reporting, Hijri calendar,
@@ -344,7 +343,7 @@ router.get('/saudi/vat/summary', async (req: Request, res: Response) => {
         totalPaid: parseFloat(String(summary?.totalPaid ?? '0')),
         totalOutstanding: parseFloat(String(summary?.totalBalance ?? '0')),
       },
-      statusBreakdown: statusBreakdown.map((s) => ({
+      statusBreakdown: statusBreakdown.map((s: any) => ({
         status: s.status,
         count: Number(s.count),
         total: parseFloat(String(s.total ?? '0')),

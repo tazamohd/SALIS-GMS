@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Financial API Routes
  * Generates real financial reports by querying the database.
@@ -658,8 +657,8 @@ router.get('/financial/cash-flow', async (req: Request, res: Response) => {
         .orderBy(sql`TO_CHAR(${purchaseOrders.orderDate}, 'YYYY-MM')`),
     ]);
 
-    const totalInflows = paymentsByMethod.reduce((s, r) => s + (Number(r.total) || 0), 0);
-    const totalOutflows = poPayments.reduce((s, r) => s + (Number(r.total) || 0), 0);
+    const totalInflows = paymentsByMethod.reduce((s: any, r: any) => s + (Number(r.total) || 0), 0);
+    const totalOutflows = poPayments.reduce((s: any, r: any) => s + (Number(r.total) || 0), 0);
 
     // Build monthly breakdown combining inflows and outflows
     const monthlyMap = new Map<string, { inflow: number; outflow: number }>();
@@ -756,7 +755,7 @@ router.get('/financial/accounts-receivable', async (req: Request, res: Response)
       '90+': 0,
     };
 
-    const enriched = outstandingInvoices.map((inv) => {
+    const enriched = outstandingInvoices.map((inv: any) => {
       const balance = Number(inv.balanceAmount) || 0;
       const dueDate = inv.dueDate ? new Date(inv.dueDate) : now;
       const daysOverdue = Math.max(0, Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)));
@@ -797,7 +796,7 @@ router.get('/financial/accounts-receivable', async (req: Request, res: Response)
       agingBuckets[key] = Math.round(agingBuckets[key] * 100) / 100;
     }
 
-    const totalOutstanding = enriched.reduce((s, inv) => s + inv.balanceAmount, 0);
+    const totalOutstanding = enriched.reduce((s: any, inv: any) => s + inv.balanceAmount, 0);
 
     res.json({
       invoices: enriched,
@@ -860,7 +859,7 @@ router.get('/financial/accounts-payable', async (req: Request, res: Response) =>
       '90+': 0,
     };
 
-    const enriched = outstandingPOs.map((po) => {
+    const enriched = outstandingPOs.map((po: any) => {
       const amount = Number(po.totalAmount) || 0;
       const orderDate = po.orderDate ? new Date(po.orderDate) : now;
       const daysOutstanding = Math.floor((now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -900,7 +899,7 @@ router.get('/financial/accounts-payable', async (req: Request, res: Response) =>
       agingBuckets[key] = Math.round(agingBuckets[key] * 100) / 100;
     }
 
-    const totalPayable = enriched.reduce((s, po) => s + po.totalAmount, 0);
+    const totalPayable = enriched.reduce((s: any, po: any) => s + po.totalAmount, 0);
 
     res.json({
       purchaseOrders: enriched,

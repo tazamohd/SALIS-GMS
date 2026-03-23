@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from 'express';
 import { db } from '../db';
 import { spareParts, sparePartInventories, purchaseOrders, purchaseOrderItems, suppliers, supplierPerformance } from '../../shared/schema';
@@ -81,7 +80,7 @@ router.get('/inventory/overview', async (req, res) => {
       totalValue,
       lowStockCount,
       outOfStockCount,
-      categoryBreakdown: categoryBreakdown.map((c) => ({
+      categoryBreakdown: categoryBreakdown.map((c: any) => ({
         category: c.category,
         count: Number(c.count),
         totalQuantity: Number(c.totalQty),
@@ -134,7 +133,7 @@ router.get('/inventory/items', async (req, res) => {
       .where(garageId ? eq(sparePartInventories.garageId, garageId) : undefined)
       .orderBy(spareParts.name);
 
-    const enrichedItems = items.map((item) => {
+    const enrichedItems = items.map((item: any) => {
       const qty = Number(item.stockQuantity ?? 0);
       const threshold = Number(item.minThreshold ?? 5);
       let status: 'in_stock' | 'low' | 'out_of_stock';
@@ -191,7 +190,7 @@ router.get('/inventory/low-stock', async (req, res) => {
       )
       .orderBy(sparePartInventories.stockQuantity);
 
-    const enrichedItems = items.map((item) => {
+    const enrichedItems = items.map((item: any) => {
       const qty = Number(item.stockQuantity ?? 0);
       const threshold = Number(item.minThreshold ?? 5);
       return {
@@ -310,7 +309,7 @@ router.get('/inventory/suppliers', async (req, res) => {
       }
     }
 
-    const enrichedSuppliers = supplierList.map((s) => {
+    const enrichedSuppliers = supplierList.map((s: any) => {
       const perf = perfMap.get(s.id);
       return {
         ...s,
@@ -347,7 +346,7 @@ router.get('/inventory/turnover', async (req, res) => {
       .where(garageId ? eq(sparePartInventories.garageId, garageId) : undefined)
       .groupBy(spareParts.category);
 
-    const enriched = turnoverData.map((row) => {
+    const enriched = turnoverData.map((row: any) => {
       const totalStock = Number(row.totalStock);
       const totalValue = parseFloat(String(row.totalValue));
       // Estimated annual turnover ratio (higher stock = potentially lower turnover)
@@ -394,7 +393,7 @@ router.get('/inventory/valuation', async (req, res) => {
     let grandTotalQuantity = 0;
     let grandTotalItems = 0;
 
-    const categories = valuationByCategory.map((row) => {
+    const categories = valuationByCategory.map((row: any) => {
       const costValue = parseFloat(String(row.totalCostValue));
       const sellingValue = parseFloat(String(row.totalSellingValue));
       const qty = Number(row.totalQuantity);

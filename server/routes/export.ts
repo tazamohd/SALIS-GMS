@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from 'express';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
@@ -236,7 +235,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Status</th><th>Count</th><th>Total (SAR)</th></tr></thead>
             <tbody>
-              ${statusBreakdown.map((s) => `<tr><td>${s.status}</td><td>${s.count}</td><td>${parseFloat(s.total).toLocaleString('en', { minimumFractionDigits: 2 })}</td></tr>`).join('')}
+              ${statusBreakdown.map((s: any) => `<tr><td>${s.status}</td><td>${s.count}</td><td>${parseFloat(s.total).toLocaleString('en', { minimumFractionDigits: 2 })}</td></tr>`).join('')}
             </tbody>
           </table>
         `;
@@ -288,7 +287,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Name</th><th>SKU</th><th>Category</th><th>Brand</th><th>Type</th></tr></thead>
             <tbody>
-              ${parts.map((p) => `<tr><td>${p.name}</td><td>${p.sku}</td><td>${p.category}</td><td>${p.brand ?? '-'}</td><td>${p.partType}</td></tr>`).join('')}
+              ${parts.map((p: any) => `<tr><td>${p.name}</td><td>${p.sku}</td><td>${p.category}</td><td>${p.brand ?? '-'}</td><td>${p.partType}</td></tr>`).join('')}
             </tbody>
           </table>
         `;
@@ -325,7 +324,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Active</th><th>Created</th></tr></thead>
             <tbody>
-              ${customerRows.map((c) => `<tr><td>${c.fullName ?? '-'}</td><td>${c.email}</td><td>${c.phone ?? '-'}</td><td>${c.role ?? '-'}</td><td>${c.isActive ? 'Yes' : 'No'}</td><td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}</td></tr>`).join('')}
+              ${customerRows.map((c: any) => `<tr><td>${c.fullName ?? '-'}</td><td>${c.email}</td><td>${c.phone ?? '-'}</td><td>${c.role ?? '-'}</td><td>${c.isActive ? 'Yes' : 'No'}</td><td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}</td></tr>`).join('')}
             </tbody>
           </table>
         `;

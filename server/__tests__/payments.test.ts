@@ -23,16 +23,31 @@ beforeAll(async () => {
   const vehicle = await seedVehicle(agent, customerId, garageId);
   const jobCard = await seedJobCard(agent, vehicle.id, customerId, garageId);
 
-  const invoiceRes = await agent.post("/api/invoices").send({
-    garageId,
-    customerId,
-    jobCardId: jobCard.id,
-    totalAmount: "750.00",
-    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "sent",
-  });
-  if (invoiceRes.status === 200 || invoiceRes.status === 201) {
-    invoiceId = invoiceRes.body.id;
+  // Create invoice using from-job endpoint (more reliable, server calculates everything)
+  const fromJobRes = await agent.post(`/api/invoices/from-job/${jobCard.id}`).send({});
+  if (fromJobRes.status === 201 || fromJobRes.status === 200) {
+    invoiceId = fromJobRes.body.invoice?.id || fromJobRes.body.id;
+  }
+
+  // Fallback: try direct invoice creation if from-job didn't work
+  if (!invoiceId) {
+    const invoiceRes = await agent.post("/api/invoices").send({
+      garageId,
+      customerId,
+      jobCardId: jobCard.id,
+      totalAmount: "750.00",
+      subtotal: "750.00",
+      taxAmount: "0.00",
+      balanceAmount: "750.00",
+      paidAmount: "0.00",
+      status: "sent",
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      invoiceDate: new Date().toISOString(),
+      invoiceNumber: `INV-TEST-${Date.now()}`,
+    });
+    if (invoiceRes.status === 200 || invoiceRes.status === 201) {
+      invoiceId = invoiceRes.body.id;
+    }
   }
 });
 
@@ -45,15 +60,13 @@ describe("Payments - CRUD", () => {
 
   it("POST /api/payments records a payment", async () => {
     if (!invoiceId) {
-      // If invoice creation failed, test that the endpoint at least responds
+      // If invoice creation failed, verify endpoint at least responds
       const res = await agent.post("/api/payments").send({
         invoiceId: "nonexistent",
         amount: "250.00",
         paymentMethod: "cash",
         paymentDate: new Date().toISOString(),
-        notes: "Partial payment",
       });
-      // Expect a structured error, not a crash
       expect([200, 201, 400, 404, 500]).toContain(res.status);
       return;
     }

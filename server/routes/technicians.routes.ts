@@ -1,23 +1,8 @@
-// @ts-nocheck
 import { Router } from "express";
-import type { Express } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
 
 const router = Router();
-
-/**
- * Technician Management Routes
- * - GET /api/technicians - List all technicians
- * - POST /api/technicians - Create new technician
- * - DELETE /api/technicians/:id - Delete technician
- * - GET /api/technician-profiles/:userId - Get technician profile
- * - POST /api/technician-profiles - Create technician profile
- * - PATCH /api/technician-profiles/:userId - Update technician profile
- * - GET /api/technicians/:technicianId/job-cards - Get technician's job cards
- * - GET /api/technicians/:technicianId/time-clock - Get technician time clock
- * - POST /api/technicians/:technicianId/time-clock - Record time clock entry
- */
 
 // Get all technicians
 router.get("/technicians", isAuthenticated, async (req, res) => {
@@ -31,7 +16,7 @@ router.get("/technicians", isAuthenticated, async (req, res) => {
   }
 });
 
-// Create new technician
+// Create technician
 router.post("/technicians", isAuthenticated, async (req, res) => {
   try {
     const technicianData = {
@@ -60,120 +45,81 @@ router.delete("/technicians/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get technician profile
-router.get(
-  "/technician-profiles/:userId",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const profile = await storage.getTechnicianProfile(userId);
-      if (!profile) {
-        return res
-          .status(404)
-          .json({ message: "Technician profile not found" });
-      }
-      res.json(profile);
-    } catch (error) {
-      console.error("Error fetching technician profile:", error);
-      res.status(500).json({ message: "Failed to fetch technician profile" });
+router.get("/technician-profiles/:userId", isAuthenticated, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const profile = await storage.getTechnicianProfile(userId);
+    if (!profile) {
+      return res.status(404).json({ message: "Technician profile not found" });
     }
+    res.json(profile);
+  } catch (error) {
+    console.error("Error fetching technician profile:", error);
+    res.status(500).json({ message: "Failed to fetch technician profile" });
   }
-);
+});
 
 // Create technician profile
-router.post(
-  "/technician-profiles",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const profile = await storage.createTechnicianProfile(req.body);
-      res.status(201).json(profile);
-    } catch (error) {
-      console.error("Error creating technician profile:", error);
-      res
-        .status(500)
-        .json({ message: "Failed to create technician profile" });
-    }
+router.post("/technician-profiles", isAuthenticated, async (req, res) => {
+  try {
+    const profile = await storage.createTechnicianProfile(req.body);
+    res.status(201).json(profile);
+  } catch (error) {
+    console.error("Error creating technician profile:", error);
+    res.status(500).json({ message: "Failed to create technician profile" });
   }
-);
+});
 
 // Update technician profile
-router.patch(
-  "/technician-profiles/:userId",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const profile = await storage.updateTechnicianProfile(userId, req.body);
-      res.json(profile);
-    } catch (error) {
-      console.error("Error updating technician profile:", error);
-      res
-        .status(500)
-        .json({ message: "Failed to update technician profile" });
-    }
+router.patch("/technician-profiles/:userId", isAuthenticated, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const profile = await storage.updateTechnicianProfile(userId, req.body);
+    res.json(profile);
+  } catch (error) {
+    console.error("Error updating technician profile:", error);
+    res.status(500).json({ message: "Failed to update technician profile" });
   }
-);
+});
 
 // Get technician's job cards
-router.get(
-  "/technicians/:technicianId/job-cards",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { technicianId } = req.params;
-      const jobCards = await storage.getTechnicianJobCards(technicianId);
-      res.json(jobCards);
-    } catch (error) {
-      console.error("Error fetching technician job cards:", error);
-      res
-        .status(500)
-        .json({ message: "Failed to fetch technician job cards" });
-    }
+router.get("/technicians/:technicianId/job-cards", isAuthenticated, async (req, res) => {
+  try {
+    const { technicianId } = req.params;
+    const jobCards = await storage.getTechnicianJobCards(technicianId);
+    res.json(jobCards);
+  } catch (error) {
+    console.error("Error fetching technician job cards:", error);
+    res.status(500).json({ message: "Failed to fetch job cards" });
   }
-);
+});
 
-// Get technician time clock
-router.get(
-  "/technicians/:technicianId/time-clock",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { technicianId } = req.params;
-      const { date } = req.query;
-      const timeClock = await storage.getTechnicianTimeClock(
-        technicianId,
-        date as string
-      );
-      res.json(timeClock);
-    } catch (error) {
-      console.error("Error fetching technician time clock:", error);
-      res.status(500).json({ message: "Failed to fetch time clock data" });
-    }
+// Get technician's time clock entries
+router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+  try {
+    const { technicianId } = req.params;
+    const entries = await storage.getTechnicianTimeClockEntries(technicianId);
+    res.json(entries);
+  } catch (error) {
+    console.error("Error fetching time clock entries:", error);
+    res.status(500).json({ message: "Failed to fetch time clock entries" });
   }
-);
+});
 
-// Record time clock entry
-router.post(
-  "/technicians/:technicianId/time-clock",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { technicianId } = req.params;
-      const { action, timestamp } = req.body;
-      const timeClock = await storage.recordTechnicianTimeClock(
-        technicianId,
-        action,
-        timestamp
-      );
-      res.status(201).json(timeClock);
-    } catch (error) {
-      console.error("Error recording time clock entry:", error);
-      res
-        .status(500)
-        .json({ message: "Failed to record time clock entry" });
-    }
+// POST clock in/out
+router.post("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+  try {
+    const { technicianId } = req.params;
+    const entryData = {
+      ...req.body,
+      technicianId,
+    };
+    const entry = await storage.createTimeClockEntry(entryData);
+    res.status(201).json(entry);
+  } catch (error) {
+    console.error("Error creating time clock entry:", error);
+    res.status(500).json({ message: "Failed to create time clock entry" });
   }
-);
+});
 
 export const technicianRoutes = router;

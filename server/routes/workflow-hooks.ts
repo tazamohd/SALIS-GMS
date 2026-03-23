@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Workflow Hooks
  * Intercepts entity status changes and routes them through the workflow engine
@@ -54,7 +53,7 @@ router.post('/job-cards/:id/transition', validate(jobTransitionSchema), async (r
     if (user.userType) userRoles.push(user.userType);
 
     const result = await workflowEngine.processTransition({
-      entityType: 'job_card',
+      entityType: 'jobCard',
       entityId: id,
       garageId: user.garageId,
       fromStatus: jobCard.status,
@@ -236,8 +235,8 @@ router.post('/inventory/check-levels', validate(inventoryCheckSchema), async (re
       .select({
         inventoryId: sparePartInventories.id,
         sparePartId: sparePartInventories.sparePartId,
-        partName: spareParts.partName,
-        partNumber: spareParts.partNumber,
+        partName: spareParts.name,
+        partNumber: spareParts.sku,
         stockQuantity: sparePartInventories.stockQuantity,
         minThreshold: sparePartInventories.minThreshold,
         purchasePrice: sparePartInventories.purchasePrice,

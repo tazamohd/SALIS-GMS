@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
@@ -42,29 +41,39 @@ router.post("/appointments", isAuthenticated, async (req: any, res) => {
   try {
     const {
       customerId,
-      vehicleId,
+      customerName,
+      customerPhone,
+      customerEmail,
+      vehicleInfo,
+      serviceType,
       appointmentDate,
-      appointmentTime,
-      service,
+      garageId,
+      description,
       notes,
+      duration,
     } = req.body;
     const userId = req.user?.id || "default-user";
 
-    if (!customerId || !vehicleId || !appointmentDate) {
+    if (!customerName || !vehicleInfo || !appointmentDate || !garageId || !serviceType) {
       return res
         .status(400)
         .json({
-          message: "Customer, vehicle, and appointment date are required",
+          message: "Customer name, vehicle info, service type, garage ID, and appointment date are required",
         });
     }
 
     const appointment = await storage.createAppointment({
-      customerId,
-      vehicleId,
-      appointmentDate,
-      appointmentTime: appointmentTime || "09:00",
-      service: service || null,
+      garageId,
+      customerId: customerId || null,
+      customerName,
+      customerPhone: customerPhone || "",
+      customerEmail: customerEmail || null,
+      vehicleInfo,
+      serviceType,
+      appointmentDate: new Date(appointmentDate),
+      description: description || null,
       notes: notes || null,
+      duration: duration || 60,
       status: "scheduled",
       createdBy: userId,
     });
@@ -97,18 +106,20 @@ router.patch("/appointments/:id", isAuthenticated, async (req, res) => {
     const { id } = req.params;
     const {
       appointmentDate,
-      appointmentTime,
-      service,
+      serviceType,
+      description,
       notes,
       status,
+      duration,
     } = req.body;
 
     const appointment = await storage.updateAppointment(id, {
-      appointmentDate: appointmentDate || undefined,
-      appointmentTime: appointmentTime || undefined,
-      service: service || undefined,
+      appointmentDate: appointmentDate ? new Date(appointmentDate) : undefined,
+      serviceType: serviceType || undefined,
+      description: description || undefined,
       notes: notes || undefined,
       status: status || undefined,
+      duration: duration || undefined,
     });
 
     res.json(appointment);
@@ -170,7 +181,7 @@ router.get("/availability", isAuthenticated, async (req, res) => {
 
     const availability = await storage.getTechnicianAvailability(
       technicianId as string,
-      date as string
+      new Date(date as string)
     );
 
     res.json(availability);
@@ -195,8 +206,8 @@ router.get("/calendar-appointments", isAuthenticated, async (req, res) => {
 
     const appointments = await storage.getCalendarAppointments(
       garageId as string,
-      startDate as string,
-      endDate as string
+      new Date(startDate as string),
+      new Date(endDate as string)
     );
 
     res.json(appointments);
@@ -214,21 +225,22 @@ router.post(
   isAuthenticated,
   async (req: any, res) => {
     try {
-      const { title, startTime, endTime, description, attendees } = req.body;
+      const { title, startTime, endTime, description, garageId, eventType } = req.body;
       const userId = req.user?.id || "default-user";
 
-      if (!title || !startTime || !endTime) {
+      if (!title || !startTime || !endTime || !garageId || !eventType) {
         return res
           .status(400)
-          .json({ message: "Title, start time, and end time are required" });
+          .json({ message: "Title, start time, end time, garage ID, and event type are required" });
       }
 
       const event = await storage.createCalendarEvent({
+        garageId,
         title,
-        startTime,
-        endTime,
+        eventType,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
         description: description || null,
-        attendees: attendees || [],
         createdBy: userId,
       });
 
@@ -243,14 +255,15 @@ router.post(
 // Get available time slots
 router.get("/time-slots", isAuthenticated, async (req, res) => {
   try {
-    const { date, duration } = req.query;
+    const { technicianId, date, duration } = req.query;
 
-    if (!date) {
-      return res.status(400).json({ message: "Date is required" });
+    if (!technicianId || !date) {
+      return res.status(400).json({ message: "Technician ID and date are required" });
     }
 
     const slots = await storage.getAvailableTimeSlots(
-      date as string,
+      technicianId as string,
+      new Date(date as string),
       parseInt((duration as string) || "60")
     );
 

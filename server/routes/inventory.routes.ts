@@ -1,67 +1,27 @@
-// @ts-nocheck
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
 
 const router = Router();
 
-/**
- * Inventory Management Routes
- * - GET /api/spare-parts - List spare parts
- * - POST /api/spare-parts - Create spare part
- * - GET /api/spare-parts/:id - Get spare part details
- * - PATCH /api/spare-parts/:id - Update spare part
- * - DELETE /api/spare-parts/:id - Delete spare part
- * - GET /api/spare-part-inventories - List inventory
- * - POST /api/spare-part-inventories - Create inventory record
- * - PATCH /api/spare-part-inventories/:id - Update inventory
- * - GET /api/stock-alerts - Get stock alerts
- * - POST /api/auto-reorder - Setup auto-reorder
- * - GET /api/inventory-audit-trail - Get audit trail
- * - GET /api/inventory-transfers - Get transfers
- * - POST /api/inventory-transfers - Create transfer
- * - GET /api/inventory-forecasts - Get forecasts
- */
+function sanitizeZodError(error: any) {
+  return {
+    message: "Validation failed",
+    errors: error.errors.map((err: any) => ({
+      field: err.path.join("."),
+      message: err.message,
+    })),
+  };
+}
 
 // Get all spare parts
 router.get("/spare-parts", isAuthenticated, async (req, res) => {
   try {
-    const { garageId, search } = req.query;
-    const parts = await storage.getSpareParts(
-      garageId as string,
-      search as string
-    );
+    const parts = await storage.getSpareParts();
     res.json(parts);
   } catch (error) {
     console.error("Error fetching spare parts:", error);
     res.status(500).json({ message: "Failed to fetch spare parts" });
-  }
-});
-
-// Create spare part
-router.post("/spare-parts", isAuthenticated, async (req: any, res) => {
-  try {
-    const { partNumber, name, description, category, cost, retail } = req.body;
-
-    if (!partNumber || !name) {
-      return res
-        .status(400)
-        .json({ message: "Part number and name are required" });
-    }
-
-    const part = await storage.createSparePart({
-      partNumber,
-      name,
-      description: description || null,
-      category: category || null,
-      cost: cost || 0,
-      retail: retail || 0,
-    });
-
-    res.status(201).json(part);
-  } catch (error) {
-    console.error("Error creating spare part:", error);
-    res.status(500).json({ message: "Failed to create spare part" });
   }
 });
 
@@ -80,21 +40,43 @@ router.get("/spare-parts/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// Create spare part
+router.post("/spare-parts", isAuthenticated, async (req: any, res) => {
+  try {
+    const { insertSparePartSchema } = await import("@shared/schema");
+    const userId = req.user?.id || "default-user";
+
+    const validationResult = insertSparePartSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
+    }
+
+    const partData = {
+      ...validationResult.data,
+      createdBy: userId,
+    };
+
+    const part = await storage.createSparePart(partData);
+    res.status(201).json(part);
+  } catch (error) {
+    console.error("Error creating spare part:", error);
+    res.status(500).json({ message: "Failed to create spare part" });
+  }
+});
+
 // Update spare part
 router.patch("/spare-parts/:id", isAuthenticated, async (req, res) => {
   try {
+    const { insertSparePartSchema } = await import("@shared/schema");
     const { id } = req.params;
-    const { name, description, category, cost, retail } = req.body;
 
-    const part = await storage.updateSparePart(id, {
-      name: name || undefined,
-      description: description || undefined,
-      category: category || undefined,
-      cost: cost || undefined,
-      retail: retail || undefined,
-    });
+    const validationResult = insertSparePartSchema.partial().safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
+    }
 
-    res.json(part);
+    const updatedPart = await storage.updateSparePart(id, validationResult.data);
+    res.json(updatedPart);
   } catch (error) {
     console.error("Error updating spare part:", error);
     res.status(500).json({ message: "Failed to update spare part" });
@@ -113,82 +95,110 @@ router.delete("/spare-parts/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Get inventory
-router.get(
-  "/spare-part-inventories",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { garageId } = req.query;
-      const inventory = await storage.getInventory(garageId as string);
-      res.json(inventory);
-    } catch (error) {
-      console.error("Error fetching inventory:", error);
-      res.status(500).json({ message: "Failed to fetch inventory" });
+// Get spare part inventories
+router.get("/spare-part-inventories", isAuthenticated, async (req, res) => {
+  try {
+    const { garage_id, spare_part_id } = req.query;
+    if (!garage_id) {
+      return res.status(400).json({ message: "garage_id is required" });
     }
+    const inventories = await storage.getSparePartInventories(
+      garage_id as string,
+      spare_part_id as string
+    );
+    res.json(inventories);
+  } catch (error) {
+    console.error("Error fetching spare part inventories:", error);
+    res.status(500).json({ message: "Failed to fetch spare part inventories" });
   }
-);
+});
 
-// Create inventory record
-router.post(
-  "/spare-part-inventories",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { sparePartId, garageId, quantity, minThreshold, location } =
-        req.body;
+// Create spare part inventory
+router.post("/spare-part-inventories", isAuthenticated, async (req, res) => {
+  try {
+    const { insertSparePartInventorySchema } = await import("@shared/schema");
 
-      if (!sparePartId || !garageId) {
-        return res
-          .status(400)
-          .json({ message: "Spare part and garage are required" });
-      }
-
-      const record = await storage.createInventoryRecord({
-        sparePartId,
-        garageId,
-        stockQuantity: quantity || 0,
-        minThreshold: minThreshold || 5,
-        location: location || null,
-      });
-
-      res.status(201).json(record);
-    } catch (error) {
-      console.error("Error creating inventory record:", error);
-      res.status(500).json({ message: "Failed to create inventory record" });
+    const validationResult = insertSparePartInventorySchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
     }
+
+    const inventory = await storage.createSparePartInventory(validationResult.data);
+    res.status(201).json(inventory);
+  } catch (error) {
+    console.error("Error creating spare part inventory:", error);
+    res.status(500).json({ message: "Failed to create spare part inventory" });
   }
-);
+});
 
-// Update inventory
-router.patch(
-  "/spare-part-inventories/:id",
-  isAuthenticated,
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { quantity, minThreshold, location } = req.body;
+// Update spare part inventory
+router.patch("/spare-part-inventories/:id", isAuthenticated, async (req, res) => {
+  try {
+    const { insertSparePartInventorySchema } = await import("@shared/schema");
+    const { id } = req.params;
 
-      const record = await storage.updateInventoryRecord(id, {
-        stockQuantity: quantity || undefined,
-        minThreshold: minThreshold || undefined,
-        location: location || undefined,
-      });
-
-      res.json(record);
-    } catch (error) {
-      console.error("Error updating inventory:", error);
-      res.status(500).json({ message: "Failed to update inventory" });
+    const validationResult = insertSparePartInventorySchema.partial().safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
     }
-  }
-);
 
-// TODO: Implement remaining inventory endpoints
-// - GET /api/stock-alerts
-// - POST /api/auto-reorder
-// - GET /api/inventory-audit-trail
-// - GET /api/inventory-transfers
-// - POST /api/inventory-transfers
-// - GET /api/inventory-forecasts
+    const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data);
+    res.json(updatedInventory);
+  } catch (error) {
+    console.error("Error updating spare part inventory:", error);
+    res.status(500).json({ message: "Failed to update spare part inventory" });
+  }
+});
+
+// Get stock alerts
+router.get("/stock-alerts", isAuthenticated, async (req: any, res) => {
+  try {
+    const { garageId, status } = req.query;
+    if (!garageId) {
+      return res.status(400).json({ message: "garageId is required" });
+    }
+    const alerts = await storage.getStockAlerts(garageId as string, status as string);
+    res.json(alerts);
+  } catch (error) {
+    console.error("Error fetching stock alerts:", error);
+    res.status(500).json({ message: "Failed to fetch stock alerts" });
+  }
+});
+
+// Create stock alert
+router.post("/stock-alerts", isAuthenticated, async (req: any, res) => {
+  try {
+    const alert = await storage.createStockAlert(req.body);
+    res.status(201).json(alert);
+  } catch (error) {
+    console.error("Error creating stock alert:", error);
+    res.status(500).json({ message: "Failed to create stock alert" });
+  }
+});
+
+// Update stock alert
+router.patch("/stock-alerts/:id", isAuthenticated, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const alert = await storage.updateStockAlert(id, req.body);
+    res.json(alert);
+  } catch (error) {
+    console.error("Error updating stock alert:", error);
+    res.status(500).json({ message: "Failed to update stock alert" });
+  }
+});
+
+// Acknowledge stock alert
+router.post("/stock-alerts/:id/acknowledge", isAuthenticated, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id || "default-user";
+    const alert = await storage.acknowledgeStockAlert(id, userId);
+    res.json(alert);
+  } catch (error) {
+    console.error("Error acknowledging stock alert:", error);
+    res.status(500).json({ message: "Failed to acknowledge stock alert" });
+  }
+});
 
 export const inventoryRoutes = router;

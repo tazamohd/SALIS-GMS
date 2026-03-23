@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router } from 'express';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';

@@ -1928,8 +1928,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertAppointmentSchema } = await import("@shared/schema");
       const userId = req.user?.id || 'default-user';
-      
-      const validationResult = insertAppointmentSchema.safeParse(req.body);
+
+      // Coerce date strings from JSON
+      const body = { ...req.body };
+      if (typeof body.appointmentDate === 'string') body.appointmentDate = new Date(body.appointmentDate);
+      if (typeof body.validUntil === 'string') body.validUntil = new Date(body.validUntil);
+
+      const validationResult = insertAppointmentSchema.safeParse(body);
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -4322,8 +4327,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertPaymentSchema } = await import("@shared/schema");
       const userId = req.user?.id || 'default-user';
-      
-      const validationResult = insertPaymentSchema.safeParse(req.body);
+
+      // Coerce date strings from JSON
+      const body = { ...req.body };
+      if (typeof body.paymentDate === 'string') body.paymentDate = new Date(body.paymentDate);
+
+      const validationResult = insertPaymentSchema.safeParse(body);
       
       if (!validationResult.success) {
         return res.status(400).json({ 
@@ -4408,11 +4417,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { estimate, items } = req.body;
       
       if (!estimate || !items || !Array.isArray(items)) {
-        return res.status(400).json({ 
-          message: "Invalid request: estimate and items (array) required" 
+        return res.status(400).json({
+          message: "Invalid request: estimate and items (array) required"
         });
       }
-      
+
+      // Coerce date strings from JSON
+      if (typeof estimate.validUntil === 'string') estimate.validUntil = new Date(estimate.validUntil);
+      if (typeof estimate.approvedAt === 'string') estimate.approvedAt = new Date(estimate.approvedAt);
+
       const estimateValidation = insertEstimateSchema.safeParse(estimate);
       if (!estimateValidation.success) {
         return res.status(400).json(sanitizeZodError(estimateValidation.error));

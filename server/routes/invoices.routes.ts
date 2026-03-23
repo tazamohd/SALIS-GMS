@@ -1,32 +1,50 @@
-// @ts-nocheck
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { db } from "../db";
+import { eq, desc } from "drizzle-orm";
+import type { z } from "zod";
 
 const router = Router();
 
 /**
- * Invoice & Payment Routes
- * - GET /api/invoices - List invoices
- * - POST /api/invoices - Create invoice
- * - GET /api/invoices/:id - Get invoice details
- * - PATCH /api/invoices/:id - Update invoice
- * - GET /api/payments - List payments
- * - POST /api/payments - Create payment
- * - GET /api/refunds - List refunds
- * - POST /api/refunds - Create refund
- * - POST /api/calculate-tax - Calculate tax
- * - POST /api/send-payment-reminder - Send payment reminder
- * - GET /api/payment-plans - List payment plans
- * - POST /api/payment-plans - Create payment plan
+ * Local helper — mirrors sanitizeZodError from the monolith
  */
+function sanitizeZodError(error: z.ZodError) {
+  return {
+    message: "Validation failed",
+    errors: error.errors.map((err) => ({
+      field: err.path.join("."),
+      message: err.message,
+    })),
+  };
+}
 
-// Get all invoices
+function sanitizeArrayValidationErrors(
+  invalidItems: Array<{ success: false; error: z.ZodError }>
+) {
+  return {
+    message: "Validation failed",
+    errors: invalidItems.flatMap((v) =>
+      v.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }))
+    ),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Invoices
+// ---------------------------------------------------------------------------
+
+// GET /invoices — list invoices (uses garage_id, not garageId)
 router.get("/invoices", isAuthenticated, async (req, res) => {
   try {
-    const { garageId, status } = req.query;
+    const { garage_id, status } = req.query;
     const invoices = await storage.getInvoices(
-      garageId as string,
+      garage_id as string,
       status as string
     );
     res.json(invoices);
@@ -36,35 +54,7 @@ router.get("/invoices", isAuthenticated, async (req, res) => {
   }
 });
 
-// Create invoice
-router.post("/invoices", isAuthenticated, async (req: any, res) => {
-  try {
-    const { customerId, jobCardId, items, tax, discount, notes } = req.body;
-    const userId = req.user?.id || "default-user";
-
-    if (!customerId) {
-      return res.status(400).json({ message: "Customer ID is required" });
-    }
-
-    const invoice = await storage.createInvoice({
-      customerId,
-      jobCardId: jobCardId || null,
-      items: items || [],
-      tax: tax || 0,
-      discount: discount || 0,
-      notes: notes || null,
-      createdBy: userId,
-      status: "draft",
-    });
-
-    res.status(201).json(invoice);
-  } catch (error) {
-    console.error("Error creating invoice:", error);
-    res.status(500).json({ message: "Failed to create invoice" });
-  }
-});
-
-// Get invoice by ID
+// GET /invoices/:id — single invoice
 router.get("/invoices/:id", isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
@@ -79,19 +69,133 @@ router.get("/invoices/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Update invoice
+// POST /invoices — create invoice (with schema validation + date coercion)
+router.post("/invoices", isAuthenticated, async (req: any, res) => {
+  try {
+    const { insertInvoiceSchema } = await import("@shared/schema");
+    const userId = req.user?.id || "default-user";
+
+    // Coerce date strings from JSON to Date objects
+    const body = { ...req.body };
+    if (typeof body.dueDate === "string") body.dueDate = new Date(body.dueDate);
+    if (typeof body.invoiceDate === "string")
+      body.invoiceDate = new Date(body.invoiceDate);
+
+    const validationResult = insertInvoiceSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
+    }
+
+    const invoiceData = {
+      ...validationResult.data,
+      createdBy: userId,
+    };
+
+    const invoice = await storage.createInvoice(invoiceData as any);
+    res.status(201).json(invoice);
+  } catch (error) {
+    console.error("Error creating invoice:", error);
+    res.status(500).json({ message: "Failed to create invoice" });
+  }
+});
+
+// POST /invoices/with-items — create invoice + line items in one call
+router.post("/invoices/with-items", isAuthenticated, async (req: any, res) => {
+  try {
+    const { insertInvoiceSchema, insertInvoiceItemSchema } = await import(
+      "@shared/schema"
+    );
+    const userId = req.user?.id || "default-user";
+    const { invoice, items } = req.body;
+
+    if (!invoice || !items || !Array.isArray(items)) {
+      return res.status(400).json({
+        message: "Invalid request: invoice and items (array) required",
+      });
+    }
+
+    // Coerce date strings from JSON
+    if (typeof invoice.dueDate === "string")
+      invoice.dueDate = new Date(invoice.dueDate);
+    if (typeof invoice.invoiceDate === "string")
+      invoice.invoiceDate = new Date(invoice.invoiceDate);
+
+    const invoiceValidation = insertInvoiceSchema.safeParse(invoice);
+    if (!invoiceValidation.success) {
+      return res
+        .status(400)
+        .json(sanitizeZodError(invoiceValidation.error));
+    }
+
+    const itemsValidation = items.map((item: any) =>
+      insertInvoiceItemSchema.omit({ invoiceId: true }).safeParse(item)
+    );
+
+    const invalidItems = itemsValidation.filter((v: any) => !v.success);
+    if (invalidItems.length > 0) {
+      return res
+        .status(400)
+        .json(sanitizeArrayValidationErrors(invalidItems as any));
+    }
+
+    const invoiceData = {
+      ...invoiceValidation.data,
+      createdBy: userId,
+    };
+
+    const validItems = itemsValidation
+      .map((v: any) => (v.success ? v.data : null))
+      .filter(Boolean);
+
+    const createdInvoice = await storage.createInvoiceWithItems(
+      invoiceData as any,
+      validItems as any
+    );
+    res.status(201).json(createdInvoice);
+  } catch (error) {
+    console.error("Error creating invoice with items:", error);
+    res.status(500).json({ message: "Failed to create invoice with items" });
+  }
+});
+
+// PATCH /invoices/:id — update invoice (with validation + status workflow)
 router.patch("/invoices/:id", isAuthenticated, async (req, res) => {
   try {
+    const { insertInvoiceSchema } = await import("@shared/schema");
     const { id } = req.params;
-    const { status, tax, discount, notes } = req.body;
 
-    const invoice = await storage.updateInvoice(id, {
-      status: status || undefined,
-      tax: tax || undefined,
-      discount: discount || undefined,
-      notes: notes || undefined,
-    });
+    const validationResult = insertInvoiceSchema.partial().safeParse(req.body);
 
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
+    }
+
+    // Validate status workflow if status is being changed
+    if (validationResult.data.status) {
+      const currentInvoice = await storage.getInvoice(id);
+      if (!currentInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      const validTransitions: Record<string, string[]> = {
+        draft: ["draft", "sent", "cancelled"],
+        sent: ["sent", "paid", "overdue", "cancelled"],
+        paid: ["paid", "cancelled"],
+        overdue: ["overdue", "paid", "cancelled"],
+        cancelled: ["cancelled"],
+      };
+
+      const allowedStatuses =
+        validTransitions[currentInvoice.status] || [currentInvoice.status];
+      if (!allowedStatuses.includes(validationResult.data.status)) {
+        return res.status(400).json({
+          message: `Invalid status transition from ${currentInvoice.status} to ${validationResult.data.status}`,
+        });
+      }
+    }
+
+    const invoice = await storage.updateInvoice(id, validationResult.data);
     res.json(invoice);
   } catch (error) {
     console.error("Error updating invoice:", error);
@@ -99,41 +203,117 @@ router.patch("/invoices/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Get all payments
+// DELETE /invoices/:id — admin/manager only
+router.delete(
+  "/invoices/:id",
+  isAuthenticated,
+  requireRole(["ADMIN", "MANAGER"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteInvoice(id);
+      res.json({ message: "Invoice deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      res.status(500).json({ message: "Failed to delete invoice" });
+    }
+  }
+);
+
+// GET /invoices/:id/items — invoice line items
+router.get("/invoices/:id/items", isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const items = await storage.getInvoiceItems(id);
+    res.json(items);
+  } catch (error) {
+    console.error("Error fetching invoice items:", error);
+    res.status(500).json({ message: "Failed to fetch invoice items" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Payments
+// ---------------------------------------------------------------------------
+
+// GET /payments — list payments with invoice & customer info
 router.get("/payments", isAuthenticated, async (req, res) => {
   try {
-    const { invoiceId, status } = req.query;
-    const payments = await storage.getPayments(
-      invoiceId as string,
-      status as string
-    );
-    res.json(payments);
+    const { invoice_id, status, method } = req.query;
+    const { payments, invoices, users } = await import("@shared/schema");
+
+    // Get payments with invoice and customer info
+    let query = db
+      .select({
+        id: payments.id,
+        invoiceId: payments.invoiceId,
+        paymentDate: payments.paymentDate,
+        amount: payments.amount,
+        paymentMethod: payments.paymentMethod,
+        referenceNumber: payments.referenceNumber,
+        notes: payments.notes,
+        createdBy: payments.createdBy,
+        createdAt: payments.createdAt,
+        invoiceNumber: invoices.invoiceNumber,
+        customerName: users.fullName,
+      })
+      .from(payments)
+      .innerJoin(invoices, eq(payments.invoiceId, invoices.id))
+      .innerJoin(users, eq(invoices.customerId, users.id))
+      .orderBy(desc(payments.paymentDate));
+
+    let results = await query;
+
+    // Apply filters
+    if (invoice_id) {
+      results = results.filter((p: any) => p.invoiceId === invoice_id);
+    }
+    if (method && method !== "all") {
+      results = results.filter((p: any) => p.paymentMethod === method);
+    }
+
+    res.json(results);
   } catch (error) {
     console.error("Error fetching payments:", error);
     res.status(500).json({ message: "Failed to fetch payments" });
   }
 });
 
-// Create payment
+// POST /payments — create payment and update invoice balance
 router.post("/payments", isAuthenticated, async (req: any, res) => {
   try {
-    const { invoiceId, amount, method, reference } = req.body;
+    const { insertPaymentSchema } = await import("@shared/schema");
     const userId = req.user?.id || "default-user";
 
-    if (!invoiceId || !amount) {
-      return res
-        .status(400)
-        .json({ message: "Invoice ID and amount are required" });
+    const validationResult = insertPaymentSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      return res.status(400).json(sanitizeZodError(validationResult.error));
     }
 
-    const payment = await storage.createPayment({
-      invoiceId,
-      amount,
-      method: method || "cash",
-      reference: reference || null,
-      status: "completed",
+    const paymentData = {
+      ...validationResult.data,
       createdBy: userId,
-    });
+    };
+
+    const payment = await storage.createPayment(paymentData as any);
+
+    // Update invoice paid amount
+    const invoice = await storage.getInvoice(payment.invoiceId);
+    if (invoice) {
+      const newPaidAmount =
+        parseFloat(invoice.paidAmount) + parseFloat(payment.amount);
+      const balanceAmount =
+        parseFloat(invoice.totalAmount) - newPaidAmount;
+      const newStatus = balanceAmount <= 0 ? "paid" : invoice.status;
+
+      await storage.updateInvoice(payment.invoiceId, {
+        paidAmount: newPaidAmount.toFixed(2),
+        balanceAmount: balanceAmount.toFixed(2),
+        status: newStatus,
+        paidAt: balanceAmount <= 0 ? new Date() : invoice.paidAt,
+      });
+    }
 
     res.status(201).json(payment);
   } catch (error) {
@@ -142,93 +322,16 @@ router.post("/payments", isAuthenticated, async (req: any, res) => {
   }
 });
 
-// Get refunds
-router.get("/refunds", isAuthenticated, async (req, res) => {
+// DELETE /payments/:id
+router.delete("/payments/:id", isAuthenticated, async (req, res) => {
   try {
-    const { paymentId } = req.query;
-    const refunds = await storage.getRefunds(paymentId as string);
-    res.json(refunds);
+    const { id } = req.params;
+    await storage.deletePayment(id);
+    res.json({ message: "Payment deleted successfully" });
   } catch (error) {
-    console.error("Error fetching refunds:", error);
-    res.status(500).json({ message: "Failed to fetch refunds" });
+    console.error("Error deleting payment:", error);
+    res.status(500).json({ message: "Failed to delete payment" });
   }
 });
-
-// Create refund
-router.post("/refunds", isAuthenticated, async (req: any, res) => {
-  try {
-    const { paymentId, amount, reason } = req.body;
-    const userId = req.user?.id || "default-user";
-
-    if (!paymentId || !amount) {
-      return res
-        .status(400)
-        .json({ message: "Payment ID and amount are required" });
-    }
-
-    const refund = await storage.createRefund({
-      paymentId,
-      amount,
-      reason: reason || null,
-      createdBy: userId,
-    });
-
-    res.status(201).json(refund);
-  } catch (error) {
-    console.error("Error creating refund:", error);
-    res.status(500).json({ message: "Failed to create refund" });
-  }
-});
-
-// Calculate tax
-router.post("/calculate-tax", isAuthenticated, async (req, res) => {
-  try {
-    const { amount, region, taxRate } = req.body;
-
-    if (!amount) {
-      return res.status(400).json({ message: "Amount is required" });
-    }
-
-    const taxAmount = amount * ((taxRate || 15) / 100);
-    const total = amount + taxAmount;
-
-    res.json({
-      amount,
-      taxRate: taxRate || 15,
-      taxAmount,
-      total,
-    });
-  } catch (error) {
-    console.error("Error calculating tax:", error);
-    res.status(500).json({ message: "Failed to calculate tax" });
-  }
-});
-
-// Send payment reminder
-router.post(
-  "/send-payment-reminder",
-  isAuthenticated,
-  async (req: any, res) => {
-    try {
-      const { invoiceId } = req.body;
-
-      if (!invoiceId) {
-        return res.status(400).json({ message: "Invoice ID is required" });
-      }
-
-      // TODO: Implement email/SMS reminder logic
-      res.json({ message: "Payment reminder sent successfully" });
-    } catch (error) {
-      console.error("Error sending payment reminder:", error);
-      res
-        .status(500)
-        .json({ message: "Failed to send payment reminder" });
-    }
-  }
-);
-
-// TODO: Implement remaining invoice routes
-// - GET /api/payment-plans
-// - POST /api/payment-plans
 
 export const invoiceRoutes = router;
