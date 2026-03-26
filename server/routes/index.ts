@@ -35,6 +35,9 @@ import { customerRoutes } from "./customers.routes";
 import { schedulingRoutes } from "./scheduling.routes";
 import { inventoryRoutes } from "./inventory.routes";
 import { technicianRoutes } from "./technicians.routes";
+import { vehicleRoutes } from "./vehicles.routes";
+import { jobCardsRoutes } from "./jobcards.routes";
+import { invoiceRoutes } from "./invoices.routes";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -204,6 +207,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api", technicianRoutes);
   console.log("✅ Technician Routes Loaded");
+
+  app.use("/api", vehicleRoutes);
+  console.log("✅ Vehicle Routes Loaded");
+
+  app.use("/api", jobCardsRoutes);
+  console.log("✅ Job Cards Routes Loaded");
+
+  app.use("/api", invoiceRoutes);
+  console.log("✅ Invoice Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
