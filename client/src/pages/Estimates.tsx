@@ -619,9 +619,9 @@ function EstimateFormDialog({
         ...prev,
         items: existingItems.map((it) => ({
           itemType: (it.itemType as LineItem["itemType"]) || "service",
-          description: it.description,
-          quantity: it.quantity,
-          unitPrice: parseFloat(it.unitPrice),
+          description: it.description as string,
+          quantity: Number(it.quantity),
+          unitPrice: parseFloat(String(it.unitPrice)),
         })),
       }));
     }
