@@ -24,6 +24,9 @@ import { JobCardDetailsDialog } from "@/components/JobCardDetailsDialog";
 import { InvoiceDetailsDialog } from "@/components/InvoiceDetailsDialog";
 import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
+import { EmptyState } from "@/components/EmptyState";
 
 export function Customers() {
   const { t } = useTranslation();
@@ -44,7 +47,7 @@ export function Customers() {
   }
   const customersUrl = `/api/customers${customersQueryParams.toString() ? `?${customersQueryParams.toString()}` : ''}`;
 
-  const { data: customers, isLoading } = useQuery<User[]>({
+  const { data: customers, isLoading, error, refetch } = useQuery<User[]>({
     queryKey: [customersUrl],
     retry: false,
   });
@@ -205,6 +208,9 @@ export function Customers() {
       });
     },
   });
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={t('customers.loadError', 'Failed to load customers')} retry={refetch} />;
 
   const filteredCustomers = (customers ?? []).filter(customer => {
     if (!searchQuery) return true;

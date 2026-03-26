@@ -37,6 +37,8 @@ import { Car, Plus, Edit, Trash2, Search, ScanLine, Loader2, Camera, Upload, Fil
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 
 export default function Vehicles() {
   const { t } = useTranslation();
@@ -53,7 +55,7 @@ export default function Vehicles() {
   const [scanDialogOpen, setScanDialogOpen] = useState(false);
   const [scanType, setScanType] = useState<'vin' | 'license' | 'id' | 'driverLicense'>('vin');
 
-  const { data: vehicles = [], isLoading } = useQuery<Vehicle[]>({
+  const { data: vehicles = [], isLoading, error, refetch } = useQuery<Vehicle[]>({
     queryKey: ['/api/vehicles'],
   });
 
@@ -306,6 +308,9 @@ export default function Vehicles() {
     setScanType(type);
     setScanDialogOpen(true);
   };
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message="Failed to load vehicles" retry={refetch} />;
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     if (!searchQuery) return true;

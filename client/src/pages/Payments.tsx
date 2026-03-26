@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { StandardTablePage } from "@/components/layouts";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 import { DollarSign, CheckCircle, Download, Plus, CreditCard, Banknote, Building2, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -283,7 +285,7 @@ export default function Payments() {
   const { t } = useTranslation();
   const [methodFilter, setMethodFilter] = useState<string>("all");
   
-  const { data: payments = [], isLoading } = useQuery<PaymentWithDetails[]>({
+  const { data: payments = [], isLoading, error, refetch } = useQuery<PaymentWithDetails[]>({
     queryKey: ["/api/payments", methodFilter !== "all" ? `?method=${methodFilter}` : ""],
   });
 
@@ -401,6 +403,9 @@ export default function Payments() {
     acc[p.paymentMethod] = (acc[p.paymentMethod] || 0) + parseFloat(p.amount);
     return acc;
   }, {} as Record<string, number>);
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message={t('payments.loadError', 'Failed to load payments')} retry={refetch} />;
 
   const unpaidInvoicesAmount = invoices
     .filter(i => i.status !== 'paid' && i.status !== 'cancelled')

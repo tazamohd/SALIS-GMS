@@ -40,6 +40,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 import {
   BarChart,
   Bar,
@@ -93,7 +95,7 @@ export default function InventoryManagement() {
 
   // ---- Data Queries ----
 
-  const { data: overview, isLoading: overviewLoading } = useQuery<any>({
+  const { data: overview, isLoading: overviewLoading, error: overviewError, refetch: refetchOverview } = useQuery<any>({
     queryKey: ["/api/inventory/overview"],
   });
 
@@ -209,6 +211,10 @@ export default function InventoryManagement() {
       notes: `Bulk reorder - ${lowItems.length} items below threshold`,
     });
   };
+
+  const isLoading = overviewLoading && itemsLoading;
+  if (isLoading) return <PageSkeleton />;
+  if (overviewError) return <ErrorState message="Failed to load inventory data" retry={refetchOverview} />;
 
   // ---- Derived data ----
 

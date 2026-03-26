@@ -18,6 +18,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Users, Edit, Award, Clock, DollarSign, Briefcase, GraduationCap, UserPlus, Trash2 } from "lucide-react";
 import AddTechnicianDialog from "@/components/AddTechnicianDialog";
 import { StandardPageLayout } from "@/components/layouts";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 
 export default function TechnicianManagement() {
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ export default function TechnicianManagement() {
     queryKey: ["/api/garages"],
   });
 
-  const { data: technicians, isLoading: techniciansLoading } = useQuery<User[]>({
+  const { data: technicians, isLoading: techniciansLoading, error: techniciansError, refetch: refetchTechnicians } = useQuery<User[]>({
     queryKey: ["/api/technicians", selectedGarage],
     queryFn: () =>
       fetch(
@@ -162,6 +164,9 @@ export default function TechnicianManagement() {
       data: editingProfile,
     });
   };
+
+  if (techniciansLoading) return <PageSkeleton />;
+  if (techniciansError) return <ErrorState message="Failed to load technicians" retry={refetchTechnicians} />;
 
   const getLevelBadgeColor = (level?: string) => {
     switch (level) {

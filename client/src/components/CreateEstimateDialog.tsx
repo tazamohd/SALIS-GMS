@@ -101,8 +101,8 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
         quantity: item.quantity,
         unitPrice: item.unitPrice.toString(),
         lineTotal: (item.quantity * item.unitPrice).toString(),
-        taxRate: "10",
-        taxAmount: ((item.quantity * item.unitPrice) * 0.1).toString(),
+        taxRate: "15",
+        taxAmount: ((item.quantity * item.unitPrice) * 0.15).toString(),
       }));
       
       return await apiRequest("POST", "/api/estimates/with-items", {
@@ -154,7 +154,7 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-    const taxRate = 10; // 10% tax rate
+    const taxRate = 15; // 15% Saudi VAT
     const taxAmount = subtotal * (taxRate / 100);
     const discountAmount = 0;
     const total = subtotal + taxAmount - discountAmount;

@@ -243,6 +243,8 @@ import { CustomerCommunications } from "@/pages/customer/CustomerCommunications"
 import CustomerPortal from "@/pages/CustomerPortal";
 import { useAuth } from "@/hooks/useAuth";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
+import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -441,22 +443,30 @@ function Router() {
       </Route>
       <Route path="/marketing-automation">
         <Layout>
-          <MarketingAutomation />
+          <ProtectedRoute flag="marketing">
+            <MarketingAutomation />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/marketing-hub">
         <Layout>
-          <MarketingHub />
+          <ProtectedRoute flag="marketing">
+            <MarketingHub />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/customer-loyalty">
         <Layout>
-          <CustomerLoyalty />
+          <ProtectedRoute flag="marketing">
+            <CustomerLoyalty />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/crm-loyalty">
         <Layout>
-          <CRMLoyalty />
+          <ProtectedRoute flag="marketing">
+            <CRMLoyalty />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/document-management">
@@ -531,27 +541,37 @@ function Router() {
       </Route>
       <Route path="/smart-assignment">
         <Layout>
-          <SmartAssignment />
+          <ProtectedRoute flag="ai_features">
+            <SmartAssignment />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/call-center">
         <Layout>
-          <CallCenter />
+          <ProtectedRoute flag="call_center">
+            <CallCenter />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/support-chat-dashboard">
         <Layout>
-          <SupportChatDashboard />
+          <ProtectedRoute flag="call_center">
+            <SupportChatDashboard />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/whatsapp">
         <Layout>
-          <WhatsAppIntegration />
+          <ProtectedRoute flag="marketing">
+            <WhatsAppIntegration />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/sms-campaigns">
         <Layout>
-          <SMSCampaigns />
+          <ProtectedRoute flag="marketing">
+            <SMSCampaigns />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/suppliers">
@@ -766,19 +786,25 @@ function Router() {
       </Route>
       <Route path="/hr-management">
         <Layout>
-          <HRManagement />
+          <ProtectedRoute flag="hr_module">
+            <HRManagement />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/hr-payroll">
         <Layout>
-          <Suspense fallback={<PageSkeleton />}>
-            <HRPayroll />
-          </Suspense>
+          <ProtectedRoute flag="hr_module">
+            <Suspense fallback={<PageSkeleton />}>
+              <HRPayroll />
+            </Suspense>
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ai-automation">
         <Layout>
-          <AIAutomation />
+          <ProtectedRoute flag="ai_features">
+            <AIAutomation />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/integrations">
@@ -876,57 +902,79 @@ function Router() {
       </Route>
       <Route path="/chart-of-accounts">
         <Layout>
-          <ChartOfAccounts />
+          <ProtectedRoute flag="advanced_finance">
+            <ChartOfAccounts />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/general-ledger">
         <Layout>
-          <GeneralLedger />
+          <ProtectedRoute flag="advanced_finance">
+            <GeneralLedger />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/journal-entries">
         <Layout>
-          <JournalEntries />
+          <ProtectedRoute flag="advanced_finance">
+            <JournalEntries />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/trial-balance">
         <Layout>
-          <TrialBalance />
+          <ProtectedRoute flag="advanced_finance">
+            <TrialBalance />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/income-statement">
         <Layout>
-          <IncomeStatement />
+          <ProtectedRoute flag="advanced_finance">
+            <IncomeStatement />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/balance-sheet">
         <Layout>
-          <BalanceSheet />
+          <ProtectedRoute flag="advanced_finance">
+            <BalanceSheet />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/cash-flow-statement">
         <Layout>
-          <CashFlowStatement />
+          <ProtectedRoute flag="advanced_finance">
+            <CashFlowStatement />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/accounts-receivable">
         <Layout>
-          <AccountsReceivable />
+          <ProtectedRoute flag="advanced_finance">
+            <AccountsReceivable />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/accounts-payable">
         <Layout>
-          <AccountsPayable />
+          <ProtectedRoute flag="advanced_finance">
+            <AccountsPayable />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/cost-centers">
         <Layout>
-          <CostCenters />
+          <ProtectedRoute flag="advanced_finance">
+            <CostCenters />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/budget-management">
         <Layout>
-          <BudgetManagement />
+          <ProtectedRoute flag="advanced_finance">
+            <BudgetManagement />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/dashboard-widgets">
@@ -951,7 +999,9 @@ function Router() {
       </Route>
       <Route path="/parts-supply-network">
         <Layout>
-          <PartsSupplyNetwork />
+          <ProtectedRoute flag="blockchain">
+            <PartsSupplyNetwork />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/diagnostics-obd">
@@ -966,62 +1016,86 @@ function Router() {
       </Route>
       <Route path="/ai-chatbot">
         <Layout>
-          <AIChatbot />
+          <ProtectedRoute flag="ai_features">
+            <AIChatbot />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ai-chatbot-assistant">
         <Layout>
-          <AIChatbotAssistant />
+          <ProtectedRoute flag="ai_features">
+            <AIChatbotAssistant />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/predictive-maintenance">
         <Layout>
-          <PredictiveMaintenance />
+          <ProtectedRoute flag="ai_features">
+            <PredictiveMaintenance />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/predictive-diagnostics">
         <Layout>
-          <PredictiveDiagnostics />
+          <ProtectedRoute flag="ai_features">
+            <PredictiveDiagnostics />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/smart-parts-recommendations">
         <Layout>
-          <SmartPartsRecommendations />
+          <ProtectedRoute flag="ai_features">
+            <SmartPartsRecommendations />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/voice-commands">
         <Layout>
-          <VoiceCommands />
+          <ProtectedRoute flag="ai_features">
+            <VoiceCommands />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/document-ocr">
         <Layout>
-          <DocumentOCR />
+          <ProtectedRoute flag="ai_features">
+            <DocumentOCR />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/smart-damage-assessment">
         <Layout>
-          <SmartDamageAssessment />
+          <ProtectedRoute flag="ai_features">
+            <SmartDamageAssessment />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/intelligent-price-optimizer">
         <Layout>
-          <IntelligentPriceOptimizer />
+          <ProtectedRoute flag="ai_features">
+            <IntelligentPriceOptimizer />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/smart-inventory-forecasting">
         <Layout>
-          <SmartInventoryForecasting />
+          <ProtectedRoute flag="ai_features">
+            <SmartInventoryForecasting />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ai-service-advisor">
         <Layout>
-          <AIServiceAdvisor />
+          <ProtectedRoute flag="ai_features">
+            <AIServiceAdvisor />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/vehicle-health-monitoring">
         <Layout>
-          <VehicleHealthMonitoring />
+          <ProtectedRoute flag="iot_dashboard">
+            <VehicleHealthMonitoring />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/business-intelligence-dashboard">
@@ -1051,22 +1125,30 @@ function Router() {
       </Route>
       <Route path="/email-marketing-campaigns">
         <Layout>
-          <EmailMarketingCampaigns />
+          <ProtectedRoute flag="marketing">
+            <EmailMarketingCampaigns />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/social-media-integration">
         <Layout>
-          <SocialMediaIntegration />
+          <ProtectedRoute flag="marketing">
+            <SocialMediaIntegration />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/video-consultations">
         <Layout>
-          <VideoConsultations />
+          <ProtectedRoute flag="ar_vr">
+            <VideoConsultations />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/parts-marketplace">
         <Layout>
-          <PartsMarketplace />
+          <ProtectedRoute flag="blockchain">
+            <PartsMarketplace />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/stripe-payment-processing">
@@ -1081,12 +1163,16 @@ function Router() {
       </Route>
       <Route path="/video-estimates">
         <Layout>
-          <VideoEstimates />
+          <ProtectedRoute flag="ar_vr">
+            <VideoEstimates />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/digital-vehicle-walkaround">
         <Layout>
-          <DigitalVehicleWalkaround />
+          <ProtectedRoute flag="ar_vr">
+            <DigitalVehicleWalkaround />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/customer-reviews-ratings">
@@ -1101,12 +1187,16 @@ function Router() {
       </Route>
       <Route path="/referral-program">
         <Layout>
-          <ReferralProgram />
+          <ProtectedRoute flag="marketing">
+            <ReferralProgram />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ai-scheduling">
         <Layout>
-          <AIScheduling />
+          <ProtectedRoute flag="ai_features">
+            <AIScheduling />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/parts-auto-reorder">
@@ -1116,7 +1206,9 @@ function Router() {
       </Route>
       <Route path="/timeclock-payroll">
         <Layout>
-          <TimeClockPayroll />
+          <ProtectedRoute flag="hr_module">
+            <TimeClockPayroll />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/equipment-calibration">
@@ -1163,7 +1255,9 @@ function Router() {
       </Route>
       <Route path="/digital-signage">
         <Layout>
-          <DigitalSignage />
+          <ProtectedRoute flag="emerging_tech">
+            <DigitalSignage />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/api-docs">
@@ -1181,37 +1275,51 @@ function Router() {
       </Route>
       <Route path="/security-cameras">
         <Layout>
-          <SecurityCameras />
+          <ProtectedRoute flag="emerging_tech">
+            <SecurityCameras />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/license-plate">
         <Layout>
-          <LicensePlateRecognition />
+          <ProtectedRoute flag="emerging_tech">
+            <LicensePlateRecognition />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/emerging-technologies">
         <Layout>
-          <EmergingTechnologies />
+          <ProtectedRoute flag="emerging_tech">
+            <EmergingTechnologies />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/interactive-3d-parts">
         <Layout>
-          <Interactive3DParts />
+          <ProtectedRoute flag="ar_vr">
+            <Interactive3DParts />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/nextgen-technologies">
         <Layout>
-          <NextGenTechnologies />
+          <ProtectedRoute flag="emerging_tech">
+            <NextGenTechnologies />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/iot-dashboard">
         <Layout>
-          <IoTDashboard />
+          <ProtectedRoute flag="iot_dashboard">
+            <IoTDashboard />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/service-bay-dashboard">
         <Layout>
-          <ServiceBayDashboard />
+          <ProtectedRoute flag="iot_dashboard">
+            <ServiceBayDashboard />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/automated-reordering">
@@ -1221,7 +1329,9 @@ function Router() {
       </Route>
       <Route path="/loyalty-program">
         <Layout>
-          <LoyaltyProgram />
+          <ProtectedRoute flag="marketing">
+            <LoyaltyProgram />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/workshop-calendar">
@@ -1231,17 +1341,23 @@ function Router() {
       </Route>
       <Route path="/computer-vision-qc">
         <Layout>
-          <ComputerVisionQC />
+          <ProtectedRoute flag="emerging_tech">
+            <ComputerVisionQC />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/smart-parts-recommender">
         <Layout>
-          <SmartPartsRecommendations />
+          <ProtectedRoute flag="ai_features">
+            <SmartPartsRecommendations />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/dynamic-pricing">
         <Layout>
-          <DynamicPricing />
+          <ProtectedRoute flag="ai_features">
+            <DynamicPricing />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/vehicle-tracking">
@@ -1251,27 +1367,37 @@ function Router() {
       </Route>
       <Route path="/digital-twin-viewer">
         <Layout>
-          <DigitalTwinViewer />
+          <ProtectedRoute flag="emerging_tech">
+            <DigitalTwinViewer />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/drone-inspection">
         <Layout>
-          <DroneInspection />
+          <ProtectedRoute flag="emerging_tech">
+            <DroneInspection />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ml-fraud-detection">
         <Layout>
-          <MLFraudDetection />
+          <ProtectedRoute flag="ai_features">
+            <MLFraudDetection />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/edge-computing">
         <Layout>
-          <EdgeComputingDiagnostics />
+          <ProtectedRoute flag="emerging_tech">
+            <EdgeComputingDiagnostics />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/payroll-management">
         <Layout>
-          <PayrollManagement />
+          <ProtectedRoute flag="hr_module">
+            <PayrollManagement />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/expense-tracking">
@@ -1291,7 +1417,9 @@ function Router() {
       </Route>
       <Route path="/telematics-integration">
         <Layout>
-          <TelematicsIntegration />
+          <ProtectedRoute flag="iot_dashboard">
+            <TelematicsIntegration />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/knowledge-base">
@@ -1306,7 +1434,9 @@ function Router() {
       </Route>
       <Route path="/google-my-business">
         <Layout>
-          <GoogleMyBusiness />
+          <ProtectedRoute flag="marketing">
+            <GoogleMyBusiness />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/compliance-management">
@@ -1323,7 +1453,9 @@ function Router() {
       </Route>
       <Route path="/social-media-monitoring">
         <Layout>
-          <SocialMediaMonitoring />
+          <ProtectedRoute flag="marketing">
+            <SocialMediaMonitoring />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/staff-performance-review">
@@ -1333,7 +1465,9 @@ function Router() {
       </Route>
       <Route path="/sustainable-energy-monitoring">
         <Layout>
-          <SustainableEnergyMonitoring />
+          <ProtectedRoute flag="emerging_tech">
+            <SustainableEnergyMonitoring />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/task-management">
@@ -1363,12 +1497,16 @@ function Router() {
       </Route>
       <Route path="/voice-command-interface">
         <Layout>
-          <VoiceCommands />
+          <ProtectedRoute flag="ai_features">
+            <VoiceCommands />
+          </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/wearable-integration">
         <Layout>
-          <WearableIntegration />
+          <ProtectedRoute flag="emerging_tech">
+            <WearableIntegration />
+          </ProtectedRoute>
         </Layout>
       </Route>
       
@@ -1488,14 +1626,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <UndoRedoProvider>
-          <TooltipProvider>
-            <Toaster />
-            <ErrorBoundary>
-              <Router />
-            </ErrorBoundary>
-          </TooltipProvider>
-        </UndoRedoProvider>
+        <FeatureFlagProvider>
+          <UndoRedoProvider>
+            <TooltipProvider>
+              <Toaster />
+              <ErrorBoundary>
+                <Router />
+              </ErrorBoundary>
+            </TooltipProvider>
+          </UndoRedoProvider>
+        </FeatureFlagProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

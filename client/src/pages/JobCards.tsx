@@ -32,6 +32,8 @@ import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfil
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 
 const priorityColors = {
   low: "bg-[#64748B]/10 text-[#64748B]",
@@ -104,7 +106,7 @@ export function JobCards() {
   });
 
   const jobCardsUrl = `/api/job-cards${filterGarageId !== "all" ? `?garage_id=${filterGarageId}` : ""}`;
-  const { data: jobCards, isLoading } = useQuery<JobCard[]>({
+  const { data: jobCards, isLoading, error, refetch } = useQuery<JobCard[]>({
     queryKey: [jobCardsUrl],
   });
 
@@ -206,6 +208,9 @@ export function JobCards() {
     setSelectedJobCard(jobCard);
     updateStatusMutation.mutate({ id: jobCard.id, status: newStatus, jobCard });
   };
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message="Failed to load job cards" retry={refetch} />;
 
   const filteredJobCards = (jobCards ?? []).filter((jc) => {
     if (filterStatus !== "all" && jc.status !== filterStatus) return false;

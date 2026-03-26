@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { Appointment } from "@shared/schema";
 import { format } from "date-fns";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
+import { PageSkeleton } from "@/components/PageSkeleton";
+import { ErrorState } from "@/components/ErrorState";
 
 export function Appointments() {
   const { t } = useTranslation();
@@ -24,7 +26,7 @@ export function Appointments() {
   const itemsPerPage = 10;
   const { toast } = useToast();
 
-  const { data: appointments, isLoading } = useQuery<Appointment[]>({
+  const { data: appointments, isLoading, error, refetch } = useQuery<Appointment[]>({
     queryKey: ['/api/appointments'],
     retry: false,
   });
@@ -93,6 +95,9 @@ export function Appointments() {
     };
     return statusMap[status] || "bg-[#64748B]/10 text-[#64748B] border-0";
   };
+
+  if (isLoading) return <PageSkeleton />;
+  if (error) return <ErrorState message="Failed to load appointments" retry={refetch} />;
 
   const getStatusLabel = (status: string) => {
     const labelMap: Record<string, string> = {
