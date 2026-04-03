@@ -235,7 +235,7 @@ export function JobCards() {
       >
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mb-6">
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.garage', 'Garage')}</Label>
                 <Select value={filterGarageId} onValueChange={setFilterGarageId}>
@@ -416,12 +416,12 @@ export function JobCards() {
       </StandardPageLayout>
 
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
             <DialogTitle className="text-[#0B1F3B] dark:text-white">{t('jobCards.createNew', 'Create New Job Card')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="jobNumber" className="text-[#0B1F3B] dark:text-white">{t('jobCards.jobNumber', 'Job Number')} *</Label>
                 <Input
@@ -460,7 +460,7 @@ export function JobCards() {
 
             <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4">
               <h3 className="font-semibold mb-3 text-[#0B1F3B] dark:text-white">{t('jobCards.vehicleInfo', 'Vehicle Information')}</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="make" className="text-[#0B1F3B] dark:text-white">{t('jobCards.make', 'Make')} *</Label>
                   <Input
@@ -546,7 +546,7 @@ export function JobCards() {
                     data-testid="input-description"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="priority" className="text-[#0B1F3B] dark:text-white">{t('jobCards.priority', 'Priority')} *</Label>
                     <Select
@@ -583,7 +583,7 @@ export function JobCards() {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="estimatedHours" className="text-[#0B1F3B] dark:text-white">{t('jobCards.estimatedHours', 'Estimated Hours')}</Label>
                     <Input

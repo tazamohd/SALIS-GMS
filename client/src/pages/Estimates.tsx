@@ -212,7 +212,7 @@ export function Estimates() {
       description={t("estimates.description", "Create and manage customer estimates")}
     >
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#0A5ED7]/10 flex items-center justify-center">
@@ -741,7 +741,7 @@ function EstimateFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-semibold text-xl">
             {isEdit ? "Edit Estimate" : "Create New Estimate"}
@@ -765,7 +765,7 @@ function EstimateFormDialog({
           </div>
 
           {/* Garage + Customer + Vehicle + Valid Until */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Garage</Label>
               <Select value={form.garageId} onValueChange={(v) => setForm({ ...form, garageId: v })}>
@@ -835,7 +835,7 @@ function EstimateFormDialog({
             <h3 className="font-semibold text-lg mb-3">Line Items</h3>
 
             {/* Add item row */}
-            <div className="grid grid-cols-[120px,1fr,80px,100px,auto] gap-2 mb-3">
+            <div className="grid grid-cols-2 sm:grid-cols-[120px,1fr,80px,100px,auto] gap-2 mb-3">
               <Select
                 value={currentItem.itemType}
                 onValueChange={(v: any) => setCurrentItem({ ...currentItem, itemType: v })}
@@ -969,7 +969,7 @@ function EstimateViewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <span>Estimate {estimate.estimateNumber}</span>
@@ -985,7 +985,7 @@ function EstimateViewDialog({
 
         <div className="space-y-5">
           {/* Info grid */}
-          <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
             <div>
               <p className="text-xs text-[#64748B] mb-0.5">Title</p>
               <p className="font-medium text-sm" data-testid="text-estimate-title">{estimate.title}</p>

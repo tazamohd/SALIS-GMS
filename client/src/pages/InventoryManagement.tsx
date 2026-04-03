@@ -237,7 +237,7 @@ export default function InventoryManagement() {
   const overviewContent = (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="relative overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
           <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
           <CardHeader className="pb-2 relative">
@@ -368,7 +368,7 @@ export default function InventoryManagement() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <div className="text-center p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <div className="text-sm text-[#64748B]">Cost Value</div>
                 <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">{formatCurrency(valuation.totalCostValue ?? 0)}</div>
@@ -447,6 +447,7 @@ export default function InventoryManagement() {
               <p className="text-[#64748B]">No inventory items found</p>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
@@ -496,6 +497,7 @@ export default function InventoryManagement() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -630,6 +632,7 @@ export default function InventoryManagement() {
               <p className="text-[#64748B]">No items are currently below their minimum threshold.</p>
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                 <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
@@ -680,6 +683,7 @@ export default function InventoryManagement() {
                 })}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>

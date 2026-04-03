@@ -212,6 +212,18 @@ export function Dashboard() {
   const role = ((user as any)?.role?.toUpperCase() || (user as User | undefined)?.userType?.toUpperCase() || 'TECHNICIAN');
   const isTechnician = role === 'TECHNICIAN';
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4 p-6 animate-pulse">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded" />)}
+        </div>
+        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Brand Background - Clean Dark/Light Theme */}
@@ -221,7 +233,7 @@ export function Dashboard() {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#0BB3FF]/5 to-transparent dark:from-[#0A5ED7]/5 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative p-6 space-y-8">
+      <div className="relative p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Hero Header - Brand Design */}
         <div className="relative">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -234,7 +246,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl font-montserrat font-black bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
                     {t('dashboard.title', 'Dashboard')}
                   </h1>
                   <p className="text-[#64748B] dark:text-[#9BA4B0] font-light">
@@ -243,7 +255,7 @@ export function Dashboard() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button className="relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg" asChild>
                 <Link href="/job-cards">
                   <FileText className="w-4 h-4 mr-2 relative z-10" />
@@ -395,7 +407,7 @@ export function Dashboard() {
         </div>
 
         {/* Status Pipeline - Brand Colors */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {[
             { icon: Clock, label: t('dashboard.checkIn', 'Check-In'), value: checkInCount, color: 'from-[#F97316] to-[#FB923C]', bgColor: 'bg-[#F97316]/10' },
             { icon: Wrench, label: t('dashboard.repair', 'In Repair'), value: repairCount, color: 'from-[#0A5ED7] to-[#0BB3FF]', bgColor: 'bg-[#0A5ED7]/10' },
@@ -523,7 +535,7 @@ export function Dashboard() {
               <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30">{t('dashboard.allTime', 'All Time')}</Badge>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: t('dashboard.totalJobs', 'Total Jobs'), value: jobCards?.length || 0, icon: FileText, color: 'from-[#0A5ED7] to-[#0BB3FF]' },
                 { label: t('dashboard.totalInvoices', 'Invoices'), value: invoices.length, icon: DollarSign, color: 'from-[#0A5ED7] to-[#0BB3FF]' },
@@ -640,7 +652,7 @@ export function Dashboard() {
             </div>
 
             {totalPages > 1 && (
-              <div className="p-4 border-t border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-between">
+              <div className="p-4 border-t border-[#E2E8F0] dark:border-[#232A36] flex flex-wrap items-center justify-between gap-2">
                 <Button 
                   variant="outline"
                   size="sm"
@@ -777,7 +789,7 @@ export function Dashboard() {
                 </div>
                 <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.todaySnapshot', "Today's Snapshot")}</h3>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
                 {[
                   { label: "Today's Revenue", value: `$${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
                   { label: 'Jobs In Progress', value: summary.jobsInProgress, color: 'text-[#0A5ED7] dark:text-[#0BB3FF]' },

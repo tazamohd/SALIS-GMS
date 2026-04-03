@@ -200,8 +200,8 @@ export default function TechnicianManagement() {
           <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{t('common.filter', 'Filters')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="w-64">
+          <div className="flex flex-wrap gap-4">
+            <div className="w-full sm:w-64">
               <Label htmlFor="garage-filter" className="text-[#0B1F3B] dark:text-white">{t('technician.garage', 'Garage')}</Label>
               <Select value={selectedGarage} onValueChange={setSelectedGarage}>
                 <SelectTrigger id="garage-filter" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="select-garage-filter">
@@ -352,7 +352,7 @@ export default function TechnicianManagement() {
       )}
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="dialog-edit">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="dialog-edit">
           <DialogHeader>
             <DialogTitle className="text-[#0B1F3B] dark:text-white" data-testid="text-dialog-title">{t('technician.editProfile', 'Edit Technician Profile')}</DialogTitle>
             <DialogDescription className="text-[#64748B]" data-testid="text-dialog-subtitle">
@@ -361,7 +361,7 @@ export default function TechnicianManagement() {
           </DialogHeader>
           {editingProfile && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="level" className="text-[#0B1F3B] dark:text-white">{t('technician.level', 'Level')}</Label>
                   <Select

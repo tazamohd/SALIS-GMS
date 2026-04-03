@@ -959,6 +959,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO technicians.routes.ts — 6 endpoints */
+  /*
   // Technician routes
   app.get('/api/technicians', isAuthenticated, async (req, res) => {
     try {
@@ -1032,7 +1034,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update technician profile" });
     }
   });
+  */
 
+  /* MOVED TO jobcards.routes.ts — 16 endpoints */
+  /*
   // Job Card routes - Module 8: Job Cards & Task Assignment
   app.get('/api/job-cards', isAuthenticated, async (req, res) => {
     try {
@@ -1341,8 +1346,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate tracking token" });
     }
   });
+  */
 
-  // Public route - Get job status by tracking token (no auth required)
+  // Public route - Get job status by tracking token (no auth required) — KEPT (not in module)
   app.get('/api/public/track/:token', async (req, res) => {
     try {
       const { token } = req.params;
@@ -1377,6 +1383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO jobcards.routes.ts — continued (tracking events + ETA) */
+  /*
   // Create job tracking event
   app.post('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
     try {
@@ -1504,19 +1512,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update job ETA" });
     }
   });
+  */
 
+  /* MOVED TO technicians.routes.ts — 3 endpoints + middleware */
+  /*
   // Technician Portal routes - Server-side scoped access
   // Authorization middleware for technician-scoped routes
   const authorizeTechnician = (req: any, res: any, next: any) => {
     const { technicianId } = req.params;
-    
+
     // Allow access if:
     // 1. User is requesting their own data
     // 2. User is an admin/manager
     if (req.user?.id !== technicianId && !['admin', 'manager'].includes(req.user?.userType)) {
       return res.status(403).json({ message: "Access denied - you can only view your own data" });
     }
-    
+
     next();
   };
 
@@ -1559,6 +1570,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create time clock entry" });
     }
   });
+  */
 
   // Service Templates routes
   app.get('/api/service-templates/all', isAuthenticated, async (req, res) => {
@@ -1763,6 +1775,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO inventory.routes.ts — 8 endpoints */
+  /*
   // Spare Parts Management routes - Module 12: Spare Parts & Inventory
   app.get('/api/spare-parts', isAuthenticated, async (req, res) => {
     try {
@@ -1892,7 +1906,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update spare part inventory" });
     }
   });
+  */
 
+  /* MOVED TO scheduling.routes.ts — 6 endpoints */
+  /*
   // Appointment Management routes - Module 9: Appointments & Scheduling
   app.get('/api/appointments', isAuthenticated, async (req, res) => {
     try {
@@ -1935,19 +1952,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof body.validUntil === 'string') body.validUntil = new Date(body.validUntil);
 
       const validationResult = insertAppointmentSchema.safeParse(body);
-      
+
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          ...sanitizeZodError(validationResult.error) 
+        return res.status(400).json({
+          message: "Validation error",
+          ...sanitizeZodError(validationResult.error)
         });
       }
-      
+
       const appointmentData = {
         ...validationResult.data,
         createdBy: userId,
       };
-      
+
       const appointment = await storage.createAppointment(appointmentData as any);
       res.status(201).json(appointment);
     } catch (error) {
@@ -1960,16 +1977,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { insertAppointmentSchema } = await import("@shared/schema");
       const { id } = req.params;
-      
+
       const validationResult = insertAppointmentSchema.partial().safeParse(req.body);
-      
+
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          ...sanitizeZodError(validationResult.error) 
+        return res.status(400).json({
+          message: "Validation error",
+          ...sanitizeZodError(validationResult.error)
         });
       }
-      
+
       const updatedAppointment = await storage.updateAppointment(id, validationResult.data);
       res.json(updatedAppointment);
     } catch (error) {
@@ -2006,7 +2023,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update appointment status" });
     }
   });
+  */
 
+  /* MOVED TO customers.routes.ts — 7 endpoints */
+  /*
   // Customer Management routes - Module 10
   app.get('/api/customers', isAuthenticated, async (req, res) => {
     try {
@@ -2022,7 +2042,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
       const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
-      
+
       if (!fullName || !email || !garageId) {
         return res.status(400).json({ message: "Name, email, and garage are required" });
       }
@@ -2125,7 +2145,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch customer payments" });
     }
   });
+  */
 
+  /* MOVED TO vehicles.routes.ts — 24 endpoints (catalogs, VIN, CRUD, service-history, maintenance, reminders) */
+  /*
   // Vehicle Catalogs endpoints
   app.get('/api/catalogs/vehicle-makes', isAuthenticated, async (req, res) => {
     try {
@@ -2565,7 +2588,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to decode VIN" });
     }
   });
+  */
 
+  /* MOVED TO customers.routes.ts — 3 endpoints (customer notes + delete) */
+  /*
   app.get('/api/customers/:id/notes', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
@@ -2616,6 +2642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete note" });
     }
   });
+  */
 
   // Purchase Orders & Supplier Integration - Module 11
   app.get('/api/suppliers', isAuthenticated, async (req, res) => {
@@ -3927,6 +3954,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO invoices.routes.ts — 11 endpoints (invoices + payments) */
+  /*
   // Module 12: Invoice & Billing Routes
   app.get('/api/invoices', isAuthenticated, async (req, res) => {
     try {
@@ -3964,19 +3993,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (typeof body.invoiceDate === 'string') body.invoiceDate = new Date(body.invoiceDate);
 
       const validationResult = insertInvoiceSchema.safeParse(body);
-      
+
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          ...sanitizeZodError(validationResult.error) 
+        return res.status(400).json({
+          message: "Validation error",
+          ...sanitizeZodError(validationResult.error)
         });
       }
-      
+
       const invoiceData = {
         ...validationResult.data,
         createdBy: userId,
       };
-      
+
       const invoice = await storage.createInvoice(invoiceData as any);
       res.status(201).json(invoice);
     } catch (error) {
@@ -3990,13 +4019,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { insertInvoiceSchema, insertInvoiceItemSchema } = await import("@shared/schema");
       const userId = req.user?.id || 'default-user';
       const { invoice, items } = req.body;
-      
+
       if (!invoice || !items || !Array.isArray(items)) {
-        return res.status(400).json({ 
-          message: "Invalid request: invoice and items (array) required" 
+        return res.status(400).json({
+          message: "Invalid request: invoice and items (array) required"
         });
       }
-      
+
       // Coerce date strings from JSON
       if (typeof invoice.dueDate === 'string') invoice.dueDate = new Date(invoice.dueDate);
       if (typeof invoice.invoiceDate === 'string') invoice.invoiceDate = new Date(invoice.invoiceDate);
@@ -4005,23 +4034,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!invoiceValidation.success) {
         return res.status(400).json(sanitizeZodError(invoiceValidation.error));
       }
-      
-      const itemsValidation = items.map((item: any) => 
+
+      const itemsValidation = items.map((item: any) =>
         insertInvoiceItemSchema.omit({ invoiceId: true }).safeParse(item)
       );
-      
+
       const invalidItems = itemsValidation.filter(v => !v.success);
       if (invalidItems.length > 0) {
         return res.status(400).json(sanitizeArrayValidationErrors(invalidItems as any));
       }
-      
+
       const invoiceData = {
         ...invoiceValidation.data,
         createdBy: userId,
       };
-      
+
       const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
-      
+
       const createdInvoice = await storage.createInvoiceWithItems(invoiceData as any, validItems as any);
       res.status(201).json(createdInvoice);
     } catch (error) {
@@ -4029,8 +4058,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create invoice with items" });
     }
   });
+  */
 
-  // Secure invoice creation from job card - server-side calculation only
+  // KEPT — /api/invoices/from-job/:jobId is not in invoices.routes.ts module
   app.post('/api/invoices/from-job/:jobId', isAuthenticated, async (req: any, res) => {
     try {
       const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems, saudiTaxCompliance, technicianProfiles } = await import("@shared/schema");
@@ -4215,13 +4245,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO invoices.routes.ts — continued (PATCH/DELETE invoices, items, payments) */
+  /*
   app.patch('/api/invoices/:id', isAuthenticated, async (req, res) => {
     try {
       const { insertInvoiceSchema } = await import("@shared/schema");
       const { id } = req.params;
-      
+
       const validationResult = insertInvoiceSchema.partial().safeParse(req.body);
-      
+
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: "Validation error", 
@@ -4380,6 +4412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete payment" });
     }
   });
+  */
 
   // Estimates & Quotes - Module 23
   app.get('/api/estimates', isAuthenticated, async (req, res) => {
@@ -5601,6 +5634,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO scheduling.routes.ts — 2 endpoints (conflicts + time-slots) */
+  /*
   // Conflict Detection & Optimization
   app.post('/api/appointments/check-conflicts', isAuthenticated, async (req: any, res) => {
     try {
@@ -5608,7 +5643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         appointmentDate: new Date(req.body.appointmentDate),
       };
-      
+
       const conflicts = await storage.checkAppointmentConflicts(appointmentData);
       res.json({ hasConflicts: conflicts.length > 0, conflicts });
     } catch (error) {
@@ -5621,7 +5656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { technicianId } = req.params;
       const { date, duration } = req.query;
-      
+
       if (!date || !duration) {
         return res.status(400).json({ message: "date and duration are required" });
       }
@@ -5637,6 +5672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch time slots" });
     }
   });
+  */
 
   app.get('/api/technician-workload/:technicianId', isAuthenticated, async (req: any, res) => {
     try {
@@ -5751,6 +5787,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO inventory.routes.ts — 4 endpoints (stock-alerts) */
+  /*
   // Module 27: Inventory & Parts Management
   // Stock Alerts
   app.get('/api/stock-alerts', isAuthenticated, async (req: any, res) => {
@@ -5799,6 +5837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to acknowledge stock alert" });
     }
   });
+  */
 
   // Reorder Settings
   app.get('/api/reorder-settings', isAuthenticated, async (req: any, res) => {
@@ -13882,6 +13921,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 5: OPERATIONS & EFFICIENCY
   // ========================================
 
+  /* MOVED TO scheduling.routes.ts — 3 endpoints (scheduling rules, optimize, optimizations stub) */
+  /*
   // AI Scheduling Optimizer - Module 81
   app.get("/api/scheduling/rules", isAuthenticated, async (req, res) => {
     res.json([
@@ -13899,6 +13940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { id: "1", date: "2024-10-26", appointmentsOptimized: 12, efficiencyGain: 14.5 },
     ]);
   });
+  */
 
   // Parts Auto-Reordering - Module 82
   app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
@@ -15313,6 +15355,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 5: OPERATIONS & EFFICIENCY ROUTES
   // ==========================================
 
+  /* MOVED TO scheduling.routes.ts — 3 endpoints (scheduling rules, optimize, history) */
+  /*
   // AI-Powered Scheduling Optimizer
   app.get('/api/scheduling/rules', isAuthenticated, async (req: any, res) => {
     try {
@@ -15350,6 +15394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch scheduling history" });
     }
   });
+  */
 
   // Parts Auto-Reordering System
   app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
@@ -18508,6 +18553,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO jobcards.routes.ts — 2 endpoints (job-card chat) */
+  /*
   // Service Chat Messages - Customer-scoped by job card
   app.get('/api/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
     try {
@@ -18527,14 +18574,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         jobCardId,
       });
-      
+
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: "Validation error", 
-          ...sanitizeZodError(validationResult.error) 
+        return res.status(400).json({
+          message: "Validation error",
+          ...sanitizeZodError(validationResult.error)
         });
       }
-      
+
       const message = await storage.createServiceChatMessage(validationResult.data);
       res.status(201).json(message);
     } catch (error: any) {
@@ -18542,6 +18589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create chat message" });
     }
   });
+  */
 
   // Service Reviews - Customer-scoped
   app.get('/api/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
@@ -21079,6 +21127,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO scheduling.routes.ts — 6 endpoints (calendar-appointments) */
+  /*
   app.get('/api/calendar-appointments', isAuthenticated, async (req: any, res) => {
     try {
       const { garageId, startDate, endDate } = req.query;
@@ -21151,6 +21201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to move calendar appointment" });
     }
   });
+  */
 
   // ==========================================
   // AR Overlay API
@@ -21666,6 +21717,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  /* MOVED TO vehicles.routes.ts — 5 endpoints (service-reminders standalone API) */
+  /*
   // ==================== Service Reminders API ====================
 
   app.get('/api/service-reminders/due', isAuthenticated, async (req: any, res) => {
@@ -21722,6 +21775,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
+  */
 
   // ==================== Service Reminder Templates API ====================
 

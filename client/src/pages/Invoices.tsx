@@ -677,7 +677,7 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? `Edit Invoice - ${invoice.invoiceNumber}` : "Create Invoice"}</DialogTitle>
           <DialogDescription className="sr-only">
@@ -726,8 +726,8 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
             <h3 className="text-sm font-semibold">Line Items</h3>
 
             {/* Add item row */}
-            <div className="grid grid-cols-12 gap-2 items-end">
-              <div className="col-span-2 space-y-1">
+            <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 items-end">
+              <div className="col-span-2 sm:col-span-2 space-y-1">
                 <Label className="text-xs">Type</Label>
                 <Select value={curType} onValueChange={(v: any) => setCurType(v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -738,19 +738,19 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
                   </SelectContent>
                 </Select>
               </div>
-              <div className="col-span-4 space-y-1">
+              <div className="col-span-2 sm:col-span-4 space-y-1">
                 <Label className="text-xs">Description</Label>
                 <Input value={curDesc} onChange={(e) => setCurDesc(e.target.value)} placeholder="Item description" />
               </div>
-              <div className="col-span-2 space-y-1">
+              <div className="col-span-1 sm:col-span-2 space-y-1">
                 <Label className="text-xs">Qty</Label>
                 <Input type="number" min={1} value={curQty} onChange={(e) => setCurQty(parseInt(e.target.value) || 1)} />
               </div>
-              <div className="col-span-3 space-y-1">
+              <div className="col-span-1 sm:col-span-3 space-y-1">
                 <Label className="text-xs">Unit Price (SAR)</Label>
                 <Input type="number" min={0} step={0.01} value={curPrice} onChange={(e) => setCurPrice(parseFloat(e.target.value) || 0)} />
               </div>
-              <div className="col-span-1">
+              <div className="col-span-2 sm:col-span-1">
                 <Button type="button" onClick={addItem} size="sm" className="w-full">
                   <Plus className="w-4 h-4" />
                 </Button>
@@ -759,8 +759,8 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
 
             {/* Items list */}
             {items.length > 0 && (
-              <div className="border rounded-md overflow-hidden">
-                <table className="w-full text-sm">
+              <div className="border rounded-md overflow-x-auto">
+                <table className="w-full text-sm min-w-[400px]">
                   <thead className="bg-gray-50 dark:bg-gray-800">
                     <tr>
                       <th className="p-2 text-left text-xs font-medium text-[#64748B]">Type</th>

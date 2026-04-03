@@ -338,7 +338,7 @@ export default function Vehicles() {
           {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-vehicle-form">
+      <DialogContent className="max-w-[95vw] sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid="modal-vehicle-form">
         <DialogHeader>
           <DialogTitle className="font-['Poppins',Helvetica] font-semibold text-xl text-[#0B1F3B] dark:text-white">
             {editingVehicle ? t('vehicles.editVehicle', 'Edit Vehicle') : t('vehicles.addNewVehicle', 'Add New Vehicle')}
@@ -417,7 +417,7 @@ export default function Vehicles() {
             {vinDecodeResult && vinDecodeResult.engineCylinders && (
               <div className="p-3 bg-[#0A5ED7]/5 border border-[#0A5ED7]/20 rounded-lg">
                 <p className="text-sm font-semibold text-[#0A5ED7] mb-2">{t('vehicles.decodedInfo', 'Decoded Vehicle Info')}</p>
-                <div className="grid grid-cols-2 gap-2 text-xs text-[#64748B]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#64748B]">
                   {vinDecodeResult.engineCylinders && <p>{t('vehicles.cylinders', 'Cylinders')}: {vinDecodeResult.engineCylinders}</p>}
                   {vinDecodeResult.engineDisplacement && <p>{t('vehicles.displacement', 'Engine Size')}: {vinDecodeResult.engineDisplacement}L</p>}
                   {vinDecodeResult.driveType && <p>{t('vehicles.driveType', 'Drive Type')}: {vinDecodeResult.driveType}</p>}
@@ -429,7 +429,7 @@ export default function Vehicles() {
             )}
 
             {/* Make Dropdown with Logos */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="make"
@@ -502,7 +502,7 @@ export default function Vehicles() {
             </div>
 
             {/* Year and Color Dropdowns */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="year"
@@ -566,7 +566,7 @@ export default function Vehicles() {
             </div>
 
             {/* License Plate with Scan Button and Nationality */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="licensePlate"
@@ -650,7 +650,7 @@ export default function Vehicles() {
             />
 
             {/* Engine Type and Transmission Dropdowns - stores names for consistency */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="engineType"
@@ -703,7 +703,7 @@ export default function Vehicles() {
             </div>
 
             {/* Owner ID Number with Scan Button */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormItem>
                 <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.idNum', 'ID Number')}</FormLabel>
                 <div className="flex gap-2">
