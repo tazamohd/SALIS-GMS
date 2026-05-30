@@ -10897,3 +10897,26 @@ export const schedulingOptimizationRuns = pgTable("scheduling_optimization_runs"
 export type SchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferSelect;
 export type InsertSchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferInsert;
 export const insertSchedulingOptimizationRunSchema = createInsertSchema(schedulingOptimizationRuns).omit({ id: true, createdAt: true });
+
+// Mobile Devices — field tablets/phones/scanners assigned to technicians.
+// Backs the Mobile Device Management page (/mobile-device-management).
+export const mobileDevices = pgTable("mobile_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  deviceName: varchar("device_name", { length: 200 }).notNull(),
+  deviceType: varchar("device_type", { length: 30 }).notNull(), // tablet | phone | scanner
+  assignedTo: varchar("assigned_to").references(() => users.id),
+  status: varchar("status", { length: 20 }).default("active").notNull(), // active | inactive | maintenance
+  batteryLevel: integer("battery_level"),
+  lastSync: timestamp("last_sync"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type MobileDevice = typeof mobileDevices.$inferSelect;
+export type InsertMobileDevice = typeof mobileDevices.$inferInsert;
+export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({
+  id: true,
+  garageId: true,
+  createdAt: true,
+  updatedAt: true,
+});

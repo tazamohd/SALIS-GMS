@@ -19,12 +19,17 @@ import dashboardRoutes from "./dashboard";
 import qualityControlRoutes from "./quality-control";
 import warrantyRoutes from "./warranty";
 import kioskRoutes from "./kiosk";
-import estimatesRoutes from "./estimates";
+// estimatesRoutes (./estimates) intentionally NOT imported: its in-memory `demoEstimates`
+// store shadowed the monolith's DB-backed /api/estimates CRUD (routes.ts:4418+). The
+// monolith handler serves now; if a modular replacement is wanted, mount
+// `./estimates.routes.ts` (DB-backed) instead of `./estimates`.
 import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
 import smsCampaignRoutes from "./sms-campaigns";
 import documentRoutes from "./documents";
-import supplierPortalRoutes from "./supplier-portal";
+// supplierPortalRoutes (./supplier-portal) intentionally NOT imported: its in-memory
+// demoSuppliers/demoPurchaseOrders shadowed the monolith's DB-backed /api/suppliers
+// CRUD (routes.ts:2648+). Re-mount only after the modular file uses storage.*.
 import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";
@@ -39,7 +44,21 @@ import { vehicleRoutes } from "./vehicles.routes";
 import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
-import { miscRoutes } from "./misc.routes";
+// miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
+// stubs returning empty arrays/messages, shadowing real monolith handlers for
+// /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
+
+// Routes for the 8 completed "half-real" pages (mobile devices, smart contracts,
+// AI repair guide, AI predictions, perf analytics, demand forecasting,
+// productivity tracker, OBD diagnostic viewer).
+import { mobileDevicesRoutes } from "./mobile-devices";
+import { smartContractsRoutes } from "./smart-contracts";
+import { aiRepairGuideRoutes } from "./ai-repair-guide";
+import { aiPredictionsRoutes } from "./ai-predictions";
+import { analyticsPerformanceRoutes } from "./analytics-performance";
+import { forecastingDemandRoutes } from "./forecasting-demand";
+import { productivityRoutes } from "./productivity";
+import { obdDiagnosticsRoutes } from "./obd-diagnostics";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -153,9 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", kioskRoutes);
   console.log("✅ Self-Service Kiosk Routes Loaded");
 
-  // Estimates & Quotations routes
-  app.use("/api", estimatesRoutes);
-  console.log("✅ Estimates & Quotations Routes Loaded");
+  // Estimates routes intentionally NOT mounted here — see import block comment.
+  // Monolith serves /api/estimates with DB-backed CRUD (routes.ts:4418+).
 
   // Fleet Management routes
   app.use("/api", fleetManagementRoutes);
@@ -173,9 +191,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", documentRoutes);
   console.log("✅ Document Management Routes Loaded");
 
-  // Supplier Portal routes
-  app.use("/api", supplierPortalRoutes);
-  console.log("✅ Supplier Portal Routes Loaded");
+  // Supplier Portal routes intentionally NOT mounted — see import block comment.
+  // Monolith serves /api/suppliers, /api/supplier-price-lists, /api/supplier-performance
+  // with DB-backed CRUD (routes.ts:2648+).
 
   // Multi-Currency Management routes
   app.use("/api", currencyRoutes);
@@ -222,8 +240,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", settingsRoutes);
   console.log("✅ Settings Routes Loaded");
 
-  app.use("/api", miscRoutes);
-  console.log("✅ Misc Routes Loaded");
+  // Completed half-real page endpoints
+  app.use("/api", mobileDevicesRoutes);
+  console.log("✅ Mobile Devices Routes Loaded");
+  app.use("/api", smartContractsRoutes);
+  console.log("✅ Smart Contracts Routes Loaded");
+  app.use("/api", aiRepairGuideRoutes);
+  console.log("✅ AI Repair Guide Routes Loaded");
+  app.use("/api", aiPredictionsRoutes);
+  console.log("✅ AI Predictions Routes Loaded");
+  app.use("/api", analyticsPerformanceRoutes);
+  console.log("✅ Performance Analytics Routes Loaded");
+  app.use("/api", forecastingDemandRoutes);
+  console.log("✅ Demand Forecasting Routes Loaded");
+  app.use("/api", productivityRoutes);
+  console.log("✅ Productivity Routes Loaded");
+  app.use("/api", obdDiagnosticsRoutes);
+  console.log("✅ OBD Diagnostics Routes Loaded");
+
+  // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

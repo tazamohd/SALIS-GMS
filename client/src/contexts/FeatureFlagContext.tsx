@@ -26,6 +26,8 @@ export const FLAG_CATEGORIES = {
     "/ml-fraud-detection",
     "/dynamic-pricing",
     "/ai-insights",
+    "/neural-network-prediction",
+    "/predictive-demand-forecasting",
   ],
   iot_dashboard: [
     "/iot-dashboard",
@@ -33,17 +35,20 @@ export const FLAG_CATEGORIES = {
     "/vehicle-health-monitoring",
     "/telematics-integration",
     "/sensor-monitoring",
+    "/obd-diagnostic-viewer",
   ],
   blockchain: [
     "/parts-supply-network",
     "/parts-marketplace",
     "/blockchain-service-history",
+    "/smart-contracts",
   ],
   ar_vr: [
     "/interactive-3d-parts",
     "/digital-vehicle-walkaround",
     "/video-estimates",
     "/video-consultations",
+    "/ar-repair-guide",
   ],
   advanced_finance: [
     "/balance-sheet",
@@ -113,6 +118,7 @@ export const FLAG_CATEGORIES = {
     "/barcode-scanner",
     "/digital-signage",
     "/sustainable-energy-monitoring",
+    "/mobile-device-management",
   ],
 } as const;
 

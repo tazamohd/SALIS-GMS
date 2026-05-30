@@ -64,6 +64,7 @@ import {
   gamificationEvents,
   gamificationBadgeAwards,
   leaderboardSnapshots,
+  mobileDevices,
   type User,
   type UpsertUser,
   type Garage,
@@ -12023,6 +12024,46 @@ export class DatabaseStorage implements IStorage {
 
   async createSchedulingOptimizationRun(data: InsertSchedulingOptimizationRun): Promise<SchedulingOptimizationRun> {
     const [row] = await db.insert(schedulingOptimizationRuns).values(data).returning();
+    return row;
+  }
+
+  // ---------- Mobile Devices (Mobile Device Management page) ----------
+  async getMobileDevices(garageId: string) {
+return await db.select().from(mobileDevices).where(eq(mobileDevices.garageId, garageId)).orderBy(desc(mobileDevices.createdAt));
+  }
+
+  async createMobileDevice(garageId: string, data: any) {
+const [row] = await db.insert(mobileDevices).values({ ...data, garageId }).returning();
+    return row;
+  }
+
+  async updateMobileDevice(id: string, garageId: string, patch: any) {
+const [row] = await db
+      .update(mobileDevices)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(and(eq(mobileDevices.id, id), eq(mobileDevices.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  async deleteMobileDevice(id: string, garageId: string) {
+const result = await db
+      .delete(mobileDevices)
+      .where(and(eq(mobileDevices.id, id), eq(mobileDevices.garageId, garageId)))
+      .returning();
+    return result[0];
+  }
+
+  // ---------- Smart Contract status update (Smart Contracts page) ----------
+  async updateSmartContractStatus(id: string, garageId: string, status: string) {
+    const patch: any = { status, updatedAt: new Date() };
+    if (status === "signed") patch.deployedAt = new Date();
+    if (status === "executed" || status === "completed") patch.executedAt = new Date();
+    const [row] = await db
+      .update(smartContracts)
+      .set(patch)
+      .where(and(eq(smartContracts.id, id), eq(smartContracts.garageId, garageId)))
+      .returning();
     return row;
   }
 }

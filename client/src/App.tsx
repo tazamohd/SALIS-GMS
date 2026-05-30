@@ -269,6 +269,16 @@ const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
 const SaudiComplianceDashboard = lazy(() => import("@/pages/SaudiComplianceDashboard"));
 const DirectMessages = lazy(() => import("@/pages/DirectMessages"));
 
+// Completed "half-real" pages (page + new server endpoint + flag)
+const ARRepairGuide = lazy(() => import("@/pages/ARRepairGuide"));
+const SmartContracts = lazy(() => import("@/pages/SmartContracts"));
+const MobileDeviceManagement = lazy(() => import("@/pages/MobileDeviceManagement"));
+const NeuralNetworkPrediction = lazy(() => import("@/pages/NeuralNetworkPrediction"));
+const PerformanceAnalytics = lazy(() => import("@/pages/PerformanceAnalytics"));
+const PredictiveDemandForecasting = lazy(() => import("@/pages/PredictiveDemandForecasting"));
+const ProductivityTracker = lazy(() => import("@/pages/ProductivityTracker"));
+const OBDDiagnosticViewer = lazy(() => import("@/pages/OBDDiagnosticViewer"));
+
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
@@ -1736,6 +1746,75 @@ function Router() {
           <ProtectedRoute flag="call_center">
             <Suspense fallback={<PageSkeleton />}>
               <DirectMessages />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+
+      <Route path="/ar-repair-guide">
+        <Layout>
+          <ProtectedRoute flag="ar_vr">
+            <Suspense fallback={<PageSkeleton />}>
+              <ARRepairGuide />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/smart-contracts">
+        <Layout>
+          <ProtectedRoute flag="blockchain">
+            <Suspense fallback={<PageSkeleton />}>
+              <SmartContracts />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/mobile-device-management">
+        <Layout>
+          <ProtectedRoute flag="emerging_tech">
+            <Suspense fallback={<PageSkeleton />}>
+              <MobileDeviceManagement />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/neural-network-prediction">
+        <Layout>
+          <ProtectedRoute flag="ai_features">
+            <Suspense fallback={<PageSkeleton />}>
+              <NeuralNetworkPrediction />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/performance-analytics">
+        <Layout>
+          <Suspense fallback={<PageSkeleton />}>
+            <PerformanceAnalytics />
+          </Suspense>
+        </Layout>
+      </Route>
+      <Route path="/predictive-demand-forecasting">
+        <Layout>
+          <ProtectedRoute flag="ai_features">
+            <Suspense fallback={<PageSkeleton />}>
+              <PredictiveDemandForecasting />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/productivity-tracker">
+        <Layout>
+          <Suspense fallback={<PageSkeleton />}>
+            <ProductivityTracker />
+          </Suspense>
+        </Layout>
+      </Route>
+      <Route path="/obd-diagnostic-viewer">
+        <Layout>
+          <ProtectedRoute flag="iot_dashboard">
+            <Suspense fallback={<PageSkeleton />}>
+              <OBDDiagnosticViewer />
             </Suspense>
           </ProtectedRoute>
         </Layout>
