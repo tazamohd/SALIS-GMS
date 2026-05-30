@@ -1,6 +1,9 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole, requireManagerOrAbove } from '../middleware/requireRole';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { storage } from '../storage';
 import {
   calculateGOSI,
   calculateEndOfService,
@@ -12,19 +15,23 @@ const router = Router();
 // ---------- EMPLOYEES ----------
 
 // GET /api/hr/employees — List employees
-router.get('/hr/employees', async (req, res) => {
+router.get('/hr/employees', isAuthenticated, async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { department, status, search, limit = '50', offset = '0' } = req.query;
   try {
-    const filters: string[] = [`u."garageId" = '${garageId}'`];
-    if (department) filters.push(`u.role = '${department}'`);
-    if (status === 'active') filters.push(`u."isActive" = true`);
-    if (status === 'inactive') filters.push(`u."isActive" = false`);
-    if (search) filters.push(`(u."fullName" ILIKE '%${search}%' OR u.email ILIKE '%${search}%')`);
+    const limitNum = Math.min(Math.max(Number(limit) || 50, 1), 500);
+    const offsetNum = Math.max(Number(offset) || 0, 0);
+    const searchPattern = search ? `%${String(search)}%` : null;
+    const departmentStr = department ? String(department) : null;
 
-    const whereClause = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
+    // Parameterised filter fragments — values are bound, not interpolated.
+    const whereClause = sql`WHERE u."garageId" = ${garageId}
+      ${departmentStr ? sql`AND u.role = ${departmentStr}` : sql``}
+      ${status === 'active' ? sql`AND u."isActive" = true` : sql``}
+      ${status === 'inactive' ? sql`AND u."isActive" = false` : sql``}
+      ${searchPattern ? sql`AND (u."fullName" ILIKE ${searchPattern} OR u.email ILIKE ${searchPattern})` : sql``}`;
 
-    const employees = await db.execute(sql.raw(`
+    const employees = await db.execute(sql`
       SELECT u.id, u."fullName" as name, u.email, u.phone,
         u.role as department, u."userType" as position,
         u."isActive" as "isActive", u."createdAt" as "hireDate",
@@ -38,12 +45,12 @@ router.get('/hr/employees', async (req, res) => {
       LEFT JOIN technician_profiles tp ON tp."userId" = u.id
       ${whereClause}
       ORDER BY u."fullName" ASC
-      LIMIT ${Number(limit)} OFFSET ${Number(offset)}
-    `));
+      LIMIT ${limitNum} OFFSET ${offsetNum}
+    `);
 
-    const countResult = await db.execute(sql.raw(`
+    const countResult = await db.execute(sql`
       SELECT COUNT(*) as total FROM users u ${whereClause}
-    `));
+    `);
 
     res.json({
       employees: (employees.rows || []).map((e: any) => ({
@@ -60,7 +67,7 @@ router.get('/hr/employees', async (req, res) => {
 });
 
 // GET /api/hr/employees/:id — Employee detail
-router.get('/hr/employees/:id', async (req, res) => {
+router.get('/hr/employees/:id', isAuthenticated, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await db.execute(sql`
@@ -107,8 +114,8 @@ router.get('/hr/employees/:id', async (req, res) => {
   }
 });
 
-// POST /api/hr/employees — Add new employee
-router.post('/hr/employees', async (req, res) => {
+// POST /api/hr/employees — Add new employee (HR/admin only)
+router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { fullName, email, phone, role, nationalId, password } = req.body;
 
@@ -136,7 +143,7 @@ router.post('/hr/employees', async (req, res) => {
 // ---------- ATTENDANCE ----------
 
 // GET /api/hr/attendance — Attendance records
-router.get('/hr/attendance', async (req, res) => {
+router.get('/hr/attendance', isAuthenticated, async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { date, employeeId, limit = '50', offset = '0' } = req.query;
   try {
@@ -193,7 +200,7 @@ router.get('/hr/attendance', async (req, res) => {
 });
 
 // POST /api/hr/attendance/clock — Clock in/out
-router.post('/hr/attendance/clock', async (req, res) => {
+router.post('/hr/attendance/clock', isAuthenticated, async (req, res) => {
   const { employeeId, action } = req.body;
   if (!employeeId || !action) {
     return res.status(400).json({ error: 'employeeId and action (in/out) are required' });
@@ -212,31 +219,32 @@ router.post('/hr/attendance/clock', async (req, res) => {
 
 // ---------- LEAVE REQUESTS ----------
 
-// In-memory leave store (would be a DB table in production)
-let leaveRequests: any[] = [
-  { id: 'lv-1', employeeId: '1', employeeName: 'Ahmed Al-Rashid', type: 'annual', startDate: '2026-04-01', endDate: '2026-04-05', days: 5, reason: 'Family vacation', status: 'pending', createdAt: '2026-03-15T10:00:00Z' },
-  { id: 'lv-2', employeeId: '2', employeeName: 'Khalid Hassan', type: 'sick', startDate: '2026-03-18', endDate: '2026-03-19', days: 2, reason: 'Medical appointment', status: 'approved', approvedBy: 'Manager', createdAt: '2026-03-17T08:30:00Z' },
-  { id: 'lv-3', employeeId: '3', employeeName: 'Sara Mohammed', type: 'annual', startDate: '2026-03-25', endDate: '2026-03-28', days: 4, reason: 'Personal leave', status: 'rejected', createdAt: '2026-03-10T14:00:00Z' },
-];
-
 // GET /api/hr/leave-requests
-router.get('/hr/leave-requests', async (req, res) => {
+router.get('/hr/leave-requests', isAuthenticated, async (req, res) => {
   const { status, employeeId } = req.query;
-  let filtered = [...leaveRequests];
-  if (status) filtered = filtered.filter(l => l.status === status);
-  if (employeeId) filtered = filtered.filter(l => l.employeeId === employeeId);
-
-  res.json({
-    leaveRequests: filtered,
-    total: filtered.length,
-    pending: leaveRequests.filter(l => l.status === 'pending').length,
-    approved: leaveRequests.filter(l => l.status === 'approved').length,
-    rejected: leaveRequests.filter(l => l.status === 'rejected').length,
-  });
+  try {
+    const [entries, counts] = await Promise.all([
+      storage.listLeaveRequestEntries({
+        status: status ? String(status) : undefined,
+        employeeId: employeeId ? String(employeeId) : undefined,
+      }),
+      storage.countLeaveRequestEntriesByStatus(),
+    ]);
+    res.json({
+      leaveRequests: entries,
+      total: entries.length,
+      pending: counts.pending,
+      approved: counts.approved,
+      rejected: counts.rejected,
+    });
+  } catch (err) {
+    console.error('HR leave requests list error:', err);
+    res.status(500).json({ error: 'Failed to fetch leave requests' });
+  }
 });
 
 // POST /api/hr/leave-requests
-router.post('/hr/leave-requests', async (req, res) => {
+router.post('/hr/leave-requests', isAuthenticated, async (req, res) => {
   const { employeeId, employeeName, type, startDate, endDate, reason } = req.body;
   if (!employeeId || !type || !startDate || !endDate) {
     return res.status(400).json({ error: 'employeeId, type, startDate, and endDate are required' });
@@ -246,25 +254,26 @@ router.post('/hr/leave-requests', async (req, res) => {
   const end = new Date(endDate);
   const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-  const newRequest = {
-    id: `lv-${Date.now()}`,
-    employeeId,
-    employeeName: employeeName || 'Employee',
-    type,
-    startDate,
-    endDate,
-    days,
-    reason: reason || '',
-    status: 'pending',
-    createdAt: new Date().toISOString(),
-  };
-
-  leaveRequests.push(newRequest);
-  res.status(201).json(newRequest);
+  try {
+    const row = await storage.createLeaveRequestEntry({
+      employeeId: String(employeeId),
+      employeeName: employeeName || 'Employee',
+      type: String(type),
+      startDate: String(startDate),
+      endDate: String(endDate),
+      days,
+      reason: reason || '',
+      status: 'pending',
+    });
+    res.status(201).json(row);
+  } catch (err) {
+    console.error('HR leave request create error:', err);
+    res.status(500).json({ error: 'Failed to create leave request' });
+  }
 });
 
-// PATCH /api/hr/leave-requests/:id — Approve/reject
-router.patch('/hr/leave-requests/:id', async (req, res) => {
+// PATCH /api/hr/leave-requests/:id — Approve/reject (manager+ only)
+router.patch('/hr/leave-requests/:id', isAuthenticated, requireManagerOrAbove, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
@@ -272,25 +281,25 @@ router.patch('/hr/leave-requests/:id', async (req, res) => {
     return res.status(400).json({ error: 'status must be "approved" or "rejected"' });
   }
 
-  const idx = leaveRequests.findIndex(l => l.id === id);
-  if (idx === -1) {
-    return res.status(404).json({ error: 'Leave request not found' });
+  try {
+    const updated = await storage.updateLeaveRequestEntry(id, {
+      status,
+      approvedBy: (req as any).user?.fullName || 'Manager',
+    });
+    if (!updated) {
+      return res.status(404).json({ error: 'Leave request not found' });
+    }
+    res.json(updated);
+  } catch (err) {
+    console.error('HR leave request update error:', err);
+    res.status(500).json({ error: 'Failed to update leave request' });
   }
-
-  leaveRequests[idx] = {
-    ...leaveRequests[idx],
-    status,
-    approvedBy: (req as any).user?.fullName || 'Manager',
-    updatedAt: new Date().toISOString(),
-  };
-
-  res.json(leaveRequests[idx]);
 });
 
 // ---------- PAYROLL ----------
 
-// GET /api/hr/payroll/summary — Monthly payroll summary
-router.get('/hr/payroll/summary', async (req, res) => {
+// GET /api/hr/payroll/summary — Monthly payroll summary (manager+ — salary data)
+router.get('/hr/payroll/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { month, year } = req.query;
 
@@ -377,8 +386,8 @@ router.get('/hr/payroll/summary', async (req, res) => {
   }
 });
 
-// GET /api/hr/payroll/slip/:employeeId — Individual pay slip
-router.get('/hr/payroll/slip/:employeeId', async (req, res) => {
+// GET /api/hr/payroll/slip/:employeeId — Individual pay slip (manager+/accountant)
+router.get('/hr/payroll/slip/:employeeId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   const { employeeId } = req.params;
   const { month, year } = req.query;
 

@@ -3103,7 +3103,9 @@ export const vehicleLocationHistory = pgTable("vehicle_location_history", {
 }, (table) => ({
   vehicleTimestampIdx: index("vehicle_location_history_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("vehicle_location_history_timestamp_idx").on(table.timestamp.desc()),
-  vehicleLatestIdx: uniqueIndex("vehicle_location_history_vehicle_latest_idx").on(table.vehicleId, table.timestamp.desc()).where(sql`timestamp >= NOW() - INTERVAL '1 hour'`),
+  // Removed time-window predicate — Postgres rejects NOW() in partial-index WHERE (not IMMUTABLE).
+  // The vehicle+timestamp ordering index above is sufficient; queries should filter by time directly.
+  vehicleLatestIdx: index("vehicle_location_history_vehicle_latest_idx").on(table.vehicleId, table.timestamp.desc()),
 }));
 
 export const geofenceZones = pgTable("geofence_zones", {
@@ -3187,7 +3189,9 @@ export const geofenceEvents = pgTable("geofence_events", {
   geofenceTimestampIdx: index("geofence_events_geofence_timestamp_idx").on(table.geofenceZoneId, table.timestamp.desc()),
   vehicleTimestampIdx: index("geofence_events_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("geofence_events_timestamp_idx").on(table.timestamp.desc()),
-  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false AND timestamp >= NOW() - INTERVAL '1 hour'`),
+  // NOW() removed from predicate — Postgres requires IMMUTABLE functions in partial-index WHERE.
+  // The notification_sent = false filter is enough; recency belongs in queries, not the index.
+  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false`),
 }));
 
 export const fleetRoutes = pgTable("fleet_routes", {
@@ -9584,7 +9588,7 @@ export const hrDepartments = pgTable("hr_departments", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 50 }),
@@ -9602,7 +9606,7 @@ export const hrPositions = pgTable("hr_positions", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   title: varchar("title", { length: 255 }).notNull(),
   titleAr: varchar("title_ar", { length: 255 }),
@@ -9623,7 +9627,7 @@ export const hrEmployeeProfiles = pgTable("hr_employee_profiles", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   employeeNumber: varchar("employee_number", { length: 50 }),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   positionId: uuid("position_id").references(() => hrPositions.id),
@@ -9708,7 +9712,7 @@ export const hrLeaveTypes = pgTable("hr_leave_types", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 20 }),
@@ -9770,7 +9774,7 @@ export const hrJobPostings = pgTable("hr_job_postings", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   positionId: uuid("position_id").references(() => hrPositions.id),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -9848,7 +9852,7 @@ export const hrBenefitPlans = pgTable("hr_benefit_plans", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   type: varchar("type", { length: 100 }).notNull(), // "health_insurance", "life_insurance", "dental", "vision", "retirement", "housing", "transportation", "education", "other"
@@ -9937,7 +9941,7 @@ export const hrAnnouncements = pgTable("hr_announcements", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   type: varchar("type", { length: 50 }).default("general"), // "general", "policy", "event", "holiday", "urgent"
@@ -10678,3 +10682,26 @@ export const insertPushNotificationSchema = createInsertSchema(pushNotifications
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
 export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences);
+
+// ----- In-memory → DB migration: flat tables matching route surfaces -----
+
+// HR leave request entries — flat replacement for the demo in-memory store in
+// server/routes/hr-payroll.ts. Distinct from hr_leave_requests, which is the
+// FK-strict canonical leave-tracking table referenced by the legacy router.
+export const hrLeaveRequestEntries = pgTable("hr_leave_request_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id", { length: 100 }).notNull(),
+  employeeName: varchar("employee_name", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  days: integer("days").notNull(),
+  reason: text("reason"),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  approvedBy: varchar("approved_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type HrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferSelect;
+export type InsertHrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferInsert;
+export const insertHrLeaveRequestEntrySchema = createInsertSchema(hrLeaveRequestEntries).omit({ id: true, createdAt: true, updatedAt: true });

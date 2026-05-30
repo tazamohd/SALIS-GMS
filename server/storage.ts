@@ -727,6 +727,9 @@ import {
   type InsertPushNotification,
   type NotificationPreference,
   type InsertNotificationPreference,
+  hrLeaveRequestEntries,
+  type HrLeaveRequestEntry,
+  type InsertHrLeaveRequestEntry,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11746,6 +11749,40 @@ export class DatabaseStorage implements IStorage {
     }
     
     return generatedReminders;
+  }
+
+  // ---------- HR Leave Request Entries (flat, demo-friendly) ----------
+  async listLeaveRequestEntries(filters: { status?: string; employeeId?: string } = {}): Promise<HrLeaveRequestEntry[]> {
+    const conditions: any[] = [];
+    if (filters.status) conditions.push(eq(hrLeaveRequestEntries.status, filters.status));
+    if (filters.employeeId) conditions.push(eq(hrLeaveRequestEntries.employeeId, filters.employeeId));
+    const query = conditions.length
+      ? db.select().from(hrLeaveRequestEntries).where(and(...conditions))
+      : db.select().from(hrLeaveRequestEntries);
+    return await query.orderBy(desc(hrLeaveRequestEntries.createdAt));
+  }
+
+  async createLeaveRequestEntry(data: InsertHrLeaveRequestEntry): Promise<HrLeaveRequestEntry> {
+    const [row] = await db.insert(hrLeaveRequestEntries).values(data).returning();
+    return row;
+  }
+
+  async updateLeaveRequestEntry(id: string, data: Partial<InsertHrLeaveRequestEntry>): Promise<HrLeaveRequestEntry | undefined> {
+    const [row] = await db.update(hrLeaveRequestEntries)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(hrLeaveRequestEntries.id, id))
+      .returning();
+    return row;
+  }
+
+  async countLeaveRequestEntriesByStatus(): Promise<{ pending: number; approved: number; rejected: number }> {
+    const all = await db.select({ status: hrLeaveRequestEntries.status }).from(hrLeaveRequestEntries);
+    const counts = { pending: 0, approved: 0, rejected: 0 };
+    for (const row of all) {
+      const s = row.status as keyof typeof counts;
+      if (s in counts) counts[s]++;
+    }
+    return counts;
   }
 }
 

@@ -7,7 +7,8 @@ import {
   commissions, employeeAttendance, shiftTemplates, shiftAssignments,
   performanceReviews, trainings, employeeTrainings, stockAlerts,
   paymentPlans, installments, taxConfigurations, discountsPromotions,
-  savedFilterPresets, notifications, roles, featureFlags
+  savedFilterPresets, notifications, roles, featureFlags,
+  hrLeaveRequestEntries,
 } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -109,6 +110,10 @@ async function seed() {
 
     console.log('✅ Current user:', userId);
 
+    // Shared placeholder hash for non-login demo users (customers, technicians).
+    // The users.password column is NOT NULL but these accounts don't authenticate.
+    const demoUserPassword = await bcrypt.hash('Demo@2024!', 10);
+
     // Create customers
     const customerData = [
       { fullName: 'John Smith', email: 'john.smith@example.com', phone: '+1-555-0101', userType: 'customer' },
@@ -127,6 +132,7 @@ async function seed() {
       if (!existing) {
         const [newCustomer] = await db.insert(users).values({
           ...customer,
+          password: demoUserPassword,
           garageId,
           isActive: true,
         }).returning();
@@ -163,6 +169,7 @@ async function seed() {
           email: tech.email,
           phone: tech.phone,
           userType: tech.userType,
+          password: demoUserPassword,
           garageId,
           isActive: true,
         }).returning();
@@ -694,6 +701,17 @@ async function seed() {
     }
 
     console.log(`✅ Created ${createdTasks.length} task assignments`);
+
+    // ── Step N: HR leave request entries (demo) ────────────────────
+    const existingLeaves = await db.select().from(hrLeaveRequestEntries).limit(1);
+    if (existingLeaves.length === 0) {
+      await db.insert(hrLeaveRequestEntries).values([
+        { employeeId: '1', employeeName: 'Ahmed Al-Rashid', type: 'annual', startDate: '2026-04-01', endDate: '2026-04-05', days: 5, reason: 'Family vacation', status: 'pending' },
+        { employeeId: '2', employeeName: 'Khalid Hassan', type: 'sick', startDate: '2026-03-18', endDate: '2026-03-19', days: 2, reason: 'Medical appointment', status: 'approved', approvedBy: 'Manager' },
+        { employeeId: '3', employeeName: 'Sara Mohammed', type: 'annual', startDate: '2026-03-25', endDate: '2026-03-28', days: 4, reason: 'Personal leave', status: 'rejected' },
+      ]);
+      console.log('✅ Seeded 3 HR leave request entries');
+    }
 
     console.log('\n🎉 Database seeding completed successfully!');
     console.log('\n📊 Summary:');
