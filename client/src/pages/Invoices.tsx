@@ -216,10 +216,10 @@ export function Invoices() {
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Invoiced", value: stats.total, color: "text-[#0B1F3B] dark:text-white" },
-          { label: "Paid", value: stats.paid, color: "text-emerald-600 dark:text-emerald-400" },
-          { label: "Outstanding", value: stats.outstanding, color: "text-blue-600 dark:text-blue-400" },
-          { label: "Overdue", value: stats.overdue, color: "text-red-600 dark:text-red-400" },
+          { label: t("invoices.total", "Total Invoiced"), value: stats.total, color: "text-[#0B1F3B] dark:text-white" },
+          { label: t("common.paid", "Paid"), value: stats.paid, color: "text-emerald-600 dark:text-emerald-400" },
+          { label: t("nav.pending_payments", "Outstanding"), value: stats.outstanding, color: "text-blue-600 dark:text-blue-400" },
+          { label: t("common.overdue", "Overdue"), value: stats.overdue, color: "text-red-600 dark:text-red-400" },
         ].map(({ label, value, color }) => (
           <Card key={label}>
             <CardContent className="pt-4 pb-4">
@@ -263,7 +263,7 @@ export function Invoices() {
         <div className="ml-auto">
           <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="w-4 h-4 mr-2" />
-            Create Invoice
+            {t("invoices.newInvoice", "Create Invoice")}
           </Button>
         </div>
       </div>
@@ -286,14 +286,14 @@ export function Invoices() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="p-3 text-left font-medium text-[#64748B]">Invoice #</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">Customer</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">Date</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">Due Date</th>
-                  <th className="p-3 text-right font-medium text-[#64748B]">Total</th>
-                  <th className="p-3 text-right font-medium text-[#64748B]">Balance</th>
-                  <th className="p-3 text-center font-medium text-[#64748B]">Status</th>
-                  <th className="p-3 text-center font-medium text-[#64748B]">Actions</th>
+                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.invoiceNumber", "Invoice #")}</th>
+                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.customer", "Customer")}</th>
+                  <th className="p-3 text-left font-medium text-[#64748B]">{t("common.date", "Date")}</th>
+                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.dueDate", "Due Date")}</th>
+                  <th className="p-3 text-right font-medium text-[#64748B]">{t("invoices.total", "Total")}</th>
+                  <th className="p-3 text-right font-medium text-[#64748B]">{t("invoices.balance", "Balance")}</th>
+                  <th className="p-3 text-center font-medium text-[#64748B]">{t("common.status", "Status")}</th>
+                  <th className="p-3 text-center font-medium text-[#64748B]">{t("common.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -386,6 +386,7 @@ function InvoiceRow({
   invoice, isExpanded, expandedItems, nextStatuses, customerName,
   onToggleExpand, onStatusChange, onEdit, onDelete,
 }: InvoiceRowProps) {
+  const { t } = useTranslation();
   return (
     <>
       <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
@@ -437,14 +438,14 @@ function InvoiceRow({
               {/* Notes */}
               {invoice.notes && (
                 <div>
-                  <span className="text-xs font-medium text-[#64748B] uppercase">Notes</span>
+                  <span className="text-xs font-medium text-[#64748B] uppercase">{t("common.notes", "Notes")}</span>
                   <p className="text-sm mt-1">{invoice.notes}</p>
                 </div>
               )}
 
               {/* Line items table */}
               <div>
-                <span className="text-xs font-medium text-[#64748B] uppercase">Line Items</span>
+                <span className="text-xs font-medium text-[#64748B] uppercase">{t("invoices.items", "Line Items")}</span>
                 {!expandedItems ? (
                   <div className="flex items-center gap-2 mt-2 text-sm text-[#64748B]">
                     <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -529,6 +530,7 @@ interface InvoiceFormDialogProps {
 }
 
 function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invoice }: InvoiceFormDialogProps) {
+  const { t } = useTranslation();
   const isEdit = !!invoice;
 
   // Form state
@@ -689,9 +691,9 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
           {/* Header fields */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Garage</Label>
+              <Label>{t("nav.garage", "Garage")}</Label>
               <Select value={garageId} onValueChange={setGarageId}>
-                <SelectTrigger><SelectValue placeholder="Select garage" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("nav.garage", "Select garage")} /></SelectTrigger>
                 <SelectContent>
                   {garages.map((g) => (
                     <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
@@ -700,9 +702,9 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Customer</Label>
+              <Label>{t("invoices.customer", "Customer")}</Label>
               <Select value={customerId} onValueChange={setCustomerId}>
-                <SelectTrigger><SelectValue placeholder="Select customer" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("invoices.customer", "Select customer")} /></SelectTrigger>
                 <SelectContent>
                   {customers.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.fullName || c.email}</SelectItem>
@@ -711,14 +713,14 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Due Date</Label>
+              <Label>{t("invoices.dueDate", "Due Date")}</Label>
               <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Notes (optional)</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Additional notes..." rows={2} />
+            <Label>{t("common.notes", "Notes")}</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("common.notes", "Additional notes...")} rows={2} />
           </div>
 
           {/* Line items section */}
@@ -814,9 +816,9 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
         </div>
 
         <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel", "Cancel")}</Button>
           <Button onClick={handleSubmit} disabled={isPending} className="bg-blue-600 hover:bg-blue-700">
-            {isPending ? (isEdit ? "Updating..." : "Creating...") : (isEdit ? "Update Invoice" : "Create Invoice")}
+            {isPending ? (isEdit ? t("common.loading", "Updating...") : t("common.loading", "Creating...")) : (isEdit ? t("invoices.editInvoice", "Update Invoice") : t("invoices.newInvoice", "Create Invoice"))}
           </Button>
         </DialogFooter>
       </DialogContent>
