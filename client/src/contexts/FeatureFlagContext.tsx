@@ -25,6 +25,7 @@ export const FLAG_CATEGORIES = {
     "/document-ocr",
     "/ml-fraud-detection",
     "/dynamic-pricing",
+    "/ai-insights",
   ],
   iot_dashboard: [
     "/iot-dashboard",
@@ -36,6 +37,7 @@ export const FLAG_CATEGORIES = {
   blockchain: [
     "/parts-supply-network",
     "/parts-marketplace",
+    "/blockchain-service-history",
   ],
   ar_vr: [
     "/interactive-3d-parts",
@@ -82,6 +84,7 @@ export const FLAG_CATEGORIES = {
     "/call-center",
     "/support-chat-dashboard",
     "/chat",
+    "/direct-messages",
   ],
   marketing: [
     "/email-marketing-campaigns",

@@ -45,18 +45,6 @@ import TechnicianServiceGuides from "@/pages/technician/ServiceGuides";
 import TechnicianSoftware from "@/pages/technician/TechnicalSoftware";
 import TechnicianMobilePortal from "@/pages/mobile/TechnicianMobilePortal";
 import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
-import PurchaseAgentDashboard from "@/pages/purchase-agent/Dashboard";
-import PurchaseAgentOrders from "@/pages/purchase-agent/Orders";
-import PurchaseAgentSuppliers from "@/pages/purchase-agent/Suppliers";
-import PurchaseAgentInventory from "@/pages/purchase-agent/Inventory";
-import PurchaseAgentPriceCompare from "@/pages/purchase-agent/PriceCompare";
-import PurchaseAgentTracking from "@/pages/purchase-agent/Tracking";
-import PurchaseAgentReports from "@/pages/purchase-agent/Reports";
-import PurchaseAgentTaskInbox from "@/pages/purchase-agent/TaskInbox";
-import PurchaseAgentQuotationManagement from "@/pages/purchase-agent/QuotationManagement";
-import PurchaseAgentPaymentTracking from "@/pages/purchase-agent/PaymentTracking";
-import PurchaseAgentDeliveryTracking from "@/pages/purchase-agent/DeliveryTracking";
-import PurchaseAgentLiveDeliveryTracking from "@/pages/purchase-agent/LiveDeliveryTracking";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
@@ -138,23 +126,6 @@ import KioskCheckIn from "@/pages/KioskCheckIn";
 import SelfServiceKiosk from "@/pages/SelfServiceKiosk";
 import SecurityCameras from "@/pages/SecurityCameras";
 import LicensePlateRecognition from "@/pages/LicensePlateRecognition";
-import EmergingTechnologies from "@/pages/EmergingTechnologies";
-import Interactive3DParts from "@/pages/Interactive3DParts";
-import NextGenTechnologies from "@/pages/NextGenTechnologies";
-import IoTDashboard from "@/pages/IoTDashboard";
-import ServiceBayDashboard from "@/pages/ServiceBayDashboard";
-import AutomatedReordering from "@/pages/AutomatedReordering";
-import LoyaltyProgram from "@/pages/LoyaltyProgram";
-import WorkshopCalendar from "@/pages/WorkshopCalendar";
-import ComputerVisionQC from "@/pages/ComputerVisionQC";
-// SmartPartsRecommender merged into SmartPartsRecommendations
-import DynamicPricing from "@/pages/DynamicPricing";
-import VehicleTracking from "@/pages/VehicleTracking";
-import DigitalTwinViewer from "@/pages/DigitalTwinViewer";
-import DroneInspection from "@/pages/DroneInspection";
-import MLFraudDetection from "@/pages/MLFraudDetection";
-import EdgeComputingDiagnostics from "@/pages/EdgeComputingDiagnostics";
-import TireManagement from "@/pages/TireManagement";
 import KPIDashboard from "@/pages/KPIDashboard";
 import AppointmentReminders from "@/pages/AppointmentReminders";
 import CustomReportBuilder from "@/pages/CustomReportBuilder";
@@ -172,7 +143,6 @@ import ComplianceManagement from "@/pages/ComplianceManagement";
 import SocialMediaMonitoring from "@/pages/SocialMediaMonitoring";
 import StaffPerformanceReview from "@/pages/StaffPerformanceReview";
 import SustainableEnergyMonitoring from "@/pages/SustainableEnergyMonitoring";
-// TaskManagement merged into TasksManagement
 import TechnicianPerformance from "@/pages/TechnicianPerformance";
 import TimesheetManagement from "@/pages/TimesheetManagement";
 import VehicleHistory from "@/pages/VehicleHistory";
@@ -180,7 +150,6 @@ import CustomerFeedback from "@/pages/CustomerFeedback";
 import DataBackup from "@/pages/DataBackup";
 import DashboardWidgets from "@/pages/DashboardWidgets";
 import Vehicles from "@/pages/Vehicles";
-// VoiceCommandInterface merged into VoiceCommands
 import WearableIntegration from "@/pages/WearableIntegration";
 import BankAccountManagement from "@/pages/BankAccountManagement";
 import InternalWarehouse from "@/pages/InternalWarehouse";
@@ -205,14 +174,6 @@ import AccountsReceivable from "@/pages/AccountsReceivable";
 import AccountsPayable from "@/pages/AccountsPayable";
 import CostCenters from "@/pages/CostCenters";
 import BudgetManagement from "@/pages/BudgetManagement";
-import PartsNetworkLayout from "@/pages/parts-network/PartsNetworkLayout";
-import PartsNetworkDashboard from "@/pages/parts-network/PartsNetworkDashboard";
-import SendQuotationRequest from "@/pages/parts-network/SendQuotationRequest";
-import MyRequests from "@/pages/parts-network/MyRequests";
-import IncomingRequests from "@/pages/parts-network/IncomingRequests";
-import QuotationsList from "@/pages/parts-network/QuotationsList";
-import NetworkMembers from "@/pages/parts-network/NetworkMembers";
-import NetworkOrders from "@/pages/parts-network/NetworkOrders";
 import { CustomerDashboard } from "@/pages/customer/CustomerDashboard";
 import { ClientLayout } from "@/components/ClientLayout";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -260,6 +221,53 @@ const NotificationCenter = lazy(() => import("@/pages/NotificationCenter"));
 const AuditTrail = lazy(() => import("@/pages/AuditTrail"));
 const HRPayroll = lazy(() => import("@/pages/HRPayroll"));
 const QualityControl = lazy(() => import("@/pages/QualityControl"));
+
+// Lazy-loaded Purchase Agent Portal pages
+const PurchaseAgentDashboard = lazy(() => import("@/pages/purchase-agent/Dashboard"));
+const PurchaseAgentOrders = lazy(() => import("@/pages/purchase-agent/Orders"));
+const PurchaseAgentSuppliers = lazy(() => import("@/pages/purchase-agent/Suppliers"));
+const PurchaseAgentInventory = lazy(() => import("@/pages/purchase-agent/Inventory"));
+const PurchaseAgentPriceCompare = lazy(() => import("@/pages/purchase-agent/PriceCompare"));
+const PurchaseAgentTracking = lazy(() => import("@/pages/purchase-agent/Tracking"));
+const PurchaseAgentReports = lazy(() => import("@/pages/purchase-agent/Reports"));
+const PurchaseAgentTaskInbox = lazy(() => import("@/pages/purchase-agent/TaskInbox"));
+const PurchaseAgentQuotationManagement = lazy(() => import("@/pages/purchase-agent/QuotationManagement"));
+const PurchaseAgentPaymentTracking = lazy(() => import("@/pages/purchase-agent/PaymentTracking"));
+const PurchaseAgentDeliveryTracking = lazy(() => import("@/pages/purchase-agent/DeliveryTracking"));
+const PurchaseAgentLiveDeliveryTracking = lazy(() => import("@/pages/purchase-agent/LiveDeliveryTracking"));
+
+// Lazy-loaded B2B Parts Network pages
+const PartsNetworkLayout = lazy(() => import("@/pages/parts-network/PartsNetworkLayout"));
+const PartsNetworkDashboard = lazy(() => import("@/pages/parts-network/PartsNetworkDashboard"));
+const SendQuotationRequest = lazy(() => import("@/pages/parts-network/SendQuotationRequest"));
+const MyRequests = lazy(() => import("@/pages/parts-network/MyRequests"));
+const IncomingRequests = lazy(() => import("@/pages/parts-network/IncomingRequests"));
+const QuotationsList = lazy(() => import("@/pages/parts-network/QuotationsList"));
+const NetworkMembers = lazy(() => import("@/pages/parts-network/NetworkMembers"));
+const NetworkOrders = lazy(() => import("@/pages/parts-network/NetworkOrders"));
+
+// Lazy-loaded Exotic & Heavy Pages
+const EmergingTechnologies = lazy(() => import("@/pages/EmergingTechnologies"));
+const Interactive3DParts = lazy(() => import("@/pages/Interactive3DParts"));
+const NextGenTechnologies = lazy(() => import("@/pages/NextGenTechnologies"));
+const IoTDashboard = lazy(() => import("@/pages/IoTDashboard"));
+const ServiceBayDashboard = lazy(() => import("@/pages/ServiceBayDashboard"));
+const AutomatedReordering = lazy(() => import("@/pages/AutomatedReordering"));
+const LoyaltyProgram = lazy(() => import("@/pages/LoyaltyProgram"));
+const WorkshopCalendar = lazy(() => import("@/pages/WorkshopCalendar"));
+const ComputerVisionQC = lazy(() => import("@/pages/ComputerVisionQC"));
+const DynamicPricing = lazy(() => import("@/pages/DynamicPricing"));
+const VehicleTracking = lazy(() => import("@/pages/VehicleTracking"));
+const DigitalTwinViewer = lazy(() => import("@/pages/DigitalTwinViewer"));
+const DroneInspection = lazy(() => import("@/pages/DroneInspection"));
+const MLFraudDetection = lazy(() => import("@/pages/MLFraudDetection"));
+const EdgeComputingDiagnostics = lazy(() => import("@/pages/EdgeComputingDiagnostics"));
+const TireManagement = lazy(() => import("@/pages/TireManagement"));
+const AIInsights = lazy(() => import("@/pages/AIInsights"));
+const BlockchainServiceHistory = lazy(() => import("@/pages/BlockchainServiceHistory"));
+const CommandCenter = lazy(() => import("@/pages/CommandCenter"));
+const SaudiComplianceDashboard = lazy(() => import("@/pages/SaudiComplianceDashboard"));
+const DirectMessages = lazy(() => import("@/pages/DirectMessages"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -403,7 +411,9 @@ function Router() {
       </Route>
       <Route path="/tire-management">
         <Layout>
-          <TireManagement />
+          <Suspense fallback={<PageSkeleton />}>
+            <TireManagement />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/kpi-dashboard">
@@ -631,100 +641,138 @@ function Router() {
       {/* Purchase Agent Portal Routes */}
       <Route path="/purchase-agent">
         <PurchaseAgentLayout>
-          <PurchaseAgentDashboard />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentDashboard />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/tasks">
         <PurchaseAgentLayout>
-          <PurchaseAgentTaskInbox />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentTaskInbox />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/quotations">
         <PurchaseAgentLayout>
-          <PurchaseAgentQuotationManagement />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentQuotationManagement />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/payments">
         <PurchaseAgentLayout>
-          <PurchaseAgentPaymentTracking />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentPaymentTracking />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/delivery">
         <PurchaseAgentLayout>
-          <PurchaseAgentDeliveryTracking />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentDeliveryTracking />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/delivery-tracking/:id">
         <PurchaseAgentLayout>
-          <PurchaseAgentLiveDeliveryTracking />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentLiveDeliveryTracking />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/orders">
         <PurchaseAgentLayout>
-          <PurchaseAgentOrders />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentOrders />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/suppliers">
         <PurchaseAgentLayout>
-          <PurchaseAgentSuppliers />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentSuppliers />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/inventory">
         <PurchaseAgentLayout>
-          <PurchaseAgentInventory />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentInventory />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/price-compare">
         <PurchaseAgentLayout>
-          <PurchaseAgentPriceCompare />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentPriceCompare />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/tracking">
         <PurchaseAgentLayout>
-          <PurchaseAgentTracking />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentTracking />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
       <Route path="/purchase-agent/reports">
         <PurchaseAgentLayout>
-          <PurchaseAgentReports />
+          <Suspense fallback={<PageSkeleton />}>
+            <PurchaseAgentReports />
+          </Suspense>
         </PurchaseAgentLayout>
       </Route>
 
       {/* B2B Parts Network Portal Routes */}
       <Route path="/parts-network">
-        <PartsNetworkLayout title="Parts Network Dashboard">
-          <PartsNetworkDashboard />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Parts Network Dashboard">
+            <PartsNetworkDashboard />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/send-request">
-        <PartsNetworkLayout title="Send Quotation Request">
-          <SendQuotationRequest />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Send Quotation Request">
+            <SendQuotationRequest />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/my-requests">
-        <PartsNetworkLayout title="My Requests">
-          <MyRequests />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="My Requests">
+            <MyRequests />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/incoming-requests">
-        <PartsNetworkLayout title="Incoming Requests">
-          <IncomingRequests />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Incoming Requests">
+            <IncomingRequests />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/quotations">
-        <PartsNetworkLayout title="Quotations">
-          <QuotationsList />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Quotations">
+            <QuotationsList />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/members">
-        <PartsNetworkLayout title="Network Members">
-          <NetworkMembers />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Network Members">
+            <NetworkMembers />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
       <Route path="/parts-network/orders">
-        <PartsNetworkLayout title="Orders">
-          <NetworkOrders />
-        </PartsNetworkLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <PartsNetworkLayout title="Orders">
+            <NetworkOrders />
+          </PartsNetworkLayout>
+        </Suspense>
       </Route>
 
       <Route path="/technician-portal-old">
@@ -1283,113 +1331,147 @@ function Router() {
       <Route path="/license-plate">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <LicensePlateRecognition />
+            <Suspense fallback={<PageSkeleton />}>
+              <LicensePlateRecognition />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/emerging-technologies">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <EmergingTechnologies />
+            <Suspense fallback={<PageSkeleton />}>
+              <EmergingTechnologies />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/interactive-3d-parts">
         <Layout>
           <ProtectedRoute flag="ar_vr">
-            <Interactive3DParts />
+            <Suspense fallback={<PageSkeleton />}>
+              <Interactive3DParts />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/nextgen-technologies">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <NextGenTechnologies />
+            <Suspense fallback={<PageSkeleton />}>
+              <NextGenTechnologies />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/iot-dashboard">
         <Layout>
           <ProtectedRoute flag="iot_dashboard">
-            <IoTDashboard />
+            <Suspense fallback={<PageSkeleton />}>
+              <IoTDashboard />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/service-bay-dashboard">
         <Layout>
           <ProtectedRoute flag="iot_dashboard">
-            <ServiceBayDashboard />
+            <Suspense fallback={<PageSkeleton />}>
+              <ServiceBayDashboard />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/automated-reordering">
         <Layout>
-          <AutomatedReordering />
+          <Suspense fallback={<PageSkeleton />}>
+            <AutomatedReordering />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/loyalty-program">
         <Layout>
           <ProtectedRoute flag="marketing">
-            <LoyaltyProgram />
+            <Suspense fallback={<PageSkeleton />}>
+              <LoyaltyProgram />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/workshop-calendar">
         <Layout>
-          <WorkshopCalendar />
+          <Suspense fallback={<PageSkeleton />}>
+            <WorkshopCalendar />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/computer-vision-qc">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <ComputerVisionQC />
+            <Suspense fallback={<PageSkeleton />}>
+              <ComputerVisionQC />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/smart-parts-recommender">
         <Layout>
           <ProtectedRoute flag="ai_features">
-            <SmartPartsRecommendations />
+            <Suspense fallback={<PageSkeleton />}>
+              <SmartPartsRecommendations />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/dynamic-pricing">
         <Layout>
           <ProtectedRoute flag="ai_features">
-            <DynamicPricing />
+            <Suspense fallback={<PageSkeleton />}>
+              <DynamicPricing />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/vehicle-tracking">
         <Layout>
-          <VehicleTracking />
+          <Suspense fallback={<PageSkeleton />}>
+            <VehicleTracking />
+          </Suspense>
         </Layout>
       </Route>
       <Route path="/digital-twin-viewer">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <DigitalTwinViewer />
+            <Suspense fallback={<PageSkeleton />}>
+              <DigitalTwinViewer />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/drone-inspection">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <DroneInspection />
+            <Suspense fallback={<PageSkeleton />}>
+              <DroneInspection />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/ml-fraud-detection">
         <Layout>
           <ProtectedRoute flag="ai_features">
-            <MLFraudDetection />
+            <Suspense fallback={<PageSkeleton />}>
+              <MLFraudDetection />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
       <Route path="/edge-computing">
         <Layout>
           <ProtectedRoute flag="emerging_tech">
-            <EdgeComputingDiagnostics />
+            <Suspense fallback={<PageSkeleton />}>
+              <EdgeComputingDiagnostics />
+            </Suspense>
           </ProtectedRoute>
         </Layout>
       </Route>
@@ -1614,6 +1696,48 @@ function Router() {
       <Route path="/advanced-reports">
         <Layout>
           <AdvancedReports />
+        </Layout>
+      </Route>
+
+      <Route path="/ai-insights">
+        <Layout>
+          <ProtectedRoute flag="ai_features">
+            <Suspense fallback={<PageSkeleton />}>
+              <AIInsights />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/blockchain-service-history">
+        <Layout>
+          <ProtectedRoute flag="blockchain">
+            <Suspense fallback={<PageSkeleton />}>
+              <BlockchainServiceHistory />
+            </Suspense>
+          </ProtectedRoute>
+        </Layout>
+      </Route>
+      <Route path="/command-center">
+        <Layout>
+          <Suspense fallback={<PageSkeleton />}>
+            <CommandCenter />
+          </Suspense>
+        </Layout>
+      </Route>
+      <Route path="/saudi-compliance">
+        <Layout>
+          <Suspense fallback={<PageSkeleton />}>
+            <SaudiComplianceDashboard />
+          </Suspense>
+        </Layout>
+      </Route>
+      <Route path="/direct-messages">
+        <Layout>
+          <ProtectedRoute flag="call_center">
+            <Suspense fallback={<PageSkeleton />}>
+              <DirectMessages />
+            </Suspense>
+          </ProtectedRoute>
         </Layout>
       </Route>
 
