@@ -10,6 +10,7 @@ import {
   savedFilterPresets, notifications, roles, featureFlags,
   hrLeaveRequestEntries,
   qcInspections, qcDefects,
+  documentLibraryItems,
 } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -735,6 +736,26 @@ async function seed() {
         ]);
       }
       console.log('✅ Seeded QC inspections and defects');
+    }
+
+    // ── Step N+2: Document library (demo) ──────────────────────────
+    const existingDocs = await db.select().from(documentLibraryItems).limit(1);
+    if (existingDocs.length === 0) {
+      await db.insert(documentLibraryItems).values([
+        { name: 'Invoice #2024-0156', type: 'pdf', category: 'invoices', size: 245_760, uploadedBy: 'Ahmed Al-Rashid', tags: ['customer', 'toyota', 'service'], description: 'Service invoice for Toyota Camry brake replacement' },
+        { name: 'Supplier Agreement - AutoParts Co', type: 'docx', category: 'contracts', size: 1_048_576, uploadedBy: 'Fatima Hassan', tags: ['supplier', 'agreement', 'parts'], description: 'Annual supply agreement with AutoParts Co for OEM parts' },
+        { name: 'Workshop Insurance Policy', type: 'pdf', category: 'insurance', size: 3_145_728, uploadedBy: 'Mohammed Saleh', tags: ['insurance', 'annual', 'workshop'], description: 'Comprehensive workshop insurance policy 2026' },
+        { name: 'Vehicle Registration - Fleet #12', type: 'pdf', category: 'vehicle-docs', size: 512_000, uploadedBy: 'Khalid Nasser', tags: ['fleet', 'registration', 'van'], description: 'Registration renewal for fleet service van #12' },
+        { name: 'Employee Onboarding - Ali Khan', type: 'pdf', category: 'employee-docs', size: 768_000, uploadedBy: 'HR Department', tags: ['onboarding', 'technician', 'new-hire'], description: 'Complete onboarding package for new technician Ali Khan' },
+        { name: 'Environmental Compliance Certificate', type: 'pdf', category: 'compliance', size: 409_600, uploadedBy: 'Mohammed Saleh', tags: ['environment', 'certificate', 'annual'], description: 'Annual environmental compliance certification for waste disposal' },
+        { name: 'Invoice #2024-0187', type: 'pdf', category: 'invoices', size: 198_656, uploadedBy: 'Ahmed Al-Rashid', tags: ['customer', 'nissan', 'oil-change'], description: 'Nissan Patrol full service with oil and filter change' },
+        { name: 'Lease Agreement - Workshop B', type: 'docx', category: 'contracts', size: 2_097_152, uploadedBy: 'Fatima Hassan', tags: ['lease', 'property', 'workshop'], description: 'Commercial lease agreement for Workshop B expansion' },
+        { name: 'Vehicle Inspection Report - BMW X5', type: 'xlsx', category: 'vehicle-docs', size: 348_160, uploadedBy: 'Technician Omar', tags: ['inspection', 'bmw', 'detailed'], description: 'Pre-purchase multi-point inspection report for BMW X5 2024' },
+        { name: 'Safety Training Certificate', type: 'pdf', category: 'employee-docs', size: 614_400, uploadedBy: 'HR Department', tags: ['safety', 'training', 'certificate'], description: 'Workshop safety training completion certificate for Q1 2026' },
+        { name: 'Fire Safety Compliance Report', type: 'pdf', category: 'compliance', size: 921_600, uploadedBy: 'Safety Officer', tags: ['fire-safety', 'inspection', 'compliance'], description: 'Annual fire safety inspection and compliance report' },
+        { name: 'Fleet Insurance Renewal', type: 'pdf', category: 'insurance', size: 1_536_000, uploadedBy: 'Fatima Hassan', tags: ['fleet', 'insurance', 'renewal'], description: 'Fleet vehicle comprehensive insurance renewal documentation' },
+      ]);
+      console.log('✅ Seeded 12 document library items');
     }
 
     console.log('\n🎉 Database seeding completed successfully!');

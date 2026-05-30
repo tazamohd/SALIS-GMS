@@ -10760,3 +10760,20 @@ export const backupHistory = pgTable("backup_history", {
 export type BackupHistory = typeof backupHistory.$inferSelect;
 export type InsertBackupHistory = typeof backupHistory.$inferInsert;
 export const insertBackupHistorySchema = createInsertSchema(backupHistory).omit({ id: true, createdAt: true });
+
+// Document library items — flat, demo-friendly counterpart to the
+// FK-heavy `documents` table. Backs /api/documents (server/routes/documents.ts).
+export const documentLibraryItems = pgTable("document_library_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 500 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  size: integer("size").default(0).notNull(),
+  uploadedBy: varchar("uploaded_by", { length: 255 }),
+  tags: jsonb("tags").default([]).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type DocumentLibraryItem = typeof documentLibraryItems.$inferSelect;
+export type InsertDocumentLibraryItem = typeof documentLibraryItems.$inferInsert;
+export const insertDocumentLibraryItemSchema = createInsertSchema(documentLibraryItems).omit({ id: true, createdAt: true });

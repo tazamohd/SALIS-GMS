@@ -739,6 +739,9 @@ import {
   backupHistory,
   type BackupHistory,
   type InsertBackupHistory,
+  documentLibraryItems,
+  type DocumentLibraryItem,
+  type InsertDocumentLibraryItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11860,6 +11863,43 @@ export class DatabaseStorage implements IStorage {
       count: rows.length,
       totalSize: rows.reduce((sum, r) => sum + (r.size ?? 0), 0),
     };
+  }
+
+  // ---------- Document Library ----------
+  async listDocumentLibraryItems(filters: { category?: string; tag?: string; search?: string } = {}): Promise<DocumentLibraryItem[]> {
+    const conditions: any[] = [];
+    if (filters.category) conditions.push(eq(documentLibraryItems.category, filters.category));
+    if (filters.search) {
+      const pat = `%${filters.search}%`;
+      conditions.push(or(
+        ilike(documentLibraryItems.name, pat),
+        ilike(documentLibraryItems.description, pat),
+        ilike(documentLibraryItems.uploadedBy, pat),
+      )!);
+    }
+    const query = conditions.length
+      ? db.select().from(documentLibraryItems).where(and(...conditions))
+      : db.select().from(documentLibraryItems);
+    let rows = await query.orderBy(desc(documentLibraryItems.createdAt));
+    if (filters.tag) {
+      rows = rows.filter((r: any) => Array.isArray(r.tags) && r.tags.includes(filters.tag));
+    }
+    return rows;
+  }
+
+  async getDocumentLibraryItem(id: string): Promise<DocumentLibraryItem | undefined> {
+    const [row] = await db.select().from(documentLibraryItems).where(eq(documentLibraryItems.id, id));
+    return row;
+  }
+
+  async createDocumentLibraryItem(data: InsertDocumentLibraryItem): Promise<DocumentLibraryItem> {
+    const [row] = await db.insert(documentLibraryItems).values(data).returning();
+    return row;
+  }
+
+  async deleteDocumentLibraryItem(id: string): Promise<DocumentLibraryItem | undefined> {
+    const [row] = await db.delete(documentLibraryItems).where(eq(documentLibraryItems.id, id)).returning();
+    return row;
   }
 }
 
