@@ -742,6 +742,9 @@ import {
   documentLibraryItems,
   type DocumentLibraryItem,
   type InsertDocumentLibraryItem,
+  kioskTickets,
+  type KioskTicket,
+  type InsertKioskTicket,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11900,6 +11903,57 @@ export class DatabaseStorage implements IStorage {
   async deleteDocumentLibraryItem(id: string): Promise<DocumentLibraryItem | undefined> {
     const [row] = await db.delete(documentLibraryItems).where(eq(documentLibraryItems.id, id)).returning();
     return row;
+  }
+
+  // ---------- Kiosk Tickets ----------
+  async listKioskTickets(filters: { statuses?: string[] } = {}): Promise<KioskTicket[]> {
+    const query = filters.statuses && filters.statuses.length
+      ? db.select().from(kioskTickets).where(inArray(kioskTickets.status, filters.statuses))
+      : db.select().from(kioskTickets);
+    return await query.orderBy(asc(kioskTickets.createdAt));
+  }
+
+  async getKioskTicket(id: string): Promise<KioskTicket | undefined> {
+    const [row] = await db.select().from(kioskTickets).where(eq(kioskTickets.id, id));
+    return row;
+  }
+
+  async getKioskTicketByNumber(ticketNumber: string): Promise<KioskTicket | undefined> {
+    const [row] = await db.select().from(kioskTickets).where(eq(kioskTickets.ticketNumber, ticketNumber));
+    return row;
+  }
+
+  async findKioskTicketByAppointment(appointmentId: string): Promise<KioskTicket | undefined> {
+    const [row] = await db.select().from(kioskTickets).where(eq(kioskTickets.appointmentId, appointmentId));
+    return row;
+  }
+
+  async findActiveKioskTicketByPhone(phone: string): Promise<KioskTicket | undefined> {
+    const [row] = await db.select().from(kioskTickets)
+      .where(and(
+        eq(kioskTickets.phone, phone),
+        inArray(kioskTickets.status, ['waiting', 'in-progress']),
+      ))
+      .limit(1);
+    return row;
+  }
+
+  async createKioskTicket(data: InsertKioskTicket): Promise<KioskTicket> {
+    const [row] = await db.insert(kioskTickets).values(data).returning();
+    return row;
+  }
+
+  async getNextKioskTicketNumber(): Promise<string> {
+    const all = await db.select({ ticketNumber: kioskTickets.ticketNumber }).from(kioskTickets);
+    let maxN = 1000;
+    for (const r of all) {
+      const m = String(r.ticketNumber).match(/Q-(\d+)/);
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (n > maxN) maxN = n;
+      }
+    }
+    return `Q-${String(maxN + 1).padStart(4, '0')}`;
   }
 }
 

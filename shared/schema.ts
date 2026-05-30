@@ -10777,3 +10777,43 @@ export const documentLibraryItems = pgTable("document_library_items", {
 export type DocumentLibraryItem = typeof documentLibraryItems.$inferSelect;
 export type InsertDocumentLibraryItem = typeof documentLibraryItems.$inferInsert;
 export const insertDocumentLibraryItemSchema = createInsertSchema(documentLibraryItems).omit({ id: true, createdAt: true });
+
+// Kiosk tickets — the self-service queue. Separate from kiosk_sessions /
+// kiosk_check_ins (which model the multi-step kiosk session); this table
+// is the simple FIFO queue exposed by server/routes/kiosk.ts.
+export const kioskTickets = pgTable("kiosk_tickets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketNumber: varchar("ticket_number", { length: 20 }).notNull(),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  vehiclePlate: varchar("vehicle_plate", { length: 50 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 255 }),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  status: varchar("status", { length: 20 }).default("waiting").notNull(),
+  type: varchar("type", { length: 20 }).default("walk-in").notNull(),
+  appointmentId: varchar("appointment_id", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export type KioskTicket = typeof kioskTickets.$inferSelect;
+export type InsertKioskTicket = typeof kioskTickets.$inferInsert;
+export const insertKioskTicketSchema = createInsertSchema(kioskTickets).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Currency transactions — FX-converted invoice/payment/refund/expense
+// records. Distinct from currency_rates (the rate table itself).
+export const currencyTransactions = pgTable("currency_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  txDate: timestamp("tx_date").defaultNow().notNull(),
+  description: text("description").notNull(),
+  originalAmount: decimal("original_amount", { precision: 18, scale: 4 }).notNull(),
+  originalCurrency: varchar("original_currency", { length: 10 }).notNull(),
+  rateUsed: decimal("rate_used", { precision: 18, scale: 6 }).notNull(),
+  sarEquivalent: decimal("sar_equivalent", { precision: 18, scale: 4 }).notNull(),
+  type: varchar("type", { length: 30 }).notNull(),
+  reference: varchar("reference", { length: 100 }),
+  customerName: varchar("customer_name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type CurrencyTransaction = typeof currencyTransactions.$inferSelect;
+export type InsertCurrencyTransaction = typeof currencyTransactions.$inferInsert;
+export const insertCurrencyTransactionSchema = createInsertSchema(currencyTransactions).omit({ id: true, createdAt: true });
