@@ -2,6 +2,7 @@ import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
 import { optimizeSchedule, generateScheduleReport } from "../services/scheduling-optimizer";
+import { eventBus } from "../engine/event-bus";
 
 const router = Router();
 
@@ -158,6 +159,32 @@ router.post(
         status,
       });
 
+      // Emit a workflow event when status transitions to "confirmed" or
+      // "checked_in" so triggers can send SMS, email, prep the queue, etc.
+      const lifecycleEvent =
+        status === 'confirmed' ? 'appointment.confirmed'
+        : status === 'checked_in' ? 'appointment.checked_in'
+        : null;
+      if (lifecycleEvent && appointment) {
+        try {
+          await eventBus.emit(eventBus.createEvent(
+            lifecycleEvent,
+            'appointment',
+            id,
+            (req as any).user?.garageId ?? (appointment as any).garageId,
+            {
+              appointmentId: id,
+              customerPhone: (appointment as any).customerPhone,
+              customerEmail: (appointment as any).customerEmail,
+              appointmentDate: (appointment as any).appointmentDate,
+            },
+            (req as any).user?.id,
+          ));
+        } catch (emitErr) {
+          console.error(`[${lifecycleEvent}] emit failed:`, emitErr);
+        }
+      }
+
       res.json(appointment);
     } catch (error) {
       console.error("Error updating appointment status:", error);
@@ -280,9 +307,6 @@ router.get("/time-slots", isAuthenticated, async (req, res) => {
 
 // ─── AI Scheduling Optimization Routes ───────────────────────────────
 
-// In-memory store for optimization history and rules
-const optimizationHistory: any[] = [];
-
 const defaultSchedulingRules = [
   { id: '1', ruleName: 'Skill-Based Assignment', description: 'Match technicians to jobs based on skill compatibility', priority: 1, isActive: true },
   { id: '2', ruleName: 'Load Balancing', description: 'Distribute work evenly across available technicians', priority: 2, isActive: true },
@@ -349,22 +373,26 @@ router.post("/scheduling/optimize", isAuthenticated, async (req: any, res) => {
       utilizationMap[t.name] = String(t.utilization);
     });
 
-    // Store in history
-    const historyEntry = {
-      id: `opt-${Date.now()}`,
-      timestamp: new Date().toISOString(),
+    // Persist to scheduling_optimization_runs
+    const persisted = await storage.createSchedulingOptimizationRun({
       appointmentsOptimized: assignments.length,
       efficiencyGain: report.averageScore > 0 ? ((report.averageScore / 100) * 25).toFixed(1) : '0',
       technicianUtilization: utilizationMap,
       suggestions,
       assignments,
       report,
-    };
-    optimizationHistory.unshift(historyEntry);
-    // Keep only last 20 entries
-    if (optimizationHistory.length > 20) optimizationHistory.length = 20;
+    });
 
-    res.json(historyEntry);
+    res.json({
+      id: persisted.id,
+      timestamp: persisted.runAt instanceof Date ? persisted.runAt.toISOString() : persisted.runAt,
+      appointmentsOptimized: persisted.appointmentsOptimized,
+      efficiencyGain: persisted.efficiencyGain,
+      technicianUtilization: persisted.technicianUtilization,
+      suggestions: persisted.suggestions,
+      assignments: persisted.assignments,
+      report: persisted.report,
+    });
   } catch (error) {
     console.error("Error running scheduling optimization:", error);
     res.status(500).json({ message: "Failed to run scheduling optimization" });
@@ -384,7 +412,17 @@ router.get("/scheduling/rules", isAuthenticated, async (_req, res) => {
 // GET /api/scheduling/history - Get optimization history
 router.get("/scheduling/history", isAuthenticated, async (_req, res) => {
   try {
-    res.json(optimizationHistory);
+    const rows = await storage.listSchedulingOptimizationRuns(20);
+    res.json(rows.map((r: any) => ({
+      id: r.id,
+      timestamp: r.runAt instanceof Date ? r.runAt.toISOString() : r.runAt,
+      appointmentsOptimized: r.appointmentsOptimized,
+      efficiencyGain: r.efficiencyGain,
+      technicianUtilization: r.technicianUtilization,
+      suggestions: r.suggestions,
+      assignments: r.assignments,
+      report: r.report,
+    })));
   } catch (error) {
     console.error("Error fetching optimization history:", error);
     res.status(500).json({ message: "Failed to fetch optimization history" });
