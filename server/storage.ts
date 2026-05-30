@@ -736,6 +736,9 @@ import {
   qcDefects,
   type QcDefect,
   type InsertQcDefect,
+  backupHistory,
+  type BackupHistory,
+  type InsertBackupHistory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11834,6 +11837,29 @@ export class DatabaseStorage implements IStorage {
   async createQcDefect(data: InsertQcDefect): Promise<QcDefect> {
     const [row] = await db.insert(qcDefects).values(data).returning();
     return row;
+  }
+
+  // ---------- Backup History ----------
+  async listBackupHistory(limit = 100): Promise<BackupHistory[]> {
+    return await db.select().from(backupHistory).orderBy(desc(backupHistory.createdAt)).limit(limit);
+  }
+
+  async getLatestBackup(): Promise<BackupHistory | undefined> {
+    const [row] = await db.select().from(backupHistory).orderBy(desc(backupHistory.createdAt)).limit(1);
+    return row;
+  }
+
+  async createBackupHistory(data: InsertBackupHistory): Promise<BackupHistory> {
+    const [row] = await db.insert(backupHistory).values(data).returning();
+    return row;
+  }
+
+  async getBackupStats(): Promise<{ count: number; totalSize: number }> {
+    const rows = await db.select({ size: backupHistory.size }).from(backupHistory);
+    return {
+      count: rows.length,
+      totalSize: rows.reduce((sum, r) => sum + (r.size ?? 0), 0),
+    };
   }
 }
 

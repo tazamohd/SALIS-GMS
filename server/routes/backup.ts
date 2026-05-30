@@ -1,33 +1,26 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
+import { storage } from '../storage';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
 import { sql, eq, count } from 'drizzle-orm';
 
 const router = Router();
 
-// In-memory backup store (in production, this would be persisted to disk / cloud storage)
-interface BackupRecord {
-  id: string;
-  createdAt: string;
-  size: number; // bytes
-  type: string; // "full" | "partial"
-  tableCounts: Record<string, number>;
-  metadata: Record<string, any>;
-}
-
-const backupStore: BackupRecord[] = [];
-let backupCounter = 0;
-
 // GET /api/backup/status — Last backup time, size, count
-router.get('/backup/status', async (_req, res) => {
+router.get('/backup/status', isAuthenticated, requireAdmin, async (_req, res) => {
   try {
-    const lastBackup = backupStore.length > 0 ? backupStore[backupStore.length - 1] : null;
+    const [latest, stats] = await Promise.all([
+      storage.getLatestBackup(),
+      storage.getBackupStats(),
+    ]);
     res.json({
-      lastBackupTime: lastBackup?.createdAt ?? null,
-      lastBackupSize: lastBackup?.size ?? 0,
-      backupCount: backupStore.length,
+      lastBackupTime: latest?.createdAt ?? null,
+      lastBackupSize: latest?.size ?? 0,
+      backupCount: stats.count,
       nextScheduled: null, // scheduled backups not implemented in dev
-      storageUsed: backupStore.reduce((sum, b) => sum + b.size, 0),
+      storageUsed: stats.totalSize,
     });
   } catch (error: any) {
     console.error('Backup status error:', error);
@@ -36,7 +29,7 @@ router.get('/backup/status', async (_req, res) => {
 });
 
 // POST /api/backup/create — Create a new backup snapshot
-router.post('/backup/create', async (_req, res) => {
+router.post('/backup/create', isAuthenticated, requireAdmin, async (_req, res) => {
   try {
     // Gather counts from key tables
     const [customerCount] = await db.select({ count: count() }).from(users);
@@ -61,25 +54,30 @@ router.post('/backup/create', async (_req, res) => {
     // Estimate ~500 bytes per record for size approximation
     const estimatedSize = totalRecords * 500;
 
-    backupCounter++;
-    const backup: BackupRecord = {
-      id: `backup-${backupCounter}-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      size: estimatedSize,
+    const stamp = Date.now();
+    const backup = await storage.createBackupHistory({
+      backupRef: `backup-${stamp}`,
       type: 'full',
+      size: estimatedSize,
+      totalRecords,
       tableCounts,
       metadata: {
         totalRecords,
         engine: 'dev-snapshot',
         note: 'Development backup — table counts and metadata only. Production would use pg_dump.',
       },
-    };
-
-    backupStore.push(backup);
+    });
 
     res.json({
       success: true,
-      backup,
+      backup: {
+        id: backup.id,
+        createdAt: backup.createdAt,
+        size: backup.size,
+        type: backup.type,
+        tableCounts: backup.tableCounts,
+        metadata: backup.metadata,
+      },
     });
   } catch (error: any) {
     console.error('Backup creation error:', error);
@@ -88,16 +86,16 @@ router.post('/backup/create', async (_req, res) => {
 });
 
 // GET /api/backup/list — List available backups
-router.get('/backup/list', async (_req, res) => {
+router.get('/backup/list', isAuthenticated, requireAdmin, async (_req, res) => {
   try {
-    const list = backupStore.map((b) => ({
+    const rows = await storage.listBackupHistory();
+    res.json(rows.map((b: any) => ({
       id: b.id,
       createdAt: b.createdAt,
       size: b.size,
       type: b.type,
-      totalRecords: b.metadata.totalRecords,
-    }));
-    res.json(list);
+      totalRecords: b.totalRecords ?? b.metadata?.totalRecords ?? 0,
+    })));
   } catch (error: any) {
     console.error('Backup list error:', error);
     res.status(500).json({ error: 'Failed to list backups' });
@@ -105,7 +103,7 @@ router.get('/backup/list', async (_req, res) => {
 });
 
 // GET /api/backup/export/:type — Export data as JSON from real DB tables
-router.get('/backup/export/:type', async (req, res) => {
+router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
     const { type } = req.params;
     let data: any[];

@@ -10743,3 +10743,20 @@ export const qcDefects = pgTable("qc_defects", {
 export type QcDefect = typeof qcDefects.$inferSelect;
 export type InsertQcDefect = typeof qcDefects.$inferInsert;
 export const insertQcDefectSchema = createInsertSchema(qcDefects).omit({ id: true, createdAt: true });
+
+// Backup history — flat record of completed backup snapshots taken via
+// /api/backup/create. Distinct from backup_jobs (a more complex job-queue
+// record used elsewhere); this table replaces the in-memory backupStore[].
+export const backupHistory = pgTable("backup_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  backupRef: varchar("backup_ref", { length: 100 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  size: integer("size").notNull(),
+  totalRecords: integer("total_records").default(0).notNull(),
+  tableCounts: jsonb("table_counts").default({}).notNull(),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type BackupHistory = typeof backupHistory.$inferSelect;
+export type InsertBackupHistory = typeof backupHistory.$inferInsert;
+export const insertBackupHistorySchema = createInsertSchema(backupHistory).omit({ id: true, createdAt: true });
