@@ -10817,3 +10817,83 @@ export const currencyTransactions = pgTable("currency_transactions", {
 export type CurrencyTransaction = typeof currencyTransactions.$inferSelect;
 export type InsertCurrencyTransaction = typeof currencyTransactions.$inferInsert;
 export const insertCurrencyTransactionSchema = createInsertSchema(currencyTransactions).omit({ id: true, createdAt: true });
+
+// Fleet accounts / vehicles / maintenance — flat tables matching the
+// fleet route surface. Distinct from fleet_groups/fleet_vehicles/fleet_
+// maintenance_schedules (FK-strict canonical fleet schema).
+export const fleetAccounts = pgTable("fleet_accounts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  contactPerson: varchar("contact_person", { length: 255 }),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  contractStatus: varchar("contract_status", { length: 30 }).default("pending").notNull(),
+  contractStart: date("contract_start"),
+  contractEnd: date("contract_end"),
+  monthlySpend: decimal("monthly_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  discountPercentage: integer("discount_percentage").default(0).notNull(),
+  paymentTerms: varchar("payment_terms", { length: 50 }).default("Net 30"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type FleetAccount = typeof fleetAccounts.$inferSelect;
+export type InsertFleetAccount = typeof fleetAccounts.$inferInsert;
+export const insertFleetAccountSchema = createInsertSchema(fleetAccounts).omit({ id: true, createdAt: true });
+
+export const fleetAccountVehicles = pgTable("fleet_account_vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  fleetAccountId: uuid("fleet_account_id").references(() => fleetAccounts.id).notNull(),
+  plateNumber: varchar("plate_number", { length: 50 }).notNull(),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  year: integer("year").notNull(),
+  vin: varchar("vin", { length: 50 }),
+  status: varchar("status", { length: 30 }).default("active").notNull(),
+  mileage: integer("mileage").default(0).notNull(),
+  lastServiceDate: date("last_service_date"),
+  lastServiceType: varchar("last_service_type", { length: 100 }),
+  nextServiceDue: date("next_service_due"),
+  nextServiceType: varchar("next_service_type", { length: 100 }),
+  avgMonthlyCost: decimal("avg_monthly_cost", { precision: 12, scale: 2 }).default("0"),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type FleetAccountVehicle = typeof fleetAccountVehicles.$inferSelect;
+export type InsertFleetAccountVehicle = typeof fleetAccountVehicles.$inferInsert;
+export const insertFleetAccountVehicleSchema = createInsertSchema(fleetAccountVehicles).omit({ id: true, createdAt: true });
+
+export const fleetMaintenanceEntries = pgTable("fleet_maintenance_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  vehicleId: uuid("vehicle_id").references(() => fleetAccountVehicles.id).notNull(),
+  fleetAccountId: uuid("fleet_account_id").references(() => fleetAccounts.id).notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  scheduledDate: date("scheduled_date").notNull(),
+  status: varchar("status", { length: 30 }).default("scheduled").notNull(),
+  estimatedCost: decimal("estimated_cost", { precision: 12, scale: 2 }).default("0").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type FleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferSelect;
+export type InsertFleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferInsert;
+export const insertFleetMaintenanceEntrySchema = createInsertSchema(fleetMaintenanceEntries).omit({ id: true, createdAt: true });
+
+// Scheduling optimization runs — replaces the in-memory optimizationHistory[]
+// in scheduling.routes.ts so AI optimization output persists across restarts.
+export const schedulingOptimizationRuns = pgTable("scheduling_optimization_runs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  runAt: timestamp("run_at").defaultNow().notNull(),
+  appointmentsOptimized: integer("appointments_optimized").default(0).notNull(),
+  efficiencyGain: varchar("efficiency_gain", { length: 20 }),
+  technicianUtilization: jsonb("technician_utilization").default({}).notNull(),
+  suggestions: jsonb("suggestions").default([]).notNull(),
+  assignments: jsonb("assignments").default([]).notNull(),
+  report: jsonb("report").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type SchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferSelect;
+export type InsertSchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferInsert;
+export const insertSchedulingOptimizationRunSchema = createInsertSchema(schedulingOptimizationRuns).omit({ id: true, createdAt: true });

@@ -745,6 +745,9 @@ import {
   kioskTickets,
   type KioskTicket,
   type InsertKioskTicket,
+  currencyTransactions,
+  type CurrencyTransaction,
+  type InsertCurrencyTransaction,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11954,6 +11957,22 @@ export class DatabaseStorage implements IStorage {
       }
     }
     return `Q-${String(maxN + 1).padStart(4, '0')}`;
+  }
+
+  // ---------- Currency Transactions ----------
+  async listCurrencyTransactions(filters: { type?: string; currency?: string; limit?: number } = {}): Promise<CurrencyTransaction[]> {
+    const conditions: any[] = [];
+    if (filters.type && filters.type !== 'all') conditions.push(eq(currencyTransactions.type, filters.type));
+    if (filters.currency && filters.currency !== 'all') conditions.push(eq(currencyTransactions.originalCurrency, filters.currency));
+    const base = conditions.length
+      ? db.select().from(currencyTransactions).where(and(...conditions))
+      : db.select().from(currencyTransactions);
+    return await base.orderBy(desc(currencyTransactions.txDate)).limit(filters.limit ?? 50);
+  }
+
+  async createCurrencyTransaction(data: InsertCurrencyTransaction): Promise<CurrencyTransaction> {
+    const [row] = await db.insert(currencyTransactions).values(data).returning();
+    return row;
   }
 }
 

@@ -11,6 +11,7 @@ import {
   hrLeaveRequestEntries,
   qcInspections, qcDefects,
   documentLibraryItems,
+  currencyTransactions,
 } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -756,6 +757,24 @@ async function seed() {
         { name: 'Fleet Insurance Renewal', type: 'pdf', category: 'insurance', size: 1_536_000, uploadedBy: 'Fatima Hassan', tags: ['fleet', 'insurance', 'renewal'], description: 'Fleet vehicle comprehensive insurance renewal documentation' },
       ]);
       console.log('✅ Seeded 12 document library items');
+    }
+
+    // ── Step N+3: Currency transactions (demo) ─────────────────────
+    const existingCurTx = await db.select().from(currencyTransactions).limit(1);
+    if (existingCurTx.length === 0) {
+      await db.insert(currencyTransactions).values([
+        { txDate: new Date('2026-03-19T14:30:00Z'), description: 'Full service — Toyota Camry', originalAmount: '450.00', originalCurrency: 'USD', rateUsed: '3.7536', sarEquivalent: '1689.12', type: 'invoice', reference: 'INV-2026-0412', customerName: 'James Wilson' },
+        { txDate: new Date('2026-03-19T11:15:00Z'), description: 'Brake pad replacement', originalAmount: '320.00', originalCurrency: 'EUR', rateUsed: '4.0816', sarEquivalent: '1306.11', type: 'invoice', reference: 'INV-2026-0411', customerName: 'Hans Mueller' },
+        { txDate: new Date('2026-03-18T16:45:00Z'), description: 'Engine diagnostics', originalAmount: '180.00', originalCurrency: 'GBP', rateUsed: '4.7506', sarEquivalent: '855.11', type: 'payment', reference: 'PAY-2026-0298', customerName: 'Oliver Smith' },
+        { txDate: new Date('2026-03-18T10:00:00Z'), description: 'Oil change service', originalAmount: '350.00', originalCurrency: 'AED', rateUsed: '1.0204', sarEquivalent: '357.14', type: 'payment', reference: 'PAY-2026-0297', customerName: 'Mohammed Al-Maktoum' },
+        { txDate: new Date('2026-03-17T09:20:00Z'), description: 'Transmission repair', originalAmount: '120.00', originalCurrency: 'KWD', rateUsed: '12.1655', sarEquivalent: '1459.85', type: 'invoice', reference: 'INV-2026-0408', customerName: 'Abdullah Al-Sabah' },
+        { txDate: new Date('2026-03-17T13:00:00Z'), description: 'Refund — incorrect part charged', originalAmount: '85.00', originalCurrency: 'USD', rateUsed: '3.7536', sarEquivalent: '319.06', type: 'refund', reference: 'REF-2026-0045', customerName: 'James Wilson' },
+        { txDate: new Date('2026-03-16T15:30:00Z'), description: 'AC compressor parts import', originalAmount: '2200.00', originalCurrency: 'USD', rateUsed: '3.7536', sarEquivalent: '8257.92', type: 'expense', reference: 'EXP-2026-0189', customerName: 'AutoParts International' },
+        { txDate: new Date('2026-03-16T08:45:00Z'), description: 'Suspension overhaul', originalAmount: '75.00', originalCurrency: 'BHD', rateUsed: '9.9304', sarEquivalent: '744.78', type: 'invoice', reference: 'INV-2026-0405', customerName: 'Ali Al-Khalifa' },
+        { txDate: new Date('2026-03-15T12:00:00Z'), description: 'Windshield replacement', originalAmount: '8500.00', originalCurrency: 'EGP', rateUsed: '0.2841', sarEquivalent: '2414.77', type: 'payment', reference: 'PAY-2026-0291', customerName: 'Ahmed Mostafa' },
+        { txDate: new Date('2026-03-15T09:00:00Z'), description: 'Annual inspection fee', originalAmount: '45.00', originalCurrency: 'JOD', rateUsed: '5.2770', sarEquivalent: '237.47', type: 'payment', reference: 'PAY-2026-0290', customerName: 'Faisal Al-Hashemi' },
+      ]);
+      console.log('✅ Seeded 10 currency transactions');
     }
 
     console.log('\n🎉 Database seeding completed successfully!');

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { storage } from '../storage';
 
 const router = Router();
 
@@ -22,18 +23,7 @@ interface CurrencySettings {
   autoConversion: boolean;
 }
 
-interface CurrencyTransaction {
-  id: number;
-  date: string;
-  description: string;
-  originalAmount: number;
-  originalCurrency: string;
-  rateUsed: number;
-  sarEquivalent: number;
-  type: 'invoice' | 'payment' | 'refund' | 'expense';
-  reference: string;
-  customerName: string;
-}
+type CurrencyTxType = 'invoice' | 'payment' | 'refund' | 'expense';
 
 // ---------------------------------------------------------------------------
 // Hardcoded exchange rates (SAR base — realistic as of early 2026)
@@ -132,72 +122,8 @@ let currencySettings: CurrencySettings = {
   autoConversion: true,
 };
 
-// ---------------------------------------------------------------------------
-// Sample transactions
-// ---------------------------------------------------------------------------
-let nextTxId = 11;
-const transactions: CurrencyTransaction[] = [
-  {
-    id: 1, date: '2026-03-19T14:30:00Z', description: 'Full service — Toyota Camry',
-    originalAmount: 450.00, originalCurrency: 'USD', rateUsed: 3.7536,
-    sarEquivalent: 1689.12, type: 'invoice', reference: 'INV-2026-0412',
-    customerName: 'James Wilson',
-  },
-  {
-    id: 2, date: '2026-03-19T11:15:00Z', description: 'Brake pad replacement',
-    originalAmount: 320.00, originalCurrency: 'EUR', rateUsed: 4.0816,
-    sarEquivalent: 1306.11, type: 'invoice', reference: 'INV-2026-0411',
-    customerName: 'Hans Mueller',
-  },
-  {
-    id: 3, date: '2026-03-18T16:45:00Z', description: 'Engine diagnostics',
-    originalAmount: 180.00, originalCurrency: 'GBP', rateUsed: 4.7506,
-    sarEquivalent: 855.11, type: 'payment', reference: 'PAY-2026-0298',
-    customerName: 'Oliver Smith',
-  },
-  {
-    id: 4, date: '2026-03-18T10:00:00Z', description: 'Oil change service',
-    originalAmount: 350.00, originalCurrency: 'AED', rateUsed: 1.0204,
-    sarEquivalent: 357.14, type: 'payment', reference: 'PAY-2026-0297',
-    customerName: 'Mohammed Al-Maktoum',
-  },
-  {
-    id: 5, date: '2026-03-17T09:20:00Z', description: 'Transmission repair',
-    originalAmount: 120.00, originalCurrency: 'KWD', rateUsed: 12.1655,
-    sarEquivalent: 1459.85, type: 'invoice', reference: 'INV-2026-0408',
-    customerName: 'Abdullah Al-Sabah',
-  },
-  {
-    id: 6, date: '2026-03-17T13:00:00Z', description: 'Refund — incorrect part charged',
-    originalAmount: 85.00, originalCurrency: 'USD', rateUsed: 3.7536,
-    sarEquivalent: 319.06, type: 'refund', reference: 'REF-2026-0045',
-    customerName: 'James Wilson',
-  },
-  {
-    id: 7, date: '2026-03-16T15:30:00Z', description: 'AC compressor parts import',
-    originalAmount: 2200.00, originalCurrency: 'USD', rateUsed: 3.7536,
-    sarEquivalent: 8257.92, type: 'expense', reference: 'EXP-2026-0189',
-    customerName: 'AutoParts International',
-  },
-  {
-    id: 8, date: '2026-03-16T08:45:00Z', description: 'Suspension overhaul',
-    originalAmount: 75.00, originalCurrency: 'BHD', rateUsed: 9.9304,
-    sarEquivalent: 744.78, type: 'invoice', reference: 'INV-2026-0405',
-    customerName: 'Ali Al-Khalifa',
-  },
-  {
-    id: 9, date: '2026-03-15T12:00:00Z', description: 'Windshield replacement',
-    originalAmount: 8500.00, originalCurrency: 'EGP', rateUsed: 0.2841,
-    sarEquivalent: 2414.77, type: 'payment', reference: 'PAY-2026-0291',
-    customerName: 'Ahmed Mostafa',
-  },
-  {
-    id: 10, date: '2026-03-15T09:00:00Z', description: 'Annual inspection fee',
-    originalAmount: 45.00, originalCurrency: 'JOD', rateUsed: 5.2770,
-    sarEquivalent: 237.47, type: 'payment', reference: 'PAY-2026-0290',
-    customerName: 'Faisal Al-Hashemi',
-  },
-];
+// Transactions now live in the currency_transactions Drizzle table; see
+// server/seed.ts for the 10 demo seeds.
 
 // ---------------------------------------------------------------------------
 // Helper: convert between currencies via SAR midRate
@@ -291,36 +217,96 @@ router.put('/currency/settings', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/currency/transactions
 // ---------------------------------------------------------------------------
-router.get('/currency/transactions', (req, res) => {
-  const { type, currency, limit: rawLimit } = req.query;
-  let filtered = [...transactions];
+router.get('/currency/transactions', async (req, res) => {
+  try {
+    const { type, currency, limit: rawLimit } = req.query;
+    const limit = rawLimit ? parseInt(rawLimit as string, 10) : 50;
 
-  if (type && type !== 'all') {
-    filtered = filtered.filter(t => t.type === type);
+    const rows = await storage.listCurrencyTransactions({
+      type: type ? String(type) : undefined,
+      currency: currency ? String(currency) : undefined,
+      limit,
+    });
+
+    const view = rows.map((t: any) => ({
+      id: t.id,
+      date: t.txDate instanceof Date ? t.txDate.toISOString() : t.txDate,
+      description: t.description,
+      originalAmount: parseFloat(t.originalAmount),
+      originalCurrency: t.originalCurrency,
+      rateUsed: parseFloat(t.rateUsed),
+      sarEquivalent: parseFloat(t.sarEquivalent),
+      type: t.type,
+      reference: t.reference,
+      customerName: t.customerName,
+    }));
+
+    const totalSAR = view.reduce((sum, t) => {
+      if (t.type === 'refund') return sum - t.sarEquivalent;
+      return sum + t.sarEquivalent;
+    }, 0);
+
+    res.json({
+      transactions: view,
+      summary: {
+        count: view.length,
+        totalSAR: parseFloat(totalSAR.toFixed(2)),
+        currencies: [...new Set(view.map(t => t.originalCurrency))],
+      },
+    });
+  } catch (err) {
+    console.error('Currency transactions error:', err);
+    res.status(500).json({ error: 'Failed to list currency transactions' });
   }
-  if (currency && currency !== 'all') {
-    filtered = filtered.filter(t => t.originalCurrency === currency);
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/currency/transactions
+// Body: { description, originalAmount, originalCurrency, type, reference?, customerName? }
+// ---------------------------------------------------------------------------
+router.post('/currency/transactions', async (req, res) => {
+  const { description, originalAmount, originalCurrency, type, reference, customerName, date } = req.body;
+
+  if (!description || typeof originalAmount !== 'number' || !originalCurrency || !type) {
+    return res.status(400).json({ error: 'description, originalAmount, originalCurrency, and type are required' });
+  }
+  if (!['invoice', 'payment', 'refund', 'expense'].includes(type)) {
+    return res.status(400).json({ error: 'type must be invoice, payment, refund, or expense' });
   }
 
-  // Sort by date descending
-  filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sar = convert(originalAmount, originalCurrency, 'SAR');
+  if (!sar) {
+    return res.status(400).json({ error: 'Invalid currency code' });
+  }
 
-  const limit = rawLimit ? parseInt(rawLimit as string, 10) : 50;
-  filtered = filtered.slice(0, limit);
-
-  const totalSAR = filtered.reduce((sum, t) => {
-    if (t.type === 'refund') return sum - t.sarEquivalent;
-    return sum + t.sarEquivalent;
-  }, 0);
-
-  res.json({
-    transactions: filtered,
-    summary: {
-      count: filtered.length,
-      totalSAR: parseFloat(totalSAR.toFixed(2)),
-      currencies: [...new Set(filtered.map(t => t.originalCurrency))],
-    },
-  });
+  try {
+    const row = await storage.createCurrencyTransaction({
+      txDate: date ? new Date(date) : new Date(),
+      description,
+      originalAmount: String(originalAmount),
+      originalCurrency,
+      rateUsed: String(1 / (exchangeRates.find(r => r.code === originalCurrency)?.midRate ?? 1)),
+      sarEquivalent: sar.result.toFixed(4),
+      type: type as CurrencyTxType,
+      reference: reference || null,
+      customerName: customerName || null,
+    });
+    res.status(201).json({
+      id: row.id,
+      date: row.txDate,
+      description: row.description,
+      originalAmount: parseFloat(row.originalAmount),
+      originalCurrency: row.originalCurrency,
+      rateUsed: parseFloat(row.rateUsed),
+      sarEquivalent: parseFloat(row.sarEquivalent),
+      type: row.type,
+      reference: row.reference,
+      customerName: row.customerName,
+    });
+  } catch (err) {
+    console.error('Currency transaction create error:', err);
+    res.status(500).json({ error: 'Failed to create currency transaction' });
+  }
 });
 
 export default router;
