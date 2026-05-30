@@ -12,6 +12,9 @@ import {
   qcInspections, qcDefects,
   documentLibraryItems,
   currencyTransactions,
+  fleetAccounts as fleetAccountsTable,
+  fleetAccountVehicles,
+  fleetMaintenanceEntries,
 } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -775,6 +778,49 @@ async function seed() {
         { txDate: new Date('2026-03-15T09:00:00Z'), description: 'Annual inspection fee', originalAmount: '45.00', originalCurrency: 'JOD', rateUsed: '5.2770', sarEquivalent: '237.47', type: 'payment', reference: 'PAY-2026-0290', customerName: 'Faisal Al-Hashemi' },
       ]);
       console.log('✅ Seeded 10 currency transactions');
+    }
+
+    // ── Step N+4: Fleet accounts/vehicles/maintenance (demo) ───────
+    const existingFleet = await db.select().from(fleetAccountsTable).limit(1);
+    if (existingFleet.length === 0) {
+      const insertedAccounts = await db.insert(fleetAccountsTable).values([
+        { externalRef: 'fa-001', companyName: 'Al Rajhi Logistics', contactPerson: 'Ahmed Al-Rashid', contactEmail: 'ahmed@alrajhi-logistics.sa', contactPhone: '+966 50 123 4567', contractStatus: 'active', contractStart: '2025-01-01', contractEnd: '2026-12-31', monthlySpend: '45200', totalSpend: '542400', discountPercentage: 15, paymentTerms: 'Net 30', notes: 'Premium fleet client, priority service' },
+        { externalRef: 'fa-002', companyName: 'Saudi Express Delivery', contactPerson: 'Khalid bin Saeed', contactEmail: 'khalid@saudiexpress.sa', contactPhone: '+966 55 987 6543', contractStatus: 'active', contractStart: '2025-03-15', contractEnd: '2027-03-14', monthlySpend: '28750', totalSpend: '287500', discountPercentage: 10, paymentTerms: 'Net 15', notes: 'Delivery fleet, high-mileage vehicles' },
+        { externalRef: 'fa-003', companyName: 'Gulf Construction Co.', contactPerson: 'Omar Al-Farsi', contactEmail: 'omar@gulfconstruction.sa', contactPhone: '+966 54 456 7890', contractStatus: 'pending', contractStart: '2026-04-01', contractEnd: '2028-03-31', monthlySpend: '0', totalSpend: '0', discountPercentage: 12, paymentTerms: 'Net 30', notes: 'Heavy-duty fleet, construction vehicles' },
+      ]).returning();
+      const accountByRef = new Map(insertedAccounts.map((a: any) => [a.externalRef, a.id]));
+
+      const insertedVehicles = await db.insert(fleetAccountVehicles).values([
+        { externalRef: 'fv-001', fleetAccountId: accountByRef.get('fa-001')!, plateNumber: 'RYD 1234', make: 'Toyota', model: 'Hilux', year: 2024, vin: 'JTFBT4K38N1000001', status: 'active', mileage: 45200, lastServiceDate: '2026-02-15', lastServiceType: 'Oil Change', nextServiceDue: '2026-04-15', nextServiceType: 'Full Service', avgMonthlyCost: '1200', totalSpend: '14400' },
+        { externalRef: 'fv-002', fleetAccountId: accountByRef.get('fa-001')!, plateNumber: 'RYD 5678', make: 'Toyota', model: 'Land Cruiser', year: 2023, vin: 'JTFBT4K38N1000002', status: 'in_service', mileage: 78300, lastServiceDate: '2026-03-10', lastServiceType: 'Brake Replacement', nextServiceDue: '2026-05-10', nextServiceType: 'Oil Change', avgMonthlyCost: '1850', totalSpend: '22200' },
+        { externalRef: 'fv-003', fleetAccountId: accountByRef.get('fa-001')!, plateNumber: 'RYD 9012', make: 'Isuzu', model: 'NPR', year: 2024, vin: 'JTFBT4K38N1000003', status: 'active', mileage: 32100, lastServiceDate: '2026-01-20', lastServiceType: 'Tire Rotation', nextServiceDue: '2026-03-25', nextServiceType: 'Oil Change', avgMonthlyCost: '980', totalSpend: '11760' },
+        { externalRef: 'fv-004', fleetAccountId: accountByRef.get('fa-001')!, plateNumber: 'RYD 3456', make: 'Mitsubishi', model: 'Canter', year: 2023, vin: 'JTFBT4K38N1000004', status: 'scheduled', mileage: 56700, lastServiceDate: '2025-12-05', lastServiceType: 'Transmission Service', nextServiceDue: '2026-03-22', nextServiceType: 'Full Service', avgMonthlyCost: '1450', totalSpend: '17400' },
+        { externalRef: 'fv-005', fleetAccountId: accountByRef.get('fa-002')!, plateNumber: 'JED 2345', make: 'Nissan', model: 'Urvan', year: 2024, vin: 'JTFBT4K38N1000005', status: 'active', mileage: 67800, lastServiceDate: '2026-03-01', lastServiceType: 'Oil Change', nextServiceDue: '2026-04-01', nextServiceType: 'Tire Replacement', avgMonthlyCost: '890', totalSpend: '10680' },
+        { externalRef: 'fv-006', fleetAccountId: accountByRef.get('fa-002')!, plateNumber: 'JED 6789', make: 'Toyota', model: 'Hiace', year: 2023, vin: 'JTFBT4K38N1000006', status: 'active', mileage: 92100, lastServiceDate: '2026-02-20', lastServiceType: 'Full Service', nextServiceDue: '2026-04-20', nextServiceType: 'Oil Change', avgMonthlyCost: '1100', totalSpend: '13200' },
+        { externalRef: 'fv-007', fleetAccountId: accountByRef.get('fa-002')!, plateNumber: 'JED 0123', make: 'Hyundai', model: 'H-1', year: 2024, vin: 'JTFBT4K38N1000007', status: 'in_service', mileage: 41500, lastServiceDate: '2026-03-18', lastServiceType: 'Suspension Repair', nextServiceDue: '2026-05-18', nextServiceType: 'Oil Change', avgMonthlyCost: '750', totalSpend: '9000' },
+        { externalRef: 'fv-008', fleetAccountId: accountByRef.get('fa-002')!, plateNumber: 'JED 4567', make: 'Ford', model: 'Transit', year: 2023, vin: 'JTFBT4K38N1000008', status: 'active', mileage: 55300, lastServiceDate: '2026-01-15', lastServiceType: 'Battery Replacement', nextServiceDue: '2026-03-28', nextServiceType: 'Oil Change', avgMonthlyCost: '920', totalSpend: '11040' },
+        { externalRef: 'fv-009', fleetAccountId: accountByRef.get('fa-003')!, plateNumber: 'DMM 7890', make: 'Toyota', model: 'Land Cruiser Pickup', year: 2024, vin: 'JTFBT4K38N1000009', status: 'active', mileage: 28400, lastServiceDate: '2026-02-28', lastServiceType: 'Oil Change', nextServiceDue: '2026-04-28', nextServiceType: 'Full Service', avgMonthlyCost: '1350', totalSpend: '16200' },
+        { externalRef: 'fv-010', fleetAccountId: accountByRef.get('fa-003')!, plateNumber: 'DMM 1234', make: 'Mitsubishi', model: 'L200', year: 2023, vin: 'JTFBT4K38N1000010', status: 'active', mileage: 61200, lastServiceDate: '2026-03-05', lastServiceType: 'Tire Replacement', nextServiceDue: '2026-05-05', nextServiceType: 'Oil Change', avgMonthlyCost: '1080', totalSpend: '12960' },
+        { externalRef: 'fv-011', fleetAccountId: accountByRef.get('fa-003')!, plateNumber: 'DMM 5678', make: 'Isuzu', model: 'D-Max', year: 2024, vin: 'JTFBT4K38N1000011', status: 'scheduled', mileage: 19800, lastServiceDate: '2026-01-10', lastServiceType: 'Brake Inspection', nextServiceDue: '2026-03-24', nextServiceType: 'Oil Change', avgMonthlyCost: '680', totalSpend: '8160' },
+        { externalRef: 'fv-012', fleetAccountId: accountByRef.get('fa-003')!, plateNumber: 'DMM 9012', make: 'Ford', model: 'Ranger', year: 2023, vin: 'JTFBT4K38N1000012', status: 'inactive', mileage: 105600, lastServiceDate: '2025-11-20', lastServiceType: 'Engine Overhaul', nextServiceDue: '2026-05-20', nextServiceType: 'Full Inspection', avgMonthlyCost: '2200', totalSpend: '26400' },
+      ]).returning();
+      const vehicleByRef = new Map(insertedVehicles.map((v: any) => [v.externalRef, v.id]));
+
+      await db.insert(fleetMaintenanceEntries).values([
+        { externalRef: 'ms-001', vehicleId: vehicleByRef.get('fv-001')!, fleetAccountId: accountByRef.get('fa-001')!, serviceType: 'Full Service', scheduledDate: '2026-04-15', status: 'scheduled', estimatedCost: '1800', notes: 'Includes oil, filters, and inspection' },
+        { externalRef: 'ms-002', vehicleId: vehicleByRef.get('fv-003')!, fleetAccountId: accountByRef.get('fa-001')!, serviceType: 'Oil Change', scheduledDate: '2026-03-25', status: 'overdue', estimatedCost: '350', notes: 'Standard oil change' },
+        { externalRef: 'ms-003', vehicleId: vehicleByRef.get('fv-004')!, fleetAccountId: accountByRef.get('fa-001')!, serviceType: 'Full Service', scheduledDate: '2026-03-22', status: 'scheduled', estimatedCost: '2200', notes: 'Full service with transmission check' },
+        { externalRef: 'ms-004', vehicleId: vehicleByRef.get('fv-005')!, fleetAccountId: accountByRef.get('fa-002')!, serviceType: 'Tire Replacement', scheduledDate: '2026-04-01', status: 'scheduled', estimatedCost: '2400', notes: 'Replace all 4 tires' },
+        { externalRef: 'ms-005', vehicleId: vehicleByRef.get('fv-008')!, fleetAccountId: accountByRef.get('fa-002')!, serviceType: 'Oil Change', scheduledDate: '2026-03-28', status: 'scheduled', estimatedCost: '320', notes: 'Synthetic oil change' },
+        { externalRef: 'ms-006', vehicleId: vehicleByRef.get('fv-009')!, fleetAccountId: accountByRef.get('fa-003')!, serviceType: 'Full Service', scheduledDate: '2026-04-28', status: 'scheduled', estimatedCost: '1950', notes: 'Major service at 30k km' },
+        { externalRef: 'ms-007', vehicleId: vehicleByRef.get('fv-011')!, fleetAccountId: accountByRef.get('fa-003')!, serviceType: 'Oil Change', scheduledDate: '2026-03-24', status: 'scheduled', estimatedCost: '300', notes: 'Regular maintenance' },
+        { externalRef: 'ms-008', vehicleId: vehicleByRef.get('fv-002')!, fleetAccountId: accountByRef.get('fa-001')!, serviceType: 'Oil Change', scheduledDate: '2026-05-10', status: 'scheduled', estimatedCost: '400', notes: 'Post brake replacement checkup' },
+        { externalRef: 'ms-009', vehicleId: vehicleByRef.get('fv-006')!, fleetAccountId: accountByRef.get('fa-002')!, serviceType: 'Oil Change', scheduledDate: '2026-04-20', status: 'scheduled', estimatedCost: '350', notes: 'High-mileage vehicle check' },
+        { externalRef: 'ms-010', vehicleId: vehicleByRef.get('fv-010')!, fleetAccountId: accountByRef.get('fa-003')!, serviceType: 'Oil Change', scheduledDate: '2026-05-05', status: 'scheduled', estimatedCost: '320', notes: 'Standard interval service' },
+        { externalRef: 'ms-011', vehicleId: vehicleByRef.get('fv-007')!, fleetAccountId: accountByRef.get('fa-002')!, serviceType: 'Oil Change', scheduledDate: '2026-05-18', status: 'scheduled', estimatedCost: '300', notes: 'After suspension repair follow-up' },
+        { externalRef: 'ms-012', vehicleId: vehicleByRef.get('fv-012')!, fleetAccountId: accountByRef.get('fa-003')!, serviceType: 'Full Inspection', scheduledDate: '2026-05-20', status: 'scheduled', estimatedCost: '1500', notes: 'Post-overhaul comprehensive inspection' },
+      ]);
+      console.log('✅ Seeded 3 fleet accounts, 12 fleet vehicles, 12 maintenance entries');
     }
 
     console.log('\n🎉 Database seeding completed successfully!');

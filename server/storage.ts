@@ -748,6 +748,18 @@ import {
   currencyTransactions,
   type CurrencyTransaction,
   type InsertCurrencyTransaction,
+  fleetAccounts,
+  type FleetAccount,
+  type InsertFleetAccount,
+  fleetAccountVehicles,
+  type FleetAccountVehicle,
+  type InsertFleetAccountVehicle,
+  fleetMaintenanceEntries,
+  type FleetMaintenanceEntry,
+  type InsertFleetMaintenanceEntry,
+  schedulingOptimizationRuns,
+  type SchedulingOptimizationRun,
+  type InsertSchedulingOptimizationRun,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11972,6 +11984,45 @@ export class DatabaseStorage implements IStorage {
 
   async createCurrencyTransaction(data: InsertCurrencyTransaction): Promise<CurrencyTransaction> {
     const [row] = await db.insert(currencyTransactions).values(data).returning();
+    return row;
+  }
+
+  // ---------- Fleet (route-aligned tables) ----------
+  async listFleetAccounts(): Promise<FleetAccount[]> {
+    return await db.select().from(fleetAccounts).orderBy(asc(fleetAccounts.companyName));
+  }
+
+  async getFleetAccount(id: string): Promise<FleetAccount | undefined> {
+    const [row] = await db.select().from(fleetAccounts).where(eq(fleetAccounts.id, id));
+    return row;
+  }
+
+  async createFleetAccount(data: InsertFleetAccount): Promise<FleetAccount> {
+    const [row] = await db.insert(fleetAccounts).values(data).returning();
+    return row;
+  }
+
+  async listFleetAccountVehicles(accountId?: string): Promise<FleetAccountVehicle[]> {
+    if (accountId) {
+      return await db.select().from(fleetAccountVehicles).where(eq(fleetAccountVehicles.fleetAccountId, accountId)).orderBy(asc(fleetAccountVehicles.plateNumber));
+    }
+    return await db.select().from(fleetAccountVehicles).orderBy(asc(fleetAccountVehicles.plateNumber));
+  }
+
+  async listFleetMaintenanceEntries(accountId?: string): Promise<FleetMaintenanceEntry[]> {
+    if (accountId) {
+      return await db.select().from(fleetMaintenanceEntries).where(eq(fleetMaintenanceEntries.fleetAccountId, accountId)).orderBy(asc(fleetMaintenanceEntries.scheduledDate));
+    }
+    return await db.select().from(fleetMaintenanceEntries).orderBy(asc(fleetMaintenanceEntries.scheduledDate));
+  }
+
+  // ---------- Scheduling Optimization Runs ----------
+  async listSchedulingOptimizationRuns(limit = 20): Promise<SchedulingOptimizationRun[]> {
+    return await db.select().from(schedulingOptimizationRuns).orderBy(desc(schedulingOptimizationRuns.runAt)).limit(limit);
+  }
+
+  async createSchedulingOptimizationRun(data: InsertSchedulingOptimizationRun): Promise<SchedulingOptimizationRun> {
+    const [row] = await db.insert(schedulingOptimizationRuns).values(data).returning();
     return row;
   }
 }
