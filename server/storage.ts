@@ -730,6 +730,12 @@ import {
   hrLeaveRequestEntries,
   type HrLeaveRequestEntry,
   type InsertHrLeaveRequestEntry,
+  qcInspections,
+  type QcInspection,
+  type InsertQcInspection,
+  qcDefects,
+  type QcDefect,
+  type InsertQcDefect,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
@@ -11783,6 +11789,51 @@ export class DatabaseStorage implements IStorage {
       if (s in counts) counts[s]++;
     }
     return counts;
+  }
+
+  // ---------- Quality Control ----------
+  async listQcInspections(filters: { result?: string; inspector?: string } = {}): Promise<QcInspection[]> {
+    const conditions: any[] = [];
+    if (filters.result && filters.result !== 'all') conditions.push(eq(qcInspections.result, filters.result));
+    if (filters.inspector) conditions.push(ilike(qcInspections.inspector, `%${filters.inspector}%`));
+    const query = conditions.length
+      ? db.select().from(qcInspections).where(and(...conditions))
+      : db.select().from(qcInspections);
+    return await query.orderBy(desc(qcInspections.createdAt));
+  }
+
+  async getQcInspection(id: string): Promise<QcInspection | undefined> {
+    const [row] = await db.select().from(qcInspections).where(eq(qcInspections.id, id));
+    return row;
+  }
+
+  async createQcInspection(data: InsertQcInspection): Promise<QcInspection> {
+    const [row] = await db.insert(qcInspections).values(data).returning();
+    return row;
+  }
+
+  async updateQcInspection(id: string, data: Partial<InsertQcInspection>): Promise<QcInspection | undefined> {
+    const [row] = await db.update(qcInspections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(qcInspections.id, id))
+      .returning();
+    return row;
+  }
+
+  async listQcDefects(filters: { severity?: string; status?: string; category?: string } = {}): Promise<QcDefect[]> {
+    const conditions: any[] = [];
+    if (filters.severity && filters.severity !== 'all') conditions.push(eq(qcDefects.severity, filters.severity));
+    if (filters.status && filters.status !== 'all') conditions.push(eq(qcDefects.status, filters.status));
+    if (filters.category) conditions.push(ilike(qcDefects.category, `%${filters.category}%`));
+    const query = conditions.length
+      ? db.select().from(qcDefects).where(and(...conditions))
+      : db.select().from(qcDefects);
+    return await query.orderBy(desc(qcDefects.createdAt));
+  }
+
+  async createQcDefect(data: InsertQcDefect): Promise<QcDefect> {
+    const [row] = await db.insert(qcDefects).values(data).returning();
+    return row;
   }
 }
 

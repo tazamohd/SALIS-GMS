@@ -9,6 +9,7 @@ import {
   paymentPlans, installments, taxConfigurations, discountsPromotions,
   savedFilterPresets, notifications, roles, featureFlags,
   hrLeaveRequestEntries,
+  qcInspections, qcDefects,
 } from '@shared/schema';
 import { sql, eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -711,6 +712,29 @@ async function seed() {
         { employeeId: '3', employeeName: 'Sara Mohammed', type: 'annual', startDate: '2026-03-25', endDate: '2026-03-28', days: 4, reason: 'Personal leave', status: 'rejected' },
       ]);
       console.log('✅ Seeded 3 HR leave request entries');
+    }
+
+    // ── Step N+1: QC inspections + defects (demo) ──────────────────
+    const existingQc = await db.select().from(qcInspections).limit(1);
+    if (existingQc.length === 0) {
+      const now = new Date();
+      const ago = (h: number) => new Date(now.getTime() - h * 3600 * 1000);
+      const seeded = await db.insert(qcInspections).values([
+        { jobCardRef: 'JC-2026-0142', vehicleInfo: '2024 Toyota Camry (ABC-1234)', serviceType: 'Oil Change', inspector: 'Ahmed Al-Rashid', inspectorId: '1', result: 'pass', notes: 'All items verified.', checklistId: 'CL-001', completedItems: 8, totalItems: 8, inspectionTimeMinutes: 12, createdAt: ago(2), updatedAt: ago(2) },
+        { jobCardRef: 'JC-2026-0139', vehicleInfo: '2023 Honda Accord (DEF-5678)', serviceType: 'Brake Service', inspector: 'Mohammed Al-Fahad', inspectorId: '2', result: 'fail', notes: 'Brake fluid low; caliper under-torqued.', checklistId: 'CL-002', completedItems: 6, totalItems: 9, inspectionTimeMinutes: 25, createdAt: ago(5), updatedAt: ago(4) },
+        { jobCardRef: 'JC-2026-0137', vehicleInfo: '2022 Nissan Patrol (GHI-9012)', serviceType: 'AC Service', inspector: 'Ahmed Al-Rashid', inspectorId: '1', result: 'conditional', notes: 'Cabin filter shows early wear.', checklistId: 'CL-003', completedItems: 6, totalItems: 7, inspectionTimeMinutes: 18, createdAt: ago(24), updatedAt: ago(23) },
+        { jobCardRef: 'JC-2026-0144', vehicleInfo: '2024 Lexus ES (STU-5678)', serviceType: 'Oil Change', inspector: 'Khalid Bin Saeed', inspectorId: '3', result: 'pending', notes: '', checklistId: 'CL-001', completedItems: 0, totalItems: 8, inspectionTimeMinutes: 0, createdAt: ago(0.5), updatedAt: ago(0.5) },
+      ]).returning();
+      const failed = seeded.find((s: any) => s.result === 'fail');
+      const passed = seeded.find((s: any) => s.result === 'pass');
+      if (failed && passed) {
+        await db.insert(qcDefects).values([
+          { inspectionId: failed.id, jobCardRef: failed.jobCardRef, description: 'Left front caliper bolt under-torqued', severity: 'high', category: 'Torque Specification', status: 'in_progress', reportedBy: 'Mohammed Al-Fahad' },
+          { inspectionId: failed.id, jobCardRef: failed.jobCardRef, description: 'Brake fluid level below MIN line', severity: 'critical', category: 'Fluid Levels', status: 'resolved', resolutionNotes: 'Topped up and bled.', reportedBy: 'Mohammed Al-Fahad', resolvedAt: ago(3) },
+          { inspectionId: passed.id, jobCardRef: passed.jobCardRef, description: 'Minor oil residue around drain plug', severity: 'low', category: 'Workmanship', status: 'resolved', resolutionNotes: 'Cleaned.', reportedBy: 'Ahmed Al-Rashid', resolvedAt: ago(1.5) },
+        ]);
+      }
+      console.log('✅ Seeded QC inspections and defects');
     }
 
     console.log('\n🎉 Database seeding completed successfully!');

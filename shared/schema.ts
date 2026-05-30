@@ -10705,3 +10705,41 @@ export const hrLeaveRequestEntries = pgTable("hr_leave_request_entries", {
 export type HrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferSelect;
 export type InsertHrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferInsert;
 export const insertHrLeaveRequestEntrySchema = createInsertSchema(hrLeaveRequestEntries).omit({ id: true, createdAt: true, updatedAt: true });
+
+// Quality Control — flat tables matching the QC route surface.
+export const qcInspections = pgTable("qc_inspections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardRef: varchar("job_card_ref", { length: 100 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 500 }).notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  inspector: varchar("inspector", { length: 255 }),
+  inspectorId: varchar("inspector_id", { length: 100 }),
+  result: varchar("result", { length: 20 }).default("pending").notNull(),
+  notes: text("notes"),
+  checklistId: varchar("checklist_id", { length: 50 }),
+  completedItems: integer("completed_items").default(0).notNull(),
+  totalItems: integer("total_items").default(0).notNull(),
+  inspectionTimeMinutes: integer("inspection_time_minutes").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export type QcInspection = typeof qcInspections.$inferSelect;
+export type InsertQcInspection = typeof qcInspections.$inferInsert;
+export const insertQcInspectionSchema = createInsertSchema(qcInspections).omit({ id: true, createdAt: true, updatedAt: true });
+
+export const qcDefects = pgTable("qc_defects", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  inspectionId: uuid("inspection_id").references(() => qcInspections.id),
+  jobCardRef: varchar("job_card_ref", { length: 100 }),
+  description: text("description").notNull(),
+  severity: varchar("severity", { length: 20 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  status: varchar("status", { length: 30 }).default("open").notNull(),
+  resolutionNotes: text("resolution_notes"),
+  reportedBy: varchar("reported_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+});
+export type QcDefect = typeof qcDefects.$inferSelect;
+export type InsertQcDefect = typeof qcDefects.$inferInsert;
+export const insertQcDefectSchema = createInsertSchema(qcDefects).omit({ id: true, createdAt: true });
