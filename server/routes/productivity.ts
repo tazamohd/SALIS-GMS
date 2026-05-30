@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Productivity Tracker — backs GET /api/productivity.
  * Hourly job-completion buckets + per-technician stats for a chosen period.
@@ -11,6 +10,19 @@ import { getTechnicianStats } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";
 
 const router = Router();
+
+interface TechStat {
+  id?: string;
+  name: string;
+  jobs: number;
+  completed: number;
+  avgHours: number;
+  efficiency: number;
+}
+interface HourRow { hour: number | string; tasks: number | string; avgHours: number | string }
+interface PendingRow { techId: string | null; pending: number | string }
+interface TechRow { name: string; completed: number; pending: number; avgTime: string; efficiency: number }
+interface HourBucket { hour: string; tasks: number; efficiency: number }
 
 function periodDays(period: string | undefined) {
   switch (period) {
@@ -49,7 +61,7 @@ router.get("/productivity", isAuthenticated, async (req: Request, res: Response)
       .orderBy(sql`EXTRACT(HOUR FROM ${jobCards.completedAt})::int`);
 
     const hourlyMap: Record<number, { tasks: number; avgHours: number }> = {};
-    hourlyRows.forEach(r => {
+    (hourlyRows as HourRow[]).forEach((r: HourRow) => {
       hourlyMap[Number(r.hour)] = { tasks: Number(r.tasks) || 0, avgHours: Number(r.avgHours) || 0 };
     });
     const hours = [8, 10, 12, 14, 16, 18];
@@ -79,26 +91,28 @@ router.get("/productivity", isAuthenticated, async (req: Request, res: Response)
       .groupBy(jobCards.assignedTo);
 
     const pendingMap = new Map<string, number>();
-    pendingRows.forEach(r => { if (r.techId) pendingMap.set(String(r.techId), Number(r.pending) || 0); });
+    (pendingRows as PendingRow[]).forEach((r: PendingRow) => {
+      if (r.techId) pendingMap.set(String(r.techId), Number(r.pending) || 0);
+    });
 
-    const technicianStats = techs.map(t => ({
+    const technicianStats: TechRow[] = (techs as TechStat[]).map((t: TechStat) => ({
       name: t.name,
       completed: t.completed,
-      pending: pendingMap.get(String(t.id)) || 0,
+      pending: pendingMap.get(String(t.id ?? "")) || 0,
       avgTime: `${(t.avgHours || 0).toFixed(1)}h`,
       efficiency: t.efficiency,
     }));
 
-    const totalCompleted = technicianStats.reduce((s, t) => s + t.completed, 0);
+    const totalCompleted = technicianStats.reduce((s: number, t: TechRow) => s + t.completed, 0);
     const averageEfficiency = technicianStats.length
-      ? Math.round(technicianStats.reduce((s, t) => s + t.efficiency, 0) / technicianStats.length)
+      ? Math.round(technicianStats.reduce((s: number, t: TechRow) => s + t.efficiency, 0) / technicianStats.length)
       : 0;
     const avgTaskDuration = technicianStats.length
-      ? `${(techs.reduce((s, t) => s + (t.avgHours || 0), 0) / techs.length).toFixed(1)}h`
+      ? `${((techs as TechStat[]).reduce((s: number, t: TechStat) => s + (t.avgHours || 0), 0) / techs.length).toFixed(1)}h`
       : "0h";
 
-    const top = [...technicianStats].sort((a, b) => b.efficiency - a.efficiency)[0];
-    const mostProd = [...hourlyProductivity].sort((a, b) => b.tasks - a.tasks)[0];
+    const top = [...technicianStats].sort((a: TechRow, b: TechRow) => b.efficiency - a.efficiency)[0];
+    const mostProd = [...hourlyProductivity].sort((a: HourBucket, b: HourBucket) => b.tasks - a.tasks)[0];
 
     const dailyTarget = Math.max(50, totalCompleted + 8);
 

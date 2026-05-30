@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Performance Analytics — backs GET /api/analytics/performance.
  * Returns: revenueByMonth, technicianStats, serviceDistribution, kpis.
@@ -46,10 +45,13 @@ router.get("/analytics/performance", isAuthenticated, async (req: Request, res: 
     ]);
 
     // Synthesize per-month target as previous month × 1.07 (industry-style growth target).
-    const withTargets = revenueByMonth.map((m, idx) => ({
+    interface MonthRow { month: string; revenue: number }
+    const withTargets = (revenueByMonth as MonthRow[]).map((m: MonthRow, idx: number) => ({
       month: m.month,
       revenue: m.revenue,
-      target: idx > 0 ? Math.round(revenueByMonth[idx - 1].revenue * 1.07) : Math.round(m.revenue * 0.95),
+      target: idx > 0
+        ? Math.round((revenueByMonth as MonthRow[])[idx - 1].revenue * 1.07)
+        : Math.round(m.revenue * 0.95),
     }));
 
     // KPIs aggregated from the same window
@@ -98,7 +100,7 @@ router.get("/analytics/performance", isAuthenticated, async (req: Request, res: 
 
     res.json({
       revenueByMonth: withTargets,
-      technicianStats: technicianStats.map(t => ({
+      technicianStats: (technicianStats as Array<{ name: string; efficiency: number; jobs: number }>).map(t => ({
         name: t.name,
         efficiency: t.efficiency,
         jobs: t.jobs,

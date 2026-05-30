@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Mobile Device Management — backs /api/mobile-devices.
  * CRUD for tablets/phones/scanners assigned to technicians within a garage.

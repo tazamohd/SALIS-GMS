@@ -4394,7 +4394,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           paidAt: balanceAmount <= 0 ? new Date() : invoice.paidAt,
         });
       }
-      
+
+      // Emit payment.received so accounting triggers fire (analytics, AR update, etc.).
+      try {
+        const { eventBus } = await import('./engine/event-bus');
+        await eventBus.emit(eventBus.createEvent(
+          'payment.received',
+          'payment',
+          payment.id,
+          (req.user as any)?.garageId ?? (invoice as any)?.garageId ?? '',
+          { paymentId: payment.id, invoiceId: payment.invoiceId, amount: payment.amount, customerId: invoice?.customerId },
+          userId,
+        ));
+      } catch (emitErr) {
+        console.error('[payment.received] emit failed:', emitErr);
+      }
+
       res.status(201).json(payment);
     } catch (error) {
       console.error("Error creating payment:", error);
@@ -4670,7 +4685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports/revenue', isAuthenticated, async (req, res) => {
+  app.get('/api/reports/revenue', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
     try {
       const { garage_id, start_date, end_date } = req.query;
       const startDate = start_date ? new Date(start_date as string) : undefined;
@@ -4715,7 +4730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports/technician-performance', isAuthenticated, async (req, res) => {
+  app.get('/api/reports/technician-performance', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { garage_id, start_date, end_date } = req.query;
       
@@ -4753,7 +4768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports/customer-analytics', isAuthenticated, async (req, res) => {
+  app.get('/api/reports/customer-analytics', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { garage_id, start_date, end_date } = req.query;
       
@@ -9391,34 +9406,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const { token, isBackupCode } = req.body;
-      
+
       if (!token) {
         return res.status(400).json({ message: "Verification token is required" });
       }
-      
+
       const twoFactorAuth = await storage.getTwoFactorAuth(userId);
       if (!twoFactorAuth || !twoFactorAuth.isEnabled) {
         return res.status(400).json({ message: "2FA is not enabled" });
       }
-      
-      const { verifyTwoFactorToken, verifyBackupCode } = await import('./twoFactorAuth');
-      
+
+      const {
+        verifyTwoFactorToken,
+        verifyBackupCode,
+        is2FALockedOut,
+        record2FAFailure,
+        clear2FAAttempts,
+      } = await import('./twoFactorAuth');
+
+      if (is2FALockedOut(userId)) {
+        return res.status(429).json({ message: "Too many failed attempts. Try again in 15 minutes." });
+      }
+
       let isValid = false;
       let remainingCodes: string[] | undefined;
-      
+
       if (isBackupCode) {
         const result = verifyBackupCode(twoFactorAuth.backupCodes as string[], token);
         isValid = result.valid;
         remainingCodes = result.remainingCodes;
-        
+
         if (isValid && remainingCodes) {
           await storage.updateTwoFactorAuth(userId, { backupCodes: remainingCodes });
         }
       } else {
         isValid = verifyTwoFactorToken(twoFactorAuth.secret, token);
       }
-      
-      res.json({ 
+
+      if (isValid) {
+        clear2FAAttempts(userId);
+      } else {
+        const nowLocked = record2FAFailure(userId);
+        if (nowLocked) {
+          return res.status(429).json({ message: "Too many failed attempts. Try again in 15 minutes." });
+        }
+      }
+
+      res.json({
         valid: isValid,
         remainingBackupCodes: remainingCodes?.length || (twoFactorAuth.backupCodes as string[])?.length || 0
       });
@@ -17152,28 +17186,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // 10. Smart Contracts
-  app.get("/api/nextgen/smart-contracts", isAuthenticated, async (req, res) => {
-    try {
-      const contracts = await storage.getSmartContracts(req.user!.garageId!);
-      res.json({ data: contracts });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch smart contracts" });
-    }
-  });
-
-  app.post("/api/nextgen/smart-contracts", isAuthenticated, async (req, res) => {
-    try {
-      const validated = insertSmartContractSchema.parse({ ...req.body, garageId: req.user!.garageId });
-      const contract = await storage.createSmartContract(validated);
-      res.json({ data: contract });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json(sanitizeZodError(error));
-      } else {
-        res.status(500).json({ error: "Failed to create smart contract" });
-      }
-    }
-  });
+  // GET/POST /api/nextgen/smart-contracts have been consolidated into the
+  // modular /api/smart-contracts router (server/routes/smart-contracts.ts).
+  // Only contract-events remains here; no equivalent modular route exists yet.
 
   app.get("/api/nextgen/contract-events", isAuthenticated, async (req, res) => {
     try {

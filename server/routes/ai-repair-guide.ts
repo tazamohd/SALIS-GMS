@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AI Repair Guide — backs POST /api/ai/repair-guide.
  * Generates a step-by-step repair plan for a given vehicle + guide name.

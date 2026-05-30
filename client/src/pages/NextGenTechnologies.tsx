@@ -83,9 +83,12 @@ export default function NextGenTechnologies() {
     queryKey: ["/api/nextgen/drone-missions"],
   });
 
-  const { data: smartContracts, isLoading: loadingContracts } = useQuery<{ data: any[] }>({
-    queryKey: ["/api/nextgen/smart-contracts"],
+  // /api/nextgen/smart-contracts was consolidated into /api/smart-contracts.
+  // The new endpoint returns the array directly; wrap for the legacy `data.data` access pattern.
+  const { data: smartContractsRaw, isLoading: loadingContracts } = useQuery<any[]>({
+    queryKey: ["/api/smart-contracts"],
   });
+  const smartContracts = { data: smartContractsRaw ?? [] };
 
   const { data: contractEvents, isLoading: loadingEvents } = useQuery<{ data: any[] }>({
     queryKey: ["/api/nextgen/contract-events"],

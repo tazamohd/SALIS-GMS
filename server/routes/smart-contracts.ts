@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Smart Contracts — backs /api/smart-contracts.
  * Thin alias over the existing storage.getSmartContracts/createSmartContract

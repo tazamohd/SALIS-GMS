@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AI Predictions — backs GET /api/ai/predictions and GET /api/ai/accuracy.
  * Statistical (non-LLM) demand / parts / revenue prediction over recent activity.
@@ -12,6 +11,11 @@ import {
 import { isAuthenticated } from "../auth";
 
 const router = Router();
+
+// Shapes returned by the (untyped) business-intelligence helpers. Used to
+// recover type narrowing once we strip ts-nocheck from this file.
+interface DailyCount { day: string; isoDate: string; count: number }
+interface PartsForecast { part: string; current: number; forecasted: number; reorderPoint: number; partId?: string }
 
 function parseTimeRange(tr: string | undefined) {
   switch (tr) {
@@ -29,9 +33,9 @@ function parseTimeRange(tr: string | undefined) {
  *  on a non-UTC Node process.
  */
 async function buildDemandSeries(garageId: string, days: number) {
-  const data = await getDailyJobCounts(garageId, Math.max(days, 28));
+  const data = (await getDailyJobCounts(garageId, Math.max(days, 28))) as DailyCount[];
   const byDow: Record<string, number[]> = {};
-  data.forEach(d => {
+  data.forEach((d: DailyCount) => {
     (byDow[d.day] = byDow[d.day] || []).push(d.count);
   });
   const baseline: Record<string, number> = {};
@@ -39,7 +43,7 @@ async function buildDemandSeries(garageId: string, days: number) {
     baseline[dow] = arr.length ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : 0;
   }
   const recent = data.slice(-Math.min(days, data.length));
-  return recent.map(d => ({
+  return recent.map((d: DailyCount) => ({
     day: d.day,
     isoDate: d.isoDate,
     predicted: baseline[d.day] ?? 0,
@@ -55,10 +59,10 @@ router.get("/ai/predictions", isAuthenticated, async (req: Request, res: Respons
 
   try {
     if (predictionType === "parts") {
-      const parts = await getPartsForecastSnapshot(user.garageId, 10);
+      const parts = (await getPartsForecastSnapshot(user.garageId, 10)) as PartsForecast[];
       return res.json({
         type: "parts",
-        data: parts.map(p => ({
+        data: parts.map((p: PartsForecast) => ({
           part: p.part,
           current: p.current,
           forecast: p.forecasted,
@@ -83,11 +87,13 @@ router.get("/ai/accuracy", isAuthenticated, async (req: Request, res: Response) 
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
     const series = await buildDemandSeries(user.garageId, 30);
-    const valid = series.filter(s => s.actual > 0);
+    const valid = series.filter((s: { actual: number }) => s.actual > 0);
     let overall = 0;
     if (valid.length > 0) {
-      const errs = valid.map(s => Math.abs(s.predicted - s.actual) / Math.max(s.actual, 1));
-      const mape = errs.reduce((a, b) => a + b, 0) / errs.length;
+      const errs = valid.map((s: { predicted: number; actual: number }) =>
+        Math.abs(s.predicted - s.actual) / Math.max(s.actual, 1)
+      );
+      const mape = errs.reduce((a: number, b: number) => a + b, 0) / errs.length;
       overall = Math.max(0, Math.min(100, Math.round((1 - mape) * 100)));
     }
     res.json({

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Predictive Demand Forecasting — backs GET /api/forecasting/demand.
  * Returns weekly forecast vs historical and parts reorder recommendations.
@@ -11,6 +10,9 @@ import {
 import { isAuthenticated } from "../auth";
 
 const router = Router();
+
+interface DailyCount { day: string; isoDate: string; count: number }
+interface PartsForecast { part: string; current: number; forecasted: number; reorderPoint: number; partId?: string }
 
 function chunkByWeek(daily: Array<{ isoDate: string; count: number }>) {
   // Bucket the daily data into weeks (oldest → newest).
@@ -52,8 +54,8 @@ router.get("/forecasting/demand", isAuthenticated, async (req: Request, res: Res
       };
     });
 
-    const parts = await getPartsForecastSnapshot(user.garageId, 10);
-    const partsDemand = parts.map(p => ({
+    const parts = (await getPartsForecastSnapshot(user.garageId, 10)) as PartsForecast[];
+    const partsDemand = parts.map((p: PartsForecast) => ({
       part: p.part,
       current: p.current,
       forecasted: p.forecasted,
@@ -68,7 +70,7 @@ router.get("/forecasting/demand", isAuthenticated, async (req: Request, res: Res
       Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday",
     };
     const byDow: Record<string, number[]> = {};
-    daily.forEach(d => {
+    (daily as DailyCount[]).forEach((d: DailyCount) => {
       const dow = DOW_MAP[d.day] ?? d.day;
       (byDow[dow] = byDow[dow] || []).push(d.count);
     });
@@ -79,8 +81,8 @@ router.get("/forecasting/demand", isAuthenticated, async (req: Request, res: Res
       if (avg > peakVal) { peakVal = avg; peakDay = dow; }
     }
 
-    const reorderAlerts = partsDemand.filter(p => p.current < p.reorderPoint).length;
-    const total = daily.reduce((s, d) => s + d.count, 0);
+    const reorderAlerts = partsDemand.filter((p: { current: number; reorderPoint: number }) => p.current < p.reorderPoint).length;
+    const total = (daily as DailyCount[]).reduce((s: number, d: DailyCount) => s + d.count, 0);
     const avgDailyAppts = daily.length > 0 ? Math.round(total / daily.length) : 0;
 
     // Forecast accuracy = how well baseline tracked the most recent week
