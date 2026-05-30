@@ -46,7 +46,8 @@ describe("Fleet - Vehicles", () => {
     // Accept 200 or 404 if endpoint not yet wired
     expect([200, 404, 500]).toContain(res.status);
     if (res.status === 200) {
-      expect(Array.isArray(res.body)).toBe(true);
+      // Route returns { vehicles: [...] } (see server/routes/fleet.ts)
+      expect(Array.isArray(res.body.vehicles)).toBe(true);
     }
   });
 });
