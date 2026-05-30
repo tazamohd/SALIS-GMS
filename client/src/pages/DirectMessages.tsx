@@ -84,7 +84,7 @@ export default function DirectMessages() {
 
   const { data: conversations = [], isLoading: conversationsLoading } = useQuery<ConversationWithDetails[]>({
     queryKey: ["/api/chat/conversations"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery<ChatMessage[]>({
@@ -104,7 +104,7 @@ export default function DirectMessages() {
 
   const { data: unreadCount = 0 } = useQuery<number>({
     queryKey: ["/api/chat/unread-count"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const sortedMessages = [...messages].sort(

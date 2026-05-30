@@ -12056,9 +12056,21 @@ const result = await db
 
   // ---------- Smart Contract status update (Smart Contracts page) ----------
   async updateSmartContractStatus(id: string, garageId: string, status: string) {
+    // Read first so we only stamp deployedAt/executedAt on the *first* transition
+    // into that state — repeated PATCHes with the same status are idempotent.
+    const [existing] = await db
+      .select()
+      .from(smartContracts)
+      .where(and(eq(smartContracts.id, id), eq(smartContracts.garageId, garageId)));
+    if (!existing) return undefined;
+
     const patch: any = { status, updatedAt: new Date() };
-    if (status === "signed") patch.deployedAt = new Date();
-    if (status === "executed" || status === "completed") patch.executedAt = new Date();
+    if (status === "signed" && !existing.deployedAt) {
+      patch.deployedAt = new Date();
+    }
+    if ((status === "executed" || status === "completed") && !existing.executedAt) {
+      patch.executedAt = new Date();
+    }
     const [row] = await db
       .update(smartContracts)
       .set(patch)

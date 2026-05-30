@@ -326,6 +326,10 @@ export const jobCards = pgTable("job_cards", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
   publicTrackingTokenIdx: index("job_cards_public_tracking_token_idx").on(table.publicTrackingToken),
+  // Composite indexes used by analytics / productivity / forecasting aggregations
+  garageCreatedIdx: index("job_cards_garage_created_idx").on(table.garageId, table.createdAt),
+  garageCompletedIdx: index("job_cards_garage_completed_idx").on(table.garageId, table.completedAt),
+  garageStatusIdx: index("job_cards_garage_status_idx").on(table.garageId, table.status),
 }));
 
 // Task Assignment Schema
@@ -1013,7 +1017,12 @@ export const invoices = pgTable("invoices", {
   paidAt: timestamp("paid_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  // Composite index used by analytics-performance / revenue forecast queries
+  garageStatusInvoiceDateIdx: index("invoices_garage_status_invoice_date_idx").on(
+    table.garageId, table.status, table.invoiceDate,
+  ),
+}));
 
 export const invoiceItems = pgTable("invoice_items", {
   id: uuid("id")
@@ -10911,7 +10920,9 @@ export const mobileDevices = pgTable("mobile_devices", {
   lastSync: timestamp("last_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  garageIdx: index("mobile_devices_garage_idx").on(table.garageId),
+}));
 export type MobileDevice = typeof mobileDevices.$inferSelect;
 export type InsertMobileDevice = typeof mobileDevices.$inferInsert;
 export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({

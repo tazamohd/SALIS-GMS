@@ -25,6 +25,15 @@ interface OBDResponse {
 
 const fmt = (n: number | null | undefined, suffix = "") => (typeof n === "number" ? `${n}${suffix}` : "—");
 
+// Safe JSON.stringify — defensive against circular references in raw OBD payloads.
+const safeJson = (value: unknown): string => {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "[unprintable snapshot — contains a circular reference]";
+  }
+};
+
 export default function OBDDiagnosticViewer() {
   const { t } = useTranslation();
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
@@ -109,12 +118,16 @@ export default function OBDDiagnosticViewer() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge className={severityClass(dtc.severity)}>{dtc.code}</Badge>
+                          <Badge className={severityClass(dtc.severity)}>
+                            {/* visible severity label — avoids color-only indicator */}
+                            <span className="font-mono">{dtc.code}</span>
+                            <span className="ml-1 uppercase text-[10px] tracking-wide">{t(`obd.severity.${dtc.severity}`, dtc.severity)}</span>
+                          </Badge>
                           <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{dtc.status}</Badge>
                         </div>
                         <p className="font-medium text-[#0B1F3B] dark:text-white">{dtc.description}</p>
                       </div>
-                      <AlertTriangle className="h-5 w-5 text-[#F97316]" />
+                      <AlertTriangle className="h-5 w-5 text-[#F97316]" aria-label={t(`obd.severity.${dtc.severity}`, dtc.severity)} />
                     </div>
                   </div>
                 ))}
@@ -147,7 +160,7 @@ export default function OBDDiagnosticViewer() {
                       {t('obd.freezeFrameFor', 'Freeze Frame for')} {ff.forCode}
                     </p>
                     <pre className="text-xs text-[#0B1F3B] dark:text-white whitespace-pre-wrap break-all">
-                      {JSON.stringify(ff.snapshot, null, 2)}
+                      {safeJson(ff.snapshot)}
                     </pre>
                   </div>
                 ))}

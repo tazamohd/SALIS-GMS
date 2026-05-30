@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
 import { TrendingUp, Users, DollarSign, Clock } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { RoleGate } from "@/components/RoleGate";
 
 interface PerformanceResponse {
   revenueByMonth: Array<{ month: string; revenue: number; target: number }>;
@@ -181,12 +182,14 @@ export default function PerformanceAnalytics() {
   ];
 
   return (
-    <AnalyticsPage
-      title={t('analytics.title', 'Performance Analytics')}
-      description={t('analytics.description', 'Live KPIs across revenue, technicians, and service mix')}
-      icon={TrendingUp}
-      filters={filters}
-      sections={sections}
-    />
+    <RoleGate module="analytics" permission="view_reports" showAccessDenied>
+      <AnalyticsPage
+        title={t('analytics.title', 'Performance Analytics')}
+        description={t('analytics.description', 'Live KPIs across revenue, technicians, and service mix')}
+        icon={TrendingUp}
+        filters={filters}
+        sections={sections}
+      />
+    </RoleGate>
   );
 }

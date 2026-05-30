@@ -60,10 +60,16 @@ router.get("/forecasting/demand", isAuthenticated, async (req: Request, res: Res
       reorderPoint: p.reorderPoint,
     }));
 
-    // Peak day = day-of-week with highest avg job count over the period
+    // Peak day = day-of-week with highest avg job count over the period.
+    // Use Postgres-derived `d.day` (server-TZ short name) and map to long name
+    // via a fixed table to avoid `new Date(isoDate)` timezone drift on the Node side.
+    const DOW_MAP: Record<string, string> = {
+      Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
+      Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday",
+    };
     const byDow: Record<string, number[]> = {};
     daily.forEach(d => {
-      const dow = new Date(d.isoDate).toLocaleDateString("en-US", { weekday: "long" });
+      const dow = DOW_MAP[d.day] ?? d.day;
       (byDow[dow] = byDow[dow] || []).push(d.count);
     });
     let peakDay = "Thursday";

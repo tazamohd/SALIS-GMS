@@ -23,29 +23,28 @@ function parseTimeRange(tr: string | undefined) {
   }
 }
 
-/** Day-of-week aware 4-week moving average → predicted vs actual demand. */
+/** Day-of-week aware 4-week moving average → predicted vs actual demand.
+ *  Uses the server-TZ day-of-week emitted by Postgres (`d.day`) to avoid the
+ *  timezone shift introduced by re-parsing `d.isoDate` with `new Date(...)`
+ *  on a non-UTC Node process.
+ */
 async function buildDemandSeries(garageId: string, days: number) {
   const data = await getDailyJobCounts(garageId, Math.max(days, 28));
-  // Group by day-of-week and average to derive baseline; then map last `days` days to that baseline.
   const byDow: Record<string, number[]> = {};
   data.forEach(d => {
-    const dow = new Date(d.isoDate).toLocaleDateString("en-US", { weekday: "short" });
-    (byDow[dow] = byDow[dow] || []).push(d.count);
+    (byDow[d.day] = byDow[d.day] || []).push(d.count);
   });
   const baseline: Record<string, number> = {};
   for (const [dow, arr] of Object.entries(byDow)) {
     baseline[dow] = arr.length ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : 0;
   }
   const recent = data.slice(-Math.min(days, data.length));
-  return recent.map(d => {
-    const dow = new Date(d.isoDate).toLocaleDateString("en-US", { weekday: "short" });
-    return {
-      day: dow,
-      isoDate: d.isoDate,
-      predicted: baseline[dow] ?? 0,
-      actual: d.count,
-    };
-  });
+  return recent.map(d => ({
+    day: d.day,
+    isoDate: d.isoDate,
+    predicted: baseline[d.day] ?? 0,
+    actual: d.count,
+  }));
 }
 
 router.get("/ai/predictions", isAuthenticated, async (req: Request, res: Response) => {

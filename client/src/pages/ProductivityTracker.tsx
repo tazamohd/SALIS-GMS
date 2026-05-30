@@ -8,6 +8,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RoleGate } from "@/components/RoleGate";
 
 interface ProductivityResponse {
   hourlyProductivity: Array<{ hour: string; tasks: number; efficiency: number }>;
@@ -62,12 +63,13 @@ export default function ProductivityTracker() {
   ];
 
   return (
-    <DashboardPage
-      title={t('productivity.title', 'Productivity Tracker')}
-      description={t('productivity.description', 'Monitor team performance and task completion metrics')}
-      icon={Activity}
-      metrics={metrics}
-    >
+    <RoleGate module="analytics" permission="view_reports" showAccessDenied>
+      <DashboardPage
+        title={t('productivity.title', 'Productivity Tracker')}
+        description={t('productivity.description', 'Monitor team performance and task completion metrics')}
+        icon={Activity}
+        metrics={metrics}
+      >
       <div className="mb-6">
         <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
           <SelectTrigger className="w-48 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-period">
@@ -88,6 +90,8 @@ export default function ProductivityTracker() {
             <CardDescription className="text-[#64748B]">{t('productivity.hourlyProductivityDesc', 'Tasks completed and efficiency by hour')}</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* API always returns 6 hourly buckets (8AM-6PM) with tasks: 0 when no jobs;
+                "all zero" therefore reliably means "no completed jobs in this window". */}
             {hourlyProductivity.every(h => h.tasks === 0) ? (
               <p className="text-sm text-[#64748B] py-16 text-center">
                 {isLoading ? t('common.loading', 'Loading...') : t('productivity.noHourlyData', 'No completed jobs in this period yet.')}
@@ -246,6 +250,7 @@ export default function ProductivityTracker() {
           </CardContent>
         </Card>
       </div>
-    </DashboardPage>
+      </DashboardPage>
+    </RoleGate>
   );
 }
