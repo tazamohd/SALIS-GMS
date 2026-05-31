@@ -1143,7 +1143,12 @@
   },
   "landing": {
     "welcomeTitle": "Welcome to SALIS AUTO",
-    "signInPrompt": "Sign in to access your dashboard and manage your workshop operations efficiently."
+    "signInPrompt": "Sign in to access your dashboard and manage your workshop operations efficiently.",
+    "pillTag": "Welcome",
+    "pillText": "Sign in to your workspace",
+    "trustZatca": "ZATCA Phase 2",
+    "trustMultiCurrency": "Multi-currency",
+    "trustRealtime": "Real-time telemetry"
   },
   "errors": {
     "required": "This field is required",

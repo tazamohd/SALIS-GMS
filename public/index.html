@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SALIS AUTO - Enterprise Automotive ERP Platform</title>
-  <meta name="description" content="SALIS AUTO is a world-class automotive ERP platform for garage operations. Features franchise management, OBD diagnostics, multi-currency support, AI-powered maintenance predictions, and 156+ comprehensive modules.">
-  <meta name="keywords" content="automotive ERP, garage management, car repair software, vehicle diagnostics, fleet management, auto shop software">
+  <meta name="theme-color" content="#0A5ED7">
+  <title>SALIS AUTO — The Operating System for Modern Garages</title>
+  <meta name="description" content="SALIS AUTO is the operating system for modern automotive workshops. 156+ modules, real-time service-bay telemetry, AI-driven diagnostics, AR-guided repairs, and full ZATCA compliance — built for garages that take operations seriously.">
+  <meta name="keywords" content="automotive ERP, garage management software, OBD diagnostics, fleet management, ZATCA, workshop calendar, AR repair, AI maintenance prediction">
   <meta name="author" content="SALIS AUTO">
   <meta name="robots" content="index, follow">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="SALIS AUTO - Enterprise Automotive ERP Platform">
-  <meta property="og:description" content="World-class automotive ERP platform with 156+ modules for garage operations at scale.">
+
+  <meta property="og:title" content="SALIS AUTO — The Operating System for Modern Garages">
+  <meta property="og:description" content="156+ modules. Real-time telemetry. AI-driven diagnostics. ZATCA-ready. Built for garages that take operations seriously.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://salisauto.replit.app">
   <meta property="og:image" content="/logo.png">
-  
-  <!-- Twitter Card -->
+
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SALIS AUTO - Enterprise Automotive ERP">
-  <meta name="twitter:description" content="World-class automotive ERP platform with 156+ modules for garage operations.">
-  
-  <!-- Canonical -->
+  <meta name="twitter:title" content="SALIS AUTO — The Operating System for Modern Garages">
+  <meta name="twitter:description" content="156+ modules. Real-time telemetry. AI-driven diagnostics. ZATCA-ready.">
+
   <link rel="canonical" href="https://salisauto.replit.app">
-  
-  <!-- JSON-LD Structured Data -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -32,311 +32,1025 @@
     "name": "SALIS AUTO",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "description": "Enterprise automotive ERP platform for garage operations with 156+ comprehensive modules including franchise management, OBD diagnostics, AI-powered predictions, and multi-currency support.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
+    "description": "Enterprise automotive ERP platform for garage operations — 156+ modules covering service bay telemetry, AI diagnostics, AR-guided repairs, multi-franchise control, and ZATCA-compliant invoicing.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "featureList": [
-      "Customer Management",
-      "Vehicle Tracking",
-      "Job Card Management",
-      "Inventory Control",
-      "Invoice Generation",
-      "Appointment Scheduling",
-      "OBD Diagnostics Integration",
-      "AI-Powered Maintenance Predictions",
-      "Multi-Currency Support",
-      "Franchise Management",
       "Real-Time Service Bay Dashboard",
+      "AI-Powered Inventory Management",
+      "Augmented Reality Repair Guides",
+      "OBD Diagnostics Integration",
+      "Multi-Franchise Command Center",
+      "ZATCA Phase 2 E-Invoicing",
+      "Workshop Calendar with Drag-Drop Scheduling",
+      "Predictive Maintenance",
       "Customer Loyalty Programs",
-      "Workshop Calendar",
-      "AR Overlay for Mechanics"
+      "Multi-Currency Multi-Language"
     ]
   }
   </script>
-  
+
   <style>
+    /* ──────────────────────────────────────────────────────────────
+       SALIS AUTO — Landing
+       Modern dark SaaS aesthetic. Inspired by Vercel/Linear/Stripe.
+       All CSS inline to keep LCP fast and deploy-trivial.
+       ────────────────────────────────────────────────────────────── */
+
+    :root {
+      --bg-0:        #050714;
+      --bg-1:        #0a0d1f;
+      --bg-2:        #111530;
+      --surface-1:   rgba(255, 255, 255, 0.03);
+      --surface-2:   rgba(255, 255, 255, 0.05);
+      --border:      rgba(255, 255, 255, 0.08);
+      --border-hi:   rgba(255, 255, 255, 0.16);
+      --fg-0:        #f8fafc;
+      --fg-1:        #cbd5e1;
+      --fg-2:        #94a3b8;
+      --fg-3:        #64748b;
+      --brand-1:     #0A5ED7;
+      --brand-2:     #0BB3FF;
+      --brand-3:     #7C5CFF;
+      --accent:      #F97316;
+      --success:     #10B981;
+
+      --grad-brand:  linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 50%, #7C5CFF 100%);
+      --grad-text:   linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      --grad-mesh:   radial-gradient(ellipse 80% 60% at 20% 0%, rgba(10, 94, 215, 0.25), transparent 60%),
+                     radial-gradient(ellipse 60% 50% at 80% 20%, rgba(11, 179, 255, 0.18), transparent 60%),
+                     radial-gradient(ellipse 70% 50% at 50% 100%, rgba(124, 92, 255, 0.15), transparent 60%);
+
+      --radius-sm:   8px;
+      --radius:      14px;
+      --radius-lg:   22px;
+      --radius-xl:   28px;
+
+      --shadow-sm:   0 4px 12px rgba(0, 0, 0, 0.2);
+      --shadow:      0 12px 40px rgba(0, 0, 0, 0.35);
+      --shadow-hi:   0 24px 80px rgba(10, 94, 215, 0.25);
+
+      --easing:      cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-      color: #f0f0f0;
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-0);
+      color: var(--fg-1);
       min-height: 100vh;
+      line-height: 1.6;
+      font-feature-settings: 'cv11', 'ss01';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    header { 
-      padding: 40px 0; 
-      border-bottom: 1px solid #333;
-      text-align: center;
+
+    /* Animated gradient mesh background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--grad-mesh);
+      pointer-events: none;
+      z-index: 0;
+      animation: meshDrift 24s ease-in-out infinite;
     }
-    .logo { font-size: 3rem; font-weight: 800; color: #fff; letter-spacing: 2px; }
-    .logo span { color: #666; }
-    .tagline { color: #888; margin-top: 10px; font-size: 1.2rem; }
-    
-    .hero { padding: 60px 0; text-align: center; }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 20px; }
-    .hero p { font-size: 1.1rem; color: #aaa; max-width: 800px; margin: 0 auto 30px; line-height: 1.8; }
-    
-    .stats { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 30px; 
-      margin: 50px 0;
+    @keyframes meshDrift {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50%      { transform: translate3d(-2%, -3%, 0) scale(1.05); }
     }
-    .stat { 
-      background: #1a1a1a; 
-      border: 1px solid #333; 
-      border-radius: 12px; 
-      padding: 30px; 
-      text-align: center;
+
+    /* Subtle grid noise overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events: none;
+      z-index: 0;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
     }
-    .stat-number { font-size: 3rem; font-weight: 700; color: #fff; }
-    .stat-label { color: #888; margin-top: 5px; }
-    
-    .features { padding: 60px 0; }
-    .features h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
-    .feature-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-      gap: 25px;
+
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+    /* ─── Sticky header ─────────────────────────────────────────── */
+    header.nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      background: rgba(5, 7, 20, 0.6);
+      border-bottom: 1px solid var(--border);
     }
-    .feature { 
-      background: #1a1a1a; 
-      border: 1px solid #333; 
-      border-radius: 12px; 
-      padding: 25px;
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
     }
-    .feature h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
-    .feature p { color: #888; line-height: 1.6; }
-    
-    .modules { padding: 60px 0; background: #0f0f0f; margin: 40px -20px; padding-left: 20px; padding-right: 20px; }
-    .modules h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
-    .module-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-    .category { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; }
-    .category h4 { color: #fff; margin-bottom: 10px; font-size: 1.1rem; }
-    .category ul { list-style: none; }
-    .category li { color: #888; padding: 5px 0; font-size: 0.9rem; }
-    .category li:before { content: "• "; color: #555; }
-    
-    .api-section { padding: 60px 0; }
-    .api-section h2 { text-align: center; font-size: 2rem; margin-bottom: 20px; }
-    .api-section p { text-align: center; color: #888; margin-bottom: 30px; }
-    .api-endpoints { background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 20px; font-family: monospace; }
-    .endpoint { padding: 10px; border-bottom: 1px solid #222; }
-    .endpoint:last-child { border-bottom: none; }
-    .method { display: inline-block; width: 60px; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 10px; }
-    .method.get { background: #1a472a; color: #4ade80; }
-    .method.post { background: #422006; color: #fb923c; }
-    .endpoint-path { color: #60a5fa; }
-    .endpoint-desc { color: #666; margin-left: 10px; }
-    
-    footer { 
-      border-top: 1px solid #333; 
-      padding: 40px 0; 
-      text-align: center;
-      color: #666;
-    }
-    footer a { color: #888; text-decoration: none; margin: 0 15px; }
-    footer a:hover { color: #fff; }
-    
-    .cta { 
-      display: inline-block; 
-      background: #fff; 
-      color: #000; 
-      padding: 15px 40px; 
-      border-radius: 8px; 
-      font-weight: 600; 
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--fg-0);
       text-decoration: none;
-      margin-top: 20px;
     }
-    .cta:hover { background: #eee; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: var(--grad-brand);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 8px 24px rgba(10,94,215,0.35);
+      position: relative;
+    }
+    .brand-mark::after {
+      content: 'S';
+      font-weight: 800;
+      color: white;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+    .brand-text span { color: var(--fg-2); font-weight: 500; }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.2s var(--easing);
+    }
+    .nav-links a:hover { color: var(--fg-0); }
+    .nav-cta {
+      padding: 9px 18px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius-sm);
+      color: var(--fg-0) !important;
+      font-weight: 600;
+      transition: all 0.2s var(--easing);
+    }
+    .nav-cta:hover {
+      background: var(--surface-1);
+      border-color: var(--brand-2);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Hero ──────────────────────────────────────────────────── */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+      position: relative;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 6px 8px;
+      border: 1px solid var(--border-hi);
+      background: var(--surface-1);
+      backdrop-filter: blur(12px);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--fg-1);
+      margin-bottom: 28px;
+    }
+    .pill .pill-tag {
+      padding: 2px 9px;
+      background: var(--grad-brand);
+      color: white;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    h1.headline {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+      color: var(--fg-0);
+      max-width: 920px;
+      margin: 0 auto 24px;
+      background: var(--grad-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h1.headline .grad {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    .subline {
+      font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+      color: var(--fg-2);
+      max-width: 720px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .cta-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 26px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.96rem;
+      text-decoration: none;
+      transition: all 0.25s var(--easing);
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--grad-brand);
+      color: white;
+      box-shadow: 0 8px 24px rgba(10, 94, 215, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(10, 94, 215, 0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .btn-secondary {
+      background: var(--surface-1);
+      color: var(--fg-0);
+      border: 1px solid var(--border-hi);
+      backdrop-filter: blur(12px);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-2);
+      border-color: var(--brand-2);
+      transform: translateY(-2px);
+    }
+    .btn .arrow { transition: transform 0.25s var(--easing); }
+    .btn:hover .arrow { transform: translateX(3px); }
+
+    /* Trust strip */
+    .trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-top: 24px;
+    }
+    .trust-label {
+      font-size: 0.78rem;
+      color: var(--fg-3);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+    }
+    .trust-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--fg-1);
+      font-weight: 500;
+    }
+    .trust-badge svg { opacity: 0.7; }
+
+    /* ─── Stats ────────────────────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 72px 0;
+    }
+    @media (max-width: 880px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+    .stat {
+      position: relative;
+      padding: 28px 24px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(12px);
+      transition: all 0.3s var(--easing);
+      overflow: hidden;
+    }
+    .stat::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--grad-brand);
+      opacity: 0;
+      transition: opacity 0.3s var(--easing);
+      border-radius: inherit;
+      z-index: -1;
+      filter: blur(20px);
+      transform: scale(0.9);
+    }
+    .stat:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hi);
+    }
+    .stat:hover::before { opacity: 0.15; }
+    .stat-number {
+      font-size: clamp(2.2rem, 3.5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--fg-0);
+      line-height: 1;
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label { color: var(--fg-2); margin-top: 10px; font-size: 0.92rem; font-weight: 500; }
+
+    /* ─── Section header ──────────────────────────────────────── */
+    .section { padding: 96px 0; }
+    .section-head { text-align: center; max-width: 720px; margin: 0 auto 64px; }
+    .eyebrow {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--brand-2);
+      margin-bottom: 14px;
+    }
+    h2 {
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--fg-0);
+      margin-bottom: 16px;
+    }
+    .section-head p { color: var(--fg-2); font-size: 1.05rem; }
+
+    /* ─── Feature grid ─────────────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    .feature {
+      position: relative;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s var(--easing);
+      overflow: hidden;
+    }
+    .feature::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(11,179,255,0.4), transparent 50%);
+      -webkit-mask: linear-gradient(black, black) content-box, linear-gradient(black, black);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s var(--easing);
+    }
+    .feature:hover {
+      transform: translateY(-3px);
+      background: var(--surface-2);
+      box-shadow: var(--shadow);
+    }
+    .feature:hover::before { opacity: 1; }
+    .feature .icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      margin-bottom: 18px;
+      transition: all 0.3s var(--easing);
+    }
+    .feature:hover .icon-wrap {
+      background: var(--grad-brand);
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(10, 94, 215, 0.35);
+    }
+    .feature .icon-wrap svg { color: var(--brand-2); transition: color 0.3s var(--easing); }
+    .feature:hover .icon-wrap svg { color: white; }
+    .feature h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--fg-0); font-weight: 600; letter-spacing: -0.01em; }
+    .feature p { color: var(--fg-2); font-size: 0.92rem; line-height: 1.6; }
+
+    /* ─── Module catalog ──────────────────────────────────────── */
+    .modules-wrap {
+      background: var(--bg-1);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .module-categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .category {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 24px;
+      transition: all 0.3s var(--easing);
+    }
+    .category:hover {
+      background: var(--surface-2);
+      border-color: var(--border-hi);
+      transform: translateY(-2px);
+    }
+    .category h4 {
+      color: var(--fg-0);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .category h4::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--grad-brand);
+    }
+    .category ul { list-style: none; }
+    .category li {
+      color: var(--fg-2);
+      padding: 6px 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s var(--easing);
+    }
+    .category li:hover { color: var(--fg-0); }
+    .category li::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--fg-3);
+      flex-shrink: 0;
+    }
+
+    /* ─── API section ─────────────────────────────────────────── */
+    .api-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      backdrop-filter: blur(12px);
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88rem;
+    }
+    .endpoint {
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      transition: background 0.2s var(--easing);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .endpoint:hover { background: var(--surface-2); }
+    .method {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      min-width: 52px;
+      text-align: center;
+    }
+    .method.get { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .method.post { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+    .endpoint-path { color: var(--brand-2); font-weight: 500; }
+    .endpoint-desc { color: var(--fg-3); font-family: 'Inter', sans-serif; font-size: 0.85rem; margin-left: auto; }
+
+    /* ─── CTA Banner ─────────────────────────────────────────── */
+    .cta-banner {
+      position: relative;
+      background: var(--grad-brand);
+      border-radius: var(--radius-xl);
+      padding: 64px 56px;
+      text-align: center;
+      overflow: hidden;
+      box-shadow: var(--shadow-hi);
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 30% 30%, rgba(255,255,255,0.25), transparent 50%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(124, 92, 255, 0.4), transparent 50%);
+      pointer-events: none;
+    }
+    .cta-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black, transparent 80%);
+    }
+    .cta-banner h2 { color: white; margin-bottom: 12px; position: relative; }
+    .cta-banner p { color: rgba(255,255,255,0.9); max-width: 540px; margin: 0 auto 32px; position: relative; }
+    .cta-banner .btn-primary {
+      background: white;
+      color: var(--brand-1);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .cta-banner .btn-primary:hover {
+      background: var(--fg-0);
+      color: var(--brand-1);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.3);
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 56px 0 32px;
+      margin-top: 64px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 720px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    .footer-brand { max-width: 320px; }
+    .footer-brand p { color: var(--fg-2); font-size: 0.92rem; margin-top: 14px; line-height: 1.6; }
+    .footer-col h5 {
+      color: var(--fg-0);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { padding: 6px 0; }
+    .footer-col a {
+      color: var(--fg-2);
+      text-decoration: none;
+      font-size: 0.92rem;
+      transition: color 0.2s var(--easing);
+    }
+    .footer-col a:hover { color: var(--fg-0); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--fg-3);
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-bottom .meta { display: flex; gap: 24px; }
+    .footer-bottom a { color: var(--fg-3); text-decoration: none; transition: color 0.2s var(--easing); }
+    .footer-bottom a:hover { color: var(--fg-1); }
+
+    /* ─── Reveal-on-scroll ────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s var(--easing), transform 0.7s var(--easing);
+    }
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Mobile nav adjustments ─────────────────────────────── */
+    @media (max-width: 720px) {
+      .nav-links { gap: 16px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 64px 0; }
+      .cta-banner { padding: 48px 24px; }
+    }
+
+    /* ─── Focus visibility ────────────────────────────────────── */
+    a:focus-visible, button:focus-visible, .btn:focus-visible {
+      outline: 2px solid var(--brand-2);
+      outline-offset: 3px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">SALIS <span>AUTO</span></div>
-      <p class="tagline">Enterprise Automotive ERP Platform</p>
-    </header>
-    
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark"></span>
+        <span class="brand-text">SALIS <span>AUTO</span></span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#modules">Modules</a>
+        <a href="#api">API</a>
+        <a href="/api/public/info">Docs</a>
+        <a href="/app" class="nav-cta">Launch App →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ─── Hero ─────────────────────────────────────────────── -->
     <section class="hero">
-      <h1>World-Class Garage Management at Scale</h1>
-      <p>SALIS AUTO is a comprehensive automotive ERP platform designed for efficient garage operations. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network.</p>
-      <a href="/app" class="cta">Launch Application</a>
+      <span class="pill">
+        <span class="pill-tag">New</span>
+        AR-guided repair workflows · ZATCA Phase 2 ready
+      </span>
+
+      <h1 class="headline">
+        The operating system for <span class="grad">modern garages</span>.
+      </h1>
+
+      <p class="subline">
+        From the service bay to the balance sheet — SALIS AUTO unifies 156+ modules into one fast,
+        opinionated platform built for workshops that take operations seriously.
+      </p>
+
+      <div class="cta-row">
+        <a href="/app" class="btn btn-primary">
+          Launch Application
+          <span class="arrow">→</span>
+        </a>
+        <a href="#features" class="btn btn-secondary">
+          Explore the platform
+        </a>
+      </div>
+
+      <div class="trust">
+        <span class="trust-label">Trusted by workshops running on</span>
+        <span class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          ZATCA Phase 2
+        </span>
+        <span class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+          Multi-currency
+        </span>
+        <span class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Real-time telemetry
+        </span>
+        <span class="trust-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          SOC 2 ready
+        </span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats reveal">
+        <div class="stat">
+          <div class="stat-number" data-target="156">156+</div>
+          <div class="stat-label">Comprehensive modules</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" data-target="320">320+</div>
+          <div class="stat-label">Database tables</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" data-target="18">18</div>
+          <div class="stat-label">Navigation groups</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" data-target="24">24</div>
+          <div class="stat-label">Professional roles</div>
+        </div>
+      </div>
     </section>
-    
-    <section class="stats">
-      <div class="stat">
-        <div class="stat-number">156+</div>
-        <div class="stat-label">Comprehensive Modules</div>
+
+    <!-- ─── Features ─────────────────────────────────────────── -->
+    <section class="section" id="features">
+      <div class="section-head reveal">
+        <div class="eyebrow">Platform</div>
+        <h2>Every part of the garage, finally talking to itself.</h2>
+        <p>Eight pillars covering everything from the moment a customer books to the moment the invoice clears.</p>
       </div>
-      <div class="stat">
-        <div class="stat-number">320+</div>
-        <div class="stat-label">Database Tables</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number">18</div>
-        <div class="stat-label">Navigation Groups</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number">24</div>
-        <div class="stat-label">Professional Roles</div>
-      </div>
-    </section>
-    
-    <section class="features">
-      <h2>Platform Features</h2>
+
       <div class="feature-grid">
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></div>
           <h3>Real-Time Service Bay Dashboard</h3>
-          <p>Live bay status monitoring with WebSocket updates, technician assignments, and job progress tracking for optimal workshop efficiency.</p>
+          <p>Live bay status with WebSocket updates, technician assignments, and job progress — see workshop load at a glance.</p>
         </article>
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
           <h3>AI-Powered Inventory Management</h3>
-          <p>Automated reordering with predictive demand forecasting, supplier integration, and smart stock level optimization.</p>
+          <p>Automated reordering with predictive demand forecasting, supplier integration, and smart stock-level optimization.</p>
         </article>
-        <article class="feature">
-          <h3>Customer Loyalty Program</h3>
-          <p>Points accumulation, tier progression (Bronze/Silver/Gold/Platinum), rewards redemption, and referral bonuses.</p>
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+          <h3>Customer Loyalty Programs</h3>
+          <p>Tiered points (Bronze → Platinum), referral bonuses, redemption flows — built to keep customers coming back.</p>
         </article>
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
           <h3>Interactive Workshop Calendar</h3>
-          <p>Visual calendar with drag-and-drop job scheduling, technician availability tracking, and resource allocation.</p>
+          <p>Visual drag-and-drop scheduling, technician availability tracking, and resource allocation across bays.</p>
         </article>
-        <article class="feature">
-          <h3>Augmented Reality for Mechanics</h3>
-          <p>AR-assisted repair guides, parts identification, and step-by-step visual instructions for complex repairs.</p>
-        </article>
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h2l2-4 4 8 4-12 4 16 2-8h2"/></svg></div>
           <h3>OBD Diagnostics Integration</h3>
-          <p>Real-time vehicle diagnostics, fault code reading, live sensor data, and automated diagnostic reports.</p>
+          <p>Real-time vehicle telemetry, fault-code reading, live sensor data, and automated diagnostic reports.</p>
         </article>
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9 1.65 1.65 0 004.27 7.18l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09A1.65 1.65 0 0019.4 15z"/></svg></div>
+          <h3>Augmented Reality for Mechanics</h3>
+          <p>AR-assisted repair guides, parts identification, and step-by-step visual instructions — even for first-day technicians.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></div>
           <h3>Multi-Franchise Management</h3>
           <p>Centralized command center for franchise networks with KPI tracking, revenue sharing, and performance analytics.</p>
         </article>
-        <article class="feature">
+        <article class="feature reveal">
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
           <h3>Saudi Arabia Compliance</h3>
-          <p>Full VAT, ZATCA E-Invoicing, Zakat integration, Hijri calendar, Arabic language, and TRN validation support.</p>
+          <p>Full VAT, ZATCA Phase 2 e-invoicing, Zakat integration, Hijri calendar, Arabic UI, and TRN validation.</p>
         </article>
       </div>
     </section>
-    
-    <section class="modules">
-      <h2>Complete Module Catalog</h2>
-      <div class="module-categories">
-        <div class="category">
-          <h4>Customer & Appointments</h4>
-          <ul>
-            <li>Customer Profiles & CRM</li>
-            <li>Appointment Scheduling</li>
-            <li>Service Reminders</li>
-            <li>Customer Portal</li>
-            <li>Feedback Collection</li>
-          </ul>
+
+    <!-- ─── Module catalog ──────────────────────────────────── -->
+    <div class="modules-wrap">
+      <div class="container section" id="modules">
+        <div class="section-head reveal">
+          <div class="eyebrow">Module Catalog</div>
+          <h2>Built for every team in the workshop.</h2>
+          <p>Pick what you need today. Everything snaps together because it shares one schema, one event bus, one identity layer.</p>
         </div>
-        <div class="category">
-          <h4>Vehicle Management</h4>
-          <ul>
-            <li>Vehicle Registry</li>
-            <li>Service History</li>
-            <li>Mileage Tracking</li>
-            <li>Fleet Management</li>
-            <li>Loaner Vehicles</li>
-          </ul>
-        </div>
-        <div class="category">
-          <h4>Service Operations</h4>
-          <ul>
-            <li>Job Card Management</li>
-            <li>Work Order Tracking</li>
-            <li>Technician Assignment</li>
-            <li>Quality Control</li>
-            <li>Service Bay Monitor</li>
-          </ul>
-        </div>
-        <div class="category">
-          <h4>Parts & Inventory</h4>
-          <ul>
-            <li>Parts Catalog</li>
-            <li>Stock Management</li>
-            <li>Purchase Orders</li>
-            <li>Supplier Network</li>
-            <li>Auto-Reordering</li>
-          </ul>
-        </div>
-        <div class="category">
-          <h4>Billing & Finance</h4>
-          <ul>
-            <li>Invoice Generation</li>
-            <li>Payment Processing</li>
-            <li>Quotations</li>
-            <li>Expense Tracking</li>
-            <li>Financial Reports</li>
-          </ul>
-        </div>
-        <div class="category">
-          <h4>Analytics & AI</h4>
-          <ul>
-            <li>Business Intelligence</li>
-            <li>Predictive Maintenance</li>
-            <li>Smart Recommendations</li>
-            <li>Performance Analytics</li>
-            <li>AI Chatbot</li>
-          </ul>
+
+        <div class="module-categories">
+          <div class="category reveal">
+            <h4>Customer &amp; Appointments</h4>
+            <ul>
+              <li>Customer profiles &amp; CRM</li>
+              <li>Appointment scheduling</li>
+              <li>Service reminders</li>
+              <li>Self-service customer portal</li>
+              <li>Feedback &amp; reviews</li>
+            </ul>
+          </div>
+          <div class="category reveal">
+            <h4>Vehicle Management</h4>
+            <ul>
+              <li>Vehicle registry</li>
+              <li>Service history timeline</li>
+              <li>Mileage tracking</li>
+              <li>Fleet management</li>
+              <li>Loaner vehicles</li>
+            </ul>
+          </div>
+          <div class="category reveal">
+            <h4>Service Operations</h4>
+            <ul>
+              <li>Job-card management</li>
+              <li>Work-order tracking</li>
+              <li>Technician assignment</li>
+              <li>Quality control</li>
+              <li>Service-bay monitor</li>
+            </ul>
+          </div>
+          <div class="category reveal">
+            <h4>Parts &amp; Inventory</h4>
+            <ul>
+              <li>Parts catalog</li>
+              <li>Stock management</li>
+              <li>Purchase orders</li>
+              <li>B2B supplier network</li>
+              <li>Auto-reordering</li>
+            </ul>
+          </div>
+          <div class="category reveal">
+            <h4>Billing &amp; Finance</h4>
+            <ul>
+              <li>Invoice generation</li>
+              <li>Payment processing</li>
+              <li>Quotations &amp; estimates</li>
+              <li>Expense tracking</li>
+              <li>Financial reports</li>
+            </ul>
+          </div>
+          <div class="category reveal">
+            <h4>Analytics &amp; AI</h4>
+            <ul>
+              <li>Business intelligence</li>
+              <li>Predictive maintenance</li>
+              <li>Smart recommendations</li>
+              <li>Performance analytics</li>
+              <li>AI chatbot</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </section>
-    
-    <section class="api-section">
-      <h2>Public API</h2>
-      <p>Access our platform data via RESTful API endpoints</p>
-      <div class="api-endpoints">
+    </div>
+
+    <!-- ─── Public API ───────────────────────────────────────── -->
+    <section class="section" id="api">
+      <div class="section-head reveal">
+        <div class="eyebrow">Developers</div>
+        <h2>RESTful API. OpenAPI spec. Production-grade.</h2>
+        <p>Read-only public endpoints for platform info. Authenticated endpoints for everything else. Bring your own integration.</p>
+      </div>
+
+      <div class="api-card reveal">
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/api/public/info</span>
-          <span class="endpoint-desc">- Platform information and statistics</span>
+          <span class="endpoint-desc">Platform information and statistics</span>
         </div>
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/api/public/features</span>
-          <span class="endpoint-desc">- List of platform features</span>
+          <span class="endpoint-desc">List of platform features</span>
         </div>
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/api/public/modules</span>
-          <span class="endpoint-desc">- Complete module catalog</span>
+          <span class="endpoint-desc">Complete module catalog</span>
         </div>
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/api/public/services</span>
-          <span class="endpoint-desc">- Available service types</span>
+          <span class="endpoint-desc">Available service types</span>
         </div>
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/api/public/stats</span>
-          <span class="endpoint-desc">- Platform statistics</span>
+          <span class="endpoint-desc">Platform statistics</span>
         </div>
         <div class="endpoint">
           <span class="method get">GET</span>
           <span class="endpoint-path">/openapi.json</span>
-          <span class="endpoint-desc">- OpenAPI specification</span>
+          <span class="endpoint-desc">Full OpenAPI specification</span>
         </div>
       </div>
     </section>
-    
-    <footer>
-      <p>&copy; 2025 SALIS AUTO. Enterprise Automotive ERP Platform.</p>
-      <nav style="margin-top: 20px;">
-        <a href="/app">Application</a>
-        <a href="/api/public/info">API</a>
-        <a href="/openapi.json">OpenAPI</a>
-        <a href="/sitemap.xml">Sitemap</a>
-        <a href="/robots.txt">Robots</a>
-      </nav>
-    </footer>
-  </div>
+
+    <!-- ─── CTA Banner ───────────────────────────────────────── -->
+    <section class="section">
+      <div class="cta-banner reveal">
+        <h2>Ready to run your workshop on rails?</h2>
+        <p>Launch the application, sign in, and you're inside the dashboard in under 30 seconds.</p>
+        <a href="/app" class="btn btn-primary">
+          Launch Application
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Footer ────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="/">
+            <span class="brand-mark"></span>
+            <span class="brand-text">SALIS <span>AUTO</span></span>
+          </a>
+          <p>The operating system for modern garages. 156+ modules, real-time telemetry, AI diagnostics, AR-guided repairs.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Product</h5>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#modules">Modules</a></li>
+            <li><a href="/app">Launch app</a></li>
+            <li><a href="/api/public/info">Platform info</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Developers</h5>
+          <ul>
+            <li><a href="#api">Public API</a></li>
+            <li><a href="/openapi.json">OpenAPI</a></li>
+            <li><a href="/api/public/stats">Live stats</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Compliance</h5>
+          <ul>
+            <li><a href="#features">ZATCA Phase 2</a></li>
+            <li><a href="#features">VAT / Zakat</a></li>
+            <li><a href="/sitemap.xml">Sitemap</a></li>
+            <li><a href="/robots.txt">Robots</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 SALIS AUTO. Enterprise Automotive ERP Platform.</span>
+        <div class="meta">
+          <span>v2.0</span>
+          <span>·</span>
+          <span>Made for workshops at scale</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Lightweight reveal-on-scroll ──────────────────────────
+    (() => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    })();
+
+    // ── Animated number counter when stats come into view ────
+    (() => {
+      const easeOut = t => 1 - Math.pow(1 - t, 3);
+      const animateCount = (el, target, duration = 1400) => {
+        const start = performance.now();
+        const initial = 0;
+        const suffix = el.textContent.includes('+') ? '+' : '';
+        const step = (now) => {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const value = Math.floor(initial + (target - initial) * easeOut(progress));
+          el.textContent = value + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = target + suffix;
+        };
+        requestAnimationFrame(step);
+      };
+      const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = parseInt(entry.target.dataset.target, 10);
+            if (target) animateCount(entry.target, target);
+            statObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('.stat-number[data-target]').forEach(el => statObserver.observe(el));
+    })();
+
+    // ── Header shadow on scroll ─────────────────────────────
+    (() => {
+      const nav = document.querySelector('header.nav');
+      const onScroll = () => {
+        if (window.scrollY > 12) nav.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)';
+        else nav.style.boxShadow = 'none';
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+  </script>
 </body>
 </html>
