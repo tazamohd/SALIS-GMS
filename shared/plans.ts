@@ -27,11 +27,18 @@ export function meetsMinPlan(userPlan: PlanId | undefined | null, requiredPlan: 
   return PLAN_HIERARCHY[userPlan] >= PLAN_HIERARCHY[requiredPlan];
 }
 
-/** Stripe price IDs (set via env in production; defaults are placeholders). */
+/** Stripe price IDs (set via env in production; defaults are placeholders).
+ *  Wrapped in a `typeof process` guard so this file is safe to import from
+ *  client code too — Vite ships it to the browser where `process` is undefined.
+ */
+function envOrNull(key: string): string | null {
+  if (typeof process === "undefined" || !process.env) return null;
+  return process.env[key] ?? null;
+}
 export const STRIPE_PRICE_IDS: Record<PlanId, string | null> = {
   STARTER: null, // free tier
-  PRO: process.env.STRIPE_PRICE_PRO ?? null,
-  ENTERPRISE: process.env.STRIPE_PRICE_ENTERPRISE ?? null,
+  PRO: envOrNull("STRIPE_PRICE_PRO"),
+  ENTERPRISE: envOrNull("STRIPE_PRICE_ENTERPRISE"),
 };
 
 /** Feature-flag categories that unlock at each tier. */
