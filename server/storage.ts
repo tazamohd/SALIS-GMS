@@ -65,6 +65,7 @@ import {
   gamificationBadgeAwards,
   leaderboardSnapshots,
   mobileDevices,
+  subscriptions,
   type User,
   type UpsertUser,
   type Garage,
@@ -12052,6 +12053,51 @@ const result = await db
       .where(and(eq(mobileDevices.id, id), eq(mobileDevices.garageId, garageId)))
       .returning();
     return result[0];
+  }
+
+  // ---------- Subscriptions (per-garage SaaS plan state) ----------
+  async getSubscription(garageId: string) {
+    const [row] = await db.select().from(subscriptions).where(eq(subscriptions.garageId, garageId));
+    return row;
+  }
+
+  /** Get-or-create — ensures every garage has a subscription row (defaults to STARTER/active). */
+  async ensureSubscription(garageId: string) {
+    const existing = await this.getSubscription(garageId);
+    if (existing) return existing;
+    const [row] = await db.insert(subscriptions).values({ garageId }).returning();
+    return row;
+  }
+
+  async updateSubscription(garageId: string, patch: Partial<typeof subscriptions.$inferInsert>) {
+    const [row] = await db
+      .update(subscriptions)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(subscriptions.garageId, garageId))
+      .returning();
+    return row;
+  }
+
+  /** Platform-admin only: list every garage's subscription with the garage name joined in. */
+  async listAllSubscriptions() {
+    return await db
+      .select({
+        subscriptionId: subscriptions.id,
+        garageId: subscriptions.garageId,
+        plan: subscriptions.plan,
+        status: subscriptions.status,
+        currentPeriodStart: subscriptions.currentPeriodStart,
+        currentPeriodEnd: subscriptions.currentPeriodEnd,
+        cancelAt: subscriptions.cancelAt,
+        canceledAt: subscriptions.canceledAt,
+        stripeSubscriptionId: subscriptions.stripeSubscriptionId,
+        stripeCustomerId: subscriptions.stripeCustomerId,
+        createdAt: subscriptions.createdAt,
+        garageName: garages.name,
+      })
+      .from(subscriptions)
+      .leftJoin(garages, eq(garages.id, subscriptions.garageId))
+      .orderBy(desc(subscriptions.createdAt));
   }
 
   // ---------- Smart Contract status update (Smart Contracts page) ----------

@@ -278,6 +278,7 @@ const PerformanceAnalytics = lazy(() => import("@/pages/PerformanceAnalytics"));
 const PredictiveDemandForecasting = lazy(() => import("@/pages/PredictiveDemandForecasting"));
 const ProductivityTracker = lazy(() => import("@/pages/ProductivityTracker"));
 const OBDDiagnosticViewer = lazy(() => import("@/pages/OBDDiagnosticViewer"));
+const Subscriptions = lazy(() => import("@/pages/Subscriptions"));
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -1817,6 +1818,14 @@ function Router() {
               <OBDDiagnosticViewer />
             </Suspense>
           </ProtectedRoute>
+        </Layout>
+      </Route>
+
+      <Route path="/subscriptions">
+        <Layout>
+          <Suspense fallback={<PageSkeleton />}>
+            <Subscriptions />
+          </Suspense>
         </Layout>
       </Route>
 

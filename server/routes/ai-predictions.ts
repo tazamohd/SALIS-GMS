@@ -9,6 +9,7 @@ import {
   generateRevenueForecast,
 } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";
+import { requirePlan } from "../middleware/requirePlan";
 
 const router = Router();
 
@@ -51,7 +52,7 @@ async function buildDemandSeries(garageId: string, days: number) {
   }));
 }
 
-router.get("/ai/predictions", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/ai/predictions", isAuthenticated, requirePlan("PRO"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const days = parseTimeRange(String(req.query.timeRange ?? "7d"));
@@ -82,7 +83,7 @@ router.get("/ai/predictions", isAuthenticated, async (req: Request, res: Respons
 });
 
 /** Mean absolute percentage error across the recent demand window. */
-router.get("/ai/accuracy", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/ai/accuracy", isAuthenticated, requirePlan("PRO"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {

@@ -8,6 +8,7 @@ import {
   getPartsForecastSnapshot,
 } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";
+import { requirePlan } from "../middleware/requirePlan";
 
 const router = Router();
 
@@ -30,7 +31,7 @@ function chunkByWeek(daily: Array<{ isoDate: string; count: number }>) {
   return buckets;
 }
 
-router.get("/forecasting/demand", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/forecasting/demand", isAuthenticated, requirePlan("PRO"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const period = Math.max(7, Math.min(90, Number(req.query.period ?? 30)));

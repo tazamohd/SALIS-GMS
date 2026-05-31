@@ -1,3 +1,5 @@
+import { usePlan } from "@/hooks/usePlan";
+import type { PlanId } from "@shared/plans";
 import {
   Home,
   ClipboardCheck,
@@ -308,7 +310,7 @@ export function Layout({ children }: LayoutProps) {
               <GripVertical className="w-3 h-3 text-[#64748B] dark:text-[#9BA4B0]" />
             </div>
           </div>
-          {/* User Role Badge */}
+          {/* User Role + Plan Badge */}
           {user && (
             <div className="px-3 pt-3 pb-1">
               <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
@@ -321,9 +323,12 @@ export function Layout({ children }: LayoutProps) {
                   <p className="text-xs font-semibold text-[#0F172A] dark:text-white truncate">
                     {(user as any)?.fullName || (user as any)?.email?.split('@')[0]}
                   </p>
-                  <span className={`inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-full tracking-wide ${getRoleBadgeColor(userRole)}`}>
-                    {getRoleDisplayLabel(userRole)}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-full tracking-wide ${getRoleBadgeColor(userRole)}`}>
+                      {getRoleDisplayLabel(userRole)}
+                    </span>
+                    <PlanBadge />
+                  </div>
                 </div>
               </div>
             </div>
@@ -481,5 +486,28 @@ export function Layout({ children }: LayoutProps) {
         <CustomerChatWidget />
       </div>
     </>
+  );
+}
+
+/** Inline plan pill rendered next to the user role badge. */
+function PlanBadge() {
+  const { plan, isLoading } = usePlan();
+  if (isLoading) return null;
+  const styles: Record<PlanId, string> = {
+    STARTER: "bg-slate-500/15 text-slate-500 dark:text-slate-300",
+    PRO: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+    ENTERPRISE: "bg-gradient-to-r from-[#7C5CFF] to-[#F97316] text-white",
+  };
+  return (
+    <Link href="/subscriptions">
+      <span
+        className={`inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full tracking-wide hover:opacity-90 transition-opacity ${styles[plan]}`}
+        data-testid="header-plan-badge"
+        title="View subscription"
+      >
+        {plan}
+        {plan === "STARTER" && <span className="opacity-70">· Upgrade</span>}
+      </span>
+    </Link>
   );
 }

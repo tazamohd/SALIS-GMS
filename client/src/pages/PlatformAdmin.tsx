@@ -1251,6 +1251,7 @@ export default function PlatformAdmin() {
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "garages", label: "Garages", icon: Building2 },
+    { id: "billing", label: "Billing", icon: CreditCard },
     { id: "suppliers", label: "Suppliers", icon: Truck },
     { id: "stores", label: "E-Commerce", icon: Store },
     { id: "support", label: "Help & Support", icon: MessageSquare },
@@ -1295,12 +1296,191 @@ export default function PlatformAdmin() {
 
         <TabsContent value="overview" className="mt-6"><OverviewTab /></TabsContent>
         <TabsContent value="garages" className="mt-6"><GaragesTab /></TabsContent>
+        <TabsContent value="billing" className="mt-6"><PlatformBillingTab /></TabsContent>
         <TabsContent value="suppliers" className="mt-6"><SuppliersTab /></TabsContent>
+        {/* PlatformBillingTab is defined inline below */}
         <TabsContent value="stores" className="mt-6"><StoresTab /></TabsContent>
         <TabsContent value="support" className="mt-6"><SupportTab /></TabsContent>
         <TabsContent value="rbac" className="mt-6"><RBACTab /></TabsContent>
         <TabsContent value="system" className="mt-6"><SystemHealthTab /></TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Billing tab — list every garage's subscription + allow platform admins
+// to force-change the plan (bypass Stripe checkout in dev).
+// ═══════════════════════════════════════════════════════════════════════
+
+interface GarageSubscriptionRow {
+  subscriptionId: string;
+  garageId: string;
+  garageName: string | null;
+  plan: "STARTER" | "PRO" | "ENTERPRISE";
+  status: string;
+  currentPeriodStart: string | null;
+  currentPeriodEnd: string | null;
+  cancelAt: string | null;
+  canceledAt: string | null;
+  stripeSubscriptionId: string | null;
+  stripeCustomerId: string | null;
+  createdAt: string;
+}
+
+function PlatformBillingTab() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const { data = [], isLoading } = useQuery<GarageSubscriptionRow[]>({
+    queryKey: ["/api/subscriptions/all"],
+  });
+
+  const planMutation = useMutation({
+    mutationFn: async ({ garageId, plan }: { garageId: string; plan: string }) => {
+      const res = await apiRequest("PATCH", `/api/subscriptions/${garageId}`, { plan });
+      return res.json();
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/subscriptions/all"] });
+      toast({ title: "Plan updated" });
+    },
+    onError: (err: Error) =>
+      toast({ title: "Update failed", description: err.message, variant: "destructive" }),
+  });
+
+  const totals = data.reduce(
+    (acc: Record<string, number>, row) => {
+      acc[row.plan] = (acc[row.plan] ?? 0) + 1;
+      return acc;
+    },
+    { STARTER: 0, PRO: 0, ENTERPRISE: 0 },
+  );
+
+  const planStyles: Record<string, string> = {
+    STARTER: "bg-slate-500/15 text-slate-600 dark:text-slate-300",
+    PRO: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white",
+    ENTERPRISE: "bg-gradient-to-r from-[#7C5CFF] to-[#F97316] text-white",
+  };
+  const statusStyles: Record<string, string> = {
+    active: "bg-emerald-500/15 text-emerald-600",
+    trialing: "bg-sky-500/15 text-sky-600",
+    past_due: "bg-amber-500/15 text-amber-600",
+    canceled: "bg-red-500/15 text-red-600",
+    unpaid: "bg-red-500/15 text-red-600",
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {(["STARTER", "PRO", "ENTERPRISE"] as const).map((p) => (
+          <Card key={p} className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-[#64748B] uppercase tracking-wide">{p} garages</div>
+                  <div className="text-3xl font-extrabold text-[#0B1F3B] dark:text-white mt-1" data-testid={`count-${p}`}>
+                    {totals[p]}
+                  </div>
+                </div>
+                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${planStyles[p]}`}>{p}</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+        <CardHeader>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">All garage subscriptions</CardTitle>
+          <CardDescription className="text-[#64748B]">
+            Override a garage's plan directly. In production this should require a refund flow when downgrading mid-cycle.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-[#64748B]">Loading…</p>
+          ) : data.length === 0 ? (
+            <p className="text-[#64748B] text-sm">
+              No subscriptions yet. Garages will appear here once they log in.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] text-left text-[#64748B]">
+                    <th className="py-2 px-2 font-medium">Garage</th>
+                    <th className="py-2 px-2 font-medium">Plan</th>
+                    <th className="py-2 px-2 font-medium">Status</th>
+                    <th className="py-2 px-2 font-medium">Renews</th>
+                    <th className="py-2 px-2 font-medium">Stripe</th>
+                    <th className="py-2 px-2 font-medium">Override</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row) => (
+                    <tr
+                      key={row.subscriptionId}
+                      className="border-b border-[#E2E8F0]/40 dark:border-[#232A36]/60"
+                      data-testid={`row-${row.garageId}`}
+                    >
+                      <td className="py-2 px-2">
+                        <div className="font-semibold text-[#0B1F3B] dark:text-white">
+                          {row.garageName ?? "Unnamed garage"}
+                        </div>
+                        <div className="text-xs text-[#64748B] font-mono">{row.garageId.slice(0, 8)}…</div>
+                      </td>
+                      <td className="py-2 px-2">
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${planStyles[row.plan]}`}>
+                          {row.plan}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2">
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-1 rounded-full ${
+                            statusStyles[row.status] ?? "bg-slate-500/15 text-slate-500"
+                          }`}
+                        >
+                          {row.status}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 text-[#64748B]">
+                        {row.currentPeriodEnd ? new Date(row.currentPeriodEnd).toLocaleDateString() : "—"}
+                        {row.cancelAt && (
+                          <div className="text-xs text-red-500">
+                            cancels {new Date(row.cancelAt).toLocaleDateString()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2 px-2 text-[#64748B] text-xs font-mono">
+                        {row.stripeSubscriptionId ? row.stripeSubscriptionId.slice(0, 12) + "…" : "dev mode"}
+                      </td>
+                      <td className="py-2 px-2">
+                        <div className="flex gap-1">
+                          {(["STARTER", "PRO", "ENTERPRISE"] as const).map((p) => (
+                            <button
+                              key={p}
+                              data-testid={`set-${row.garageId}-${p}`}
+                              disabled={p === row.plan || planMutation.isPending}
+                              onClick={() => planMutation.mutate({ garageId: row.garageId, plan: p })}
+                              className={`text-[10px] px-2 py-1 rounded-md transition-colors ${
+                                p === row.plan
+                                  ? "bg-[#0A5ED7]/10 text-[#0A5ED7] cursor-default"
+                                  : "bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:border-[#0BB3FF]"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

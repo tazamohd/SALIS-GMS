@@ -12,6 +12,7 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requirePlan } from "../middleware/requirePlan";
 import { openai, AI_MODEL } from "../ai";
 
 const router = Router();
@@ -86,7 +87,7 @@ function fallbackSteps(guide: string) {
   }));
 }
 
-router.post("/ai/repair-guide", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/ai/repair-guide", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
 

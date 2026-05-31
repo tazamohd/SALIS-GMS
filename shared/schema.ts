@@ -10907,6 +10907,34 @@ export type SchedulingOptimizationRun = typeof schedulingOptimizationRuns.$infer
 export type InsertSchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferInsert;
 export const insertSchedulingOptimizationRunSchema = createInsertSchema(schedulingOptimizationRuns).omit({ id: true, createdAt: true });
 
+// Subscriptions — per-garage SaaS subscription state (replaces the loose
+// `garages.subscriptionPlan` string column for everything except backwards-
+// compat reads). Stripe subscription / customer ids are nullable so this
+// works both before and after Stripe is wired.
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull().unique(),
+  plan: varchar("plan", { length: 20 }).notNull().default("STARTER"), // STARTER | PRO | ENTERPRISE
+  status: varchar("status", { length: 20 }).notNull().default("active"), // active | trialing | past_due | canceled | unpaid
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAt: timestamp("cancel_at"),
+  canceledAt: timestamp("canceled_at"),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 120 }).unique(),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 120 }),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("subscriptions_garage_idx").on(table.garageId),
+  stripeSubIdx: index("subscriptions_stripe_sub_idx").on(table.stripeSubscriptionId),
+}));
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+
 // Mobile Devices — field tablets/phones/scanners assigned to technicians.
 // Backs the Mobile Device Management page (/mobile-device-management).
 export const mobileDevices = pgTable("mobile_devices", {

@@ -14,6 +14,7 @@ import { db } from "../db";
 import { obdDiagnosticData } from "../../shared/schema";
 import { and, eq, desc } from "drizzle-orm";
 import { isAuthenticated } from "../auth";
+import { requirePlan } from "../middleware/requirePlan";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const router = Router();
 interface AuthedUser { id?: string; garageId?: string; userType?: string }
 const u = (req: Request): AuthedUser => (req.user as AuthedUser | undefined) ?? {};
 
-router.get("/diagnostics/obd/:vehicleId", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/diagnostics/obd/:vehicleId", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = u(req);
   if (!user.garageId) return res.status(403).json({ message: "No garage associated" });
   const { vehicleId } = req.params;
@@ -114,7 +115,7 @@ const ingestionSchema = z.object({
   vehicleInfo: z.record(z.unknown()).optional(),
 });
 
-router.post("/diagnostics/obd/:vehicleId", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/diagnostics/obd/:vehicleId", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = u(req);
   if (!user.garageId) return res.status(403).json({ message: "No garage associated" });
   const { vehicleId } = req.params;

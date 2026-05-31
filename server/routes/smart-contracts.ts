@@ -7,6 +7,7 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requirePlan } from "../middleware/requirePlan";
 import { insertSmartContractSchema } from "../../shared/schema";
 
 const router = Router();
@@ -14,7 +15,7 @@ const router = Router();
 const STATUSES = ["draft", "pending_signature", "signed", "active", "executed", "completed"] as const;
 const patchSchema = z.object({ status: z.enum(STATUSES) });
 
-router.get("/smart-contracts", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/smart-contracts", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -26,7 +27,7 @@ router.get("/smart-contracts", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.post("/smart-contracts", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/smart-contracts", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = insertSmartContractSchema.safeParse({ ...req.body, garageId: user.garageId });
@@ -40,7 +41,7 @@ router.post("/smart-contracts", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.patch("/smart-contracts/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/smart-contracts/:id", isAuthenticated, requirePlan("ENTERPRISE"), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = patchSchema.safeParse(req.body);

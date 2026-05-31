@@ -59,6 +59,7 @@ import { analyticsPerformanceRoutes } from "./analytics-performance";
 import { forecastingDemandRoutes } from "./forecasting-demand";
 import { productivityRoutes } from "./productivity";
 import { obdDiagnosticsRoutes } from "./obd-diagnostics";
+import { subscriptionsRoutes } from "./subscriptions";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -257,6 +258,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Productivity Routes Loaded");
   app.use("/api", obdDiagnosticsRoutes);
   console.log("✅ OBD Diagnostics Routes Loaded");
+  app.use("/api", subscriptionsRoutes);
+  console.log("✅ Subscriptions Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
