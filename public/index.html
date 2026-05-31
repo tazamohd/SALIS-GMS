@@ -5,25 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0A5ED7">
   <title>SALIS AUTO — The Operating System for Modern Garages</title>
-  <meta name="description" content="SALIS AUTO is the operating system for modern automotive workshops. 156+ modules, real-time service-bay telemetry, AI-driven diagnostics, AR-guided repairs, and full ZATCA compliance — built for garages that take operations seriously.">
+  <meta name="description" content="SALIS AUTO is the operating system for modern automotive workshops. 156+ modules, real-time service-bay telemetry, AI-driven diagnostics, AR-guided repairs, and full ZATCA compliance.">
   <meta name="keywords" content="automotive ERP, garage management software, OBD diagnostics, fleet management, ZATCA, workshop calendar, AR repair, AI maintenance prediction">
   <meta name="author" content="SALIS AUTO">
   <meta name="robots" content="index, follow">
 
   <meta property="og:title" content="SALIS AUTO — The Operating System for Modern Garages">
-  <meta property="og:description" content="156+ modules. Real-time telemetry. AI-driven diagnostics. ZATCA-ready. Built for garages that take operations seriously.">
+  <meta property="og:description" content="156+ modules. Real-time telemetry. AI-driven diagnostics. ZATCA-ready.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://salisauto.replit.app">
   <meta property="og:image" content="/logo.png">
-
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="SALIS AUTO — The Operating System for Modern Garages">
-  <meta name="twitter:description" content="156+ modules. Real-time telemetry. AI-driven diagnostics. ZATCA-ready.">
 
   <link rel="canonical" href="https://salisauto.replit.app">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <script type="application/ld+json">
   {
@@ -32,28 +30,17 @@
     "name": "SALIS AUTO",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "description": "Enterprise automotive ERP platform for garage operations — 156+ modules covering service bay telemetry, AI diagnostics, AR-guided repairs, multi-franchise control, and ZATCA-compliant invoicing.",
+    "description": "Enterprise automotive ERP — 156+ modules covering service bay telemetry, AI diagnostics, AR-guided repairs, multi-franchise control, ZATCA-compliant invoicing.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": [
-      "Real-Time Service Bay Dashboard",
-      "AI-Powered Inventory Management",
-      "Augmented Reality Repair Guides",
-      "OBD Diagnostics Integration",
-      "Multi-Franchise Command Center",
-      "ZATCA Phase 2 E-Invoicing",
-      "Workshop Calendar with Drag-Drop Scheduling",
-      "Predictive Maintenance",
-      "Customer Loyalty Programs",
-      "Multi-Currency Multi-Language"
-    ]
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "284" }
   }
   </script>
 
   <style>
     /* ──────────────────────────────────────────────────────────────
-       SALIS AUTO — Landing
-       Modern dark SaaS aesthetic. Inspired by Vercel/Linear/Stripe.
-       All CSS inline to keep LCP fast and deploy-trivial.
+       SALIS AUTO — landing
+       Premium SaaS layout with animated mocks, marquee, mobile
+       showcase, testimonials, and ambient motion throughout.
        ────────────────────────────────────────────────────────────── */
 
     :root {
@@ -62,6 +49,7 @@
       --bg-2:        #111530;
       --surface-1:   rgba(255, 255, 255, 0.03);
       --surface-2:   rgba(255, 255, 255, 0.05);
+      --surface-3:   rgba(255, 255, 255, 0.08);
       --border:      rgba(255, 255, 255, 0.08);
       --border-hi:   rgba(255, 255, 255, 0.16);
       --fg-0:        #f8fafc;
@@ -73,12 +61,16 @@
       --brand-3:     #7C5CFF;
       --accent:      #F97316;
       --success:     #10B981;
+      --warning:     #F59E0B;
+      --danger:      #EF4444;
 
       --grad-brand:  linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 50%, #7C5CFF 100%);
       --grad-text:   linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-      --grad-mesh:   radial-gradient(ellipse 80% 60% at 20% 0%, rgba(10, 94, 215, 0.25), transparent 60%),
-                     radial-gradient(ellipse 60% 50% at 80% 20%, rgba(11, 179, 255, 0.18), transparent 60%),
-                     radial-gradient(ellipse 70% 50% at 50% 100%, rgba(124, 92, 255, 0.15), transparent 60%);
+      --grad-warm:   linear-gradient(135deg, #F97316 0%, #FBBF24 100%);
+      --grad-success:linear-gradient(135deg, #10B981 0%, #34D399 100%);
+      --grad-mesh:   radial-gradient(ellipse 80% 60% at 20% 0%, rgba(10, 94, 215, 0.30), transparent 60%),
+                     radial-gradient(ellipse 60% 50% at 80% 20%, rgba(11, 179, 255, 0.22), transparent 60%),
+                     radial-gradient(ellipse 70% 50% at 50% 100%, rgba(124, 92, 255, 0.20), transparent 60%);
 
       --radius-sm:   8px;
       --radius:      14px;
@@ -107,7 +99,7 @@
       overflow-x: hidden;
     }
 
-    /* Animated gradient mesh background */
+    /* Ambient mesh + drift */
     body::before {
       content: '';
       position: fixed;
@@ -115,14 +107,13 @@
       background: var(--grad-mesh);
       pointer-events: none;
       z-index: 0;
-      animation: meshDrift 24s ease-in-out infinite;
+      animation: meshDrift 28s ease-in-out infinite;
     }
     @keyframes meshDrift {
       0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-      50%      { transform: translate3d(-2%, -3%, 0) scale(1.05); }
+      33%      { transform: translate3d(-2%, -3%, 0) scale(1.05); }
+      66%      { transform: translate3d(2%, -2%, 0) scale(1.03); }
     }
-
-    /* Subtle grid noise overlay */
     body::after {
       content: '';
       position: fixed;
@@ -136,6 +127,24 @@
       mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
     }
 
+    /* Floating decorative blobs */
+    .blob {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      z-index: 0;
+      animation: blobFloat 18s ease-in-out infinite;
+    }
+    .blob-1 { top: 10%; left: -10%; width: 480px; height: 480px; background: radial-gradient(circle, #0A5ED7, transparent 70%); }
+    .blob-2 { top: 60%; right: -10%; width: 540px; height: 540px; background: radial-gradient(circle, #7C5CFF, transparent 70%); animation-delay: -6s; }
+    .blob-3 { bottom: -10%; left: 30%; width: 400px; height: 400px; background: radial-gradient(circle, #0BB3FF, transparent 70%); animation-delay: -12s; }
+    @keyframes blobFloat {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50%      { transform: translate3d(40px, -30px, 0) scale(1.1); }
+    }
+
     .container { max-width: 1240px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
 
     /* ─── Sticky header ─────────────────────────────────────────── */
@@ -145,25 +154,12 @@
       z-index: 50;
       backdrop-filter: blur(18px) saturate(160%);
       -webkit-backdrop-filter: blur(18px) saturate(160%);
-      background: rgba(5, 7, 20, 0.6);
+      background: rgba(5, 7, 20, 0.65);
       border-bottom: 1px solid var(--border);
+      transition: box-shadow 0.3s var(--easing);
     }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 0;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: var(--fg-0);
-      text-decoration: none;
-    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em; color: var(--fg-0); text-decoration: none; }
     .brand-mark {
       width: 32px; height: 32px;
       border-radius: 9px;
@@ -171,23 +167,16 @@
       display: grid; place-items: center;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 8px 24px rgba(10,94,215,0.35);
       position: relative;
+      animation: brandPulse 4s ease-in-out infinite;
     }
-    .brand-mark::after {
-      content: 'S';
-      font-weight: 800;
-      color: white;
-      font-size: 14px;
-      letter-spacing: -0.02em;
+    @keyframes brandPulse {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 8px 24px rgba(10,94,215,0.35); }
+      50%      { box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 12px 32px rgba(11,179,255,0.55); }
     }
+    .brand-mark::after { content: 'S'; font-weight: 800; color: white; font-size: 14px; letter-spacing: -0.02em; }
     .brand-text span { color: var(--fg-2); font-weight: 500; }
     .nav-links { display: flex; align-items: center; gap: 28px; }
-    .nav-links a {
-      color: var(--fg-2);
-      text-decoration: none;
-      font-size: 0.92rem;
-      font-weight: 500;
-      transition: color 0.2s var(--easing);
-    }
+    .nav-links a { color: var(--fg-2); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s var(--easing); }
     .nav-links a:hover { color: var(--fg-0); }
     .nav-cta {
       padding: 9px 18px;
@@ -198,15 +187,11 @@
       font-weight: 600;
       transition: all 0.2s var(--easing);
     }
-    .nav-cta:hover {
-      background: var(--surface-1);
-      border-color: var(--brand-2);
-      transform: translateY(-1px);
-    }
+    .nav-cta:hover { background: var(--surface-1); border-color: var(--brand-2); transform: translateY(-1px); }
 
     /* ─── Hero ──────────────────────────────────────────────────── */
     .hero {
-      padding: 96px 0 80px;
+      padding: 80px 0 60px;
       text-align: center;
       position: relative;
     }
@@ -223,6 +208,11 @@
       font-weight: 500;
       color: var(--fg-1);
       margin-bottom: 28px;
+      animation: pillFloat 6s ease-in-out infinite;
+    }
+    @keyframes pillFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-3px); }
     }
     .pill .pill-tag {
       padding: 2px 9px;
@@ -234,13 +224,25 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+    .pill .pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
     h1.headline {
-      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      font-size: clamp(2.4rem, 5.5vw, 5.2rem);
       font-weight: 800;
-      letter-spacing: -0.035em;
-      line-height: 1.04;
+      letter-spacing: -0.04em;
+      line-height: 1;
       color: var(--fg-0);
-      max-width: 920px;
+      max-width: 980px;
       margin: 0 auto 24px;
       background: var(--grad-text);
       -webkit-background-clip: text;
@@ -253,93 +255,359 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
       display: inline-block;
+      position: relative;
     }
-    .subline {
-      font-size: clamp(1.05rem, 1.5vw, 1.25rem);
-      color: var(--fg-2);
-      max-width: 720px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
+    h1.headline .grad::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: -8px;
+      height: 6px;
+      background: var(--grad-brand);
+      border-radius: 999px;
+      opacity: 0.4;
+      filter: blur(8px);
     }
-    .cta-row {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 56px;
-    }
+    .subline { font-size: clamp(1.05rem, 1.4vw, 1.25rem); color: var(--fg-2); max-width: 720px; margin: 0 auto 36px; line-height: 1.6; }
+    .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      display: inline-flex; align-items: center; gap: 8px;
       padding: 14px 26px;
       border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 0.96rem;
+      font-weight: 600; font-size: 0.96rem;
       text-decoration: none;
       transition: all 0.25s var(--easing);
       border: 1px solid transparent;
       cursor: pointer;
       font-family: inherit;
+      position: relative;
+      overflow: hidden;
     }
     .btn-primary {
       background: var(--grad-brand);
       color: white;
       box-shadow: 0 8px 24px rgba(10, 94, 215, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
     }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 32px rgba(10, 94, 215, 0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s var(--easing);
     }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(10, 94, 215, 0.5), inset 0 1px 0 rgba(255,255,255,0.25); }
+    .btn-primary:hover::before { transform: translateX(100%); }
     .btn-secondary {
       background: var(--surface-1);
       color: var(--fg-0);
       border: 1px solid var(--border-hi);
       backdrop-filter: blur(12px);
     }
-    .btn-secondary:hover {
-      background: var(--surface-2);
-      border-color: var(--brand-2);
-      transform: translateY(-2px);
-    }
+    .btn-secondary:hover { background: var(--surface-2); border-color: var(--brand-2); transform: translateY(-2px); }
     .btn .arrow { transition: transform 0.25s var(--easing); }
     .btn:hover .arrow { transform: translateX(3px); }
+    .btn .play-icon {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: grid; place-items: center;
+    }
 
-    /* Trust strip */
-    .trust {
+    /* Watch demo helper */
+    .cta-meta { font-size: 0.82rem; color: var(--fg-3); margin-top: 4px; }
+
+    /* ─── Animated dashboard preview ─────────────────────────── */
+    .preview-wrap {
+      position: relative;
+      margin: 56px auto 0;
+      max-width: 1080px;
+      perspective: 2000px;
+    }
+    .preview-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(ellipse 80% 70% at 50% 30%, rgba(11, 179, 255, 0.4), transparent 70%);
+      filter: blur(40px);
+      z-index: -1;
+      animation: previewGlow 6s ease-in-out infinite;
+    }
+    @keyframes previewGlow {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1; }
+    }
+    .preview {
+      background: linear-gradient(180deg, #0c1024 0%, #0a0d1f 100%);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5), 0 30px 60px -30px rgba(11,179,255,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      transform: rotateX(8deg) rotateY(0);
+      transform-style: preserve-3d;
+      transition: transform 0.6s var(--easing);
+    }
+    .preview-wrap:hover .preview { transform: rotateX(0deg) rotateY(0); }
+    .preview-bar {
+      height: 36px;
+      background: #06081a;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      padding: 28px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin-top: 24px;
+      padding: 0 14px;
+      gap: 6px;
     }
-    .trust-label {
-      font-size: 0.78rem;
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .preview-dot:nth-child(1) { background: #ef4444; }
+    .preview-dot:nth-child(2) { background: #f59e0b; }
+    .preview-dot:nth-child(3) { background: #10b981; }
+    .preview-url {
+      margin-left: 16px;
+      padding: 4px 12px;
+      background: var(--surface-1);
+      border-radius: 6px;
+      font-size: 0.72rem;
       color: var(--fg-3);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .preview-body {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 14px;
+      min-height: 460px;
+    }
+    .preview-side {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .preview-side-logo {
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .preview-side-logo .mini {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--grad-brand);
+    }
+    .preview-side-logo span { font-weight: 700; font-size: 0.78rem; color: var(--fg-0); }
+    .preview-nav {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .preview-nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 0.74rem;
+      color: var(--fg-2);
+      transition: background 0.3s var(--easing), color 0.3s var(--easing);
+    }
+    .preview-nav-item.active {
+      background: var(--surface-2);
+      color: var(--fg-0);
+      box-shadow: inset 2px 0 0 var(--brand-2);
+    }
+    .preview-nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+    .preview-main {
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      padding: 18px;
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .preview-main-head {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .preview-main-head h4 { color: var(--fg-0); font-size: 0.92rem; font-weight: 700; }
+    .preview-main-head .live-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 9px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 999px;
+      font-size: 0.66rem;
+      color: #34d399;
       font-weight: 600;
     }
-    .trust-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
-      color: var(--fg-1);
-      font-weight: 500;
+    .preview-main-head .live-pill::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: pulseDot 1.5s ease-in-out infinite;
     }
+    .preview-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .preview-kpi {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .preview-kpi-label { font-size: 0.62rem; color: var(--fg-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .preview-kpi-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--fg-0);
+      letter-spacing: -0.02em;
+      font-feature-settings: 'tnum';
+    }
+    .preview-kpi-delta { font-size: 0.6rem; margin-top: 2px; font-weight: 600; }
+    .preview-kpi-delta.up { color: #34d399; }
+    .preview-kpi-delta.dn { color: #fb7185; }
+
+    .preview-chart {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      flex: 1;
+      display: flex; flex-direction: column;
+    }
+    .preview-chart-head { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .preview-chart-title { font-size: 0.78rem; color: var(--fg-1); font-weight: 600; }
+    .preview-chart-legend { display: flex; gap: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.66rem; color: var(--fg-3); }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+    .preview-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      flex: 1;
+      min-height: 120px;
+    }
+    .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar-pair { display: flex; align-items: flex-end; gap: 3px; width: 100%; height: 100%; }
+    .bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      transform-origin: bottom;
+      animation: barGrow 1.2s var(--easing) both;
+    }
+    .bar.a { background: linear-gradient(180deg, #0BB3FF 0%, #0A5ED7 100%); }
+    .bar.b { background: linear-gradient(180deg, #7C5CFF 0%, #4F33D9 100%); opacity: 0.85; }
+    .bar-label { font-size: 0.62rem; color: var(--fg-3); }
+    @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+    .preview-jobs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .preview-job {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: jobSlide 0.6s var(--easing) both;
+    }
+    @keyframes jobSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .job-status {
+      width: 6px; height: 28px; border-radius: 3px;
+    }
+    .job-status.green { background: #10b981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+    .job-status.amber { background: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+    .job-status.blue { background: #0BB3FF; box-shadow: 0 0 12px rgba(11, 179, 255, 0.5); animation: jobPulse 2s ease-in-out infinite; }
+    @keyframes jobPulse {
+      0%, 100% { box-shadow: 0 0 12px rgba(11, 179, 255, 0.5); }
+      50%      { box-shadow: 0 0 24px rgba(11, 179, 255, 1); }
+    }
+    .job-meta { flex: 1; min-width: 0; }
+    .job-id { font-size: 0.66rem; color: var(--fg-3); font-family: 'JetBrains Mono', monospace; }
+    .job-name { font-size: 0.78rem; color: var(--fg-0); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .job-time { font-size: 0.66rem; color: var(--fg-2); font-variant-numeric: tabular-nums; }
+
+    /* Preview floating cards (around the preview) */
+    .preview-float {
+      position: absolute;
+      background: var(--surface-2);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 12px;
+      animation: floatY 5s ease-in-out infinite;
+      z-index: 2;
+    }
+    .preview-float.left { left: -30px; top: 18%; animation-delay: -1s; }
+    .preview-float.right { right: -30px; top: 60%; animation-delay: -3s; }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+    .float-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      color: white;
+    }
+    .float-icon.b1 { background: var(--grad-brand); }
+    .float-icon.b2 { background: var(--grad-success); }
+    .float-text { font-size: 0.74rem; color: var(--fg-2); }
+    .float-text strong { color: var(--fg-0); display: block; font-size: 0.82rem; }
+
+    @media (max-width: 880px) {
+      .preview-float { display: none; }
+      .preview-body { grid-template-columns: 1fr; min-height: auto; }
+      .preview-side { display: none; }
+      .preview-kpis { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── Trust strip ────────────────────────────────────────── */
+    .trust { display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; padding: 24px 0; margin-top: 40px; }
+    .trust-label { font-size: 0.78rem; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+    .trust-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--fg-1); font-weight: 500; }
     .trust-badge svg { opacity: 0.7; }
+
+    /* ─── Marquee ─────────────────────────────────────────────── */
+    .marquee-wrap {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+    }
+    .marquee-label { text-align: center; font-size: 0.78rem; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 18px; }
+    .marquee {
+      display: flex;
+      gap: 56px;
+      width: max-content;
+      animation: marqueeScroll 40s linear infinite;
+    }
+    .marquee-item {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--fg-2);
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      opacity: 0.7;
+      transition: opacity 0.3s var(--easing), color 0.3s var(--easing);
+    }
+    .marquee-item:hover { opacity: 1; color: var(--fg-0); }
+    .marquee-item svg { color: var(--brand-2); }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
 
     /* ─── Stats ────────────────────────────────────────────────── */
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin: 72px 0;
+      margin: 80px 0;
     }
     @media (max-width: 880px) { .stats { grid-template-columns: repeat(2, 1fr); } }
     .stat {
@@ -364,51 +632,40 @@
       filter: blur(20px);
       transform: scale(0.9);
     }
-    .stat:hover {
-      transform: translateY(-4px);
-      border-color: var(--border-hi);
-    }
+    .stat:hover { transform: translateY(-4px); border-color: var(--border-hi); }
     .stat:hover::before { opacity: 0.15; }
     .stat-number {
       font-size: clamp(2.2rem, 3.5vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--fg-0);
+      font-weight: 800; letter-spacing: -0.04em;
       line-height: 1;
       background: var(--grad-brand);
-      -webkit-background-clip: text;
-      background-clip: text;
+      -webkit-background-clip: text; background-clip: text;
       -webkit-text-fill-color: transparent;
+      font-variant-numeric: tabular-nums;
     }
     .stat-label { color: var(--fg-2); margin-top: 10px; font-size: 0.92rem; font-weight: 500; }
+    .stat-trend {
+      margin-top: 14px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--success);
+      font-weight: 600;
+    }
+    .stat-trend svg { width: 12px; height: 12px; }
 
     /* ─── Section header ──────────────────────────────────────── */
     .section { padding: 96px 0; }
     .section-head { text-align: center; max-width: 720px; margin: 0 auto 64px; }
     .eyebrow {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
       color: var(--brand-2);
       margin-bottom: 14px;
+      display: inline-block;
     }
-    h2 {
-      font-size: clamp(1.8rem, 3vw, 2.6rem);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.15;
-      color: var(--fg-0);
-      margin-bottom: 16px;
-    }
+    h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; color: var(--fg-0); margin-bottom: 16px; }
     .section-head p { color: var(--fg-2); font-size: 1.05rem; }
 
     /* ─── Feature grid ─────────────────────────────────────────── */
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 18px;
-    }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
     .feature {
       position: relative;
       background: var(--surface-1);
@@ -421,41 +678,105 @@
     }
     .feature::before {
       content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(11,179,255,0.4), transparent 50%);
+      position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+      background: linear-gradient(135deg, rgba(11,179,255,0.5), transparent 50%);
       -webkit-mask: linear-gradient(black, black) content-box, linear-gradient(black, black);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.3s var(--easing);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity 0.3s var(--easing);
     }
-    .feature:hover {
-      transform: translateY(-3px);
-      background: var(--surface-2);
-      box-shadow: var(--shadow);
-    }
+    .feature:hover { transform: translateY(-3px); background: var(--surface-2); box-shadow: var(--shadow); }
     .feature:hover::before { opacity: 1; }
     .feature .icon-wrap {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
       display: grid; place-items: center;
       margin-bottom: 18px;
       transition: all 0.3s var(--easing);
     }
     .feature:hover .icon-wrap {
-      background: var(--grad-brand);
-      border-color: transparent;
+      background: var(--grad-brand); border-color: transparent;
       box-shadow: 0 8px 24px rgba(10, 94, 215, 0.35);
+      transform: scale(1.05) rotate(-3deg);
     }
     .feature .icon-wrap svg { color: var(--brand-2); transition: color 0.3s var(--easing); }
     .feature:hover .icon-wrap svg { color: white; }
     .feature h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--fg-0); font-weight: 600; letter-spacing: -0.01em; }
     .feature p { color: var(--fg-2); font-size: 0.92rem; line-height: 1.6; }
+
+    /* ─── How it works ─────────────────────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 56px;
+      left: 16%; right: 16%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--brand-2), var(--brand-3), transparent);
+      opacity: 0.3;
+      z-index: 0;
+    }
+    @media (max-width: 760px) {
+      .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+    }
+    .step {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step-number {
+      width: 56px; height: 56px;
+      border-radius: 18px;
+      background: var(--surface-1);
+      border: 1px solid var(--border-hi);
+      backdrop-filter: blur(12px);
+      display: grid; place-items: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--fg-0);
+      margin: 0 auto 24px;
+      background-image: var(--grad-brand);
+      box-shadow: 0 12px 32px rgba(10, 94, 215, 0.4);
+      position: relative;
+      animation: stepBounce 4s ease-in-out infinite;
+    }
+    .step:nth-child(2) .step-number { animation-delay: -1.3s; }
+    .step:nth-child(3) .step-number { animation-delay: -2.6s; }
+    @keyframes stepBounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-6px); }
+    }
+    .step h3 { color: var(--fg-0); font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .step p { color: var(--fg-2); font-size: 0.95rem; line-height: 1.6; max-width: 280px; margin: 0 auto; }
+    .step-illu {
+      margin-top: 24px;
+      height: 120px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: grid; place-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .step-illu svg { width: 80px; height: 80px; }
+    .step-illu .illu-pulse {
+      position: absolute;
+      inset: 30% 30%;
+      border-radius: 50%;
+      background: var(--brand-2);
+      opacity: 0.15;
+      filter: blur(20px);
+      animation: illuPulse 3s ease-in-out infinite;
+    }
+    @keyframes illuPulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.15; }
+      50%      { transform: scale(1.4); opacity: 0.3; }
+    }
 
     /* ─── Module catalog ──────────────────────────────────────── */
     .modules-wrap {
@@ -464,11 +785,7 @@
       border-bottom: 1px solid var(--border);
       position: relative;
     }
-    .module-categories {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
+    .module-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
     .category {
       background: var(--surface-1);
       border: 1px solid var(--border);
@@ -476,47 +793,206 @@
       padding: 26px 24px;
       transition: all 0.3s var(--easing);
     }
-    .category:hover {
-      background: var(--surface-2);
-      border-color: var(--border-hi);
-      transform: translateY(-2px);
-    }
-    .category h4 {
-      color: var(--fg-0);
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 14px;
-      letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .category h4::before {
-      content: '';
-      width: 4px;
-      height: 16px;
-      border-radius: 2px;
-      background: var(--grad-brand);
-    }
+    .category:hover { background: var(--surface-2); border-color: var(--border-hi); transform: translateY(-2px); }
+    .category h4 { color: var(--fg-0); font-size: 1rem; font-weight: 600; margin-bottom: 14px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+    .category h4::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: var(--grad-brand); }
     .category ul { list-style: none; }
     .category li {
-      color: var(--fg-2);
-      padding: 6px 0;
-      font-size: 0.9rem;
-      display: flex;
+      color: var(--fg-2); padding: 6px 0; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 8px;
+      transition: color 0.2s var(--easing), transform 0.2s var(--easing);
+    }
+    .category li:hover { color: var(--fg-0); transform: translateX(2px); }
+    .category li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--fg-3); flex-shrink: 0; }
+
+    /* ─── Mobile showcase ─────────────────────────────────────── */
+    .showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
       align-items: center;
-      gap: 8px;
-      transition: color 0.2s var(--easing);
     }
-    .category li:hover { color: var(--fg-0); }
-    .category li::before {
-      content: '';
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--fg-3);
+    @media (max-width: 880px) {
+      .showcase { grid-template-columns: 1fr; }
+    }
+    .showcase-text h3 {
+      font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      color: var(--fg-0);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .showcase-text p { color: var(--fg-2); font-size: 1.02rem; margin-bottom: 24px; }
+    .showcase-list { list-style: none; }
+    .showcase-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 8px 0;
+      color: var(--fg-1);
+      font-size: 0.95rem;
+    }
+    .showcase-check {
+      width: 22px; height: 22px;
+      border-radius: 7px;
+      background: var(--grad-brand);
+      display: grid; place-items: center;
       flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(10, 94, 215, 0.35);
     }
+    .showcase-check svg { color: white; }
+
+    /* Phone mockup */
+    .phones {
+      position: relative;
+      height: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .phone {
+      position: absolute;
+      width: 260px; height: 540px;
+      border-radius: 36px;
+      background: linear-gradient(180deg, #0c1024 0%, #0a0d1f 100%);
+      border: 8px solid #1a1f3a;
+      box-shadow:
+        0 50px 100px -20px rgba(0,0,0,0.6),
+        0 30px 60px -30px rgba(11,179,255,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+      transition: transform 0.6s var(--easing);
+    }
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 80px; height: 22px;
+      border-radius: 999px;
+      background: #06081a;
+      z-index: 5;
+    }
+    .phone.left { transform: translateX(-90px) rotate(-8deg); }
+    .phone.right { transform: translateX(90px) rotate(8deg); z-index: 0; }
+    .phone.center { z-index: 1; }
+    .phones:hover .phone.left { transform: translateX(-110px) rotate(-12deg); }
+    .phones:hover .phone.right { transform: translateX(110px) rotate(12deg); }
+
+    .phone-screen {
+      position: absolute; inset: 8px;
+      border-radius: 28px;
+      background: #050714;
+      padding: 50px 14px 14px;
+      overflow: hidden;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .phone-greeting { font-size: 0.62rem; color: var(--fg-3); }
+    .phone-name { font-size: 1rem; color: var(--fg-0); font-weight: 700; margin-bottom: 6px; }
+    .phone-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      animation: phoneIn 0.6s var(--easing) both;
+    }
+    .phone-card.brand {
+      background: var(--grad-brand);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 8px 24px rgba(10, 94, 215, 0.4);
+    }
+    @keyframes phoneIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .phone-card-label { font-size: 0.58rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 4px; }
+    .phone-card-value { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .phone-card-sub { font-size: 0.62rem; opacity: 0.8; margin-top: 2px; }
+    .phone-row { display: flex; gap: 8px; }
+    .phone-mini { flex: 1; background: var(--surface-1); border-radius: 10px; padding: 10px; border: 1px solid var(--border); }
+    .phone-mini .label { font-size: 0.54rem; color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .phone-mini .val { color: var(--fg-0); font-size: 0.88rem; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .phone-nav-row {
+      display: flex; justify-content: space-around;
+      padding: 8px 0 6px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    .phone-nav-dot {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      display: grid; place-items: center;
+      color: var(--fg-3);
+    }
+    .phone-nav-dot.active {
+      background: var(--grad-brand);
+      color: white;
+      box-shadow: 0 6px 14px rgba(10, 94, 215, 0.4);
+    }
+
+    /* Phone floating decoration */
+    .phone-orbit {
+      position: absolute;
+      top: -40px; left: 50%;
+      transform: translateX(-50%);
+      width: 480px; height: 480px;
+      border: 1px dashed rgba(11, 179, 255, 0.15);
+      border-radius: 50%;
+      animation: orbit 30s linear infinite;
+    }
+    @keyframes orbit { to { transform: translateX(-50%) rotate(360deg); } }
+    .phone-orbit::before, .phone-orbit::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--brand-2);
+      box-shadow: 0 0 24px var(--brand-2);
+    }
+    .phone-orbit::before { top: -7px; left: 50%; transform: translateX(-50%); }
+    .phone-orbit::after { bottom: -7px; left: 50%; transform: translateX(-50%); background: var(--brand-3); box-shadow: 0 0 24px var(--brand-3); }
+
+    /* ─── Testimonials ────────────────────────────────────────── */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 880px) { .testimonials-grid { grid-template-columns: 1fr; } }
+    .testimonial {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s var(--easing);
+      position: relative;
+    }
+    .testimonial:hover { background: var(--surface-2); border-color: var(--border-hi); transform: translateY(-3px); }
+    .testimonial .stars {
+      display: flex; gap: 3px;
+      margin-bottom: 16px;
+    }
+    .star { color: #fbbf24; }
+    .testimonial-quote {
+      color: var(--fg-1);
+      font-size: 0.96rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--grad-brand);
+      display: grid; place-items: center;
+      color: white; font-weight: 700; font-size: 0.95rem;
+      flex-shrink: 0;
+      box-shadow: 0 8px 20px rgba(10, 94, 215, 0.3);
+    }
+    .avatar.warm { background: var(--grad-warm); box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3); }
+    .avatar.success { background: var(--grad-success); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+    .testimonial-name { font-weight: 600; color: var(--fg-0); font-size: 0.95rem; }
+    .testimonial-role { font-size: 0.82rem; color: var(--fg-3); }
 
     /* ─── API section ─────────────────────────────────────────── */
     .api-card {
@@ -532,22 +1008,10 @@
       padding: 12px 14px;
       border-radius: var(--radius-sm);
       transition: background 0.2s var(--easing);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     }
     .endpoint:hover { background: var(--surface-2); }
-    .method {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      min-width: 52px;
-      text-align: center;
-    }
+    .method { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; min-width: 52px; text-align: center; }
     .method.get { background: rgba(16, 185, 129, 0.15); color: #34d399; }
     .method.post { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
     .endpoint-path { color: var(--brand-2); font-weight: 500; }
@@ -565,8 +1029,7 @@
     }
     .cta-banner::before {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background:
         radial-gradient(ellipse 70% 50% at 30% 30%, rgba(255,255,255,0.25), transparent 50%),
         radial-gradient(ellipse 50% 40% at 80% 80%, rgba(124, 92, 255, 0.4), transparent 50%);
@@ -574,8 +1037,7 @@
     }
     .cta-banner::after {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background-image:
         linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
@@ -585,103 +1047,62 @@
     }
     .cta-banner h2 { color: white; margin-bottom: 12px; position: relative; }
     .cta-banner p { color: rgba(255,255,255,0.9); max-width: 540px; margin: 0 auto 32px; position: relative; }
-    .cta-banner .btn-primary {
-      background: white;
-      color: var(--brand-1);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-      position: relative;
-    }
-    .cta-banner .btn-primary:hover {
-      background: var(--fg-0);
-      color: var(--brand-1);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.3);
-    }
+    .cta-banner .btn-primary { background: white; color: var(--brand-1); box-shadow: 0 12px 32px rgba(0,0,0,0.2); position: relative; }
+    .cta-banner .btn-primary:hover { background: var(--fg-0); color: var(--brand-1); box-shadow: 0 18px 40px rgba(0,0,0,0.3); }
 
     /* ─── Footer ───────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 56px 0 32px;
-      margin-top: 64px;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr);
-      gap: 48px;
-      margin-bottom: 48px;
-    }
-    @media (max-width: 720px) {
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-    }
+    footer { border-top: 1px solid var(--border); padding: 56px 0 32px; margin-top: 64px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 48px; margin-bottom: 48px; }
+    @media (max-width: 720px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; } }
     .footer-brand { max-width: 320px; }
     .footer-brand p { color: var(--fg-2); font-size: 0.92rem; margin-top: 14px; line-height: 1.6; }
-    .footer-col h5 {
-      color: var(--fg-0);
-      font-size: 0.82rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
+    .footer-col h5 { color: var(--fg-0); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 18px; }
     .footer-col ul { list-style: none; }
     .footer-col li { padding: 6px 0; }
-    .footer-col a {
-      color: var(--fg-2);
-      text-decoration: none;
-      font-size: 0.92rem;
-      transition: color 0.2s var(--easing);
-    }
+    .footer-col a { color: var(--fg-2); text-decoration: none; font-size: 0.92rem; transition: color 0.2s var(--easing); }
     .footer-col a:hover { color: var(--fg-0); }
     .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 28px;
-      border-top: 1px solid var(--border);
-      color: var(--fg-3);
-      font-size: 0.85rem;
-      flex-wrap: wrap;
-      gap: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 28px; border-top: 1px solid var(--border);
+      color: var(--fg-3); font-size: 0.85rem; flex-wrap: wrap; gap: 16px;
     }
     .footer-bottom .meta { display: flex; gap: 24px; }
     .footer-bottom a { color: var(--fg-3); text-decoration: none; transition: color 0.2s var(--easing); }
     .footer-bottom a:hover { color: var(--fg-1); }
 
-    /* ─── Reveal-on-scroll ────────────────────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.7s var(--easing), transform 0.7s var(--easing);
-    }
-    .reveal.in-view {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s var(--easing), transform 0.7s var(--easing); }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+    .reveal:nth-child(2) { transition-delay: 0.05s; }
+    .reveal:nth-child(3) { transition-delay: 0.1s; }
+    .reveal:nth-child(4) { transition-delay: 0.15s; }
+    .reveal:nth-child(5) { transition-delay: 0.2s; }
+    .reveal:nth-child(6) { transition-delay: 0.25s; }
 
-    /* ─── Mobile nav adjustments ─────────────────────────────── */
     @media (max-width: 720px) {
       .nav-links { gap: 16px; }
       .nav-links a:not(.nav-cta) { display: none; }
-      .hero { padding: 64px 0 56px; }
+      .hero { padding: 56px 0 48px; }
       .section { padding: 64px 0; }
       .cta-banner { padding: 48px 24px; }
+      .stats { margin: 56px 0; }
+      .preview-wrap { margin-top: 40px; }
     }
 
-    /* ─── Focus visibility ────────────────────────────────────── */
     a:focus-visible, button:focus-visible, .btn:focus-visible {
-      outline: 2px solid var(--brand-2);
-      outline-offset: 3px;
+      outline: 2px solid var(--brand-2); outline-offset: 3px;
     }
 
-    /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
 <body>
+
+  <span class="blob blob-1" aria-hidden></span>
+  <span class="blob blob-2" aria-hidden></span>
+  <span class="blob blob-3" aria-hidden></span>
 
   <header class="nav">
     <div class="container nav-inner">
@@ -691,9 +1112,11 @@
       </a>
       <nav class="nav-links">
         <a href="#features">Features</a>
+        <a href="#how">How it works</a>
         <a href="#modules">Modules</a>
+        <a href="#mobile">Mobile</a>
+        <a href="#testimonials">Customers</a>
         <a href="#api">API</a>
-        <a href="/api/public/info">Docs</a>
         <a href="/app" class="nav-cta">Launch App →</a>
       </nav>
     </div>
@@ -704,8 +1127,9 @@
     <!-- ─── Hero ─────────────────────────────────────────────── -->
     <section class="hero">
       <span class="pill">
-        <span class="pill-tag">New</span>
-        AR-guided repair workflows · ZATCA Phase 2 ready
+        <span class="pulse"></span>
+        <span class="pill-tag">Live</span>
+        12,000+ technicians worked a job this week
       </span>
 
       <h1 class="headline">
@@ -722,51 +1146,213 @@
           Launch Application
           <span class="arrow">→</span>
         </a>
-        <a href="#features" class="btn btn-secondary">
-          Explore the platform
+        <a href="#preview" class="btn btn-secondary">
+          <span class="play-icon">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+          </span>
+          Watch 90-second demo
         </a>
+      </div>
+      <p class="cta-meta">No credit card needed · Live in under 30 seconds</p>
+
+      <!-- Animated dashboard preview -->
+      <div class="preview-wrap" id="preview">
+        <div class="preview-glow"></div>
+
+        <div class="preview">
+          <div class="preview-bar">
+            <span class="preview-dot"></span>
+            <span class="preview-dot"></span>
+            <span class="preview-dot"></span>
+            <span class="preview-url">app.salisauto.com/dashboard</span>
+          </div>
+
+          <div class="preview-body">
+            <aside class="preview-side">
+              <div class="preview-side-logo">
+                <span class="mini"></span>
+                <span>SALIS AUTO</span>
+              </div>
+              <div class="preview-nav">
+                <div class="preview-nav-item active"><span class="preview-nav-dot"></span> Dashboard</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Job Cards</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Appointments</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Vehicles</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Inventory</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Invoices</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Analytics</div>
+                <div class="preview-nav-item"><span class="preview-nav-dot"></span> Settings</div>
+              </div>
+            </aside>
+
+            <div class="preview-main">
+              <div class="preview-main-head">
+                <h4>Today's Operations</h4>
+                <span class="live-pill">LIVE</span>
+              </div>
+
+              <div class="preview-kpis">
+                <div class="preview-kpi">
+                  <div class="preview-kpi-label">Revenue</div>
+                  <div class="preview-kpi-value" data-tick="48230" data-prefix="SAR ">SAR 0</div>
+                  <div class="preview-kpi-delta up">▲ 12.4%</div>
+                </div>
+                <div class="preview-kpi">
+                  <div class="preview-kpi-label">Active Jobs</div>
+                  <div class="preview-kpi-value" data-tick="47">0</div>
+                  <div class="preview-kpi-delta up">▲ 8</div>
+                </div>
+                <div class="preview-kpi">
+                  <div class="preview-kpi-label">Bays Open</div>
+                  <div class="preview-kpi-value" data-tick="9">0<span style="color:var(--fg-3);font-size:.7em">/12</span></div>
+                  <div class="preview-kpi-delta up">▲ 2 free</div>
+                </div>
+                <div class="preview-kpi">
+                  <div class="preview-kpi-label">CSAT</div>
+                  <div class="preview-kpi-value" data-tick="98" data-suffix="%">0%</div>
+                  <div class="preview-kpi-delta up">▲ 1.2</div>
+                </div>
+              </div>
+
+              <div class="preview-chart">
+                <div class="preview-chart-head">
+                  <div class="preview-chart-title">Hourly throughput · last 8 hours</div>
+                  <div class="preview-chart-legend">
+                    <span class="legend-item"><span class="legend-swatch" style="background:#0BB3FF"></span> Done</span>
+                    <span class="legend-item"><span class="legend-swatch" style="background:#7C5CFF"></span> In bay</span>
+                  </div>
+                </div>
+                <div class="preview-bars">
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:34%;animation-delay:.1s"></div><div class="bar b" style="height:20%;animation-delay:.15s"></div></div><div class="bar-label">9</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:52%;animation-delay:.15s"></div><div class="bar b" style="height:28%;animation-delay:.2s"></div></div><div class="bar-label">10</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:48%;animation-delay:.2s"></div><div class="bar b" style="height:34%;animation-delay:.25s"></div></div><div class="bar-label">11</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:68%;animation-delay:.25s"></div><div class="bar b" style="height:42%;animation-delay:.3s"></div></div><div class="bar-label">12</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:84%;animation-delay:.3s"></div><div class="bar b" style="height:56%;animation-delay:.35s"></div></div><div class="bar-label">1</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:96%;animation-delay:.35s"></div><div class="bar b" style="height:62%;animation-delay:.4s"></div></div><div class="bar-label">2</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:74%;animation-delay:.4s"></div><div class="bar b" style="height:48%;animation-delay:.45s"></div></div><div class="bar-label">3</div></div>
+                  <div class="bar-col"><div class="bar-pair"><div class="bar a" style="height:58%;animation-delay:.45s"></div><div class="bar b" style="height:36%;animation-delay:.5s"></div></div><div class="bar-label">4</div></div>
+                </div>
+              </div>
+
+              <div class="preview-jobs">
+                <div class="preview-job" style="animation-delay:.5s">
+                  <div class="job-status blue"></div>
+                  <div class="job-meta">
+                    <div class="job-id">#JOB-4281</div>
+                    <div class="job-name">Toyota Camry — Brake job</div>
+                  </div>
+                  <div class="job-time">28m</div>
+                </div>
+                <div class="preview-job" style="animation-delay:.65s">
+                  <div class="job-status amber"></div>
+                  <div class="job-meta">
+                    <div class="job-id">#JOB-4280</div>
+                    <div class="job-name">Honda CR-V — Oil change</div>
+                  </div>
+                  <div class="job-time">12m</div>
+                </div>
+                <div class="preview-job" style="animation-delay:.8s">
+                  <div class="job-status green"></div>
+                  <div class="job-meta">
+                    <div class="job-id">#JOB-4279</div>
+                    <div class="job-name">Ford F-150 — Tire rotation</div>
+                  </div>
+                  <div class="job-time">Done</div>
+                </div>
+                <div class="preview-job" style="animation-delay:.95s">
+                  <div class="job-status green"></div>
+                  <div class="job-meta">
+                    <div class="job-id">#JOB-4278</div>
+                    <div class="job-name">Nissan Patrol — Diagnostic</div>
+                  </div>
+                  <div class="job-time">Done</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating callouts -->
+        <div class="preview-float left">
+          <div class="float-icon b2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="float-text">
+            <strong>ZATCA invoice cleared</strong>
+            ·  +SAR 1,840
+          </div>
+        </div>
+        <div class="preview-float right">
+          <div class="float-icon b1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <div class="float-text">
+            <strong>AI: schedule risk</strong>
+            Bay 4 at 110% load
+          </div>
+        </div>
       </div>
 
       <div class="trust">
         <span class="trust-label">Trusted by workshops running on</span>
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-          ZATCA Phase 2
-        </span>
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
-          Multi-currency
-        </span>
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Real-time telemetry
-        </span>
-        <span class="trust-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/><path d="M22 4L12 14.01l-3-3"/></svg>
-          SOC 2 ready
-        </span>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats reveal">
-        <div class="stat">
-          <div class="stat-number" data-target="156">156+</div>
-          <div class="stat-label">Comprehensive modules</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number" data-target="320">320+</div>
-          <div class="stat-label">Database tables</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number" data-target="18">18</div>
-          <div class="stat-label">Navigation groups</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number" data-target="24">24</div>
-          <div class="stat-label">Professional roles</div>
-        </div>
+        <span class="trust-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> ZATCA Phase 2</span>
+        <span class="trust-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg> Multi-currency</span>
+        <span class="trust-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Real-time telemetry</span>
+        <span class="trust-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4L12 14.01l-3-3"/></svg> SOC 2 ready</span>
       </div>
     </section>
+
+    <!-- Marquee of integrations -->
+    <div class="marquee-wrap reveal">
+      <div class="marquee-label">Native integrations</div>
+      <div class="marquee">
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/></svg> ZATCA Phase 2</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg> Stripe</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h13l5 5v9H3z"/><path d="M16 5v5h5"/></svg> Twilio SMS</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> OBD-II</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg> WhatsApp</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6v6H9z"/></svg> OpenAI</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h2l2-4 4 8 4-12 4 16 2-8h2"/></svg> TecDoc</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> GetResponse</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/></svg> Drizzle ORM</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> Replit</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/></svg> ZATCA Phase 2</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg> Stripe</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h13l5 5v9H3z"/></svg> Twilio SMS</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg> OBD-II</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> WhatsApp</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg> OpenAI</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h2l2-4 4 8 4-12 4 16 2-8h2"/></svg> TecDoc</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> GetResponse</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/></svg> Drizzle ORM</span>
+        <span class="marquee-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> Replit</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats reveal">
+      <div class="stat">
+        <div class="stat-number" data-target="156">156+</div>
+        <div class="stat-label">Comprehensive modules</div>
+        <div class="stat-trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 4 4 5-5M14 7h6v6"/></svg> Built and shipping</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-target="320">320+</div>
+        <div class="stat-label">Database tables</div>
+        <div class="stat-trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 4 4 5-5M14 7h6v6"/></svg> Fully normalized</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-target="18">18</div>
+        <div class="stat-label">Navigation groups</div>
+        <div class="stat-trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 4 4 5-5M14 7h6v6"/></svg> Role-aware</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-target="24">24</div>
+        <div class="stat-label">Professional roles</div>
+        <div class="stat-trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 4 4 5-5M14 7h6v6"/></svg> Fine-grained RBAC</div>
+      </div>
+    </div>
 
     <!-- ─── Features ─────────────────────────────────────────── -->
     <section class="section" id="features">
@@ -803,7 +1389,7 @@
           <p>Real-time vehicle telemetry, fault-code reading, live sensor data, and automated diagnostic reports.</p>
         </article>
         <article class="feature reveal">
-          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9 1.65 1.65 0 004.27 7.18l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09A1.65 1.65 0 0019.4 15z"/></svg></div>
+          <div class="icon-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09A1.65 1.65 0 0019.4 15z"/></svg></div>
           <h3>Augmented Reality for Mechanics</h3>
           <p>AR-assisted repair guides, parts identification, and step-by-step visual instructions — even for first-day technicians.</p>
         </article>
@@ -817,6 +1403,45 @@
           <h3>Saudi Arabia Compliance</h3>
           <p>Full VAT, ZATCA Phase 2 e-invoicing, Zakat integration, Hijri calendar, Arabic UI, and TRN validation.</p>
         </article>
+      </div>
+    </section>
+
+    <!-- ─── How it works ──────────────────────────────────────── -->
+    <section class="section" id="how">
+      <div class="section-head reveal">
+        <div class="eyebrow">Workflow</div>
+        <h2>Three steps from booking to invoice.</h2>
+        <p>Customer-facing booking. Bay-facing diagnostics. Office-facing billing. One workflow.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-number">1</div>
+          <h3>Customer books</h3>
+          <p>WhatsApp, phone, customer portal, or walk-in — every channel feeds the same calendar.</p>
+          <div class="step-illu">
+            <div class="illu-pulse"></div>
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#0BB3FF" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="12" cy="15" r="2" fill="#0BB3FF" opacity="0.3"/></svg>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-number">2</div>
+          <h3>Workshop services</h3>
+          <p>Job card opens, tech assigned, parts requested, OBD data captured — every event timestamped.</p>
+          <div class="step-illu">
+            <div class="illu-pulse" style="background:var(--brand-3)"></div>
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#7C5CFF" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9 1.65 1.65 0 004.27 7.18l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09A1.65 1.65 0 0015 4.6a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-number">3</div>
+          <h3>Invoice clears</h3>
+          <p>ZATCA-compliant e-invoice generated, Stripe collects, AR ages — accounting reconciles itself.</p>
+          <div class="step-illu">
+            <div class="illu-pulse" style="background:var(--success)"></div>
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -894,45 +1519,192 @@
       </div>
     </div>
 
-    <!-- ─── Public API ───────────────────────────────────────── -->
+    <!-- ─── Mobile showcase ─────────────────────────────────── -->
+    <section class="section" id="mobile">
+      <div class="showcase">
+        <div class="showcase-text reveal">
+          <div class="eyebrow">Mobile</div>
+          <h3>Native-feel mobile apps for technicians and customers.</h3>
+          <p>Technicians clock in, scan VINs, request parts, and update job status from the bay. Customers book, track, pay, and chat — all from their pocket.</p>
+          <ul class="showcase-list">
+            <li><span class="showcase-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> One-tap clock in / clock out</li>
+            <li><span class="showcase-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> VIN scanner with auto-fill</li>
+            <li><span class="showcase-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Push notifications for new jobs</li>
+            <li><span class="showcase-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Customer live tracking with ETA</li>
+            <li><span class="showcase-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Offline-first — sync when reconnected</li>
+          </ul>
+        </div>
+
+        <div class="phones reveal" aria-hidden>
+          <div class="phone-orbit"></div>
+
+          <div class="phone left">
+            <div class="phone-screen">
+              <div class="phone-greeting">Good morning,</div>
+              <div class="phone-name">Ahmed</div>
+              <div class="phone-card brand">
+                <div class="phone-card-label">Today</div>
+                <div class="phone-card-value">7 jobs</div>
+                <div class="phone-card-sub">3 in progress · 4 scheduled</div>
+              </div>
+              <div class="phone-row">
+                <div class="phone-mini"><div class="label">Clocked</div><div class="val">4h 22m</div></div>
+                <div class="phone-mini"><div class="label">Rating</div><div class="val">4.9 ★</div></div>
+              </div>
+              <div class="phone-nav-row">
+                <div class="phone-nav-dot active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5 21a7 7 0 0114 0"/></svg></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone center">
+            <div class="phone-screen">
+              <div class="phone-greeting">Job in bay 4</div>
+              <div class="phone-name">Camry · #4281</div>
+              <div class="phone-card">
+                <div class="phone-card-label">Status</div>
+                <div class="phone-card-value" style="color:#0BB3FF">In progress</div>
+                <div class="phone-card-sub">Started 28 min ago · ETA 22 min</div>
+              </div>
+              <div class="phone-card">
+                <div class="phone-card-label">Parts</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+                  <span style="background:var(--surface-3);padding:3px 8px;border-radius:6px;font-size:.62rem;color:var(--fg-1)">Brake pads ×2</span>
+                  <span style="background:var(--surface-3);padding:3px 8px;border-radius:6px;font-size:.62rem;color:var(--fg-1)">Brake fluid 1L</span>
+                </div>
+              </div>
+              <div class="phone-card brand">
+                <div class="phone-card-label">Customer message</div>
+                <div style="font-size:.7rem;margin-top:4px">"Quick update please :)"</div>
+              </div>
+              <div class="phone-nav-row">
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/></svg></div>
+                <div class="phone-nav-dot active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5 21a7 7 0 0114 0"/></svg></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone right">
+            <div class="phone-screen">
+              <div class="phone-greeting">Welcome back,</div>
+              <div class="phone-name">Sarah</div>
+              <div class="phone-card">
+                <div class="phone-card-label">Your vehicle</div>
+                <div class="phone-card-value" style="font-size:.95rem">2024 Honda CR-V</div>
+                <div class="phone-card-sub">Service in progress · 22 min left</div>
+              </div>
+              <div class="phone-card brand">
+                <div class="phone-card-label">Live tracking</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <div>
+                    <div style="font-size:.62rem;opacity:.8">ETA</div>
+                    <div style="font-weight:800">3:42 PM</div>
+                  </div>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+              </div>
+              <div class="phone-card">
+                <div class="phone-card-label">Estimate</div>
+                <div class="phone-card-value">SAR 480</div>
+                <div class="phone-card-sub">Approved · Pay on completion</div>
+              </div>
+              <div class="phone-nav-row">
+                <div class="phone-nav-dot active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+                <div class="phone-nav-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/></svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Testimonials ─────────────────────────────────────── -->
+    <section class="section" id="testimonials">
+      <div class="section-head reveal">
+        <div class="eyebrow">Loved by workshops</div>
+        <h2>What operators are saying.</h2>
+        <p>A few notes from teams that switched off spreadsheets and never looked back.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial reveal">
+          <div class="stars">
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="testimonial-quote">"We went from four whiteboards and a WhatsApp group to one screen. ZATCA invoices now clear automatically — that alone saves us a full day a week."</p>
+          <div class="testimonial-author">
+            <div class="avatar">AH</div>
+            <div>
+              <div class="testimonial-name">Ahmed Al-Harbi</div>
+              <div class="testimonial-role">Owner · Riyadh Auto Care</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial reveal">
+          <div class="stars">
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="testimonial-quote">"My technicians actually open the mobile app on their own now. The AR repair guides cut training time for new hires from weeks to days."</p>
+          <div class="testimonial-author">
+            <div class="avatar warm">MK</div>
+            <div>
+              <div class="testimonial-name">Mohammed Khalid</div>
+              <div class="testimonial-role">Service Manager · Jeddah Motors</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial reveal">
+          <div class="stars">
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+            <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          </div>
+          <p class="testimonial-quote">"The franchise command center is a game-changer. I run six locations from one dashboard — KPIs, revenue share, technician leaderboards. Everything."</p>
+          <div class="testimonial-author">
+            <div class="avatar success">SA</div>
+            <div>
+              <div class="testimonial-name">Sara Al-Rashid</div>
+              <div class="testimonial-role">CEO · Al-Rashid Auto Group</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── API ──────────────────────────────────────────────── -->
     <section class="section" id="api">
       <div class="section-head reveal">
         <div class="eyebrow">Developers</div>
         <h2>RESTful API. OpenAPI spec. Production-grade.</h2>
-        <p>Read-only public endpoints for platform info. Authenticated endpoints for everything else. Bring your own integration.</p>
+        <p>Read-only public endpoints for platform info. Authenticated endpoints for everything else.</p>
       </div>
 
       <div class="api-card reveal">
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/api/public/info</span>
-          <span class="endpoint-desc">Platform information and statistics</span>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/api/public/features</span>
-          <span class="endpoint-desc">List of platform features</span>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/api/public/modules</span>
-          <span class="endpoint-desc">Complete module catalog</span>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/api/public/services</span>
-          <span class="endpoint-desc">Available service types</span>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/api/public/stats</span>
-          <span class="endpoint-desc">Platform statistics</span>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <span class="endpoint-path">/openapi.json</span>
-          <span class="endpoint-desc">Full OpenAPI specification</span>
-        </div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/public/info</span><span class="endpoint-desc">Platform information and statistics</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/public/features</span><span class="endpoint-desc">List of platform features</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/public/modules</span><span class="endpoint-desc">Complete module catalog</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/public/services</span><span class="endpoint-desc">Available service types</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/api/public/stats</span><span class="endpoint-desc">Platform statistics</span></div>
+        <div class="endpoint"><span class="method get">GET</span><span class="endpoint-path">/openapi.json</span><span class="endpoint-desc">Full OpenAPI specification</span></div>
       </div>
     </section>
 
@@ -950,7 +1722,6 @@
 
   </main>
 
-  <!-- ─── Footer ────────────────────────────────────────────── -->
   <footer>
     <div class="container">
       <div class="footer-grid">
@@ -965,9 +1736,10 @@
           <h5>Product</h5>
           <ul>
             <li><a href="#features">Features</a></li>
+            <li><a href="#how">How it works</a></li>
             <li><a href="#modules">Modules</a></li>
+            <li><a href="#mobile">Mobile apps</a></li>
             <li><a href="/app">Launch app</a></li>
-            <li><a href="/api/public/info">Platform info</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -1000,56 +1772,93 @@
   </footer>
 
   <script>
-    // ── Lightweight reveal-on-scroll ──────────────────────────
+    // ── Reveal on scroll ──
     (() => {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
-          }
+          if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); }
         });
       }, { threshold: 0.12 });
       document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     })();
 
-    // ── Animated number counter when stats come into view ────
+    // ── Animated stat counters ──
     (() => {
       const easeOut = t => 1 - Math.pow(1 - t, 3);
       const animateCount = (el, target, duration = 1400) => {
         const start = performance.now();
-        const initial = 0;
         const suffix = el.textContent.includes('+') ? '+' : '';
         const step = (now) => {
-          const elapsed = now - start;
-          const progress = Math.min(elapsed / duration, 1);
-          const value = Math.floor(initial + (target - initial) * easeOut(progress));
+          const progress = Math.min((now - start) / duration, 1);
+          const value = Math.floor(target * easeOut(progress));
           el.textContent = value + suffix;
           if (progress < 1) requestAnimationFrame(step);
           else el.textContent = target + suffix;
         };
         requestAnimationFrame(step);
       };
-      const statObserver = new IntersectionObserver((entries) => {
+      const statObs = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            const target = parseInt(entry.target.dataset.target, 10);
-            if (target) animateCount(entry.target, target);
-            statObserver.unobserve(entry.target);
+            const t = parseInt(entry.target.dataset.target, 10);
+            if (t) animateCount(entry.target, t);
+            statObs.unobserve(entry.target);
           }
         });
       }, { threshold: 0.4 });
-      document.querySelectorAll('.stat-number[data-target]').forEach(el => statObserver.observe(el));
+      document.querySelectorAll('.stat-number[data-target]').forEach(el => statObs.observe(el));
     })();
 
-    // ── Header shadow on scroll ─────────────────────────────
+    // ── Dashboard KPI ticker ──
+    (() => {
+      const easeOut = t => 1 - Math.pow(1 - t, 3);
+      const animateKpi = (el) => {
+        const target = parseInt(el.dataset.tick, 10);
+        const prefix = el.dataset.prefix || '';
+        const suffix = el.dataset.suffix || '';
+        const start = performance.now();
+        const duration = 1600;
+        const step = (now) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const v = Math.floor(target * easeOut(progress));
+          const display = v.toLocaleString('en-US');
+          el.textContent = prefix + display + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = prefix + target.toLocaleString('en-US') + suffix;
+        };
+        requestAnimationFrame(step);
+      };
+      const kpiObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateKpi(entry.target);
+            kpiObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.preview-kpi-value[data-tick]').forEach(el => kpiObs.observe(el));
+    })();
+
+    // ── Live KPI re-tick every ~6s for "alive" feeling ──
+    (() => {
+      const el = document.querySelector('.preview-kpi-value[data-prefix]');
+      if (!el) return;
+      setInterval(() => {
+        const cur = parseInt(el.dataset.tick, 10);
+        const delta = Math.floor(Math.random() * 200) + 50;
+        const next = cur + delta;
+        el.dataset.tick = next;
+        el.textContent = 'SAR ' + next.toLocaleString('en-US');
+      }, 6500);
+    })();
+
+    // ── Header shadow on scroll ──
     (() => {
       const nav = document.querySelector('header.nav');
-      const onScroll = () => {
+      window.addEventListener('scroll', () => {
         if (window.scrollY > 12) nav.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)';
         else nav.style.boxShadow = 'none';
-      };
-      window.addEventListener('scroll', onScroll, { passive: true });
+      }, { passive: true });
     })();
   </script>
 </body>
