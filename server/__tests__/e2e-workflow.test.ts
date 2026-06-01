@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import type { Express } from "express";
 import supertest from "supertest";
 import { createTestApp } from "./setup";
+import { loginAsAdmin } from "./helpers";
 
 let app: Express;
 
@@ -20,18 +21,13 @@ describe("E2E Golden Path - Full Business Workflow", () => {
   let invoiceId: string;
 
   it("Step 1: Register a new garage admin", async () => {
-    testAgent = supertest.agent(app);
-    const res = await testAgent.post("/api/register").send({
-      email: `e2e-admin-${Date.now()}@slis.sa`,
-      password: "E2ETest123!",
-      fullName: "E2E Test Admin",
-      phone: "+966500000099",
-    });
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("id");
-    userId = res.body.id;
-
-    garageId = process.env.TEST_GARAGE_ID || "";
+    // Use the shared helper so the new user is wired to the seeded test garage —
+    // POST /api/job-cards (Step 4) requires req.user.garageId.
+    const login = await loginAsAdmin(app);
+    testAgent = login.agent;
+    userId = login.user.id;
+    garageId = login.garageId;
+    expect(userId).toBeTruthy();
     expect(garageId).toBeTruthy();
   });
 

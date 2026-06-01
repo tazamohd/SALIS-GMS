@@ -9768,7 +9768,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/settings', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const settings = await storage.updateUserSettings(userId, req.body);
+      // Upsert: update if a row exists, otherwise create one so the response is
+      // always a populated settings object (callers rely on this).
+      let settings = await storage.updateUserSettings(userId, req.body);
+      if (!settings) {
+        settings = await storage.createUserSettings({ userId, ...req.body });
+      }
       res.json(settings);
     } catch (error) {
       console.error("Error updating settings:", error);
