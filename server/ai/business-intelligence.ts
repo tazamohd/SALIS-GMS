@@ -393,17 +393,21 @@ export async function getDailyJobCounts(garageId: string, days = 30) {
  * Returns top N parts by current usage with reorder threshold.
  */
 export async function getPartsForecastSnapshot(garageId: string, limit = 10) {
-  // Average monthly usage = count of POs containing this part in last 90 days / 3
+  // Average monthly usage = count of POs containing this part in last 90 days / 3.
+  // NOTE: `spareParts` exposes a `name` column (not `partName`) and
+  // `sparePartInventories` joins via `sparePartId` (not `partId`). Both were
+  // hidden by @ts-nocheck and made this handler 500 on any garage.
+  // Using a LEFT join from inventories → parts so empty inventories return [].
   const rows = await db.select({
     id: spareParts.id,
-    name: spareParts.partName,
+    name: spareParts.name,
     current: sql<number>`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`,
     minThreshold: sql<number>`COALESCE(MIN(${sparePartInventories.minThreshold}), 5)`,
   })
     .from(spareParts)
-    .leftJoin(sparePartInventories, eq(sparePartInventories.partId, spareParts.id))
+    .leftJoin(sparePartInventories, eq(sparePartInventories.sparePartId, spareParts.id))
     .where(eq(sparePartInventories.garageId, garageId))
-    .groupBy(spareParts.id, spareParts.partName)
+    .groupBy(spareParts.id, spareParts.name)
     .orderBy(desc(sql`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`))
     .limit(limit);
 
