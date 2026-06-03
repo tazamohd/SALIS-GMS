@@ -55,5 +55,5 @@ node scripts/apply-perf-indexes.mjs
 ## Known follow-ups (deliberately deferred)
 
 - **Stripe Checkout** — `change-plan` currently does an in-DB upgrade because Stripe Checkout session creation isn't wired yet (`stripeReady` flag in the response signals when env is set). One follow-up PR.
-- **Forecasting demand 500 on empty parts inventory** — flagged with a `TODO(real bug)` in `completed-pages-authed.test.ts`; fix in `getPartsForecastSnapshot`. Small follow-up.
+- ~~**Forecasting demand 500 on empty parts inventory**~~ — fixed in `a8b174b`. The query referenced `spareParts.partName` (actual column is `name`) and `sparePartInventories.partId` (actual is `sparePartId`). `@ts-nocheck` was hiding both. Test tolerance removed.
 - **Vite HMR "Failed to parse JSON file" noise** — cosmetic, from the runtime-error overlay plugin trying to load a missing source-map JSON. Doesn't affect functionality.
