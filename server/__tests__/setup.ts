@@ -1,7 +1,5 @@
 import express, { type Express } from "express";
-import { createServer, type Server } from "http";
-import session from "express-session";
-import passport from "passport";
+import type { Server } from "http";
 import fs from "fs";
 import { beforeAll } from "vitest";
 
@@ -23,32 +21,14 @@ export async function createTestApp(): Promise<{ app: Express; server: Server }>
     return { app: cachedApp, server: cachedServer };
   }
 
-  const { setupAuth } = await import("../auth");
-  const { registerRoutes: registerLegacyRoutes, markAuthInitialized } = await import("../routes");
-  const { authRoutes } = await import("../routes/auth");
+  // Use the production router (registers all route modules + legacy fallback)
+  const { registerRoutes } = await import("../routes/index");
 
   const app = express();
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: false }));
 
-  app.set("trust proxy", 1);
-  app.use(
-    session({
-      secret: "test-secret-key-for-testing-only",
-      resave: false,
-      saveUninitialized: false,
-      cookie: { httpOnly: true, secure: false, sameSite: "lax" },
-    })
-  );
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  await setupAuth(app);
-  markAuthInitialized();
-
-  app.use("/api", authRoutes);
-
-  const server = await registerLegacyRoutes(app);
+  const server = await registerRoutes(app);
 
   app.use((err: any, _req: any, res: any, _next: any) => {
     const status = err.status || err.statusCode || 500;
