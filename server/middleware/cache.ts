@@ -36,7 +36,12 @@ export function cacheMiddleware(ttlSeconds: number) {
       return next();
     }
 
-    const key = req.originalUrl;
+    // Scope the cache key by user identity to prevent one user's response
+    // being served to another. Anonymous requests still share a key.
+    const user = (req as any).user;
+    const userId = user?.id ?? "anon";
+    const garageId = user?.garageId ?? "none";
+    const key = `${userId}:${garageId}:${req.originalUrl}`;
     const now = Date.now();
     const cached = cache.get(key);
 

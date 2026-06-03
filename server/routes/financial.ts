@@ -291,7 +291,7 @@ router.get('/financial/balance-sheet', async (req: Request, res: Response) => {
         .where(
           and(
             eq(invoices.garageId, garageId),
-            inArray(invoices.status, ['sent', 'overdue']),
+            inArray(invoices.status, ['sent', 'overdue', 'partially_paid']),
             lte(invoices.invoiceDate, asOfDate),
           ),
         ),
@@ -526,7 +526,7 @@ router.get('/financial/trial-balance', async (req: Request, res: Response) => {
       // AR (invoices issued minus payments)
       db.select({ total: sql<number>`COALESCE(SUM(${invoices.balanceAmount}::numeric), 0)` })
         .from(invoices)
-        .where(and(eq(invoices.garageId, garageId), inArray(invoices.status, ['sent', 'overdue']), gte(invoices.invoiceDate, startDate), lte(invoices.invoiceDate, endDate))),
+        .where(and(eq(invoices.garageId, garageId), inArray(invoices.status, ['sent', 'overdue', 'partially_paid']), gte(invoices.invoiceDate, startDate), lte(invoices.invoiceDate, endDate))),
 
       // Inventory value
       db.select({ total: sql<number>`COALESCE(SUM(${sparePartInventories.stockQuantity} * COALESCE(${sparePartInventories.costPrice}::numeric, ${sparePartInventories.purchasePrice}::numeric, 0)), 0)` })
@@ -738,7 +738,7 @@ router.get('/financial/accounts-receivable', async (req: Request, res: Response)
       .where(
         and(
           eq(invoices.garageId, garageId),
-          inArray(invoices.status, ['sent', 'overdue']),
+          inArray(invoices.status, ['sent', 'overdue', 'partially_paid']),
         ),
       )
       .orderBy(asc(invoices.dueDate));

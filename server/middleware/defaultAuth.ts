@@ -32,4 +32,5 @@ export function requireAuthByDefault(req: Request, res: Response, next: NextFunc
   }
 
   res.status(401).json({ message: "Authentication required" });
+  return;
 }

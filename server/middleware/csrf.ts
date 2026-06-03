@@ -48,7 +48,18 @@ export function validateCsrfToken(req: Request, res: Response, next: NextFunctio
   const token = req.headers["x-csrf-token"] as string | undefined;
   const sessionToken = req.session.csrfToken;
 
-  if (!token || !sessionToken || token !== sessionToken) {
+  if (!token || !sessionToken) {
+    res.status(403).json({ message: "Invalid CSRF token" });
+    return;
+  }
+
+  // Constant-time comparison: hash both sides to equal-length digests so
+  // timingSafeEqual never throws on unequal length, and the comparison
+  // itself doesn't leak token bytes via short-circuit timing.
+  const tokenDigest = crypto.createHash("sha256").update(String(token)).digest();
+  const sessionDigest = crypto.createHash("sha256").update(String(sessionToken)).digest();
+
+  if (!crypto.timingSafeEqual(tokenDigest, sessionDigest)) {
     res.status(403).json({ message: "Invalid CSRF token" });
     return;
   }

@@ -78,9 +78,10 @@ class EventBus {
       }
     }
 
-    // Async handlers run in parallel (fire-and-forget with error logging)
+    // Async handlers run in parallel; await so callers that await emit()
+    // are guaranteed all side effects have run before continuing.
     if (asyncHandlers.length > 0) {
-      Promise.allSettled(
+      await Promise.allSettled(
         asyncHandlers.map(({ handler }) =>
           Promise.resolve(handler(event)).catch(err => {
             console.error(`[EventBus] Async handler error for "${event.type}":`, err);

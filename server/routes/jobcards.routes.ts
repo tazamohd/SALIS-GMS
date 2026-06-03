@@ -1,13 +1,32 @@
 import { Router } from "express";
+import { randomBytes } from "crypto";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
-import { jobCardParts, sparePartInventories, jobCards, insertJobTrackingEventSchema } from "@shared/schema";
+import { jobCardParts, sparePartInventories, jobCards, insertJobCardSchema, insertJobTrackingEventSchema } from "@shared/schema";
 import { z } from "zod";
 import QRCode from "qrcode";
+import { eventBus } from "../engine/event-bus";
 
 const router = Router();
+
+// Server-controlled fields are stripped from client input; created/updated/identity
+// columns are managed by the handler, not the request body.
+const createJobCardSchema = insertJobCardSchema.omit({
+  id: true,
+  jobNumber: true,
+  createdAt: true,
+  updatedAt: true,
+  createdBy: true,
+  garageId: true,
+});
+
+function generateJobNumber(): string {
+  const ts = Date.now().toString(36).toUpperCase();
+  const suffix = randomBytes(2).toString('hex').toUpperCase();
+  return `JC-${ts}-${suffix}`;
+}
 
 function sanitizeZodError(error: z.ZodError) {
   return {
@@ -70,9 +89,21 @@ router.get("/job-cards/:id/details", isAuthenticated, async (req, res) => {
 router.post("/job-cards", isAuthenticated, async (req: any, res) => {
   try {
     const userId = req.user?.id || 'default-user';
+    const garageId = req.user?.garageId;
+    if (!garageId) {
+      return res.status(400).json({ message: "User has no garage assigned" });
+    }
+
+    const parsed = createJobCardSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json(sanitizeZodError(parsed.error));
+    }
+
     const jobCardData = {
-      ...req.body,
+      ...parsed.data,
+      jobNumber: generateJobNumber(),
       createdBy: userId,
+      garageId,
     };
     const jobCard = await storage.createJobCard(jobCardData);
     res.status(201).json(jobCard);
@@ -168,6 +199,19 @@ router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
         });
 
         console.log(`Inventory updated for Job ID: ${id}`);
+
+        // Emit job.completed so triggers can notify the customer + push to analytics.
+        // Awaiting here is intentional: downstream handlers may create notifications
+        // that the client expects to exist when it refreshes.
+        await eventBus.emit(eventBus.createEvent(
+          'job.completed',
+          'job_card',
+          id,
+          (req as any).user?.garageId ?? updatedJobCard.garageId,
+          { jobCardId: id, customerId: updatedJobCard.customerId, totalCost: updatedJobCard.totalCost },
+          (req as any).user?.id,
+        ));
+
         return res.json(updatedJobCard);
       }
     }

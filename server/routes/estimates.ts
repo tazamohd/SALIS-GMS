@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -307,7 +308,7 @@ let nextNumber = 9;
 // ── Routes ─────────────────────────────────────────────────────────────────
 
 // GET /api/estimates/stats — Aggregate stats
-router.get('/estimates/stats', (_req, res) => {
+router.get('/estimates/stats', isAuthenticated, (_req, res) => {
   const total = estimates.length;
   const converted = estimates.filter(e => e.status === 'converted').length;
   const conversionRate = total > 0 ? Math.round((converted / total) * 10000) / 100 : 0;
@@ -337,7 +338,7 @@ router.get('/estimates/stats', (_req, res) => {
 });
 
 // GET /api/estimates — List all estimates
-router.get('/estimates', (req, res) => {
+router.get('/estimates', isAuthenticated, (req, res) => {
   let result = [...estimates];
   const { status, search } = req.query;
   if (status && status !== 'all') {
@@ -359,14 +360,14 @@ router.get('/estimates', (req, res) => {
 });
 
 // GET /api/estimates/:id — Single estimate detail
-router.get('/estimates/:id', (req, res) => {
+router.get('/estimates/:id', isAuthenticated, (req, res) => {
   const est = estimates.find(e => e.id === req.params.id);
   if (!est) return res.status(404).json({ error: 'Estimate not found' });
   res.json(est);
 });
 
 // POST /api/estimates — Create new estimate
-router.post('/estimates', (req, res) => {
+router.post('/estimates', isAuthenticated, (req, res) => {
   const {
     customerName, customerEmail, customerPhone,
     vehicleMake, vehicleModel, vehicleYear, vehiclePlate, vehicleVin,
@@ -378,8 +379,10 @@ router.post('/estimates', (req, res) => {
   }
 
   const lineItems: LineItem[] = rawItems.map((li: any) => {
-    const qty = Number(li.quantity) || 1;
-    const price = Number(li.unitPrice) || 0;
+    const parsedQty = Number(li.quantity);
+    const qty = Number.isFinite(parsedQty) && parsedQty >= 0 ? parsedQty : 1;
+    const parsedPrice = Number(li.unitPrice);
+    const price = Number.isFinite(parsedPrice) && parsedPrice >= 0 ? parsedPrice : 0;
     return {
       id: generateLineItemId(),
       type: li.type === 'labor' ? 'labor' : 'parts',
@@ -425,7 +428,7 @@ router.post('/estimates', (req, res) => {
 });
 
 // PATCH /api/estimates/:id/status — Update status
-router.patch('/estimates/:id/status', (req, res) => {
+router.patch('/estimates/:id/status', isAuthenticated, (req, res) => {
   const est = estimates.find(e => e.id === req.params.id);
   if (!est) return res.status(404).json({ error: 'Estimate not found' });
 

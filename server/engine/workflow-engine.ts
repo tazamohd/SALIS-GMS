@@ -88,8 +88,9 @@ class WorkflowEngine {
         request.userId
       );
 
-      // Fire triggers asynchronously (don't block the transition)
-      eventBus.emit(triggerEvent).catch(err => {
+      // Await downstream side effects so the transition response reflects
+      // the actual post-state (inventory deducted, invoice generated, etc.).
+      await eventBus.emit(triggerEvent).catch(err => {
         console.error(`[WorkflowEngine] Trigger "${trigger}" failed:`, err);
       });
     }
