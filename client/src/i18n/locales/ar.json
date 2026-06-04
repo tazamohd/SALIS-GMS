@@ -115,7 +115,9 @@
     "revenue": "الإيرادات",
     "expenses": "المصروفات",
     "profit": "الأرباح",
-    "notAvailable": "غير متوفر"
+    "notAvailable": "غير متوفر",
+    "balance": "الرصيد",
+    "smartSearch": "ابحث عن العملاء والمركبات والقطع..."
   },
   "auth": {
     "login": "تسجيل الدخول",
