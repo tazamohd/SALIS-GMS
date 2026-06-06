@@ -12,6 +12,19 @@ if (process.env.TEST_DATABASE_URL) {
   process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
 }
 
+// The test suite boots the full production route tree (server/routes.ts), and a
+// few optional paid integrations hard-throw at import when their credentials are
+// absent — notably server/paypal.ts ("Missing PAYPAL_CLIENT_ID"), whose snippet
+// is vendor-locked and must not be edited. Provide inert placeholders so import
+// succeeds; any real credentials already in the environment are preserved.
+process.env.PAYPAL_CLIENT_ID ||= 'test-paypal-client-id';
+process.env.PAYPAL_CLIENT_SECRET ||= 'test-paypal-client-secret';
+
+// express-session requires a non-empty `secret`; auth.ts reads SESSION_SECRET
+// (set in production/Replit). Without it, every login in the suite 500s with
+// "secret option required for sessions". Provide a deterministic test secret.
+process.env.SESSION_SECRET ||= 'test-session-secret';
+
 // Use DB global setup only when running server tests (not shared-only)
 const needsDb = !process.argv.some(a => a === 'shared/' || a.startsWith('shared/'));
 
