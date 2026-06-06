@@ -17,6 +17,7 @@
     "test:integration": "vitest run server/routes/__tests__",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
+    "lint:colors": "node scripts/check-hex-classes.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,css}\""
   },
   "dependencies": {
