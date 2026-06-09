@@ -19,6 +19,7 @@
 | `SALIS_AUTO_REVIEW.md` | June 2026 | SALIS-GMS | Historical code-review input |
 | `SalisAuto GMS Complete Platform Review And GitHub Recovery Plan.docx` | June 2026 | SALIS-GMS | Recovery-plan input |
 | `SalisAuto GMS Deep Platform Audit And Recovery Plan.docx` | June 2026 | SALIS-GMS | Recovery-plan input |
+| `tazamohd/CDX` | Older snapshot, inspected June 10 | Separate legacy implementation | External and stale context only |
 
 The two extensionless reports and the DOCX reports are preserved as evidence inputs. Their claims are not merged into the current defect count unless independently verified against SALIS-GMS.
 
@@ -45,6 +46,7 @@ The two extensionless reports and the DOCX reports are preserved as evidence inp
 | ZATCA Phase 2 is complete | Optimistic status reports | Contradictory/unverified | Production clearance/reporting is not demonstrated |
 | Payment integration is complete | Optimistic status reports | Unverified | Production provider and reconciliation evidence is absent |
 | Core platform is production-grade | PR #19/report family | Unsupported | Critical compliance, payment, RBAC, and governance gates remain |
+| CDX is "production ready" and fully ZATCA compliant | `tazamohd/CDX` README | Wrong repository/unsupported | CDX is a smaller legacy snapshot; claims lack current SALIS-GMS release evidence |
 | `server/routes.ts` is monolithic | Multiple reviews | Verified current | 20,654 physical lines |
 | `server/storage.ts` is monolithic | Multiple reviews | Verified current | 10,979 physical lines |
 | `shared/schema.ts` is monolithic | Multiple reviews | Verified current | 10,147 physical lines |
