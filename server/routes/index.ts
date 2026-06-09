@@ -4,6 +4,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { setupAuth } from "../auth";
+import { requireAuthByDefault } from "../middleware/defaultAuth";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
@@ -116,6 +117,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Default-deny on /api: every route below this line requires an authenticated
+  // session unless its path matches the PUBLIC_ROUTES allow-list in
+  // server/middleware/defaultAuth.ts. Per-route `isAuthenticated` guards remain
+  // as belt-and-braces for routes that compose extra checks (roles, garage scope).
+  app.use(requireAuthByDefault);
+  console.log("🔒 Default-deny /api auth gate active");
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
