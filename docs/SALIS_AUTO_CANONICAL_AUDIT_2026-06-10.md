@@ -207,17 +207,17 @@ Detailed source-by-source reconciliation is in `SALIS_AUTO_AUDIT_SOURCE_RECONCIL
 
 | Issue | Priority | June 10 treatment |
 |---|---|---|
-| #7 | High | Authentication baseline improved; retain remaining RBAC and tenant acceptance items |
-| #8 | High | CI runs, but deterministic install and protected required checks remain release gates |
-| #9 | Medium | Retain architecture decomposition with measurable migration targets |
-| #10 | High | Test infrastructure exists; retain critical-path and negative authorization coverage |
+| #7 | High | Canonical report establishes a source of truth; retain status-document consolidation and ownership |
+| #8 | Critical | Typecheck/build design is verified locally; workflow publication, ESLint configuration, and required checks remain |
+| #9 | High | Retain the verified 60-file `@ts-nocheck` burn-down with risk-based sequencing |
+| #10 | High | Render secret declaration is prepared; retain environment documentation and deployment smoke-test evidence |
 | #11 | Critical | Retain ZATCA production integration and certification work |
 | #12 | Critical | Retain production payment integration and reconciliation work |
 | #13 | High | Retain finance completion and control validation |
-| #14 | High | Retain HR/payroll completion and regulatory validation |
-| #15 | Medium | Retain customer experience wiring and ownership verification |
-| #16 | High | Retain security hardening and adversarial tenant testing |
-| #17 | Medium | Retain performance baseline and observability requirements |
+| #14 | High | Retain estimate-to-invoice and job-card-to-invoice workflow completion |
+| #15 | High | Retain client-side and critical-path end-to-end coverage |
+| #16 | Medium | Retain route decomposition with measurable legacy-router reduction |
+| #17 | Critical | Elevate RBAC enforcement and tenant-negative tests to a release gate |
 | #18 | Medium | Retain repository hygiene and documentation consolidation |
 | New | Critical | Create branch-governance and release-trunk issue |
 
