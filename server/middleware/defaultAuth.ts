@@ -13,6 +13,10 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   "/api/ready",
   /^\/api\/public\/.*/,
   /^\/api\/plans$/,
+  // Self-service kiosk lives in shop-floor tablets without a user session.
+  // The walk-in queue, service catalog, and registration endpoints must be
+  // reachable anonymously by design.
+  /^\/api\/kiosk\/.*/,
 ];
 
 function isPublicRoute(path: string): boolean {
