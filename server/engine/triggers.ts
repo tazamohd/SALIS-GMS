@@ -7,6 +7,7 @@
 
 import { eventBus } from './event-bus';
 import type { WorkflowEvent } from '../../shared/workflows';
+import { logger } from '../logger';
 
 /**
  * Register all cross-department workflow triggers.
@@ -46,7 +47,7 @@ export function registerWorkflowTriggers(): void {
         });
       }
     } catch (err) {
-      console.error('[Trigger] job.assigned error:', err);
+      logger.error('trigger job.assigned failed', { error: String(err) });
     }
   }, 'Notify technician and check parts on job assignment');
 
@@ -80,7 +81,7 @@ export function registerWorkflowTriggers(): void {
         event.userId
       ));
     } catch (err) {
-      console.error('[Trigger] job.completed error:', err);
+      logger.error("trigger job.completed failed", { error: String(err) });
     }
   }, 'Auto-generate invoice and notify customer on job completion');
 
@@ -99,7 +100,7 @@ export function registerWorkflowTriggers(): void {
             `Your appointment has been confirmed for ${appointmentDate}. Thank you for choosing SALIS AUTO!`
           );
         } catch (smsErr) {
-          console.warn('[Trigger] SMS send failed (non-critical):', smsErr);
+          logger.warn('trigger SMS send failed (non-critical)', { error: String(smsErr) });
         }
       }
 
@@ -118,7 +119,7 @@ export function registerWorkflowTriggers(): void {
         });
       }
     } catch (err) {
-      console.error('[Trigger] appointment.confirmed error:', err);
+      logger.error("trigger appointment.confirmed failed", { error: String(err) });
     }
   }, 'Send SMS/email confirmation when appointment confirmed');
 
@@ -140,7 +141,7 @@ export function registerWorkflowTriggers(): void {
         data: { appointmentId, vehicleId, customerId },
       });
     } catch (err) {
-      console.error('[Trigger] appointment.checked_in error:', err);
+      logger.error("trigger appointment.checked_in failed", { error: String(err) });
     }
   }, 'Notify advisor and prepare job card on customer check-in');
 
@@ -177,7 +178,7 @@ export function registerWorkflowTriggers(): void {
         });
       }
     } catch (err) {
-      console.error('[Trigger] inventory.low_stock error:', err);
+      logger.error("trigger inventory.low_stock failed", { error: String(err) });
     }
   }, 'Alert managers and suggest PO when stock is low');
 
@@ -213,7 +214,7 @@ export function registerWorkflowTriggers(): void {
         event.userId
       ));
     } catch (err) {
-      console.error('[Trigger] payment.received error:', err);
+      logger.error("trigger payment.received failed", { error: String(err) });
     }
   }, 'Update invoice status and post to GL on payment');
 
@@ -238,7 +239,7 @@ export function registerWorkflowTriggers(): void {
         });
       }
     } catch (err) {
-      console.error('[Trigger] invoice.overdue error:', err);
+      logger.error("trigger invoice.overdue failed", { error: String(err) });
     }
   }, 'Send overdue reminders to customers');
 
@@ -262,7 +263,7 @@ export function registerWorkflowTriggers(): void {
         }
       }
     } catch (err) {
-      console.error('[Trigger] purchase_order.received error:', err);
+      logger.error("trigger purchase_order.received failed", { error: String(err) });
     }
   }, 'Update inventory when PO items received');
 
@@ -282,7 +283,7 @@ export function registerWorkflowTriggers(): void {
         });
       }
     } catch (err) {
-      console.error('[Trigger] technician.clock_in error:', err);
+      logger.error("trigger technician.clock_in failed", { error: String(err) });
     }
   }, 'Update dashboard when technician clocks in');
 
@@ -303,9 +304,11 @@ export function registerWorkflowTriggers(): void {
       }
     } catch (err) {
       // Analytics trigger failures are non-critical
-      console.warn('[Trigger] analytics broadcast error:', err);
+      logger.warn('trigger analytics broadcast failed', { error: String(err) });
     }
   }, 'Broadcast analytics updates to dashboards');
 
+  // Boot-time message: kept as console.log so the operator-friendly emoji output
+  // composes with the route-registration log lines in routes/index.ts.
   console.log('✅ Workflow triggers registered');
 }

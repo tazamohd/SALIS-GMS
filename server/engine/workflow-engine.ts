@@ -8,6 +8,7 @@
 import { eventBus } from './event-bus';
 import { stateMachines, type EntityType, type TransitionResult } from './state-machines';
 import type { WorkflowEvent } from '../../shared/workflows';
+import { logger } from '../logger';
 
 export interface TransitionRequest {
   entityType: EntityType;
@@ -91,7 +92,7 @@ class WorkflowEngine {
       // Await downstream side effects so the transition response reflects
       // the actual post-state (inventory deducted, invoice generated, etc.).
       await eventBus.emit(triggerEvent).catch(err => {
-        console.error(`[WorkflowEngine] Trigger "${trigger}" failed:`, err);
+        logger.error('workflow-engine trigger failed', { trigger, error: String(err) });
       });
     }
 
