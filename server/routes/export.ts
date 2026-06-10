@@ -1,9 +1,22 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
 import { sql, count } from 'drizzle-orm';
 
 const router = Router();
+
+// ─── Helper: escape HTML to prevent stored XSS from DB strings ───
+function escapeHtml(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 // ─── Helper: convert an array of objects to CSV string ───
 function toCsv(rows: Record<string, any>[]): string {
@@ -30,7 +43,7 @@ function toCsv(rows: Record<string, any>[]): string {
 }
 
 // GET /api/export/csv/:type — Export table data as CSV download
-router.get('/export/csv/:type', async (req, res) => {
+router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
     const { type } = req.params;
     let rows: Record<string, any>[];
@@ -158,7 +171,7 @@ router.get('/export/csv/:type', async (req, res) => {
 });
 
 // GET /api/export/report/:type — Generate printer-friendly HTML report
-router.get('/export/report/:type', async (req, res) => {
+router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
     const { type } = req.params;
     let title = '';
@@ -235,7 +248,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Status</th><th>Count</th><th>Total (SAR)</th></tr></thead>
             <tbody>
-              ${statusBreakdown.map((s: any) => `<tr><td>${s.status}</td><td>${s.count}</td><td>${parseFloat(s.total).toLocaleString('en', { minimumFractionDigits: 2 })}</td></tr>`).join('')}
+              ${statusBreakdown.map((s: any) => `<tr><td>${escapeHtml(s.status)}</td><td>${s.count}</td><td>${parseFloat(s.total).toLocaleString('en', { minimumFractionDigits: 2 })}</td></tr>`).join('')}
             </tbody>
           </table>
         `;
@@ -287,7 +300,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Name</th><th>SKU</th><th>Category</th><th>Brand</th><th>Type</th></tr></thead>
             <tbody>
-              ${parts.map((p: any) => `<tr><td>${p.name}</td><td>${p.sku}</td><td>${p.category}</td><td>${p.brand ?? '-'}</td><td>${p.partType}</td></tr>`).join('')}
+              ${parts.map((p: any) => `<tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.sku)}</td><td>${escapeHtml(p.category)}</td><td>${escapeHtml(p.brand ?? '-')}</td><td>${escapeHtml(p.partType)}</td></tr>`).join('')}
             </tbody>
           </table>
         `;
@@ -324,7 +337,7 @@ router.get('/export/report/:type', async (req, res) => {
           <table>
             <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Active</th><th>Created</th></tr></thead>
             <tbody>
-              ${customerRows.map((c: any) => `<tr><td>${c.fullName ?? '-'}</td><td>${c.email}</td><td>${c.phone ?? '-'}</td><td>${c.role ?? '-'}</td><td>${c.isActive ? 'Yes' : 'No'}</td><td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}</td></tr>`).join('')}
+              ${customerRows.map((c: any) => `<tr><td>${escapeHtml(c.fullName ?? '-')}</td><td>${escapeHtml(c.email)}</td><td>${escapeHtml(c.phone ?? '-')}</td><td>${escapeHtml(c.role ?? '-')}</td><td>${c.isActive ? 'Yes' : 'No'}</td><td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '-'}</td></tr>`).join('')}
             </tbody>
           </table>
         `;

@@ -42,3 +42,28 @@ export const config = {
   zatcaCsid: process.env.ZATCA_CSID || '',
   appUrl: process.env.APP_URL || 'http://localhost:5000',
 } as const;
+
+/**
+ * Surface which optional integrations are unconfigured at boot so silent
+ * "dummy"/"empty" defaults don't hide degraded behaviour. Skipped in test
+ * runs to keep CI logs quiet.
+ */
+const INTEGRATION_FEATURE_FLAGS: Array<{ key: string; feature: string }> = [
+  { key: 'stripeSecretKey',      feature: 'Stripe payments'         },
+  { key: 'openaiApiKey',         feature: 'OpenAI-powered features (AI chat, predictions)' },
+  { key: 'twilioAccountSid',     feature: 'Twilio SMS notifications' },
+  { key: 'getResponseApiKey',    feature: 'GetResponse email campaigns' },
+  { key: 'tecdocApiKey',         feature: 'TecDoc parts catalog'    },
+  { key: 'zatcaApiUrl',          feature: 'ZATCA e-invoicing'       },
+];
+
+if (process.env.NODE_ENV !== 'test') {
+  const disabled = INTEGRATION_FEATURE_FLAGS.filter(({ key }) => !(config as any)[key]);
+  if (disabled.length > 0) {
+    console.warn(`⚠️  Disabled integrations (${disabled.length}/${INTEGRATION_FEATURE_FLAGS.length}):`);
+    for (const { feature } of disabled) {
+      console.warn(`   • ${feature}`);
+    }
+    console.warn(`   Routes that depend on these will return mock data or 503.`);
+  }
+}

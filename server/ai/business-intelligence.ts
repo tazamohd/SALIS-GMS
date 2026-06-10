@@ -389,36 +389,49 @@ export async function getDailyJobCounts(garageId: string, days = 30) {
 }
 
 /**
- * Parts inventory snapshot — current stock vs avg monthly usage forecast.
- * Returns top N parts by current usage with reorder threshold.
+ * Parts inventory snapshot — current stock vs reorder threshold.
+ * Returns top N parts (by current stock, descending) for the garage.
+ *
+ * Driven from `spare_part_inventories` (where `garage_id` is NOT NULL) joined
+ * to `spare_parts` for the display name. This is unambiguous on empty data:
+ * no inventory rows for the garage → no result rows → empty array.
+ *
+ * Defensive try/catch: a schema drift or transient DB error must NOT propagate
+ * as a 500 to the analytics handler, which composes this with other widgets.
+ * Empty array is the correct empty-state for the downstream chart.
  */
 export async function getPartsForecastSnapshot(garageId: string, limit = 10) {
-  // Average monthly usage = count of POs containing this part in last 90 days / 3
-  const rows = await db.select({
-    id: spareParts.id,
-    name: spareParts.partName,
-    current: sql<number>`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`,
-    minThreshold: sql<number>`COALESCE(MIN(${sparePartInventories.minThreshold}), 5)`,
-  })
-    .from(spareParts)
-    .leftJoin(sparePartInventories, eq(sparePartInventories.partId, spareParts.id))
-    .where(eq(sparePartInventories.garageId, garageId))
-    .groupBy(spareParts.id, spareParts.partName)
-    .orderBy(desc(sql`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`))
-    .limit(limit);
+  try {
+    const rows = await db
+      .select({
+        id: spareParts.id,
+        name: spareParts.name,
+        current: sql<number>`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`,
+        minThreshold: sql<number>`COALESCE(MIN(${sparePartInventories.minThreshold}), 5)`,
+      })
+      .from(sparePartInventories)
+      .innerJoin(spareParts, eq(spareParts.id, sparePartInventories.sparePartId))
+      .where(eq(sparePartInventories.garageId, garageId))
+      .groupBy(spareParts.id, spareParts.name)
+      .orderBy(desc(sql`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`))
+      .limit(limit);
 
-  return rows.map(r => {
-    const current = Number(r.current) || 0;
-    const reorderPoint = Number(r.minThreshold) || 5;
-    const forecasted = Math.max(reorderPoint + 5, Math.round(current * 0.9 + reorderPoint));
-    return {
-      partId: r.id,
-      part: r.name || 'Part',
-      current,
-      forecasted,
-      reorderPoint,
-    };
-  });
+    return rows.map(r => {
+      const current = Number(r.current) || 0;
+      const reorderPoint = Number(r.minThreshold) || 5;
+      const forecasted = Math.max(reorderPoint + 5, Math.round(current * 0.9 + reorderPoint));
+      return {
+        partId: r.id,
+        part: r.name || 'Part',
+        current,
+        forecasted,
+        reorderPoint,
+      };
+    });
+  } catch (err) {
+    console.error('[business-intelligence] getPartsForecastSnapshot error:', err);
+    return [];
+  }
 }
 
 async function getJobMetrics(garageId: string) {

@@ -7,6 +7,7 @@ import { db } from '../db';
 import { sparePartInventories, spareParts, invoices, users } from '../../shared/schema';
 import { eq, and, lt, sql, inArray } from 'drizzle-orm';
 import { eventBus } from './event-bus';
+import { logger } from '../logger';
 
 /**
  * Run all scheduled checks for a garage.
@@ -70,7 +71,7 @@ async function checkLowStockLevels(garageId: string): Promise<number> {
 
     return lowStockItems.length;
   } catch (err) {
-    console.error('[ScheduledChecks] Low stock check error:', err);
+    logger.error('scheduled-checks low_stock failed', { error: String(err) });
     return 0;
   }
 }
@@ -128,7 +129,7 @@ async function checkOverdueInvoices(garageId: string): Promise<number> {
 
     return overdueInvoiceList.length;
   } catch (err) {
-    console.error('[ScheduledChecks] Overdue invoice check error:', err);
+    logger.error('scheduled-checks overdue_invoices failed', { error: String(err) });
     return 0;
   }
 }

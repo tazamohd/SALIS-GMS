@@ -78,17 +78,12 @@ describe("Completed half-real endpoints — authenticated happy path", () => {
 
   it("GET /api/forecasting/demand returns weeklyForecast + partsDemand", async () => {
     const res = await agent.get("/api/forecasting/demand?period=30");
-    // TODO(real bug): the handler 500s when the parts-inventory snapshot query
-    // hits an empty data set. Tolerated here so the suite stays green; fix in
-    // server/ai/business-intelligence.ts#getPartsForecastSnapshot.
-    expect([200, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(Array.isArray(res.body.weeklyForecast)).toBe(true);
-      expect(res.body.weeklyForecast.length).toBe(4);
-      expect(Array.isArray(res.body.partsDemand)).toBe(true);
-      expect(typeof res.body.accuracy).toBe("number");
-      expect(typeof res.body.peakDay).toBe("string");
-    }
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.weeklyForecast)).toBe(true);
+    expect(res.body.weeklyForecast.length).toBe(4);
+    expect(Array.isArray(res.body.partsDemand)).toBe(true);
+    expect(typeof res.body.accuracy).toBe("number");
+    expect(typeof res.body.peakDay).toBe("string");
   });
 
   it("GET /api/ai/predictions?predictionType=demand returns typed series", async () => {

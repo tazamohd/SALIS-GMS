@@ -6,6 +6,7 @@
  */
 
 import type { WorkflowEvent } from '../../shared/workflows';
+import { logger } from '../logger';
 
 type EventHandler = (event: WorkflowEvent) => Promise<void> | void;
 
@@ -74,16 +75,17 @@ class EventBus {
       try {
         await handler(event);
       } catch (err) {
-        console.error(`[EventBus] Sync handler error for "${event.type}":`, err);
+        logger.error('event-bus sync handler error', { eventType: event.type, error: String(err) });
       }
     }
 
-    // Async handlers run in parallel (fire-and-forget with error logging)
+    // Async handlers run in parallel; await so callers that await emit()
+    // are guaranteed all side effects have run before continuing.
     if (asyncHandlers.length > 0) {
-      Promise.allSettled(
+      await Promise.allSettled(
         asyncHandlers.map(({ handler }) =>
           Promise.resolve(handler(event)).catch(err => {
-            console.error(`[EventBus] Async handler error for "${event.type}":`, err);
+            logger.error('event-bus async handler error', { eventType: event.type, error: String(err) });
           })
         )
       );

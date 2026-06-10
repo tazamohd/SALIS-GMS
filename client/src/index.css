@@ -452,36 +452,11 @@
     box-shadow: 0 8px 24px rgba(10, 94, 215, 0.1);
   }
   
-  /* Status Pills */
-  .status-pill {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  
-  .status-pill-blue {
-    background-color: rgba(10, 94, 215, 0.1);
-    color: #0A5ED7;
-  }
-  
-  .dark .status-pill-blue {
-    background-color: rgba(11, 179, 255, 0.15);
-    color: #0BB3FF;
-  }
-  
-  .status-pill-orange {
-    background-color: rgba(249, 115, 22, 0.1);
-    color: #F97316;
-  }
-  
-  .status-pill-gray {
-    background-color: rgba(107, 114, 128, 0.1);
-    color: #6B7280;
-  }
-  
-  .dark .status-pill-gray {
-    background-color: rgba(155, 164, 176, 0.15);
-    color: #9BA4B0;
-  }
-  
+  /* Status pills: use the <StatusBadge> component instead — it's driven by
+   * the --success/--warning/--info/--destructive semantic tokens and adapts
+   * to dark mode without per-class overrides. The legacy `.status-pill-*`
+   * classes (hardcoded brand hex) were removed. */
+
   /* Enhanced Typography Utilities */
   .text-display-lg {
     font-family: var(--display-large-semibold-font-family);

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, dev, pr-branch]
   pull_request:
-    branches: [main]
+    branches: [main, pr-branch]
 
 jobs:
   test:
@@ -40,7 +40,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      # npm install (not ci) — the lock file is generated on Windows by the
+      # developer machine and is missing the Linux-platform esbuild optional
+      # deps that npm ci insists on. Using npm install lets CI resolve the
+      # full Linux-side dep tree without forcing a wet-finger lock rewrite.
+      - run: npm install --no-audit --no-fund
 
       - name: Push Drizzle schema
         run: npx drizzle-kit push --force

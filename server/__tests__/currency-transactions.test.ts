@@ -1,19 +1,23 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import type { Express } from "express";
+import type supertest from "supertest";
 import { createTestApp } from "./setup";
-import supertest from "supertest";
+import { loginAsAdmin } from "./helpers";
 
 let app: Express;
+let agent: supertest.Agent;
 
 beforeAll(async () => {
   const result = await createTestApp();
   app = result.app;
+  const login = await loginAsAdmin(app);
+  agent = login.agent;
 });
 
 describe("Currency Transactions (DB-backed)", () => {
   it("POST /api/currency/transactions creates and GET lists it", async () => {
     const ts = Date.now();
-    const create = await supertest(app).post("/api/currency/transactions").send({
+    const create = await agent.post("/api/currency/transactions").send({
       description: `Test FX tx ${ts}`,
       originalAmount: 123.45,
       originalCurrency: "USD",
@@ -25,7 +29,7 @@ describe("Currency Transactions (DB-backed)", () => {
     expect(create.body.id).toBeDefined();
     expect(create.body.originalCurrency).toBe("USD");
 
-    const list = await supertest(app).get("/api/currency/transactions?limit=100");
+    const list = await agent.get("/api/currency/transactions?limit=100");
     expect(list.status).toBe(200);
     expect(Array.isArray(list.body.transactions)).toBe(true);
     const ids = list.body.transactions.map((t: any) => t.id);
@@ -34,7 +38,7 @@ describe("Currency Transactions (DB-backed)", () => {
   });
 
   it("POST /api/currency/transactions rejects unknown currency", async () => {
-    const res = await supertest(app).post("/api/currency/transactions").send({
+    const res = await agent.post("/api/currency/transactions").send({
       description: "bad",
       originalAmount: 10,
       originalCurrency: "XXX",
