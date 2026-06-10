@@ -13,7 +13,7 @@
  * ignored. For a PLATFORM_ADMIN / SUPER_ADMIN it honours an explicit override so
  * platform staff can inspect a specific garage.
  */
-import type { Request } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 const CROSS_GARAGE_ROLES = new Set(["PLATFORM_ADMIN", "SUPER_ADMIN", "SUPERADMIN"]);
 
@@ -35,4 +35,30 @@ export function resolveGarageScope(req: Request): string | undefined {
 export function isCrossGarageRole(req: Request): boolean {
   const role = String(((req as any).user || {}).role || "").toUpperCase();
   return CROSS_GARAGE_ROLES.has(role);
+}
+
+/**
+ * Defense-in-depth: force `?garage_id` / `?garageId` to the caller's session
+ * garage for ordinary staff, BEFORE any route handler reads it. This closes the
+ * "trust the client garage_id" cross-tenant class across the entire legacy
+ * monolith in one place, without editing dozens of handlers.
+ *
+ * Exemptions (the param is left as the client sent it):
+ *  - PLATFORM_ADMIN / SUPER_ADMIN — legitimately query across garages.
+ *  - CUSTOMER — browses across garages (find-a-garage, storefronts); their own
+ *    data endpoints scope by customerId, not garageId.
+ *  - users with no session garageId (nothing to pin to).
+ *
+ * Modular routes that already call resolveGarageScope are unaffected (they
+ * ignore the query param for non-admins regardless).
+ */
+export function enforceGarageScopeOnQuery(req: Request, _res: Response, next: NextFunction): void {
+  const user = (req as any).user || {};
+  const role = String(user.role || "").toUpperCase();
+  const isCustomer = user.userType === "customer" || role === "CUSTOMER";
+  if (!CROSS_GARAGE_ROLES.has(role) && !isCustomer && user.garageId) {
+    if (req.query && "garage_id" in req.query) (req.query as any).garage_id = user.garageId;
+    if (req.query && "garageId" in req.query) (req.query as any).garageId = user.garageId;
+  }
+  next();
 }

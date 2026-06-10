@@ -14283,19 +14283,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { documentType, imageData, extractedText } = req.body;
       const { analyzeOCRDocument } = await import("./ai-service");
-      
-      // In production, use OCR service (Tesseract.js or cloud) to extract text from imageData
-      const textToAnalyze = extractedText || "Sample extracted text";
-      
+
+      // Real OCR: if the client sends a base64 image (data URL or raw), run it
+      // through Tesseract.js to extract the text. Falls back to any client-
+      // supplied extractedText, then to empty — never the old placeholder.
+      let textToAnalyze = extractedText || "";
+      let ocrConfidence = 85;
+      if (imageData && !extractedText) {
+        try {
+          const { recognize } = await import("tesseract.js");
+          // Accept either a full data URL or a bare base64 string.
+          const img = String(imageData).startsWith("data:")
+            ? imageData
+            : Buffer.from(String(imageData), "base64");
+          const result: any = await recognize(img as any, "eng");
+          textToAnalyze = (result?.data?.text || "").trim();
+          ocrConfidence = Math.round(result?.data?.confidence ?? 85);
+        } catch (ocrErr) {
+          console.error("OCR extraction failed; falling back to empty text:", ocrErr);
+        }
+      }
+
+      if (!textToAnalyze) {
+        return res.status(400).json({ message: "No text could be extracted. Provide imageData or extractedText." });
+      }
+
       const analysis = await analyzeOCRDocument(textToAnalyze, documentType);
-      
+
       const document = await storage.createOCRDocument({
         userId: req.user?.id,
         garageId: req.user?.garageId,
         documentType,
         originalText: textToAnalyze,
         extractedData: analysis.fields,
-        confidence: 85,
+        confidence: ocrConfidence,
         status: "processed"
       });
 

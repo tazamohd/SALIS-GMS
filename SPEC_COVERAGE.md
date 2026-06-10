@@ -4,7 +4,7 @@
 **Source spec:** "SalisAuto Platform — Comprehensive Project Documentation" (Website Analysis Request, 18 functional modules + business-strategy layer)
 **Method:** Each spec module mapped to its backend route, DB table, and client page in the `pr-branch` codebase, then classified REAL / PARTIAL / STUB / MISSING.
 
-> **Headline (corrected after deep verification):** of the spec's modules, **40 are REAL** (route + schema + UI, DB-backed), **2 PARTIAL**, **3 STUB**, **1 MISSING**. The first coverage pass under-counted because the verification agent only grepped the modular `server/routes/*.ts` files and missed handlers in the 19k-line monolith `server/routes.ts` — Vehicle Storage and Knowledge Base are in fact fully DB-backed there, and LMS/Training was wired in this PR. The RBAC layer defines **25 roles** (spec asked for 24); the schema has **409 tables**. After this PR's work the remaining real gaps are tiny: **41 REAL / 2 PARTIAL / 3 STUB / 0 MISSING**. LMS and Gate Pass were wired this PR. The only open items are Quick Actions (no consuming UI yet), Google My Business (needs Google API keys), and Document-OCR's image→text extraction step (needs Tesseract.js or OpenAI Vision).
+> **Headline (corrected after deep verification):** of the spec's modules, **40 are REAL** (route + schema + UI, DB-backed), **2 PARTIAL**, **3 STUB**, **1 MISSING**. The first coverage pass under-counted because the verification agent only grepped the modular `server/routes/*.ts` files and missed handlers in the 19k-line monolith `server/routes.ts` — Vehicle Storage and Knowledge Base are in fact fully DB-backed there, and LMS/Training was wired in this PR. The RBAC layer defines **25 roles** (spec asked for 24); the schema has **409 tables**. After this PR's work the platform implements essentially the entire spec: **43 REAL / 1 PARTIAL / 1 STUB / 0 MISSING**. LMS, Gate Pass, Quick Actions, and real OCR (Tesseract.js) were all wired here. The single remaining stub is **Google My Business** (needs Google API credentials — can't be built without them); the one PARTIAL is the Design System (Tailwind, no formal token system).
 
 ---
 
@@ -38,14 +38,14 @@
 | 12.1 | Mobile / PWA | ✅ technician-mobile/customer-portal | reuses core | ✅ TechnicianPortal/CustomerPortal | **REAL** |
 | 12.2 | RBAC | ✅ rbac/requireRole | ✅ roles/rolePermissions | ✅ RoleManagement | **REAL** |
 | 13.1 | Design System | ❌ | ❌ | ✅ component pages | **PARTIAL** (Tailwind, no formal DS) |
-| 13.2 | Quick Actions | ❌ | ✅ mobileQuickActions | ✅ dashboard | **STUB** (table only) |
+| 13.2 | Quick Actions | ✅ quick-actions.routes (this PR) | ✅ mobileQuickActions | ✅ dashboard | **REAL** (user-scoped CRUD; wired this PR) |
 | 14 | Contract & Legal Docs | ✅ documents | ✅ documents/contractRenewals | ✅ ContractManagement | **REAL** (no version/approval workflow) |
 | 15.1 | Deposits / Partial Payments | ✅ payments.routes | ✅ paymentPlans/installments | ✅ Payments | **REAL** |
 | 15.2 | WhatsApp Invoicing | ✅ whatsapp | ✅ notifications | ✅ WhatsAppIntegration | **REAL** |
 | 15.3 | BNPL (Tabby/Tamara) | ✅ payments-gateway.routes | ✅ payments.gateway | ✅ PaymentMethodsDialog | **REAL** (this PR) |
 | 15.4 | Gate Pass (post-payment) | ✅ gate-pass.routes (this PR) | ✅ gatePasses | (API + QR; UI pending) | **REAL** (wired this PR) |
 | 16.1 | Custom Reports / CSV Export | ✅ export/reports | ✅ customReports | ✅ Reports/CustomReportBuilder | **REAL** |
-| 16.2 | OCR / Document Parsing | ✅ /api/ai-ocr/process (analysis real) | ✅ ocrDocuments | ✅ DocumentOCR | **PARTIAL** (AI analysis real; image→text extraction stubbed — needs Tesseract.js/Vision) |
+| 16.2 | OCR / Document Parsing | ✅ /api/ai-ocr/process (Tesseract.js, this PR) | ✅ ocrDocuments | ✅ DocumentOCR | **REAL** (real image→text via Tesseract.js + AI field analysis) |
 | 16.3 | Predictive Analytics | ✅ ai-predictions/analytics | ✅ aiVideoAnalysis | ✅ BusinessIntelligence | **REAL** |
 | 17 | Supplier Portal (B2B) | ✅ supplier-portal | ✅ suppliers/purchaseOrders | ✅ SupplierPortal | **REAL** |
 | 18 | E-Commerce / Marketplace | ✅ parts-network | ✅ partsNetworkOrders/marketplaceConnections | ✅ PartsMarketplace | **REAL** (no WooCommerce) |

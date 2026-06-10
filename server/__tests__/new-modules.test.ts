@@ -105,6 +105,43 @@ describe("Training / LMS", () => {
   });
 });
 
+// ── Quick actions ────────────────────────────────────────────────────────────
+describe("Mobile quick actions", () => {
+  it("creates, lists, and deletes a user-scoped quick action", async () => {
+    const create = await admin.post("/api/quick-actions").send({
+      appType: "technician",
+      actionType: "clock_in",
+      label: "Clock In",
+      icon: "clock",
+      route: "/technician-app/time-clock",
+      sortOrder: 1,
+    });
+    expect([200, 201]).toContain(create.status);
+    const id = create.body.data.id;
+    expect(id).toBeDefined();
+
+    const list = await admin.get("/api/quick-actions");
+    expect(list.status).toBe(200);
+    expect(list.body.data.find((q: any) => q.id === id)).toBeDefined();
+
+    const del = await admin.delete(`/api/quick-actions/${id}`);
+    expect(del.status).toBe(200);
+  });
+
+  it("does not let one user modify another user's quick action", async () => {
+    // advisor (different user) tries to delete an admin-owned action.
+    const create = await admin.post("/api/quick-actions").send({
+      appType: "customer",
+      actionType: "book_appointment",
+      label: "Book",
+    });
+    const id = create.body.data.id;
+    const del = await advisor.delete(`/api/quick-actions/${id}`);
+    expect(del.status).toBe(404); // not visible → not deletable
+    await admin.delete(`/api/quick-actions/${id}`); // cleanup
+  });
+});
+
 // ── Gate pass ────────────────────────────────────────────────────────────────
 describe("Gate pass", () => {
   let paidInvoiceId = "";
