@@ -43,7 +43,7 @@ Evidence was checked against repository files, repeatable counts, current pull r
 | Repository or branch | Role on June 10, 2026 | Audit treatment |
 |---|---|---|
 | `tazamohd/SALIS-GMS` | Authoritative product implementation | Source of current defect and readiness findings |
-| `main` | Default branch; does not yet contain the broad PR #6 integration | Authoritative release trunk; protection remains required |
+| `main` | Default branch; does not yet contain the broad PR #6 integration | Protected release trunk with review and current CI requirements |
 | `pr-branch` | Audited implementation baseline at `6c34e325` | Canonical integration head; PR #23 now exposes it to `main` |
 | `review-base` | PR #6 was merged here on June 10, 2026 | Temporary review branch, not the release trunk |
 | `tazamohd/mnus` | Separate repository referenced by Manus reports | External context only |
@@ -220,7 +220,7 @@ Detailed source-by-source reconciliation is in `SALIS_AUTO_AUDIT_SOURCE_RECONCIL
 | #16 | Medium | Retain route decomposition with measurable legacy-router reduction |
 | #17 | Critical | Elevate RBAC enforcement and tenant-negative tests to a release gate |
 | #18 | Medium | Retain repository hygiene and documentation consolidation |
-| #22 | Critical | Protected `main`, required checks, branch ownership, and one canonical release path |
+| #22 | Critical | `main` protection is enabled; retain check-name migration, branch retirement, and release-procedure evidence |
 
 ## 11. Phased Remediation Roadmap
 
