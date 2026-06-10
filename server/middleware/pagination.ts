@@ -80,4 +80,39 @@ export function applyPaginationToQuery<Q extends { limit: (n: number) => any; of
   return query.limit(pagination.limit).offset(pagination.offset);
 }
 
-export default { parsePagination, buildPaginatedResponse, applyPaginationToQuery, PAGINATION_DEFAULTS };
+/** True when the request explicitly asks for a page (via ?page or ?limit). */
+export function isPaginationRequested(req: { query: any }): boolean {
+  return req.query?.page !== undefined || req.query?.limit !== undefined;
+}
+
+/**
+ * Backward-compatible, opt-in pagination at the route layer.
+ *
+ * If the caller passed ?page/?limit, return a `{ data, pagination }` envelope
+ * (a slice of `rows`); otherwise return `rows` unchanged so existing clients —
+ * and tests that expect a plain array — are unaffected. Lets list views adopt
+ * paging incrementally without a breaking shape change.
+ */
+export function maybePaginate<T>(
+  req: { query: any },
+  rows: T[],
+): T[] | PaginatedResponse<T> {
+  if (!isPaginationRequested(req)) return rows;
+  const page = Math.max(1, parseInt(req.query.page) || PAGINATION_DEFAULTS.page);
+  const limit = Math.min(
+    PAGINATION_DEFAULTS.maxLimit,
+    Math.max(1, parseInt(req.query.limit) || PAGINATION_DEFAULTS.limit),
+  );
+  const offset = (page - 1) * limit;
+  const slice = rows.slice(offset, offset + limit);
+  return buildPaginatedResponse(slice, rows.length, { page, limit, offset });
+}
+
+export default {
+  parsePagination,
+  buildPaginatedResponse,
+  applyPaginationToQuery,
+  isPaginationRequested,
+  maybePaginate,
+  PAGINATION_DEFAULTS,
+};

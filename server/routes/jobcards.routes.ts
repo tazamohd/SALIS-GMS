@@ -8,6 +8,7 @@ import { jobCardParts, sparePartInventories, jobCards, insertJobCardSchema, inse
 import { z } from "zod";
 import QRCode from "qrcode";
 import { eventBus } from "../engine/event-bus";
+import { maybePaginate } from "../middleware/pagination";
 
 const router = Router();
 
@@ -61,7 +62,8 @@ router.get("/job-cards", isAuthenticated, async (req: any, res) => {
     const customerId = isCustomer ? user.id : undefined;
 
     const jobCards = await storage.getJobCards(garageId, assignedTo, customerId);
-    res.json(jobCards);
+    // Opt-in pagination: plain array unless ?page/?limit is passed.
+    res.json(maybePaginate(req, jobCards));
   } catch (error) {
     console.error("Error fetching job cards:", error);
     res.status(500).json({ message: "Failed to fetch job cards" });

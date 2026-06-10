@@ -92,3 +92,22 @@ describe("Cross-tenant isolation — list reads are scoped to the caller's garag
     expect(jobs.body.find((j: any) => j.id === jobA.id)).toBeDefined();
   });
 });
+
+describe("Opt-in pagination — backward compatible", () => {
+  it("returns a plain array when no ?page/?limit is given", async () => {
+    const res = await agentA.get("/api/customers");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it("returns a { data, pagination } envelope when ?page/?limit is given", async () => {
+    const res = await agentA.get("/api/customers?page=1&limit=1");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(false);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBeLessThanOrEqual(1);
+    expect(res.body.pagination).toMatchObject({ page: 1, limit: 1 });
+    expect(typeof res.body.pagination.total).toBe("number");
+    expect(res.body.pagination.total).toBeGreaterThanOrEqual(1);
+  });
+});

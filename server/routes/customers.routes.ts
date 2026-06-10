@@ -2,6 +2,7 @@ import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
 import { resolveGarageScope } from "../middleware/garageScope";
+import { maybePaginate } from "../middleware/pagination";
 
 const router = Router();
 
@@ -13,7 +14,8 @@ router.get("/customers", isAuthenticated, async (req, res) => {
     // (prevents cross-tenant reads). Platform admins may override.
     const garageId = resolveGarageScope(req);
     const customers = await storage.getCustomers(garageId as string, search as string);
-    res.json(customers);
+    // Opt-in pagination: plain array unless ?page/?limit is passed.
+    res.json(maybePaginate(req, customers));
   } catch (error) {
     console.error("Error fetching customers:", error);
     res.status(500).json({ message: "Failed to fetch customers" });
