@@ -116,6 +116,9 @@ app.use((req, res, next) => {
   initializeEngine();
   log("Workflow Engine initialized");
 
+  // Load VAT/GOSI rates from the DB into the in-process cache (fail-soft).
+  void import("./services/tax-config").then((m) => m.loadTaxConfig()).catch(() => {});
+
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const isDev = process.env.NODE_ENV === 'development';

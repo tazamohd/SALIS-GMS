@@ -36,6 +36,13 @@
       "when": 1780981874876,
       "tag": "0006_payment_gateway_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780981874877,
+      "tag": "0007_tax_config",
+      "breakpoints": true
     }
   ]
 }

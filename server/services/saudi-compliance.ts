@@ -3,10 +3,12 @@
  * GOSI calculations, End of Service Benefits, Vacation, Saudization (Nitaqat)
  */
 
-/** GOSI contribution rates (as of 2024 regulations) */
-const GOSI_RATES = {
-  saudi: { employer: 0.12, employee: 0.10 },    // 12% employer, 10% employee
-  nonSaudi: { employer: 0.02, employee: 0.00 },  // 2% employer only for non-Saudi
+import { getGosiRates } from './tax-config';
+
+/** Fallback GOSI rates if the DB config hasn't loaded (2024+ standard). */
+const GOSI_FALLBACK = {
+  saudi: { employer: 0.1175, employee: 0.0975 },
+  nonSaudi: { employer: 0.02, employee: 0.00 },
 };
 
 export interface GOSIResult {
@@ -17,11 +19,30 @@ export interface GOSIResult {
   isSaudi: boolean;
 }
 
-/** Calculate GOSI contributions for an employee */
+/**
+ * Calculate GOSI contributions for an employee. Rates are read from the live
+ * tax-config cache (DB-driven, editable without redeploy); the constants above
+ * are only a boot-time fallback. The contribution base is capped at the
+ * configured maximum salary.
+ */
 export function calculateGOSI(baseSalary: number, isSaudi: boolean = true): GOSIResult {
-  const rates = isSaudi ? GOSI_RATES.saudi : GOSI_RATES.nonSaudi;
-  const employerContribution = Math.round(baseSalary * rates.employer * 100) / 100;
-  const employeeContribution = Math.round(baseSalary * rates.employee * 100) / 100;
+  let employerRate: number;
+  let employeeRate: number;
+  let maxSalary = Infinity;
+  try {
+    const cfg = getGosiRates();
+    employerRate = isSaudi ? cfg.saudiEmployerRate : cfg.nonSaudiEmployerRate;
+    employeeRate = isSaudi ? cfg.saudiEmployeeRate : cfg.nonSaudiEmployeeRate;
+    maxSalary = cfg.maxContributionSalary || Infinity;
+  } catch {
+    const rates = isSaudi ? GOSI_FALLBACK.saudi : GOSI_FALLBACK.nonSaudi;
+    employerRate = rates.employer;
+    employeeRate = rates.employee;
+  }
+
+  const base = Math.min(baseSalary, maxSalary);
+  const employerContribution = Math.round(base * employerRate * 100) / 100;
+  const employeeContribution = Math.round(base * employeeRate * 100) / 100;
 
   return {
     baseSalary,

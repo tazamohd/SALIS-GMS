@@ -1077,6 +1077,44 @@ export const payments = pgTable("payments", {
   gatewayMetadata: jsonb("gateway_metadata"), // raw provider response snapshot for audit/debugging
 });
 
+// ── Tax / statutory rate configuration ──────────────────────────────────────
+// VAT and GOSI rates live in the DB so they can change without a code deploy
+// (Saudi VAT has already changed once; GOSI rates phase up). The active row is
+// the one with is_active = true; superseded rows are kept for the audit trail.
+export const vatConfig = pgTable("vat_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: varchar("country_code", { length: 2 }).notNull().default("SA"),
+  vatRate: doublePrecision("vat_rate").notNull().default(0.15), // 15%
+  vatRegistrationNumber: varchar("vat_registration_number", { length: 50 }),
+  companyNameEn: varchar("company_name_en", { length: 255 }),
+  companyNameAr: varchar("company_name_ar", { length: 255 }),
+  isActive: boolean("is_active").notNull().default(true),
+  effectiveFrom: timestamp("effective_from").notNull().defaultNow(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const gosiConfig = pgTable("gosi_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Saudi nationals (2024+ standard: 9.75% employee + 11.75% employer).
+  saudiEmployeeRate: doublePrecision("saudi_employee_rate").notNull().default(0.0975),
+  saudiEmployerRate: doublePrecision("saudi_employer_rate").notNull().default(0.1175),
+  // Non-Saudi (employer-only hazards contribution).
+  nonSaudiEmployeeRate: doublePrecision("non_saudi_employee_rate").notNull().default(0.0),
+  nonSaudiEmployerRate: doublePrecision("non_saudi_employer_rate").notNull().default(0.02),
+  maxContributionSalary: decimal("max_contribution_salary", { precision: 12, scale: 2 }).notNull().default("45000"),
+  isActive: boolean("is_active").notNull().default(true),
+  effectiveFrom: timestamp("effective_from").notNull().defaultNow(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Module 21: Notifications & Communication
 export const notifications = pgTable("notifications", {
   id: uuid("id")

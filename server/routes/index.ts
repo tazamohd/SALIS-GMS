@@ -46,6 +46,7 @@ import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
 import paymentsGatewayRoutes from "./payments-gateway.routes";
+import taxConfigRoutes from "./tax-config.routes";
 // miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
 // stubs returning empty arrays/messages, shadowing real monolith handlers for
 // /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
@@ -255,6 +256,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API keys are configured; with none set, only manual (cash) is offered.
   app.use("/api", paymentsGatewayRoutes);
   console.log("✅ Payment Gateway Routes Loaded");
+
+  // DB-driven VAT/GOSI rates (editable without redeploy).
+  app.use("/api", taxConfigRoutes);
+  console.log("✅ Tax Config Routes Loaded");
 
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);
