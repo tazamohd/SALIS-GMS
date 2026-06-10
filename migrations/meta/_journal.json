@@ -43,6 +43,13 @@
       "when": 1780981874877,
       "tag": "0007_tax_config",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780981874878,
+      "tag": "0008_gate_passes",
+      "breakpoints": true
     }
   ]
 }

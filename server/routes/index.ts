@@ -48,6 +48,7 @@ import { settingsRoutes } from "./settings.routes";
 import paymentsGatewayRoutes from "./payments-gateway.routes";
 import taxConfigRoutes from "./tax-config.routes";
 import trainingLmsRoutes from "./training-lms.routes";
+import gatePassRoutes from "./gate-pass.routes";
 // miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
 // stubs returning empty arrays/messages, shadowing real monolith handlers for
 // /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
@@ -265,6 +266,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Training / LMS (wires existing storage methods that had no routes).
   app.use("/api", trainingLmsRoutes);
   console.log("✅ Training / LMS Routes Loaded");
+
+  // Gate passes (QR a customer shows to collect their vehicle after paying).
+  app.use("/api", gatePassRoutes);
+  console.log("✅ Gate Pass Routes Loaded");
 
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);

@@ -1115,6 +1115,26 @@ export const gosiConfig = pgTable("gosi_config", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ── Gate passes ─────────────────────────────────────────────────────────────
+// Issued when an invoice is paid: a QR/short-code pass the customer shows to
+// collect their vehicle, which gate staff scan to verify and release. Persisted
+// so there's an audit trail of who collected the vehicle and when.
+export const gatePasses = pgTable("gate_passes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  garageId: uuid("garage_id").references(() => garages.id),
+  customerId: varchar("customer_id"),
+  vehicleId: uuid("vehicle_id"),
+  passCode: varchar("pass_code", { length: 20 }).notNull().unique(),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // active | used | expired | revoked
+  issuedBy: varchar("issued_by"),
+  issuedAt: timestamp("issued_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  usedAt: timestamp("used_at"),
+  usedBy: varchar("used_by"),
+  notes: text("notes"),
+});
+
 // Module 21: Notifications & Communication
 export const notifications = pgTable("notifications", {
   id: uuid("id")
