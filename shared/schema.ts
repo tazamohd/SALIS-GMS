@@ -1061,6 +1061,20 @@ export const payments = pgTable("payments", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
+
+  // ── Multi-gateway payment fields (all nullable — manual/cash payments leave
+  // them blank; online gateway payments populate them). Added for the unified
+  // payment layer that supports Mada/cards/Apple Pay/STC Pay via an aggregator,
+  // plus Tabby/Tamara BNPL, PayPal, and Stripe. ──────────────────────────────
+  gateway: varchar("gateway", { length: 30 }), // moyasar | hyperpay | tap | tabby | tamara | paypal | stripe | manual
+  methodType: varchar("method_type", { length: 30 }), // mada | visa | mastercard | amex | apple_pay | stc_pay | tabby | tamara | paypal | cash | bank_transfer | cheque
+  status: varchar("status", { length: 20 }).default("completed"), // pending | authorized | completed | failed | refunded | cancelled
+  currency: varchar("currency", { length: 3 }).default("SAR"),
+  gatewayTransactionId: varchar("gateway_transaction_id", { length: 255 }), // the provider's charge/payment id
+  gatewayReference: varchar("gateway_reference", { length: 255 }), // checkout/order id used to start the flow
+  processingFee: decimal("processing_fee", { precision: 10, scale: 2 }),
+  failureReason: text("failure_reason"),
+  gatewayMetadata: jsonb("gateway_metadata"), // raw provider response snapshot for audit/debugging
 });
 
 // Module 21: Notifications & Communication

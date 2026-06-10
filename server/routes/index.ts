@@ -45,6 +45,7 @@ import { vehicleRoutes } from "./vehicles.routes";
 import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
+import paymentsGatewayRoutes from "./payments-gateway.routes";
 // miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
 // stubs returning empty arrays/messages, shadowing real monolith handlers for
 // /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
@@ -248,6 +249,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api", settingsRoutes);
   console.log("✅ Settings Routes Loaded");
+
+  // Unified multi-gateway payments (Mada/cards/Apple Pay/STC Pay via aggregator,
+  // Tabby/Tamara BNPL, PayPal, Stripe, manual). Active gateways depend on which
+  // API keys are configured; with none set, only manual (cash) is offered.
+  app.use("/api", paymentsGatewayRoutes);
+  console.log("✅ Payment Gateway Routes Loaded");
 
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);

@@ -7,16 +7,15 @@ import { format } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { PaymentDialog } from "@/components/customer/PaymentDialog";
+import { PaymentMethodsDialog } from "@/components/customer/PaymentMethodsDialog";
 import { exportInvoiceToPDF } from "@/lib/pdfExport";
 import type { Invoice, InvoiceItem } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerInvoices() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [methodsOpen, setMethodsOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [clientSecret, setClientSecret] = useState<string>('');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -51,32 +50,16 @@ export function CustomerInvoices() {
     queryKey: ['/api/customer/invoices'],
   });
 
-  const createPaymentIntentMutation = useMutation({
-    mutationFn: async (invoiceId: string) => {
-      return apiRequest('POST', '/api/customer/create-payment-intent', { invoiceId });
-    },
-    onSuccess: (data: any) => {
-      setClientSecret(data.clientSecret);
-      setPaymentDialogOpen(true);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to initiate payment",
-        variant: "destructive",
-      });
-    },
-  });
-
+  // Opens the multi-gateway method selector (Mada/cards/Apple Pay/STC Pay/
+  // Tabby/Tamara/PayPal/cash — whatever is configured).
   const handlePayInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
-    createPaymentIntentMutation.mutate(invoice.id);
+    setMethodsOpen(true);
   };
 
   const handlePaymentSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['/api/customer/invoices'] });
     setSelectedInvoice(null);
-    setClientSecret('');
   };
 
   const filteredInvoices = invoices.filter(inv => 
@@ -205,13 +188,10 @@ export function CustomerInvoices() {
                       <Button
                         className="flex-1 min-w-[160px] bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
                         onClick={() => handlePayInvoice(inv)}
-                        disabled={createPaymentIntentMutation.isPending}
                         data-testid={`button-pay-invoice-${inv.id}`}
                       >
                         <CreditCard className="h-4 w-4 mr-2" />
-                        {createPaymentIntentMutation.isPending && selectedInvoice?.id === inv.id
-                          ? 'Loading...'
-                          : `Pay $${Number(inv.balanceAmount).toFixed(2)}`}
+                        {`Pay $${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
                     )}
 
@@ -240,13 +220,12 @@ export function CustomerInvoices() {
         </div>
       )}
 
-      {selectedInvoice && clientSecret && (
-        <PaymentDialog
-          open={paymentDialogOpen}
-          onOpenChange={setPaymentDialogOpen}
+      {selectedInvoice && (
+        <PaymentMethodsDialog
+          open={methodsOpen}
+          onOpenChange={setMethodsOpen}
           invoiceId={selectedInvoice.id}
           amount={Number(selectedInvoice.balanceAmount)}
-          clientSecret={clientSecret}
           onSuccess={handlePaymentSuccess}
         />
       )}

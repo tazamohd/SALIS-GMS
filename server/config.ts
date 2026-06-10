@@ -67,3 +67,29 @@ if (process.env.NODE_ENV !== 'test') {
     console.warn(`   Routes that depend on these will return mock data or 503.`);
   }
 }
+
+/**
+ * Report which payment gateways are configured at boot. The unified payment
+ * layer only offers a method when its gateway has keys; this makes the active
+ * set visible to the operator. Manual (cash) is always available.
+ */
+const PAYMENT_GATEWAY_KEYS: Array<{ label: string; configured: boolean }> = [
+  { label: 'Moyasar (Mada/cards/Apple Pay/STC Pay)', configured: !!process.env.MOYASAR_SECRET_KEY },
+  { label: 'HyperPay (Mada/cards/Apple Pay/STC Pay)', configured: !!(process.env.HYPERPAY_ACCESS_TOKEN && process.env.HYPERPAY_ENTITY_ID) },
+  { label: 'Tap (Mada/cards/Apple Pay/STC Pay)', configured: !!process.env.TAP_SECRET_KEY },
+  { label: 'Tabby (BNPL)', configured: !!(process.env.TABBY_SECRET_KEY && process.env.TABBY_MERCHANT_CODE) },
+  { label: 'Tamara (BNPL)', configured: !!process.env.TAMARA_API_TOKEN },
+  { label: 'PayPal', configured: !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) },
+  { label: 'Stripe (international cards)', configured: !!process.env.STRIPE_SECRET_KEY },
+];
+
+if (process.env.NODE_ENV !== 'test') {
+  const on = PAYMENT_GATEWAY_KEYS.filter((g) => g.configured);
+  console.warn(`💳 Payment gateways: ${on.length}/${PAYMENT_GATEWAY_KEYS.length} configured + manual (cash) always on`);
+  for (const g of PAYMENT_GATEWAY_KEYS) {
+    console.warn(`   ${g.configured ? '✓' : '·'} ${g.label}`);
+  }
+  if (on.length === 0) {
+    console.warn(`   Only cash / bank transfer / cheque are available until a gateway key is set.`);
+  }
+}
