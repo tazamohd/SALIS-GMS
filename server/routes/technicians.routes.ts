@@ -1,14 +1,16 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { resolveGarageScope } from "../middleware/garageScope";
 
 const router = Router();
 
 // Get all technicians
 router.get("/technicians", isAuthenticated, async (req, res) => {
   try {
-    const { garage_id } = req.query;
-    const technicians = await storage.getTechnicians(garage_id as string);
+    // Scope to the caller's garage; ignore client-supplied garage_id.
+    const garageId = resolveGarageScope(req);
+    const technicians = await storage.getTechnicians(garageId as string);
     res.json(technicians);
   } catch (error) {
     console.error("Error fetching technicians:", error);

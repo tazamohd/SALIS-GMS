@@ -144,3 +144,57 @@ export async function seedJobCard(agent: supertest.Agent, vehicleId: string, cus
   }
   return res.body;
 }
+
+/**
+ * Create a SECOND garage with its own admin, logged in. Used by the
+ * cross-tenant isolation suite to prove a user in garage B cannot see garage
+ * A's data. Mirrors globalSetup's garage seeding (garage + ENTERPRISE sub).
+ */
+export async function createSecondGarageAdmin(app: Express): Promise<{
+  agent: supertest.Agent;
+  garageId: string;
+  user: any;
+}> {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL required for second-garage setup");
+
+  const client = new Client({ connectionString: url });
+  await client.connect();
+  let garageId = "";
+  try {
+    const r = await client.query(
+      `INSERT INTO garages (name, country, city, is_active)
+       VALUES ('Test Garage B', 'Saudi Arabia', 'Jeddah', true) RETURNING id`,
+    );
+    garageId = r.rows[0]?.id ?? "";
+    if (garageId) {
+      await client.query(
+        `INSERT INTO subscriptions (garage_id, plan, status)
+         VALUES ($1, 'ENTERPRISE', 'active')
+         ON CONFLICT (garage_id) DO UPDATE SET plan = 'ENTERPRISE', status = 'active', updated_at = NOW()`,
+        [garageId],
+      );
+    }
+  } finally {
+    await client.end();
+  }
+
+  const agent = supertest.agent(app);
+  const adminB = {
+    email: `admin-garageB-${Date.now()}@slis.sa`,
+    password: "TestPass123!",
+    fullName: "Garage B Admin",
+    phone: "+966500000099",
+  };
+  await agent.post("/api/register").send(adminB).expect((res) => {
+    if (res.status !== 200 && res.status !== 400 && res.status !== 500) {
+      throw new Error(`Register (garage B) failed: ${res.status} ${JSON.stringify(res.body)}`);
+    }
+  });
+  await attachUserToGarage(adminB.email, garageId, "ADMIN");
+  const loginRes = await agent.post("/api/login").send({ email: adminB.email, password: adminB.password });
+  if (loginRes.status !== 200) {
+    throw new Error(`Login (garage B) failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
+  }
+  return { agent, garageId, user: loginRes.body };
+}
