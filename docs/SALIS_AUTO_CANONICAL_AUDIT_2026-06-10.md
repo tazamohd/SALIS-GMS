@@ -43,13 +43,13 @@ Evidence was checked against repository files, repeatable counts, current pull r
 | Repository or branch | Role on June 10, 2026 | Audit treatment |
 |---|---|---|
 | `tazamohd/SALIS-GMS` | Authoritative product implementation | Source of current defect and readiness findings |
-| `main` | Default branch; behind the large integration branch | Protected release trunk should be restored |
-| `pr-branch` | Broad integration branch at `6c34e325` | Current implementation baseline for this audit |
-| `review-base` | Base of PR #6 | Temporary review topology, not a durable trunk strategy |
+| `main` | Default branch; PR #6 merged into it on June 10, 2026 | Authoritative release trunk; protection remains required |
+| `pr-branch` | Audited implementation baseline at `6c34e325` | Historical integration head; should be retired after dependent work is rebased |
+| `review-base` | Former base of PR #6 | Temporary topology superseded by the merge to `main` |
 | `tazamohd/mnus` | Separate repository referenced by Manus reports | External context only |
 | `MotazMohd/SalisAutoPlatform` | Separate planning/specification repository | External context only |
 
-PR #3 and PR #6 share the same long-lived head branch but advertise different scopes and bases. This makes review state ambiguous and allows unrelated changes to accumulate behind an obsolete title. PR #6 should be the sole integration PR and ultimately target `main`; focused remediation should merge into `pr-branch` first.
+PR #3 and PR #6 shared the same long-lived head branch but advertised different scopes and bases. PR #3 was closed as superseded, and PR #6 merged into `main` on June 10, 2026. PR #21 is now based on `main`. Issue #22 tracks the remaining branch-protection and canonical release-path controls.
 
 ## 4. Repeatable Current Metrics
 
@@ -198,10 +198,10 @@ Detailed source-by-source reconciliation is in `SALIS_AUTO_AUDIT_SOURCE_RECONCIL
 |---|---|---|
 | #3 | Close as superseded | Title describes i18n while the shared head branch has expanded far beyond that scope |
 | #5 | Close or relocate | Vendored Claude skill is tooling content outside the product delivery boundary |
-| #6 | Retain as canonical integration PR | It represents the current `pr-branch`; retarget to `main` after focused remediation |
+| #6 | Merged June 10, 2026 | Its broad integration state is now part of `main`; remaining launch gates are not implied fixed |
 | #19 | Close as superseded | Its audit claims are reconciled and replaced by this canonical report |
 | #20 | Close as superseded | It overlaps CI and did not establish deterministic lockfile installation |
-| New remediation PR | Review and merge into `pr-branch` | Isolated lockfile, CI, deployment-secret, and canonical-report changes |
+| #21 | Draft; review against `main` | Canonical report and deployment-secret fix are published; workflow consolidation remains blocked on workflow-write scope |
 
 ## 10. Issue Triage
 
@@ -219,7 +219,7 @@ Detailed source-by-source reconciliation is in `SALIS_AUTO_AUDIT_SOURCE_RECONCIL
 | #16 | Medium | Retain route decomposition with measurable legacy-router reduction |
 | #17 | Critical | Elevate RBAC enforcement and tenant-negative tests to a release gate |
 | #18 | Medium | Retain repository hygiene and documentation consolidation |
-| New | Critical | Create branch-governance and release-trunk issue |
+| #22 | Critical | Protected `main`, required checks, branch ownership, and one canonical release path |
 
 ## 11. Phased Remediation Roadmap
 
