@@ -29,6 +29,13 @@
       "when": 1780981874875,
       "tag": "0005_add_performance_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780981874876,
+      "tag": "0006_payment_gateway_columns",
+      "breakpoints": true
     }
   ]
 }
