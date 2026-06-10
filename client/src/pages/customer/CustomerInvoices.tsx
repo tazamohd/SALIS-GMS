@@ -6,8 +6,10 @@ import { FileText, DollarSign, Filter, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { PaymentDialog } from "@/components/customer/PaymentDialog";
-import type { Invoice } from "@shared/schema";
+import { exportInvoiceToPDF } from "@/lib/pdfExport";
+import type { Invoice, InvoiceItem } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 
 export function CustomerInvoices() {
@@ -15,7 +17,35 @@ export function CustomerInvoices() {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [clientSecret, setClientSecret] = useState<string>('');
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Generate and download a ZATCA-styled invoice PDF using the shared
+  // jsPDF exporter. Line items are fetched on demand; if that call fails the
+  // PDF still renders with the header + totals from the invoice itself.
+  const handleDownloadPdf = async (invoice: Invoice) => {
+    setDownloadingId(invoice.id);
+    try {
+      let items: InvoiceItem[] = [];
+      try {
+        const res = await apiRequest('GET', `/api/invoices/${invoice.id}/items`);
+        items = (await res.json()) as InvoiceItem[];
+      } catch {
+        items = [];
+      }
+      const customerName = (user as any)?.fullName || (user as any)?.email || 'Customer';
+      exportInvoiceToPDF(invoice, items, customerName, { name: 'SALIS AUTO' });
+    } catch (error: any) {
+      toast({
+        title: 'Download failed',
+        description: error?.message || 'Could not generate the invoice PDF.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ['/api/customer/invoices'],
@@ -170,32 +200,39 @@ export function CustomerInvoices() {
                     </div>
                   )}
 
-                  {inv.status !== 'paid' && Number(inv.balanceAmount) > 0 && (
-                    <div className="flex gap-2 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
-                      <Button 
-                        className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90" 
+                  <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
+                    {inv.status !== 'paid' && Number(inv.balanceAmount) > 0 && (
+                      <Button
+                        className="flex-1 min-w-[160px] bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
                         onClick={() => handlePayInvoice(inv)}
                         disabled={createPaymentIntentMutation.isPending}
                         data-testid={`button-pay-invoice-${inv.id}`}
                       >
                         <CreditCard className="h-4 w-4 mr-2" />
-                        {createPaymentIntentMutation.isPending && selectedInvoice?.id === inv.id 
-                          ? 'Loading...' 
+                        {createPaymentIntentMutation.isPending && selectedInvoice?.id === inv.id
+                          ? 'Loading...'
                           : `Pay $${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
-                      <Button variant="outline" disabled className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]" data-testid={`button-download-invoice-${inv.id}`}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    </div>
-                  )}
+                    )}
 
-                  {inv.status === 'paid' && (
-                    <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 pt-4 border-t border-[#E2E8F0] dark:border-[#232A36]">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="text-sm font-medium">Paid on {inv.paidAt ? format(new Date(inv.paidAt), 'PPP') : 'N/A'}</span>
-                    </div>
-                  )}
+                    {inv.status === 'paid' && (
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                        <DollarSign className="h-4 w-4" />
+                        <span className="text-sm font-medium">Paid on {inv.paidAt ? format(new Date(inv.paidAt), 'PPP') : 'N/A'}</span>
+                      </div>
+                    )}
+
+                    <Button
+                      variant="outline"
+                      onClick={() => handleDownloadPdf(inv)}
+                      disabled={downloadingId === inv.id}
+                      className="border-[#E2E8F0] dark:border-[#232A36]"
+                      data-testid={`button-download-invoice-${inv.id}`}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      {downloadingId === inv.id ? 'Generating…' : 'Download PDF'}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

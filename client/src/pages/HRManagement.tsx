@@ -117,6 +117,25 @@ const mockTrainings = [
   { id: "3", name: "Safety and Compliance", provider: "OSHA Certified", duration: "2 days", type: "Compliance", enrolled: 25, status: "upcoming" },
 ];
 
+/**
+ * Wraps a tab whose data is still a visual prototype (not yet DB-backed) so the
+ * UI is honest about it. Keeps the tab usable for demos while signalling that
+ * the numbers are illustrative, not live.
+ */
+function BetaWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 rounded-lg border border-amber-300/60 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+        <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+          Beta
+        </span>
+        <span>This module is a preview — the data shown is illustrative and not yet saved to your account.</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export default function HRManagement() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -124,15 +143,15 @@ export default function HRManagement() {
 
   const tabs: TabConfig[] = [
     { id: 'employees', label: t('hr.employees', 'Employees'), icon: Users, content: <EmployeesTab garageId={garageId} /> },
-    { id: 'attendance', label: t('hr.attendance', 'Attendance'), icon: Clock, content: <AttendanceTab garageId={garageId} /> },
-    { id: 'leave', label: t('hr.leave', 'Leave'), icon: CalendarDays, content: <LeaveManagementTab garageId={garageId} /> },
-    { id: 'payroll', label: t('hr.payroll', 'Payroll'), icon: DollarSign, content: <PayrollTab garageId={garageId} /> },
-    { id: 'performance', label: t('hr.performance', 'Performance'), icon: Target, content: <PerformanceTab garageId={garageId} /> },
-    { id: 'training', label: t('hr.training', 'Training'), icon: GraduationCap, content: <TrainingTab garageId={garageId} /> },
-    { id: 'recruitment', label: t('hr.recruitment', 'Recruitment'), icon: UserPlus, content: <RecruitmentTab garageId={garageId} /> },
-    { id: 'benefits', label: t('hr.benefits', 'Benefits'), icon: Gift, content: <BenefitsTab garageId={garageId} /> },
+    { id: 'attendance', label: t('hr.attendance', 'Attendance'), icon: Clock, content: <BetaWrapper><AttendanceTab garageId={garageId} /></BetaWrapper> },
+    { id: 'leave', label: t('hr.leave', 'Leave'), icon: CalendarDays, content: <BetaWrapper><LeaveManagementTab garageId={garageId} /></BetaWrapper> },
+    { id: 'payroll', label: t('hr.payroll', 'Payroll'), icon: DollarSign, content: <BetaWrapper><PayrollTab garageId={garageId} /></BetaWrapper> },
+    { id: 'performance', label: t('hr.performance', 'Performance'), icon: Target, content: <BetaWrapper><PerformanceTab garageId={garageId} /></BetaWrapper> },
+    { id: 'training', label: t('hr.training', 'Training'), icon: GraduationCap, content: <BetaWrapper><TrainingTab garageId={garageId} /></BetaWrapper> },
+    { id: 'recruitment', label: t('hr.recruitment', 'Recruitment'), icon: UserPlus, content: <BetaWrapper><RecruitmentTab garageId={garageId} /></BetaWrapper> },
+    { id: 'benefits', label: t('hr.benefits', 'Benefits'), icon: Gift, content: <BetaWrapper><BenefitsTab garageId={garageId} /></BetaWrapper> },
     { id: 'organization', label: t('hr.organization', 'Organization'), icon: Building2, content: <OrganizationTab garageId={garageId} /> },
-    { id: 'self-service', label: t('hr.selfService', 'Self-Service'), icon: ClipboardCheck, content: <SelfServiceTab garageId={garageId} /> },
+    { id: 'self-service', label: t('hr.selfService', 'Self-Service'), icon: ClipboardCheck, content: <BetaWrapper><SelfServiceTab garageId={garageId} /></BetaWrapper> },
   ];
 
   return (

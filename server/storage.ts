@@ -798,7 +798,7 @@ export interface IStorage {
   getUserRoles(userId: string): Promise<any[]>;
   
   // Job Card operations - Module 8
-  getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]>;
+  getJobCards(garageId?: string, assignedTo?: string, customerId?: string): Promise<JobCard[]>;
   getJobCard(id: string): Promise<JobCard | undefined>;
   getJobCardWithDetails(id: string): Promise<any>;
   createJobCard(data: any): Promise<JobCard>;
@@ -2206,7 +2206,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Job Card operations - Module 8: Job Cards & Task Assignment
-  async getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]> {
+  async getJobCards(garageId?: string, assignedTo?: string, customerId?: string): Promise<JobCard[]> {
     const conditions = [];
     if (garageId) {
       conditions.push(eq(jobCards.garageId, garageId));
@@ -2214,7 +2214,10 @@ export class DatabaseStorage implements IStorage {
     if (assignedTo) {
       conditions.push(eq(jobCards.assignedTo, assignedTo));
     }
-    
+    if (customerId) {
+      conditions.push(eq(jobCards.customerId, customerId));
+    }
+
     if (conditions.length > 0) {
       return await db.select().from(jobCards).where(and(...conditions)).orderBy(desc(jobCards.createdAt));
     }

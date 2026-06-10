@@ -44,10 +44,23 @@ function sanitizeZodError(error: z.ZodError) {
  */
 
 // GET /api/job-cards - List job cards
-router.get("/job-cards", isAuthenticated, async (req, res) => {
+// SECURITY: scope is derived from the session, never the query string. A garage
+// user only ever sees their own garage's cards; a CUSTOMER additionally sees
+// only the cards where they are the customer. The legacy `garage_id`/`assigned_to`
+// query params are honoured only as *additional* filters within the caller's
+// own garage (admins/managers can still narrow by technician).
+router.get("/job-cards", isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, assigned_to } = req.query;
-    const jobCards = await storage.getJobCards(garage_id as string, assigned_to as string);
+    const user = req.user || {};
+    const isCustomer = (user.userType === 'customer') || (user.role && String(user.role).toUpperCase() === 'CUSTOMER');
+
+    // Always pin to the caller's garage. Fall back to the (validated) query
+    // param only when the session has no garageId (e.g. platform admins).
+    const garageId = user.garageId || (req.query.garage_id as string) || undefined;
+    const assignedTo = (req.query.assigned_to as string) || undefined;
+    const customerId = isCustomer ? user.id : undefined;
+
+    const jobCards = await storage.getJobCards(garageId, assignedTo, customerId);
     res.json(jobCards);
   } catch (error) {
     console.error("Error fetching job cards:", error);
@@ -56,13 +69,25 @@ router.get("/job-cards", isAuthenticated, async (req, res) => {
 });
 
 // GET /api/job-cards/:id - Get job card by ID
-router.get("/job-cards/:id", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
     const jobCard = await storage.getJobCard(id);
     if (!jobCard) {
       return res.status(404).json({ message: "Job card not found" });
     }
+
+    // Ownership / tenancy enforcement: a card outside the caller's garage is a
+    // 404 (don't reveal existence); a customer may only read their own cards.
+    const user = req.user || {};
+    const isCustomer = (user.userType === 'customer') || (user.role && String(user.role).toUpperCase() === 'CUSTOMER');
+    if (user.garageId && jobCard.garageId && jobCard.garageId !== user.garageId) {
+      return res.status(404).json({ message: "Job card not found" });
+    }
+    if (isCustomer && jobCard.customerId && jobCard.customerId !== user.id) {
+      return res.status(404).json({ message: "Job card not found" });
+    }
+
     res.json(jobCard);
   } catch (error) {
     console.error("Error fetching job card:", error);
