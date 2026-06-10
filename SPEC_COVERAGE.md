@@ -4,7 +4,7 @@
 **Source spec:** "SalisAuto Platform — Comprehensive Project Documentation" (Website Analysis Request, 18 functional modules + business-strategy layer)
 **Method:** Each spec module mapped to its backend route, DB table, and client page in the `pr-branch` codebase, then classified REAL / PARTIAL / STUB / MISSING.
 
-> **Headline:** of the spec's modules, **37 are REAL** (route + schema + UI, DB-backed), **1 PARTIAL**, **6 STUB** (schema/UI present, no working API), **1 MISSING**. The RBAC layer defines **25 roles** (spec asked for 24). The schema has **409 tables**. The platform substantially implements the full product vision; the remaining work is finishing the 6 stubs, one missing feature, and a few enhancement gaps — not building from scratch.
+> **Headline (corrected after deep verification):** of the spec's modules, **40 are REAL** (route + schema + UI, DB-backed), **2 PARTIAL**, **3 STUB**, **1 MISSING**. The first coverage pass under-counted because the verification agent only grepped the modular `server/routes/*.ts` files and missed handlers in the 19k-line monolith `server/routes.ts` — Vehicle Storage and Knowledge Base are in fact fully DB-backed there, and LMS/Training was wired in this PR. The RBAC layer defines **25 roles** (spec asked for 24); the schema has **409 tables**. The remaining real gaps are tiny: 3 stubs (Quick Actions, Google My Business [needs Google API keys], and one of the LMS sub-tables), Document-OCR's image→text step, and the post-payment Gate Pass.
 
 ---
 
@@ -24,10 +24,10 @@
 | 10.1 | Payroll | ✅ hr-payroll | ✅ payrollPeriods/Entries | ✅ PayrollManagement | **REAL** |
 | 10.2 | Expense Tracking | ✅ | ✅ expenses/categories | ✅ ExpenseTracking | **REAL** |
 | 10.3 | Towing / Recovery | ✅ | ✅ towingRequests/towTrucks | ✅ TowingServices | **REAL** |
-| 10.4 | Vehicle Storage | ❌ | ✅ vehicleStorageAssignments | ✅ VehicleStorage | **STUB** (table, no API) |
+| 10.4 | Vehicle Storage | ✅ routes.ts (storage-facilities + assignments) | ✅ vehicleStorageAssignments/storageFacilities | ✅ VehicleStorage | **REAL** (corrected — DB-backed in monolith) |
 | 10.5 | Telematics / OBD | ✅ obd-diagnostics/fleet | ✅ obdDiagnosticData/telematicsReadings | ✅ OBDDiagnosticViewer | **REAL** |
-| 10.6 | Knowledge Base | ❌ | ✅ knowledgeArticles | ✅ KnowledgeBase | **STUB** (page, no API) |
-| 10.7 | LMS / Training | ❌ | ✅ trainings/certifications | ✅ TrainingLMS | **STUB** (schema only) |
+| 10.6 | Knowledge Base | ✅ routes.ts (categories + articles CRUD) | ✅ knowledgeArticles/articleCategories | ✅ KnowledgeBase | **REAL** (corrected — DB-backed in monolith) |
+| 10.7 | LMS / Training | ✅ training-lms.routes (this PR) | ✅ trainingModules/certifications/attempts | ✅ TrainingLMS | **REAL** (wired this PR) |
 | 10.8 | Google My Business | ❌ | ✅ gmb_posts/reviews | ✅ GoogleMyBusiness | **STUB** (schema only) |
 | 10.9 | Compliance | ✅ quality-control/audit | ✅ complianceAudits/Policies | ✅ ComplianceManagement | **REAL** |
 | 11.1 | Predictive Maintenance | ✅ predictive-maintenance | ✅ aiMaintenancePredictions | ✅ PredictiveMaintenance | **REAL** |
@@ -45,7 +45,7 @@
 | 15.3 | BNPL (Tabby/Tamara) | ✅ payments-gateway.routes | ✅ payments.gateway | ✅ PaymentMethodsDialog | **REAL** (this PR) |
 | 15.4 | Gate Pass (post-payment) | ❌ | ❌ | ❌ | **MISSING** |
 | 16.1 | Custom Reports / CSV Export | ✅ export/reports | ✅ customReports | ✅ Reports/CustomReportBuilder | **REAL** |
-| 16.2 | OCR / Document Parsing | ❌ | ✅ ocrDocuments | ✅ DocumentOCR | **STUB** (table only) |
+| 16.2 | OCR / Document Parsing | ✅ /api/ai-ocr/process (analysis real) | ✅ ocrDocuments | ✅ DocumentOCR | **PARTIAL** (AI analysis real; image→text extraction stubbed — needs Tesseract.js/Vision) |
 | 16.3 | Predictive Analytics | ✅ ai-predictions/analytics | ✅ aiVideoAnalysis | ✅ BusinessIntelligence | **REAL** |
 | 17 | Supplier Portal (B2B) | ✅ supplier-portal | ✅ suppliers/purchaseOrders | ✅ SupplierPortal | **REAL** |
 | 18 | E-Commerce / Marketplace | ✅ parts-network | ✅ partsNetworkOrders/marketplaceConnections | ✅ PartsMarketplace | **REAL** (no WooCommerce) |
