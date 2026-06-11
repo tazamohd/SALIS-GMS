@@ -11,3 +11,8 @@ user_credentials.csv
 .env.*
 *.pem
 *.key
+# MoAI-ADK runtime artifacts
+.moai/logs/
+.moai/state/
+.moai/reports/
+.moai/cache/
