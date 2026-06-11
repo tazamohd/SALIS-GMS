@@ -3,10 +3,13 @@ import { calculateGOSI, calculateEndOfService, calculateVacationBalance, checkNi
 
 describe('GOSI Calculations', () => {
   it('calculates Saudi employee contributions correctly', () => {
+    // 2024+ standard GOSI rates: 11.75% employer + 9.75% employee (the audit
+    // flagged the old hard-coded rates as wrong). Rates are now DB-driven via
+    // gosi_config; this asserts the seeded default.
     const result = calculateGOSI(10000, true);
-    expect(result.employerContribution).toBe(1200); // 12%
-    expect(result.employeeContribution).toBe(1000); // 10%
-    expect(result.totalContribution).toBe(2200);
+    expect(result.employerContribution).toBe(1175); // 11.75%
+    expect(result.employeeContribution).toBe(975);  // 9.75%
+    expect(result.totalContribution).toBe(2150);
   });
 
   it('calculates non-Saudi employee contributions correctly', () => {

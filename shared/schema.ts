@@ -1015,6 +1015,14 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  // ZATCA Phase 2 (Fatoora) e-invoicing clearance tracking. Populated when an
+  // invoice is submitted to ZATCA for clearance/reporting. Key-deferred: stays
+  // null until the clearance flow is exercised (stub or real CSID).
+  zatcaClearanceStatus: varchar("zatca_clearance_status", { length: 20 }), // CLEARED, REPORTED, REJECTED, ERROR
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaClearedAt: timestamp("zatca_cleared_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -1061,6 +1069,78 @@ export const payments = pgTable("payments", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
+
+  // ── Multi-gateway payment fields (all nullable — manual/cash payments leave
+  // them blank; online gateway payments populate them). Added for the unified
+  // payment layer that supports Mada/cards/Apple Pay/STC Pay via an aggregator,
+  // plus Tabby/Tamara BNPL, PayPal, and Stripe. ──────────────────────────────
+  gateway: varchar("gateway", { length: 30 }), // moyasar | hyperpay | tap | tabby | tamara | paypal | stripe | manual
+  methodType: varchar("method_type", { length: 30 }), // mada | visa | mastercard | amex | apple_pay | stc_pay | tabby | tamara | paypal | cash | bank_transfer | cheque
+  status: varchar("status", { length: 20 }).default("completed"), // pending | authorized | completed | failed | refunded | cancelled
+  currency: varchar("currency", { length: 3 }).default("SAR"),
+  gatewayTransactionId: varchar("gateway_transaction_id", { length: 255 }), // the provider's charge/payment id
+  gatewayReference: varchar("gateway_reference", { length: 255 }), // checkout/order id used to start the flow
+  processingFee: decimal("processing_fee", { precision: 10, scale: 2 }),
+  failureReason: text("failure_reason"),
+  gatewayMetadata: jsonb("gateway_metadata"), // raw provider response snapshot for audit/debugging
+});
+
+// ── Tax / statutory rate configuration ──────────────────────────────────────
+// VAT and GOSI rates live in the DB so they can change without a code deploy
+// (Saudi VAT has already changed once; GOSI rates phase up). The active row is
+// the one with is_active = true; superseded rows are kept for the audit trail.
+export const vatConfig = pgTable("vat_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: varchar("country_code", { length: 2 }).notNull().default("SA"),
+  vatRate: doublePrecision("vat_rate").notNull().default(0.15), // 15%
+  vatRegistrationNumber: varchar("vat_registration_number", { length: 50 }),
+  companyNameEn: varchar("company_name_en", { length: 255 }),
+  companyNameAr: varchar("company_name_ar", { length: 255 }),
+  isActive: boolean("is_active").notNull().default(true),
+  effectiveFrom: timestamp("effective_from").notNull().defaultNow(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const gosiConfig = pgTable("gosi_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Saudi nationals (2024+ standard: 9.75% employee + 11.75% employer).
+  saudiEmployeeRate: doublePrecision("saudi_employee_rate").notNull().default(0.0975),
+  saudiEmployerRate: doublePrecision("saudi_employer_rate").notNull().default(0.1175),
+  // Non-Saudi (employer-only hazards contribution).
+  nonSaudiEmployeeRate: doublePrecision("non_saudi_employee_rate").notNull().default(0.0),
+  nonSaudiEmployerRate: doublePrecision("non_saudi_employer_rate").notNull().default(0.02),
+  maxContributionSalary: decimal("max_contribution_salary", { precision: 12, scale: 2 }).notNull().default("45000"),
+  isActive: boolean("is_active").notNull().default(true),
+  effectiveFrom: timestamp("effective_from").notNull().defaultNow(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ── Gate passes ─────────────────────────────────────────────────────────────
+// Issued when an invoice is paid: a QR/short-code pass the customer shows to
+// collect their vehicle, which gate staff scan to verify and release. Persisted
+// so there's an audit trail of who collected the vehicle and when.
+export const gatePasses = pgTable("gate_passes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id").notNull().references(() => invoices.id, { onDelete: "cascade" }),
+  garageId: uuid("garage_id").references(() => garages.id),
+  customerId: varchar("customer_id"),
+  vehicleId: uuid("vehicle_id"),
+  passCode: varchar("pass_code", { length: 20 }).notNull().unique(),
+  status: varchar("status", { length: 20 }).notNull().default("active"), // active | used | expired | revoked
+  issuedBy: varchar("issued_by"),
+  issuedAt: timestamp("issued_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at"),
+  usedAt: timestamp("used_at"),
+  usedBy: varchar("used_by"),
+  notes: text("notes"),
 });
 
 // Module 21: Notifications & Communication

@@ -2,6 +2,8 @@ import { Router } from "express";
 import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { resolveGarageScope } from "../middleware/garageScope";
+import { maybePaginate } from "../middleware/pagination";
 
 const router = Router();
 
@@ -194,9 +196,10 @@ router.get("/decode-vin/:vin", isAuthenticated, async (req, res) => {
 
 router.get("/vehicles", isAuthenticated, async (req, res) => {
   try {
-    const { garageId } = req.query;
+    // Scope to the caller's garage; ignore client-supplied garageId.
+    const garageId = resolveGarageScope(req);
     const vehicles = await storage.getVehicles(garageId as string | undefined);
-    res.json(vehicles);
+    res.json(maybePaginate(req, vehicles));
   } catch (error) {
     console.error("Error fetching vehicles:", error);
     res.status(500).json({ message: "Failed to fetch vehicles" });

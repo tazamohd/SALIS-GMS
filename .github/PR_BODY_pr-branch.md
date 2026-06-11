@@ -52,8 +52,37 @@ node scripts/apply-perf-indexes.mjs
 - [ ] `ProductivityTracker` and `PerformanceAnalytics` show `RoleGate` "access restricted" panel for TECHNICIAN/ADVISOR
 - [ ] All Arabic strings render correctly when locale switched to AR (RTL, 326 new keys merged into `ar.json`)
 
-## Known follow-ups (deliberately deferred)
+## Session 3 — Closeout work landed in this PR
 
-- **Stripe Checkout** — `change-plan` currently does an in-DB upgrade because Stripe Checkout session creation isn't wired yet (`stripeReady` flag in the response signals when env is set). One follow-up PR.
-- ~~**Forecasting demand 500 on empty parts inventory**~~ — fixed in `a8b174b`. The query referenced `spareParts.partName` (actual column is `name`) and `sparePartInventories.partId` (actual is `sparePartId`). `@ts-nocheck` was hiding both. Test tolerance removed.
-- **Vite HMR "Failed to parse JSON file" noise** — cosmetic, from the runtime-error overlay plugin trying to load a missing source-map JSON. Doesn't affect functionality.
+This sequence of commits brings the branch to a state where it can ship with no known security gaps and a documented production deploy story.
+
+| Tier | Item | Resolution |
+|---|---|---|
+| T1 | `requireAuthByDefault` was defined but never mounted → `/api` was default-allow on dozens of routes | Mounted with `app.use()` after `setupAuth`. PUBLIC_ROUTES extended to cover monolith login/register, customer-portal login, /api/plans, and self-service /api/kiosk/*. Currency + fleet integration tests updated to login first. |
+| T1 | `.github/workflows/ci.yml` existed on disk but untracked | Now committed; GitHub CI will fire on push. |
+| T1 | Vitest had never been run end-to-end in this session | Ran against `slis_gms_test`: **227 / 227 passing** (PR claim was accurate). |
+| T2 | Missing CSP header; helmet not installed | `helmet` installed; full CSP + HSTS + X-Frame applied via `server/index.ts`. CSP allows Vite HMR in dev, locks down in prod. |
+| T2 | Request-id generated but not in error responses or log lines | Global error handler now reads `req.requestId` and surfaces it in both the JSON body and the `[ERROR] [rid=…]` log line. |
+| T2 | `.env.example` missing `REDIS_URL`, Stripe webhook vars | Documented. |
+| T2 | DEPLOYMENT.md told operators to use `db:push` in production | Rewritten to use `db:migrate` everywhere; added `db:migrate vs db:push` comparison table, SSL/reverse-proxy nginx snippet, first-admin promotion. |
+| T3 | No production migration runner | New `server/scripts/migrate.ts` runs `drizzle-orm/node-postgres/migrator` against `migrations/`. `npm run db:migrate` is the production-safe path. Dockerfile entrypoint runs it pre-start. Journal had drift (referenced a missing 0000 file); regenerated to match actual files + auto-generated drift-catchup migration. Verified end-to-end on fresh DB. |
+| T3 | No automated backup story | New `scripts/backup-pg-dump.mjs` streams `pg_dump → gzip`, enforces 30 daily / 12 weekly / 12 monthly retention, optional S3 upload via AWS CLI. Engine schedules it daily at 02:00 UTC behind `BACKUP_ENABLED=true` opt-in. Smoke-tested locally. |
+| T3 | Vite dev "Failed to parse JSON file" overlay noise | Replit overlay plugins now gated behind `REPL_ID` env var. Silent on non-Replit dev hosts. |
+| T3 | `console.*` calls bypass structured logger | Engine layer (event-bus, triggers, scheduled-checks, workflow-engine, engine/index) migrated to `logger.{info,warn,error}`. ~17 sites moved. The remaining ~1,600 sites in routes/services are deferred — they're mostly per-request error logs that would benefit from a proper ts-morph codemod rather than ad-hoc edits. |
+
+## Still deferred to follow-up PRs
+
+- **Stripe Checkout end-to-end** — `change-plan` still does an in-DB upgrade. The Checkout Session creation + `checkout.session.completed` webhook handler need real Stripe API keys to verify, so this needs a dedicated PR with the test card flow.
+- **Console-to-logger sweep across routes/services** — ~1,600 sites in non-engine code. Needs a codemod, not manual edits, to avoid mis-typing the `{ extra }` payload shape.
+- **Tailwind RTL logical-property migration** — `left-*`/`right-*`/`ml-*`/`mr-*`/`pl-*`/`pr-*` still scattered across ~200 pages. Switching to `tailwindcss-logical` plugin or `rtlcss` PostCSS transform at build time would auto-flip them; either way it's a build-config change worth its own PR.
+- **72 orphan client pages** — files exist under `client/src/pages/` but not mounted in `App.tsx`. Mostly emerging-tech showcase pages. Per-page disposition (wire / delete) requires a product decision per module.
+- **Routes/services integration test gap** — 60 of 68 routes lack integration tests, 15 of 18 services likewise. E2E golden path covers the core happy paths; expanding coverage is a multi-day exercise.
+
+## Verification (this PR)
+
+- `npx tsc --noEmit` → 0 errors
+- `TEST_DATABASE_URL=… npm test` → **227 / 227 passing** (3 prior fails caused by my auth gate now fixed: 2 by adding `/api/kiosk/*` to PUBLIC_ROUTES, 1 by making the currency + fleet integration tests log in first)
+- `npm run db:migrate` on a fresh DB → all 4 migrations applied in <5s
+- `node scripts/backup-pg-dump.mjs` → produces `.sql.gz`, prunes per retention policy
+- `curl /api/ai/insights` anonymous → **401** (was 200 before the auth gate)
+- `curl -I /` → CSP, HSTS, X-Frame all set by `helmet`

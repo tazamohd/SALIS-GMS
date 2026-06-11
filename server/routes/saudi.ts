@@ -6,10 +6,16 @@
 
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
-import { invoices, users, garages } from '../../shared/schema';
+import { invoices, invoiceItems, users, garages } from '../../shared/schema';
 import { eq, and, gte, sql, count, sum } from 'drizzle-orm';
 import { generateZATCAQRCode, validateZATCACompliance } from '../../shared/zatcaUtils';
 import { formatDualCalendar, getCurrentHijriDate, isRamadan } from '../../shared/hijriUtils';
+import {
+  generateEInvoice,
+  submitToClearance,
+  type ZATCAPhase2Invoice,
+  type ZATCALineItem,
+} from '../services/zatca-phase2';
 
 const router = Router();
 
@@ -272,6 +278,140 @@ router.get('/saudi/zatca/qr/:invoiceId', async (req: Request, res: Response) => 
   } catch (error) {
     console.error('ZATCA QR generation error:', error);
     res.status(500).json({ message: 'Failed to generate QR code' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/saudi/zatca/submit/:invoiceId — Submit an invoice to ZATCA Phase 2
+// (Fatoora) clearance. Key-deferred: with no ZATCA_CSID configured the service
+// returns a development stub; once ZATCA_CSID (+ ZATCA_API_URL) are set it calls
+// the real FATOORA clearance API. Either way the clearance result is persisted
+// back onto the invoice row.
+// ---------------------------------------------------------------------------
+router.post('/saudi/zatca/submit/:invoiceId', async (req: Request, res: Response) => {
+  try {
+    const user = req.user as any;
+    if (!user?.garageId) {
+      return res.status(403).json({ message: 'No garage associated with user' });
+    }
+
+    const invoiceId = req.params.invoiceId;
+
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.garageId, user.garageId)))
+      .limit(1);
+
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    const [garage] = await db
+      .select()
+      .from(garages)
+      .where(eq(garages.id, user.garageId))
+      .limit(1);
+
+    // Buyer (customer) — optional; present makes this a standard tax invoice.
+    let buyer: ZATCAPhase2Invoice['buyer'];
+    if (invoice.customerId) {
+      const [customer] = await db
+        .select({ fullName: users.fullName, nationalId: users.nationalId })
+        .from(users)
+        .where(eq(users.id, invoice.customerId))
+        .limit(1);
+      if (customer?.fullName) {
+        buyer = { name: customer.fullName };
+      }
+    }
+
+    // Line items — fall back to a single summary line if none recorded.
+    const items = await db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, invoice.id));
+
+    const subtotal = parseFloat(String(invoice.subtotal ?? '0'));
+    const totalVAT = parseFloat(String(invoice.taxAmount ?? '0'));
+    const totalDiscount = parseFloat(String(invoice.discountAmount ?? '0'));
+    const totalWithVAT = parseFloat(String(invoice.totalAmount ?? '0'));
+
+    const lineItems: ZATCALineItem[] = items.length > 0
+      ? items.map((it: typeof items[number]) => ({
+          description: it.description ?? 'Item',
+          quantity: Number(it.quantity ?? 1),
+          unitPrice: parseFloat(String(it.unitPrice ?? '0')),
+          taxCategory: 'S',
+          taxPercent: parseFloat(String(it.taxRate ?? '15')) || 15,
+          discount: parseFloat(String(it.discountAmount ?? '0')) || 0,
+        }))
+      : [{
+          description: `Invoice ${invoice.invoiceNumber}`,
+          quantity: 1,
+          unitPrice: subtotal,
+          taxCategory: 'S',
+          taxPercent: subtotal > 0 ? Math.round((totalVAT / subtotal) * 100) : 15,
+          discount: totalDiscount,
+        }];
+
+    const zatcaInvoice: ZATCAPhase2Invoice = {
+      invoiceNumber: invoice.invoiceNumber,
+      invoiceType: buyer ? 'standard' : 'simplified',
+      invoiceSubType: buyer ? '0100000' : '0200000',
+      issueDate: (invoice.invoiceDate ?? new Date()).toISOString(),
+      currency: 'SAR',
+      seller: {
+        name: garage?.name ?? 'SALIS AUTO',
+        vatNumber: garage?.licenseNumber ?? '',
+        address: {
+          street: '',
+          buildingNumber: '',
+          city: garage?.city ?? '',
+          postalCode: '',
+          district: '',
+          country: 'SA',
+        },
+      },
+      buyer,
+      lineItems,
+      subtotal,
+      totalDiscount,
+      totalTaxableAmount: subtotal - totalDiscount,
+      totalVAT,
+      totalWithVAT,
+      paymentMethod: 'cash',
+    };
+
+    // Generate the UBL e-invoice and submit for clearance (stub or real).
+    const ubl = generateEInvoice(zatcaInvoice);
+    const clearance = await submitToClearance(ubl);
+
+    const cleared = clearance.status === 'CLEARED' || clearance.status === 'REPORTED';
+
+    // Persist the clearance outcome onto the invoice.
+    await db
+      .update(invoices)
+      .set({
+        zatcaClearanceStatus: clearance.status,
+        zatcaClearanceId: clearance.clearanceId ?? null,
+        zatcaInvoiceHash: clearance.invoiceHash ?? ubl.hash,
+        zatcaQrCode: clearance.qrCode ?? null,
+        zatcaClearedAt: cleared ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(invoices.id, invoice.id), eq(invoices.garageId, user.garageId)));
+
+    return res.json({
+      invoiceId: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      cleared,
+      clearance,
+      invoiceHash: ubl.hash,
+    });
+  } catch (error) {
+    console.error('ZATCA clearance submission error:', error);
+    res.status(500).json({ message: 'Failed to submit invoice for ZATCA clearance' });
   }
 });
 

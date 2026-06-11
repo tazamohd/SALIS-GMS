@@ -249,33 +249,53 @@ export async function submitToClearance(
   };
 
   try {
-    // TODO: Uncomment when integrating with real ZATCA API
-    // const response = await fetch(ZATCA_CLEARANCE_URL, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json',
-    //     'Accept-Version': 'V2',
-    //     'Accept-Language': 'en',
-    //     'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
-    //   },
-    //   body: JSON.stringify(requestBody),
-    // });
-    // const data = await response.json();
-    // return mapClearanceResponse(data);
+    // Key-deferred: when a CSID is configured we call the real FATOORA
+    // clearance API; otherwise we return a prepared/stub response so the flow
+    // is exercisable end-to-end without ZATCA onboarding. Set ZATCA_CSID (and
+    // ZATCA_API_URL for sandbox vs production) to go live.
+    if (authToken) {
+      const response = await fetch(ZATCA_CLEARANCE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Accept-Version': 'V2',
+          'Accept-Language': 'en',
+          'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      const data: any = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        return {
+          status: 'ERROR',
+          invoiceHash: ublInvoice.hash,
+          errors: [data?.message || `ZATCA clearance HTTP ${response.status}`],
+          timestamp: new Date().toISOString(),
+        };
+      }
+      return {
+        status: data?.clearanceStatus === 'CLEARED' || data?.clearanceStatus === 'CLEARED_WITH_WARNINGS' ? 'CLEARED' : 'ERROR',
+        clearanceId: data?.clearanceId || data?.invoiceHash,
+        invoiceHash: data?.invoiceHash || ublInvoice.hash,
+        qrCode: data?.qrCode,
+        warnings: data?.validationResults?.warningMessages || [],
+        errors: data?.validationResults?.errorMessages || [],
+        timestamp: new Date().toISOString(),
+      };
+    }
 
-    // Stub response for development
-    console.log('[ZATCA Phase 2] Clearance submission prepared:', {
+    // No CSID configured — prepared/stub response for development.
+    console.log('[ZATCA Phase 2] Clearance prepared (no CSID — stub):', {
       endpoint: ZATCA_CLEARANCE_URL,
       invoiceHash: ublInvoice.hash,
     });
-
     return {
       status: 'CLEARED',
-      clearanceId: `CLR-${Date.now()}`,
+      clearanceId: `CLR-STUB-${ublInvoice.hash.substring(0, 8)}`,
       invoiceHash: ublInvoice.hash,
       qrCode: ublInvoice.encodedInvoice.substring(0, 100),
-      warnings: [],
+      warnings: ['ZATCA_CSID not configured — this is a development stub, not a real clearance.'],
       errors: [],
       timestamp: new Date().toISOString(),
     };

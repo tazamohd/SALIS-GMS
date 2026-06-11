@@ -120,6 +120,39 @@ async function seed() {
     // The users.password column is NOT NULL but these accounts don't authenticate.
     const demoUserPassword = await bcrypt.hash('Demo@2024!', 10);
 
+    // ── Demo login users, one per portal role ──────────────────────────────
+    // Lets a demo operator log into every portal with a memorable credential.
+    // All share the password `Demo@2026!`. Safe for demo/preview environments;
+    // do NOT rely on these in production (rotate or remove before go-live).
+    const demoRoleLoginPassword = await bcrypt.hash('Demo@2026!', 10);
+    const demoRoleUsers = [
+      { email: 'manager@salisauto.com',   fullName: 'Demo Manager',        role: 'MANAGER',        userType: 'manager' },
+      { email: 'advisor@salisauto.com',   fullName: 'Demo Advisor',        role: 'ADVISOR',        userType: 'advisor' },
+      { email: 'technician@salisauto.com',fullName: 'Demo Technician',     role: 'TECHNICIAN',     userType: 'technician' },
+      { email: 'accountant@salisauto.com',fullName: 'Demo Accountant',     role: 'ACCOUNTANT',     userType: 'accountant' },
+      { email: 'storekeeper@salisauto.com',fullName: 'Demo Store Keeper',  role: 'STORE_KEEPER',   userType: 'store_keeper' },
+      { email: 'support@salisauto.com',   fullName: 'Demo Support Agent',  role: 'CUSTOMER_SUPPORT', userType: 'support' },
+      { email: 'purchaser@salisauto.com', fullName: 'Demo Purchase Agent', role: 'PURCHASE_AGENT', userType: 'purchase_agent' },
+      { email: 'platformadmin@salisauto.com', fullName: 'Demo Platform Admin', role: 'PLATFORM_ADMIN', userType: 'platform_admin' },
+    ];
+    let demoRoleCreated = 0;
+    for (const ru of demoRoleUsers) {
+      const [existing] = await db.select().from(users).where(sql`${users.email} = ${ru.email}`).limit(1);
+      if (!existing) {
+        await db.insert(users).values({
+          email: ru.email,
+          password: demoRoleLoginPassword,
+          fullName: ru.fullName,
+          userType: ru.userType,
+          role: ru.role,
+          garageId,
+          isActive: true,
+        });
+        demoRoleCreated++;
+      }
+    }
+    console.log(`✅ Demo role login users: ${demoRoleCreated} created (password: Demo@2026!)`);
+
     // Create customers
     const customerData = [
       { fullName: 'John Smith', email: 'john.smith@example.com', phone: '+1-555-0101', userType: 'customer' },

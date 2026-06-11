@@ -4,6 +4,8 @@ import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq, desc } from "drizzle-orm";
+import { resolveGarageScope } from "../middleware/garageScope";
+import { maybePaginate } from "../middleware/pagination";
 import type { z } from "zod";
 
 const router = Router();
@@ -42,12 +44,11 @@ function sanitizeArrayValidationErrors(
 // GET /invoices — list invoices (uses garage_id, not garageId)
 router.get("/invoices", isAuthenticated, async (req, res) => {
   try {
-    const { garage_id, status } = req.query;
-    const invoices = await storage.getInvoices(
-      garage_id as string,
-      status as string
-    );
-    res.json(invoices);
+    const { status } = req.query;
+    // Scope to the caller's garage (never trust client garage_id); opt-in paging.
+    const garageId = resolveGarageScope(req);
+    const invoices = await storage.getInvoices(garageId as string, status as string);
+    res.json(maybePaginate(req, invoices));
   } catch (error) {
     console.error("Error fetching invoices:", error);
     res.status(500).json({ message: "Failed to fetch invoices" });

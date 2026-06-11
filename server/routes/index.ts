@@ -4,6 +4,8 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { setupAuth } from "../auth";
+import { requireAuthByDefault } from "../middleware/defaultAuth";
+import { enforceGarageScopeOnQuery } from "../middleware/garageScope";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
@@ -44,6 +46,11 @@ import { vehicleRoutes } from "./vehicles.routes";
 import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
+import paymentsGatewayRoutes from "./payments-gateway.routes";
+import taxConfigRoutes from "./tax-config.routes";
+import trainingLmsRoutes from "./training-lms.routes";
+import gatePassRoutes from "./gate-pass.routes";
+import quickActionsRoutes from "./quick-actions.routes";
 // miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
 // stubs returning empty arrays/messages, shadowing real monolith handlers for
 // /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
@@ -116,6 +123,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Default-deny on /api: every route below this line requires an authenticated
+  // session unless its path matches the PUBLIC_ROUTES allow-list in
+  // server/middleware/defaultAuth.ts. Per-route `isAuthenticated` guards remain
+  // as belt-and-braces for routes that compose extra checks (roles, garage scope).
+  app.use(requireAuthByDefault);
+  console.log("🔒 Default-deny /api auth gate active");
+
+  // Defense-in-depth tenant scoping: pin ?garage_id/?garageId to the caller's
+  // own garage for ordinary staff (platform admins + customers exempt), so no
+  // legacy handler can be tricked into returning another garage's data.
+  app.use(enforceGarageScopeOnQuery);
+  console.log("🔒 Garage-scope query guard active");
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
@@ -240,6 +260,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api", settingsRoutes);
   console.log("✅ Settings Routes Loaded");
+
+  // Unified multi-gateway payments (Mada/cards/Apple Pay/STC Pay via aggregator,
+  // Tabby/Tamara BNPL, PayPal, Stripe, manual). Active gateways depend on which
+  // API keys are configured; with none set, only manual (cash) is offered.
+  app.use("/api", paymentsGatewayRoutes);
+  console.log("✅ Payment Gateway Routes Loaded");
+
+  // DB-driven VAT/GOSI rates (editable without redeploy).
+  app.use("/api", taxConfigRoutes);
+  console.log("✅ Tax Config Routes Loaded");
+
+  // Training / LMS (wires existing storage methods that had no routes).
+  app.use("/api", trainingLmsRoutes);
+  console.log("✅ Training / LMS Routes Loaded");
+
+  // Gate passes (QR a customer shows to collect their vehicle after paying).
+  app.use("/api", gatePassRoutes);
+  console.log("✅ Gate Pass Routes Loaded");
+
+  // Per-user mobile quick actions (configurable app shortcuts).
+  app.use("/api", quickActionsRoutes);
+  console.log("✅ Quick Actions Routes Loaded");
 
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);

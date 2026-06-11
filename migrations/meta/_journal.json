@@ -5,22 +5,57 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1760585030645,
-      "tag": "0000_add-financial-module",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
       "when": 1761828390115,
       "tag": "0001_cultured_apocalypse",
       "breakpoints": true
     },
     {
-      "idx": 2,
+      "idx": 1,
       "version": "7",
       "when": 1762107827180,
       "tag": "0002_real_daredevil",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780981874874,
+      "tag": "0004_schema_drift_catchup",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780981874875,
+      "tag": "0005_add_performance_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780981874876,
+      "tag": "0006_payment_gateway_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780981874877,
+      "tag": "0007_tax_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780981874878,
+      "tag": "0008_gate_passes",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780981874879,
+      "tag": "0009_zatca_clearance",
       "breakpoints": true
     }
   ]

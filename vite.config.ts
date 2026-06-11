@@ -1,19 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+// The Replit overlay plugins (runtime-error-modal, cartographer) only work
+// when running inside Replit (they fetch source-maps via a Replit-specific
+// HTTP API). On non-Replit dev hosts they spam "Failed to parse JSON file"
+// in the Vite log because the source-map endpoint doesn't exist. Gate both
+// plugins behind REPL_ID like cartographer already was.
+const isReplit = process.env.REPL_ID !== undefined;
+const isProd = process.env.NODE_ENV === "production";
 
 export default defineConfig({
   plugins: [
     react(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
+    ...(isReplit
+      ? await Promise.all([
+          import("@replit/vite-plugin-runtime-error-modal").then((m) => m.default()),
+          ...(!isProd
+            ? [import("@replit/vite-plugin-cartographer").then((m) => m.cartographer())]
+            : []),
+        ])
       : []),
   ],
   resolve: {
