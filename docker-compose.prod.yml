@@ -1,0 +1,164 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SALIS AUTO GMS — production stack (self-hosted VPS)
+#
+#   caddy (80/443, auto-HTTPS) → app (Express :5000) → postgres 16 + redis 7
+#
+# Usage — the --env-file flag is REQUIRED so ${DOMAIN} and ${POSTGRES_PASSWORD}
+# interpolate into this file (the app itself reads env_file separately):
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# Optional daily-backup sidecar (profile-gated; see also the cron alternative
+# documented in DEPLOYMENT.md §10):
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.production --profile backup up -d
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  # One-shot migration runner: replays migrations/*.sql via npm run db:migrate,
+  # then exits 0. The app only starts after this completes successfully, so a
+  # broken migration blocks the rollout instead of booting a half-migrated app.
+  migrate:
+    build: .
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+    command: ["npm", "run", "db:migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build: .
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+    # The Dockerfile CMD re-runs db:migrate on every boot; in this stack the
+    # dedicated migrate service owns that, so the app just starts the server.
+    command: ["node", "dist/index.js"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      # /api/health/ready verifies DB connectivity, not just process liveness.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/health/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    # Intentionally NO ports: — Caddy is the only public entrypoint.
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: slis_gms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.production}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Backups land on the host (./backups) and the scripts are available
+      # inside the container for `docker compose exec postgres sh /scripts/...`.
+      - ./backups:/backups
+      - ./scripts:/scripts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d slis_gms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Intentionally NO ports: — Postgres is reachable only on the compose
+    # network (data never leaves the VPS; see KSA data-residency note in
+    # DEPLOYMENT.md §10).
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Intentionally NO ports: — used by the app for rate limiting / queues.
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env.production}
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data     # TLS certificates — must persist across restarts
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Self-hosted uptime monitoring + alerting (Uptime Kuma). Lives on the
+  # compose network so it can probe the app's health endpoints directly
+  # (http://app:5000/api/health/ready|live). UI is reachable ONLY through
+  # Caddy at https://status.<DOMAIN> — no host port is published.
+  # First-run setup (admin account + monitors): DEPLOYMENT.md §10.10.
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    volumes:
+      - kuma_data:/app/data
+    healthcheck:
+      # The official image ships a purpose-built healthcheck binary.
+      test: ["CMD", "extra/healthcheck"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 180s
+    restart: unless-stopped
+    # Intentionally NO ports: and NO depends_on app — the monitor must keep
+    # running (and alerting) even while the app itself is down or rebuilding.
+
+  # Optional backup sidecar (enable with --profile backup). Runs
+  # scripts/backup-db.sh once a day at BACKUP_HOUR_UTC (default 02:00 UTC).
+  # For stricter scheduling prefer host cron — see DEPLOYMENT.md §10.
+  backup:
+    profiles: ["backup"]
+    image: postgres:16-alpine
+    env_file: .env.production
+    environment:
+      BACKUP_DIR: /backups
+    volumes:
+      - ./scripts/backup-db.sh:/usr/local/bin/backup-db.sh:ro
+      - ./backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "[backup-sidecar] daily backup at hour $${BACKUP_HOUR_UTC:-2} UTC"
+        while true; do
+          hour=$$(date -u +%H); hour=$${hour#0}; [ -n "$$hour" ] || hour=0
+          if [ "$$hour" -eq "$${BACKUP_HOUR_UTC:-2}" ]; then
+            sh /usr/local/bin/backup-db.sh || echo "[backup-sidecar] backup FAILED" >&2
+            sleep 3600
+          fi
+          sleep 300
+        done
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  caddy_data:
+  caddy_config:
+  kuma_data:

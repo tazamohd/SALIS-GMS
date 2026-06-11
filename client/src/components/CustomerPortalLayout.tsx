@@ -5,8 +5,7 @@ import {
   FileText, 
   Car, 
   MessageSquare, 
-  Home, 
-  User as UserIcon,
+  Home,
   LogOut,
   Bell
 } from "lucide-react";
@@ -76,13 +75,6 @@ export function CustomerPortalLayout({ children }: { children: React.ReactNode }
                       <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <Link href="/portal/profile">
-                    <DropdownMenuItem data-testid="link-profile">
-                      <UserIcon className="mr-2 h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                  </Link>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} data-testid="button-logout">
                     <LogOut className="mr-2 h-4 w-4" />

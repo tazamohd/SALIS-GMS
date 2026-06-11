@@ -346,6 +346,232 @@ The app's HSTS header (set by `helmet`) only takes effect over HTTPS; serving vi
 
 ---
 
+## 10. Production VPS Deployment (Docker + Caddy)
+
+Self-hosted production stack for the Saudi market: `docker-compose.prod.yml`
+runs Caddy (automatic HTTPS) → app (Express :5000) → PostgreSQL 16 + Redis 7,
+plus a one-shot migration service and an optional daily-backup sidecar.
+Postgres and Redis are **not** exposed to the host — Caddy is the only public
+entrypoint.
+
+> **KSA data residency**: with this stack the database lives in a Docker
+> volume on your VPS, so all customer/invoice data stays on the server you
+> choose (pick a KSA or GCC region provider if residency matters to you).
+> Alternative: point `DATABASE_URL` at Neon instead of the compose `postgres`
+> service — simpler ops, but data then resides in Neon's cloud region
+> (currently no KSA region), which may not fit your residency requirements.
+
+### 10.1 Provision the VPS
+
+- 2 vCPU / 4 GB RAM / 40 GB SSD is a comfortable baseline.
+- Open ports **22, 80, 443** only (cloud firewall or `ufw allow 22,80,443/tcp`).
+
+**DNS for salisauto.com** (registrar/DNS: domain.com nameservers):
+
+| Record | Name | Value | When |
+|---|---|---|---|
+| A | `salisauto.com` (apex) | VPS IP | **At cutover** — it currently points to `34.111.179.208` (existing hosting); keep it there until the VPS stack passes its smoke test |
+| A | `www.salisauto.com` | VPS IP (or CNAME → `salisauto.com`) | Anytime — Caddy 308-redirects www → apex |
+| A | `status.salisauto.com` | VPS IP | Anytime — serves the Uptime Kuma UI (§10.10) |
+
+**Zero-downtime cutover:** 24h before switching, lower the apex A-record TTL
+to 300s. Bring the full stack up on the VPS and verify with a Host-header
+probe before touching DNS:
+`curl -fk --resolve salisauto.com:443:<VPS_IP> https://salisauto.com/api/health/ready`
+(Let's Encrypt issuance for the apex only succeeds after DNS points at the
+VPS — expect a self-signed/issuance-pending cert until then, hence `-k`.)
+Then repoint the apex A record and watch traffic arrive in Caddy's logs.
+Old hosting stays live as instant rollback: change the A record back.
+
+### 10.2 Install Docker
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER   # log out/in afterwards
+docker --version && docker compose version
+```
+
+### 10.3 Clone and configure
+
+```bash
+git clone <repo-url> && cd SLIS-GMS
+
+cp .env.production.example .env.production
+chmod 600 .env.production
+```
+
+Edit `.env.production` and set at minimum:
+
+| Variable | How |
+|---|---|
+| `DOMAIN` | Your bare hostname, e.g. `gms.example.com` |
+| `POSTGRES_PASSWORD` | `openssl rand -hex 24` |
+| `DATABASE_URL` | `postgresql://postgres:<POSTGRES_PASSWORD>@postgres:5432/slis_gms` (write the password out — env files don't interpolate) |
+| `SESSION_SECRET` | `openssl rand -hex 32` |
+| `APP_URL` / `PUBLIC_APP_URL` | `https://<DOMAIN>` |
+
+Integrations (ZATCA, Sentry, Moyasar/Stripe/PayPal, Twilio, GetResponse) are
+optional and key-deferred — see the comments in `.env.production.example`.
+
+### 10.4 Start the stack
+
+```bash
+# --env-file is REQUIRED on every compose command: it feeds ${DOMAIN} and
+# ${POSTGRES_PASSWORD} into the compose file itself.
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+
+# Watch the rollout: migrate must exit 0, then app starts, then caddy.
+docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml --env-file .env.production logs -f migrate app
+```
+
+The `migrate` service replays `migrations/*.sql` once and exits; the app only
+starts after it succeeds.
+
+### 10.5 Seed and secure the admin account
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec app npm run db:seed
+```
+
+The seed script creates initial roles and an admin account with a known
+development password. **Immediately** log in at `https://<DOMAIN>` and change
+the admin password to a strong generated one (e.g. `openssl rand -base64 24`
+as a starting point for a password manager entry). Do not leave any seeded
+password in place on a production system.
+
+### 10.6 Verify health
+
+```bash
+curl -fsS https://<DOMAIN>/api/health          # {"status":"ok",...}
+curl -fsS https://<DOMAIN>/api/health/ready    # {"ready":true,"db":"connected"}
+curl -fsS https://<DOMAIN>/api/health/live     # {"alive":true}
+
+# HTTPS + security headers (HSTS, nosniff, referrer-policy):
+curl -sI https://<DOMAIN> | grep -iE 'strict-transport|content-type-options|referrer'
+# HTTP→HTTPS redirect (Caddy default):
+curl -sI http://<DOMAIN> | head -3
+```
+
+### 10.7 Backups
+
+**Option A — sidecar (compose-managed):** start the stack with the `backup`
+profile; it runs `scripts/backup-db.sh` daily at `BACKUP_HOUR_UTC`
+(default 02:00 UTC ≈ 05:00 KSA):
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  --profile backup up -d
+```
+
+**Option B — host cron (recommended for precise scheduling):**
+
+```cron
+0 2 * * * cd /opt/SLIS-GMS && docker compose -f docker-compose.prod.yml --env-file .env.production exec -T postgres sh /scripts/backup-db.sh >> /var/log/gms-backup.log 2>&1
+```
+
+Dumps are custom-format (`pg_restore`-able), written to `./backups/` on the
+host, retain the newest 30 (`BACKUP_KEEP`), and upload to S3 when
+`AWS_S3_BUCKET` is set and the AWS CLI is available.
+
+**Backup drill (run once now, then quarterly):**
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec postgres sh /scripts/backup-db.sh
+ls -lh backups/    # expect a fresh gms-YYYYMMDD-HHMMSS.dump
+```
+
+### 10.8 Restore drill
+
+Prove the dump is restorable **into a scratch database** without touching
+production data:
+
+```bash
+# 1. Create a scratch DB inside the postgres container
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec postgres createdb -U postgres slis_gms_drill
+
+# 2. Restore the latest dump into it (FORCE=1 skips the interactive prompt)
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec -e FORCE=1 \
+  -e DATABASE_URL="postgresql://postgres:<POSTGRES_PASSWORD>@localhost:5432/slis_gms_drill" \
+  postgres sh /scripts/restore-db.sh /backups/<latest>.dump
+
+# 3. Spot-check, then drop the scratch DB
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec postgres psql -U postgres -d slis_gms_drill -c "SELECT count(*) FROM users;"
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec postgres dropdb -U postgres slis_gms_drill
+```
+
+A real disaster recovery uses the same `restore-db.sh` against the production
+`DATABASE_URL` (stop the `app` service first, restore, then start it again).
+
+### 10.9 Updating the app
+
+```bash
+git pull
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+# migrate re-runs (idempotent — already-applied files are skipped), app restarts.
+curl -fsS https://<DOMAIN>/api/health/ready
+```
+
+### 10.10 Monitoring and alerting (Uptime Kuma)
+
+The stack includes a self-hosted [Uptime Kuma](https://github.com/louislam/uptime-kuma)
+service. It sits on the compose network (so it can probe the app container
+directly) and its UI is exposed **only** through Caddy at
+`https://status.<DOMAIN>` — no host port.
+
+**Prerequisite:** a second DNS **A record**, `status.<DOMAIN>` → the same VPS
+IP, created before first start (Caddy gets its own Let's Encrypt cert for it).
+
+**First-run setup (do this immediately after `up -d`):**
+
+1. Open `https://status.<DOMAIN>` — the first visit shows the admin-account
+   creation form. Anyone who reaches it first owns the instance, so create
+   the admin right away (strong password, password manager).
+2. Add three monitors (type **HTTP(s)**, check interval **60s**, retries **3**):
+
+   | Monitor | URL | What it proves |
+   |---|---|---|
+   | App ready (DB) | `http://app:5000/api/health/ready` | App up **and** Postgres reachable |
+   | App live | `http://app:5000/api/health/live` | Process alive (catches DB-only outages by diffing against "ready") |
+   | Public site | `https://<DOMAIN>/api/health` | Full path: DNS → TLS cert → Caddy → app, as customers see it |
+
+   The first two probe the container directly and keep working even if Caddy
+   or DNS breaks; the third is the outside view. "Ready" failing while "live"
+   is green points at the database, not the app.
+
+**Alert channels (Kuma → Settings → Notifications)** — practical picks for a
+solo operator in KSA:
+
+- **Telegram** (recommended primary): free, instant, works fine in Saudi.
+  Create a bot with @BotFather, paste the bot token + your chat ID into
+  Kuma's Telegram notification type. Two minutes of setup.
+- **Email (SMTP)**: use any mailbox you already own as a slower fallback
+  channel; attach it to the same monitors.
+- **WhatsApp**: Kuma has no native WhatsApp type — use its generic
+  **Webhook** notification pointing at a WhatsApp gateway (e.g. CallMeBot,
+  or your own Twilio WhatsApp sender already configured via
+  `TWILIO_*` vars). Treat this as optional polish, not the primary channel.
+
+Attach the notification(s) to all three monitors and use **Test** on each.
+
+> **Sentry complements, not duplicates, these probes:** Kuma tells you the
+> app is *down*; Sentry (key-deferred via `SENTRY_DSN` / `VITE_SENTRY_DSN`
+> in `.env.production.example`) tells you it is *erroring while up*. Once a
+> DSN is set, add a Sentry alert rule for a 5xx/error-rate spike so the two
+> systems cover both failure modes.
+
+Kuma's own data (monitors, history, notification config) lives in the
+`kuma_data` volume and is **not** part of the Postgres backups — after
+changing monitor config, grab a copy via *Settings → Backup → Export*.
+
+---
+
 ## Build Reference
 
 ```bash

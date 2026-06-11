@@ -85,7 +85,7 @@ export default function TechnicianMobileProfile() {
               </div>
             </Link>
 
-            <Link href="/time-clock">
+            <Link href="/technician-app/clock">
               <div className="flex items-center justify-between p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-[#64748B]" />

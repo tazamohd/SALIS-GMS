@@ -1,0 +1,65 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SALIS AUTO GMS — Caddy reverse proxy (production)
+#
+# {$DOMAIN} is injected by docker-compose.prod.yml from .env.production
+# (e.g. DOMAIN=gms.example.com — bare hostname, no scheme).
+#
+# Caddy defaults already cover:
+#   - Automatic HTTPS via Let's Encrypt (certs persisted in the caddy_data volume)
+#   - HTTP → HTTPS redirect on port 80
+#   - TLS 1.2+ with modern cipher suites
+# ═══════════════════════════════════════════════════════════════════════════
+
+{$DOMAIN} {
+	# Compress responses (zstd preferred, gzip fallback).
+	encode zstd gzip
+
+	header {
+		# HSTS — only ever served over HTTPS here, so safe to preload.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Don't advertise the server stack.
+		-Server
+	}
+
+	# App container listens on 5000 (Dockerfile EXPOSE 5000 / server config
+	# default PORT=5000). X-Forwarded-For / X-Forwarded-Proto are set by
+	# Caddy automatically; the Express app sits behind `trust proxy`.
+	reverse_proxy app:5000 {
+		# Passive proxying is fine, but an active probe against the liveness
+		# endpoint takes the upstream out of rotation faster during restarts.
+		health_uri /api/health/live
+		health_interval 30s
+	}
+}
+
+# ─── www → apex redirect ─────────────────────────────────────────────────────
+# Needs a DNS record for www.<DOMAIN> (A to the VPS IP, or CNAME to the apex).
+# Caddy obtains a cert for www and 308-redirects everything to the apex.
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+# ─── Uptime Kuma status/monitoring UI ────────────────────────────────────────
+# Needs its own DNS A record: status.<DOMAIN> → same VPS IP (Let's Encrypt
+# issues a separate cert for it). Kuma is never published on a host port —
+# this proxy is the only way in. Caddy proxies the websocket upgrade
+# (Kuma's UI is socket.io-based) automatically.
+status.{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Kuma listens on 3001 inside the container (image default).
+	reverse_proxy uptime-kuma:3001
+}

@@ -1,0 +1,6 @@
+cloud_bucket: my-salis-backup
+cloud_enabled: false
+deep_ai: false
+input_dir: M:/SalisCo
+mission_mode: Generalist
+output_dir: M:/test

@@ -9,6 +9,15 @@ if (!process.env.DATABASE_URL) {
 
 const isNeon = process.env.DATABASE_URL.includes('neon.tech');
 
+// Pool sizing note (2026-06-11): an experiment with smaller/shorter-lived test
+// pools (max 5, idle 2s) to bound vitest's per-file pool accumulation made the
+// suite WORSE (connect churn → "Connection terminated unexpectedly"). The
+// empirically best run used the plain 20/30s sizing below. If mid-suite
+// connection timeouts reappear, suspect slow fsync on the Postgres data dir
+// (OneDrive-synced paths!) before touching these numbers.
+const POOL_MAX = 20;
+const POOL_IDLE_MS = 30_000;
+
 // Use standard pg Pool for local dev, Neon serverless Pool for production
 let pool: any;
 let db: any;
@@ -22,8 +31,8 @@ if (isNeon) {
 
   pool = new NeonPool({
     connectionString: process.env.DATABASE_URL,
-    max: 20,
-    idleTimeoutMillis: 30_000,
+    max: POOL_MAX,
+    idleTimeoutMillis: POOL_IDLE_MS,
     connectionTimeoutMillis: 5_000,
   });
   db = drizzleNeon({ client: pool, schema });
@@ -34,8 +43,8 @@ if (isNeon) {
 
   pool = new pg.default.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 20,
-    idleTimeoutMillis: 30_000,
+    max: POOL_MAX,
+    idleTimeoutMillis: POOL_IDLE_MS,
     connectionTimeoutMillis: 5_000,
   });
   db = drizzleNode({ client: pool, schema });

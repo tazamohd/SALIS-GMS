@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -141,7 +141,8 @@ export default function DocumentManagement() {
   const [uploadDescription, setUploadDescription] = useState("");
   const [uploadTags, setUploadTags] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Queries ──────────────────────────────────────────────────────
 
@@ -168,22 +169,33 @@ export default function DocumentManagement() {
   // ── Mutations ────────────────────────────────────────────────────
 
   const uploadMutation = useMutation({
-    mutationFn: (data: Partial<Document>) => apiRequest("POST", "/api/documents", data),
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch("/api/uploads", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Upload failed (${res.status})`);
+      }
+      return res.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documents/categories"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documents/stats"] });
-      toast({ title: "Document uploaded", description: "Document metadata saved successfully." });
+      toast({ title: "Document uploaded", description: "File stored successfully." });
       // Reset form
       setUploadName("");
       setUploadType("pdf");
       setUploadCategory("");
       setUploadDescription("");
       setUploadTags("");
-      setUploadedFileName("");
+      setSelectedFile(null);
     },
-    onError: () => {
-      toast({ title: "Upload failed", description: "Failed to save document metadata.", variant: "destructive" });
+    onError: (error: Error) => {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
     },
   });
 
@@ -209,32 +221,46 @@ export default function DocumentManagement() {
     setIsDragOver(false);
   }, []);
 
+  const handleFileSelected = useCallback((file: File) => {
+    setSelectedFile(file);
+    if (!uploadName) setUploadName(file.name.replace(/\.[^.]+$/, ""));
+    const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
+    setUploadType(ext);
+  }, [uploadName]);
+
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) {
-      setUploadedFileName(file.name);
-      if (!uploadName) setUploadName(file.name.replace(/\.[^.]+$/, ""));
-      const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
-      setUploadType(ext);
-    }
-  }, [uploadName]);
+    if (file) handleFileSelected(file);
+  }, [handleFileSelected]);
 
   const handleUploadSubmit = () => {
+    if (!selectedFile) {
+      toast({ title: "No file selected", description: "Choose or drop a file to upload.", variant: "destructive" });
+      return;
+    }
     if (!uploadName || !uploadCategory) {
       toast({ title: "Missing fields", description: "Name and category are required.", variant: "destructive" });
       return;
     }
-    uploadMutation.mutate({
-      name: uploadName,
-      type: uploadType,
-      category: uploadCategory,
-      size: Math.floor(Math.random() * 2_000_000) + 100_000, // stub size
-      tags: uploadTags.split(",").map((t) => t.trim()).filter(Boolean),
-      description: uploadDescription,
-    });
+    const formData = new FormData();
+    formData.append("file", selectedFile); // real file — size comes from the File object server-side
+    formData.append("name", uploadName);
+    formData.append("category", uploadCategory);
+    formData.append("description", uploadDescription);
+    formData.append("tags", uploadTags);
+    uploadMutation.mutate(formData);
   };
+
+  // Library items created by /api/uploads carry a `file:<id>` tag linking to
+  // the downloadable file; metadata-only legacy rows have no such tag.
+  const getFileId = (doc: Document): string | null => {
+    const tag = doc.tags.find((t) => t.startsWith("file:"));
+    return tag ? tag.slice("file:".length) : null;
+  };
+
+  const visibleTags = (doc: Document): string[] => doc.tags.filter((t) => !t.startsWith("file:"));
 
   // ── Metrics ──────────────────────────────────────────────────────
 
@@ -361,9 +387,9 @@ export default function DocumentManagement() {
                                 {doc.name}
                               </span>
                             </div>
-                            {doc.tags.length > 0 && (
+                            {visibleTags(doc).length > 0 && (
                               <div className="flex gap-1 mt-1 flex-wrap">
-                                {doc.tags.slice(0, 3).map((tag) => (
+                                {visibleTags(doc).slice(0, 3).map((tag) => (
                                   <Badge
                                     key={tag}
                                     variant="outline"
@@ -400,6 +426,17 @@ export default function DocumentManagement() {
                                 size="icon"
                                 className="h-8 w-8 text-[#0A5ED7] hover:text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                                 title="Download"
+                                onClick={() => {
+                                  const fileId = getFileId(doc);
+                                  if (fileId) {
+                                    window.open(`/api/uploads/${fileId}`, "_blank");
+                                  } else {
+                                    toast({
+                                      title: "No file attached",
+                                      description: "This entry is metadata only — no stored file to download.",
+                                    });
+                                  }
+                                }}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
@@ -450,23 +487,32 @@ export default function DocumentManagement() {
                     : "border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/50"
                   }
                 `}
-                onClick={() => {
-                  // Stub: clicking would open file picker
-                  toast({ title: "File Upload", description: "File upload is a UI stub. Fill in the metadata fields below." });
-                }}
+                onClick={() => fileInputRef.current?.click()}
               >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileSelected(file);
+                    e.target.value = "";
+                  }}
+                />
                 <Upload className={`h-10 w-10 mx-auto mb-3 ${isDragOver ? "text-[#0A5ED7]" : "text-[#64748B]"}`} />
-                {uploadedFileName ? (
+                {selectedFile ? (
                   <div className="flex items-center justify-center gap-2">
                     <FileText className="h-5 w-5 text-[#0A5ED7]" />
-                    <span className="text-[#0B1F3B] dark:text-white font-medium">{uploadedFileName}</span>
+                    <span className="text-[#0B1F3B] dark:text-white font-medium">{selectedFile.name}</span>
+                    <span className="text-xs text-[#64748B]">({formatBytes(selectedFile.size)})</span>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setUploadedFileName("");
+                        setSelectedFile(null);
                       }}
                     >
                       <X className="h-3 w-3" />

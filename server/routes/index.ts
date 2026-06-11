@@ -29,6 +29,7 @@ import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
 import smsCampaignRoutes from "./sms-campaigns";
 import documentRoutes from "./documents";
+import uploadsRoutes from "./uploads";
 // supplierPortalRoutes (./supplier-portal) intentionally NOT imported: its in-memory
 // demoSuppliers/demoPurchaseOrders shadowed the monolith's DB-backed /api/suppliers
 // CRUD (routes.ts:2648+). Re-mount only after the modular file uses storage.*.
@@ -211,6 +212,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Document Management routes
   app.use("/api", documentRoutes);
   console.log("✅ Document Management Routes Loaded");
+
+  // File upload routes (M3.1 — real file storage behind tenant scoping)
+  app.use("/api", uploadsRoutes);
+  console.log("✅ Uploads Routes Loaded");
 
   // Supplier Portal routes intentionally NOT mounted — see import block comment.
   // Monolith serves /api/suppliers, /api/supplier-price-lists, /api/supplier-performance

@@ -27,7 +27,7 @@ export default function TechnicianMobileHome() {
     { icon: Play, label: "Clock In", route: "/technician-app/clock", color: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]" },
     { icon: Clipboard, label: "My Jobs", route: "/technician-app/jobs", color: "bg-[#0A5ED7]" },
     { icon: Wrench, label: "Parts Lookup", route: "/technician-app/lookup", color: "bg-[#0BB3FF]" },
-    { icon: Clock, label: "Timesheet", route: "/time-clock", color: "bg-[#F97316]" },
+    { icon: Clock, label: "Timesheet", route: "/technician-app/clock", color: "bg-[#F97316]" },
   ];
 
   return (

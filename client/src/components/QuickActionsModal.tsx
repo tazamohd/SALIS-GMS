@@ -160,7 +160,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
       label: "Customer Portal",
       description: "Access the customer self-service portal",
       icon: User,
-      path: "/client/dashboard",
+      path: "/client",
       keywords: ["customer", "portal", "client", "self-service", "dashboard"],
     },
     {
