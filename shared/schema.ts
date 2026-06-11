@@ -1015,6 +1015,14 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  // ZATCA Phase 2 (Fatoora) e-invoicing clearance tracking. Populated when an
+  // invoice is submitted to ZATCA for clearance/reporting. Key-deferred: stays
+  // null until the clearance flow is exercised (stub or real CSID).
+  zatcaClearanceStatus: varchar("zatca_clearance_status", { length: 20 }), // CLEARED, REPORTED, REJECTED, ERROR
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaClearedAt: timestamp("zatca_cleared_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({

@@ -50,6 +50,13 @@
       "when": 1780981874878,
       "tag": "0008_gate_passes",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780981874879,
+      "tag": "0009_zatca_clearance",
+      "breakpoints": true
     }
   ]
 }

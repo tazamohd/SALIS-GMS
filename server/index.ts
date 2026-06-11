@@ -1,5 +1,8 @@
 // Validate environment variables on startup (fails fast if required vars missing)
 import "./config";
+// Sentry error tracking (no-op unless SENTRY_DSN is set). Imported right after
+// config so dotenv has populated the env.
+import { sentryEnabled, Sentry } from "./instrument";
 
 import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
@@ -30,7 +33,9 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "blob:", "https:"],
-      connectSrc: ["'self'", ...(isProd ? [] : ["ws:", "wss:", "http://localhost:*"])],
+      // Sentry browser SDK posts events to *.sentry.io; allow it so the client
+      // error tracker isn't blocked by CSP when VITE_SENTRY_DSN is configured.
+      connectSrc: ["'self'", "https://*.sentry.io", ...(isProd ? [] : ["ws:", "wss:", "http://localhost:*"])],
       frameAncestors: ["'none'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
@@ -118,6 +123,12 @@ app.use((req, res, next) => {
 
   // Load VAT/GOSI rates from the DB into the in-process cache (fail-soft).
   void import("./services/tax-config").then((m) => m.loadTaxConfig()).catch(() => {});
+
+  // Sentry Express error handler — must be registered after routes and before
+  // our own error middleware. No-op unless SENTRY_DSN was set.
+  if (sentryEnabled) {
+    try { Sentry.setupExpressErrorHandler(app); } catch (e) { console.error("Sentry express handler setup failed", e); }
+  }
 
   app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

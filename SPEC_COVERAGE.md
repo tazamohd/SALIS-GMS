@@ -4,7 +4,7 @@
 **Source spec:** "SalisAuto Platform — Comprehensive Project Documentation" (Website Analysis Request, 18 functional modules + business-strategy layer)
 **Method:** Each spec module mapped to its backend route, DB table, and client page in the `pr-branch` codebase, then classified REAL / PARTIAL / STUB / MISSING.
 
-> **Headline (corrected after deep verification):** of the spec's modules, **40 are REAL** (route + schema + UI, DB-backed), **2 PARTIAL**, **3 STUB**, **1 MISSING**. The first coverage pass under-counted because the verification agent only grepped the modular `server/routes/*.ts` files and missed handlers in the 19k-line monolith `server/routes.ts` — Vehicle Storage and Knowledge Base are in fact fully DB-backed there, and LMS/Training was wired in this PR. The RBAC layer defines **25 roles** (spec asked for 24); the schema has **409 tables**. After this PR's work the platform implements essentially the entire spec: **43 REAL / 1 PARTIAL / 1 STUB / 0 MISSING**. LMS, Gate Pass, Quick Actions, and real OCR (Tesseract.js) were all wired here. The single remaining stub is **Google My Business** (needs Google API credentials — can't be built without them); the one PARTIAL is the Design System (Tailwind, no formal token system).
+> **Headline (corrected after deep verification):** of the spec's modules, **40 are REAL** (route + schema + UI, DB-backed), **2 PARTIAL**, **3 STUB**, **1 MISSING**. The first coverage pass under-counted because the verification agent only grepped the modular `server/routes/*.ts` files and missed handlers in the 19k-line monolith `server/routes.ts` — Vehicle Storage and Knowledge Base are in fact fully DB-backed there, and LMS/Training was wired in this PR. The RBAC layer defines **25 roles** (spec asked for 24); the schema has **409 tables**. After this PR's work the platform implements essentially the entire spec: **44 REAL / 1 PARTIAL / 0 STUB / 0 MISSING**. LMS, Gate Pass, Quick Actions, and real OCR (Tesseract.js) were all wired here. **Google My Business is REAL** (DB-backed CRUD over profiles/posts/reviews); its live Google Business Profile API sync is key-deferred (activates when `GOOGLE_*` OAuth creds are supplied — same pattern as payments). The one remaining PARTIAL is the Design System (Tailwind, no formal token system). **Two external integrations are now key-deferred**: ZATCA Phase 2 clearance (`POST /api/saudi/zatca/submit/:invoiceId` returns a dev-stub clearance until `ZATCA_CSID` is set, then calls the real FATOORA API) and Sentry error tracking (server + client no-op until `SENTRY_DSN`/`VITE_SENTRY_DSN` are set).
 
 ---
 
@@ -28,7 +28,7 @@
 | 10.5 | Telematics / OBD | ✅ obd-diagnostics/fleet | ✅ obdDiagnosticData/telematicsReadings | ✅ OBDDiagnosticViewer | **REAL** |
 | 10.6 | Knowledge Base | ✅ routes.ts (categories + articles CRUD) | ✅ knowledgeArticles/articleCategories | ✅ KnowledgeBase | **REAL** (corrected — DB-backed in monolith) |
 | 10.7 | LMS / Training | ✅ training-lms.routes (this PR) | ✅ trainingModules/certifications/attempts | ✅ TrainingLMS | **REAL** (wired this PR) |
-| 10.8 | Google My Business | ❌ | ✅ gmb_posts/reviews | ✅ GoogleMyBusiness | **STUB** (schema only) |
+| 10.8 | Google My Business | ✅ routes.ts (profiles/posts/reviews CRUD) | ✅ googleBusinessProfiles/gmbPosts/gmbReviews | ✅ GoogleMyBusiness | **REAL** (DB-backed CRUD; live Google API sync key-deferred on GOOGLE_* creds) |
 | 10.9 | Compliance | ✅ quality-control/audit | ✅ complianceAudits/Policies | ✅ ComplianceManagement | **REAL** |
 | 11.1 | Predictive Maintenance | ✅ predictive-maintenance | ✅ aiMaintenancePredictions | ✅ PredictiveMaintenance | **REAL** |
 | 11.2 | Parts Recommendation | ✅ parts-recommendations | ✅ aiPartsRecommendations | ✅ SmartPartsRecommendations | **REAL** |
@@ -52,18 +52,21 @@
 
 ---
 
-## Gaps to close (the only real "build" work left from the spec)
+## Gaps to close (status after this PR series)
 
-### Stubs — schema/UI exist, API missing (each ~½–1 day)
-1. **Vehicle Storage (10.4)** — `vehicleStorageAssignments`/`storageFacilities` tables exist; need CRUD route + daily-rate calc + UI wiring.
-2. **Knowledge Base (10.6)** — `knowledgeArticles`/`articleCategories` tables exist; need CRUD route + search + the page wired.
-3. **LMS / Training (10.7)** — `trainings`/`trainingModules`/`certifications` tables exist; need course/quiz/certificate routes.
-4. **Google My Business (10.8)** — `gmb_*` tables exist; need the GMB API integration (reviews/posts) — needs Google API credentials.
-5. **Document OCR (16.2)** — `ocrDocuments` table exists; the `/api/ai-ocr/process` endpoint returns placeholder text. Needs Tesseract.js or OpenAI Vision.
-6. **Quick Actions (13.2)** — `mobileQuickActions` table exists; need the config route so dashboard quick actions are data-driven.
+### Formerly-stub modules — now CLOSED (all wired + DB-backed)
+1. ~~**Vehicle Storage (10.4)**~~ — REAL: CRUD + daily-rate in the monolith.
+2. ~~**Knowledge Base (10.6)**~~ — REAL: categories + articles CRUD in the monolith.
+3. ~~**LMS / Training (10.7)**~~ — REAL: `training-lms.routes.ts` (modules/certifications/attempts).
+4. ~~**Google My Business (10.8)**~~ — REAL: DB-backed CRUD over profiles/posts/reviews. **Live Google Business Profile API sync is key-deferred** (activates on `GOOGLE_*` OAuth creds).
+5. ~~**Document OCR (16.2)**~~ — REAL: `/api/ai-ocr/process` runs Tesseract.js image→text + AI field analysis.
+6. ~~**Quick Actions (13.2)**~~ — REAL: `quick-actions.routes.ts` user-scoped CRUD.
+7. ~~**Gate Pass (15.4)**~~ — REAL: `gate-pass.routes.ts` issue/get/verify + QR.
 
-### Missing — net new (small)
-7. **Gate Pass (15.4)** — after an invoice is paid, generate a digital gate pass (QR + vehicle/customer/invoice ref) the customer shows to collect their vehicle. Natural extension of the payment layer.
+### Key-deferred external integrations (no-op/stub until credentials supplied)
+- **ZATCA Phase 2 clearance** — `POST /api/saudi/zatca/submit/:invoiceId` builds the UBL e-invoice, submits for clearance, and persists the result onto the invoice (`zatca_clearance_status/id/hash/qr/cleared_at`). With no `ZATCA_CSID` it returns a clearly-labelled dev stub; set `ZATCA_CSID` (+ `ZATCA_API_URL`) to call the real FATOORA API.
+- **Sentry error tracking** — server (`@sentry/node`) and client (`@sentry/react`) both no-op until `SENTRY_DSN` / `VITE_SENTRY_DSN` are set. CSP `connect-src` already allows `*.sentry.io`.
+- **Payment gateways** — every Saudi/international method activates when its keys are present (Moyasar, HyperPay, Tap, Stripe, PayPal, Tabby, Tamara).
 
 ### Enhancement gaps (on already-REAL modules)
 - **Contract versioning + approval workflow (14)** — repository exists; add revision history + e-sign/approval states.

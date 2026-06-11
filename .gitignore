@@ -11,3 +11,6 @@ user_credentials.csv
 .env.*
 *.pem
 *.key
+# Planned-but-unwired scaffolding (job queue / redis) — not yet in scope
+_planned/
+
