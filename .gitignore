@@ -9,8 +9,49 @@ vite.config.ts.*
 user_credentials.csv
 .env
 .env.*
+# ...but env TEMPLATES are documentation, not secrets — keep them versioned
+!.env.production.example
 *.pem
 *.key
-# Planned-but-unwired scaffolding (job queue / redis) � not yet in scope
+# Production DB dumps written by scripts/backup-db.sh / the backup sidecar
+backups/
+# Planned-but-unwired scaffolding (job queue / redis) � not yet in scope
 _planned/
 
+# Local Postgres data directories (embedded-postgres / local dev clusters)
+pg-data/
+pg-local-data/
+pg-test-data/
+.test-garage-id
+
+# Claude Code session state (settings.json IS versioned; local/session files are not)
+.claude/worktrees/
+.claude/launch.json
+.claude/settings.local.json
+.config/
+.local/
+
+# Session transcripts and scratch artifacts
+SLIS-GMS/
+C--Users-TAZAM-Downloads-SLIS-GMS--claude-worktrees-happy-mcclintock/
+conversation.md
+test-run-full.log
+
+
+# Uploaded files (M3.1 file uploads)
+uploads/
+
+# IDE / toolchain binaries that leaked into the tree (JetBrains, Kotlin, Apple SDK)
+lib/
+bin/
+
+# Stale duplicate forks of the live monolith sources — DEAD, nothing imports them.
+# Live source of truth is shared/schema.ts and server/storage.ts (newer, tracked).
+# Kept on disk but out of git to avoid resolver confusion. Safe to delete.
+shared/schema/
+server/storage/
+
+# Unmounted, stale modular extraction — NOT registered in routes/index.ts, and the
+# Tier-3 security gate flagged it (no tenant scoping / RBAC / IDOR). Live payment
+# routes are in the monolith server/routes.ts. Do not commit until rewritten.
+server/routes/payments.routes.ts
