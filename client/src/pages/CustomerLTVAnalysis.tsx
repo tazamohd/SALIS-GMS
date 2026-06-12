@@ -7,12 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   TrendingUp,
-  TrendingDown,
   Users,
   DollarSign,
   AlertTriangle,
   CheckCircle,
-  Calendar,
   Search,
   Target,
   Lightbulb,

@@ -3,7 +3,7 @@
  * Wraps shared/hijriUtils for React components with Hijri-first display.
  */
 
-import { gregorianToHijri, formatHijriDate, getCurrentHijriDate, isRamadan, getHijriMonthName } from '../../../shared/hijriUtils';
+import { gregorianToHijri, getCurrentHijriDate, isRamadan, getHijriMonthName } from '../../../shared/hijriUtils';
 
 /** Format a date as Hijri-first: "14 Sha'ban 1447 / 16 Mar 2026" */
 export function formatHijriFirst(date: Date): string {

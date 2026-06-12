@@ -2,10 +2,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
-import { Award, TrendingUp, Clock, Target } from "lucide-react";
+import { Award, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 
 export default function StaffPerformanceReview() {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { TabsPageLayout, type TabConfig } from "@/components/layouts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

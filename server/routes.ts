@@ -3,7 +3,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { eq, and, desc, sql, count } from "drizzle-orm";
+import { eq, desc, sql, count } from "drizzle-orm";
 import {
   hrDepartments,
   hrPositions,
@@ -31,8 +31,6 @@ import {
   insertHrPerformanceReviewSchema,
   insertHrAnnouncementSchema,
   insertHrSelfServiceRequestSchema,
-  jobCardParts,
-  sparePartInventories,
   jobCards,
   invoices,
 } from "@shared/schema";
@@ -45,7 +43,6 @@ import { smsService } from "./services/smsService";
 import { initializeChatWebSocket, getChatWebSocketServer } from "./websocket";
 import { z } from "zod";
 import { 
-  insertNotificationSchema, 
   insertSavedFilterPresetSchema, 
   insertExportJobSchema,
   insertEmployeeAttendanceSchema,
@@ -57,14 +54,10 @@ import {
   insertTrainingSchema,
   insertEmployeeTrainingSchema,
   insertAIJobEstimationSchema,
-  insertAIMaintenancePredictionSchema,
   insertAIPartsRecommendationSchema,
   insertAIScheduleOptimizationSchema,
   insertAIChatConversationSchema,
   insertIntegrationConnectionSchema,
-  insertIntegrationSyncLogSchema,
-  insertAccountingTransactionSchema,
-  insertOBDDiagnosticDataSchema,
   insertWarrantySchema,
   insertWarrantyClaimSchema,
   insertInspectionTemplateSchema,
@@ -115,7 +108,6 @@ import {
   insertRobotTaskSchema,
   insertDroneFleetSchema,
   insertDroneMissionSchema,
-  insertSmartContractSchema,
   insertContractEventSchema,
   insertCarbonCreditSchema,
   insertCarbonEmissionSchema,
@@ -149,17 +141,14 @@ import {
   insertComplianceAuditSchema,
   insertComplianceTaskSchema,
   insertServiceSignatureSchema,
-  insertServiceChatMessageSchema,
   insertServiceReviewSchema,
   insertIoTSensorSchema,
-  insertIoTSensorReadingSchema,
-  insertIoTAlertSchema,
-  insertJobTrackingEventSchema
+  insertIoTSensorReadingSchema
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
-import { analyzePredictiveMaintenance, generatePartsRecommendations, streamChatResponse } from './ai-service';
+import { analyzePredictiveMaintenance } from './ai-service';
 import { auditLog } from './auditMiddleware';
 import QRCode from 'qrcode';
 import * as phase3Service from './phase3-integrations-service';

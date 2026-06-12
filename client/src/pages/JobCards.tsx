@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter } from "lucide-react";
+import { Plus, Eye, Calendar, User, Wrench, Building2, Filter } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,16 +22,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
+import type { JobCard, Garage, User as UserType, TechnicianProfile } from "@shared/schema";
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
-import { EmptyState } from "@/components/ui/empty-state";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { ErrorState } from "@/components/ErrorState";
 

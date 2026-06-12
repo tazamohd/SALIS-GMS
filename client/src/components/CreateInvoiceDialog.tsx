@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { insertInvoiceSchema, type InsertInvoice, type Garage, type User, type Vehicle } from "@shared/schema";
+import { insertInvoiceSchema, type InsertInvoice, type Garage, type User } from "@shared/schema";
 import { z } from "zod";
 
 const itemSchema = z.object({

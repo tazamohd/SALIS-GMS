@@ -30,7 +30,6 @@ import {
   Filter,
   Calendar,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   FileText,
   RefreshCw,

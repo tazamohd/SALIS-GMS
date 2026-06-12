@@ -17,17 +17,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
-  Warehouse, 
   MapPin, 
-  Package, 
   Plus,
   ArrowRightLeft,
-  BoxSelect,
   Layers,
   Grid3X3,
   Search,
   Edit,
-  Trash2,
   CheckCircle
 } from "lucide-react";
 import { format } from "date-fns";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge, CalendarPlus, Receipt, BoxesIcon, ClipboardList } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Flame, ShieldCheck, Gauge, CalendarPlus, Receipt, BoxesIcon, ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";

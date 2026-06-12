@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Award, AlertCircle, CheckCircle, TrendingUp, FileText, ClipboardCheck } from "lucide-react";
+import { Award, AlertCircle, CheckCircle, FileText, ClipboardCheck } from "lucide-react";
 
 export default function ISOQualityManagement() {
   const { t } = useTranslation();

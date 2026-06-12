@@ -9,7 +9,6 @@ import { Link } from "wouter";
 import {
   Package,
   Search,
-  Filter,
   Send,
   Clock,
   MapPin,

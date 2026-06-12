@@ -6,10 +6,9 @@
 
 import { Router, Request, Response } from 'express';
 import { workflowEngine } from '../engine/workflow-engine';
-import { eventBus } from '../engine/event-bus';
 import { db } from '../db';
-import { jobCards, invoices, appointments, sparePartInventories, spareParts } from '../../shared/schema';
-import { eq, and, lte, sql } from 'drizzle-orm';
+import { jobCards, appointments, sparePartInventories, spareParts } from '../../shared/schema';
+import { eq, and, sql } from 'drizzle-orm';
 import { validate } from '../middleware/validate';
 import { jobTransitionSchema, appointmentCheckInSchema, inventoryCheckSchema } from '../schemas/validation';
 

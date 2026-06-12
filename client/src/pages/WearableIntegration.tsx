@@ -8,7 +8,6 @@ import { Watch, Activity, Heart, Footprints, Battery, Wifi, AlertCircle, CheckCi
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function WearableIntegration() {
   const { t } = useTranslation();

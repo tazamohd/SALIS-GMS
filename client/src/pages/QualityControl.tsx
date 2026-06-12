@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { DashboardPage } from "@/components/layouts/DashboardPage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -34,7 +33,6 @@ import {
   Clock,
   TrendingUp,
   Shield,
-  Bug,
   ChevronDown,
   ChevronRight,
   BarChart3,

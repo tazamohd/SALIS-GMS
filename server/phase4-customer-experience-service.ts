@@ -9,10 +9,9 @@ import {
   customerReviews,
   referralPrograms,
   customerReferrals,
-  jobCards,
   users
 } from "@shared/schema";
-import { eq, desc, and, sql, gte } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 // ========================================
 // 1. LIVE SERVICE TRACKING

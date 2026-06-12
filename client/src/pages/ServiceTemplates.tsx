@@ -35,7 +35,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertServiceTemplateSchema, type ServiceTemplate } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, DollarSign, CheckCircle, XCircle, Eye, Pencil, Trash2, Wrench } from "lucide-react";
+import { Plus, Clock, DollarSign, CheckCircle, XCircle, Trash2, Wrench } from "lucide-react";
 import { z } from "zod";
 import { StandardPageLayout } from "@/components/layouts";
 

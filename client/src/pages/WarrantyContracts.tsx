@@ -20,8 +20,6 @@ import {
   TrendingUp,
   CheckCircle,
   XCircle,
-  Clock,
-  AlertCircle,
   Search,
 } from "lucide-react";
 

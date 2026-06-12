@@ -19,6 +19,7 @@ import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import prettier from 'eslint-config-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 
 export default tseslint.config(
@@ -43,6 +44,7 @@ export default tseslint.config(
   // ---- ESNext spec rules (apply to all JS/TS) -------------------------
   {
     files: ['**/*.{js,jsx,ts,tsx,mjs,cjs}'],
+    plugins: { 'unused-imports': unusedImports },
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -54,21 +56,29 @@ export default tseslint.config(
       'prefer-const': 'error',
       // ecomfe ESNext: rest params instead of `arguments`, spread instead of apply.
       'prefer-rest-params': 'error',
-      'prefer-spread': 'warn',
+      'prefer-spread': 'error',
       // ecomfe general JS: strict equality.
       eqeqeq: ['error', 'smart'],
       // ecomfe ESNext: consistent object method/property shorthand.
-      'object-shorthand': ['warn', 'always'],
+      'object-shorthand': ['error', 'always'],
       // ecomfe ESNext: template literals over string concatenation.
-      'prefer-template': 'warn',
-      'no-useless-concat': 'warn',
-      // ecomfe ESNext: arrow body / dot notation hygiene.
-      'dot-notation': 'warn',
-      'no-else-return': 'warn',
-      // Keep the TS recommended set practical for a large existing codebase.
-      '@typescript-eslint/no-unused-vars': [
+      'prefer-template': 'error',
+      'no-useless-concat': 'error',
+      // ecomfe ESNext: dot notation / no redundant else.
+      'dot-notation': 'error',
+      'no-else-return': 'error',
+      // Unused imports are auto-removed; unused locals stay a (non-blocking) warning.
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       // Existing escape-hatch comments are deliberate; flag for review, don't block.

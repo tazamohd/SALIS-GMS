@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ShoppingCart, Plus, Building2, Eye, Edit, Trash2, MoreVertical, CheckCircle, Send, XCircle, Package as PackageIcon } from "lucide-react";
+import { ShoppingCart, Building2, Trash2, MoreVertical, CheckCircle, Send, XCircle, Package as PackageIcon } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,10 +22,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AddSupplierDialog } from "@/components/AddSupplierDialog";
-import { CreatePurchaseOrderDialog } from "@/components/CreatePurchaseOrderDialog";
 import { PurchaseOrderDetailsDialog } from "@/components/PurchaseOrderDetailsDialog";
-import type { PurchaseOrder, Supplier, Garage, PurchaseOrderItem } from "@shared/schema";
+import type { PurchaseOrder, Supplier, Garage } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { StandardTablePage } from "@/components/layouts";

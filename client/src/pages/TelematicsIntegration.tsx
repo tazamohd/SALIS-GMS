@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Radio, Activity, AlertTriangle, MapPin, Gauge } from "lucide-react";
+import { Radio, Activity, AlertTriangle } from "lucide-react";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 
 const alertSchema = z.object({

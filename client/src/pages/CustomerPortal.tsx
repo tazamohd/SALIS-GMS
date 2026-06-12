@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import {
   Car, Calendar, FileText, CreditCard, History, LogOut,
-  CheckCircle, Clock, AlertCircle, Wrench, Plus, ChevronRight
+  CheckCircle, Clock, AlertCircle, Wrench, Plus
 } from "lucide-react";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

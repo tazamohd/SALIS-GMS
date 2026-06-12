@@ -4,8 +4,6 @@ import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import { Scan, Package, Wrench, Car } from "lucide-react";
 

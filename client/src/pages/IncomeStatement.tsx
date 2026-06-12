@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/table";
 import {
   TrendingUp,
-  TrendingDown,
   Download,
   Printer,
   DollarSign,
@@ -33,7 +32,6 @@ import {
   ExternalLink,
   ArrowUpRight,
   ArrowDownRight,
-  Calendar,
   Scale,
   PieChart,
 } from "lucide-react";

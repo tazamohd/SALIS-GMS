@@ -57,7 +57,6 @@ import {
   TrendingUp,
   CreditCard,
   Eye,
-  Send,
 } from "lucide-react";
 
 const paymentSchema = z.object({

@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Loader2, Brain, Eye, MessageSquare, Package, MonitorPlay, Glasses, Network, Bot, Plane, FileCode, Leaf, Zap, Recycle, Satellite, Shield } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";

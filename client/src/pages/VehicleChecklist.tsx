@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -32,7 +29,6 @@ import {
   Clock,
   User,
   Calendar,
-  FileText,
   Save,
   Printer,
 } from "lucide-react";

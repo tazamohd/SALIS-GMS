@@ -29,7 +29,6 @@ import {
   Building2,
   Wallet,
   CreditCard,
-  FileText,
   ExternalLink,
   CheckCircle,
   BarChart3,

@@ -9,8 +9,6 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { 
@@ -22,10 +20,8 @@ import {
   Bell,
   BellRing,
   Clock,
-  Calendar,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   Wrench,
   Activity,
   RefreshCw,
@@ -33,9 +29,7 @@ import {
   Smartphone,
   Signal,
   Power,
-  TrendingUp,
-  Eye,
-  History
+  TrendingUp
 } from 'lucide-react';
 
 interface VehicleTrackingData {

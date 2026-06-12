@@ -1,4 +1,4 @@
-import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play, Zap } from "lucide-react";
+import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play, Zap } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
 import { JobCardDialog } from "@/components/JobCardDialog";
 import { JobCardsList } from "@/components/JobCardsList";
-import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
 import { ToolAvailabilityDialog } from "@/components/ToolAvailabilityDialog";
 import { AddToolDialog } from "@/components/AddToolDialog";
 import { ServiceTemplatesDialog } from "@/components/ServiceTemplatesDialog";

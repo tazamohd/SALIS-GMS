@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Trash2, FileText, File, Wrench } from "lucide-react";
+import { Trash2, FileText, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

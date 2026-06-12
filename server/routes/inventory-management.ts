@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { spareParts, sparePartInventories, purchaseOrders, purchaseOrderItems, suppliers, supplierPerformance } from '../../shared/schema';
-import { eq, sql, and, lte, desc } from 'drizzle-orm';
+import { eq, sql, and, desc } from 'drizzle-orm';
 
 const router = Router();
 

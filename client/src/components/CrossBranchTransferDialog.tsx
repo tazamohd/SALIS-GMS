@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Tool, Branch, Garage } from "@shared/schema";
+import type { Tool, Garage } from "@shared/schema";
 
 const transferFormSchema = z.object({
   toolId: z.string().min(1, "Please select a tool"),

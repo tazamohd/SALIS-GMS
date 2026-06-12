@@ -20,7 +20,6 @@ import {
   Car,
   Receipt,
   Brain,
-  Zap,
   Package,
   Shield,
   TrendingUp,

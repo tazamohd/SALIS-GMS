@@ -8,7 +8,7 @@ import {
   Activity, AlertTriangle, CheckCircle, Radio, Thermometer, Gauge, 
   Battery, Droplet, Wind, Zap, TrendingUp, Car
 } from "lucide-react";
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const healthScore = 87;
 

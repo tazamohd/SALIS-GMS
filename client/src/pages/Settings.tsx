@@ -3,13 +3,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Settings as SettingsIcon, Globe, DollarSign, Palette, Printer, Keyboard, RotateCcw } from "lucide-react";
+import { Settings as SettingsIcon, Globe, DollarSign, Palette, Printer, Keyboard } from "lucide-react";
 import type { UserSettings } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts";
 

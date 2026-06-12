@@ -5,11 +5,7 @@ import { db } from "./db";
 import { sql } from "drizzle-orm";
 import { 
   jobCards, 
-  invoices, 
-  payments, 
-  customerProfiles, 
-  vehicles,
-  technicianProfiles,
+  invoices,
   appointments as appointmentsTable
 } from "@shared/schema";
 

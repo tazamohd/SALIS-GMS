@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -44,19 +43,11 @@ import {
 import {
   Landmark,
   CreditCard,
-  FileText,
   Building2,
   Plus,
   Search,
   Download,
-  Calendar,
-  AlertTriangle,
-  Clock,
-  DollarSign,
-  TrendingUp,
-  Users,
   Wallet,
-  ArrowUpRight,
   ExternalLink,
 } from "lucide-react";
 

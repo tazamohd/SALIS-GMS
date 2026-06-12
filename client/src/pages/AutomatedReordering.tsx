@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -27,17 +26,14 @@ import {
   Settings,
   Package,
   ShoppingCart,
-  ArrowUpCircle,
-  ArrowDownCircle,
   Target,
   Activity,
   LineChart as LineChartIcon,
   Sparkles,
   Award,
-  Gauge,
-  ArrowRight
+  Gauge
 } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, BarChart, Bar, ComposedChart, RadialBarChart, RadialBar, PieChart, Pie, Cell } from "recharts";
+import { ResponsiveContainer, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area, BarChart, Bar, ComposedChart } from "recharts";
 
 interface InventoryForecast {
   id: string;

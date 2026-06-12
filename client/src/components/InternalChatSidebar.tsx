@@ -4,14 +4,12 @@ import { useTranslation } from "react-i18next";
 import { 
   MessageCircle, 
   Send, 
-  X, 
   Search, 
   Users, 
   Plus,
   Loader2,
   CheckCheck,
-  ChevronDown,
-  ChevronUp
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

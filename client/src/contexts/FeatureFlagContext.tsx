@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useCallback, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 /**

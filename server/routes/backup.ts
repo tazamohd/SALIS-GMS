@@ -4,7 +4,7 @@ import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
 import { storage } from '../storage';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
-import { sql, eq, count } from 'drizzle-orm';
+import { count } from 'drizzle-orm';
 
 const router = Router();
 

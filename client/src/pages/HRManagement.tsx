@@ -1,17 +1,13 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -27,7 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -36,15 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Clock, Calendar, DollarSign, Star, GraduationCap, Plus, Play, Pause, StopCircle, 
   Users, UserPlus, Briefcase, Building2, FileText, Gift, Target, Megaphone,
-  CalendarDays, ClipboardCheck, TrendingUp, Mail, Phone, MapPin, ChevronRight,
-  Search, Filter, MoreVertical, Eye, Edit, Trash2, CheckCircle, XCircle, 
-  AlertCircle, Clock4, Send, MessageSquare
+  CalendarDays, ClipboardCheck, TrendingUp,
+  Search, Eye, Edit, CheckCircle, XCircle, Clock4
 } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
 import { TabsPageLayout, TabConfig } from "@/components/layouts";
 
 // Mock data for demonstration

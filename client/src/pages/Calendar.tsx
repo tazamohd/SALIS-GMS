@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Calendar as BigCalendar, dateFnsLocalizer, View, SlotInfo } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import { format, parse, startOfWeek, getDay, addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, parse, startOfWeek, getDay, startOfMonth, endOfMonth } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";

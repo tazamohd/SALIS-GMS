@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Activity, Thermometer, Droplet, Gauge, Zap, AlertTriangle, CheckCircle, Wifi, WifiOff, Loader2 } from 'lucide-react';
+import { Activity, Zap, AlertTriangle, CheckCircle, Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { queryClient, apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 

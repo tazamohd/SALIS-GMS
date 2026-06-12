@@ -7,7 +7,7 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import { invoices, users, garages } from '../../shared/schema';
-import { eq, and, gte, sql, count, sum } from 'drizzle-orm';
+import { eq, and, gte, count, sum } from 'drizzle-orm';
 import { generateZATCAQRCode, validateZATCACompliance } from '../../shared/zatcaUtils';
 import { formatDualCalendar, getCurrentHijriDate, isRamadan } from '../../shared/hijriUtils';
 

@@ -1,6 +1,4 @@
 import { Router } from "express";
-import path from "path";
-import fs from "fs";
 
 const router = Router();
 

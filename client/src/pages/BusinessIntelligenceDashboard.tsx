@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
   BarChart3,
-  LineChart,
   PieChart,
   TrendingUp,
   TrendingDown,
@@ -40,7 +39,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from "recharts";
 import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
 
 const COLORS = ['#0A5ED7', '#0BB3FF', '#64748B', '#94A3B8'];

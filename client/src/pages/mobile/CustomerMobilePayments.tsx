@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Receipt, Download, CreditCard, Clock, CheckCircle } from "lucide-react";
+import { Receipt, CreditCard, Clock, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import type { Invoice } from "@shared/schema";
 

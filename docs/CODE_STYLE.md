@@ -25,14 +25,16 @@ formatting rules via `.prettierrc`), and ESLint handles everything else.
 
 ## Spec rules applied (from ecomfe ESNext & React guides)
 
-**ESNext**
+These ESNext rules are **errors** (enforced, CI-blocking):
 - `no-var`, `prefer-const` — use `let`/`const`, never `var`
 - `prefer-rest-params`, `prefer-spread` — rest/spread over `arguments`/`apply`
 - `eqeqeq` (smart) — strict equality
 - `object-shorthand` — consistent method/property shorthand
 - `prefer-template`, `no-useless-concat` — template literals over string concat
 - `dot-notation`, `no-else-return` — general hygiene
-- `no-case-declarations` — block-scope declarations inside `case`
+- `unused-imports/no-unused-imports` — unused imports are auto-removed by `lint:fix`
+
+`no-case-declarations` (block-scope declarations inside `case`) is kept a warning.
 
 **React**
 - `react/jsx-pascal-case` — PascalCase component names
@@ -51,7 +53,20 @@ the new JSX transform makes `react-in-jsx-scope` unnecessary.
 
 ## Adoption status
 
-ESLint currently passes with **0 errors**. Legacy patterns surface as **warnings**
-(a cleanup backlog) rather than hard failures, so the rules can be tightened
-incrementally without blocking development. The largest backlog is unused
-variables/imports — run `npm run lint:fix` and prune as files are touched.
+ESLint passes with **0 errors** and is enforced in CI (the `ESLint` job in
+`.github/workflows/test.yml`). The correctness and auto-fixable ESNext/React
+rules above are **errors**; the remaining items are **warnings** — a cleanup
+backlog teams can draw down incrementally without blocking development.
+
+Current warning backlog (run `npm run lint` for the live list):
+
+| Rule | Count* | Why it's a warning |
+| --- | --- | --- |
+| `unused-imports/no-unused-vars` | ~320 | Unused locals/args need human judgment (imports are auto-removed) |
+| `react/no-array-index-key` | ~191 | Each fix needs a stable id; bulk auto-changing keys risks reconciliation bugs |
+| `@typescript-eslint/ban-ts-comment` | ~60 | Existing escape hatches; review case-by-case |
+| `react-hooks/exhaustive-deps` | ~14 | Adding deps can change behavior; fix per-site |
+| `no-case-declarations` | ~12 | Wrap `case` bodies in braces when touched |
+| `@typescript-eslint/no-require-imports` | ~3 | Dynamic `require()` in a few server modules |
+
+\* Snapshot at adoption time; run the linter for the current count.

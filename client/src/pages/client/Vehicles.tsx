@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Car, Calendar, FileText, Wrench, DollarSign, Receipt, Eye, Download, Clock, CheckCircle } from "lucide-react";
+import { Car, Calendar, Wrench, DollarSign, Receipt, Eye, Clock, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 import { useState } from "react";

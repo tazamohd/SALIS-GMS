@@ -6,10 +6,10 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import {
-  jobCards, invoices, appointments, spareParts,
+  jobCards, invoices, appointments,
   sparePartInventories, purchaseOrders, users
 } from '../../shared/schema';
-import { eq, and, gte, sql, count } from 'drizzle-orm';
+import { eq, and, sql, count } from 'drizzle-orm';
 import { eventBus } from '../engine/event-bus';
 import type { CommandCenterData, AlertItem } from '../../shared/workflows';
 
