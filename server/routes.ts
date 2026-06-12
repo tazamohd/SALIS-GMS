@@ -5289,7 +5289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const preferences = await storage.getNotificationPreferences(userId);
+      const preferences = await storage.getNotificationPreferencesSimple(userId);
       res.json(preferences || { userId, eventMap: '{}', channel: 'all', isLockedByAdmin: false });
     } catch (error) {
       console.error("Error fetching notification preferences:", error);
@@ -5301,7 +5301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const { eventMap } = req.body;
-      const preferences = await storage.upsertNotificationPreferences(userId, eventMap);
+      const preferences = await storage.upsertNotificationPreferencesSimple(userId, eventMap);
       res.json(preferences);
     } catch (error) {
       console.error("Error saving notification preferences:", error);
@@ -12394,7 +12394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loyalty Accounts
   app.post("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
-      const account = await storage.createLoyaltyAccount(req.body);
+      const account = await storage.createCustomerLoyaltyAccount(req.body);
       res.status(201).json(account);
     } catch (error: any) {
       console.error("Error creating loyalty account:", error);
@@ -12405,7 +12405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
       const { programId, customerId } = req.query;
-      const accounts = await storage.getLoyaltyAccounts(
+      const accounts = await storage.getCustomerLoyaltyAccounts(
         programId as string | undefined,
         customerId as string | undefined
       );
@@ -12433,7 +12433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, async (req, res) => {
     try {
       const { customerId } = req.params;
-      const account = await storage.getLoyaltyAccountByCustomer(customerId);
+      const account = await storage.getCustomerLoyaltyAccountByCustomer(customerId);
       res.json(account || null);
     } catch (error) {
       console.error("Error fetching loyalty account by customer:", error);
@@ -12444,7 +12444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const updated = await storage.updateLoyaltyAccount(id, req.body);
+      const updated = await storage.updateCustomerLoyaltyAccount(id, req.body);
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating loyalty account:", error);
@@ -19996,7 +19996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/backups/stats', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId || 'default-garage';
-      const stats = await storage.getBackupStats(garageId);
+      const stats = await storage.getBackupJobStats(garageId);
       res.json(stats);
     } catch (error: any) {
       console.error("Error fetching backup stats:", error);
@@ -20008,7 +20008,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/backups/latest', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId || 'default-garage';
-      const backup = await storage.getLatestBackup(garageId);
+      const backup = await storage.getLatestBackupJob(garageId);
       res.json(backup || null);
     } catch (error: any) {
       console.error("Error fetching latest backup:", error);
@@ -21961,7 +21961,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
     try {
-      const notification = await storage.markNotificationAsRead(req.params.id);
+      const notification = await storage.markPushNotificationAsRead(req.params.id);
       res.json(notification);
     } catch (error: any) {
       console.error("Error marking notification as read:", error);
