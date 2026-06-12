@@ -15,6 +15,8 @@ which this project does not use.
 | `commands/code-review.md` | `/code-review` — review the diff against this repo's conventions, security, and tests. |
 | `commands/security-review.md` | `/security-review` — auth, RBAC, multi-tenant isolation, secrets, ZATCA integrity. |
 | `commands/add-route.md` | `/add-route` — scaffold a domain `*.routes.ts` module + test following the existing pattern. |
+| `commands/specs/*.md` | SDD workflow: `/specs:brainstorm`, `/specs:spec-to-tasks`, `/specs:task-implementation`, `/specs:task-review`. Outputs to `docs/specs/`. |
+| `templates/*.md` | `functional-specification.md` and `task.md` used by the SDD commands. |
 | `agents/react-frontend-expert.md` | Sub-agent for the React 18 client. |
 | `agents/express-api-expert.md` | Sub-agent for the Express/Drizzle/RBAC backend. |
 | `agents/drizzle-schema-expert.md` | Sub-agent for `shared/schema.ts` and migrations. |
@@ -24,6 +26,16 @@ which this project does not use.
 - Commands: type `/code-review`, `/security-review`, or `/add-route <domain>`.
 - Agents activate automatically by description, or invoke explicitly
   (e.g. "use the express-api-expert to add …").
+
+## SDD workflow (Specifications-Driven Development)
+A trimmed, stack-tuned adaptation of developer-kit's SDD loop:
+```
+/specs:brainstorm "<idea>"                       → docs/specs/<id>/specification.md
+/specs:spec-to-tasks docs/specs/<id>/            → docs/specs/<id>/tasks/TASK-*.md
+/specs:task-implementation .../tasks/TASK-001.md → code + tests (TDD)
+/specs:task-review docs/specs/<id>/              → coverage + convention report
+```
+See `docs/specs/README.md` for details.
 
 ## Want the full upstream marketplace instead?
 You can additionally install developer-kit's plugins:
