@@ -7,8 +7,34 @@ on:
     branches: [main, pr-branch]
 
 jobs:
-  test:
+  build-lint:
     name: Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        # eslint 9+ needs a flat eslint.config.js, which this repo hasn't migrated
+        # to yet, so run it best-effort until the lint config is added (follow-up).
+        run: |
+          npm run lint || echo "lint skipped (eslint flat config pending)"
+
+  test:
+    name: Vitest (Postgres 16)
     runs-on: ubuntu-latest
 
     services:
@@ -41,15 +67,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Lint
-        # eslint 9+ needs a flat eslint.config.js, which this repo hasn't migrated
-        # to yet, so run it best-effort until the lint config is added (follow-up).
-        run: |
-          npm run lint || echo "lint skipped (eslint flat config pending)"
 
       - name: Push Drizzle schema
         run: npx drizzle-kit push --force
