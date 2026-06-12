@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "developer-kit": {
+      "source": {
+        "source": "github",
+        "repo": "giuseppe-trisciuoglio/developer-kit"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "developer-kit@developer-kit": true,
+    "developer-kit-typescript@developer-kit": true
+  }
+}
