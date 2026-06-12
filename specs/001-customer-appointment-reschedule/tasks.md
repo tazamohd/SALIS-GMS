@@ -46,7 +46,7 @@ Web app with established layering: `shared/`, `server/`, `client/src/`, `e2e/`.
 - [ ] T005 [P] Add the append-only `appointmentChangeLog` table (`appointmentId`, `garageId`, `actorUserId`, `action`, `previousSlot`, `newSlot?`, `reason?`, `createdAt`) to `shared/schema.ts`.
 - [ ] T006 Apply the schema changes to the dev database with `npm run db:push` and confirm `npm run check` is clean.
 - [ ] T007 Add an eligibility helper (pure function) `server/utils/` computing reschedulable status from `{ status, appointmentDate, rescheduleCount, policy, now }` returning `ok` or a specific error code (FR-005/FR-008/FR-015), reused by all mutating endpoints.
-- [ ] T008 [P] Add a policy-resolution helper in `server/storage.ts` that loads the garage's `reschedulePolicies` row or falls back to documented defaults.
+- [ ] T008 Add a policy-resolution helper in `server/storage.ts` that loads the garage's `reschedulePolicies` row or falls back to documented defaults (depends on T004).
 - [ ] T009 Register a new modular route file `server/routes/appointments-self-service.ts` in the hybrid loader (`server/routes/index.ts`) behind session auth + RBAC (customer scope), with no handlers yet (wiring only).
 
 **Checkpoint**: Schema, policy, eligibility logic, and route wiring exist — stories can begin.
@@ -74,7 +74,7 @@ slot, confirm, and see the move reflected for customer and garage; the old slot 
 - [ ] T015 [US1] Implement `GET /api/portal/appointments/:id/available-slots` in `server/routes/appointments-self-service.ts`: verify ownership/garage (404 on miss), reject ineligible status (409), return `availableSlotsResponseSchema`.
 - [ ] T016 [US1] **Transactional slot claim (KEY)**: implement `rescheduleAppointment` in `server/storage.ts` inside `db.transaction(...)` with row-locking (`FOR UPDATE`) on the contended capacity + appointment rows, mirroring `startBaySession` (`server/storage.ts:10863`); re-validate slot, write new `appointmentDate`, release old slot, bump `rescheduleCount`/`lastRescheduledAt`, and write `appointmentChangeLog` — all atomic.
 - [ ] T017 [US1] Implement `POST /api/portal/appointments/:id/reschedule`: validate body with `rescheduleRequestSchema`, enforce eligibility via the helper, call the storage method, map error codes to `400/404/409`, return `rescheduleResultSchema`.
-- [ ] T018 [P] [US1] Build the customer page `client/src/pages/CustomerAppointmentReschedule.tsx` using an existing archetype wrapper + shadcn/ui, wired with TanStack Query to the slots + reschedule endpoints, with a confirm step (FR-013) and localized error handling (FR-014).
+- [ ] T018 [P] [US1] Build the customer page `client/src/pages/CustomerAppointmentReschedule.tsx` using an existing archetype wrapper + shadcn/ui, wired with TanStack Query to the slots + reschedule endpoints, with a confirm step (FR-013), localized error handling including the empty-availability case (FR-014), and an entry point (link/action) from the existing client-portal appointment list (FR-001 — no new browsing screen).
 - [ ] T019 [P] [US1] Build `client/src/components/appointments/SlotPicker.tsx` (available-slot selector, disabled/unavailable slots non-selectable), and add the portal route in the client router.
 
 **Checkpoint**: US1 is the shippable MVP — reschedule works end-to-end and is concurrency-safe.
@@ -111,11 +111,11 @@ with correct details; with `smsOnChange` enabled, an SMS attempt is logged.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T024 [P] [US3] Integration test: reschedule and cancel each create a staff `notifications` row with correct old/new slot detail; SMS path invoked only when `smsOnChange` is set and never blocks the response (FR-009/FR-010) — same test file (SMS mocked).
+- [ ] T024 [P] [US3] Integration test: reschedule and cancel each create a staff `notifications` row with correct old/new slot detail, addressed to `assignedTo` when set and to the front-desk/manager role when `assignedTo` is null (FR-009); SMS path invoked only when `smsOnChange` is set and never blocks the response (FR-010) — same test file (SMS mocked).
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Add a notification step to both storage mutations: write a staff-targeted `notifications` row and push it over the existing WebSocket channel (`server/websocket.ts`) — reuse existing notification helpers.
+- [ ] T025 [US3] Add a notification step to both storage mutations: resolve the recipient as the appointment's `assignedTo` staff when set, otherwise the garage's front-desk/manager RBAC role (FR-009); write a staff-targeted `notifications` row and push it over the existing WebSocket channel (`server/websocket.ts`) — reuse existing notification helpers.
 - [ ] T026 [US3] Add a non-blocking SMS dispatch via `server/smsService.ts`, gated by the garage's `smsOnChange`; failures are logged via `server/logger.ts`, never surfaced as request errors.
 
 **Checkpoint**: Changes are now observable by staff in real time.
@@ -146,7 +146,7 @@ RTL layout, localized dates; repeat in English. No untranslated keys.
 
 - [ ] T030 [P] Add a per-garage reschedule-policy admin affordance (or seed defaults) so `reschedulePolicies` is configurable; document defaults.
 - [ ] T031 Run the full gate: `npm run check`, `npm run lint`, `npm test`, and the Playwright spec — all green (Constitution quality gates).
-- [ ] T032 Execute `specs/001-customer-appointment-reschedule/quickstart.md` manual scenarios 1–9 and confirm behavior.
+- [ ] T032 Execute `specs/001-customer-appointment-reschedule/quickstart.md` manual scenarios 1–9 and confirm behavior, including timing the happy-path reschedule against the <90s target (SC-001).
 - [ ] T033 [P] Update relevant docs (portal/customer feature docs under `docs/`) to mention self-service reschedule/cancel.
 
 ---

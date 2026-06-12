@@ -29,7 +29,8 @@ A status-change row is written when a cancel sets status to `cancelled`.
 
 ### `notifications` (reuse as-is)
 
-One staff-targeted row per customer reschedule/cancel (FR-009), pushed over WebSocket.
+One staff-targeted row per customer reschedule/cancel (FR-009), pushed over WebSocket. Recipient is
+the appointment's `assignedTo` staff when set, otherwise the garage's front-desk/manager RBAC role.
 
 ## New entities
 

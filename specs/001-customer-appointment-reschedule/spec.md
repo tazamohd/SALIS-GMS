@@ -68,9 +68,10 @@ receive a cancellation notification.
 
 ### User Story 3 - Garage staff are notified of customer changes (Priority: P2)
 
-When a customer reschedules or cancels, the assigned garage staff receive an in-app notification
-showing the appointment, the customer, and the change (old slot → new slot, or cancelled), so the
-workshop schedule stays trustworthy without staff watching the calendar continuously.
+When a customer reschedules or cancels, the appointment's assigned garage staff (or, if none is
+assigned, the garage's front-desk/manager role) receive an in-app notification showing the
+appointment, the customer, and the change (old slot → new slot, or cancelled), so the workshop
+schedule stays trustworthy without staff watching the calendar continuously.
 
 **Why this priority**: Without notification, staff lose confidence in self-service because changes
 happen silently. It is P2 because the change itself is already persisted and visible on the
@@ -84,9 +85,12 @@ distinct in-app notification appears for each with the correct appointment and c
 1. **Given** a customer reschedules an appointment, **When** the change is saved, **Then** the
    garage staff associated with that appointment receive an in-app notification describing the old
    and new slot.
-2. **Given** a customer cancels an appointment, **When** the change is saved, **Then** the garage
+2. **Given** the appointment has no assigned staff member, **When** a customer reschedules or
+   cancels it, **Then** the garage's front-desk/manager role receives the notification instead, so
+   the change is never silently lost.
+3. **Given** a customer cancels an appointment, **When** the change is saved, **Then** the garage
    staff receive an in-app cancellation notification.
-3. **Given** the garage has SMS reminders enabled, **When** a reschedule or cancel occurs, **Then**
+4. **Given** the garage has SMS reminders enabled, **When** a reschedule or cancel occurs, **Then**
    an SMS notification MAY also be sent (SMS is optional and gated by the garage's configuration).
 
 ---
@@ -141,7 +145,9 @@ hard-coded English remain; repeat in English.
 ### Functional Requirements
 
 - **FR-001**: The system MUST allow an authenticated customer to view their own upcoming
-  appointments that are eligible for self-service change.
+  appointments that are eligible for self-service change, surfaced through the existing client
+  portal appointment list (the reschedule/cancel flow is reached by opening one of those
+  appointments); this feature does not introduce a separate appointment-browsing screen.
 - **FR-002**: The system MUST allow a customer to reschedule an eligible appointment to a different
   date and time chosen from slots the garage genuinely has available.
 - **FR-003**: The system MUST allow a customer to cancel an eligible appointment.
@@ -158,7 +164,9 @@ hard-coded English remain; repeat in English.
 - **FR-008**: The system MUST enforce a configurable maximum number of self-service reschedules per
   appointment and block further reschedules once the limit is reached.
 - **FR-009**: The system MUST notify the garage staff associated with an appointment, via in-app
-  notification, whenever a customer reschedules or cancels it.
+  notification, whenever a customer reschedules or cancels it. The recipient is the appointment's
+  assigned staff member when one is set; when no staff is assigned, the notification MUST fall back
+  to the garage's front-desk/manager role so no customer change goes unseen.
 - **FR-010**: The system MUST optionally send an SMS notification on reschedule or cancel when the
   garage has SMS notifications enabled, and MUST treat SMS delivery as non-blocking.
 - **FR-011**: The system MUST record an audit entry for every reschedule and cancel, capturing the
@@ -225,3 +233,9 @@ hard-coded English remain; repeat in English.
 - Customers are notified of the outcome in-portal; whether customers also receive their own
   SMS/email confirmation follows the garage's existing reminder configuration and is not newly
   mandated here.
+- The customer's list of upcoming appointments is provided by the existing client portal; this
+  feature adds the reschedule/cancel actions reached from an opened appointment rather than a new
+  browsing screen (see FR-001).
+- Staff notification recipients are resolved from the existing RBAC roles: the appointment's
+  assigned staff when set, otherwise the garage's front-desk/manager role; no new role is
+  introduced.

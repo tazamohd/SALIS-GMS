@@ -42,7 +42,8 @@ Server flow (single DB transaction, FR-007):
 4. Update `appointmentDate`, release old slot, increment `rescheduleCount`, set `lastRescheduledAt`.
 5. Write `appointmentChangeLog` (action `reschedule`, old/new slot, reason) and an
    `appointmentStatusHistory`/audit entry.
-6. Create staff `notifications` row + WebSocket push; optionally enqueue SMS (non-blocking).
+6. Create staff `notifications` row (recipient = `assignedTo`, else garage front-desk/manager role)
+   + WebSocket push; optionally enqueue SMS (non-blocking).
 
 - **200** → `rescheduleResultSchema`: `{ appointmentId, newSlotStart, rescheduleCount }`
 - **400 / 404 / 409** as above.
