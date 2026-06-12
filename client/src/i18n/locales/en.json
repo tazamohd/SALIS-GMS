@@ -1,4 +1,26 @@
 {
+  "reschedule": {
+    "title": "Reschedule appointment",
+    "description": "Choose a new time for your upcoming service visit.",
+    "selectSlot": "Select a new time slot",
+    "noSlots": "No open slots are available. Please contact the garage.",
+    "reasonLabel": "Reason (optional)",
+    "reasonPlaceholder": "Let the garage know why…",
+    "cancel": "Back",
+    "confirmCta": "Reschedule",
+    "confirmTitle": "Confirm new time",
+    "confirmBody": "Your appointment will be moved to the selected slot.",
+    "success": "Appointment rescheduled",
+    "errorTitle": "Could not reschedule",
+    "errors": {
+      "inside_cutoff": "This appointment is too close to its start time to change online. Please contact the garage.",
+      "limit_reached": "This appointment has already been rescheduled the maximum number of times.",
+      "slot_taken": "That time slot is no longer available. Please choose another.",
+      "ineligible_status": "This appointment can no longer be rescheduled.",
+      "not_owner": "Appointment not found.",
+      "validation_error": "Something went wrong. Please try again."
+    }
+  },
   "app": {
     "name": "SALIS AUTO",
     "tagline": "Integrated automotive workshop management system",

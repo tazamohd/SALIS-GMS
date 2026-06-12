@@ -785,6 +785,10 @@ export const appointments = pgTable("appointments", {
   reminderSentAt: timestamp("reminder_sent_at"),
   notes: text("notes"),
   cancellationReason: text("cancellation_reason"),
+  // Self-service rescheduling (feature 001): how many times the customer has
+  // rescheduled this appointment, and when it was last rescheduled.
+  rescheduleCount: integer("reschedule_count").notNull().default(0),
+  lastRescheduledAt: timestamp("last_rescheduled_at"),
   createdBy: varchar("created_by")
     .notNull()
     .references(() => users.id),
@@ -822,6 +826,46 @@ export const appointmentReminders = pgTable("appointment_reminders", {
   sentAt: timestamp("sent_at"),
   status: varchar("status").notNull().default("pending"), // "pending", "sent", "failed"
   failureReason: text("failure_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Reschedule Policies (feature 001) - per-garage rules governing customer
+// self-service rescheduling/cancellation. One row per garage; absent rows fall
+// back to documented defaults (24h notice, 3 reschedules, no SMS).
+export const reschedulePolicies = pgTable("reschedule_policies", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id")
+    .notNull()
+    .unique()
+    .references(() => garages.id),
+  minNoticeHours: integer("min_notice_hours").notNull().default(24),
+  maxReschedules: integer("max_reschedules").notNull().default(3),
+  smsOnChange: boolean("sms_on_change").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Appointment Change Log (feature 001) - immutable audit of every
+// customer-initiated reschedule/cancel (actor, action, old/new slot, reason).
+export const appointmentChangeLog = pgTable("appointment_change_log", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  appointmentId: uuid("appointment_id")
+    .notNull()
+    .references(() => appointments.id),
+  garageId: uuid("garage_id")
+    .notNull()
+    .references(() => garages.id),
+  actorUserId: varchar("actor_user_id")
+    .notNull()
+    .references(() => users.id),
+  action: varchar("action").notNull(), // "reschedule" | "cancel"
+  previousSlot: timestamp("previous_slot").notNull(),
+  newSlot: timestamp("new_slot"),
+  reason: text("reason"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -1160,6 +1204,20 @@ export type InsertAppointmentStatusHistory =
 export type AppointmentReminder = typeof appointmentReminders.$inferSelect;
 export type InsertAppointmentReminder =
   typeof appointmentReminders.$inferInsert;
+
+// Feature 001: reschedule policy + change log
+export type ReschedulePolicy = typeof reschedulePolicies.$inferSelect;
+export type InsertReschedulePolicy = typeof reschedulePolicies.$inferInsert;
+export const insertReschedulePolicySchema = createInsertSchema(
+  reschedulePolicies,
+).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type AppointmentChangeLog = typeof appointmentChangeLog.$inferSelect;
+export type InsertAppointmentChangeLog =
+  typeof appointmentChangeLog.$inferInsert;
+export const insertAppointmentChangeLogSchema = createInsertSchema(
+  appointmentChangeLog,
+).omit({ id: true, createdAt: true });
 
 export type Vehicle = typeof vehicles.$inferSelect;
 export type InsertVehicle = typeof vehicles.$inferInsert;

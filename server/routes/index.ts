@@ -38,6 +38,7 @@ import featureFlagRoutes from "./feature-flags";
 import healthRoutes from "./health";
 import { customerRoutes } from "./customers.routes";
 import { schedulingRoutes } from "./scheduling.routes";
+import { appointmentsSelfServiceRoutes } from "./appointments-self-service";
 import { inventoryRoutes } from "./inventory.routes";
 import { technicianRoutes } from "./technicians.routes";
 import { vehicleRoutes } from "./vehicles.routes";
@@ -222,6 +223,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api", schedulingRoutes);
   console.log("✅ Scheduling Routes Loaded");
+
+  // Customer self-service appointment rescheduling (feature 001)
+  app.use("/api", appointmentsSelfServiceRoutes);
+  console.log("✅ Appointment Self-Service Routes Loaded");
 
   app.use("/api", inventoryRoutes);
   console.log("✅ Inventory Routes Loaded");
