@@ -21558,29 +21558,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== Notification Preferences API ====================
 
-  app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id;
-      const prefs = await storage.getNotificationPreferences(userId);
-      if (!prefs) {
-        return res.json({
-          pushEnabled: true,
-          emailEnabled: true,
-          smsEnabled: true,
-          serviceReminders: true,
-          appointmentReminders: true,
-          statusUpdates: true,
-          promotions: false,
-          vehicleAlerts: true,
-        });
-      }
-      res.json(prefs);
-    } catch (error: any) {
-      console.error("Error fetching notification preferences:", error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
   app.put('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id;
