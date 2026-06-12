@@ -57,6 +57,7 @@ The `registerRoutes(app)` function is the API layer's single assembly point. It 
 /landing                     Bot SSR endpoint
 /                            Bot/crawler SSR middleware
 /api (health only)           Health check — no auth
+/api/public                  Unauthenticated public endpoints (server/routes/public.ts) — no auth
 setupAuth(app)               Passport + session middleware
 /api (auth routes)           Login, logout, register, user
 /api (feature modules)       predictive-maintenance, parts-recommendations,

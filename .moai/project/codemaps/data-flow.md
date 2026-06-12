@@ -12,8 +12,8 @@ Client browser
 Express middleware stack (server/index.ts)
   1. requestId middleware          -- assigns X-Request-ID
   2. express.json()                -- parses JSON body
-  3. express-rate-limit            -- checks rate limit bucket
-  4. Security headers middleware   -- sets X-Frame-Options, etc.
+  3. Security headers middleware   -- sets X-Frame-Options, X-Content-Type-Options, HSTS, etc.
+  4. express-rate-limit            -- checks rate limit bucket (API + auth limiters)
   5. Request logging middleware    -- records start time
        |
        v

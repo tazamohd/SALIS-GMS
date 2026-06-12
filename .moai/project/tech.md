@@ -25,7 +25,7 @@
 | Calendar | react-big-calendar | ^1.19.4 |
 | Drag-and-drop | @dnd-kit/core | ^6.3.1 |
 | i18n | react-i18next + i18next | ^16.1.0 / ^25.6.0 |
-| PDF generation | jspdf + jspdf-autotable | ^3.0.3 |
+| PDF generation | jspdf + jspdf-autotable | ^3.0.3 / ^5.0.2 |
 | QR codes | qrcode | ^1.5.4 |
 | PWA | Service worker via registerSW | — |
 
@@ -36,7 +36,7 @@ The Vite build produces manual chunks: `vendor-react`, `vendor-ui`, `vendor-char
 | Concern | Library / Tool | Version |
 |---------|----------------|---------|
 | HTTP server | Express | ^4.21.2 |
-| Session authentication | Passport.js + passport-local | ^0.7.0 |
+| Session authentication | Passport.js + passport-local | ^0.7.0 / ^1.0.0 |
 | Session store | connect-pg-simple (PostgreSQL) | ^10.0.0 |
 | Password hashing | bcrypt | ^6.0.0 |
 | 2FA | speakeasy | ^2.0.0 |

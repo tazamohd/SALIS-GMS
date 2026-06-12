@@ -93,7 +93,7 @@ server/routes/index.ts
 | `react-big-calendar` | ^1.19.4 | Calendar view for appointments |
 | `react-day-picker` | ^8.10.1 | Date picker component |
 | `@dnd-kit/core` + `@dnd-kit/sortable` | ^6.3.1 / ^10.0.0 | Drag-and-drop |
-| `react-i18next` + `i18next` | ^16.1.0 / ^25.6.0 | Internationalization (Arabic/English) |
+| `react-i18next` + `i18next` | ^16.1.0 / ^25.6.0 | Internationalization (7 locales: en, ar, fr, es, de, zh, hi) |
 | `i18next-browser-languagedetector` | ^8.2.0 | Auto-detect browser language |
 | `date-fns` | ^3.6.0 | Date formatting and arithmetic |
 | `@stripe/react-stripe-js` + `@stripe/stripe-js` | — | Stripe payment UI |

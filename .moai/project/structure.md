@@ -39,8 +39,11 @@ client/
     ├── index.css            # Global CSS and Tailwind base
     ├── components/          # Shared UI components
     │   ├── Layout.tsx       # Main authenticated shell (sidebar, topbar)
+    │   ├── ClientLayout.tsx
     │   ├── TechnicianLayout.tsx
+    │   ├── TechnicianMobileLayout.tsx
     │   ├── CustomerPortalLayout.tsx
+    │   ├── CustomerMobileLayout.tsx
     │   ├── PurchaseAgentLayout.tsx
     │   ├── ErrorBoundary.tsx
     │   └── ui/              # shadcn/ui primitives (button, dialog, table, etc.)
