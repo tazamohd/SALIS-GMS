@@ -2,6 +2,8 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+import { registerFluentFormatters } from './formatters';
+
 import enTranslations from './locales/en.json';
 import arTranslations from './locales/ar.json';
 import frTranslations from './locales/fr.json';
@@ -58,6 +60,12 @@ i18n
       caches: ['localStorage']
     }
   });
+
+// Borrowed from Project Fluent: let translation strings reference locale-aware
+// formatters inline (currency, numbers, Hijri/Gregorian dates) instead of
+// pre-formatting and concatenating in components. The formatter service is set
+// up synchronously by init() above, so this is safe to call immediately.
+registerFluentFormatters(i18n);
 
 i18n.on('languageChanged', (lng) => {
   const lang = supportedLanguages.find(l => l.code === lng);

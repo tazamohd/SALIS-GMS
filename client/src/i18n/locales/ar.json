@@ -1,4 +1,29 @@
 {
+  "count": {
+    "vehicles_zero": "لا توجد مركبات",
+    "vehicles_one": "مركبة واحدة",
+    "vehicles_two": "مركبتان",
+    "vehicles_few": "{{count}} مركبات",
+    "vehicles_many": "{{count}} مركبة",
+    "vehicles_other": "{{count}} مركبة",
+    "items_zero": "لا توجد عناصر",
+    "items_one": "عنصر واحد",
+    "items_two": "عنصران",
+    "items_few": "{{count}} عناصر",
+    "items_many": "{{count}} عنصرًا",
+    "items_other": "{{count}} عنصر",
+    "daysRemaining_zero": "لم يتبقَّ أي يوم",
+    "daysRemaining_one": "يتبقى يوم واحد",
+    "daysRemaining_two": "يتبقى يومان",
+    "daysRemaining_few": "تتبقى {{count}} أيام",
+    "daysRemaining_many": "يتبقى {{count}} يومًا",
+    "daysRemaining_other": "يتبقى {{count}} يوم"
+  },
+  "greeting": {
+    "welcome": "أهلاً بك، {{name}}",
+    "welcome_male": "أهلاً بك، السيد {{name}}",
+    "welcome_female": "أهلاً بك، السيدة {{name}}"
+  },
   "app": {
     "name": "ساليس أوتو",
     "tagline": "نظام إدارة مراكز السيارات المتكامل",
