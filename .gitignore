@@ -16,3 +16,4 @@ user_credentials.csv
 .moai/state/
 .moai/reports/
 .moai/cache/
+.moai/plans/
