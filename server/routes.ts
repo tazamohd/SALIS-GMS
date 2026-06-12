@@ -20594,48 +20594,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      const accounts = await storage.getLoyaltyAccounts(garageId as string);
-      res.json(accounts);
-    } catch (error: any) {
-      console.error("Error fetching loyalty accounts:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty accounts" });
-    }
-  });
-
-  app.get('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.getLoyaltyAccount(req.params.id);
-      if (!account) return res.status(404).json({ message: "Account not found" });
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error fetching loyalty account:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty account" });
-    }
-  });
-
-  app.post('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.createLoyaltyAccount(req.body);
-      res.status(201).json(account);
-    } catch (error: any) {
-      console.error("Error creating loyalty account:", error);
-      res.status(500).json({ message: "Failed to create loyalty account" });
-    }
-  });
-
-  app.patch('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.updateLoyaltyAccount(req.params.id, req.body);
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error updating loyalty account:", error);
-      res.status(500).json({ message: "Failed to update loyalty account" });
-    }
-  });
-
   app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, async (req: any, res) => {
     try {
       const { points } = req.body;
