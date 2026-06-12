@@ -49,8 +49,12 @@ by `/02-speckit.specify`).
 
 ## Quick start
 
+A starter constitution seeded with SALIS-GMS's real stack rules already lives at
+[`.specify/memory/constitution.md`](../.specify/memory/constitution.md). Review/amend
+it with `/01-speckit.constitution`, then:
+
 ```
-/01-speckit.constitution    # establish project rules first (recommended)
+/01-speckit.constitution    # review/amend the seeded project rules
 /02-speckit.specify  "Add a parts low-stock email alert"
 /03-speckit.clarify         # resolve ambiguities
 /04-speckit.plan
@@ -64,6 +68,8 @@ specify→analyze pipeline with `/00-speckit.all`.
 ## Note on overlap with built-ins
 
 The QA-stage commands (`/08-speckit.checker`, `/09-speckit.tester`,
-`/10-speckit.reviewer`, `/11-speckit.validate`) overlap with Claude Code's
-built-in `/code-review`, `/security-review`, and `/verify`. They're included for
-a complete pipeline; use whichever fits your workflow.
+`/10-speckit.reviewer`) overlap with Claude Code's built-in `/code-review`,
+`/security-review`, and `/verify`, plus the repo's own `npm run lint` / `check` /
+`test`. They've been relabeled `[Prefer native]` and carry a redirect note — use the
+native tooling by default. `/11-speckit.validate` (semantic spec-vs-code check) has no
+built-in equivalent and is kept as a first-class step.

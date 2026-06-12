@@ -1,10 +1,14 @@
 ---
-description: Execute tests, measure coverage, and report results.
+description: "[Prefer native] Run tests/coverage. On SALIS-GMS use npm test (Vitest) + /verify."
 ---
 
 // turbo-all
 
 # Workflow: speckit.tester
+
+> **Note for SALIS-GMS:** This overlaps with native tooling. Prefer
+> `npm test` / `npm run test:coverage` (Vitest), the Playwright `e2e/` suite, and
+> `/verify`. Use this command only if you want the speckit reporting format.
 
 1. **Context Analysis**:
    - The user may specify test paths, options, or just run all tests.

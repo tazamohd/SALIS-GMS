@@ -1,8 +1,12 @@
 ---
-description: Perform code review with actionable feedback and suggestions.
+description: "[Prefer native] Code review. On SALIS-GMS use /code-review."
 ---
 
 # Workflow: speckit.reviewer
+
+> **Note for SALIS-GMS:** This overlaps with the built-in `/code-review`, which is
+> the preferred reviewer for this repo. Use this command only if you want the
+> speckit review format.
 
 1. **Context Analysis**:
    - The user may specify files to review, "staged" for git staged changes, or "branch" for branch diff.
