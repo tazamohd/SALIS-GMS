@@ -11,6 +11,8 @@ services:
         fromDatabase:
           name: slis-gms-db
           property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
 databases:
   - name: slis-gms-db
     plan: free
