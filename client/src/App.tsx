@@ -198,6 +198,7 @@ import TechnicianMobileClock from "@/pages/mobile/TechnicianMobileClock";
 import TechnicianMobileLookup from "@/pages/mobile/TechnicianMobileLookup";
 import TechnicianMobileProfile from "@/pages/mobile/TechnicianMobileProfile";
 import { CustomerAppointments } from "@/pages/customer/CustomerAppointments";
+import { CustomerAppointmentReschedule } from "@/pages/customer/CustomerAppointmentReschedule";
 import { CustomerInvoices } from "@/pages/customer/CustomerInvoices";
 import { CustomerVehicles } from "@/pages/customer/CustomerVehicles";
 import { CustomerCommunications } from "@/pages/customer/CustomerCommunications";
@@ -322,6 +323,11 @@ function Router() {
       <Route path="/portal/dashboard">
         <CustomerPortalLayout>
           <CustomerDashboard />
+        </CustomerPortalLayout>
+      </Route>
+      <Route path="/portal/appointments/:id/reschedule">
+        <CustomerPortalLayout>
+          <CustomerAppointmentReschedule />
         </CustomerPortalLayout>
       </Route>
       <Route path="/portal/appointments">

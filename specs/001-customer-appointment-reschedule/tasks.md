@@ -30,8 +30,8 @@ Web app with established layering: `shared/`, `server/`, `client/src/`, `e2e/`.
 
 **Purpose**: Establish the shared contract and i18n namespaces every story builds on.
 
-- [ ] T001 [P] Create the shared Zod contract module `shared/schemas/appointmentReschedule.ts` with `rescheduleRequestSchema`, `cancelRequestSchema`, `availableSlotSchema`, `availableSlotsResponseSchema`, `rescheduleResultSchema`, and the discriminated error-code union (`inside_cutoff | limit_reached | slot_taken | ineligible_status | not_owner | validation_error`), per contracts/appointment-reschedule.md.
-- [ ] T002 [P] Add the `reschedule` i18n namespace keys (labels, slot/date strings, confirmations, every error-code message) to `client/src/i18n/locales/en.json`.
+- [X] T001 [P] Create the shared Zod contract module `shared/schemas/appointmentReschedule.ts` with `rescheduleRequestSchema`, `cancelRequestSchema`, `availableSlotSchema`, `availableSlotsResponseSchema`, `rescheduleResultSchema`, and the discriminated error-code union (`inside_cutoff | limit_reached | slot_taken | ineligible_status | not_owner | validation_error`), per contracts/appointment-reschedule.md.
+- [X] T002 [P] Add the `reschedule` i18n namespace keys (labels, slot/date strings, confirmations, every error-code message) to `client/src/i18n/locales/en.json`.
 
 ---
 
@@ -41,13 +41,13 @@ Web app with established layering: `shared/`, `server/`, `client/src/`, `e2e/`.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Extend `shared/schema.ts`: add `rescheduleCount` (integer, default 0) and `lastRescheduledAt` (timestamp, nullable) to the existing `appointments` table, per data-model.md.
-- [ ] T004 [P] Add the `reschedulePolicies` table (per-garage: `garageId` unique, `minNoticeHours` default 24, `maxReschedules` default 3, `smsOnChange` default false) to `shared/schema.ts` with drizzle-zod insert/select schemas.
-- [ ] T005 [P] Add the append-only `appointmentChangeLog` table (`appointmentId`, `garageId`, `actorUserId`, `action`, `previousSlot`, `newSlot?`, `reason?`, `createdAt`) to `shared/schema.ts`.
-- [ ] T006 Apply the schema changes to the dev database with `npm run db:push` and confirm `npm run check` is clean.
-- [ ] T007 Add an eligibility helper (pure function) `server/utils/` computing reschedulable status from `{ status, appointmentDate, rescheduleCount, policy, now }` returning `ok` or a specific error code (FR-005/FR-008/FR-015), reused by all mutating endpoints.
-- [ ] T008 Add a policy-resolution helper in `server/storage.ts` that loads the garage's `reschedulePolicies` row or falls back to documented defaults (depends on T004).
-- [ ] T009 Register a new modular route file `server/routes/appointments-self-service.ts` in the hybrid loader (`server/routes/index.ts`) behind session auth + RBAC (customer scope), with no handlers yet (wiring only).
+- [X] T003 Extend `shared/schema.ts`: add `rescheduleCount` (integer, default 0) and `lastRescheduledAt` (timestamp, nullable) to the existing `appointments` table, per data-model.md.
+- [X] T004 [P] Add the `reschedulePolicies` table (per-garage: `garageId` unique, `minNoticeHours` default 24, `maxReschedules` default 3, `smsOnChange` default false) to `shared/schema.ts` with drizzle-zod insert/select schemas.
+- [X] T005 [P] Add the append-only `appointmentChangeLog` table (`appointmentId`, `garageId`, `actorUserId`, `action`, `previousSlot`, `newSlot?`, `reason?`, `createdAt`) to `shared/schema.ts`.
+- [X] T006 Apply the schema changes to the dev database with `npm run db:push` and confirm `npm run check` is clean.
+- [X] T007 Add an eligibility helper (pure function) `server/utils/` computing reschedulable status from `{ status, appointmentDate, rescheduleCount, policy, now }` returning `ok` or a specific error code (FR-005/FR-008/FR-015), reused by all mutating endpoints.
+- [X] T008 Add a policy-resolution helper in `server/storage.ts` that loads the garage's `reschedulePolicies` row or falls back to documented defaults (depends on T004).
+- [X] T009 Register a new modular route file `server/routes/appointments-self-service.ts` in the hybrid loader (`server/routes/index.ts`) behind session auth + RBAC (customer scope), with no handlers yet (wiring only).
 
 **Checkpoint**: Schema, policy, eligibility logic, and route wiring exist — stories can begin.
 
@@ -63,19 +63,19 @@ slot, confirm, and see the move reflected for customer and garage; the old slot 
 
 ### Tests for User Story 1 ⚠️ (write first, ensure they fail)
 
-- [ ] T010 [P] [US1] Integration test: `GET /api/portal/appointments/:id/available-slots` returns only real availability and `404`s for non-owned/cross-garage appointments — `server/routes/__tests__/appointments-self-service.test.ts`.
-- [ ] T011 [P] [US1] Integration test: happy-path reschedule updates `appointmentDate`, increments `rescheduleCount`, frees the old slot, and writes an `appointmentChangeLog` row — same test file.
-- [ ] T012 [P] [US1] **Concurrency test (KEY)**: two simultaneous reschedules at the last remaining slot yield exactly one `200` and one `409 slot_taken`, with no double-booking (SC-003) — same test file.
-- [ ] T013 [P] [US1] Unit test for the eligibility helper covering cutoff and limit boundaries — `server/utils/__tests__/`.
+- [X] T010 [P] [US1] Integration test: `GET /api/portal/appointments/:id/available-slots` returns only real availability and `404`s for non-owned/cross-garage appointments — `server/routes/__tests__/appointments-self-service.test.ts`.
+- [X] T011 [P] [US1] Integration test: happy-path reschedule updates `appointmentDate`, increments `rescheduleCount`, frees the old slot, and writes an `appointmentChangeLog` row — same test file.
+- [X] T012 [P] [US1] **Concurrency test (KEY)**: two simultaneous reschedules at the last remaining slot yield exactly one `200` and one `409 slot_taken`, with no double-booking (SC-003) — same test file.
+- [X] T013 [P] [US1] Unit test for the eligibility helper covering cutoff and limit boundaries — `server/utils/__tests__/`.
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement an availability read in `server/storage.ts` that derives offered slots from existing workshop availability/capacity + existing bookings (reuse, do not rebuild), scoped by `garageId`.
-- [ ] T015 [US1] Implement `GET /api/portal/appointments/:id/available-slots` in `server/routes/appointments-self-service.ts`: verify ownership/garage (404 on miss), reject ineligible status (409), return `availableSlotsResponseSchema`.
-- [ ] T016 [US1] **Transactional slot claim (KEY)**: implement `rescheduleAppointment` in `server/storage.ts` inside `db.transaction(...)` with row-locking (`FOR UPDATE`) on the contended capacity + appointment rows, mirroring `startBaySession` (`server/storage.ts:10863`); re-validate slot, write new `appointmentDate`, release old slot, bump `rescheduleCount`/`lastRescheduledAt`, and write `appointmentChangeLog` — all atomic.
-- [ ] T017 [US1] Implement `POST /api/portal/appointments/:id/reschedule`: validate body with `rescheduleRequestSchema`, enforce eligibility via the helper, call the storage method, map error codes to `400/404/409`, return `rescheduleResultSchema`.
-- [ ] T018 [P] [US1] Build the customer page `client/src/pages/CustomerAppointmentReschedule.tsx` using an existing archetype wrapper + shadcn/ui, wired with TanStack Query to the slots + reschedule endpoints, with a confirm step (FR-013), localized error handling including the empty-availability case (FR-014), and an entry point (link/action) from the existing client-portal appointment list (FR-001 — no new browsing screen).
-- [ ] T019 [P] [US1] Build `client/src/components/appointments/SlotPicker.tsx` (available-slot selector, disabled/unavailable slots non-selectable), and add the portal route in the client router.
+- [X] T014 [US1] Implement an availability read in `server/storage.ts` that derives offered slots from existing workshop availability/capacity + existing bookings (reuse, do not rebuild), scoped by `garageId`.
+- [X] T015 [US1] Implement `GET /api/portal/appointments/:id/available-slots` in `server/routes/appointments-self-service.ts`: verify ownership/garage (404 on miss), reject ineligible status (409), return `availableSlotsResponseSchema`.
+- [X] T016 [US1] **Transactional slot claim (KEY)**: implement `rescheduleAppointment` in `server/storage.ts` inside `db.transaction(...)` with row-locking (`FOR UPDATE`) on the contended capacity + appointment rows, mirroring `startBaySession` (`server/storage.ts:10863`); re-validate slot, write new `appointmentDate`, release old slot, bump `rescheduleCount`/`lastRescheduledAt`, and write `appointmentChangeLog` — all atomic.
+- [X] T017 [US1] Implement `POST /api/portal/appointments/:id/reschedule`: validate body with `rescheduleRequestSchema`, enforce eligibility via the helper, call the storage method, map error codes to `400/404/409`, return `rescheduleResultSchema`.
+- [X] T018 [P] [US1] Build the customer page `client/src/pages/CustomerAppointmentReschedule.tsx` using an existing archetype wrapper + shadcn/ui, wired with TanStack Query to the slots + reschedule endpoints, with a confirm step (FR-013), localized error handling including the empty-availability case (FR-014), and an entry point (link/action) from the existing client-portal appointment list (FR-001 — no new browsing screen).
+- [X] T019 [P] [US1] Build `client/src/components/appointments/SlotPicker.tsx` (available-slot selector, disabled/unavailable slots non-selectable), and add the portal route in the client router.
 
 **Checkpoint**: US1 is the shippable MVP — reschedule works end-to-end and is concurrency-safe.
 

@@ -764,7 +764,9 @@ import {
   type InsertSchedulingOptimizationRun,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
+import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt, ne } from "drizzle-orm";
+import { checkRescheduleEligibility } from "./utils/appointmentEligibility";
+import type { RescheduleErrorCode } from "@shared/schemas/appointmentReschedule";
 import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
@@ -2589,6 +2591,169 @@ export class DatabaseStorage implements IStorage {
     }).where(eq(appointments.id, id)).returning();
     
     return updatedAppointment;
+  }
+
+  // ── Feature 001: Customer self-service rescheduling ──────────────────────
+
+  async getReschedulePolicy(
+    garageId: string,
+  ): Promise<{ minNoticeHours: number; maxReschedules: number; smsOnChange: boolean }> {
+    const { reschedulePolicies } = await import("@shared/schema");
+    const [row] = await db
+      .select()
+      .from(reschedulePolicies)
+      .where(eq(reschedulePolicies.garageId, garageId));
+    return {
+      minNoticeHours: row?.minNoticeHours ?? 24,
+      maxReschedules: row?.maxReschedules ?? 3,
+      smsOnChange: row?.smsOnChange ?? false,
+    };
+  }
+
+  /**
+   * Build candidate reschedule slots from a business-hours grid for the coming
+   * week and mark each unavailable when it overlaps a live (non-cancelled)
+   * appointment in the same garage. Availability is derived from real bookings;
+   * bay/technician capacity refinement is a documented follow-up.
+   */
+  async getRescheduleAvailability(
+    garageId: string,
+    durationMinutes: number,
+    now: Date,
+  ): Promise<Array<{ start: string; end: string; available: boolean }>> {
+    const DAY_START_HOUR = 9;
+    const DAY_END_HOUR = 17;
+    const slots: Array<{ start: Date; end: Date }> = [];
+    for (let d = 1; d <= 7; d++) {
+      const day = new Date(now);
+      day.setUTCDate(day.getUTCDate() + d);
+      for (let h = DAY_START_HOUR; h < DAY_END_HOUR; h++) {
+        const start = new Date(
+          Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), h, 0, 0),
+        );
+        const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+        slots.push({ start, end });
+      }
+    }
+    if (slots.length === 0) return [];
+
+    const windowStart = slots[0].start;
+    const windowEnd = slots[slots.length - 1].end;
+    const existing = await db
+      .select()
+      .from(appointments)
+      .where(
+        and(
+          eq(appointments.garageId, garageId),
+          ne(appointments.status, "cancelled"),
+          gte(appointments.appointmentDate, windowStart),
+          lte(appointments.appointmentDate, windowEnd),
+        ),
+      );
+
+    return slots.map(({ start, end }) => ({
+      start: start.toISOString(),
+      end: end.toISOString(),
+      available: !existing.some((a) => {
+        const oStart = new Date(a.appointmentDate as any);
+        const oEnd = new Date(oStart.getTime() + (a.duration ?? 60) * 60 * 1000);
+        return start < oEnd && oStart < end;
+      }),
+    }));
+  }
+
+  /**
+   * Concurrency-safe customer reschedule. A per-(garage, slot) advisory lock
+   * serializes competing claims to the same slot, mirroring the row-locking
+   * race guard in startBaySession, so two simultaneous reschedules to the last
+   * slot cannot both succeed (FR-007 / SC-003).
+   */
+  async rescheduleAppointmentForCustomer(params: {
+    appointmentId: string;
+    customerId: string;
+    garageId: string;
+    newSlotStart: Date;
+    reason?: string;
+    now: Date;
+  }): Promise<
+    { ok: true; appointment: Appointment } | { ok: false; code: RescheduleErrorCode }
+  > {
+    const { appointmentChangeLog } = await import("@shared/schema");
+    const policy = await this.getReschedulePolicy(params.garageId);
+
+    return await db.transaction(async (tx) => {
+      const lockKey = `${params.garageId}|${params.newSlotStart.toISOString()}`;
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`,
+      );
+
+      const [appt] = await tx
+        .select()
+        .from(appointments)
+        .where(eq(appointments.id, params.appointmentId));
+      if (
+        !appt ||
+        appt.customerId !== params.customerId ||
+        appt.garageId !== params.garageId
+      ) {
+        return { ok: false as const, code: "not_owner" as const };
+      }
+
+      const elig = checkRescheduleEligibility({
+        status: appt.status,
+        appointmentDate: new Date(appt.appointmentDate as any),
+        rescheduleCount: appt.rescheduleCount ?? 0,
+        policy,
+        now: params.now,
+      });
+      if (!elig.ok) return { ok: false as const, code: elig.code };
+
+      const newStart = params.newSlotStart;
+      const newEnd = new Date(
+        newStart.getTime() + (appt.duration ?? 60) * 60 * 1000,
+      );
+
+      const others = await tx
+        .select()
+        .from(appointments)
+        .where(
+          and(
+            eq(appointments.garageId, params.garageId),
+            ne(appointments.id, params.appointmentId),
+            ne(appointments.status, "cancelled"),
+          ),
+        );
+      const conflict = others.some((o) => {
+        const oStart = new Date(o.appointmentDate as any);
+        const oEnd = new Date(oStart.getTime() + (o.duration ?? 60) * 60 * 1000);
+        return newStart < oEnd && oStart < newEnd;
+      });
+      if (conflict) return { ok: false as const, code: "slot_taken" as const };
+
+      const previousSlot = new Date(appt.appointmentDate as any);
+      const [updated] = await tx
+        .update(appointments)
+        .set({
+          appointmentDate: newStart,
+          rescheduleCount: (appt.rescheduleCount ?? 0) + 1,
+          lastRescheduledAt: params.now,
+          updatedAt: params.now,
+        })
+        .where(eq(appointments.id, params.appointmentId))
+        .returning();
+
+      await tx.insert(appointmentChangeLog).values({
+        appointmentId: params.appointmentId,
+        garageId: params.garageId,
+        actorUserId: params.customerId,
+        action: "reschedule",
+        previousSlot,
+        newSlot: newStart,
+        reason: params.reason ?? null,
+      });
+
+      return { ok: true as const, appointment: updated };
+    });
   }
 
   // Customer Management operations - Module 10
