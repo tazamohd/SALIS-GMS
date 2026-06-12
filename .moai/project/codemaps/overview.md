@@ -17,7 +17,7 @@ Express Server (port 5000)
       |       `-- Legacy monolith (server/routes.ts) — registered last
       |
       +-- Middleware stack
-      |       requestId → rate limit → security headers → session/Passport → RBAC
+      |       requestId → security headers → rate limit → session/Passport → RBAC
       |
       +-- Service layer (server/services/)
       |
@@ -60,12 +60,12 @@ server/        <----(imports)----  shared/
 
 ## Route Architecture — Hybrid (In-Progress Refactoring)
 
-The route layer is undergoing an incremental migration from a single monolithic file (`server/routes.ts`, ~4400+ lines) to domain-specific modular files in `server/routes/`.
+The route layer is undergoing an incremental migration from a single monolithic file (`server/routes.ts`, ~22,000+ lines) to domain-specific modular files in `server/routes/`.
 
 Current state:
 - **Fully extracted** (8 domains, ~94 endpoints): customers, vehicles, job cards, technicians, inventory, invoices, scheduling, settings
 - **Skeleton files** (pending extraction): fleet, reports
-- **Intentionally unmounted**: `misc.routes.ts` (in-memory stubs conflict with monolith handlers), `estimates.ts` (in-memory store shadowed DB-backed monolith)
+- **Intentionally unmounted**: `misc.routes.ts` (in-memory stubs conflict with monolith handlers), `estimates.ts` (in-memory store shadowed DB-backed monolith), `supplier-portal.ts` (in-memory demo data shadows DB-backed monolith /api/suppliers CRUD)
 - **Legacy monolith**: `server/routes.ts` remains active and is registered last; it handles all domains not yet extracted
 
 `server/routes/index.ts` is the single registration point. Modular handlers are mounted before the legacy monolith, so they take priority for overlapping paths. This enables zero-downtime extraction: a new `.routes.ts` file shadows the legacy handler as soon as it is mounted.

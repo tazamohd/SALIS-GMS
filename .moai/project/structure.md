@@ -55,15 +55,22 @@ client/
     │   └── useAuth.tsx      # Auth context and session hook
     ├── contexts/            # React context providers
     ├── lib/                 # Utilities and API client helpers
-    │   ├── queryClient.ts   # TanStack Query client instance
+    │   ├── queryClient.ts   # TanStack Query client instance and fetch wrapper
     │   ├── registerSW.ts    # PWA service worker registration
-    │   └── api.ts           # Fetch wrappers for /api/* endpoints
+    │   ├── authUtils.ts     # Auth-related utility functions
+    │   └── utils.ts         # General utility helpers
     ├── config/              # Client-side config constants
     ├── styles/              # Additional CSS modules
     └── i18n/
-        ├── config.ts        # i18next initialization
+        ├── config.ts        # i18next initialization (7 locales, fallbackLng: 'en')
         └── locales/
-            └── ar.json      # Arabic translations
+            ├── en.json      # English translations (fallback locale)
+            ├── ar.json      # Arabic translations
+            ├── fr.json      # French translations
+            ├── es.json      # Spanish translations
+            ├── de.json      # German translations
+            ├── zh.json      # Chinese translations
+            └── hi.json      # Hindi translations
 ```
 
 **Routing**: `App.tsx` defines all routes using `wouter`. Authentication state is read via `useQuery` against `/api/user`; unauthenticated users are redirected to `/login`. Multiple layout shells (`Layout`, `TechnicianLayout`, `CustomerPortalLayout`) wrap sub-sections of the route tree.
@@ -122,12 +129,13 @@ server/
 │   ├── financial.ts
 │   └── ...                  # Additional feature routes
 │
-├── routes.ts                # LEGACY MONOLITH: ~4400+ line single-file route
+├── routes.ts                # LEGACY MONOLITH: ~22,000+ line single-file route
 │                            # handler for all remaining domains not yet
 │                            # extracted. Registered last via registerLegacyRoutes.
 │
 ├── middleware/
 │   ├── requireRole.ts       # RBAC middleware (checks user role)
+│   ├── requirePlan.ts       # SaaS plan entitlement gate (uses shared/plans.ts)
 │   ├── defaultAuth.ts       # isAuthenticated guard
 │   ├── validate.ts          # Zod request body validation middleware
 │   ├── cache.ts             # Response caching middleware
@@ -189,7 +197,7 @@ This ordering ensures modular handlers shadow the legacy handler when both cover
 ```
 shared/
 ├── schema.ts           # Single source of truth for all DB table definitions
-│                       # (Drizzle ORM, 320+ tables; exported Zod insert/select schemas)
+│                       # (Drizzle ORM, 400+ tables; exported Zod insert/select schemas)
 ├── vatUtils.ts         # VAT 15% calculation helpers
 ├── zatcaUtils.ts       # ZATCA QR code and invoice field helpers
 ├── hijriUtils.ts       # Hijri / Gregorian calendar conversion
@@ -232,7 +240,7 @@ Production schema changes use `npm run db:push` (drizzle-kit push). The migratio
 | ZATCA compliance | `shared/zatcaUtils.ts`, `server/services/zatca-phase2.ts` |
 | VAT utilities | `shared/vatUtils.ts` |
 | Hijri calendar | `shared/hijriUtils.ts` |
-| Arabic i18n | `client/src/i18n/locales/ar.json` |
+| i18n locales | `client/src/i18n/locales/` (en, ar, fr, es, de, zh, hi) |
 | Vite config | `vite.config.ts` |
 | Docker build | `Dockerfile` |
 | Railway deploy | `railway.json` |
