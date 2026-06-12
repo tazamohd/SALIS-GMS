@@ -156,6 +156,7 @@ import {
   insertIoTAlertSchema,
   insertJobTrackingEventSchema
 } from "@shared/schema";
+import { detectArabicRequest } from "@shared/languageUtils";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
@@ -10093,14 +10094,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/support/tickets', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const { 
-        conversationId, 
-        category, 
-        priority, 
+      const {
+        conversationId,
+        category,
+        priority,
         subject,
         createConversation,
         participantIds,
-        garageId
+        garageId,
+        language
       } = req.body;
       // Use garageId from request body as fallback for development mode
       const userGarageId = req.user?.garageId || garageId || 1;
@@ -10168,7 +10170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create support ticket
-      const ticket = await storage.createSupportTicket({
+      let ticket = await storage.createSupportTicket({
         garageId: userGarageId,
         conversationId: finalConversationId!,
         category,
@@ -10177,7 +10179,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'open',
         createdBy: userId,
       });
-      
+
+      // Arabic-language routing: if the request looks Arabic (by UI locale,
+      // the customer's stored language preference, or Arabic text in the
+      // subject), route it to a dedicated Arabic support agent. When no human
+      // Arabic agent is available, an Arabic-speaking AI assistant acknowledges
+      // the request so the customer is never left waiting in silence.
+      try {
+        const creator = await storage.getUser(userId);
+        const isArabic = detectArabicRequest({
+          locale: language,
+          profileLanguage: creator?.preferredLanguage,
+          text: subject,
+        });
+
+        if (isArabic) {
+          await storage.updateSupportTicket(ticket.id, {
+            metadata: { ...((ticket.metadata as Record<string, any>) ?? {}), language: 'ar' },
+          });
+
+          const wsServer = getChatWebSocketServer();
+          const agents = await storage.getArabicSupportAgents(userGarageId);
+          // Exclude the ticket creator from candidates (self-assignment).
+          const candidates = agents.filter(a => a.id !== userId);
+
+          if (candidates.length > 0) {
+            const agent = candidates[0];
+            ticket = await storage.assignTicket(ticket.id, agent.id, 'system');
+            // Ensure the agent participates in the conversation.
+            await storage.addChatParticipant({
+              conversationId: finalConversationId!,
+              userId: agent.id,
+              role: 'admin',
+            }).catch(() => {});
+
+            if (wsServer && finalConversationId) {
+              const participants = await storage.getChatParticipants(finalConversationId);
+              wsServer.broadcastNewMessage(finalConversationId, {
+                type: 'ticket_assigned',
+                ticketId: ticket.id,
+                assignedTo: agent.id,
+                assignedBy: 'system',
+                reason: 'arabic_language_routing',
+              } as any, participants.map(p => p.userId));
+            }
+          } else {
+            // No human Arabic agent available — let the AI assistant reply in Arabic.
+            try {
+              const { generateChatbotResponse } = await import('./services/aiChatbot');
+              const aiText = await generateChatbotResponse(
+                { garageId: String(userGarageId), conversationHistory: [], language: 'ar' },
+                subject
+              );
+              const aiUser = await storage.ensureAiAssistantUser(userGarageId);
+              const aiMessage = await storage.createChatMessage({
+                conversationId: finalConversationId!,
+                senderId: aiUser.id,
+                content: aiText,
+                messageType: 'text',
+              });
+              if (wsServer && finalConversationId) {
+                const participants = await storage.getChatParticipants(finalConversationId);
+                wsServer.broadcastNewMessage(finalConversationId, aiMessage as any, participants.map(p => p.userId));
+              }
+            } catch (aiError) {
+              console.error('Arabic AI auto-response failed:', aiError);
+            }
+          }
+        }
+      } catch (routingError) {
+        // Routing is best-effort; never fail ticket creation because of it.
+        console.error('Arabic support routing failed:', routingError);
+      }
+
       res.json(ticket);
     } catch (error) {
       console.error("Error creating support ticket:", error);

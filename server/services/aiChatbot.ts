@@ -23,12 +23,19 @@ export interface ChatbotContext {
     vin?: string;
   };
   conversationHistory: ChatMessage[];
+  /** Response language; "ar" makes the assistant reply in Arabic. Defaults to "en". */
+  language?: string;
 }
 
 export async function generateChatbotResponse(
   context: ChatbotContext,
   userMessage: string
 ): Promise<string> {
+  const languageInstruction =
+    context.language && context.language.toLowerCase().startsWith("ar")
+      ? `\n\nIMPORTANT: Reply ONLY in Modern Standard Arabic (العربية). Use clear, professional, customer-friendly Arabic and Arabic numerals where natural. Do not switch to English unless quoting a part number, VIN, or brand name.`
+      : "";
+
   const systemPrompt = `You are an AI assistant for SALIS AUTO, a world-class automotive service center. Your role is to:
 
 1. Answer customer questions about services, pricing, and vehicle maintenance
@@ -48,7 +55,7 @@ Current Context:
 - Garage ID: ${context.garageId}
 ${context.vehicleInfo ? `- Vehicle: ${context.vehicleInfo.year} ${context.vehicleInfo.make} ${context.vehicleInfo.model}` : ""}
 
-Respond naturally and conversationally.`;
+Respond naturally and conversationally.${languageInstruction}`;
 
   const messages: ChatMessage[] = [
     { role: "system", content: systemPrompt },

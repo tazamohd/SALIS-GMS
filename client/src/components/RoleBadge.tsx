@@ -1,5 +1,5 @@
 import { usePermissions } from '@/hooks/usePermissions';
-import { Shield, Crown, Settings, Wrench, Users, ShoppingCart, Calculator, Briefcase, Package, Megaphone, Phone, UserCheck } from 'lucide-react';
+import { Shield, Crown, Settings, Wrench, Users, ShoppingCart, Calculator, Briefcase, Package, Megaphone, Phone, UserCheck, Languages } from 'lucide-react';
 
 const roleIcons: Record<string, React.ReactNode> = {
   business_owner: <Crown className="w-3.5 h-3.5" />,
@@ -7,6 +7,7 @@ const roleIcons: Record<string, React.ReactNode> = {
   general_manager: <Briefcase className="w-3.5 h-3.5" />,
   service_manager: <Users className="w-3.5 h-3.5" />,
   service_advisor: <UserCheck className="w-3.5 h-3.5" />,
+  arabic_support_agent: <Languages className="w-3.5 h-3.5" />,
   technician: <Wrench className="w-3.5 h-3.5" />,
   customer: <Users className="w-3.5 h-3.5" />,
   purchase_agent: <ShoppingCart className="w-3.5 h-3.5" />,
