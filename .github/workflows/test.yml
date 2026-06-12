@@ -47,9 +47,9 @@ jobs:
 
       - name: Lint
         # eslint 9+ needs a flat eslint.config.js, which this repo hasn't migrated
-        # to yet — run it best-effort so the check reflects build+test until the
-        # lint config is added as a follow-up.
-        run: npm run lint || echo "lint skipped: eslint flat config pending (follow-up)"
+        # to yet, so run it best-effort until the lint config is added (follow-up).
+        run: |
+          npm run lint || echo "lint skipped (eslint flat config pending)"
 
       - name: Push Drizzle schema
         run: npx drizzle-kit push --force
