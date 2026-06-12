@@ -5289,7 +5289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const preferences = await storage.getNotificationPreferences(userId);
+      const preferences = await storage.getNotificationPreferencesSimple(userId);
       res.json(preferences || { userId, eventMap: '{}', channel: 'all', isLockedByAdmin: false });
     } catch (error) {
       console.error("Error fetching notification preferences:", error);
@@ -5301,7 +5301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const { eventMap } = req.body;
-      const preferences = await storage.upsertNotificationPreferences(userId, eventMap);
+      const preferences = await storage.upsertNotificationPreferencesSimple(userId, eventMap);
       res.json(preferences);
     } catch (error) {
       console.error("Error saving notification preferences:", error);
@@ -8794,31 +8794,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { marketplace, partNumber, partName, quantity, unitPrice } = req.body;
-      
-      const order = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        marketplace,
-        partNumber,
-        partName,
-        quantity,
-        unitPrice,
-        totalPrice: quantity * unitPrice,
-        orderStatus: "pending",
-        orderDate: new Date().toISOString(),
-      };
-      
-      res.json(order);
-    } catch (error) {
-      console.error("Error creating marketplace order:", error);
-      res.status(500).json({ message: "Failed to create marketplace order" });
-    }
-  });
-
   // Phase 4: Customer Experience Routes
   app.get('/api/service-tracking/active', isAuthenticated, async (req: any, res) => {
     try {
@@ -11428,57 +11403,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Contract Management API Routes
   // Get all contracts with enhanced data (utilization, SLA metrics, renewals)
-  app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
-    try {
-      const { db } = await import('./storage');
-      const { fleetContracts, fleetGroups, contractUtilization, contractSLAMetrics, contractRenewals } = await import('@shared/schema');
-      const { eq, desc } = await import('drizzle-orm');
-
-      const contracts = await db
-        .select()
-        .from(fleetContracts)
-        .orderBy(desc(fleetContracts.createdAt));
-
-      const enrichedContracts = await Promise.all(contracts.map(async (contract) => {
-        const [fleetGroup] = await db
-          .select()
-          .from(fleetGroups)
-          .where(eq(fleetGroups.id, contract.fleetGroupId));
-
-        const utilization = await db
-          .select()
-          .from(contractUtilization)
-          .where(eq(contractUtilization.contractId, contract.id))
-          .orderBy(desc(contractUtilization.serviceDate));
-
-        const slaMetrics = await db
-          .select()
-          .from(contractSLAMetrics)
-          .where(eq(contractSLAMetrics.contractId, contract.id))
-          .orderBy(desc(contractSLAMetrics.incidentDate));
-
-        const renewals = await db
-          .select()
-          .from(contractRenewals)
-          .where(eq(contractRenewals.contractId, contract.id))
-          .orderBy(desc(contractRenewals.createdAt));
-
-        return {
-          ...contract,
-          fleetGroup,
-          utilization,
-          slaMetrics,
-          renewals,
-        };
-      }));
-
-      res.json(enrichedContracts);
-    } catch (error) {
-      console.error("Error fetching enhanced contracts:", error);
-      res.status(500).json({ message: "Failed to fetch contracts" });
-    }
-  });
-
   // Trigger renewal workflow for a contract
   app.post('/api/contracts/:contractId/trigger-renewal', isAuthenticated, async (req: any, res) => {
     try {
@@ -12394,7 +12318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loyalty Accounts
   app.post("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
-      const account = await storage.createLoyaltyAccount(req.body);
+      const account = await storage.createCustomerLoyaltyAccount(req.body);
       res.status(201).json(account);
     } catch (error: any) {
       console.error("Error creating loyalty account:", error);
@@ -12405,7 +12329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
       const { programId, customerId } = req.query;
-      const accounts = await storage.getLoyaltyAccounts(
+      const accounts = await storage.getCustomerLoyaltyAccounts(
         programId as string | undefined,
         customerId as string | undefined
       );
@@ -12433,7 +12357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, async (req, res) => {
     try {
       const { customerId } = req.params;
-      const account = await storage.getLoyaltyAccountByCustomer(customerId);
+      const account = await storage.getCustomerLoyaltyAccountByCustomer(customerId);
       res.json(account || null);
     } catch (error) {
       console.error("Error fetching loyalty account by customer:", error);
@@ -12444,7 +12368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const updated = await storage.updateLoyaltyAccount(id, req.body);
+      const updated = await storage.updateCustomerLoyaltyAccount(id, req.body);
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating loyalty account:", error);
@@ -14438,16 +14362,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/analytics/custom-reports", isAuthenticated, async (req: any, res) => {
-    try {
-      // TODO: Implement getCustomReports in storage
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching custom reports:", error);
-      res.status(500).json({ message: "Failed to fetch custom reports" });
-    }
-  });
-
   // Dashboard Widgets (using mock data until storage methods are implemented)
   app.post("/api/analytics/widgets", isAuthenticated, async (req: any, res) => {
     try {
@@ -15194,35 +15108,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Video Estimates
-  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = videoEstimateSchema.parse(req.body);
-      
-      const estimateData = {
-        garageId,
-        customerId: validated.customerId,
-        vehicleId: validated.vehicleId,
-        technicianId: validated.technicianId,
-        videoUrl: validated.videoUrl,
-        thumbnailUrl: validated.thumbnailUrl,
-        duration: validated.duration,
-        transcription: validated.transcription,
-        estimatedCost: validated.estimatedCost,
-        recommendedServices: validated.recommendedServices,
-      };
-      const estimate = await phase4Service.createVideoEstimate(estimateData);
-      res.status(201).json(estimate);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating video estimate:", error);
-      res.status(500).json({ message: "Failed to create video estimate" });
-    }
-  });
-
   app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req, res) => {
     try {
       const { customerId } = req.params;
@@ -15397,31 +15282,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /* MOVED TO scheduling.routes.ts — 3 endpoints (scheduling rules, optimize, history) */
   /*
   // AI-Powered Scheduling Optimizer
-  app.get('/api/scheduling/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const rules = await phase5Service.getSchedulingRules(garageId);
-      res.json(rules);
-    } catch (error) {
-      console.error("Error fetching scheduling rules:", error);
-      res.status(500).json({ message: "Failed to fetch scheduling rules" });
-    }
-  });
-
-  app.post('/api/scheduling/optimize', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      if (!garageId) {
-        return res.status(400).json({ message: "Garage ID is required. Please ensure you are associated with a garage." });
-      }
-      const optimization = await phase5Service.runSchedulingOptimization(garageId);
-      res.status(201).json(optimization);
-    } catch (error) {
-      console.error("Error running scheduling optimization:", error);
-      res.status(500).json({ message: "Failed to run scheduling optimization" });
-    }
-  });
-
   app.get('/api/scheduling/history', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
@@ -15436,41 +15296,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   */
 
   // Parts Auto-Reordering System
-  app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = autoReorderRuleSchema.parse(req.body);
-      
-      const ruleData = {
-        garageId,
-        partId: validated.partId,
-        minQuantity: validated.minQuantity,
-        reorderQuantity: validated.reorderQuantity,
-        preferredSupplierId: validated.preferredSupplierId,
-      };
-      const rule = await phase5Service.createAutoReorderRule(ruleData);
-      res.status(201).json(rule);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating auto-reorder rule:", error);
-      res.status(500).json({ message: "Failed to create auto-reorder rule" });
-    }
-  });
-
-  app.get('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const rules = await phase5Service.getAutoReorderRules(garageId);
-      res.json(rules);
-    } catch (error) {
-      console.error("Error fetching auto-reorder rules:", error);
-      res.status(500).json({ message: "Failed to fetch auto-reorder rules" });
-    }
-  });
-
   app.post('/api/auto-reorder/check', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
@@ -15482,94 +15307,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/auto-reorder/history', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { limit } = req.query;
-      const history = await phase5Service.getReorderHistory(garageId, limit ? parseInt(limit) : 50);
-      res.json(history);
-    } catch (error) {
-      console.error("Error fetching reorder history:", error);
-      res.status(500).json({ message: "Failed to fetch reorder history" });
-    }
-  });
-
   // Multi-Location Routing Optimizer
-  app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = routingOptimizationSchema.parse(req.body);
-      
-      const routeData = {
-        garageId,
-        routeDate: new Date(validated.routeDate),
-        routeType: validated.routeType,
-        startLocation: validated.startLocation,
-        stops: validated.stops,
-        totalDistance: validated.totalDistance,
-        estimatedDuration: validated.estimatedDuration,
-        assignedDriver: validated.assignedDriver,
-      };
-      const route = await phase5Service.createRoutingOptimization(routeData);
-      res.status(201).json(route);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating route optimization:", error);
-      res.status(500).json({ message: "Failed to create route optimization" });
-    }
-  });
-
-  app.get('/api/routing/routes', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { status } = req.query;
-      const routes = await phase5Service.getRoutes(garageId, status as string);
-      res.json(routes);
-    } catch (error) {
-      console.error("Error fetching routes:", error);
-      res.status(500).json({ message: "Failed to fetch routes" });
-    }
-  });
-
   // Time Clock & Payroll
-  app.post('/api/timeclock/clock-in', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const garageId = req.user?.garageId;
-      const entry = await phase5Service.clockIn(garageId, userId);
-      res.status(201).json(entry);
-    } catch (error) {
-      console.error("Error clocking in:", error);
-      res.status(500).json({ message: "Failed to clock in" });
-    }
-  });
-
-  app.post('/api/timeclock/clock-out', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const entry = await phase5Service.clockOut(userId);
-      res.json(entry);
-    } catch (error) {
-      console.error("Error clocking out:", error);
-      res.status(500).json({ message: "Failed to clock out" });
-    }
-  });
-
-  app.get('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { status } = req.query;
-      const periods = await phase5Service.getPayrollPeriods(garageId, status as string);
-      res.json(periods);
-    } catch (error) {
-      console.error("Error fetching payroll periods:", error);
-      res.status(500).json({ message: "Failed to fetch payroll periods" });
-    }
-  });
-
   app.post('/api/payroll/calculate/:periodId', isAuthenticated, async (req, res) => {
     try {
       const { periodId } = req.params;
@@ -15707,44 +15446,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error creating quality checklist:", error);
       res.status(500).json({ message: "Failed to create quality checklist" });
-    }
-  });
-
-  app.post('/api/quality/non-conformances', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = nonConformanceSchema.parse(req.body);
-      
-      const ncData = {
-        garageId,
-        ncNumber: validated.ncNumber,
-        jobCardId: validated.jobCardId,
-        description: validated.description,
-        severity: validated.severity,
-        reportedBy: validated.reportedBy,
-        category: validated.category,
-      };
-      const nonConformance = await phase6Service.createNonConformance(ncData);
-      res.status(201).json(nonConformance);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating non-conformance:", error);
-      res.status(500).json({ message: "Failed to create non-conformance" });
-    }
-  });
-
-  app.get('/api/quality/non-conformances', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { status } = req.query;
-      const nonConformances = await phase6Service.getNonConformances(garageId, status as string);
-      res.json(nonConformances);
-    } catch (error) {
-      console.error("Error fetching non-conformances:", error);
-      res.status(500).json({ message: "Failed to fetch non-conformances" });
     }
   });
 
@@ -16164,32 +15865,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Barcode/QR Scanner - POST alias
-  app.post('/api/barcode/scan', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      
-      const { barcodeData, scanType, itemType, itemId } = req.body;
-      
-      const scanData = {
-        garageId,
-        scanType,
-        barcodeData,
-        partId: scanType === 'part_inventory' ? itemId : undefined,
-        vehicleId: scanType === 'vehicle_checkin' ? itemId : undefined,
-        toolId: scanType === 'tool_tracking' ? itemId : undefined,
-        scannedBy: userId,
-        location: req.body.location,
-        associatedAction: req.body.associatedAction,
-      };
-      const scan = await phase7Service.recordBarcodeScan(scanData);
-      res.status(201).json(scan);
-    } catch (error) {
-      console.error("Error recording barcode scan:", error);
-      res.status(500).json({ message: "Failed to record barcode scan" });
-    }
-  });
-
   // Kiosk Check-In - POST alias
   app.post('/api/kiosk/checkin', isAuthenticated, async (req, res) => {
     try {
@@ -17998,15 +17673,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await storage.deletePayrollEmployee(req.params.id);
       res.json({ success: true });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.get('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
-    try {
-      const periods = await storage.getPayPeriods(req.user?.garageId, req.query.status);
-      res.json({ data: periods });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
@@ -19996,7 +19662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/backups/stats', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId || 'default-garage';
-      const stats = await storage.getBackupStats(garageId);
+      const stats = await storage.getBackupJobStats(garageId);
       res.json(stats);
     } catch (error: any) {
       console.error("Error fetching backup stats:", error);
@@ -20008,7 +19674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/backups/latest', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId || 'default-garage';
-      const backup = await storage.getLatestBackup(garageId);
+      const backup = await storage.getLatestBackupJob(garageId);
       res.json(backup || null);
     } catch (error: any) {
       console.error("Error fetching latest backup:", error);
@@ -20628,63 +20294,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Performance Reviews
-  app.get('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
-    try {
-      const { employeeId, status } = req.query;
-      let query = db.select().from(hrPerformanceReviews);
-      
-      if (employeeId) {
-        query = query.where(eq(hrPerformanceReviews.employeeId, employeeId as string)) as any;
-      }
-      if (status) {
-        query = query.where(eq(hrPerformanceReviews.status, status as string)) as any;
-      }
-      
-      const reviews = await query.orderBy(desc(hrPerformanceReviews.createdAt));
-      res.json(reviews);
-    } catch (error: any) {
-      console.error("Error fetching performance reviews:", error);
-      res.status(500).json({ message: "Failed to fetch performance reviews" });
-    }
-  });
-
-  app.post('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
-    try {
-      const validation = insertHrPerformanceReviewSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json(sanitizeZodError(validation.error));
-      }
-      const [review] = await db.insert(hrPerformanceReviews).values(validation.data).returning();
-      res.status(201).json(review);
-    } catch (error: any) {
-      console.error("Error creating performance review:", error);
-      res.status(500).json({ message: "Failed to create performance review" });
-    }
-  });
-
-  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const updateData: any = { ...req.body, updatedAt: new Date() };
-      
-      if (req.body.status === 'completed') {
-        updateData.completedAt = new Date();
-      }
-      
-      const [updated] = await db.update(hrPerformanceReviews)
-        .set(updateData)
-        .where(eq(hrPerformanceReviews.id, id))
-        .returning();
-      if (!updated) {
-        return res.status(404).json({ message: "Performance review not found" });
-      }
-      res.json(updated);
-    } catch (error: any) {
-      console.error("Error updating performance review:", error);
-      res.status(500).json({ message: "Failed to update performance review" });
-    }
-  });
-
   // HR Announcements
   app.get('/api/hr/announcements', isAuthenticated, async (req: any, res) => {
     try {
@@ -20982,48 +20591,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error deleting loyalty tier:", error);
       res.status(500).json({ message: "Failed to delete loyalty tier" });
-    }
-  });
-
-  app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      const accounts = await storage.getLoyaltyAccounts(garageId as string);
-      res.json(accounts);
-    } catch (error: any) {
-      console.error("Error fetching loyalty accounts:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty accounts" });
-    }
-  });
-
-  app.get('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.getLoyaltyAccount(req.params.id);
-      if (!account) return res.status(404).json({ message: "Account not found" });
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error fetching loyalty account:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty account" });
-    }
-  });
-
-  app.post('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.createLoyaltyAccount(req.body);
-      res.status(201).json(account);
-    } catch (error: any) {
-      console.error("Error creating loyalty account:", error);
-      res.status(500).json({ message: "Failed to create loyalty account" });
-    }
-  });
-
-  app.patch('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.updateLoyaltyAccount(req.params.id, req.body);
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error updating loyalty account:", error);
-      res.status(500).json({ message: "Failed to update loyalty account" });
     }
   });
 
@@ -21961,7 +21528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
     try {
-      const notification = await storage.markNotificationAsRead(req.params.id);
+      const notification = await storage.markPushNotificationAsRead(req.params.id);
       res.json(notification);
     } catch (error: any) {
       console.error("Error marking notification as read:", error);
@@ -21990,29 +21557,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ==================== Notification Preferences API ====================
-
-  app.get('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id;
-      const prefs = await storage.getNotificationPreferences(userId);
-      if (!prefs) {
-        return res.json({
-          pushEnabled: true,
-          emailEnabled: true,
-          smsEnabled: true,
-          serviceReminders: true,
-          appointmentReminders: true,
-          statusUpdates: true,
-          promotions: false,
-          vehicleAlerts: true,
-        });
-      }
-      res.json(prefs);
-    } catch (error: any) {
-      console.error("Error fetching notification preferences:", error);
-      res.status(500).json({ message: error.message });
-    }
-  });
 
   app.put('/api/notification-preferences', isAuthenticated, async (req: any, res) => {
     try {
