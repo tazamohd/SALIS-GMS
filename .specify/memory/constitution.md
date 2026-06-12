@@ -1,199 +1,160 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
-
-## Core Principles
-
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
-
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
-
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
-
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
-
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
-
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
-
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
-
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
 <!-- Sync Impact Report
-Version Change: 1.0.0 → 1.1.0 (Extension System)
-Modified Principles: Added Section VI (Workflow Selection), Updated Quality Gates
-Added Sections: VI. Workflow Selection
-Removed Sections: N/A
+Version Change: (template) → 1.0.0
+Modified Principles: N/A (initial ratification — replaced the unfilled spec-kit template and
+  the example "Tweeter Constitution" sample appended from spec-kit-extensions docs)
+Added Sections: Core Principles (I–VII), Technical Constraints, Development Workflow &
+  Quality Gates, Governance
+Removed Sections: Tweeter example content (character limits, Tweeter performance standards)
 Templates Requiring Updates:
-- plan-template.md: ✅ Constitution Check section references all principles
-- spec-template.md: ✅ Compatible with current structure
-- tasks-template.md: ✅ Supports all workflow task categories
-- CLAUDE.md: ✅ Already references constitution authority
-- Extension workflows: ✅ All 5 new workflows comply with existing principles
+- .specify/templates/plan-template.md: ✅ Constitution Check gate is generic; derives gates
+  from this file at plan time
+- .specify/templates/spec-template.md: ✅ compatible, no mandatory-section changes
+- .specify/templates/tasks-template.md: ✅ supports all workflow task categories
+- CLAUDE.md: ✅ references this constitution and mirrors Principles II, III, IV, V, VI
 Follow-up TODOs: None
-Amendment Rationale: Added support for 5 new workflow types (bugfix, modify, refactor, hotfix, deprecate) to extend specification-first development to all software lifecycle activities.
 -->
 
-# Tweeter Constitution
+# SALIS AUTO Constitution
 
 ## Core Principles
 
 ### I. Specification-First Development
-Every feature MUST begin with a formal specification document using the `/specify` command. Specifications define the "what" and "why" before any implementation. No code shall be written without an approved spec that clearly articulates user scenarios, requirements, and success criteria. This ensures alignment between stakeholder expectations and delivered functionality.
+Every new feature MUST begin with a formal specification via `/speckit-specify` before any
+implementation. Specifications define the "what" and "why"; plans (`/speckit-plan`) define
+the "how"; tasks (`/speckit-tasks`) define the order. No feature code shall be written
+without an approved spec articulating user scenarios, requirements, and success criteria.
+Lifecycle work (bug fixes, modifications, refactors, hotfixes, deprecations) MUST use the
+matching extension workflow rather than the feature path (see Principle VII).
 
-### II. Minimal Viable Functionality
-Features MUST adhere to the 140-character constraint that defines Tweeter's core identity. Complexity SHALL be actively resisted - every feature must justify its existence through clear user value. YAGNI (You Aren't Gonna Need It) principles apply: build only what is specified, avoid premature optimization, and reject feature creep that compromises the platform's simplicity.
+### II. Multi-File Decomposition
+Work MUST be decomposed into small, focused files instead of growing existing ones:
 
-### III. Test-Driven Development
-Tests MUST be written before implementation following the Red-Green-Refactor cycle. Every contract, endpoint, and user-facing feature SHALL have corresponding tests that fail initially, then pass once implemented. Integration tests are mandatory for inter-component communication. Test coverage SHALL be maintained at minimum 80% for core functionality.
+- The legacy monoliths `server/routes.ts` and `server/storage.ts` are frozen — additions
+  to them are PROHIBITED. New or changed endpoints live in modular
+  `server/routes/*.routes.ts` files registered in `server/routes/index.ts`.
+- Non-trivial business logic belongs in `server/services/`; database schema changes belong
+  in `shared/schema.ts` (the single source of truth for Drizzle + Zod types).
+- New files SHOULD stay under ~300 lines; when a file outgrows a single responsibility it
+  MUST be split.
+- Frontend: one page component per route in `client/src/pages/`; reusable pieces are
+  extracted to `client/src/components/`.
 
-### IV. Progressive Enhancement
-Development SHALL proceed from simple to complex in measured iterations. Start with text-only tweets, then add mentions, then hashtags - each enhancement must build upon stable foundations. Database schemas SHALL support forward migration without breaking existing data. APIs MUST maintain backward compatibility within major versions.
+Rationale: the codebase is mid-migration from a 40K-line monolith; every change must move
+toward modularity, never away from it.
 
-### V. Clear Data Boundaries
-Data models SHALL maintain strict separation between users, tweets, and interactions. Each entity MUST own its data exclusively - no shared mutable state. Foreign key relationships SHALL be explicit and enforced at the database level. Data access SHALL occur only through defined service interfaces, never through direct database queries from presentation layers.
+### III. Test-Backed Changes
+Every new or modified API endpoint MUST have integration tests (Vitest + Supertest against
+PostgreSQL) in `server/routes/__tests__/` or `server/__tests__/`. Bug fixes MUST add a
+failing regression test before the fix is applied. Refactors MUST keep existing tests
+passing unchanged. The full relevant test target (`test:server`, `test:integration`, or
+`npm test`) MUST pass before work is declared complete.
 
-### VI. Workflow Selection
-Development activities SHALL use the appropriate workflow type based on the nature of the work. Each workflow enforces specific quality gates and documentation requirements tailored to its purpose:
+### IV. Validated and Authorized API Surface
+Every endpoint MUST validate request bodies with Zod schemas from `@shared/schema` and
+return sanitized validation errors — raw Zod output MUST NOT reach clients. Protected
+routes MUST be guarded with the appropriate middleware (`isAuthenticated`, `requireRole()`,
+`requirePlan()`, `validate()`). No endpoint ships without an explicit authorization
+decision recorded in its route module.
 
-- **Feature Development** (`/specify`): New functionality - requires full specification, planning, and TDD approach
-- **Bug Fixes** (`/bugfix`): Defect remediation - requires regression test BEFORE applying fix
-- **Modifications** (`/modify`): Changes to existing features - requires impact analysis and backward compatibility assessment
-- **Refactoring** (`/refactor`): Code quality improvements - requires baseline metrics, behavior preservation guarantee, and incremental validation
-- **Hotfixes** (`/hotfix`): Emergency production issues - expedited process with deferred testing and mandatory post-mortem
-- **Deprecation** (`/deprecate`): Feature sunset - requires phased rollout (warnings → disabled → removed), migration guide, and stakeholder approvals
+### V. Internationalization and Compliance Integrity
+All user-facing strings MUST go through i18next with keys present in BOTH
+`client/src/i18n/en.json` and `ar.json`; Arabic RTL rendering MUST not be broken by new
+UI. Financial logic MUST use the shared compliance utilities — VAT (15% KSA) via
+`shared/vatUtils.ts`, ZATCA e-invoicing via `shared/zatcaUtils.ts`, Hijri dates via
+`shared/hijriUtils.ts`. Hand-rolled tax, invoice-QR, or calendar math is PROHIBITED.
 
-The wrong workflow SHALL NOT be used - features must not bypass specification, bugs must not skip regression tests, and refactorings must not alter behavior.
+Rationale: Saudi market compliance is a product guarantee; a single inconsistent VAT
+rounding or malformed ZATCA QR is a legal defect, not a cosmetic bug.
+
+### VI. Post-Implementation Review
+Before any work is declared done, the implementer MUST:
+
+1. Run `npm run check` — zero TypeScript errors (strict mode is non-negotiable).
+2. Run `npm run lint` and the relevant test target.
+3. Re-read the full diff verifying: no additions to legacy monoliths, validation and RBAC
+   on every new endpoint, i18n keys in both locales.
+4. Report results honestly — failing tests or skipped steps MUST be stated, never glossed
+   over.
+
+### VII. Workflow Selection
+Development activities MUST use the workflow matching the nature of the work:
+
+- **Feature Development** (`/speckit-specify`): new functionality — full spec, plan, tasks
+- **Bug Fixes** (`/speckit.bugfix`): defect remediation — regression test BEFORE fix
+- **Modifications** (`/speckit.modify`): changes to existing features — impact analysis and
+  backward-compatibility assessment
+- **Refactoring** (`/speckit.refactor`): code quality — baseline metrics, behavior
+  preservation, incremental validation
+- **Hotfixes** (`/speckit.hotfix`): production emergencies — expedited process, rollback
+  plan, mandatory post-mortem within 48 hours
+- **Deprecation** (`/speckit.deprecate`): feature sunset — phased rollout
+  (warnings → disabled → removed), migration guide, stakeholder approval
+
+The wrong workflow SHALL NOT be used: features must not bypass specification, bugs must
+not skip regression tests, refactorings must not alter behavior.
 
 ## Technical Constraints
 
-### Character Limits
-- Tweet content: Maximum 140 characters (UTF-8)
-- Username: Maximum 15 characters (alphanumeric + underscore)
-- Display name: Maximum 50 characters
+- **Stack**: React 18 + Vite + TypeScript (strict) frontend; Express (ESM TypeScript)
+  backend; Drizzle ORM on PostgreSQL 16; TanStack Query v5; shadcn/ui + Tailwind;
+  Vitest/Supertest and Playwright for tests. New dependencies require justification in the
+  feature plan.
+- **Type safety**: `npm run check` MUST report zero errors on every commit. New files MUST
+  NOT use `@ts-nocheck` or `any` escapes without a written justification in the plan.
+- **Database**: schema changes only through `shared/schema.ts` + drizzle-kit; no raw SQL
+  outside migrations.
+- **Multi-tenancy**: every new query touching tenant-scoped tables MUST filter by
+  garage/branch scope; cross-tenant data leakage is a release blocker.
 
-### Performance Standards
-- Tweet submission: < 200ms p95 latency
-- Timeline loading: < 500ms for 50 tweets
-- Search response: < 1s for keyword matches
+## Development Workflow & Quality Gates
 
-### Technology Decisions
-- Backend: Language/framework determined per feature spec
-- Frontend: Progressive web app, mobile-first design
-- Storage: Relational database for core data, cache for timelines
-- Testing: Framework-appropriate tools (pytest, jest, etc.)
+### Core flow
+1. `/speckit-specify <description>` → spec.md
+2. `/speckit-clarify` (optional) to resolve ambiguities
+3. `/speckit-plan` → design artifacts (gated by Constitution Check)
+4. `/speckit-tasks` → dependency-ordered tasks.md
+5. `/speckit-implement` → execution following task order
 
-## Development Workflow
+### Workflow-specific gates
+- **Feature**: spec complete before plan; plan passes Constitution Check before tasks;
+  tests written with implementation; review verifies constitution compliance.
+- **Bugfix**: reproduction documented with exact steps; regression test written and failing
+  before fix; root cause identified; prevention strategy defined.
+- **Modification**: impact analysis identifies all affected files/contracts; original
+  feature linked; backward compatibility assessed; migration path documented for breaking
+  changes.
+- **Refactor**: baseline metrics captured first; tests pass after EVERY incremental change;
+  behavior preservation guaranteed (tests unchanged); measurable improvement shown.
+- **Hotfix**: severity assessed (P0/P1/P2); rollback plan prepared before deploy; fix
+  verified in production before tests are backfilled (the only sanctioned TDD exception);
+  post-mortem within 48 hours.
+- **Deprecation**: dependency scan run; migration guide written before Phase 1; all three
+  phases complete in sequence; stakeholder approval obtained before starting.
 
-### Core Workflow (Feature Development)
-1. Feature request initiates with `/specify <description>`
-2. Clarification via `/clarify` to resolve ambiguities
-3. Technical planning with `/plan` to create implementation design
-4. Task breakdown using `/tasks` for execution roadmap
-5. Implementation via `/implement` following task order
-
-### Extension Workflows
-- **Bugfix**: `/bugfix "<description>"` → bug-report.md + tasks.md with regression test requirement
-- **Modification**: `/modify <feature_num> "<description>"` → modification.md + impact analysis + tasks.md
-- **Refactor**: `/refactor "<description>"` → refactor.md + baseline metrics + incremental tasks.md
-- **Hotfix**: `/hotfix "<incident>"` → hotfix.md + expedited tasks.md + post-mortem.md (within 48 hours)
-- **Deprecation**: `/deprecate <feature_num> "<reason>"` → deprecation.md + dependency scan + phased tasks.md
-
-### Quality Gates by Workflow
-
-**Feature Development**:
-- Specification MUST be complete before planning
-- Plan MUST pass constitution checks before task generation
-- Tests MUST be written before implementation (TDD)
-- Code review MUST verify constitution compliance
-
-**Bugfix**:
-- Bug reproduction MUST be documented with exact steps
-- Regression test MUST be written before fix is applied
-- Root cause MUST be identified and documented
-- Prevention strategy MUST be defined
-
-**Modification**:
-- Impact analysis MUST identify all affected files and contracts
-- Original feature spec MUST be linked
-- Backward compatibility MUST be assessed
-- Migration path MUST be documented if breaking changes
-
-**Refactor**:
-- Baseline metrics MUST be captured before any changes
-- Tests MUST pass after EVERY incremental change
-- Behavior preservation MUST be guaranteed (tests unchanged)
-- Target metrics MUST show measurable improvement
-
-**Hotfix**:
-- Severity MUST be assessed (P0/P1/P2)
-- Rollback plan MUST be prepared before deployment
-- Fix MUST be deployed and verified before writing tests (exception to TDD)
-- Post-mortem MUST be completed within 48 hours of resolution
-
-**Deprecation**:
-- Dependency scan MUST be run to identify affected code
-- Migration guide MUST be created before Phase 1
-- All three phases MUST complete in sequence (no skipping)
-- Stakeholder approvals MUST be obtained before starting
-
-### Documentation Requirements
-- Every public API MUST have inline documentation
-- Complex algorithms MUST include explanation comments
-- README MUST be updated for user-facing changes
-- CLAUDE.md MUST reflect architectural decisions
+### Documentation
+- Public API changes MUST update the relevant docs under `docs/`.
+- README MUST be updated for user-facing changes.
+- CLAUDE.md MUST reflect architectural decisions and stay consistent with this
+  constitution.
 
 ## Governance
 
-### Amendment Process
-Constitution amendments require:
-1. Written proposal documenting the change rationale
-2. Impact analysis on existing features and workflows
-3. Migration plan for affected components
-4. Version increment following semantic versioning
+This constitution supersedes ad-hoc practice. Amendments require a written proposal with
+rationale, an impact analysis on existing features and workflows, a migration plan for
+affected components, and a semantic version increment:
 
-### Compliance Verification
-- All pull requests MUST include constitution compliance checklist
-- Automated checks SHALL enforce character limits and test coverage
-- Architecture reviews MUST validate data boundary adherence
-- Performance regression tests SHALL guard against degradation
+- **MAJOR**: backward-incompatible removals or redefinitions of principles
+- **MINOR**: new principles/sections or materially expanded guidance
+- **PATCH**: clarifications, wording, non-semantic refinements
 
-### Version Policy
-- MAJOR: Breaking changes to core principles or data models
-- MINOR: New principles or significant workflow changes
-- PATCH: Clarifications, corrections, or minor adjustments
+Compliance verification: pull requests MUST satisfy the quality gates of their workflow
+type; plan-stage Constitution Checks derive their gates from this document; reviews MUST
+validate Principles II–V explicitly on every diff.
 
-**Version**: 1.1.0 | **Ratified**: 2025-09-28 | **Last Amended**: 2025-10-01
+**Version**: 1.0.0 | **Ratified**: 2026-06-12 | **Last Amended**: 2026-06-12
 
 ### Amendment History
-- **v1.1.0** (2025-10-01): Added Section VI (Workflow Selection) to support 5 extension workflows (bugfix, modify, refactor, hotfix, deprecate). Updated Quality Gates to document workflow-specific requirements. Minor version bump per semantic versioning.
-- **v1.0.0** (2025-09-28): Initial constitution ratified with 5 core principles and development workflow.
+- **v1.0.0** (2026-06-12): Initial constitution ratified with seven core principles
+  (specification-first, multi-file decomposition, test-backed changes, validated/authorized
+  API surface, i18n & compliance integrity, post-implementation review, workflow selection),
+  technical constraints, workflow quality gates, and governance policy.
