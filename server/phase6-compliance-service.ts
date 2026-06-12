@@ -10,8 +10,7 @@ import {
   safetyIncidents,
   incidentInvestigations,
   insuranceClaims,
-  users,
-  jobCards
+  users
 } from "@shared/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 

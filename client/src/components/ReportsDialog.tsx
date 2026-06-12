@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Download, FileText, TrendingUp, Users, Wrench, Calendar, DollarSign } from "lucide-react";
+import { BarChart3, Download, FileText, Wrench } from "lucide-react";
 import type { JobCard, Tool } from "@shared/schema";
 
 interface ReportsDialogProps {

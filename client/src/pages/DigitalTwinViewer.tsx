@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Box, RotateCcw, Eye, Layers, Activity, Settings, Loader2 } from 'lucide-react';
+import { Box, RotateCcw, Eye, Layers, Activity, Settings } from 'lucide-react';
 import { TabsPageLayout } from '@/components/layouts';
 
 interface Vehicle {

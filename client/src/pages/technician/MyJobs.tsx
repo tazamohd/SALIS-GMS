@@ -76,11 +76,11 @@ export default function TechnicianMyJobs() {
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
-        <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4"></div>
-        <div className="h-12 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+        <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4" />
+        <div className="h-12 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
         <div className="grid gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+            <div key={i} className="h-40 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
           ))}
         </div>
       </div>

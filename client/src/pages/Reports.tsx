@@ -180,7 +180,7 @@ export function Reports() {
     <div className="space-y-6">
       {overviewLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-[#64748B]">{t('common.loading', 'Loading overview...')}</p>
         </div>
       ) : (
@@ -230,7 +230,7 @@ export function Reports() {
     <div className="space-y-6">
       {revenueLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-[#64748B]">{t('analytics.loadingRevenueData', 'Loading revenue data...')}</p>
         </div>
       ) : (
@@ -398,7 +398,7 @@ export function Reports() {
     <div className="space-y-6">
       {jobCardsLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-[#64748B]">{t('analytics.loadingJobCardAnalytics', 'Loading job card analytics...')}</p>
         </div>
       ) : (
@@ -480,7 +480,7 @@ export function Reports() {
     <div className="space-y-6">
       {technicianLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-[#64748B]">{t('analytics.loadingTechnicianPerformance', 'Loading technician performance...')}</p>
         </div>
       ) : (
@@ -636,7 +636,7 @@ export function Reports() {
     <div className="space-y-6">
       {customerLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingCustomerAnalytics', 'Loading customer analytics...')}</p>
         </div>
       ) : (
@@ -811,7 +811,7 @@ export function Reports() {
     <div className="space-y-6">
       {inventoryLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-gray-900 dark:border-white border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-900 dark:text-white/60">{t('analytics.loadingInventoryData', 'Loading inventory data...')}</p>
         </div>
       ) : (

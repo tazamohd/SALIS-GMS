@@ -42,7 +42,7 @@ class SMSService {
       const message = await twilioClient.messages.create({
         body: template.message,
         from: fromPhoneNumber,
-        to: to,
+        to,
       });
 
       await storage.markNotificationAsSent(notification.id);

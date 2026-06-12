@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -193,15 +193,15 @@ export default function Suppliers() {
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Card key={i} className="animate-pulse bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]" data-testid={`skeleton-card-${i}`}>
               <CardHeader className="pb-3">
-                <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/2"></div>
+                <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-3/4 mb-2" />
+                <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/2" />
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-2">
-                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
-                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20"></div>
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20" />
+                  <div className="h-6 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-20" />
                 </div>
-                <div className="h-10 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+                <div className="h-10 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
               </CardContent>
             </Card>
           ))}

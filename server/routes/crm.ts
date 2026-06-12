@@ -11,7 +11,7 @@ router.get('/crm/customers', async (req, res) => {
   try {
     const search = (req.query.search as string) || '';
     const searchFilter = search
-      ? sql` AND (u.full_name ILIKE ${'%' + search + '%'} OR u.email ILIKE ${'%' + search + '%'} OR u.phone ILIKE ${'%' + search + '%'})`
+      ? sql` AND (u.full_name ILIKE ${`%${  search  }%`} OR u.email ILIKE ${`%${  search  }%`} OR u.phone ILIKE ${`%${  search  }%`})`
       : sql``;
 
     const result = await db.execute(sql`

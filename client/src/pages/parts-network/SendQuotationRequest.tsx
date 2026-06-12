@@ -28,8 +28,6 @@ import {
   Package,
   Car,
   MapPin,
-  Clock,
-  Image,
   Send,
   Plus,
   X,

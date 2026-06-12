@@ -166,7 +166,7 @@ export class ChatWebSocketServer {
     });
   }
 
-  private async handleAuth(ws: AuthenticatedWebSocket, data: any) {
+  private async handleAuth(ws: AuthenticatedWebSocket, _data: any) {
     try {
       // Extract session cookie from WebSocket upgrade request
       if (!ws.req || !ws.req.headers.cookie) {

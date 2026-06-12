@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, Plus, Search, User, Phone, Car, MoreHorizontal, CheckCircle, XCircle, PlayCircle, AlertTriangle } from "lucide-react";
+import { Calendar, Clock, Plus, Search, User, Phone, MoreHorizontal, CheckCircle, XCircle, PlayCircle, AlertTriangle } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";

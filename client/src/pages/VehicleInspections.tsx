@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ClipboardList, FileCheck, Plus, Pencil, Trash2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { ClipboardList, FileCheck, Plus, Trash2, CheckCircle } from "lucide-react";
 import { 
   insertInspectionTemplateSchema, 
   insertVehicleInspectionSchema, 

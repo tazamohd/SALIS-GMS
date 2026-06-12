@@ -31,20 +31,15 @@ import { Label } from "@/components/ui/label";
 import {
   Send,
   Search,
-  Plus,
   MoreVertical,
   MessageCircle,
   Paperclip,
-  Smile,
   CheckCircle2,
   Clock,
   AlertCircle,
   XCircle,
-  User as UserIcon,
   Ticket,
-  Upload,
   X,
-  Download,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";

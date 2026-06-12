@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -166,7 +166,7 @@ export default function Vehicles() {
     
     // Hydrate selectedMakeId from vehicle.make using multiple matching strategies
     const vehicleMakeLower = (vehicle.make || '').toLowerCase().trim();
-    let matchedMake = vehicleMakes.find(m => m.name.toLowerCase() === vehicleMakeLower) // Exact match
+    const matchedMake = vehicleMakes.find(m => m.name.toLowerCase() === vehicleMakeLower) // Exact match
       || vehicleMakes.find(m => m.name.toLowerCase().includes(vehicleMakeLower)) // Contains
       || vehicleMakes.find(m => vehicleMakeLower.includes(m.name.toLowerCase())); // Reverse contains
     
@@ -433,7 +433,7 @@ export default function Vehicles() {
               <FormField
                 control={form.control}
                 name="make"
-                render={({ field }) => (
+                render={({ field: _field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')} *</FormLabel>
                     <Select 
@@ -853,7 +853,7 @@ export default function Vehicles() {
     >
         {actionButtons}
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-[#0A5ED7]/30 border-t-[#0A5ED7] rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-[#0A5ED7]/30 border-t-[#0A5ED7] rounded-full animate-spin" />
         </div>
       </StandardPageLayout>
     );

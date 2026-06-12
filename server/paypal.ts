@@ -93,7 +93,7 @@ export async function createPaypalOrder(req: Request, res: Response) {
 
     const collect = {
       body: {
-        intent: intent,
+        intent,
         purchaseUnits: [
           {
             amount: {

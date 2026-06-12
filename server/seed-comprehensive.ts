@@ -17,7 +17,7 @@ function randomDate(start: Date, end: Date): Date {
 
 // Helper function to generate phone number
 function generatePhone(): string {
-  return '+966 ' + faker.number.int({ min: 10, max: 99 }) + ' ' + faker.number.int({ min: 100, max: 999 }) + ' ' + faker.number.int({ min: 1000, max: 9999 });
+  return `+966 ${  faker.number.int({ min: 10, max: 99 })  } ${  faker.number.int({ min: 100, max: 999 })  } ${  faker.number.int({ min: 1000, max: 9999 })}`;
 }
 
 // Helper to generate Saudi TRN (Tax Registration Number)
@@ -128,7 +128,7 @@ async function seedCoreStructure() {
 /**
  * PHASE 2: User Accounts & Staff
  */
-async function seedUsers(garages: any[], branches: any[]) {
+async function seedUsers(garages: any[], _branches: any[]) {
   console.log('👥 Phase 2: Seeding Users & Staff...');
   
   const hashedPassword = await bcrypt.hash('password123', 10);

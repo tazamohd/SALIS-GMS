@@ -26,7 +26,6 @@ import {
   Download,
   Printer,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Building2,
   Wallet,

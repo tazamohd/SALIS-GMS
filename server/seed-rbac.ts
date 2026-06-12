@@ -9,10 +9,8 @@ import { db } from './db';
 import { permissions, roles, rolePermissions } from '@shared/schema';
 import {
   RESOURCES,
-  ACTIONS,
   STANDARD_ROLES,
   ROLE_PERMISSIONS,
-  getAllResourceKeys,
   getAllActionKeys,
 } from './rbac-config';
 import { eq, and } from 'drizzle-orm';

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BarChart3, TrendingUp, Users, Package, DollarSign, Wrench,
-  Download, AlertTriangle, CheckCircle, Clock
+import { Users, Package, DollarSign, Wrench,
+  Download, AlertTriangle, CheckCircle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

@@ -9,7 +9,7 @@
  *   GET  /api/subscriptions/all           — platform-admin: every garage's plan
  *   PATCH /api/subscriptions/:garageId    — platform-admin: force change/refund
  */
-import { Router, type Request, type Response } from "express";
+import { Router, type Request } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";

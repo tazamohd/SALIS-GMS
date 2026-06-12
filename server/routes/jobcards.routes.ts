@@ -6,7 +6,6 @@ import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
 import { jobCardParts, sparePartInventories, jobCards, insertJobCardSchema, insertJobTrackingEventSchema } from "@shared/schema";
 import { z } from "zod";
-import QRCode from "qrcode";
 import { eventBus } from "../engine/event-bus";
 
 const router = Router();

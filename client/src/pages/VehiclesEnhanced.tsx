@@ -10,10 +10,7 @@ import {
   insertVehicleSchema,
   type VehicleServiceHistory,
   type MaintenanceSchedule,
-  type ServiceReminder,
-  insertVehicleServiceHistorySchema,
-  insertMaintenanceScheduleSchema,
-  insertServiceReminderSchema
+  type ServiceReminder
 } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Car, Plus, Edit, Trash2, Search, Clock, Wrench, Bell, Shield, Image, Download } from "lucide-react";
+import { Car, Plus, Search, Clock, Wrench, Bell, Shield, Image } from "lucide-react";
 import { format } from "date-fns";
 import { StandardPageLayout } from "@/components/layouts";
 

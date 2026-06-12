@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Star, ThumbsUp, TrendingUp, MessageCircle, Plus, AlertCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Star, ThumbsUp, TrendingUp, MessageCircle, AlertCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
@@ -72,8 +72,8 @@ export default function CustomerReviewsRatings() {
         icon={Star}
       >
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128" />
         </div>
       </StandardPageLayout>
     );

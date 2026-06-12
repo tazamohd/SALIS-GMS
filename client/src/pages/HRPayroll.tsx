@@ -9,9 +9,7 @@ import {
   Check,
   X,
   FileText,
-  Building2,
   Briefcase,
-  TrendingUp,
   Shield,
 } from "lucide-react";
 import { DashboardPage } from "@/components/layouts/DashboardPage";

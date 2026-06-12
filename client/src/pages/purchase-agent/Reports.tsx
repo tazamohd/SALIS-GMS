@@ -20,7 +20,6 @@ import {
   Download,
   Calendar,
   FileText,
-  PieChart,
 } from "lucide-react";
 import type { PurchaseOrder, Supplier, SparePart, SparePartInventory, SupplierPerformance } from "@shared/schema";
 

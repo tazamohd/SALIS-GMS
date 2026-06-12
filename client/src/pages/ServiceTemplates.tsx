@@ -35,7 +35,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertServiceTemplateSchema, type ServiceTemplate } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Clock, DollarSign, CheckCircle, XCircle, Eye, Pencil, Trash2, Wrench } from "lucide-react";
+import { Plus, Clock, DollarSign, CheckCircle, XCircle, Trash2, Wrench } from "lucide-react";
 import { z } from "zod";
 import { StandardPageLayout } from "@/components/layouts";
 
@@ -414,7 +414,7 @@ export default function ServiceTemplates() {
 
       {activeLoading ? (
         <div className="text-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-[#64748B]">{t('serviceTemplates.loadingTemplates', 'Loading templates...')}</p>
         </div>
       ) : filteredTemplates && filteredTemplates.length > 0 ? (

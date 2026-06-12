@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Camera, CheckCircle, AlertTriangle, FileText, Plus, Image, AlertCircle } from "lucide-react";
+import { Camera, CheckCircle, AlertTriangle, FileText, Plus, Image } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -80,8 +80,8 @@ export default function DigitalVehicleWalkaround() {
     return (
       <div className="p-8 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-96"></div>
-          <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-128"></div>
+          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-96" />
+          <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-128" />
         </div>
       </div>
     );

@@ -42,7 +42,7 @@ export function FormPage({
       icon={icon}
     >
       <div className={cn("max-w-4xl mx-auto group relative", cardClassName)}>
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-3xl blur opacity-50"></div>
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-3xl blur opacity-50" />
         <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-3xl border border-purple-200/50 dark:border-white/10 shadow-xl overflow-hidden">
           {(formTitle || formDescription) && (
             <div className="p-6 border-b border-gray-200/50 dark:border-white/10">

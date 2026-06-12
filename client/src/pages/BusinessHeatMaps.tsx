@@ -183,19 +183,19 @@ export default function BusinessHeatMaps() {
               <span className="text-sm text-[#64748B]">{t('heatmaps.legend', 'Legend')}:</span>
               <div className="flex gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+                  <div className="h-4 w-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
                   <span className="text-sm text-[#64748B]">{t('heatmaps.low', 'Low')} (0-7)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-[#0BB3FF]/40 rounded"></div>
+                  <div className="h-4 w-4 bg-[#0BB3FF]/40 rounded" />
                   <span className="text-sm text-[#64748B]">{t('heatmaps.medium', 'Medium')} (8-15)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-[#0BB3FF] rounded"></div>
+                  <div className="h-4 w-4 bg-[#0BB3FF] rounded" />
                   <span className="text-sm text-[#64748B]">{t('heatmaps.high', 'High')} (16-22)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 bg-[#0A5ED7] rounded"></div>
+                  <div className="h-4 w-4 bg-[#0A5ED7] rounded" />
                   <span className="text-sm text-[#64748B]">{t('heatmaps.peak', 'Peak')} (23+)</span>
                 </div>
               </div>

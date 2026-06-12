@@ -12,7 +12,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  Package,
   Clock,
   TrendingUp,
   DollarSign,

@@ -154,7 +154,7 @@ export default function KioskCheckIn() {
       customerId: customerData.customer.id,
       vehicleId: selectedVehicle.id,
       appointmentId: selectedAppointment?.id,
-      phoneNumber: phoneNumber,
+      phoneNumber,
       checkInMethod: "kiosk",
     });
   };

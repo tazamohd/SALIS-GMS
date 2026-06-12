@@ -32,9 +32,9 @@ export default function PayPalButton({
 }: PayPalButtonProps) {
   const createOrder = async () => {
     const orderPayload = {
-      amount: amount,
-      currency: currency,
-      intent: intent,
+      amount,
+      currency,
+      intent,
     };
     const response = await fetch("/paypal/order", {
       method: "POST",
@@ -139,6 +139,6 @@ export default function PayPalButton({
     }
   };
 
-  return <paypal-button id="paypal-button"></paypal-button>;
+  return <paypal-button id="paypal-button" />;
 }
 // <END_EXACT_CODE>

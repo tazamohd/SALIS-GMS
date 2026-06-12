@@ -23,11 +23,7 @@ import {
   ArrowUpRight, 
   ArrowDownLeft, 
   RefreshCw,
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
   CheckCircle,
-  XCircle,
   Clock
 } from "lucide-react";
 import { format } from "date-fns";

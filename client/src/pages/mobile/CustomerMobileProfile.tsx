@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Mail, Phone, MapPin, Bell, Lock, LogOut, Settings } from "lucide-react";
+import { User, Mail, Phone, Bell, Lock, LogOut, Settings } from "lucide-react";
 import { Link } from "wouter";
 import type { User as UserType } from "@shared/schema";
 

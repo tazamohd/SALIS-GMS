@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Award, Target, TrendingUp, Star, Zap, Medal } from "lucide-react";
+import { Trophy, Award, Target, Star, Zap, Medal } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts";
 
 export default function TechnicianLeaderboards() {

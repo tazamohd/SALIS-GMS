@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Truck, MapPin, Phone, Clock } from "lucide-react";
+import { Truck } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 
 const towingJobSchema = z.object({

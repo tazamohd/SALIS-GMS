@@ -15,7 +15,6 @@ import {
   Users,
   ArrowUpRight,
   ArrowRight,
-  Clock,
   DollarSign,
 } from "lucide-react";
 

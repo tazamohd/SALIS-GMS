@@ -3,11 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
 import { 
-  Car, Calendar, FileText, Clock, AlertCircle, CheckCircle, User, 
-  Bell, MessageSquare, Wrench, Settings, MapPin, Star, Sparkles,
-  AlertTriangle, ChevronRight, Gauge, Droplets, Wind, Disc
+  Car, Calendar, FileText, Clock, AlertCircle, CheckCircle, 
+  Bell, MessageSquare, Wrench, MapPin, Sparkles,
+  AlertTriangle, ChevronRight, Droplets, Wind, Disc
 } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";

@@ -16,10 +16,9 @@ import {
   spareParts,
   vehicles,
   tools,
-  users,
-  appointments
+  users
 } from "@shared/schema";
-import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 
 // ========================================
 // 1. BARCODE/QR SCANNER INTEGRATION

@@ -4,7 +4,7 @@
  */
 
 import { db } from '../db';
-import { sparePartInventories, spareParts, invoices, users } from '../../shared/schema';
+import { sparePartInventories, spareParts, invoices } from '../../shared/schema';
 import { eq, and, lt, sql, inArray } from 'drizzle-orm';
 import { eventBus } from './event-bus';
 

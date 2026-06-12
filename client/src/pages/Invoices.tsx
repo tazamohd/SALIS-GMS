@@ -770,7 +770,7 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
                       <th className="p-2 text-right text-xs font-medium text-[#64748B]">Qty</th>
                       <th className="p-2 text-right text-xs font-medium text-[#64748B]">Unit Price</th>
                       <th className="p-2 text-right text-xs font-medium text-[#64748B]">Line Total</th>
-                      <th className="p-2 w-8"></th>
+                      <th className="p-2 w-8" />
                     </tr>
                   </thead>
                   <tbody className="divide-y dark:divide-gray-700">

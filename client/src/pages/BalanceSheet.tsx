@@ -29,7 +29,6 @@ import {
   Building2,
   Wallet,
   CreditCard,
-  FileText,
   ExternalLink,
   CheckCircle,
   BarChart3,
@@ -165,7 +164,7 @@ export default function BalanceSheet() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="pl-6">{t('accounting.totalCurrentAssets', 'Total Current Assets')}</TableCell>
                 <TableCell className="text-right font-mono">{totalCurrentAssets.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
@@ -193,7 +192,7 @@ export default function BalanceSheet() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="pl-6">{t('accounting.totalNonCurrentAssets', 'Total Non-Current Assets')}</TableCell>
                 <TableCell className="text-right font-mono">{totalNonCurrentAssets.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
@@ -202,7 +201,7 @@ export default function BalanceSheet() {
               </TableRow>
 
               <TableRow className="bg-blue-100 dark:bg-blue-900/40 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('accounting.totalAssets', 'TOTAL ASSETS')}</TableCell>
                 <TableCell className="text-right font-mono text-blue-700 dark:text-blue-300">
                   {t('common.sar', 'SAR')} {totalAssets.toLocaleString()}
@@ -233,7 +232,7 @@ export default function BalanceSheet() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="pl-6">{t('accounting.totalCurrentLiabilities', 'Total Current Liabilities')}</TableCell>
                 <TableCell className="text-right font-mono">{totalCurrentLiabilities.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
@@ -257,7 +256,7 @@ export default function BalanceSheet() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="pl-6">{t('accounting.totalNonCurrentLiabilities', 'Total Non-Current Liabilities')}</TableCell>
                 <TableCell className="text-right font-mono">{totalNonCurrentLiabilities.toLocaleString()}</TableCell>
                 <TableCell className="text-right font-mono text-muted-foreground">
@@ -266,7 +265,7 @@ export default function BalanceSheet() {
               </TableRow>
 
               <TableRow className="bg-red-100 dark:bg-red-900/40 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('accounting.totalLiabilities', 'TOTAL LIABILITIES')}</TableCell>
                 <TableCell className="text-right font-mono text-red-700 dark:text-red-300">
                   {t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}
@@ -294,7 +293,7 @@ export default function BalanceSheet() {
                 </TableRow>
               ))}
               <TableRow className="bg-purple-100 dark:bg-purple-900/40 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('accounting.totalEquity', 'TOTAL EQUITY')}</TableCell>
                 <TableCell className="text-right font-mono text-purple-700 dark:text-purple-300">
                   {t('common.sar', 'SAR')} {totalEquity.toLocaleString()}
@@ -305,7 +304,7 @@ export default function BalanceSheet() {
               </TableRow>
 
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('accounting.totalLiabilitiesAndEquity', 'TOTAL LIABILITIES & EQUITY')}</TableCell>
                 <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
                   {t('common.sar', 'SAR')} {totalLiabilitiesAndEquity.toLocaleString()}

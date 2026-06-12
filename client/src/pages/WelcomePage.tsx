@@ -42,16 +42,16 @@ export default function WelcomePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]"></div>
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-[#0A5ED7]/10 to-transparent dark:from-[#0BB3FF]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-[#0BB3FF]/10 to-transparent dark:from-[#0A5ED7]/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-r from-[#F97316]/5 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-[#0A5ED7]/10 to-transparent dark:from-[#0BB3FF]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-[#0BB3FF]/10 to-transparent dark:from-[#0A5ED7]/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-r from-[#F97316]/5 to-transparent rounded-full blur-3xl" />
       </div>
 
       <div className="text-center space-y-6 max-w-md">
         <div className="flex justify-center mb-8">
           <div className="relative group">
-            <div className="absolute -inset-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
+            <div className="absolute -inset-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
             <img 
               src={logoImage} 
               alt={t('app.name', 'SALIS AUTO')} 

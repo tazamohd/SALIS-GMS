@@ -34,7 +34,6 @@ import {
   MessageCircle,
   User as UserIcon,
   Loader2,
-  Circle,
   CheckCheck,
   Phone,
   Mail,

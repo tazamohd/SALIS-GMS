@@ -9,9 +9,9 @@ async function getAccessToken() {
   
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
   const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
+    ? `repl ${  process.env.REPL_IDENTITY}` 
     : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+    ? `depl ${  process.env.WEB_REPL_RENEWAL}` 
     : null;
 
   if (!xReplitToken) {
@@ -19,7 +19,7 @@ async function getAccessToken() {
   }
 
   connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=google-calendar',
+    `https://${  hostname  }/api/v2/connection?include_secrets=true&connector_names=google-calendar`,
     {
       headers: {
         'Accept': 'application/json',
@@ -103,7 +103,7 @@ export async function updateGoogleCalendarEvent(eventId: string, appointment: an
 
     const response = await calendar.events.update({
       calendarId: 'primary',
-      eventId: eventId,
+      eventId,
       requestBody: event,
     });
 
@@ -126,7 +126,7 @@ export async function deleteGoogleCalendarEvent(eventId: string) {
     
     await calendar.events.delete({
       calendarId: 'primary',
-      eventId: eventId,
+      eventId,
     });
 
     return { success: true };
@@ -146,7 +146,7 @@ export async function listGoogleCalendarEvents(timeMin?: string, timeMax?: strin
     const response = await calendar.events.list({
       calendarId: 'primary',
       timeMin: timeMin || new Date().toISOString(),
-      timeMax: timeMax,
+      timeMax,
       maxResults: 100,
       singleEvents: true,
       orderBy: 'startTime',

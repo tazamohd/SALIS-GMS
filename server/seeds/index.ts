@@ -105,7 +105,7 @@ export async function runComprehensiveSeed() {
     const endTime = Date.now();
     const duration = Math.round((endTime - startTime) / 1000);
     
-    console.log('\n' + '='.repeat(60));
+    console.log(`\n${  '='.repeat(60)}`);
     console.log('🎉 COMPREHENSIVE DATA POPULATION COMPLETE!');
     console.log('='.repeat(60));
     console.log(`Total Time: ${Math.floor(duration / 60)} minutes ${duration % 60} seconds\n`);

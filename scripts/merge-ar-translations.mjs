@@ -381,5 +381,5 @@ for (const [k, v] of Object.entries(T)) {
   added++;
 }
 
-writeFileSync(arPath, JSON.stringify(ar, null, 2) + "\n");
+writeFileSync(arPath, `${JSON.stringify(ar, null, 2)  }\n`);
 console.log(`✅ Merged ${added} Arabic translations into ar.json`);

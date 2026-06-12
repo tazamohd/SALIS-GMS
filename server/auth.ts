@@ -5,7 +5,6 @@ import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import type { User } from "@shared/schema";
 import { db } from "./db";
 import { garages } from "@shared/schema";
 import { eq } from "drizzle-orm";

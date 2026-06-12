@@ -26,7 +26,6 @@ import type { User, Vehicle, Garage, CustomerNote } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { ErrorState } from "@/components/ErrorState";
-import { EmptyState } from "@/components/EmptyState";
 
 export function Customers() {
   const { t } = useTranslation();

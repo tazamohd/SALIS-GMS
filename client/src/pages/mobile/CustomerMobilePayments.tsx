@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Receipt, Download, CreditCard, Clock, CheckCircle } from "lucide-react";
+import { Receipt, CreditCard, Clock, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import type { Invoice } from "@shared/schema";
 
@@ -26,7 +26,7 @@ export default function CustomerMobilePayments() {
     return (
       <div className="p-4 flex justify-center items-center h-64 bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto mb-4" />
           <p className="text-[#64748B]">Loading payments...</p>
         </div>
       </div>

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Eye, Trash2, DollarSign, QrCode } from "lucide-react";
+import { Eye, Trash2, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { calculateVAT, SAUDI_VAT_RATE } from "@shared/vatUtils";
 import {
   Dialog,
   DialogContent,

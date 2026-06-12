@@ -46,8 +46,8 @@ export function Profile() {
         icon={UserIcon}
       >
         <div className="animate-pulse space-y-4">
-          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg"></div>
-          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg"></div>
+          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg" />
+          <div className="h-64 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg" />
         </div>
       </StandardPageLayout>
     );

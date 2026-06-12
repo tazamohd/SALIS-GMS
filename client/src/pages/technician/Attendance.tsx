@@ -130,7 +130,7 @@ export default function TechnicianAttendance() {
         setIsWithinRange(nearest ? minDistance <= nearest.radius : false);
         setIsLoadingLocation(false);
       },
-      (error) => {
+      (_error) => {
         setLocationError("Unable to retrieve your location. Please enable GPS.");
         setIsLoadingLocation(false);
       },

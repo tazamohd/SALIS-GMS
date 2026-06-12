@@ -140,12 +140,12 @@ export class SmartContractEngine {
           paymentIntentId: result.paymentIntentId,
           executedAt: new Date().toISOString(),
         };
-      } else {
+      } 
         return {
           success: false,
           error: "Payment processing failed",
         };
-      }
+      
     } catch (error: any) {
       return {
         success: false,

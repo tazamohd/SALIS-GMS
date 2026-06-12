@@ -59,7 +59,7 @@ async function captureScreenshots() {
   console.log(`Routes: ${routes.length} pages`);
   console.log(`Resolutions: ${Object.keys(RESOLUTIONS).length} sizes`);
   console.log(`Total screenshots: ${routes.length * Object.keys(RESOLUTIONS).length}`);
-  console.log('='.repeat(60) + '\n');
+  console.log(`${'='.repeat(60)  }\n`);
 
   // Create output directories
   for (const res of Object.values(RESOLUTIONS)) {
@@ -127,7 +127,7 @@ async function captureScreenshots() {
 
   await browser.close();
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${  '='.repeat(60)}`);
   console.log('CAPTURE COMPLETE');
   console.log('='.repeat(60));
   console.log(`Success: ${totalSuccess}`);

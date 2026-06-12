@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { StandardPageLayout } from "@/components/layouts/StandardPageLayout";
 import {
   CreditCard,
@@ -35,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CURRENCIES as CURRENCY_CONFIG, PAYMENT_METHODS, getPaymentMethods } from "@/lib/currency";
 
 const CURRENCIES = [
   { code: 'sar', symbol: 'ر.س', name: 'SAR - Saudi Riyal' },

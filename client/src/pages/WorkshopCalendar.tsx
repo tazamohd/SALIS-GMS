@@ -1,15 +1,11 @@
-import { useState, useCallback } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { queryClient, apiRequest } from "@/lib/queryClient";
 import { DashboardPage } from "@/components/layouts/DashboardPage";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Calendar as CalendarIcon, 
@@ -21,10 +17,9 @@ import {
   ChevronRight,
   AlertTriangle,
   CheckCircle2,
-  GripVertical,
-  Maximize2
+  GripVertical
 } from "lucide-react";
-import { format, addDays, startOfWeek, addHours, isSameDay, parseISO } from "date-fns";
+import { format, addDays, startOfWeek, addHours, isSameDay } from "date-fns";
 
 interface CalendarEvent {
   id: string;

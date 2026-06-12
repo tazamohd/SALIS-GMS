@@ -1,4 +1,4 @@
-import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Home, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play, Zap } from "lucide-react";
+import { EyeOffIcon, LogOut, UserIcon, BarChart3, Settings, Bell, Users, FileText, TrendingUp, Building2, UserPlus, Shield, Wrench, ClipboardCheck, Clock, AlertCircle, CheckCircle, Play, Zap } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { useQuery } from "@tanstack/react-query";
 import type { User, Garage, JobCard, ServiceTemplate, Tool } from "@shared/schema";
 import { JobCardDialog } from "@/components/JobCardDialog";
 import { JobCardsList } from "@/components/JobCardsList";
-import { TaskAssignmentDialog } from "@/components/TaskAssignmentDialog";
 import { ToolAvailabilityDialog } from "@/components/ToolAvailabilityDialog";
 import { AddToolDialog } from "@/components/AddToolDialog";
 import { ServiceTemplatesDialog } from "@/components/ServiceTemplatesDialog";
@@ -31,8 +30,8 @@ const GarageOverview = () => {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4" />
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2" />
       </div>
     );
   }
@@ -75,9 +74,9 @@ const ToolsOverview = () => {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
-        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
-        <div className="animate-pulse bg-gray-200 h-16 rounded-lg"></div>
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg" />
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg" />
+        <div className="animate-pulse bg-gray-200 h-16 rounded-lg" />
       </div>
     );
   }
@@ -132,7 +131,7 @@ const ToolsOverview = () => {
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${
               tool.isActive ? 'bg-gray-700' : 'bg-gray-400'
-            }`}></span>
+            }`} />
             <span className="font-['Poppins',Helvetica] font-normal text-gray-500 dark:text-gray-500 text-xs">
               {tool.isActive ? t('tools.available', 'Available') : t('tools.unavailable', 'Unavailable')}
             </span>
@@ -158,8 +157,8 @@ const JobCardsOverview = () => {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4" />
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2" />
       </div>
     );
   }
@@ -287,8 +286,8 @@ const ServiceTemplatesOverview = () => {
   if (isLoading || !firstGarage) {
     return (
       <div className="space-y-2">
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4" />
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2" />
       </div>
     );
   }
@@ -339,8 +338,8 @@ const IntegrationMetrics = () => {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
-        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2"></div>
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4" />
+        <div className="animate-pulse bg-gray-200 h-4 rounded w-1/2" />
       </div>
     );
   }
@@ -603,7 +602,7 @@ export const LoginDashboard = (): JSX.Element => {
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-accent-500 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-accent-500 rounded-full mt-2" />
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                         {t('dashboard.newProjectCreated', 'New project created')}
@@ -614,7 +613,7 @@ export const LoginDashboard = (): JSX.Element => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-gray-500 rounded-full mt-2" />
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                         {t('dashboard.teamMemberAdded', 'Team member added')}
@@ -625,7 +624,7 @@ export const LoginDashboard = (): JSX.Element => {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full mt-2"></div>
+                    <div className="w-2 h-2 bg-gray-600 rounded-full mt-2" />
                     <div>
                       <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                         {t('dashboard.taskCompleted', 'Task completed')}
@@ -728,27 +727,27 @@ export const LoginDashboard = (): JSX.Element => {
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.userManagement', 'User Management')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.branchControl', 'Branch Control')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('nav.job_cards', 'Job Cards')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.taskAssignment', 'Task Assignment')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-900 dark:text-white">{t('dashboard.toolManagement', 'Tool Management')}</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-gray-400 rounded-full" />
                       <span className="font-['Poppins',Helvetica] text-gray-500 dark:text-gray-500">{t('nav.appointments', 'Appointments')}</span>
                     </div>
                   </div>
@@ -901,7 +900,7 @@ export const LoginDashboard = (): JSX.Element => {
                   </h4>
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full mt-2"></div>
+                      <div className="flex-shrink-0 w-2 h-2 bg-gray-700 dark:bg-gray-400 rounded-full mt-2" />
                       <div className="flex-1">
                         <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                           "Prepare Workspace" completed - JOB-2024-001
@@ -913,7 +912,7 @@ export const LoginDashboard = (): JSX.Element => {
                     </div>
                     
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-2 h-2 bg-gray-600 dark:bg-gray-500 rounded-full mt-2"></div>
+                      <div className="flex-shrink-0 w-2 h-2 bg-gray-600 dark:bg-gray-500 rounded-full mt-2" />
                       <div className="flex-1">
                         <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                           "Drain Old Oil" 75% complete - JOB-2024-001
@@ -925,7 +924,7 @@ export const LoginDashboard = (): JSX.Element => {
                     </div>
                     
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 w-2 h-2 bg-gray-500 dark:bg-gray-600 rounded-full mt-2"></div>
+                      <div className="flex-shrink-0 w-2 h-2 bg-gray-500 dark:bg-gray-600 rounded-full mt-2" />
                       <div className="flex-1">
                         <p className="font-['Poppins',Helvetica] font-medium text-gray-900 dark:text-white text-sm">
                           "Engine Visual Inspection" 60% complete - JOB-2024-002
@@ -1029,21 +1028,21 @@ export const LoginDashboard = (): JSX.Element => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gray-700 rounded-full"></span>
+                        <span className="w-2 h-2 bg-gray-700 rounded-full" />
                         <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.allSystems', 'All Systems')}</span>
                       </div>
                       <span className="font-['Poppins',Helvetica] font-semibold text-gray-800 text-sm">{t('dashboard.connected', 'Connected')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gray-600 rounded-full"></span>
+                        <span className="w-2 h-2 bg-gray-600 rounded-full" />
                         <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.realtimeSync', 'Real-time Sync')}</span>
                       </div>
                       <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">{t('common.active', 'Active')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-gray-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-gray-500 rounded-full" />
                         <span className="font-['Poppins',Helvetica] font-normal text-gray-900 dark:text-white text-sm">{t('dashboard.crossModuleLinks', 'Cross-Module Links')}</span>
                       </div>
                       <span className="font-['Poppins',Helvetica] font-semibold text-gray-700 text-sm">18 {t('common.active', 'Active')}</span>

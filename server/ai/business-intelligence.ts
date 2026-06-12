@@ -6,10 +6,10 @@
 
 import { db } from '../db';
 import {
-  jobCards, invoices, payments, appointments, spareParts,
-  sparePartInventories, purchaseOrders, users, vehicles
+  jobCards, invoices, appointments, spareParts,
+  sparePartInventories, purchaseOrders, users
 } from '../../shared/schema';
-import { eq, and, gte, lte, sql, count, desc } from 'drizzle-orm';
+import { eq, and, gte, sql, count, desc } from 'drizzle-orm';
 import { openai, AI_MODEL, AI_MAX_TOKENS } from '../ai';
 import type { AIInsight, RevenueForecast, DemandPrediction } from '../../shared/workflows';
 

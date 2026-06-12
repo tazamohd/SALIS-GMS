@@ -51,7 +51,6 @@ import {
   Plus,
   Search,
   Download,
-  Upload,
   Edit,
   Trash2,
   ChevronRight,
@@ -69,7 +68,6 @@ import {
   DollarSign,
   CircleDot,
   Filter,
-  RefreshCw,
 } from "lucide-react";
 
 const accountSchema = z.object({

@@ -12,13 +12,11 @@ import {
   FileCode,
   ExternalLink,
   Star,
-  Download,
   Info,
   Zap,
   Settings,
   Monitor,
   HardDrive,
-  Wifi,
   Shield,
   Clock,
 } from "lucide-react";

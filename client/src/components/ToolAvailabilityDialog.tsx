@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Zap, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import type { Tool, ToolAvailability, Garage } from "@shared/schema";
+import type { Tool, Garage } from "@shared/schema";
 
 interface ToolAvailabilityDialogProps {
   open: boolean;
@@ -52,7 +52,7 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse bg-gray-200 h-20 rounded"></div>
+              <div key={i} className="animate-pulse bg-gray-200 h-20 rounded" />
             ))}
           </div>
         ) : (

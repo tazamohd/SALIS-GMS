@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -16,19 +16,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import {
-  Building2, Store, Truck, Users, Shield, BarChart3, Activity,
-  CreditCard, Plus, Search, CheckCircle, XCircle, AlertTriangle,
-  Globe, Phone, Mail, MapPin, Eye, Edit, Trash2, RefreshCw,
-  TrendingUp, TrendingDown, Wrench, Package, MessageSquare,
-  Star, Clock, LayoutDashboard, Crown, ChevronRight, Settings,
-  Server, Database, Cpu, HardDrive, Wifi, Lock, BookOpen
+  Building2, Store, Truck, Users, Shield, Activity,
+  CreditCard, Plus, Search, CheckCircle, XCircle, MapPin, Eye, Edit, RefreshCw,
+  TrendingUp, Package, MessageSquare,
+  Star, LayoutDashboard, Crown, Settings,
+  Server, Database, Cpu, HardDrive, Wifi
 } from "lucide-react";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from "recharts";
 
@@ -1452,7 +1448,7 @@ function PlatformBillingTab() {
                         )}
                       </td>
                       <td className="py-2 px-2 text-[#64748B] text-xs font-mono">
-                        {row.stripeSubscriptionId ? row.stripeSubscriptionId.slice(0, 12) + "…" : "dev mode"}
+                        {row.stripeSubscriptionId ? `${row.stripeSubscriptionId.slice(0, 12)  }…` : "dev mode"}
                       </td>
                       <td className="py-2 px-2">
                         <div className="flex gap-1">

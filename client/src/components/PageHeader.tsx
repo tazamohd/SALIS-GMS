@@ -35,14 +35,14 @@ export function PageHeader({
         <div className="flex items-center gap-3">
           {Icon ? (
             <div className="relative">
-              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30"></div>
+              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30" />
               <div className="relative p-3 rounded-xl bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] shadow-lg">
                 <Icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
             </div>
           ) : (
             <div className="relative">
-              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30"></div>
+              <div className="absolute inset-0 bg-[#0A5ED7] rounded-xl blur-md opacity-20 dark:opacity-30" />
               <div className="relative p-3 rounded-xl bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] shadow-lg">
                 <Sparkles className="h-6 w-6 text-white" aria-hidden="true" />
               </div>

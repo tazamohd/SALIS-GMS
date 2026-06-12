@@ -12,7 +12,6 @@ import {
   MapPin,
   Star,
   Phone,
-  Mail,
   CheckCircle,
   Package,
   Truck,

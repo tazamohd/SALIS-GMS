@@ -4,7 +4,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import { db } from "../db";
-import { jobCards, users } from "../../shared/schema";
+import { jobCards } from "../../shared/schema";
 import { and, eq, gte, isNotNull, sql, count } from "drizzle-orm";
 import { getTechnicianStats } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";

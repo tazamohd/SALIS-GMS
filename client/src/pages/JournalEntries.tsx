@@ -51,7 +51,6 @@ import {
   Clock,
   XCircle,
   Edit,
-  Trash2,
   Copy,
   Eye,
   BookOpen,

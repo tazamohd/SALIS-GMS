@@ -7,7 +7,6 @@ import {
   userRoleBranch,
   technicianProfiles,
   customerProfiles,
-  assistantProfiles,
   jobCards,
   jobTrackingEvents,
   taskAssignments,
@@ -49,13 +48,10 @@ import {
   payments,
   technicianMetricDefinitions,
   technicianMetricPreferences,
-  technicianPerformanceStream,
   technicianPerformanceRollups,
   serviceFeedback,
   technicianFeedbackSummary,
   maintenanceRecommendations,
-  maintenanceTriggerRules,
-  telematicsProviders,
   telematicsDevices,
   telematicsStreams,
   telematicsReadings,
@@ -86,7 +82,6 @@ import {
   type InsertSparePartInventory,
   type Appointment,
   type InsertAppointment,
-  type AppointmentStatusHistory,
   type Vehicle,
   type InsertVehicle,
   type VehicleServiceHistory,
@@ -146,7 +141,6 @@ import {
   type TechnicianProfile,
   type InsertTechnicianProfile,
   notifications,
-  notificationSchedules,
   type Notification,
   type InsertNotification,
   type NotificationSchedule,
@@ -176,14 +170,10 @@ import {
   type InsertStockAlert,
   type ReorderSetting,
   type InsertReorderSetting,
-  type PricingHistory,
   type InsertPricingHistory,
-  type InventoryAuditTrail,
   type InsertInventoryAuditTrail,
   type InventoryTransfer,
   type InsertInventoryTransfer,
-  type TecDocCache,
-  type InsertTecDocCache,
   paymentPlans,
   installments,
   refunds,
@@ -260,8 +250,6 @@ import {
   aiChatConversations,
   voiceCommands,
   ocrDocuments,
-  aiChatMessages,
-  aiServiceSuggestions,
   integrationConnections,
   integrationSyncLogs,
   accountingTransactions,
@@ -311,16 +299,6 @@ import {
   fleetContracts,
   fleetPricingTiers,
   fleetMaintenanceSchedules,
-  type FleetGroup,
-  type InsertFleetGroup,
-  type FleetVehicle,
-  type InsertFleetVehicle,
-  type FleetContract,
-  type InsertFleetContract,
-  type FleetPricingTier,
-  type InsertFleetPricingTier,
-  type FleetMaintenanceSchedule,
-  type InsertFleetMaintenanceSchedule,
   warranties,
   warrantyClaims,
   inspectionTemplates,
@@ -341,24 +319,19 @@ import {
   documentAccessLog,
   franchiseGroups,
   franchiseContracts,
-  franchiseRoles,
   revenueSharingRules,
   franchiseKpis,
-  franchiseBranches,
   locales,
   translationResources,
   currencyRates,
   taxRegions,
   timezoneRules,
   networkPartners,
-  partnerContracts,
   fulfillmentOrders,
   shipmentEvents,
   warehouseNodes,
-  crossBorderDocs,
   obdDevices,
   deviceAssignments,
-  realtimeStreams,
   obdSessions,
   diagnosticReports,
   vendorCatalogs,
@@ -386,8 +359,6 @@ import {
   type InsertTimezoneRule,
   type NetworkPartner,
   type InsertNetworkPartner,
-  type PartnerContract,
-  type InsertPartnerContract,
   type FulfillmentOrder,
   type InsertFulfillmentOrder,
   type ShipmentEvent,
@@ -463,7 +434,6 @@ import {
   type IoTAlert,
   type InsertIoTAlert,
   parts3DModels,
-  parts3DViewSessions,
   type Parts3DModel,
   type InsertParts3DModel,
   type Parts3DViewSession,
@@ -603,63 +573,42 @@ import {
   type InsertQuantumEncryptionKey,
   type QuantumSecureMessage,
   type InsertQuantumSecureMessage,
-  payrollEmployees,
-  payPeriods,
-  payrollRuns,
   type PayrollEmployee,
   type InsertPayrollEmployee,
   type PayPeriod,
   type InsertPayPeriod,
   type PayrollRun,
   type InsertPayrollRun,
-  expenseCategories,
-  expenses,
   type ExpenseCategory,
   type InsertExpenseCategory,
   type Expense,
   type InsertExpense,
-  towingJobs,
   type TowingJob,
   type InsertTowingJob,
-  storageFacilities,
-  vehicleStorageAssignments,
   type StorageFacility,
   type InsertStorageFacility,
   type VehicleStorageAssignment,
   type InsertVehicleStorageAssignment,
-  telematicsFeeds,
-  telematicsAlerts,
   type TelematicsFeed,
   type InsertTelematicsFeed,
   type TelematicsAlert,
   type InsertTelematicsAlert,
-  articleCategories,
-  knowledgeArticles,
   type ArticleCategory,
   type InsertArticleCategory,
   type KnowledgeArticle,
   type InsertKnowledgeArticle,
-  trainingModules,
-  certifications,
-  certificationAttempts,
   type TrainingModule,
   type InsertTrainingModule,
   type Certification,
   type InsertCertification,
   type CertificationAttempt,
   type InsertCertificationAttempt,
-  googleBusinessProfiles,
-  gmbPosts,
-  gmbReviews,
   type GoogleBusinessProfile,
   type InsertGoogleBusinessProfile,
   type GmbPost,
   type InsertGmbPost,
   type GmbReview,
   type InsertGmbReview,
-  compliancePolicies,
-  complianceAudits,
-  complianceTasks,
   type CompliancePolicy,
   type InsertCompliancePolicy,
   type ComplianceAudit,
@@ -671,7 +620,6 @@ import {
   type ServiceBay,
   type InsertServiceBay,
   type BayOccupancySession,
-  type InsertBayOccupancySession,
   inventoryForecasts,
   replenishmentOrders,
   loyaltyTiers,
@@ -755,10 +703,8 @@ import {
   type InsertFleetAccount,
   fleetAccountVehicles,
   type FleetAccountVehicle,
-  type InsertFleetAccountVehicle,
   fleetMaintenanceEntries,
   type FleetMaintenanceEntry,
-  type InsertFleetMaintenanceEntry,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -2342,7 +2288,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(jobCards.createdAt));
   }
 
-  async getTechnicianTimeClockEntries(technicianId: string): Promise<any[]> {
+  async getTechnicianTimeClockEntries(_technicianId: string): Promise<any[]> {
     // TODO: Create timeClockEntries table in schema
     // For now, return empty array
     return [];
@@ -2402,7 +2348,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Tool Management operations - Module 7
-  async getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]> {
+  async getTools(_garageId?: string, _isGlobal?: boolean): Promise<Tool[]> {
     return await db.select().from(tools)
       .where(eq(tools.isActive, true))
       .orderBy(tools.name);
@@ -2481,7 +2427,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Tool Availability operations
-  async getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]> {
+  async getToolAvailability(garageId: string, _toolId?: string): Promise<ToolAvailability[]> {
     return await db.select().from(toolAvailability)
       .where(eq(toolAvailability.garageId, garageId));
   }
@@ -2610,7 +2556,7 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    let query = db.select().from(users).where(and(...conditions));
+    const query = db.select().from(users).where(and(...conditions));
     
     return await query.orderBy(desc(users.createdAt));
   }
@@ -5826,28 +5772,22 @@ export class DatabaseStorage implements IStorage {
 
     switch (module) {
       case 'jobCards':
-        const deleteJobCards = await db.delete(jobCards).where(inArray(jobCards.id, ids));
-        count = deleteJobCards.rowCount || 0;
+        count = (await db.delete(jobCards).where(inArray(jobCards.id, ids))).rowCount || 0;
         break;
       case 'customers':
-        const deleteCustomers = await db.delete(users).where(inArray(users.id, ids));
-        count = deleteCustomers.rowCount || 0;
+        count = (await db.delete(users).where(inArray(users.id, ids))).rowCount || 0;
         break;
       case 'vehicles':
-        const deleteVehicles = await db.delete(vehicles).where(inArray(vehicles.id, ids));
-        count = deleteVehicles.rowCount || 0;
+        count = (await db.delete(vehicles).where(inArray(vehicles.id, ids))).rowCount || 0;
         break;
       case 'invoices':
-        const deleteInvoices = await db.delete(invoices).where(inArray(invoices.id, ids));
-        count = deleteInvoices.rowCount || 0;
+        count = (await db.delete(invoices).where(inArray(invoices.id, ids))).rowCount || 0;
         break;
       case 'estimates':
-        const deleteEstimates = await db.delete(estimates).where(inArray(estimates.id, ids));
-        count = deleteEstimates.rowCount || 0;
+        count = (await db.delete(estimates).where(inArray(estimates.id, ids))).rowCount || 0;
         break;
       case 'spareParts':
-        const deleteSpareParts = await db.delete(spareParts).where(inArray(spareParts.id, ids));
-        count = deleteSpareParts.rowCount || 0;
+        count = (await db.delete(spareParts).where(inArray(spareParts.id, ids))).rowCount || 0;
         break;
       default:
         throw new Error(`Bulk delete not supported for module: ${module}`);
@@ -5861,40 +5801,23 @@ export class DatabaseStorage implements IStorage {
 
     switch (module) {
       case 'jobCards':
-        const updateJobCards = await db.update(jobCards)
-          .set(data)
-          .where(inArray(jobCards.id, ids));
-        count = updateJobCards.rowCount || 0;
+        count = (await db.update(jobCards).set(data).where(inArray(jobCards.id, ids))).rowCount || 0;
         break;
       case 'customers':
-        const updateCustomers = await db.update(users)
-          .set(data)
-          .where(inArray(users.id, ids));
-        count = updateCustomers.rowCount || 0;
+        count = (await db.update(users).set(data).where(inArray(users.id, ids))).rowCount || 0;
         break;
       case 'vehicles':
-        const updateVehicles = await db.update(vehicles)
-          .set(data)
-          .where(inArray(vehicles.id, ids));
-        count = updateVehicles.rowCount || 0;
+        count = (await db.update(vehicles).set(data).where(inArray(vehicles.id, ids))).rowCount || 0;
         break;
       case 'invoices':
-        const updateInvoices = await db.update(invoices)
-          .set(data)
-          .where(inArray(invoices.id, ids));
-        count = updateInvoices.rowCount || 0;
+        count = (await db.update(invoices).set(data).where(inArray(invoices.id, ids))).rowCount || 0;
         break;
       case 'estimates':
-        const updateEstimates = await db.update(estimates)
-          .set(data)
-          .where(inArray(estimates.id, ids));
-        count = updateEstimates.rowCount || 0;
+        count = (await db.update(estimates).set(data).where(inArray(estimates.id, ids))).rowCount || 0;
         break;
       case 'spareParts':
-        const updateSpareParts = await db.update(spareParts)
-          .set(data)
-          .where(inArray(spareParts.id, ids));
-        count = updateSpareParts.rowCount || 0;
+        count =
+          (await db.update(spareParts).set(data).where(inArray(spareParts.id, ids))).rowCount || 0;
         break;
       default:
         throw new Error(`Bulk update not supported for module: ${module}`);
@@ -6343,7 +6266,7 @@ export class DatabaseStorage implements IStorage {
         eq(commissionRules.isActive, true)
       ));
     
-    let applicableRule = rules[0];
+    const applicableRule = rules[0];
     if (!applicableRule) return null;
     
     const baseAmount = parseFloat(invoice.totalAmount);
@@ -8329,7 +8252,7 @@ export class DatabaseStorage implements IStorage {
       openRate: deliveredCount > 0 ? (openedCount / deliveredCount * 100).toFixed(2) : 0,
       clickRate: deliveredCount > 0 ? (clickedCount / deliveredCount * 100).toFixed(2) : 0,
       unsubscribeRate: sentCount > 0 ? (unsubscribedCount / sentCount * 100).toFixed(2) : 0,
-      recipients: recipients
+      recipients
     };
   }
 
@@ -9409,7 +9332,7 @@ export class DatabaseStorage implements IStorage {
     return reading;
   }
 
-  async getIoTSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]> {
+  async getIoTSensorReadings(sensorId?: string, _vehicleId?: string): Promise<IoTSensorReading[]> {
     const conditions = [];
     if (sensorId) conditions.push(eq(iotSensorReadings.sensorId, sensorId));
     
@@ -10064,7 +9987,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIotAlerts(vehicleId?: string, status?: string, severity?: string): Promise<any[]> {
-    let conditions = [];
+    const conditions = [];
     
     if (vehicleId) {
       conditions.push(eq(iotAlerts.vehicleId, vehicleId));
@@ -10819,7 +10742,7 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    let completedSessionsQuery = db.select().from(bayOccupancySessions)
+    const completedSessionsQuery = db.select().from(bayOccupancySessions)
       .where(gte(bayOccupancySessions.endTime, today));
     
     const completedSessions = await completedSessionsQuery;
@@ -11514,9 +11437,9 @@ export class DatabaseStorage implements IStorage {
     const existing = await this.getVehicleTrackingByVehicleId(vehicleId);
     if (existing) {
       return await this.updateVehicleTracking(vehicleId, data);
-    } else {
+    } 
       return await this.createVehicleTracking({ ...data, vehicleId });
-    }
+    
   }
 
   async getVehicleTrackingHistory(vehicleId: string, limit: number = 100): Promise<VehicleTrackingHistory[]> {
@@ -11734,10 +11657,10 @@ export class DatabaseStorage implements IStorage {
         .where(eq(notificationPreferences.id, existing.id))
         .returning();
       return updated;
-    } else {
+    } 
       const [created] = await db.insert(notificationPreferences).values(data).returning();
       return created;
-    }
+    
   }
 
   // ==================== Auto Service Reminder Generation ====================

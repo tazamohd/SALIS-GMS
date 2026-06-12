@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Clock, Wrench, CheckCircle, AlertCircle, User as UserIcon, Award, Briefcase, GraduationCap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -85,10 +84,10 @@ export function TechnicianPortal() {
     return (
       <div className="p-8 bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4"></div>
+          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+              <div key={i} className="h-24 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
             ))}
           </div>
         </div>

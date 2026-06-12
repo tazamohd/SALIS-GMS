@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { exportPaymentReceiptToPDF } from "@/lib/pdfExport";
 import type { Invoice } from "@shared/schema";
@@ -446,7 +446,7 @@ export default function Payments() {
           <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
             <p className="text-sm text-[#64748B]">{t('payments.cashPayments', 'Cash Payments')}</p>
             <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">
-              ${(paymentsByMethod['cash'] || 0).toFixed(2)}
+              ${(paymentsByMethod.cash || 0).toFixed(2)}
             </p>
           </div>
         </div>

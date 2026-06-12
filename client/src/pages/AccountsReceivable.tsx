@@ -55,9 +55,7 @@ import {
   Phone,
   FileText,
   ExternalLink,
-  Calendar,
   TrendingUp,
-  Send,
   Eye,
 } from "lucide-react";
 

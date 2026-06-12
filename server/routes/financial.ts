@@ -7,10 +7,10 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import {
-  invoices, invoiceItems, payments, purchaseOrders, purchaseOrderItems,
-  sparePartInventories, spareParts, users, suppliers, jobCards,
+  invoices, invoiceItems, payments, purchaseOrders,
+  sparePartInventories, users, suppliers,
 } from '../../shared/schema';
-import { eq, and, gte, lte, sql, count, sum, desc, asc, inArray } from 'drizzle-orm';
+import { eq, and, gte, lte, sql, count, asc, inArray } from 'drizzle-orm';
 
 const router = Router();
 

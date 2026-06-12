@@ -41,7 +41,6 @@ import {
   Phone,
   Mail,
   BookOpen,
-  Star,
   Scan,
   Palmtree,
   CreditCard,

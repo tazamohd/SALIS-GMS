@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -6,7 +6,6 @@ import { DashboardPage } from "@/components/layouts/DashboardPage";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -14,11 +13,9 @@ import {
   Car, 
   Clock, 
   Activity, 
-  AlertTriangle, 
   CheckCircle2,
   XCircle,
   Timer,
-  Users,
   TrendingUp,
   RefreshCw,
   Zap

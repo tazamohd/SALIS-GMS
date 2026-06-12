@@ -29,8 +29,7 @@ import {
   FileSpreadsheet,
   FilePlus,
   Trash2,
-  Calendar,
-  User
+  Calendar
 } from "lucide-react";
 
 const categorySchema = z.object({

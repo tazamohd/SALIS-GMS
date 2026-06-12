@@ -1,9 +1,8 @@
-import { ReactNode, useState, useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { LucideIcon, Plus, Database } from "lucide-react";
+import { ReactNode, useState, useEffect, useLayoutEffect, useRef } from "react";
+import { LucideIcon, Database } from "lucide-react";
 import { StandardPageLayout } from "./StandardPageLayout";
 import { FilterBar, FilterConfig } from "@/components/FilterBar";
 import { DataTable, Column } from "@/components/DataTable";
-import { Button } from "@/components/ui/button";
 
 interface PageAction {
   label: string;

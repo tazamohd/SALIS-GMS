@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Camera, X, CheckCircle } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BrowserMultiFormatReader } from "@zxing/library";
 
@@ -61,7 +61,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
       codeReader.decodeFromVideoDevice(
         selectedDeviceId,
         videoRef.current!,
-        (result, error) => {
+        (result, _error) => {
           if (result) {
             handleBarcodeDetected(result.getText());
           }

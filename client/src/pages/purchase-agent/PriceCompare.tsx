@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import {
   Search,
-  TrendingUp,
   TrendingDown,
   DollarSign,
   Star,
@@ -226,7 +225,7 @@ export default function PurchaseAgentPriceCompare() {
                           <TableHead className="text-[#0B1F3B] dark:text-white">Min Order</TableHead>
                           <TableHead className="text-[#0B1F3B] dark:text-white">Lead Time</TableHead>
                           <TableHead className="text-[#0B1F3B] dark:text-white">Availability</TableHead>
-                          <TableHead></TableHead>
+                          <TableHead />
                         </TableRow>
                       </TableHeader>
                       <TableBody>

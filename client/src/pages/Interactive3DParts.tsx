@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import {
@@ -29,14 +29,12 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
   Box,
   Search,
   RotateCcw,
   ZoomIn,
   ZoomOut,
-  Move,
   Eye,
   ShoppingCart,
   Info,
@@ -47,12 +45,6 @@ import {
   RefreshCw,
   Plus,
   Minus,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
   Maximize2,
   Grid3X3,
   Package,
@@ -64,9 +56,6 @@ import {
   CircleDot,
   Filter,
   Download,
-  Share2,
-  Bookmark,
-  MousePointer2,
   Hand,
 } from "lucide-react";
 

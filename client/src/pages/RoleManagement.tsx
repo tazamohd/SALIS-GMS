@@ -1,24 +1,14 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+
 import {
   Dialog,
   DialogContent,
@@ -43,10 +33,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Shield, Plus, Edit, Trash2, Users, Copy, Search, 
-  Settings, Wrench, DollarSign, Package, Car, Calendar,
-  BarChart3, Building2, UserCog, Eye, Lock, Unlock, 
-  CheckCircle, XCircle, AlertTriangle, Crown, Star, ChevronRight
+  Shield, Plus, Edit, Users, Copy, Search, 
+  Settings, Wrench, DollarSign, Package, Car,
+  BarChart3, Building2, UserCog, Lock, 
+  CheckCircle, AlertTriangle, Crown
 } from "lucide-react";
 import { StandardPageLayout } from "@/components/layouts";
 

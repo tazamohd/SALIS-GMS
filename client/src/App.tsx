@@ -1,6 +1,6 @@
-import { Switch, Route, Redirect } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -46,7 +46,6 @@ import TechnicianSoftware from "@/pages/technician/TechnicalSoftware";
 import TechnicianMobilePortal from "@/pages/mobile/TechnicianMobilePortal";
 import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
 import Notifications from "@/pages/Notifications";
-import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
 import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
@@ -206,7 +205,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import PlatformAdmin from "@/pages/PlatformAdmin";
@@ -287,7 +285,7 @@ function Router() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto" />
           <p className="mt-4 text-sm text-[#64748B]">Loading SALIS AUTO...</p>
         </div>
       </div>

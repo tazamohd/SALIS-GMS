@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { TrendingUp, TrendingDown, Target, Zap, DollarSign, Users, BarChart3 } from "lucide-react";
+import { TrendingUp, Target, Zap, DollarSign, Users, BarChart3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { AnalyticsPage } from "@/components/layouts";
 

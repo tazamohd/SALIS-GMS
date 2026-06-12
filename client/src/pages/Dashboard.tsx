@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Award, Flame, ShieldCheck, Gauge, CalendarPlus, Receipt, BoxesIcon, ClipboardList } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle, Wrench, TrendingUp, Users, DollarSign, Package, FileText, Car, Activity, Zap, ArrowUpRight, ArrowDownRight, Sparkles, Target, Flame, ShieldCheck, Gauge, CalendarPlus, Receipt, BoxesIcon, ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
@@ -228,9 +228,9 @@ export function Dashboard() {
     <div className="min-h-screen relative overflow-hidden">
       {/* Brand Background - Clean Dark/Light Theme */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]"></div>
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-[#0A5ED7]/5 to-transparent dark:from-[#0BB3FF]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#0BB3FF]/5 to-transparent dark:from-[#0A5ED7]/5 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#0E1117]" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-[#0A5ED7]/5 to-transparent dark:from-[#0BB3FF]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-[#0BB3FF]/5 to-transparent dark:from-[#0A5ED7]/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative p-4 md:p-6 space-y-6 md:space-y-8">
@@ -240,7 +240,7 @@ export function Dashboard() {
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-[#0A5ED7] rounded-2xl blur-lg opacity-30 dark:opacity-40"></div>
+                  <div className="absolute inset-0 bg-[#0A5ED7] rounded-2xl blur-lg opacity-30 dark:opacity-40" />
                   <div className="relative p-3 rounded-2xl bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] shadow-2xl shadow-[#0A5ED7]/25">
                     <Sparkles className="w-8 h-8 text-white" />
                   </div>
@@ -302,7 +302,7 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="mt-4 h-1 bg-[#0A5ED7]/10 dark:bg-[#0BB3FF]/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]"></div>
+                <div className="h-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] rounded-full w-[75%]" />
               </div>
             </div>
           </div>
@@ -446,7 +446,7 @@ export function Dashboard() {
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin" />
                   </div>
                 ) : dashboardStats?.revenue && dashboardStats.revenue.length > 0 ? (
                   <ResponsiveContainer width="100%" height={280}>
@@ -486,7 +486,7 @@ export function Dashboard() {
                 </div>
                 {statsLoading ? (
                   <div className="h-[280px] flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-[#0BB3FF]/20 border-t-[#0BB3FF] rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-4 border-[#0BB3FF]/20 border-t-[#0BB3FF] rounded-full animate-spin" />
                   </div>
                 ) : dashboardStats?.jobStatus && dashboardStats.jobStatus.length > 0 ? (
                   <ResponsiveContainer width="100%" height={280}>
@@ -593,7 +593,7 @@ export function Dashboard() {
                   {isLoading ? (
                     <tr>
                       <td colSpan={7} className="py-12 text-center">
-                        <div className="w-8 h-8 mx-auto border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 mx-auto border-4 border-[#0A5ED7]/20 border-t-[#0A5ED7] rounded-full animate-spin" />
                       </td>
                     </tr>
                   ) : latestTasks.length === 0 ? (

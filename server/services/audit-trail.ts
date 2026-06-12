@@ -202,7 +202,7 @@ export async function seedAuditLog(garageId: string) {
   for (const e of demoEntries) {
     await logAudit({
       ...e,
-      ipAddress: '192.168.1.' + Math.floor(Math.random() * 255),
+      ipAddress: `192.168.1.${  Math.floor(Math.random() * 255)}`,
       userAgent: 'Mozilla/5.0',
       garageId,
     });

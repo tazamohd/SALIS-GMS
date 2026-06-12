@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,19 +42,13 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import {
   TrendingUp,
-  TrendingDown,
   Plus,
   PiggyBank,
   Target,
   BarChart3,
-  Calendar,
   Shield,
   Percent,
-  FileText,
   DollarSign,
-  ExternalLink,
-  Wallet,
-  ArrowLeft,
 } from "lucide-react";
 
 const reserveAllocationSchema = z.object({
