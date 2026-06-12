@@ -1,4 +1,17 @@
 {
+  "count": {
+    "vehicles_one": "{{count}} vehicle",
+    "vehicles_other": "{{count}} vehicles",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "daysRemaining_one": "{{count}} day remaining",
+    "daysRemaining_other": "{{count}} days remaining"
+  },
+  "greeting": {
+    "welcome": "Welcome, {{name}}",
+    "welcome_male": "Welcome, Mr. {{name}}",
+    "welcome_female": "Welcome, Ms. {{name}}"
+  },
   "app": {
     "name": "SALIS AUTO",
     "tagline": "Integrated automotive workshop management system",
