@@ -1452,7 +1452,7 @@ function PlatformBillingTab() {
                         )}
                       </td>
                       <td className="py-2 px-2 text-[#64748B] text-xs font-mono">
-                        {row.stripeSubscriptionId ? row.stripeSubscriptionId.slice(0, 12) + "…" : "dev mode"}
+                        {row.stripeSubscriptionId ? `${row.stripeSubscriptionId.slice(0, 12)  }…` : "dev mode"}
                       </td>
                       <td className="py-2 px-2">
                         <div className="flex gap-1">

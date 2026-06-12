@@ -19,7 +19,7 @@ async function capture() {
       await page.setViewport({ width: 1920, height: 1080 });
       
       // First login
-      await page.goto(BASE_URL + '/login', { waitUntil: 'networkidle2', timeout: 10000 });
+      await page.goto(`${BASE_URL  }/login`, { waitUntil: 'networkidle2', timeout: 10000 });
       await new Promise(r => setTimeout(r, 1000));
       try {
         await page.type('input[type="email"]', 'admin@salisauto.com');
@@ -36,12 +36,12 @@ async function capture() {
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       
       await page.screenshot({ 
-        path: path.join(dir, name + '.png'),
+        path: path.join(dir, `${name  }.png`),
         clip: { x: 0, y: 0, width: 1920, height: 1080 }
       });
-      console.log('OK: ' + route);
+      console.log(`OK: ${  route}`);
     } catch (e) {
-      console.log('FAIL: ' + route + ' - ' + e.message.substring(0, 40));
+      console.log(`FAIL: ${  route  } - ${  e.message.substring(0, 40)}`);
     } finally {
       await page.close();
     }

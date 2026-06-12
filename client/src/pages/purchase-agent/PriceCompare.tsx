@@ -226,7 +226,7 @@ export default function PurchaseAgentPriceCompare() {
                           <TableHead className="text-[#0B1F3B] dark:text-white">Min Order</TableHead>
                           <TableHead className="text-[#0B1F3B] dark:text-white">Lead Time</TableHead>
                           <TableHead className="text-[#0B1F3B] dark:text-white">Availability</TableHead>
-                          <TableHead></TableHead>
+                          <TableHead />
                         </TableRow>
                       </TableHeader>
                       <TableBody>

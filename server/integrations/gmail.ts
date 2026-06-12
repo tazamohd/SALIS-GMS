@@ -9,9 +9,9 @@ async function getAccessToken() {
   
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
   const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
+    ? `repl ${  process.env.REPL_IDENTITY}` 
     : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+    ? `depl ${  process.env.WEB_REPL_RENEWAL}` 
     : null;
 
   if (!xReplitToken) {
@@ -19,7 +19,7 @@ async function getAccessToken() {
   }
 
   connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=google-mail',
+    `https://${  hostname  }/api/v2/connection?include_secrets=true&connector_names=google-mail`,
     {
       headers: {
         'Accept': 'application/json',

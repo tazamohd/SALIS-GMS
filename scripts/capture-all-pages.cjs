@@ -313,7 +313,7 @@ async function captureScreenshots() {
   console.log('='.repeat(60));
   console.log(`Total pages to capture: ${routes.length}`);
   console.log(`Output: ${OUTPUT_DIR}`);
-  console.log('='.repeat(60) + '\n');
+  console.log(`${'='.repeat(60)  }\n`);
 
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -360,7 +360,7 @@ async function captureScreenshots() {
 
   await browser.close();
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${  '='.repeat(60)}`);
   console.log('SCREENSHOT CAPTURE COMPLETE');
   console.log('='.repeat(60));
   console.log(`Success: ${successCount} / ${routes.length}`);

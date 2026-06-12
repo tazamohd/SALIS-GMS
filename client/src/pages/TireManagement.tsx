@@ -74,9 +74,9 @@ export default function TireManagement() {
       return <Badge className="bg-red-500/10 text-red-600 border-0">{t('tireManagement.outOfStock', 'Out of Stock')}</Badge>;
     } else if (tire.quantityInStock <= tire.reorderPoint) {
       return <Badge className="bg-[#F97316]/10 text-[#F97316] border-0">{t('tireManagement.lowStock', 'Low Stock')}</Badge>;
-    } else {
+    } 
       return <Badge className="bg-green-500/10 text-green-600 border-0">{t('tireManagement.inStock', 'In Stock')}</Badge>;
-    }
+    
   };
 
   const getSeasonIcon = (season: string) => {

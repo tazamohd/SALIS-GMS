@@ -114,9 +114,9 @@ export function useCallCenterWebSocket(userId: string | null, garageId: string |
             const updated = [...oldSessions];
             updated[existingIndex] = validSession;
             return updated;
-          } else {
+          } 
             return [validSession, ...oldSessions];
-          }
+          
         }
       );
       
@@ -142,9 +142,9 @@ export function useCallCenterWebSocket(userId: string | null, garageId: string |
             const updated = [...oldQueues];
             updated[existingIndex] = validQueue;
             return updated;
-          } else {
+          } 
             return [validQueue, ...oldQueues];
-          }
+          
         }
       );
       

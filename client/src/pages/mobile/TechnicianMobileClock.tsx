@@ -32,12 +32,12 @@ export default function TechnicianMobileClock() {
           clockInTime: new Date().toISOString(),
           location: "Mobile App",
         });
-      } else {
+      } 
         return apiRequest("/api/time-clock/clock-out", "POST", {
           entryId: todayEntry.id,
           clockOutTime: new Date().toISOString(),
         });
-      }
+      
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/time-clock/entries"] });

@@ -287,7 +287,7 @@ function Router() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto" />
           <p className="mt-4 text-sm text-[#64748B]">Loading SALIS AUTO...</p>
         </div>
       </div>

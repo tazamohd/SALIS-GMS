@@ -41,7 +41,7 @@ export default function Settings() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto" />
           <p className="mt-4 text-[#64748B]">{t('settings.loadingSettings', 'Loading settings...')}</p>
         </div>
       </div>

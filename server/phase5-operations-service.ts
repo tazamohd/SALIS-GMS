@@ -108,7 +108,7 @@ export async function runSchedulingOptimization(garageId: string) {
     
     if (technicians.length === 0) {
       const noTechOptimization = await createSchedulingOptimization({
-        garageId: garageId,
+        garageId,
         optimizationDate: new Date(),
         appointmentsOptimized: upcomingAppointments.length,
         efficiencyGain: 0,
@@ -180,7 +180,7 @@ export async function runSchedulingOptimization(garageId: string) {
     const efficiencyGain = Math.min(15, Math.max(0, 100 - avgUtilization) / 5);
     
     const optimization = await createSchedulingOptimization({
-      garageId: garageId,
+      garageId,
       optimizationDate: new Date(),
       appointmentsOptimized: upcomingAppointments.length,
       efficiencyGain,

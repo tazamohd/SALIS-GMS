@@ -548,7 +548,7 @@ export default function EstimatesQuotations() {
                         <th className="text-right p-2 font-medium text-[#64748B] w-[80px]">Qty</th>
                         <th className="text-right p-2 font-medium text-[#64748B] w-[120px]">Unit Price</th>
                         <th className="text-right p-2 font-medium text-[#64748B] w-[120px]">Line Total</th>
-                        <th className="w-[50px]"></th>
+                        <th className="w-[50px]" />
                       </tr>
                     </thead>
                     <tbody>

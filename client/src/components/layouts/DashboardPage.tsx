@@ -109,7 +109,7 @@ export function DashboardPage({
                     </div>
                   </div>
                   <div className="relative">
-                    <div className={cn("absolute inset-0 rounded-full blur-xl", scheme.bg)}></div>
+                    <div className={cn("absolute inset-0 rounded-full blur-xl", scheme.bg)} />
                     <div className={cn(
                       "relative w-14 h-14 rounded-full bg-gradient-to-br flex items-center justify-center shadow-lg",
                       scheme.gradient

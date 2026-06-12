@@ -241,7 +241,7 @@ router.post('/whatsapp/send', (req, res) => {
   }
 
   // Find or create conversation
-  let conversation = conversations.find(c => c.customerPhone === customerPhone);
+  const conversation = conversations.find(c => c.customerPhone === customerPhone);
   const msgId = `msg-${Date.now()}`;
   const now = new Date().toISOString();
 

@@ -169,7 +169,7 @@ const allRoutes = [
 ];
 
 async function captureScreenshots() {
-  console.log('Starting screenshot capture for ' + allRoutes.length + ' pages...');
+  console.log(`Starting screenshot capture for ${  allRoutes.length  } pages...`);
   
   const browser = await puppeteer.launch({
     headless: true,
@@ -188,7 +188,7 @@ async function captureScreenshots() {
   // Login
   console.log('Logging in...');
   try {
-    await page.goto(BASE_URL + '/login', { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(`${BASE_URL  }/login`, { waitUntil: 'networkidle2', timeout: 30000 });
     await new Promise(r => setTimeout(r, 2000));
     await page.type('input[type="email"], input[name="email"]', 'admin@salisauto.com');
     await page.type('input[type="password"], input[name="password"]', 'admin123');
@@ -203,21 +203,21 @@ async function captureScreenshots() {
   
   for (const { route, name, category } of allRoutes) {
     try {
-      console.log('Capturing ' + route + '...');
+      console.log(`Capturing ${  route  }...`);
       await page.goto(BASE_URL + route, { waitUntil: 'domcontentloaded', timeout: 15000 });
       await new Promise(r => setTimeout(r, 1500));
-      const screenshotPath = path.join('screenshots', category, name + '.png');
+      const screenshotPath = path.join('screenshots', category, `${name  }.png`);
       await page.screenshot({ path: screenshotPath, clip: { x: 0, y: 0, width: 1920, height: 1080 } });
       captured++;
-      console.log('  OK (' + captured + '/' + allRoutes.length + ')');
+      console.log(`  OK (${  captured  }/${  allRoutes.length  })`);
     } catch (error) {
       failed++;
-      console.log('  FAIL: ' + error.message.substring(0, 50));
+      console.log(`  FAIL: ${  error.message.substring(0, 50)}`);
     }
   }
   
   await browser.close();
-  console.log('Done! Captured: ' + captured + ', Failed: ' + failed);
+  console.log(`Done! Captured: ${  captured  }, Failed: ${  failed}`);
   
   // Generate gallery
   const html = generateGallery(allRoutes, categories);
@@ -229,11 +229,11 @@ function generateGallery(routes, categories) {
   const catData = {};
   categories.forEach(c => { catData[c] = { title: c.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), screens: routes.filter(r => r.category === c) }; });
   
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SALIS AUTO Screenshots</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui;background:#0f0f0f;color:#fff;padding:20px}h1{text-align:center;font-size:2rem;margin-bottom:30px}.cat{margin-bottom:40px}.cat-title{font-size:1.2rem;padding:10px 15px;background:#1a1a1a;border-radius:8px;margin-bottom:15px;border-left:3px solid #555}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}.card{background:#1a1a1a;border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .2s}.card:hover{transform:translateY(-3px)}.card img{width:100%;height:170px;object-fit:cover;object-position:top}.info{padding:10px}.name{font-weight:600;font-size:.9rem}.route{color:#666;font-size:.75rem;font-family:monospace}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;justify-content:center;align-items:center}.modal.active{display:flex}.modal img{max-width:95%;max-height:95%}.close{position:absolute;top:20px;right:30px;font-size:2rem;color:#fff;cursor:pointer}</style></head><body><h1>SALIS AUTO - ' + routes.length + ' Screenshots</h1>' + 
-  categories.map(c => '<div class="cat"><div class="cat-title">' + catData[c].title + ' (' + catData[c].screens.length + ')</div><div class="grid">' + 
-    catData[c].screens.map(s => '<div class="card" onclick="openModal(\'' + c + '/' + s.name + '.png\')"><img src="' + c + '/' + s.name + '.png" loading="lazy" onerror="this.style.background=\'#222\'"><div class="info"><div class="name">' + s.name.replace(/-/g,' ').replace(/^\d+\s*/,'') + '</div><div class="route">' + s.route + '</div></div></div>').join('') + 
-  '</div></div>').join('') +
-  '<div class="modal" id="modal"><span class="close" onclick="closeModal()">&times;</span><img id="modal-img"></div><script>function openModal(s){document.getElementById("modal-img").src=s;document.getElementById("modal").classList.add("active")}function closeModal(){document.getElementById("modal").classList.remove("active")}document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};document.onkeydown=e=>{if(e.key==="Escape")closeModal()}</script></body></html>';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SALIS AUTO Screenshots</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui;background:#0f0f0f;color:#fff;padding:20px}h1{text-align:center;font-size:2rem;margin-bottom:30px}.cat{margin-bottom:40px}.cat-title{font-size:1.2rem;padding:10px 15px;background:#1a1a1a;border-radius:8px;margin-bottom:15px;border-left:3px solid #555}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}.card{background:#1a1a1a;border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .2s}.card:hover{transform:translateY(-3px)}.card img{width:100%;height:170px;object-fit:cover;object-position:top}.info{padding:10px}.name{font-weight:600;font-size:.9rem}.route{color:#666;font-size:.75rem;font-family:monospace}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;justify-content:center;align-items:center}.modal.active{display:flex}.modal img{max-width:95%;max-height:95%}.close{position:absolute;top:20px;right:30px;font-size:2rem;color:#fff;cursor:pointer}</style></head><body><h1>SALIS AUTO - ${  routes.length  } Screenshots</h1>${  
+  categories.map(c => `<div class="cat"><div class="cat-title">${  catData[c].title  } (${  catData[c].screens.length  })</div><div class="grid">${  
+    catData[c].screens.map(s => `<div class="card" onclick="openModal('${  c  }/${  s.name  }.png')"><img src="${  c  }/${  s.name  }.png" loading="lazy" onerror="this.style.background='#222'"><div class="info"><div class="name">${  s.name.replace(/-/g,' ').replace(/^\d+\s*/,'')  }</div><div class="route">${  s.route  }</div></div></div>`).join('')  
+  }</div></div>`).join('') 
+  }<div class="modal" id="modal"><span class="close" onclick="closeModal()">&times;</span><img id="modal-img"></div><script>function openModal(s){document.getElementById("modal-img").src=s;document.getElementById("modal").classList.add("active")}function closeModal(){document.getElementById("modal").classList.remove("active")}document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")closeModal()};document.onkeydown=e=>{if(e.key==="Escape")closeModal()}</script></body></html>`;
 }
 
 captureScreenshots().catch(console.error);

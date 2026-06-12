@@ -67,7 +67,7 @@ export async function sendSMS(message: SMSMessage): Promise<{
  */
 export function formatSaudiPhoneNumber(phone: string): string {
   // Remove all non-digit characters
-  let cleaned = phone.replace(/\D/g, '');
+  const cleaned = phone.replace(/\D/g, '');
 
   // If starts with 966, add +
   if (cleaned.startsWith('966')) {
@@ -212,13 +212,13 @@ export async function sendBulkSMS(
         to: messages[index].to,
         error: result.value.error,
       };
-    } else {
+    } 
       return {
         success: false,
         to: messages[index].to,
         error: result.reason.message || 'Unknown error',
       };
-    }
+    
   });
 }
 

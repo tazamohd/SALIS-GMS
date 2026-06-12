@@ -52,7 +52,7 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse bg-gray-200 h-20 rounded"></div>
+              <div key={i} className="animate-pulse bg-gray-200 h-20 rounded" />
             ))}
           </div>
         ) : (

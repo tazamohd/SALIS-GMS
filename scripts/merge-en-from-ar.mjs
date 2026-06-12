@@ -83,7 +83,7 @@ const SPECIAL_WORDS = {
 
 function splitWords(key) {
   // first split on common separators
-  let parts = key.split(/[_\-/\s]+/).filter(Boolean);
+  const parts = key.split(/[_\-/\s]+/).filter(Boolean);
   // then split camelCase boundaries inside each part
   const out = [];
   for (const p of parts) {
@@ -102,7 +102,7 @@ function titleCase(word) {
   if (ACRONYMS.has(lc)) return lc.toUpperCase();
   // plural acronyms like KPIs, IDs, APIs, OEMs
   if (lc.endsWith("s") && ACRONYMS.has(lc.slice(0, -1))) {
-    return lc.slice(0, -1).toUpperCase() + "s";
+    return `${lc.slice(0, -1).toUpperCase()  }s`;
   }
   if (/^\d/.test(lc)) return lc;
   return lc[0].toUpperCase() + lc.slice(1);
@@ -114,12 +114,12 @@ function humanize(key) {
   // pattern: "...Success" → "... successfully"
   if (words.length >= 2 && words[words.length - 1].toLowerCase() === "success") {
     const head = words.slice(0, -1).map(titleCase).join(" ");
-    return head + " successfully";
+    return `${head  } successfully`;
   }
   // pattern: "...Failed" → "... failed"
   if (words.length >= 2 && words[words.length - 1].toLowerCase() === "failed") {
     const head = words.slice(0, -1).map(titleCase).join(" ");
-    return head + " failed";
+    return `${head  } failed`;
   }
   return words.map(titleCase).join(" ");
 }
@@ -588,7 +588,7 @@ function checkLeaves(obj, prefix = "") {
 }
 checkLeaves(merged);
 
-fs.writeFileSync(EN_PATH, JSON.stringify(merged, null, 2) + "\n");
+fs.writeFileSync(EN_PATH, `${JSON.stringify(merged, null, 2)  }\n`);
 console.log("Wrote", EN_PATH);
 
 // Stats

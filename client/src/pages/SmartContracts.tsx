@@ -333,7 +333,7 @@ export default function SmartContracts() {
       {isLoading && (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A5ED7] mx-auto" />
             <p className="mt-4 text-[#64748B]">{t('smartContracts.loadingContracts', 'Loading contracts...')}</p>
           </div>
         </div>

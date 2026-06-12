@@ -44,11 +44,11 @@ interface Estimate {
 // ── Demo Data ──────────────────────────────────────────────────────────────
 
 function generateId(): string {
-  return 'est-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  return `est-${  Date.now().toString(36)  }-${  Math.random().toString(36).slice(2, 8)}`;
 }
 
 function generateLineItemId(): string {
-  return 'li-' + Math.random().toString(36).slice(2, 10);
+  return `li-${  Math.random().toString(36).slice(2, 10)}`;
 }
 
 const VAT_RATE = 0.15; // 15% Saudi VAT
@@ -302,7 +302,7 @@ const demoEstimates: Estimate[] = [
   },
 ];
 
-let estimates: Estimate[] = [...demoEstimates];
+const estimates: Estimate[] = [...demoEstimates];
 let nextNumber = 9;
 
 // ── Routes ─────────────────────────────────────────────────────────────────
@@ -401,7 +401,7 @@ router.post('/estimates', isAuthenticated, (req, res) => {
   const estimate: Estimate = {
     id: generateId(),
     estimateNumber: estNumber,
-    customerId: 'cust-' + Math.random().toString(36).slice(2, 6),
+    customerId: `cust-${  Math.random().toString(36).slice(2, 6)}`,
     customerName,
     customerEmail: customerEmail || '',
     customerPhone: customerPhone || '',
@@ -462,7 +462,7 @@ router.patch('/estimates/:id/status', isAuthenticated, (req, res) => {
   est.updatedAt = new Date().toISOString();
 
   if (targetStatus === 'converted') {
-    est.convertedJobCardId = 'jc-2026-' + String(Math.floor(Math.random() * 9000 + 1000));
+    est.convertedJobCardId = `jc-2026-${  String(Math.floor(Math.random() * 9000 + 1000))}`;
   }
 
   res.json(est);

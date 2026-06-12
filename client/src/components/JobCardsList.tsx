@@ -71,7 +71,7 @@ export function JobCardsList() {
         <CardContent>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse bg-gray-200 h-24 rounded"></div>
+              <div key={i} className="animate-pulse bg-gray-200 h-24 rounded" />
             ))}
           </div>
         </CardContent>

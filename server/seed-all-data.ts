@@ -64,7 +64,7 @@ function randomDate(start: Date, end: Date): Date {
 }
 
 function generatePhone(): string {
-  return '+966 ' + faker.number.int({ min: 10, max: 99 }) + ' ' + faker.number.int({ min: 100, max: 999 }) + ' ' + faker.number.int({ min: 1000, max: 9999 });
+  return `+966 ${  faker.number.int({ min: 10, max: 99 })  } ${  faker.number.int({ min: 100, max: 999 })  } ${  faker.number.int({ min: 1000, max: 9999 })}`;
 }
 
 function generateTRN(): string {
@@ -967,7 +967,7 @@ export async function seedAllData() {
     const endTime = Date.now();
     const duration = Math.round((endTime - startTime) / 1000);
     
-    console.log('\n' + '='.repeat(70));
+    console.log(`\n${  '='.repeat(70)}`);
     console.log('🎉 INITIAL DATA SEEDING COMPLETE!');
     console.log('='.repeat(70));
     console.log(`Time elapsed: ${Math.floor(duration / 60)}m ${duration % 60}s`);

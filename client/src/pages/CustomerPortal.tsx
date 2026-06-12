@@ -217,7 +217,7 @@ export default function CustomerPortal() {
 
       toast({
         title: t('customers.portal.welcome', 'Welcome!'),
-        description: t('customers.portal.loggedInAs', 'Logged in as') + ` ${data.customer.fullName}`,
+        description: `${t('customers.portal.loggedInAs', 'Logged in as')  } ${data.customer.fullName}`,
       });
     } catch (error: any) {
       toast({

@@ -630,7 +630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Accessibility Routes - serve robots.txt, sitemap.xml, openapi.json, and .well-known files
   // These routes make the site accessible to ChatGPT, Gemini, and other AI models
-  const publicDir = process.cwd() + '/client/public';
+  const publicDir = `${process.cwd()  }/client/public`;
   
   app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
@@ -5752,7 +5752,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error("Error creating payment intent:", error);
-      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+      res.status(500).json({ message: `Error creating payment intent: ${  error.message}` });
     }
   });
 
@@ -14139,7 +14139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const newConv = await storage.createAIChatConversation({
           userId: req.user?.id,
           garageId: req.user?.garageId,
-          title: message.substring(0, 50) + "...",
+          title: `${message.substring(0, 50)  }...`,
           status: "active"
         });
         convId = newConv.id;
@@ -14890,7 +14890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Mock part lookup by barcode
       res.json({
         barcode,
-        partNumber: "PN-" + barcode,
+        partNumber: `PN-${  barcode}`,
         partName: "Oil Filter",
         inStock: true,
         quantity: 45,
@@ -16625,7 +16625,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 0; i < 2; i++) {
         await storage.createCollaborationSession({
           garageId,
-          jobCardId: 'sample-job-' + i,
+          jobCardId: `sample-job-${  i}`,
           technicianId: userId,
           sessionType: ['video_call', 'ar_annotation'][i],
           duration: 25 + i * 10,
@@ -17598,7 +17598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId,
         showroomName: 'Virtual Service Center - Premium',
         metaversePlatform: 'Decentraland',
-        showroomUrl: 'https://metaverse.example.com/garage/' + garageId,
+        showroomUrl: `https://metaverse.example.com/garage/${  garageId}`,
         virtualCoordinates: 'X:125, Y:67, Z:3',
         featuredVehicles: [vehicleId],
         interactiveFeatures: ['3D vehicle viewer', 'service history', 'live chat'],
@@ -17757,7 +17757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId,
         contractType: 'service_warranty',
         blockchainNetwork: 'Ethereum',
-        contractAddress: '0x' + Math.random().toString(16).substring(2, 42),
+        contractAddress: `0x${  Math.random().toString(16).substring(2, 42)}`,
         abi: JSON.stringify([{ type: 'function', name: 'claimWarranty' }]),
         terms: {
           warrantyPeriod: '12 months',
@@ -17774,7 +17774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createContractEvent({
           contractId: contract.id,
           eventType: i === 0 ? 'contract_created' : 'milestone_reached',
-          transactionHash: '0x' + Math.random().toString(16).substring(2, 66),
+          transactionHash: `0x${  Math.random().toString(16).substring(2, 66)}`,
           blockNumber: 18500000 + i * 100,
           eventData: i === 0 
             ? { action: 'contract_deployed', parties: 2 }
@@ -17794,7 +17794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verificationStandard: 'Gold Standard',
         issuanceDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
         expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
-        certificateUrl: 'https://certificates.example.com/carbon/' + garageId,
+        certificateUrl: `https://certificates.example.com/carbon/${  garageId}`,
         status: 'active',
       });
       totalRecords++;
@@ -17884,7 +17884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         connectionType: 'satellite_internet',
         bandwidth: '250 Mbps',
         latency: 35,
-        terminalId: 'STARLINK-' + garageId.substring(0, 8),
+        terminalId: `STARLINK-${  garageId.substring(0, 8)}`,
         installationDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
         monthlyDataAllowance: 1000.0,
         status: 'active',
@@ -17922,9 +17922,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           keyId: quantumKey.id,
           senderId: userId,
           recipientId: userId,
-          encryptedPayload: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
+          encryptedPayload: `QE-${  Buffer.from(`Secure message ${i + 1}`).toString('base64')}`,
           encryptionAlgorithm: 'Lattice-based-Kyber-1024',
-          messageHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
+          messageHash: `SHA3-512-${  Math.random().toString(36).substring(2, 15)}`,
           transmissionDate: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000).toISOString(),
           status: i === 0 ? 'delivered' : 'pending',
         });
@@ -17936,7 +17936,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Successfully seeded all 15 next-gen technology modules",
           modules: 15,
           tablesPopulated: 30,
-          totalRecords: totalRecords,
+          totalRecords,
           breakdown: {
             neuralDiagnostics: 5,
             computerVision: 4,

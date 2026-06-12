@@ -35,9 +35,9 @@ export function MobileCardPage({
     <div className={cn("flex flex-col min-h-screen relative overflow-hidden", className)}>
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-purple-50/50 to-blue-50 dark:from-black dark:via-purple-950/30 dark:to-black"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200/40 dark:bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200/40 dark:bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-purple-50/50 to-blue-50 dark:from-black dark:via-purple-950/30 dark:to-black" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200/40 dark:bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-200/40 dark:bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       {/* Mobile Header */}
@@ -66,7 +66,7 @@ export function MobileCardPage({
         {isLoading ? (
           [...Array(5)].map((_, i) => (
             <div key={i} className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50 animate-pulse"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-50 animate-pulse" />
               <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-2xl p-4 border border-purple-200/50 dark:border-white/10">
                 <div className="h-16 bg-purple-100/50 dark:bg-white/5 rounded-xl animate-pulse" />
               </div>
@@ -89,7 +89,7 @@ export function MobileCardPage({
               onClick={item.onClick}
               data-testid={`mobile-card-${item.id}`}
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-all duration-300"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-all duration-300" />
               <div className="relative backdrop-blur-xl bg-white/70 dark:bg-black/20 rounded-2xl p-4 border border-purple-200/50 dark:border-white/10 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] hover:-translate-y-0.5">
                 <div className="flex items-center gap-4">
                   {item.icon && (

@@ -178,7 +178,7 @@ export default function IncomeStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/50 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('incomeStatement.totalRevenue', 'Total Revenue')}</TableCell>
                 <TableCell className="text-right font-mono text-green-600">
                   {totalRevenue.toLocaleString()}
@@ -212,7 +212,7 @@ export default function IncomeStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/50 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('incomeStatement.totalCostOfGoodsSold', 'Total Cost of Goods Sold')}</TableCell>
                 <TableCell className="text-right font-mono text-red-600">
                   ({totalCOGS.toLocaleString()})
@@ -220,11 +220,11 @@ export default function IncomeStatement() {
                 <TableCell className="text-right font-mono text-muted-foreground">
                   ({totalPreviousCOGS.toLocaleString()})
                 </TableCell>
-                <TableCell></TableCell>
+                <TableCell />
               </TableRow>
 
               <TableRow className="bg-blue-50 dark:bg-blue-900/20 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="text-blue-700 dark:text-blue-400">{t('incomeStatement.grossProfit', 'GROSS PROFIT')}</TableCell>
                 <TableCell className="text-right font-mono text-blue-600">
                   {grossProfit.toLocaleString()}
@@ -258,7 +258,7 @@ export default function IncomeStatement() {
                 </TableRow>
               ))}
               <TableRow className="bg-muted/50 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell>{t('incomeStatement.totalOperatingExpenses', 'Total Operating Expenses')}</TableCell>
                 <TableCell className="text-right font-mono text-red-600">
                   ({totalOperatingExpenses.toLocaleString()})
@@ -266,11 +266,11 @@ export default function IncomeStatement() {
                 <TableCell className="text-right font-mono text-muted-foreground">
                   ({previousOperatingExpenses.toLocaleString()})
                 </TableCell>
-                <TableCell></TableCell>
+                <TableCell />
               </TableRow>
 
               <TableRow className="bg-purple-50 dark:bg-purple-900/20 font-bold">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="text-purple-700 dark:text-purple-400">{t('incomeStatement.operatingIncome', 'OPERATING INCOME')}</TableCell>
                 <TableCell className="text-right font-mono text-purple-600">
                   {operatingIncome.toLocaleString()}
@@ -298,12 +298,12 @@ export default function IncomeStatement() {
                   <TableCell className="text-right font-mono text-muted-foreground">
                     ({item.previousAmount.toLocaleString()})
                   </TableCell>
-                  <TableCell></TableCell>
+                  <TableCell />
                 </TableRow>
               ))}
 
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
-                <TableCell></TableCell>
+                <TableCell />
                 <TableCell className="text-green-800 dark:text-green-300">{t('incomeStatement.netIncome', 'NET INCOME')}</TableCell>
                 <TableCell className="text-right font-mono text-green-700 dark:text-green-400">
                   SAR {netIncome.toLocaleString()}

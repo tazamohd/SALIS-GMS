@@ -18,7 +18,7 @@ export function requireRole(allowedRoles: UserRole[]) {
     
     if (!allowedRoles.includes(userRole as UserRole)) {
       return res.status(403).json({ 
-        message: "Access denied. Required role: " + allowedRoles.join(' or ')
+        message: `Access denied. Required role: ${  allowedRoles.join(' or ')}`
       });
     }
     

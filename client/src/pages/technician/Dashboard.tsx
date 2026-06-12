@@ -107,10 +107,10 @@ export default function TechnicianDashboard() {
     return (
       <div className="space-y-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4"></div>
+          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-1/4" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-[#E2E8F0] dark:bg-[#232A36] rounded"></div>
+              <div key={i} className="h-32 bg-[#E2E8F0] dark:bg-[#232A36] rounded" />
             ))}
           </div>
         </div>

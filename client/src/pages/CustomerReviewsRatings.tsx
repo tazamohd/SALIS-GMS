@@ -72,8 +72,8 @@ export default function CustomerReviewsRatings() {
         icon={Star}
       >
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-96" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-128" />
         </div>
       </StandardPageLayout>
     );

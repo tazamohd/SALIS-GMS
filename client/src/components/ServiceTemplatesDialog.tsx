@@ -41,7 +41,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse bg-gray-200 h-32 rounded"></div>
+              <div key={i} className="animate-pulse bg-gray-200 h-32 rounded" />
             ))}
           </div>
         ) : templates.length === 0 ? (

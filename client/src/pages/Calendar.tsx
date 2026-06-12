@@ -420,7 +420,7 @@ export default function Calendar() {
               showMultiDayTimes
               defaultView="month"
               views={['month', 'week', 'day', 'agenda']}
-              toolbar={true}
+              toolbar
               style={{ height: '100%' }}
             />
           </div>

@@ -80,8 +80,8 @@ export default function DigitalVehicleWalkaround() {
     return (
       <div className="p-8 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-96"></div>
-          <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-128"></div>
+          <div className="h-8 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-96" />
+          <div className="h-4 bg-[#E2E8F0] dark:bg-[#232A36] rounded w-128" />
         </div>
       </div>
     );

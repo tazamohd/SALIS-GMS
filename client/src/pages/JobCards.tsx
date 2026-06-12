@@ -292,7 +292,7 @@ export function JobCards() {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="animate-spin w-8 h-8 border-4 border-[#0A5ED7] border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-[#64748B]">{t('jobCards.loading', 'Loading job cards...')}</p>
           </div>
         ) : filteredJobCards.length === 0 ? (
