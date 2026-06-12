@@ -33,8 +33,8 @@ These ESNext rules are **errors** (enforced, CI-blocking):
 - `prefer-template`, `no-useless-concat` — template literals over string concat
 - `dot-notation`, `no-else-return` — general hygiene
 - `unused-imports/no-unused-imports` — unused imports are auto-removed by `lint:fix`
-
-`no-case-declarations` (block-scope declarations inside `case`) is kept a warning.
+- `no-case-declarations` — `case` bodies must not leak block-scoped declarations
+- `@typescript-eslint/no-require-imports` — use ESM `import`, not `require()` (off for `.cjs`/config files)
 
 **React**
 - `react/jsx-pascal-case` — PascalCase component names
@@ -62,11 +62,13 @@ Current warning backlog (run `npm run lint` for the live list):
 
 | Rule | Count* | Why it's a warning |
 | --- | --- | --- |
-| `unused-imports/no-unused-vars` | ~320 | Unused locals/args need human judgment (imports are auto-removed) |
+| `unused-imports/no-unused-vars` | ~289 vars + 31 args | Unused locals/args need human judgment (imports are auto-removed) |
 | `react/no-array-index-key` | ~191 | Each fix needs a stable id; bulk auto-changing keys risks reconciliation bugs |
 | `@typescript-eslint/ban-ts-comment` | ~60 | Existing escape hatches; review case-by-case |
 | `react-hooks/exhaustive-deps` | ~14 | Adding deps can change behavior; fix per-site |
-| `no-case-declarations` | ~12 | Wrap `case` bodies in braces when touched |
-| `@typescript-eslint/no-require-imports` | ~3 | Dynamic `require()` in a few server modules |
 
 \* Snapshot at adoption time; run the linter for the current count.
+
+Unused **args** are the safest next target (prefix with `_` or drop trailing
+params). Unused **vars** and array-index keys should be cleaned per-file as
+those files are touched, since both can hide intent or affect behavior.

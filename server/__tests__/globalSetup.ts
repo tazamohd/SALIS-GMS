@@ -1,6 +1,7 @@
 import EmbeddedPostgres from "embedded-postgres";
 import { execSync } from "child_process";
 import fs from "fs";
+import net from "net";
 import { Client } from "pg";
 
 const EMBEDDED_URL = "postgresql://postgres:postgres@localhost:5432/slis_gms";
@@ -10,7 +11,6 @@ let activeUrl: string;
 
 function isPortInUse(port: number): Promise<boolean> {
   return new Promise((resolve) => {
-    const net = require("net");
     const server = net.createServer();
     server.once("error", () => resolve(true));
     server.once("listening", () => { server.close(); resolve(false); });

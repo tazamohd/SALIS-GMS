@@ -2,6 +2,7 @@
 // Saudi Arabia's Zakat, Tax and Customs Authority
 // Phase 2 requires real-time invoice clearance through ZATCA's Fatoora platform
 
+import { createHash } from 'crypto';
 import {
   ZATCAInvoiceData,
   generateZATCAQRCode,
@@ -399,8 +400,7 @@ function generateUUID(): string {
 
 function computeInvoiceHash(xml: string): string {
   // Use Node.js crypto for SHA-256 hashing
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(xml, 'utf-8').digest('base64');
+  return createHash('sha256').update(xml, 'utf-8').digest('base64');
 }
 
 function extractUUIDFromXml(xml: string): string {

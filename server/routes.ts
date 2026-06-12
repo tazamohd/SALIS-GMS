@@ -1,6 +1,7 @@
 // @ts-nocheck — Monolith file, slated for deletion in Phase 3 (route refactoring)
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { createHash } from "crypto";
 import { storage } from "./storage";
 import { db } from "./db";
 import { eq, desc, sql, count } from "drizzle-orm";
@@ -1343,7 +1344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { token } = req.params;
       
       // Hash the token to compare with stored hash
-      const hashedToken = require('crypto').createHash('sha256').update(token).digest('hex');
+      const hashedToken = createHash('sha256').update(token).digest('hex');
       
       const jobCard = await storage.getJobByTrackingToken(hashedToken);
       if (!jobCard) {

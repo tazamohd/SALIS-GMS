@@ -85,9 +85,8 @@ export default tseslint.config(
       '@typescript-eslint/ban-ts-comment': 'warn',
       // TS namespaces are occasionally legitimate (module augmentation, .d.ts).
       '@typescript-eslint/no-namespace': 'off',
-      // ecomfe ESNext: declarations in case blocks need their own scope —
-      // worth flagging but kept non-blocking for incremental cleanup.
-      'no-case-declarations': 'warn',
+      // ecomfe ESNext: declarations in case blocks need their own scope.
+      'no-case-declarations': 'error',
       'no-empty': ['warn', { allowEmptyCatch: true }],
     },
   },
@@ -101,14 +100,6 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
-
-  // A handful of server modules use dynamic require(); flag, don't block.
-  {
-    files: ['server/**/*.ts'],
-    rules: {
-      '@typescript-eslint/no-require-imports': 'warn',
     },
   },
 
