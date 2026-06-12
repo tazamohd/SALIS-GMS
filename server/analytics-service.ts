@@ -24,7 +24,7 @@ async function safeExecuteSQL<T>(query: Promise<any>, defaultValue: T): Promise<
 export async function generateBusinessIntelligenceReport(
   garageId: string, 
   dateRange?: { start: Date; end: Date },
-  limit: number = 100
+  _limit: number = 100
 ) {
   try {
     const start = dateRange?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default 30 days

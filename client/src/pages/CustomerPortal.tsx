@@ -783,7 +783,7 @@ export default function CustomerPortal() {
             <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#0A5ED7] to-[#0BB3FF]" />
 
             <div className="space-y-6">
-              {serviceHistory.map((record: any, index: number) => (
+              {serviceHistory.map((record: any, _index: number) => (
                 <div key={record.id} className="relative pl-12" data-testid={`history-${record.id}`}>
                   {/* Timeline dot */}
                   <div className={`absolute left-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${

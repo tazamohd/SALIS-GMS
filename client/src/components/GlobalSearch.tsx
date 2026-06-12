@@ -75,7 +75,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
     return labels[module] || module;
   };
 
-  const navigateToItem = (module: string, item: any) => {
+  const navigateToItem = (module: string, _item: any) => {
     onOpenChange(false);
     
     switch (module) {

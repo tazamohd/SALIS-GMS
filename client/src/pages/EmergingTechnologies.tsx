@@ -20,14 +20,14 @@ export default function EmergingTechnologies() {
 
   const seedMutation = useMutation({
     mutationFn: () => apiRequest('/api/emerging-tech/seed', 'POST', {}),
-    onSuccess: (data: any) => {
+    onSuccess: (_data: any) => {
       toast({
         title: t('emergingTech.sampleDataSeeded', 'Sample Data Seeded!'),
         description: t('emergingTech.seedSuccessDesc', 'Successfully created sample data for all 12 modules.'),
       });
       queryClient.invalidateQueries({ queryKey: ['/api/emerging-tech'] });
     },
-    onError: (error) => {
+    onError: (_error) => {
       toast({
         title: t('emergingTech.seedingFailed', 'Seeding Failed'),
         description: t('emergingTech.seedFailedDesc', 'Failed to seed sample data. Please try again.'),

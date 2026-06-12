@@ -62,13 +62,13 @@ Current warning backlog (run `npm run lint` for the live list):
 
 | Rule | Count* | Why it's a warning |
 | --- | --- | --- |
-| `unused-imports/no-unused-vars` | ~289 vars + 31 args | Unused locals/args need human judgment (imports are auto-removed) |
+| `unused-imports/no-unused-vars` | ~289 vars | Unused locals need human judgment (imports auto-removed; unused args cleaned) |
 | `react/no-array-index-key` | ~191 | Each fix needs a stable id; bulk auto-changing keys risks reconciliation bugs |
 | `@typescript-eslint/ban-ts-comment` | ~60 | Existing escape hatches; review case-by-case |
 | `react-hooks/exhaustive-deps` | ~14 | Adding deps can change behavior; fix per-site |
 
 \* Snapshot at adoption time; run the linter for the current count.
 
-Unused **args** are the safest next target (prefix with `_` or drop trailing
-params). Unused **vars** and array-index keys should be cleaned per-file as
-those files are touched, since both can hide intent or affect behavior.
+Unused **args** have been prefixed with `_` to mark them intentional. Unused
+**vars** and array-index keys should be cleaned per-file as those files are
+touched, since both can hide intent or affect behavior.

@@ -228,7 +228,7 @@ export default function PublicTracking() {
                 <div className="relative">
                   <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[#E2E8F0] dark:bg-[#232A36]" />
                   <div className="space-y-6">
-                    {events.map((event: any, index: number) => (
+                    {events.map((event: any, _index: number) => (
                       <div key={event.id} className="relative flex gap-4" data-testid={`event-${event.id}`}>
                         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white dark:bg-[#151A23] border-2 border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-center z-10">
                           {getEventIcon(event.eventType)}

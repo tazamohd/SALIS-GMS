@@ -261,16 +261,16 @@ export async function postToSocialMedia(data: {
   return posts;
 }
 
-export async function fetchSocialMediaReviews(garageId: string) {
+export async function fetchSocialMediaReviews(_garageId: string) {
   // In production, this would fetch from Google, Yelp, Facebook APIs
   // TODO: Implement reviews table
   return [];
 }
 
 export async function respondToReview(
-  reviewId: string,
-  response: string,
-  respondedBy: string
+  _reviewId: string,
+  _response: string,
+  _respondedBy: string
 ) {
   // TODO: Implement reviews table
   return { success: true };

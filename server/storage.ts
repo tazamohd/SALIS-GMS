@@ -2288,7 +2288,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(jobCards.createdAt));
   }
 
-  async getTechnicianTimeClockEntries(technicianId: string): Promise<any[]> {
+  async getTechnicianTimeClockEntries(_technicianId: string): Promise<any[]> {
     // TODO: Create timeClockEntries table in schema
     // For now, return empty array
     return [];
@@ -2348,7 +2348,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Tool Management operations - Module 7
-  async getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]> {
+  async getTools(_garageId?: string, _isGlobal?: boolean): Promise<Tool[]> {
     return await db.select().from(tools)
       .where(eq(tools.isActive, true))
       .orderBy(tools.name);
@@ -2427,7 +2427,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Tool Availability operations
-  async getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]> {
+  async getToolAvailability(garageId: string, _toolId?: string): Promise<ToolAvailability[]> {
     return await db.select().from(toolAvailability)
       .where(eq(toolAvailability.garageId, garageId));
   }
@@ -9332,7 +9332,7 @@ export class DatabaseStorage implements IStorage {
     return reading;
   }
 
-  async getIoTSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]> {
+  async getIoTSensorReadings(sensorId?: string, _vehicleId?: string): Promise<IoTSensorReading[]> {
     const conditions = [];
     if (sensorId) conditions.push(eq(iotSensorReadings.sensorId, sensorId));
     

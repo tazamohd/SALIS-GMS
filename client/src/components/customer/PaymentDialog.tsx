@@ -18,7 +18,7 @@ interface PaymentFormProps {
   onCancel: () => void;
 }
 
-function PaymentForm({ invoiceId, amount, onSuccess, onCancel }: PaymentFormProps) {
+function PaymentForm({ invoiceId: _invoiceId, amount, onSuccess, onCancel }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();

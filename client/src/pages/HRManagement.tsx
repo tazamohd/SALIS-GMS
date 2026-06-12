@@ -139,7 +139,7 @@ export default function HRManagement() {
   );
 }
 
-function EmployeesTab({ garageId }: { garageId: string }) {
+function EmployeesTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -378,7 +378,7 @@ function EmployeeForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function AttendanceTab({ garageId }: { garageId: string }) {
+function AttendanceTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [selectedEmployee, setSelectedEmployee] = useState<string>("all");
@@ -527,7 +527,7 @@ function AttendanceTab({ garageId }: { garageId: string }) {
   );
 }
 
-function LeaveManagementTab({ garageId }: { garageId: string }) {
+function LeaveManagementTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
 
@@ -700,7 +700,7 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
   );
 }
 
-function PayrollTab({ garageId }: { garageId: string }) {
+function PayrollTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -782,7 +782,7 @@ function PayrollTab({ garageId }: { garageId: string }) {
   );
 }
 
-function PerformanceTab({ garageId }: { garageId: string }) {
+function PerformanceTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -864,7 +864,7 @@ function PerformanceTab({ garageId }: { garageId: string }) {
   );
 }
 
-function TrainingTab({ garageId }: { garageId: string }) {
+function TrainingTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -967,7 +967,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
   );
 }
 
-function RecruitmentTab({ garageId }: { garageId: string }) {
+function RecruitmentTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [showPostDialog, setShowPostDialog] = useState(false);
 
@@ -1156,7 +1156,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
   );
 }
 
-function BenefitsTab({ garageId }: { garageId: string }) {
+function BenefitsTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -1253,7 +1253,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
   );
 }
 
-function OrganizationTab({ garageId }: { garageId: string }) {
+function OrganizationTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
@@ -1376,7 +1376,7 @@ function OrganizationTab({ garageId }: { garageId: string }) {
   );
 }
 
-function SelfServiceTab({ garageId }: { garageId: string }) {
+function SelfServiceTab({ garageId: _garageId }: { garageId: string }) {
   const { t } = useTranslation();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
 

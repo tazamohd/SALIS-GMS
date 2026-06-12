@@ -433,7 +433,7 @@ export default function Vehicles() {
               <FormField
                 control={form.control}
                 name="make"
-                render={({ field }) => (
+                render={({ field: _field }) => (
                   <FormItem>
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')} *</FormLabel>
                     <Select 

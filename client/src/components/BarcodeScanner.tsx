@@ -61,7 +61,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
       codeReader.decodeFromVideoDevice(
         selectedDeviceId,
         videoRef.current!,
-        (result, error) => {
+        (result, _error) => {
           if (result) {
             handleBarcodeDetected(result.getText());
           }
