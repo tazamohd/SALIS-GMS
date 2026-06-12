@@ -41,7 +41,7 @@ interface SupportTicket {
 }
 
 export function CustomerChatWidget() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -81,6 +81,8 @@ export function CustomerChatWidget() {
         category: data.category,
         priority: 'medium',
         createConversation: true,
+        // Active UI locale so Arabic requests can be routed to an Arabic agent.
+        language: i18n.language,
       });
       return res.json() as Promise<SupportTicket>;
     },

@@ -763,6 +763,7 @@ import {
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
 } from "@shared/schema";
+import { ARABIC_SUPPORT_ROLE } from "@shared/languageUtils";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
@@ -776,6 +777,8 @@ export interface IStorage {
   createUser(user: UpsertUser): Promise<User>;
   deleteUser(id: string): Promise<void>;
   getTechnicians(garageId?: string): Promise<User[]>;
+  getArabicSupportAgents(garageId: string): Promise<User[]>;
+  ensureAiAssistantUser(garageId: string): Promise<User>;
   getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined>;
   createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile>;
   updateTechnicianProfile(userId: string, data: Partial<TechnicianProfile>): Promise<TechnicianProfile>;
@@ -2128,6 +2131,45 @@ export class DatabaseStorage implements IStorage {
   async getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined> {
     const [profile] = await db.select().from(technicianProfiles).where(eq(technicianProfiles.userId, userId));
     return profile;
+  }
+
+  // Finds (or lazily creates) the per-garage AI assistant system user used to
+  // author automated AI replies (e.g. Arabic auto-responses) in chat
+  // conversations. Having a real user row keeps the chat_messages.sender_id
+  // foreign key valid. This account cannot log in (random unusable password).
+  async ensureAiAssistantUser(garageId: string): Promise<User> {
+    const email = `ai-assistant+${garageId}@salis.local`;
+    const [existing] = await db.select().from(users).where(eq(users.email, email));
+    if (existing) return existing;
+
+    const [created] = await db.insert(users).values({
+      email,
+      // Unusable, non-login credential for a system-only account.
+      password: createHash("sha256").update(randomUUID() + email).digest("hex"),
+      fullName: "SALIS AI Assistant",
+      role: "ai_assistant",
+      userType: "system",
+      garageId,
+      isActive: true,
+      supportsArabic: true,
+      preferredLanguage: "ar",
+    }).returning();
+    return created;
+  }
+
+  // Active agents in a garage who can handle Arabic-language support:
+  // either flagged supportsArabic or holding the dedicated Arabic support role.
+  async getArabicSupportAgents(garageId: string): Promise<User[]> {
+    return await db.select().from(users).where(
+      and(
+        eq(users.garageId, garageId),
+        eq(users.isActive, true),
+        or(
+          eq(users.supportsArabic, true),
+          eq(users.role, ARABIC_SUPPORT_ROLE)
+        )
+      )
+    );
   }
 
   async createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile> {

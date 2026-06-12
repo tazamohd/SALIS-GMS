@@ -103,6 +103,12 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
   // Role for access control: ADMIN, MANAGER, ADVISOR, TECHNICIAN, ACCOUNTANT
   role: varchar("role", { length: 50 }).default("ADVISOR"),
+  // Preferred interface/support language for this user (e.g. "en", "ar").
+  preferredLanguage: varchar("preferred_language", { length: 10 }).default("en"),
+  // Marks a support agent as able to handle Arabic-language conversations.
+  // Used (together with role = 'arabic_support_agent') to auto-route Arabic
+  // support tickets to a dedicated Arabic-speaking agent.
+  supportsArabic: boolean("supports_arabic").default(false),
 });
 
 // User Role Branch (Many-to-Many relationship)
