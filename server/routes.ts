@@ -163,6 +163,7 @@ import { analyzePredictiveMaintenance, generatePartsRecommendations, streamChatR
 import { auditLog } from './auditMiddleware';
 import QRCode from 'qrcode';
 import * as phase3Service from './phase3-integrations-service';
+import { computeMonetaryTotals } from '@shared/vatUtils';
 import * as phase4Service from './phase4-customer-experience-service';
 import * as phase5Service from './phase5-operations-service';
 import * as phase6Service from './phase6-compliance-service';
@@ -4248,13 +4249,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json(sanitizeArrayValidationErrors(invalidItems as any));
       }
       
+      const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
+
+      // Derive the subtotal from line items and enforce VAT server-side.
+      const num = (v: any) => parseFloat(String(v ?? '0')) || 0;
+      const itemsSubtotal = (validItems as any[]).reduce(
+        (sum, it) => sum + (it.lineTotal != null ? num(it.lineTotal) : num(it.unitPrice) * num(it.quantity)),
+        0,
+      );
+      const estTotals = computeMonetaryTotals({
+        subtotal: itemsSubtotal,
+        discountAmount: (estimateValidation.data as any).discountAmount,
+      });
+
       const estimateData = {
         ...estimateValidation.data,
+        subtotal: estTotals.subtotal,
+        taxAmount: estTotals.taxAmount,
+        totalAmount: estTotals.totalAmount,
         createdBy: userId,
       };
-      
-      const validItems = itemsValidation.map(v => v.success ? v.data : null).filter(Boolean);
-      
+
       const createdEstimate = await storage.createEstimateWithItems(estimateData as any, validItems as any);
       res.status(201).json(createdEstimate);
     } catch (error) {
@@ -4384,7 +4399,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const items = await storage.getEstimateItems(id);
-      
+
+      // Recompute VAT/total from the estimate's subtotal so the converted invoice is
+      // always VAT-correct even if the estimate was stored with stale figures.
+      const totals = computeMonetaryTotals({
+        subtotal: estimate.subtotal,
+        discountAmount: estimate.discountAmount,
+        paidAmount: "0",
+      });
+
       // Create invoice from estimate
       const invoiceData = {
         garageId: estimate.garageId,
@@ -4393,11 +4416,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         status: "draft" as const,
         subtotal: estimate.subtotal,
-        taxAmount: estimate.taxAmount,
+        taxAmount: totals.taxAmount,
         discountAmount: estimate.discountAmount,
-        totalAmount: estimate.totalAmount,
+        totalAmount: totals.totalAmount,
         paidAmount: "0.00",
-        balanceAmount: estimate.totalAmount,
+        balanceAmount: totals.balanceAmount,
         notes: estimate.notes,
       };
       

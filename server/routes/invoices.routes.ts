@@ -5,7 +5,7 @@ import { storage } from "../storage";
 import { db } from "../db";
 import { eq, desc } from "drizzle-orm";
 import type { z } from "zod";
-import { calculateVAT, SAUDI_VAT_RATE } from "@shared/vatUtils";
+import { computeMonetaryTotals } from "@shared/vatUtils";
 
 const router = Router();
 
@@ -13,20 +13,15 @@ const toNum = (v: any) => parseFloat(String(v ?? "0")) || 0;
 
 // Recompute the monetary totals server-side so Saudi VAT (15%) is always applied
 // correctly and a client cannot submit mismatched tax/total figures (ZATCA/VAT
-// compliance). subtotal/discount/paid are taken from the validated invoice; tax,
-// total and balance are derived. Decimal columns are stored as fixed(2) strings.
+// compliance). Delegates to the shared computeMonetaryTotals so every invoice/
+// estimate creation path enforces VAT identically.
 function applyServerVat<T extends Record<string, any>>(data: T): T {
-  const subtotal = toNum(data.subtotal);
-  const discount = toNum(data.discountAmount);
-  const paid = toNum(data.paidAmount);
-  const taxable = Math.max(0, subtotal - discount);
-  const { vatAmount, total } = calculateVAT(taxable, SAUDI_VAT_RATE);
-  return {
-    ...data,
-    taxAmount: vatAmount.toFixed(2),
-    totalAmount: total.toFixed(2),
-    balanceAmount: (total - paid).toFixed(2),
-  };
+  const { taxAmount, totalAmount, balanceAmount } = computeMonetaryTotals({
+    subtotal: data.subtotal,
+    discountAmount: data.discountAmount,
+    paidAmount: data.paidAmount,
+  });
+  return { ...data, taxAmount, totalAmount, balanceAmount };
 }
 
 /**

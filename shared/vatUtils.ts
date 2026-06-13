@@ -116,3 +116,39 @@ export function calculateInvoiceWithVAT(
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
   return calculateVAT(subtotal, vatRate);
 }
+
+export interface MonetaryTotalsInput {
+  subtotal: number | string;
+  discountAmount?: number | string;
+  paidAmount?: number | string;
+  vatRate?: number;
+}
+
+export interface MonetaryTotals {
+  subtotal: string;
+  taxAmount: string;
+  totalAmount: string;
+  balanceAmount: string;
+}
+
+/**
+ * Compute the canonical money fields for an invoice/estimate so VAT is enforced
+ * consistently across every creation path (server-side source of truth). VAT is
+ * applied to (subtotal - discount); all outputs are fixed(2) strings ready for the
+ * decimal columns.
+ */
+export function computeMonetaryTotals(input: MonetaryTotalsInput): MonetaryTotals {
+  const num = (v: unknown): number => parseFloat(String(v ?? '0')) || 0;
+  const subtotal = num(input.subtotal);
+  const discount = num(input.discountAmount);
+  const paid = num(input.paidAmount);
+  const rate = input.vatRate ?? SAUDI_VAT_RATE;
+  const taxable = Math.max(0, subtotal - discount);
+  const { vatAmount, total } = calculateVAT(taxable, rate);
+  return {
+    subtotal: subtotal.toFixed(2),
+    taxAmount: vatAmount.toFixed(2),
+    totalAmount: total.toFixed(2),
+    balanceAmount: (total - paid).toFixed(2),
+  };
+}

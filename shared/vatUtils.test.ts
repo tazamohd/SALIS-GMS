@@ -6,6 +6,7 @@ import {
   calculateZakat,
   validateTRN,
   formatTRN,
+  computeMonetaryTotals,
   SAUDI_VAT_RATE,
 } from './vatUtils';
 
@@ -65,6 +66,36 @@ describe('calculateZakat', () => {
   it('applies the 2.5% rate', () => {
     const r = calculateZakat(10000);
     expect(r.zakatAmount).toBe(250);
+  });
+});
+
+describe('computeMonetaryTotals (shared invoice/estimate source of truth)', () => {
+  it('returns fixed(2) strings with 15% VAT', () => {
+    const t = computeMonetaryTotals({ subtotal: '100.00' });
+    expect(t).toEqual({
+      subtotal: '100.00',
+      taxAmount: '15.00',
+      totalAmount: '115.00',
+      balanceAmount: '115.00',
+    });
+  });
+
+  it('applies VAT after discount and subtracts paid from balance', () => {
+    const t = computeMonetaryTotals({
+      subtotal: 200,
+      discountAmount: 50,
+      paidAmount: 72.5,
+    });
+    // taxable 150 -> VAT 22.50 -> total 172.50 -> balance 100.00
+    expect(t.taxAmount).toBe('22.50');
+    expect(t.totalAmount).toBe('172.50');
+    expect(t.balanceAmount).toBe('100.00');
+  });
+
+  it('never produces negative tax when discount exceeds subtotal', () => {
+    const t = computeMonetaryTotals({ subtotal: 50, discountAmount: 100 });
+    expect(t.taxAmount).toBe('0.00');
+    expect(t.totalAmount).toBe('0.00');
   });
 });
 
