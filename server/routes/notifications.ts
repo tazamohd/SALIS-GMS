@@ -52,7 +52,8 @@ router.put('/notifications/preferences', validate(notificationPreferencesSchema)
 // Demo: seed some notifications
 router.post('/notifications/seed', async (req, res) => {
   const userId = (req as any).user?.id || '1';
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const demos = [
     { title: 'Job #1042 Completed', message: 'Oil change for Toyota Camry 2022 is done', type: 'success' as const, category: 'Job Updates', actionUrl: '/job-cards' },
     { title: 'Low Stock Alert', message: 'Brake Pads Front - only 2 remaining', type: 'warning' as const, category: 'Inventory Alerts', actionUrl: '/inventory' },

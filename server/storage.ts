@@ -765,6 +765,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
+import { garageScope, stampGarageId, branchScope, branchScopeByUserId } from "./tenancy/tenant-guard";
 import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
@@ -2105,7 +2106,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(userData).returning();
+    // Server-stamp tenancy: a garaged caller cannot create a user in another garage
+    // (no client-controlled tenancy). Anonymous/registration paths preserve the
+    // provided value because no garage scope is established.
+    const [user] = await db.insert(users).values(stampGarageId(userData as any, "users")).returning();
     return user;
   }
 
@@ -2114,15 +2118,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTechnicians(garageId?: string): Promise<User[]> {
-    if (garageId) {
-      return await db.select().from(users).where(
-        and(
-          eq(users.userType, 'technician'),
-          eq(users.garageId, garageId)
-        )
-      );
-    }
-    return await db.select().from(users).where(eq(users.userType, 'technician'));
+    // Tenant-scoped: deny-by-default when no garage can be resolved (never all tenants).
+    return await db.select().from(users).where(
+      and(
+        eq(users.userType, 'technician'),
+        garageScope(users.garageId, garageId),
+        branchScopeByUserId(users.id)
+      )
+    );
   }
 
   async getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined> {
@@ -2207,29 +2210,25 @@ export class DatabaseStorage implements IStorage {
 
   // Job Card operations - Module 8: Job Cards & Task Assignment
   async getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]> {
-    const conditions = [];
-    if (garageId) {
-      conditions.push(eq(jobCards.garageId, garageId));
-    }
+    // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
+    const conditions = [garageScope(jobCards.garageId, garageId), branchScope(jobCards.branchId)];
     if (assignedTo) {
       conditions.push(eq(jobCards.assignedTo, assignedTo));
     }
-    
-    if (conditions.length > 0) {
-      return await db.select().from(jobCards).where(and(...conditions)).orderBy(desc(jobCards.createdAt));
-    }
-    return await db.select().from(jobCards).orderBy(desc(jobCards.createdAt));
+    return await db.select().from(jobCards).where(and(...conditions)).orderBy(desc(jobCards.createdAt));
   }
 
   async getJobCard(id: string): Promise<JobCard | undefined> {
-    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    // Existence-hiding: a cross-tenant id resolves to undefined (route returns 404).
+    const [jobCard] = await db.select().from(jobCards)
+      .where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)));
     return jobCard;
   }
 
   async getJobCardWithDetails(id: string): Promise<any> {
     const { diagnosticReports, maintenanceRecommendations, invoices, invoiceItems, payments, vehicles, users, jobTrackingEvents } = await import("@shared/schema");
     
-    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    const [jobCard] = await db.select().from(jobCards).where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)));
     if (!jobCard) return null;
 
     const [vehicle] = jobCard.vehicleId 
@@ -2266,12 +2265,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createJobCard(data: any): Promise<JobCard> {
-    const [jobCard] = await db.insert(jobCards).values(data).returning();
+    const [jobCard] = await db.insert(jobCards).values(stampGarageId(data, "job_cards")).returning();
     return jobCard;
   }
 
   async updateJobCard(id: string, data: any): Promise<JobCard> {
-    const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
+    // Scope the mutation to the caller's garage: a cross-tenant id affects 0 rows.
+    const [jobCard] = await db.update(jobCards).set(data)
+      .where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)))
+      .returning();
     return jobCard;
   }
 
@@ -2518,11 +2520,9 @@ export class DatabaseStorage implements IStorage {
 
   // Appointment operations - Module 9: Appointments & Scheduling
   async getAppointments(garageId?: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Appointment[]> {
-    const conditions = [];
-    
-    if (garageId) {
-      conditions.push(eq(appointments.garageId, garageId));
-    }
+    // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
+    const conditions = [garageScope(appointments.garageId, garageId), branchScope(appointments.branchId)];
+
     if (status) {
       conditions.push(eq(appointments.status, status));
     }
@@ -2532,28 +2532,24 @@ export class DatabaseStorage implements IStorage {
     if (dateTo) {
       conditions.push(lte(appointments.appointmentDate, new Date(dateTo)));
     }
-    
-    if (conditions.length > 0) {
-      return await db.select().from(appointments)
-        .where(and(...conditions))
-        .orderBy(desc(appointments.appointmentDate));
-    }
-    
+
     return await db.select().from(appointments)
+      .where(and(...conditions))
       .orderBy(desc(appointments.appointmentDate));
   }
 
   async getAppointment(id: string): Promise<Appointment | undefined> {
-    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    const [appointment] = await db.select().from(appointments)
+      .where(and(eq(appointments.id, id), garageScope(appointments.garageId)));
     return appointment;
   }
 
   async createAppointment(data: Omit<InsertAppointment, 'appointmentNumber' | 'id'>): Promise<Appointment> {
     const appointmentNumber = `APT-${Date.now()}`;
-    const [appointment] = await db.insert(appointments).values({
+    const [appointment] = await db.insert(appointments).values(stampGarageId({
       ...data,
       appointmentNumber,
-    }).returning();
+    }, "appointments")).returning();
     return appointment;
   }
 
@@ -2561,12 +2557,12 @@ export class DatabaseStorage implements IStorage {
     const [appointment] = await db.update(appointments).set({
       ...data,
       updatedAt: new Date()
-    }).where(eq(appointments.id, id)).returning();
+    }).where(and(eq(appointments.id, id), garageScope(appointments.garageId))).returning();
     return appointment;
   }
 
   async deleteAppointment(id: string): Promise<void> {
-    await db.delete(appointments).where(eq(appointments.id, id));
+    await db.delete(appointments).where(and(eq(appointments.id, id), garageScope(appointments.garageId)));
   }
 
   async updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment> {
@@ -2593,12 +2589,12 @@ export class DatabaseStorage implements IStorage {
 
   // Customer Management operations - Module 10
   async getCustomers(garageId?: string, searchQuery?: string): Promise<User[]> {
-    const conditions = [eq(users.userType, "customer")];
-    
-    if (garageId) {
-      conditions.push(eq(users.garageId, garageId));
-    }
-    
+    // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
+    const conditions = [
+      eq(users.userType, "customer"),
+      garageScope(users.garageId, garageId),
+    ];
+
     if (searchQuery) {
       const searchPattern = `%${searchQuery}%`;
       conditions.push(
@@ -2617,21 +2613,17 @@ export class DatabaseStorage implements IStorage {
 
   async getCustomer(id: string): Promise<User | undefined> {
     const [customer] = await db.select().from(users)
-      .where(eq(users.id, id));
+      .where(and(eq(users.id, id), garageScope(users.garageId)));
     return customer;
   }
 
   async getVehicles(garageId?: string): Promise<Vehicle[]> {
-    if (garageId) {
-      return await db.select().from(vehicles)
-        .where(and(
-          eq(vehicles.garageId, garageId),
-          eq(vehicles.isActive, true)
-        ))
-        .orderBy(desc(vehicles.createdAt));
-    }
+    // Tenant-scoped: deny-by-default when no garage can be resolved.
     return await db.select().from(vehicles)
-      .where(eq(vehicles.isActive, true))
+      .where(and(
+        garageScope(vehicles.garageId, garageId),
+        eq(vehicles.isActive, true)
+      ))
       .orderBy(desc(vehicles.createdAt));
   }
 
@@ -2639,18 +2631,20 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(vehicles)
       .where(and(
         eq(vehicles.customerId, customerId),
-        eq(vehicles.isActive, true)
+        eq(vehicles.isActive, true),
+        garageScope(vehicles.garageId)
       ))
       .orderBy(desc(vehicles.createdAt));
   }
 
   async getVehicle(id: string): Promise<Vehicle | undefined> {
-    const [vehicle] = await db.select().from(vehicles).where(eq(vehicles.id, id));
+    const [vehicle] = await db.select().from(vehicles)
+      .where(and(eq(vehicles.id, id), garageScope(vehicles.garageId)));
     return vehicle;
   }
 
   async createVehicle(data: InsertVehicle): Promise<Vehicle> {
-    const [vehicle] = await db.insert(vehicles).values(data).returning();
+    const [vehicle] = await db.insert(vehicles).values(stampGarageId(data, "vehicles")).returning();
     return vehicle;
   }
 
@@ -2658,12 +2652,13 @@ export class DatabaseStorage implements IStorage {
     const [vehicle] = await db.update(vehicles).set({
       ...data,
       updatedAt: new Date()
-    }).where(eq(vehicles.id, id)).returning();
+    }).where(and(eq(vehicles.id, id), garageScope(vehicles.garageId))).returning();
     return vehicle;
   }
 
   async deleteVehicle(id: string): Promise<void> {
-    await db.update(vehicles).set({ isActive: false }).where(eq(vehicles.id, id));
+    await db.update(vehicles).set({ isActive: false })
+      .where(and(eq(vehicles.id, id), garageScope(vehicles.garageId)));
   }
 
   // Vehicle Service History - Module 22 Enhancements
@@ -2827,33 +2822,30 @@ export class DatabaseStorage implements IStorage {
 
   // Purchase Orders & Supplier Integration - Module 11
   async getSuppliers(garageId?: string): Promise<Supplier[]> {
-    if (garageId) {
-      return await db.select().from(suppliers)
-        .where(and(
-          eq(suppliers.garageId, garageId),
-          eq(suppliers.isActive, true)
-        ))
-        .orderBy(desc(suppliers.createdAt));
-    }
+    // Tenant-scoped: deny-by-default when no garage can be resolved.
     return await db.select().from(suppliers)
-      .where(eq(suppliers.isActive, true))
+      .where(and(
+        garageScope(suppliers.garageId, garageId),
+        eq(suppliers.isActive, true)
+      ))
       .orderBy(desc(suppliers.createdAt));
   }
 
   async getSupplier(id: string): Promise<Supplier | undefined> {
-    const [supplier] = await db.select().from(suppliers).where(eq(suppliers.id, id));
+    const [supplier] = await db.select().from(suppliers)
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)));
     return supplier;
   }
 
   async createSupplier(data: InsertSupplier): Promise<Supplier> {
-    const [supplier] = await db.insert(suppliers).values(data).returning();
+    const [supplier] = await db.insert(suppliers).values(stampGarageId(data, "suppliers")).returning();
     return supplier;
   }
 
   async updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
     const [supplier] = await db.update(suppliers)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(suppliers.id, id))
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)))
       .returning();
     return supplier;
   }
@@ -2861,7 +2853,7 @@ export class DatabaseStorage implements IStorage {
   async deleteSupplier(id: string): Promise<void> {
     await db.update(suppliers)
       .set({ isActive: false })
-      .where(eq(suppliers.id, id));
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)));
   }
 
   async getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]> {
@@ -3549,7 +3541,7 @@ export class DatabaseStorage implements IStorage {
   async createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder> {
     const poNumber = `PO-${Date.now()}`;
     const [po] = await db.insert(purchaseOrders)
-      .values({ ...data, poNumber })
+      .values(stampGarageId({ ...data, poNumber }, "purchase_orders"))
       .returning();
     return po;
   }
@@ -3611,28 +3603,22 @@ export class DatabaseStorage implements IStorage {
   // Module 12: Invoice & Billing
   async getInvoices(garageId?: string, status?: string): Promise<Invoice[]> {
     const { invoices } = await import("@shared/schema");
-    const conditions = [];
-    
-    if (garageId) {
-      conditions.push(eq(invoices.garageId, garageId));
-    }
-    
+    // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
+    const conditions = [garageScope(invoices.garageId, garageId)];
+
     if (status) {
       conditions.push(eq(invoices.status, status));
     }
-    
-    if (conditions.length > 0) {
-      return await db.select().from(invoices)
-        .where(and(...conditions))
-        .orderBy(desc(invoices.createdAt));
-    }
-    
-    return await db.select().from(invoices).orderBy(desc(invoices.createdAt));
+
+    return await db.select().from(invoices)
+      .where(and(...conditions))
+      .orderBy(desc(invoices.createdAt));
   }
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
     const { invoices } = await import("@shared/schema");
-    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    const [invoice] = await db.select().from(invoices)
+      .where(and(eq(invoices.id, id), garageScope(invoices.garageId)));
     return invoice;
   }
 
@@ -3640,7 +3626,7 @@ export class DatabaseStorage implements IStorage {
     const { invoices } = await import("@shared/schema");
     const invoiceNumber = `INV-${Date.now()}`;
     const [invoice] = await db.insert(invoices)
-      .values({ ...data, invoiceNumber })
+      .values(stampGarageId({ ...data, invoiceNumber }, "invoices"))
       .returning();
     return invoice;
   }
@@ -3649,20 +3635,21 @@ export class DatabaseStorage implements IStorage {
     const { invoices } = await import("@shared/schema");
     const [invoice] = await db.update(invoices)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(invoices.id, id))
+      .where(and(eq(invoices.id, id), garageScope(invoices.garageId)))
       .returning();
     return invoice;
   }
 
   async deleteInvoice(id: string): Promise<void> {
     const { invoices } = await import("@shared/schema");
-    await db.delete(invoices).where(eq(invoices.id, id));
+    await db.delete(invoices).where(and(eq(invoices.id, id), garageScope(invoices.garageId)));
   }
 
   async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
-    const { invoiceItems } = await import("@shared/schema");
+    const { invoiceItems, invoices } = await import("@shared/schema");
+    const garageInvoiceIds = db.select({ id: invoices.id }).from(invoices).where(garageScope(invoices.garageId));
     return await db.select().from(invoiceItems)
-      .where(eq(invoiceItems.invoiceId, invoiceId))
+      .where(and(eq(invoiceItems.invoiceId, invoiceId), inArray(invoiceItems.invoiceId, garageInvoiceIds)))
       .orderBy(desc(invoiceItems.createdAt));
   }
 
@@ -3685,7 +3672,7 @@ export class DatabaseStorage implements IStorage {
     return await db.transaction(async (tx) => {
       const invoiceNumber = `INV-${Date.now()}`;
       const [invoice] = await tx.insert(invoices)
-        .values({ ...invoiceData, invoiceNumber })
+        .values(stampGarageId({ ...invoiceData, invoiceNumber }, "invoices"))
         .returning();
       
       if (items.length > 0) {
@@ -3698,13 +3685,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPayments(invoiceId?: string): Promise<Payment[]> {
-    const { payments } = await import("@shared/schema");
+    const { payments, invoices } = await import("@shared/schema");
+    // Scope to payments whose invoice belongs to the caller's garage (payments has no garage_id).
+    const garageInvoiceIds = db.select({ id: invoices.id }).from(invoices).where(garageScope(invoices.garageId));
+    const conditions = [inArray(payments.invoiceId, garageInvoiceIds)];
     if (invoiceId) {
-      return await db.select().from(payments)
-        .where(eq(payments.invoiceId, invoiceId))
-        .orderBy(desc(payments.createdAt));
+      conditions.push(eq(payments.invoiceId, invoiceId));
     }
-    return await db.select().from(payments).orderBy(desc(payments.createdAt));
+    return await db.select().from(payments).where(and(...conditions)).orderBy(desc(payments.createdAt));
   }
 
   async createPayment(data: InsertPayment): Promise<Payment> {
@@ -3747,7 +3735,7 @@ export class DatabaseStorage implements IStorage {
   async createEstimate(data: InsertEstimate): Promise<Estimate> {
     const estimateNumber = `EST-${Date.now()}`;
     const [estimate] = await db.insert(estimates)
-      .values({ ...data, estimateNumber })
+      .values(stampGarageId({ ...data, estimateNumber }, "estimates"))
       .returning();
     return estimate;
   }
@@ -4603,7 +4591,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(appointments)
-      .where(eq(appointments.customerId, customerId))
+      .where(and(eq(appointments.customerId, customerId), garageScope(appointments.garageId)))
       .orderBy(desc(appointments.appointmentDate));
     return result;
   }
@@ -4613,7 +4601,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(invoices)
-      .where(eq(invoices.customerId, customerId))
+      .where(and(eq(invoices.customerId, customerId), garageScope(invoices.garageId)))
       .orderBy(desc(invoices.invoiceDate));
     return result;
   }
@@ -4623,7 +4611,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(jobCards)
-      .where(eq(jobCards.customerId, customerId))
+      .where(and(eq(jobCards.customerId, customerId), garageScope(jobCards.garageId)))
       .orderBy(desc(jobCards.createdAt));
     return result;
   }

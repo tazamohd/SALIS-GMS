@@ -34,6 +34,17 @@ async function ensureTable() {
       severity TEXT NOT NULL DEFAULT 'low'
     )
   `);
+  // FR-9 / AD-7: enforce append-only at the DB layer (fires even for the table owner).
+  await db.execute(sql`
+    CREATE OR REPLACE FUNCTION audit_log_immutable() RETURNS trigger AS $$
+    BEGIN RAISE EXCEPTION 'audit_log is append-only'; END;
+    $$ LANGUAGE plpgsql;
+  `);
+  await db.execute(sql`DROP TRIGGER IF EXISTS audit_log_no_update_delete ON audit_log;`);
+  await db.execute(sql`
+    CREATE TRIGGER audit_log_no_update_delete BEFORE UPDATE OR DELETE ON audit_log
+      FOR EACH ROW EXECUTE FUNCTION audit_log_immutable();
+  `);
 }
 
 let tableReady = false;

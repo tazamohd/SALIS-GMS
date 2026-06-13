@@ -6,7 +6,8 @@ import { partsRecommendationSchema } from '../schemas/validation';
 const router = Router();
 
 router.get('/ai/parts-recommendations', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { vehicleMake, vehicleModel, vehicleYear, serviceType, description } = req.query;
   try {
     const recommendations = await recommendParts(garageId, {
@@ -21,7 +22,8 @@ router.get('/ai/parts-recommendations', async (req, res) => {
 });
 
 router.post('/ai/parts-recommendations', validate(partsRecommendationSchema), async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const recommendations = await recommendParts(garageId, req.body);
     res.json({ recommendations, total: recommendations.length });

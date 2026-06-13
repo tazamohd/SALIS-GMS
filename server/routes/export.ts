@@ -4,6 +4,7 @@ import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
 import { sql, count } from 'drizzle-orm';
+import { garageScope } from '../tenancy/tenant-guard';
 
 const router = Router();
 
@@ -62,6 +63,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             created_at: users.createdAt,
           })
           .from(users)
+          .where(garageScope(users.garageId))
           .limit(10000);
         break;
       }
@@ -81,6 +83,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             paid_amount: invoices.paidAmount,
           })
           .from(invoices)
+          .where(garageScope(invoices.garageId))
           .limit(10000);
         break;
       }
@@ -99,6 +102,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             completed_at: jobCards.completedAt,
           })
           .from(jobCards)
+          .where(garageScope(jobCards.garageId))
           .limit(10000);
         break;
       }
@@ -117,6 +121,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             engine_type: vehicles.engineType,
           })
           .from(vehicles)
+          .where(garageScope(vehicles.garageId))
           .limit(10000);
         break;
       }
@@ -133,6 +138,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             status: appointments.status,
           })
           .from(appointments)
+          .where(garageScope(appointments.garageId))
           .limit(10000);
         break;
       }
@@ -149,6 +155,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             created_at: spareParts.createdAt,
           })
           .from(spareParts)
+          .where(garageScope(spareParts.garageId))
           .limit(10000);
         break;
       }
@@ -210,7 +217,8 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             paidAmount: sql<string>`coalesce(sum(${invoices.paidAmount}), 0)`,
             taxAmount: sql<string>`coalesce(sum(${invoices.taxAmount}), 0)`,
           })
-          .from(invoices);
+          .from(invoices)
+          .where(garageScope(invoices.garageId));
 
         const statusBreakdown = await db
           .select({
@@ -219,6 +227,7 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             total: sql<string>`coalesce(sum(${invoices.totalAmount}), 0)`,
           })
           .from(invoices)
+          .where(garageScope(invoices.garageId))
           .groupBy(invoices.status);
 
         const totalAmt = parseFloat(invoiceStats?.totalAmount ?? '0');
@@ -267,20 +276,23 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             partType: spareParts.partType,
           })
           .from(spareParts)
+          .where(garageScope(spareParts.garageId))
           .limit(500);
 
         const [partStats] = await db
           .select({
             total: count(),
           })
-          .from(spareParts);
+          .from(spareParts)
+          .where(garageScope(spareParts.garageId));
 
         const [invStats] = await db
           .select({
             totalStock: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
             totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
           })
-          .from(sparePartInventories);
+          .from(sparePartInventories)
+          .where(garageScope(sparePartInventories.garageId));
 
         tableHtml = `
           <div class="summary-grid">
@@ -321,11 +333,13 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: users.createdAt,
           })
           .from(users)
+          .where(garageScope(users.garageId))
           .limit(1000);
 
         const [customerStats] = await db
           .select({ total: count() })
-          .from(users);
+          .from(users)
+          .where(garageScope(users.garageId));
 
         tableHtml = `
           <div class="summary-grid">

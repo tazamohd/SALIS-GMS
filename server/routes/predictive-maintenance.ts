@@ -4,7 +4,8 @@ import { predictMaintenance, getMaintenanceStats } from '../services/predictive-
 const router = Router();
 
 router.get('/predictive-maintenance/predictions', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const predictions = await predictMaintenance(garageId);
     res.json({ predictions });
@@ -12,7 +13,8 @@ router.get('/predictive-maintenance/predictions', async (req, res) => {
 });
 
 router.get('/predictive-maintenance/stats', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const stats = await getMaintenanceStats(garageId);
     res.json(stats);

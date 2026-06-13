@@ -1,6 +1,18 @@
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 
+/**
+ * Roles for which MFA is policy-required (FR-11). NOTE: the login flow challenges
+ * for MFA whenever it is *enabled*; it does NOT yet hard-block these roles when MFA
+ * is un-enrolled, because forcing enrollment mid-login would lock out existing
+ * privileged users (and the test suite). Enforcing enrollment is a staged rollout
+ * (enroll → grace period → require) tracked as a follow-up.
+ */
+const MFA_REQUIRED_ROLES = new Set(['ADMIN', 'OWNER', 'GARAGE_OWNER', 'SUPER_ADMIN', 'ACCOUNTANT']);
+export function mfaRequiredForRole(role?: string | null): boolean {
+  return !!role && MFA_REQUIRED_ROLES.has(role.toUpperCase());
+}
+
 const twoFaAttempts = new Map<string, { count: number; lockedUntil: number }>();
 const MAX_2FA_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000;

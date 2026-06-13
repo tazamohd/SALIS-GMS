@@ -16,7 +16,8 @@ const router = Router();
 
 // GET /api/hr/employees — List employees
 router.get('/hr/employees', isAuthenticated, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { department, status, search, limit = '50', offset = '0' } = req.query;
   try {
     const limitNum = Math.min(Math.max(Number(limit) || 50, 1), 500);
@@ -116,7 +117,8 @@ router.get('/hr/employees/:id', isAuthenticated, async (req, res) => {
 
 // POST /api/hr/employees — Add new employee (HR/admin only)
 router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { fullName, email, phone, role, nationalId, password } = req.body;
 
   if (!fullName || !email) {
@@ -144,7 +146,8 @@ router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req,
 
 // GET /api/hr/attendance — Attendance records
 router.get('/hr/attendance', isAuthenticated, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { date, employeeId, limit = '50', offset = '0' } = req.query;
   try {
     // Use the users table with createdAt as reference for demo attendance data
@@ -300,7 +303,8 @@ router.patch('/hr/leave-requests/:id', isAuthenticated, requireManagerOrAbove, a
 
 // GET /api/hr/payroll/summary — Monthly payroll summary (manager+ — salary data)
 router.get('/hr/payroll/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { month, year } = req.query;
 
   try {

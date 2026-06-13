@@ -19919,7 +19919,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user's dashboard widgets
   app.get('/api/dashboard/widgets', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const widgets = await storage.getDashboardWidgets(req.user?.id, garageId);
       res.json(widgets);
     } catch (error: any) {
@@ -19942,7 +19943,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new widget
   app.post('/api/dashboard/widgets', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const widget = await storage.createDashboardWidget({
         ...req.body,
         userId: req.user?.id,
@@ -19995,7 +19997,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get backup statistics
   app.get('/api/backups/stats', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const stats = await storage.getBackupStats(garageId);
       res.json(stats);
     } catch (error: any) {
@@ -20007,7 +20010,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get latest backup
   app.get('/api/backups/latest', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const backup = await storage.getLatestBackup(garageId);
       res.json(backup || null);
     } catch (error: any) {
@@ -20019,7 +20023,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all backups
   app.get('/api/backups', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const { status } = req.query;
       const backups = await storage.getBackupJobs(garageId, status as string);
       res.json(backups);
@@ -20032,7 +20037,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create new backup job
   app.post('/api/backups', isAuthenticated, async (req: any, res) => {
     try {
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const backup = await storage.createBackupJob({
         garageId,
         jobType: req.body.jobType || 'full',
@@ -20105,7 +20111,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create restore job
-      const garageId = req.user?.garageId || 'default-garage';
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: 'Garage context required' });
       const restoreJob = await storage.createBackupJob({
         garageId,
         jobType: 'restore',

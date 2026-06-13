@@ -10,7 +10,8 @@ const router = Router();
  * pending invoices, low stock items, technician utilization.
  */
 router.get('/dashboard/summary', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -116,7 +117,8 @@ router.get('/dashboard/summary', async (req, res) => {
  * Last 10 activities across all modules (job updates, payments, appointments, etc.)
  */
 router.get('/dashboard/recent-activity', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const activities = await db.execute(sql`
       (
@@ -187,7 +189,8 @@ router.get('/dashboard/recent-activity', async (req, res) => {
  * Weekly trends for revenue, jobs, customer visits (last 4 weeks)
  */
 router.get('/dashboard/trends', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     // Revenue trend - last 4 weeks
     const revenueTrend = await db.execute(sql`

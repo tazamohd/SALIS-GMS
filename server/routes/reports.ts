@@ -6,7 +6,8 @@ const router = Router();
 
 // GET /api/reports/revenue - Revenue report with date range
 router.get('/reports/revenue', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { from, to, groupBy = 'month' } = req.query;
   try {
     const dateFormat = groupBy === 'day' ? 'YYYY-MM-DD' : groupBy === 'week' ? 'IYYY-IW' : 'YYYY-MM';
@@ -25,7 +26,8 @@ router.get('/reports/revenue', async (req, res) => {
 
 // GET /api/reports/technician-performance
 router.get('/reports/technician-performance', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const performance = await db.execute(sql`
       SELECT u.id, u."fullName" as name,
@@ -45,7 +47,8 @@ router.get('/reports/technician-performance', async (req, res) => {
 
 // GET /api/reports/inventory-turnover
 router.get('/reports/inventory-turnover', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const turnover = await db.execute(sql`
       SELECT sp.name, sp."partNumber", sp.category,
@@ -66,7 +69,8 @@ router.get('/reports/inventory-turnover', async (req, res) => {
 
 // GET /api/reports/customer-analytics
 router.get('/reports/customer-analytics', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const customers = await db.execute(sql`
       SELECT u.id, u."fullName" as name, u.email,
@@ -87,7 +91,8 @@ router.get('/reports/customer-analytics', async (req, res) => {
 
 // GET /api/reports/summary - Executive summary
 router.get('/reports/summary', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   try {
     const [revenue, jobs, customers, inventory] = await Promise.all([
       db.execute(sql`SELECT COALESCE(SUM(CAST("totalAmount" AS numeric)), 0) as total FROM invoices WHERE "garageId" = ${garageId} AND status = 'paid'`),
