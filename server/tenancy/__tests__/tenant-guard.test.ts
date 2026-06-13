@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
-import { resolveScopedGarageId, garageScope, stampGarageId } from "../tenant-guard";
+import { resolveScopedGarageId, garageScope, stampGarageId, branchScope } from "../tenant-guard";
 import { runWithTenantScope, type TenantScope } from "../tenant-context";
-import { users } from "@shared/schema";
+import { users, jobCards } from "@shared/schema";
 
 const tenant = (over: Partial<TenantScope> = {}): TenantScope => ({
   userId: "u1",
   garageId: "garage-a",
   branchIds: [],
+  isBranchRestricted: false,
   isPlatformPrincipal: false,
   ...over,
 });
@@ -77,6 +78,33 @@ describe("garageScope — condition shape", () => {
   it("honors an explicit id in a background (no-scope) context", () => {
     const cond = garageScope(users.garageId, "garage-d");
     expect(JSON.stringify(cond)).toContain("garage-d");
+  });
+});
+
+describe("branchScope — branch-level restriction (mechanism; not yet applied to resources)", () => {
+  it("does not restrict for a garage-level user (sees all branches)", () => {
+    runWithTenantScope(tenant({ isBranchRestricted: false, branchIds: ["b1"] }), () => {
+      expect(JSON.stringify(branchScope(jobCards.branchId))).not.toContain("b1");
+    });
+  });
+
+  it("restricts to bound branches for a branch-restricted user", () => {
+    runWithTenantScope(tenant({ isBranchRestricted: true, branchIds: ["b1", "b2"] }), () => {
+      const cond = JSON.stringify(branchScope(jobCards.branchId));
+      expect(cond).toContain("b1");
+      expect(cond).toContain("b2");
+    });
+  });
+
+  it("denies a branch-restricted user with no bound branches", () => {
+    runWithTenantScope(tenant({ isBranchRestricted: true, branchIds: [] }), () => {
+      const cond = JSON.stringify(branchScope(jobCards.branchId));
+      expect(cond).not.toContain("b1");
+    });
+  });
+
+  it("does not restrict when there is no scope (background)", () => {
+    expect(branchScope(jobCards.branchId)).toBeTruthy();
   });
 });
 

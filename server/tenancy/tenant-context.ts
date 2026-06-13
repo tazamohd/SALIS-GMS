@@ -31,6 +31,12 @@ export interface TenantScope {
   garageId: string | null;
   /** Branch ids the user is bound to (from user_role_branch). */
   branchIds: string[];
+  /**
+   * True when the user should see only their own Branch(es) for branch-scoped
+   * resources (vs a garage-level role that sees all Branches of the Garage).
+   * Consumed by `branchScope`. The exact role→scope mapping is PRD Open Q #1.
+   */
+  isBranchRestricted: boolean;
   /** True when the principal is not bound to a single Garage (Super Admin). */
   isPlatformPrincipal: boolean;
   /** Present only while a platform principal is impersonating a tenant. */
@@ -45,6 +51,7 @@ export const ANONYMOUS_SCOPE: TenantScope = Object.freeze({
   userId: null,
   garageId: null,
   branchIds: [],
+  isBranchRestricted: false,
   isPlatformPrincipal: false,
 });
 

@@ -43,7 +43,7 @@ export class ChatWebSocketServer {
           // data-layer access from WebSocket handlers is isolated like HTTP requests.
           if (ws.userId && ws.garageId) {
             runWithTenantScope(
-              { userId: ws.userId, garageId: ws.garageId, branchIds: [], isPlatformPrincipal: false },
+              { userId: ws.userId, garageId: ws.garageId, branchIds: [], isBranchRestricted: false, isPlatformPrincipal: false },
               () => this.handleMessage(ws, message),
             );
           } else {

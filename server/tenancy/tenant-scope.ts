@@ -25,8 +25,17 @@ function unique(ids: Array<string | null | undefined>): string[] {
  * - branchIds reuse `req.userRoles` when loadUserPermissions already populated them,
  *   otherwise fall back to a direct indexed user_role_branch lookup.
  */
+/**
+ * Coarse roles that operate at the Garage level (see all Branches). Everyone
+ * else with branch bindings is treated as branch-restricted.
+ * [ASSUMPTION] This classification is provisional — the authoritative
+ * per-role / per-resource matrix is PRD Open Question #1. `branchScope` is not
+ * yet applied to any resource, so this only populates the scope flag.
+ */
+const GARAGE_LEVEL_ROLES = new Set(["ADMIN", "MANAGER", "OWNER", "GARAGE_OWNER", "SUPER_ADMIN"]);
+
 export async function resolveTenantScope(req: Request): Promise<TenantScope> {
-  const user = req.user as { id?: string; garageId?: string | null } | undefined;
+  const user = req.user as { id?: string; garageId?: string | null; role?: string | null } | undefined;
 
   if (!user?.id) {
     return ANONYMOUS_SCOPE;
@@ -34,6 +43,7 @@ export async function resolveTenantScope(req: Request): Promise<TenantScope> {
 
   const garageId: string | null = user.garageId ?? null;
   const isPlatformPrincipal = !garageId;
+  const isGarageLevelRole = !!user.role && GARAGE_LEVEL_ROLES.has(user.role.toUpperCase());
 
   let branchIds: string[] = [];
   const preloaded = (req as Request & {
@@ -54,6 +64,7 @@ export async function resolveTenantScope(req: Request): Promise<TenantScope> {
     userId: user.id,
     garageId,
     branchIds,
+    isBranchRestricted: !isPlatformPrincipal && !isGarageLevelRole && branchIds.length > 0,
     isPlatformPrincipal,
   };
 }

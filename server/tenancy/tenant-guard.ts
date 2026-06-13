@@ -6,7 +6,7 @@
  * caller-supplied values — so a query can never silently widen to all tenants
  * just because a route forgot to pass garageId (architecture AD-2 / FR-1).
  */
-import { eq, sql, type SQL } from "drizzle-orm";
+import { eq, inArray, sql, type SQL } from "drizzle-orm";
 import type { AnyColumn } from "drizzle-orm";
 import { getTenantScope, hasTenantScope } from "./tenant-context";
 
@@ -57,6 +57,28 @@ export function garageScope(column: AnyColumn, passed?: string | null): SQL {
   }
   const gid = resolveScopedGarageId(passed);
   return gid ? eq(column, gid) : sql`false`;
+}
+
+/**
+ * A Drizzle WHERE condition restricting `branchColumn` to the caller's Branch(es)
+ * for branch-scoped resources.
+ *
+ *  - No Tenant Scope (background) or a garage-level / platform principal: no
+ *    branch restriction (`true`) — the garage boundary is enforced separately by
+ *    `garageScope`.
+ *  - A branch-restricted user with bound branches: restrict to those branch ids.
+ *  - A branch-restricted user with NO bound branches: deny (`false`).
+ *
+ * NOTE: not yet applied to any resource — the per-resource branch-vs-garage
+ * matrix is PRD Open Question #1. Provided so resources can adopt it once the
+ * matrix is confirmed, without re-deriving the rule each time.
+ */
+export function branchScope(branchColumn: AnyColumn): SQL {
+  const scope = getTenantScope();
+  if (!scope || !scope.isBranchRestricted) {
+    return sql`true`;
+  }
+  return scope.branchIds.length > 0 ? inArray(branchColumn, scope.branchIds) : sql`false`;
 }
 
 /**

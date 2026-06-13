@@ -13,6 +13,7 @@ const GARAGE_A: TenantScope = {
   userId: "user-a",
   garageId: "garage-a",
   branchIds: ["branch-a1", "branch-a2"],
+  isBranchRestricted: false,
   isPlatformPrincipal: false,
 };
 
@@ -20,6 +21,7 @@ const GARAGE_B: TenantScope = {
   userId: "user-b",
   garageId: "garage-b",
   branchIds: ["branch-b1"],
+  isBranchRestricted: false,
   isPlatformPrincipal: false,
 };
 
