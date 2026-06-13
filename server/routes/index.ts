@@ -27,9 +27,9 @@ import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
 import smsCampaignRoutes from "./sms-campaigns";
 import documentRoutes from "./documents";
-// supplierPortalRoutes (./supplier-portal) intentionally NOT imported: its in-memory
-// demoSuppliers/demoPurchaseOrders shadowed the monolith's DB-backed /api/suppliers
-// CRUD (routes.ts:2648+). Re-mount only after the modular file uses storage.*.
+// Supplier portal: the monolith serves DB-backed /api/suppliers, /api/supplier-price-lists
+// and /api/supplier-performance (routes.ts:2648+). The old in-memory supplier-portal.ts
+// demo router was removed; a modular replacement should be storage-backed when added.
 import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";

@@ -41,4 +41,13 @@ describe("Job card tenant isolation", () => {
       .send({ status: "in_progress" });
     expect(res.status).toBe(404);
   });
+
+  it("guards job-card sub-resources (parts, tasks) against foreign ids", async () => {
+    const id = "00000000-0000-0000-0000-000000000000";
+    expect((await agent.get(`/api/job-cards/${id}/parts`)).status).toBe(404);
+    expect((await agent.get(`/api/job-cards/${id}/tasks`)).status).toBe(404);
+    expect(
+      (await agent.post(`/api/job-cards/${id}/tasks`).send({ title: "x" })).status,
+    ).toBe(404);
+  });
 });

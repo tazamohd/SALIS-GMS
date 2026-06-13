@@ -346,9 +346,10 @@ router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, async (req
 });
 
 // GET /api/job-cards/:jobCardId/tasks - Get task assignments for job card
-router.get("/job-cards/:jobCardId/tasks", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:jobCardId/tasks", isAuthenticated, async (req: any, res) => {
   try {
     const { jobCardId } = req.params;
+    if (!(await loadOwnedJobCard(req, res, jobCardId))) return;
     const tasks = await storage.getTaskAssignments(jobCardId);
     res.json(tasks);
   } catch (error) {
@@ -361,6 +362,7 @@ router.get("/job-cards/:jobCardId/tasks", isAuthenticated, async (req, res) => {
 router.post("/job-cards/:jobCardId/tasks", isAuthenticated, async (req: any, res) => {
   try {
     const { jobCardId } = req.params;
+    if (!(await loadOwnedJobCard(req, res, jobCardId))) return;
     const userId = req.user?.id || 'default-user';
     const taskData = {
       ...req.body,
