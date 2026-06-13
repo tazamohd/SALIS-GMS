@@ -301,9 +301,9 @@ router.get("/time-slots", isAuthenticated, async (req, res) => {
   }
 });
 
-// TODO: Implement recurring appointments
-// - POST /api/recurring-appointments
-// - GET /api/recurring-appointments
+// Recurring appointments are implemented in the legacy monolith (server/routes.ts):
+// GET/POST/PATCH/DELETE /api/recurring-appointments and .../:id/generate, backed by
+// the recurring_appointments table. Migrate them into this router in a later sprint.
 
 // ─── AI Scheduling Optimization Routes ───────────────────────────────
 

@@ -45,6 +45,7 @@ import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
 import { miscRoutes } from "./misc.routes";
+import { serviceTemplateRoutes } from "./service-templates.routes";
 // NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
 // /api/tools, /api/service-templates, /api/notifications and /api/backup remain
 // served by the legacy monolith until they are migrated in later sprints.
@@ -245,6 +246,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Smart search (tenant-scoped) — mounted ahead of the monolith
   app.use("/api", miscRoutes);
   console.log("✅ Misc (Search) Routes Loaded");
+
+  // Service templates (tenant-scoped) — mounted ahead of the monolith
+  app.use("/api", serviceTemplateRoutes);
+  console.log("✅ Service Template Routes Loaded");
 
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);

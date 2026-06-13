@@ -1441,75 +1441,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   */
 
   // Service Templates routes
-  app.get('/api/service-templates/all', isAuthenticated, async (req, res) => {
-    try {
-      const allTemplates = await storage.getAllServiceTemplates();
-      res.json(allTemplates);
-    } catch (error) {
-      console.error("Error fetching all service templates:", error);
-      res.status(500).json({ message: "Failed to fetch service templates" });
-    }
-  });
-
-  app.get('/api/service-templates', isAuthenticated, async (req, res) => {
-    try {
-      const { garage_id } = req.query;
-      if (!garage_id) {
-        return res.status(400).json({ message: "garage_id is required" });
-      }
-      const templates = await storage.getServiceTemplates(garage_id as string);
-      res.json(templates);
-    } catch (error) {
-      console.error("Error fetching service templates:", error);
-      res.status(500).json({ message: "Failed to fetch service templates" });
-    }
-  });
-
-  app.get('/api/service-templates/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const template = await storage.getServiceTemplate(id);
-      if (!template) {
-        return res.status(404).json({ message: "Service template not found" });
-      }
-      res.json(template);
-    } catch (error) {
-      console.error("Error fetching service template:", error);
-      res.status(500).json({ message: "Failed to fetch service template" });
-    }
-  });
-
-  app.post('/api/service-templates', isAuthenticated, async (req, res) => {
-    try {
-      const template = await storage.createServiceTemplate(req.body);
-      res.status(201).json(template);
-    } catch (error) {
-      console.error("Error creating service template:", error);
-      res.status(500).json({ message: "Failed to create service template" });
-    }
-  });
-
-  app.put('/api/service-templates/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const template = await storage.updateServiceTemplate(id, req.body);
-      res.json(template);
-    } catch (error) {
-      console.error("Error updating service template:", error);
-      res.status(500).json({ message: "Failed to update service template" });
-    }
-  });
-
-  app.delete('/api/service-templates/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteServiceTemplate(id);
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting service template:", error);
-      res.status(500).json({ message: "Failed to delete service template" });
-    }
-  });
+  // Service template CRUD (/api/service-templates*) is served by the modular,
+  // tenant-scoped server/routes/service-templates.routes.ts (mounted ahead of this
+  // monolith in routes/index.ts).
 
   // Tool Management routes - Module 7
   app.get('/api/tools', isAuthenticated, async (req, res) => {

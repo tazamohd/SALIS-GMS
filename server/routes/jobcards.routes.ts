@@ -38,16 +38,35 @@ function sanitizeZodError(error: z.ZodError) {
   };
 }
 
+// Loads a job card only if it belongs to the caller's garage. On a missing or
+// cross-garage id it sends 404 (so existence isn't leaked) and returns null, so
+// callers can `if (!(await loadOwnedJobCard(...))) return;` before touching sub-resources.
+async function loadOwnedJobCard(req: any, res: any, jobCardId: string) {
+  const jobCard = await storage.getJobCard(jobCardId);
+  if (!jobCard || (req.user?.garageId && jobCard.garageId !== req.user.garageId)) {
+    res.status(404).json({ message: "Job card not found" });
+    return null;
+  }
+  return jobCard;
+}
+
 /**
  * Job Card Management Routes
  * Matches monolith server/routes.ts handlers exactly.
  */
 
-// GET /api/job-cards - List job cards
-router.get("/job-cards", isAuthenticated, async (req, res) => {
+// GET /api/job-cards - List job cards (tenant-scoped)
+router.get("/job-cards", isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, assigned_to } = req.query;
-    const jobCards = await storage.getJobCards(garage_id as string, assigned_to as string);
+    const { assigned_to } = req.query;
+    const userGarageId = req.user?.garageId;
+    const requested = req.query.garage_id as string | undefined;
+    // Never let a caller read another garage's job cards by passing ?garage_id=.
+    if (requested && userGarageId && requested !== userGarageId) {
+      return res.status(403).json({ message: "Cannot access another garage's job cards" });
+    }
+    const garageId = userGarageId || requested;
+    const jobCards = await storage.getJobCards(garageId, assigned_to as string);
     res.json(jobCards);
   } catch (error) {
     console.error("Error fetching job cards:", error);
@@ -55,12 +74,13 @@ router.get("/job-cards", isAuthenticated, async (req, res) => {
   }
 });
 
-// GET /api/job-cards/:id - Get job card by ID
-router.get("/job-cards/:id", isAuthenticated, async (req, res) => {
+// GET /api/job-cards/:id - Get job card by ID (tenant-scoped)
+router.get("/job-cards/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
     const jobCard = await storage.getJobCard(id);
-    if (!jobCard) {
+    // 404 (not 403) on a cross-garage id so we don't leak that the record exists.
+    if (!jobCard || (req.user?.garageId && jobCard.garageId !== req.user.garageId)) {
       return res.status(404).json({ message: "Job card not found" });
     }
     res.json(jobCard);
@@ -70,12 +90,15 @@ router.get("/job-cards/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// GET /api/job-cards/:id/details - Get full job card details
-router.get("/job-cards/:id/details", isAuthenticated, async (req, res) => {
+// GET /api/job-cards/:id/details - Get full job card details (tenant-scoped)
+router.get("/job-cards/:id/details", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
     const jobCardDetails = await storage.getJobCardWithDetails(id);
-    if (!jobCardDetails) {
+    if (
+      !jobCardDetails ||
+      (req.user?.garageId && jobCardDetails.garageId !== req.user.garageId)
+    ) {
       return res.status(404).json({ message: "Job card not found" });
     }
     res.json(jobCardDetails);
@@ -113,11 +136,17 @@ router.post("/job-cards", isAuthenticated, async (req: any, res) => {
   }
 });
 
-// PUT /api/job-cards/:id - Update job card
-router.put("/job-cards/:id", isAuthenticated, async (req, res) => {
+// PUT /api/job-cards/:id - Update job card (tenant-scoped)
+router.put("/job-cards/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
-    const updatedJobCard = await storage.updateJobCard(id, req.body);
+    const existing = await storage.getJobCard(id);
+    if (!existing || (req.user?.garageId && existing.garageId !== req.user.garageId)) {
+      return res.status(404).json({ message: "Job card not found" });
+    }
+    // Don't allow moving a job card to another garage via the body.
+    const { garageId: _ignore, ...data } = req.body ?? {};
+    const updatedJobCard = await storage.updateJobCard(id, data);
     res.json(updatedJobCard);
   } catch (error) {
     console.error("Error updating job card:", error);
@@ -126,15 +155,21 @@ router.put("/job-cards/:id", isAuthenticated, async (req, res) => {
 });
 
 // PATCH /api/job-cards/:id - Update job card status (with inventory deduction on completion)
-router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
+router.patch("/job-cards/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
     const newStatus = req.body.status;
 
+    // Tenant guard: the job card must belong to the caller's garage.
+    const owned = await storage.getJobCard(id);
+    if (!owned || (req.user?.garageId && owned.garageId !== req.user.garageId)) {
+      return res.status(404).json({ message: "Job card not found" });
+    }
+
     // If status is changing to 'completed', handle inventory deduction and status update atomically
     if (newStatus === 'completed') {
       // Get current job card to check existing status
-      const currentJobCard = await storage.getJobCard(id);
+      const currentJobCard = owned;
       if (!currentJobCard) {
         return res.status(404).json({ message: "Job card not found" });
       }
@@ -216,8 +251,10 @@ router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
       }
     }
 
-    // For non-completion status updates, use storage method
-    const updatedJobCard = await storage.updateJobCard(id, req.body);
+    // For non-completion status updates, use storage method.
+    // Strip garageId so a card can't be reassigned to another garage via the body.
+    const { garageId: _ignore, ...patch } = req.body ?? {};
+    const updatedJobCard = await storage.updateJobCard(id, patch);
     res.json(updatedJobCard);
   } catch (error: any) {
     console.error("Error updating job card:", error);
@@ -229,9 +266,10 @@ router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
 });
 
 // GET /api/job-cards/:jobCardId/parts - Get parts for job card (direct DB query, no storage method)
-router.get("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:jobCardId/parts", isAuthenticated, async (req: any, res) => {
   try {
     const { jobCardId } = req.params;
+    if (!(await loadOwnedJobCard(req, res, jobCardId))) return;
     const parts = await db.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, jobCardId));
     res.json(parts);
   } catch (error) {
@@ -241,9 +279,10 @@ router.get("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
 });
 
 // POST /api/job-cards/:jobCardId/parts - Add part to job card (direct DB insert with zod validation)
-router.post("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
+router.post("/job-cards/:jobCardId/parts", isAuthenticated, async (req: any, res) => {
   try {
     const { jobCardId } = req.params;
+    if (!(await loadOwnedJobCard(req, res, jobCardId))) return;
 
     // Validate request body
     const addPartSchema = z.object({
@@ -283,13 +322,18 @@ router.post("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => 
 });
 
 // DELETE /api/job-cards/:jobCardId/parts/:partId - Remove part from job card
-router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, async (req, res) => {
+router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, async (req: any, res) => {
   try {
-    const { partId } = req.params;
+    const { jobCardId, partId } = req.params;
+    if (!(await loadOwnedJobCard(req, res, jobCardId))) return;
 
     // Check if part was already deducted
     const [existingPart] = await db.select().from(jobCardParts).where(eq(jobCardParts.id, partId));
-    if (existingPart?.isDeducted) {
+    // The part must belong to the job card named in the path.
+    if (!existingPart || existingPart.jobCardId !== jobCardId) {
+      return res.status(404).json({ message: "Part not found on this job card" });
+    }
+    if (existingPart.isDeducted) {
       return res.status(400).json({ message: "Cannot remove part that has already been deducted from inventory" });
     }
 
