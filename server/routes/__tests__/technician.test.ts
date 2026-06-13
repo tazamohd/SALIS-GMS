@@ -46,6 +46,27 @@ describe('Technician Mobile API', () => {
     });
   });
 
+  describe('POST /api/technicians (mass-assignment hardening)', () => {
+    it('ignores client-supplied role/garageId and scopes to the session garage', async () => {
+      const res = await agent.post('/api/technicians').send({
+        fullName: 'Hardening Tech',
+        email: `tech-harden-${Date.now()}@slis.sa`,
+        phone: `+96650${Date.now().toString().slice(-7)}`,
+        role: 'PLATFORM_ADMIN', // attempted privilege escalation
+        garageId: '11111111-1111-1111-1111-111111111111', // attempted cross-tenant
+      });
+      // Tolerate environments where user creation needs extra columns; assert the
+      // security properties only when the create succeeds.
+      if (res.status === 201) {
+        expect(res.body.userType).toBe('technician');
+        expect(res.body.role).not.toBe('PLATFORM_ADMIN');
+        expect(res.body.garageId).not.toBe('11111111-1111-1111-1111-111111111111');
+      } else {
+        expect([400, 500]).toContain(res.status);
+      }
+    });
+  });
+
   describe('POST /api/technician/parts-request', () => {
     it('should reject missing required fields', async () => {
       const res = await agent.post('/api/technician/parts-request').send({

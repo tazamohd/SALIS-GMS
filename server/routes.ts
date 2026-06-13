@@ -841,12 +841,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/technicians', isAuthenticated, async (req, res) => {
+  app.post('/api/technicians', isAuthenticated, async (req: any, res) => {
     try {
+      // Drop client-supplied identity/privilege fields to prevent privilege
+      // escalation (role) and cross-tenant assignment (id/garageId); the server
+      // forces userType, active state and the garage from the session.
+      const { id, role, userType, isActive, garageId, ...rest } = req.body ?? {};
       const technicianData = {
-        ...req.body,
+        ...rest,
         userType: 'technician',
         isActive: true,
+        ...(req.user?.garageId ? { garageId: req.user.garageId } : {}),
       };
       const technician = await storage.createUser(technicianData);
       res.status(201).json(technician);
@@ -1446,59 +1451,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // monolith in routes/index.ts).
 
   // Tool Management routes - Module 7
-  app.get('/api/tools', isAuthenticated, async (req, res) => {
-    try {
-      const { garage_id, is_global } = req.query;
-      const tools = await storage.getTools(
-        garage_id as string,
-        is_global === 'true'
-      );
-      res.json(tools);
-    } catch (error) {
-      console.error("Error fetching tools:", error);
-      res.status(500).json({ message: "Failed to fetch tools" });
-    }
-  });
-
-  app.get('/api/tools/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const tool = await storage.getTool(id);
-      if (!tool) {
-        return res.status(404).json({ message: "Tool not found" });
-      }
-      res.json(tool);
-    } catch (error) {
-      console.error("Error fetching tool:", error);
-      res.status(500).json({ message: "Failed to fetch tool" });
-    }
-  });
-
-  app.post('/api/tools', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const toolData = {
-        ...req.body,
-        createdBy: userId,
-      };
-      const tool = await storage.createTool(toolData);
-      res.status(201).json(tool);
-    } catch (error) {
-      console.error("Error creating tool:", error);
-      res.status(500).json({ message: "Failed to create tool" });
-    }
-  });
-
-  app.put('/api/tools/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updatedTool = await storage.updateTool(id, req.body);
-      res.json(updatedTool);
-    } catch (error) {
-      console.error("Error updating tool:", error);
-      res.status(500).json({ message: "Failed to update tool" });
-    }
-  });
+  // Tool catalogue CRUD (/api/tools GET, GET/:id, POST, PUT) is served by the
+  // modular server/routes/tools.routes.ts (mounted ahead of this monolith).
+  // tool-availability, tool-usage and /tools/:toolId/usage remain here for now.
 
   // Tool Availability routes
   app.get('/api/tool-availability', isAuthenticated, async (req, res) => {
@@ -1765,6 +1720,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const appointmentData = {
         ...validationResult.data,
         createdBy: userId,
+        // Force the tenant from the session so a client can't create an
+        // appointment in another garage by passing a different garageId.
+        ...(req.user?.garageId ? { garageId: req.user.garageId } : {}),
       };
 
       const appointment = await storage.createAppointment(appointmentData as any);
