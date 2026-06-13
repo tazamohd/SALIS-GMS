@@ -192,10 +192,25 @@ router.get("/decode-vin/:vin", isAuthenticated, async (req, res) => {
 
 // ── Vehicle CRUD ───────────────────────────────────────────────────
 
-router.get("/vehicles", isAuthenticated, async (req, res) => {
+// Loads a vehicle only if it belongs to the caller's garage; otherwise sends 404
+// (so existence isn't leaked) and returns null.
+async function loadOwnedVehicle(req: any, res: any, id: string) {
+  const vehicle = await storage.getVehicle(id);
+  if (!vehicle || (req.user?.garageId && vehicle.garageId !== req.user.garageId)) {
+    res.status(404).json({ message: "Vehicle not found" });
+    return null;
+  }
+  return vehicle;
+}
+
+router.get("/vehicles", isAuthenticated, async (req: any, res) => {
   try {
-    const { garageId } = req.query;
-    const vehicles = await storage.getVehicles(garageId as string | undefined);
+    const userGarageId = req.user?.garageId;
+    const requested = req.query.garageId as string | undefined;
+    if (requested && userGarageId && requested !== userGarageId) {
+      return res.status(403).json({ message: "Cannot access another garage's vehicles" });
+    }
+    const vehicles = await storage.getVehicles(userGarageId || requested);
     res.json(vehicles);
   } catch (error) {
     console.error("Error fetching vehicles:", error);
@@ -220,10 +235,12 @@ router.post("/vehicles", isAuthenticated, async (req, res) => {
   }
 });
 
-router.patch("/vehicles/:id", isAuthenticated, async (req, res) => {
+router.patch("/vehicles/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { insertVehicleSchema } = await import("@shared/schema");
     const { id } = req.params;
+
+    if (!(await loadOwnedVehicle(req, res, id))) return;
 
     const validationResult = insertVehicleSchema.partial().safeParse(req.body);
 
@@ -231,7 +248,9 @@ router.patch("/vehicles/:id", isAuthenticated, async (req, res) => {
       return res.status(400).json(sanitizeZodError(validationResult.error));
     }
 
-    const updatedVehicle = await storage.updateVehicle(id, validationResult.data);
+    // Don't allow moving a vehicle to another garage via the body.
+    const { garageId: _ignore, ...patch } = validationResult.data as any;
+    const updatedVehicle = await storage.updateVehicle(id, patch);
     res.json(updatedVehicle);
   } catch (error) {
     console.error("Error updating vehicle:", error);
@@ -239,9 +258,10 @@ router.patch("/vehicles/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-router.delete("/vehicles/:id", isAuthenticated, async (req, res) => {
+router.delete("/vehicles/:id", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedVehicle(req, res, id))) return;
     await storage.deleteVehicle(id);
     res.json({ message: "Vehicle deleted successfully" });
   } catch (error) {
@@ -252,9 +272,10 @@ router.delete("/vehicles/:id", isAuthenticated, async (req, res) => {
 
 // ── Vehicle Service History ────────────────────────────────────────
 
-router.get("/vehicles/:id/service-history", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/service-history", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedVehicle(req, res, id))) return;
     const history = await storage.getVehicleServiceHistory(id);
     res.json(history);
   } catch (error) {
@@ -304,9 +325,10 @@ router.delete("/service-history/:id", isAuthenticated, async (req, res) => {
 
 // ── Maintenance Schedules ──────────────────────────────────────────
 
-router.get("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedVehicle(req, res, id))) return;
     const schedules = await storage.getMaintenanceSchedules(id);
     res.json(schedules);
   } catch (error) {
@@ -369,9 +391,10 @@ router.delete("/maintenance-schedules/:id", isAuthenticated, async (req, res) =>
 
 // ── Service Reminders ──────────────────────────────────────────────
 
-router.get("/vehicles/:id/service-reminders", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/service-reminders", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedVehicle(req, res, id))) return;
     const { status } = req.query;
     const reminders = await storage.getServiceReminders(id, status as string | undefined);
     res.json(reminders);

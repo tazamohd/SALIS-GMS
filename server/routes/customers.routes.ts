@@ -4,11 +4,27 @@ import { storage } from "../storage";
 
 const router = Router();
 
-// Get all customers
-router.get("/customers", isAuthenticated, async (req, res) => {
+// Loads a customer only if they belong to the caller's garage; otherwise sends 404
+// (so existence isn't leaked) and returns null.
+async function loadOwnedCustomer(req: any, res: any, id: string) {
+  const customer = await storage.getCustomer(id);
+  if (!customer || (req.user?.garageId && customer.garageId !== req.user.garageId)) {
+    res.status(404).json({ message: "Customer not found" });
+    return null;
+  }
+  return customer;
+}
+
+// Get all customers (tenant-scoped)
+router.get("/customers", isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, search } = req.query;
-    const customers = await storage.getCustomers(garage_id as string, search as string);
+    const { search } = req.query;
+    const userGarageId = req.user?.garageId;
+    const requested = req.query.garage_id as string | undefined;
+    if (requested && userGarageId && requested !== userGarageId) {
+      return res.status(403).json({ message: "Cannot access another garage's customers" });
+    }
+    const customers = await storage.getCustomers(userGarageId || requested, search as string);
     res.json(customers);
   } catch (error) {
     console.error("Error fetching customers:", error);
@@ -67,13 +83,10 @@ router.post("/customers", isAuthenticated, async (req: any, res) => {
 });
 
 // Get customer by ID
-router.get("/customers/:id", isAuthenticated, async (req, res) => {
+router.get("/customers/:id", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const customer = await storage.getCustomer(id);
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
-    }
+    const customer = await loadOwnedCustomer(req, res, req.params.id);
+    if (!customer) return;
     res.json(customer);
   } catch (error) {
     console.error("Error fetching customer:", error);
@@ -82,9 +95,10 @@ router.get("/customers/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get customer vehicles
-router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/vehicles", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const vehicles = await storage.getCustomerVehicles(id);
     res.json(vehicles);
   } catch (error) {
@@ -94,9 +108,10 @@ router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
 });
 
 // Get customer job cards
-router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/job-cards", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const jobCards = await storage.getCustomerJobCards(id);
     res.json(jobCards);
   } catch (error) {
@@ -106,9 +121,10 @@ router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
 });
 
 // Get customer invoices
-router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/invoices", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const invoices = await storage.getCustomerInvoices(id);
     res.json(invoices);
   } catch (error) {
@@ -118,9 +134,10 @@ router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
 });
 
 // Get customer payments
-router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/payments", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const payments = await storage.getCustomerPayments(id);
     res.json(payments);
   } catch (error) {
@@ -130,9 +147,10 @@ router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
 });
 
 // Get customer notes
-router.get("/customers/:id/notes", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/notes", isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const notes = await storage.getCustomerNotes(id);
     res.json(notes);
   } catch (error) {
