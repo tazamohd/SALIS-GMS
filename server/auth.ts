@@ -4,6 +4,7 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import connectPg from "connect-pg-simple";
 import bcrypt from "bcrypt";
+import { generateCsrfToken, validateCsrfToken, csrfTokenRoute } from "./middleware/csrf";
 import { storage } from "./storage";
 import type { User } from "@shared/schema";
 import { db } from "./db";
@@ -48,6 +49,15 @@ export async function setupAuth(app: Express) {
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // CSRF protection for session-authenticated, state-changing requests. The
+  // token is minted per session and exposed via GET /api/csrf-token; the
+  // validator only enforces it for authenticated, non-safe requests (see
+  // middleware/csrf.ts). Mounted here — after passport.session and before any
+  // routes are registered — so it covers the whole API surface.
+  app.use(generateCsrfToken);
+  app.get("/api/csrf-token", csrfTokenRoute);
+  app.use(validateCsrfToken);
 
   passport.use(
     new LocalStrategy(

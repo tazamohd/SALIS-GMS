@@ -33,10 +33,24 @@ const CSRF_EXEMPT_PATHS = new Set([
   "/api/auth/login",
   "/api/auth/register",
   "/api/customer-portal/login",
+  // Logout only tears down the caller's own session; a forced logout is a minor
+  // nuisance rather than a security breach, so it is exempt from CSRF.
+  "/api/logout",
+  "/api/auth/logout",
 ]);
 
 export function validateCsrfToken(req: Request, res: Response, next: NextFunction): void {
   if (SKIP_METHODS.has(req.method)) {
+    return next();
+  }
+
+  // CSRF only protects requests authenticated via the session cookie — that is
+  // the only credential an attacker can ride from a victim's browser. Requests
+  // without an active passport session (public endpoints, server-to-server
+  // webhooks, the separately-authenticated customer portal, kiosk walk-ins)
+  // have no ambient session to abuse, so they are not subject to CSRF.
+  const isAuthed = typeof (req as any).isAuthenticated === "function" && (req as any).isAuthenticated();
+  if (!isAuthed) {
     return next();
   }
 
