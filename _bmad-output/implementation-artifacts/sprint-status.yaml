@@ -35,7 +35,7 @@ development_status:
   1-1-establish-request-tenant-scope: done
   1-2-scoped-reads-with-no-return-all-fallback: done
   1-3-scoped-writes-with-server-stamped-tenancy: done
-  1-4-branch-level-scoping-for-branch-scoped-roles: review
+  1-4-branch-level-scoping-for-branch-scoped-roles: done
   1-5-existence-hiding-error-semantics: done
   1-6-postgres-row-level-security-backstop: in-progress
   1-7-cross-tenant-isolation-test-harness-core: done
