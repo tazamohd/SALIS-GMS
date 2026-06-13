@@ -9,6 +9,7 @@ export const RuntimeToasts = () => {
       description:
         "AED 2,310 invoiced to Al Noor Logistics for job card JC-1042.",
       duration: Infinity,
+      style: { animation: "none" },
     });
   }, []);
   return (

@@ -14,6 +14,11 @@ const revenueConfig = {
   revenue: { label: "Revenue (SAR)", color: "#0A5ED7" },
 };
 
+// ChartCard wraps children in a .chart-animate div (0.8s clip-path reveal);
+// disable it so captures are deterministic and the full chart is visible.
+const noChartAnimation =
+  ".chart-animate{animation:none !important;clip-path:none !important;opacity:1 !important}";
+
 export const RevenueWithChart = () => (
   <ChartCard
     title="Monthly Revenue"
@@ -22,11 +27,12 @@ export const RevenueWithChart = () => (
     deltaLabel="vs May"
     className="w-full max-w-md"
   >
+    <style dangerouslySetInnerHTML={{ __html: noChartAnimation }} />
     <ChartContainer config={revenueConfig} style={{ width: "100%", height: 180 }}>
       <BarChart data={monthlyRevenue}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={6} />
-        <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+        <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} isAnimationActive={false} />
       </BarChart>
     </ChartContainer>
   </ChartCard>

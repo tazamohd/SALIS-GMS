@@ -42,8 +42,8 @@ export const WeeklyRevenueBars = () => (
         <YAxis tickLine={false} axisLine={false} width={48} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
-        <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
-        <Bar dataKey="parts" fill="var(--color-parts)" radius={4} />
+        <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} isAnimationActive={false} />
+        <Bar dataKey="parts" fill="var(--color-parts)" radius={4} isAnimationActive={false} />
       </BarChart>
     </ChartContainer>
   </div>
@@ -77,6 +77,7 @@ export const JobsCompletedLine = () => (
           stroke="var(--color-jobs)"
           strokeWidth={2}
           dot={{ fill: "var(--color-jobs)", r: 3 }}
+          isAnimationActive={false}
         />
       </LineChart>
     </ChartContainer>

@@ -45,10 +45,6 @@ export const WorkshopCommandPalette = () => (
             <Wrench />
             <span>JC-2031 — Toyota Camry 2022 — Brake Service</span>
           </CommandItem>
-          <CommandItem>
-            <Wrench />
-            <span>JC-2030 — Hyundai Sonata — A/C Repair</span>
-          </CommandItem>
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Customers">
