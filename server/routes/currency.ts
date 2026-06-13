@@ -115,7 +115,7 @@ const exchangeRates: CurrencyRate[] = [
 // ---------------------------------------------------------------------------
 // In-memory settings
 // ---------------------------------------------------------------------------
-let currencySettings: CurrencySettings = {
+const currencySettings: CurrencySettings = {
   defaultCurrency: 'SAR',
   decimalPlaces: 2,
   numberFormat: 'en',

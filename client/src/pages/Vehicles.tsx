@@ -166,7 +166,7 @@ export default function Vehicles() {
     
     // Hydrate selectedMakeId from vehicle.make using multiple matching strategies
     const vehicleMakeLower = (vehicle.make || '').toLowerCase().trim();
-    let matchedMake = vehicleMakes.find(m => m.name.toLowerCase() === vehicleMakeLower) // Exact match
+    const matchedMake = vehicleMakes.find(m => m.name.toLowerCase() === vehicleMakeLower) // Exact match
       || vehicleMakes.find(m => m.name.toLowerCase().includes(vehicleMakeLower)) // Contains
       || vehicleMakes.find(m => vehicleMakeLower.includes(m.name.toLowerCase())); // Reverse contains
     
