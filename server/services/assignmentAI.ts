@@ -1,14 +1,6 @@
-import OpenAI from "openai";
+import { openai } from "../ai/client";
 import type { IStorage } from "../storage";
 import type { JobCard, User, TechnicianProfile } from "@shared/schema";
-
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  // Placeholder keeps the SDK from throwing at import when the integration is
-  // unconfigured; call sites guard on the env var before using the client.
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
 
 interface TechnicianRecommendation {
   technicianId: string;
@@ -85,7 +77,7 @@ async function callOpenAIForRecommendations(
   const systemPrompt = `You are an expert automotive technician assignment system for a garage. Your task is to recommend the best technicians for a given job based on skills, workload, experience, and assignment rules.
 
 Assignment Rules:
-${JSON.stringify(assignmentRules, null, 2)}
+${JSON.stringify(assignmentRules)}
 
 Consider these factors:
 1. Technician skills match with job requirements

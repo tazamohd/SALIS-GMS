@@ -1,24 +1,12 @@
 // AI Service for SALIS AUTO - Phase 1: AI & Automation
 // Using Replit AI Integrations for OpenAI access (no API key needed, billed to credits)
 
-import OpenAI from "openai";
-
-// Validate OpenAI credentials with graceful fallback
-const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
-
-if (!AI_AVAILABLE) {
-  console.warn('⚠️  OpenAI credentials not found. AI features will return mock responses.');
-}
-
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = AI_AVAILABLE ? new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
-}) : null;
+import { openai, AI_AVAILABLE } from "./ai/client";
+import { compactHistory, compactRecords, truncateText } from "./ai/compaction";
 
 // AI Chatbot - Module 85
 export async function* streamChatResponse(messages: any[]) {
-  if (!openai) {
+  if (!AI_AVAILABLE) {
     yield "I'm currently in demo mode. AI features require OpenAI credentials to be configured.";
     return;
   }
@@ -39,7 +27,7 @@ export async function* streamChatResponse(messages: any[]) {
           
           Provide clear, professional, and helpful responses. If you're unsure about something, acknowledge it honestly.`
         },
-        ...messages
+        ...(compactHistory(messages) as any[])
       ],
       stream: true,
       max_completion_tokens: 8192
@@ -66,7 +54,7 @@ export async function analyzePredictiveMaintenance(vehicleData: {
   mileage: number;
   serviceHistory: any[];
 }) {
-  if (!openai) {
+  if (!AI_AVAILABLE) {
     return [
       { issue: 'Oil Change Due', probability: 0.85, estimatedMiles: vehicleData.mileage + 500, severity: 'medium', recommendation: 'Schedule oil change within 500 miles' }
     ];
@@ -86,7 +74,11 @@ export async function analyzePredictiveMaintenance(vehicleData: {
         content: `Analyze this vehicle:
         - ${vehicleData.year} ${vehicleData.make} ${vehicleData.model}
         - Current mileage: ${vehicleData.mileage}
-        - Service history: ${JSON.stringify(vehicleData.serviceHistory)}
+        - Service history: ${(() => {
+          const { kept, omittedCount } = compactRecords(vehicleData.serviceHistory, 15);
+          const json = JSON.stringify(kept);
+          return omittedCount > 0 ? `${json} (${omittedCount} older record(s) omitted)` : json;
+        })()}
         
         Predict upcoming maintenance needs.`
       }
@@ -112,7 +104,7 @@ export async function generatePartsRecommendations(context: {
   serviceType: string;
   symptoms?: string;
 }) {
-  if (!openai) {
+  if (!AI_AVAILABLE) {
     return [
       { partName: 'Standard Oil Filter', partNumber: 'OF-123', compatibility: 95, priority: 'high', estimatedCost: 25, reason: 'Demo mode' }
     ];
@@ -150,7 +142,7 @@ export async function generatePartsRecommendations(context: {
 
 // Document OCR Analysis - Module 88
 export async function analyzeOCRDocument(extractedText: string, documentType: string) {
-  if (!openai) {
+  if (!AI_AVAILABLE) {
     return { type: documentType, fields: {}, summary: 'Demo mode - AI not configured' };
   }
 
@@ -166,7 +158,7 @@ export async function analyzeOCRDocument(extractedText: string, documentType: st
       {
         role: "user",
         content: `Document Type: ${documentType}
-        Extracted Text: ${extractedText}
+        Extracted Text: ${truncateText(extractedText)}
         
         Extract and structure all relevant information (invoice numbers, amounts, dates, parts, services, etc.).`
       }
@@ -190,7 +182,7 @@ export async function generateServiceSuggestions(context: {
   symptoms: string;
   mileage: number;
 }) {
-  if (!openai) {
+  if (!AI_AVAILABLE) {
     return [
       { service: 'General Inspection', reason: 'Demo mode', priority: 'medium', estimatedCost: 50, estimatedTime: 60 }
     ];
