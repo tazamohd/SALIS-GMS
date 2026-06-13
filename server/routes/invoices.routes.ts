@@ -243,7 +243,7 @@ router.get("/payments", isAuthenticated, async (req, res) => {
     const { payments, invoices, users } = await import("@shared/schema");
 
     // Get payments with invoice and customer info
-    let query = db
+    const query = db
       .select({
         id: payments.id,
         invoiceId: payments.invoiceId,

@@ -7,6 +7,26 @@ on:
     branches: [main, pr-branch]
 
 jobs:
+  quality:
+    name: Type-check & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
   test:
     name: Vitest (Postgres 16)
     runs-on: ubuntu-latest

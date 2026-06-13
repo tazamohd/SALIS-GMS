@@ -302,7 +302,7 @@ const demoEstimates: Estimate[] = [
   },
 ];
 
-let estimates: Estimate[] = [...demoEstimates];
+const estimates: Estimate[] = [...demoEstimates];
 let nextNumber = 9;
 
 // ── Routes ─────────────────────────────────────────────────────────────────

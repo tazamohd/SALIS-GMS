@@ -2610,7 +2610,7 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    let query = db.select().from(users).where(and(...conditions));
+    const query = db.select().from(users).where(and(...conditions));
     
     return await query.orderBy(desc(users.createdAt));
   }
@@ -6343,7 +6343,7 @@ export class DatabaseStorage implements IStorage {
         eq(commissionRules.isActive, true)
       ));
     
-    let applicableRule = rules[0];
+    const applicableRule = rules[0];
     if (!applicableRule) return null;
     
     const baseAmount = parseFloat(invoice.totalAmount);
@@ -10064,7 +10064,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIotAlerts(vehicleId?: string, status?: string, severity?: string): Promise<any[]> {
-    let conditions = [];
+    const conditions = [];
     
     if (vehicleId) {
       conditions.push(eq(iotAlerts.vehicleId, vehicleId));
@@ -10819,7 +10819,7 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    let completedSessionsQuery = db.select().from(bayOccupancySessions)
+    const completedSessionsQuery = db.select().from(bayOccupancySessions)
       .where(gte(bayOccupancySessions.endTime, today));
     
     const completedSessions = await completedSessionsQuery;
