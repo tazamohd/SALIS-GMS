@@ -32,6 +32,9 @@ router.post("/admin/impersonate", isAuthenticated, requirePlatformPrincipal, asy
     if (!garage) {
       return res.status(404).json({ message: "Garage not found" });
     }
+    if (garage.isActive === false) {
+      return res.status(400).json({ message: "Cannot impersonate an inactive garage" });
+    }
     req.session.impersonation = { targetGarageId, actorUserId: req.user.id, startedAt: Date.now() };
     req.session.save(async (err: any) => {
       if (err) return next(err);

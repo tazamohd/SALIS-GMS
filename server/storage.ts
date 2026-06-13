@@ -2106,7 +2106,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(userData).returning();
+    // Server-stamp tenancy: a garaged caller cannot create a user in another garage
+    // (no client-controlled tenancy). Anonymous/registration paths preserve the
+    // provided value because no garage scope is established.
+    const [user] = await db.insert(users).values(stampGarageId(userData as any, "users")).returning();
     return user;
   }
 
@@ -2224,7 +2227,7 @@ export class DatabaseStorage implements IStorage {
   async getJobCardWithDetails(id: string): Promise<any> {
     const { diagnosticReports, maintenanceRecommendations, invoices, invoiceItems, payments, vehicles, users, jobTrackingEvents } = await import("@shared/schema");
     
-    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    const [jobCard] = await db.select().from(jobCards).where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)));
     if (!jobCard) return null;
 
     const [vehicle] = jobCard.vehicleId 
@@ -2627,7 +2630,8 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(vehicles)
       .where(and(
         eq(vehicles.customerId, customerId),
-        eq(vehicles.isActive, true)
+        eq(vehicles.isActive, true),
+        garageScope(vehicles.garageId)
       ))
       .orderBy(desc(vehicles.createdAt));
   }
@@ -3536,7 +3540,7 @@ export class DatabaseStorage implements IStorage {
   async createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder> {
     const poNumber = `PO-${Date.now()}`;
     const [po] = await db.insert(purchaseOrders)
-      .values({ ...data, poNumber })
+      .values(stampGarageId({ ...data, poNumber }, "purchase_orders"))
       .returning();
     return po;
   }
@@ -3641,9 +3645,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
-    const { invoiceItems } = await import("@shared/schema");
+    const { invoiceItems, invoices } = await import("@shared/schema");
+    const garageInvoiceIds = db.select({ id: invoices.id }).from(invoices).where(garageScope(invoices.garageId));
     return await db.select().from(invoiceItems)
-      .where(eq(invoiceItems.invoiceId, invoiceId))
+      .where(and(eq(invoiceItems.invoiceId, invoiceId), inArray(invoiceItems.invoiceId, garageInvoiceIds)))
       .orderBy(desc(invoiceItems.createdAt));
   }
 
@@ -3666,7 +3671,7 @@ export class DatabaseStorage implements IStorage {
     return await db.transaction(async (tx) => {
       const invoiceNumber = `INV-${Date.now()}`;
       const [invoice] = await tx.insert(invoices)
-        .values({ ...invoiceData, invoiceNumber })
+        .values(stampGarageId({ ...invoiceData, invoiceNumber }, "invoices"))
         .returning();
       
       if (items.length > 0) {
@@ -3679,13 +3684,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPayments(invoiceId?: string): Promise<Payment[]> {
-    const { payments } = await import("@shared/schema");
+    const { payments, invoices } = await import("@shared/schema");
+    // Scope to payments whose invoice belongs to the caller's garage (payments has no garage_id).
+    const garageInvoiceIds = db.select({ id: invoices.id }).from(invoices).where(garageScope(invoices.garageId));
+    const conditions = [inArray(payments.invoiceId, garageInvoiceIds)];
     if (invoiceId) {
-      return await db.select().from(payments)
-        .where(eq(payments.invoiceId, invoiceId))
-        .orderBy(desc(payments.createdAt));
+      conditions.push(eq(payments.invoiceId, invoiceId));
     }
-    return await db.select().from(payments).orderBy(desc(payments.createdAt));
+    return await db.select().from(payments).where(and(...conditions)).orderBy(desc(payments.createdAt));
   }
 
   async createPayment(data: InsertPayment): Promise<Payment> {
@@ -3728,7 +3734,7 @@ export class DatabaseStorage implements IStorage {
   async createEstimate(data: InsertEstimate): Promise<Estimate> {
     const estimateNumber = `EST-${Date.now()}`;
     const [estimate] = await db.insert(estimates)
-      .values({ ...data, estimateNumber })
+      .values(stampGarageId({ ...data, estimateNumber }, "estimates"))
       .returning();
     return estimate;
   }
@@ -4584,7 +4590,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(appointments)
-      .where(eq(appointments.customerId, customerId))
+      .where(and(eq(appointments.customerId, customerId), garageScope(appointments.garageId)))
       .orderBy(desc(appointments.appointmentDate));
     return result;
   }
@@ -4594,7 +4600,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(invoices)
-      .where(eq(invoices.customerId, customerId))
+      .where(and(eq(invoices.customerId, customerId), garageScope(invoices.garageId)))
       .orderBy(desc(invoices.invoiceDate));
     return result;
   }
@@ -4604,7 +4610,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(jobCards)
-      .where(eq(jobCards.customerId, customerId))
+      .where(and(eq(jobCards.customerId, customerId), garageScope(jobCards.garageId)))
       .orderBy(desc(jobCards.createdAt));
     return result;
   }

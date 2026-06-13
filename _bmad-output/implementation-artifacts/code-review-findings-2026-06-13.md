@@ -5,6 +5,11 @@ Three layers: Blind Hunter, Edge Case Hunter, Acceptance Auditor.
 
 Triage buckets: **[D]** decision-needed · **[P]** patch (unambiguous) · **[Defer]** real but phased/pre-existing · dismissed-as-noise dropped.
 
+> **Update 2026-06-13:** All 10 `[P]` patches applied (commit pending CI). The 3 `[D]` items were
+> decided: super-admin model → explicit `isSuperAdmin` flag (deferred to follow-up story); platform
+> reads → require audited impersonation (deferred); no-scope posture → fail-open-for-background (kept).
+> Impersonation hardening (is_active + 1h time-box + actor re-bind) landed now.
+
 ## 🔴 Critical — unambiguous patches (NOT part of the documented tail)
 
 - [ ] **[P] Whole-database CSV/report export** — `GET /api/export/csv/:type` and `/api/export/report/:type` run `db.select().from(table).limit(10000)` with **no garage filter**, gated only by `requireAdmin`. Any garage admin exports every tenant's customers/invoices/vehicles/job-cards. [server/routes/export.ts:46,174] (edge)

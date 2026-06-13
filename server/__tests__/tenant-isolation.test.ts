@@ -11,7 +11,7 @@ import type { Express } from "express";
 import supertest from "supertest";
 import { Client } from "pg";
 import { createTestApp } from "./setup";
-import { loginAsAdmin } from "./helpers";
+import { loginAsAdmin, seedVehicle } from "./helpers";
 
 let app: Express;
 
@@ -123,18 +123,22 @@ describe("Tenant isolation — Garage A cannot reach Garage B", () => {
     expect(own.status).toBe(200);
   });
 
-  it("cross-tenant update does not mutate the other tenant's record", async () => {
-    const before = await agentB.get(`/api/customers/${bCustomer.id}`);
-    const originalName = before.body.fullName;
+  it("cross-tenant write does not mutate the other tenant's record", async () => {
+    // B owns a vehicle (real scoped-write surface). A must not read or mutate it.
+    const bVehicle = await seedVehicle(agentB, bCustomer.id, garageB);
+    const before = await agentB.get(`/api/vehicles/${bVehicle.id}`);
+    expect(before.status).toBe(200);
+    const originalColor = before.body.color;
 
-    const attempt = await agentA
-      .patch(`/api/customers/${bCustomer.id}`)
-      .send({ fullName: "HACKED BY A" });
-    expect([403, 404]).toContain(attempt.status);
+    // A cannot even see B's vehicle (existence-hiding 404).
+    const aRead = await agentA.get(`/api/vehicles/${bVehicle.id}`);
+    expect(aRead.status).toBe(404);
 
-    const after = await agentB.get(`/api/customers/${bCustomer.id}`);
-    expect(after.body.fullName).toBe(originalName);
-    expect(after.body.fullName).not.toBe("HACKED BY A");
+    // A's scoped update affects 0 rows — B's vehicle is observably unchanged.
+    await agentA.patch(`/api/vehicles/${bVehicle.id}`).send({ color: "HACKED" });
+    const after = await agentB.get(`/api/vehicles/${bVehicle.id}`);
+    expect(after.body.color).toBe(originalColor);
+    expect(after.body.color).not.toBe("HACKED");
   });
 
   it("global search does not surface the other tenant's data", async () => {
