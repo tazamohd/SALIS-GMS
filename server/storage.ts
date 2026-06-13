@@ -300,6 +300,7 @@ import {
   type ActionHistory,
   type InsertActionHistory,
   dashboardWidgets,
+  customReports,
   type DashboardWidget,
   type InsertDashboardWidget,
   customerPortalSessions,
@@ -10731,6 +10732,17 @@ export class DatabaseStorage implements IStorage {
   // DASHBOARD WIDGETS METHODS
   // ========================================
   
+  async getCustomReports(garageId: string): Promise<CustomReport[]> {
+    return await db.select().from(customReports)
+      .where(eq(customReports.garageId, garageId))
+      .orderBy(desc(customReports.createdAt));
+  }
+
+  async createCustomReport(data: InsertCustomReport): Promise<CustomReport> {
+    const [report] = await db.insert(customReports).values(data).returning();
+    return report;
+  }
+
   async getDashboardWidgets(userId: string, garageId: string): Promise<DashboardWidget[]> {
     return await db.select().from(dashboardWidgets)
       .where(and(

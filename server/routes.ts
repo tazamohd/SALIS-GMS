@@ -35,6 +35,8 @@ import {
   sparePartInventories,
   jobCards,
   invoices,
+  insertCustomReportSchema,
+  insertDashboardWidgetSchema,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -14204,21 +14206,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   //   }
   // });
 
-  // Custom Reports Builder (using mock data until storage methods are implemented)
+  // Custom Reports Builder (DB-backed, tenant-scoped)
   app.post("/api/analytics/custom-report", isAuthenticated, async (req: any, res) => {
     try {
-      const { reportType, filters, dateRange } = req.body;
-      
-      // TODO: Implement createCustomReport in storage
-      res.status(201).json({
-        id: "report-new",
-        userId: req.user?.id,
-        garageId: req.user?.garageId,
-        reportName: reportType,
-        filters,
-        dateRange,
-        createdAt: new Date().toISOString()
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const parsed = insertCustomReportSchema
+        .omit({ garageId: true, createdBy: true })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const report = await storage.createCustomReport({
+        ...parsed.data,
+        garageId,
+        createdBy: req.user?.id,
       });
+      res.status(201).json(report);
     } catch (error) {
       console.error("Error creating custom report:", error);
       res.status(500).json({ message: "Failed to create custom report" });
@@ -14227,25 +14233,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/analytics/custom-reports", isAuthenticated, async (req: any, res) => {
     try {
-      // TODO: Implement getCustomReports in storage
-      res.json([]);
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.json([]);
+      res.json(await storage.getCustomReports(garageId));
     } catch (error) {
       console.error("Error fetching custom reports:", error);
       res.status(500).json({ message: "Failed to fetch custom reports" });
     }
   });
 
-  // Dashboard Widgets (using mock data until storage methods are implemented)
+  // Dashboard Widgets (DB-backed, scoped to the user + garage)
   app.post("/api/analytics/widgets", isAuthenticated, async (req: any, res) => {
     try {
-      // TODO: Implement createDashboardWidget in storage
-      res.status(201).json({
-        id: "widget-new",
-        ...req.body,
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const parsed = insertDashboardWidgetSchema
+        .omit({ garageId: true, userId: true })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const widget = await storage.createDashboardWidget({
+        ...parsed.data,
+        garageId,
         userId: req.user?.id,
-        garageId: req.user?.garageId,
-        createdAt: new Date().toISOString()
       });
+      res.status(201).json(widget);
     } catch (error) {
       console.error("Error creating widget:", error);
       res.status(500).json({ message: "Failed to create widget" });
@@ -14254,8 +14269,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/analytics/widgets", isAuthenticated, async (req: any, res) => {
     try {
-      // TODO: Implement getDashboardWidgets in storage
-      res.json([]);
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.json([]);
+      res.json(await storage.getDashboardWidgets(req.user?.id, garageId));
     } catch (error) {
       console.error("Error fetching widgets:", error);
       res.status(500).json({ message: "Failed to fetch widgets" });
