@@ -37,6 +37,7 @@ import {
   invoices,
   insertCustomReportSchema,
   insertDashboardWidgetSchema,
+  insertTechnicianProfileSchema,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -892,7 +893,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/technician-profiles', isAuthenticated, async (req, res) => {
     try {
-      const profile = await storage.createTechnicianProfile(req.body);
+      const parsed = insertTechnicianProfileSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const profile = await storage.createTechnicianProfile(parsed.data);
       res.status(201).json(profile);
     } catch (error) {
       console.error("Error creating technician profile:", error);
