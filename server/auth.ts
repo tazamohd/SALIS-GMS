@@ -122,6 +122,22 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
   res.status(401).json({ message: "Unauthorized" });
 };
 
+/**
+ * Establish an authenticated session while defending against session fixation:
+ * rotate the session id (regenerate) before writing the Passport user into it,
+ * so a pre-auth session id can never be reused post-login (FR-6).
+ */
+export function regenerateAndLogin(
+  req: import("express").Request,
+  user: Express.User,
+  done: (err?: any) => void,
+): void {
+  req.session.regenerate((regenErr) => {
+    if (regenErr) return done(regenErr);
+    req.login(user, (loginErr) => done(loginErr ?? undefined));
+  });
+}
+
 export async function invalidateUserSessions(userId: string): Promise<void> {
   try {
     const { pool } = await import('./db');

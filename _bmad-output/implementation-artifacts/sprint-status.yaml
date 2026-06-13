@@ -41,9 +41,9 @@ development_status:
   1-7-cross-tenant-isolation-test-harness-core: review
   epic-1-retrospective: optional
 
-  epic-2: backlog
-  2-1-block-auth-bypass-in-production: backlog
-  2-2-session-and-cookie-hardening: backlog
+  epic-2: in-progress
+  2-1-block-auth-bypass-in-production: review
+  2-2-session-and-cookie-hardening: review
   epic-2-retrospective: optional
 
   epic-3: backlog

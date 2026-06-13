@@ -14,6 +14,46 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
+// FR-5: authentication must never be disablable in production.
+export const AUTH_DISABLING_FLAGS = ['AUTH_BYPASS', 'DISABLE_AUTH', 'SKIP_AUTH', 'NO_AUTH'] as const;
+const isTruthyEnv = (v?: string) =>
+  v != null && ['1', 'true', 'yes', 'on'].includes(v.trim().toLowerCase());
+
+/**
+ * Pure decision for the auth-bypass guard, so it is unit-testable without the
+ * process.exit side effect. `fatal` is true only when a bypass flag is set under
+ * production \u2014 in which case the app must refuse to boot.
+ */
+export function evaluateAuthBypass(env: NodeJS.ProcessEnv = process.env): {
+  active: string[];
+  fatal: boolean;
+} {
+  const active = AUTH_DISABLING_FLAGS.filter((f) => isTruthyEnv(env[f]));
+  return { active, fatal: active.length > 0 && env.NODE_ENV === 'production' };
+}
+
+/** True when an auth-disabling flag is currently active (always false in production). */
+export function isAuthBypassActive(): boolean {
+  const { active, fatal } = evaluateAuthBypass();
+  return active.length > 0 && !fatal;
+}
+
+// Enforce at boot: refuse to start if bypass is set in production; warn otherwise.
+{
+  const { active, fatal } = evaluateAuthBypass();
+  if (fatal) {
+    console.error(
+      `\u274C Refusing to boot: auth-disabling flag(s) set in production: ${active.join(', ')}. ` +
+        `Authentication cannot be disabled in production.`,
+    );
+    process.exit(1);
+  } else if (active.length > 0) {
+    console.warn(
+      `\u26A0\uFE0F  AUTH BYPASS ACTIVE via ${active.join(', ')} \u2014 non-production only. NEVER set this in production.`,
+    );
+  }
+}
+
 // Fallback: allow AI_INTEGRATIONS_OPENAI_API_KEY as alias
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
