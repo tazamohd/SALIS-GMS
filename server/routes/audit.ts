@@ -4,7 +4,8 @@ import { getAuditLog, getAuditStats, seedAuditLog } from '../services/audit-trai
 const router = Router();
 
 router.get('/audit/log', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   const { userId, resource, action, severity, from, to, limit, offset } = req.query;
   const result = await getAuditLog({
     garageId,
@@ -21,12 +22,14 @@ router.get('/audit/log', async (req, res) => {
 });
 
 router.get('/audit/stats', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   res.json(await getAuditStats(garageId));
 });
 
 router.post('/audit/seed', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user?.garageId;
+  if (!garageId) return res.status(403).json({ message: 'Garage context required' });
   await seedAuditLog(garageId);
   res.json({ success: true, message: 'Demo audit entries created' });
 });

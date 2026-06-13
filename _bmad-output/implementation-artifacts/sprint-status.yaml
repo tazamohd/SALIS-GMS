@@ -59,11 +59,13 @@ development_status:
   epic-5: in-progress
   5-1-privileged-action-audit-events: done
   5-2-audited-impersonation-sessions: done
+  5-3-explicit-super-admin-flag: backlog
+  5-4-require-impersonation-for-platform-reads: backlog
   epic-5-retrospective: optional
 
-  epic-6: backlog
+  epic-6: in-progress
   6-1-extend-isolation-harness-to-high-risk-endpoints-ci-gate: backlog
-  6-2-ci-guard-against-unscoped-tenant-queries: backlog
+  6-2-ci-guard-against-unscoped-tenant-queries: review
   epic-6-retrospective: optional
 
 # Suggested sprint slicing (advisory; reorder freely)
