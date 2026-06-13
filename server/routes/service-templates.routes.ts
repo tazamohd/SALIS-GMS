@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { insertServiceTemplateSchema } from "@shared/schema";
 import { z } from "zod";
@@ -110,7 +111,7 @@ router.put("/service-templates/:id", isAuthenticated, async (req: any, res) => {
 });
 
 // DELETE /api/service-templates/:id - delete (tenant-scoped).
-router.delete("/service-templates/:id", isAuthenticated, async (req: any, res) => {
+router.delete("/service-templates/:id", isAuthenticated, requireRole(["ADMIN", "MANAGER"]), async (req: any, res) => {
   try {
     const { id } = req.params;
     const existing = await storage.getServiceTemplate(id);

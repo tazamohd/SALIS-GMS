@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
@@ -258,7 +259,7 @@ router.patch("/vehicles/:id", isAuthenticated, async (req: any, res) => {
   }
 });
 
-router.delete("/vehicles/:id", isAuthenticated, async (req: any, res) => {
+router.delete("/vehicles/:id", isAuthenticated, requireRole(["ADMIN", "MANAGER"]), async (req: any, res) => {
   try {
     const { id } = req.params;
     if (!(await loadOwnedVehicle(req, res, id))) return;
