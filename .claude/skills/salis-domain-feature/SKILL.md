@@ -45,16 +45,30 @@ remarkably consistent, so the nearest sibling is your best template.
 
 ## Workflow
 
+0. **Check what already exists — do this first, every time.** This is a 104+
+   module ERP with a 22k-line legacy monolith, so the resource you were asked to
+   "add" very often *already exists* in part: a table, a couple of storage
+   methods, or a monolith route may already be there. Building blind creates
+   duplicate tables and shadowed endpoints. Grep all three layers for the
+   resource name before writing anything:
+   ```bash
+   grep -ni "your_resource\|yourResource" shared/schema.ts server/storage.ts
+   grep -n '"/api/your-resource' server/routes.ts server/routes/*.ts
+   ```
+   If it exists, your job is to *complete/extend* it (and respect what's already
+   served), not recreate it. Reconcile your plan with what you find.
 1. **Find the domain.** Look in `server/routes/` for an existing `{domain}.routes.ts`
    (e.g. `customers.routes.ts`, `vehicles.routes.ts`, `invoices.routes.ts`). If
    the feature fits an existing domain, extend that file rather than making a new
    one. `server/routes/REFACTORING_GUIDE.md` lists every domain and its endpoints.
-2. **Schema first** (only if you need new tables/columns). Add the `pgTable`, the
-   `createInsertSchema(...).omit({...})`, and the `$inferSelect`/`$inferInsert`
-   type exports. Then apply it with `npm run db:push`.
-3. **Storage next.** Add the method signature to the `IStorage` interface
-   (~line 771) and implement it in `DatabaseStorage` (~line 2078). Both, always —
-   the interface is the contract the route layer trusts.
+2. **Schema first** (only if the table/column doesn't already exist — see step 0).
+   Add the `pgTable`, the `createInsertSchema(...).omit({...})`, and the
+   `$inferSelect`/`$inferInsert` type exports. Then apply it with `npm run db:push`.
+3. **Storage next.** Add the method signature to the `IStorage` interface and
+   implement it in the `DatabaseStorage` class — grep for `export interface
+   IStorage` and `class DatabaseStorage` to find them (the file is ~12k lines, so
+   search rather than scroll). Edit both, always — the interface is the contract
+   the route layer trusts. Check the method doesn't already exist before adding it.
 4. **Route.** Add handlers to the domain router, following the try/catch +
    `console.error` + `res.status(...).json({ message })` shape used everywhere.
 5. **Mount** the router in `server/routes/index.ts` if it's new — but read the
