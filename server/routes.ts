@@ -684,6 +684,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
+      // Enforce a minimum password strength: at least 8 characters and a mix of
+      // letters and digits. Prevents trivially weak credentials at signup.
+      const strongEnough =
+        typeof password === "string" &&
+        password.length >= 8 &&
+        /[A-Za-z]/.test(password) &&
+        /[0-9]/.test(password);
+      if (!strongEnough) {
+        return res.status(400).json({
+          message: "Password must be at least 8 characters and include both letters and numbers",
+        });
+      }
+
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "Email already registered" });
@@ -5757,15 +5770,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PayPal Routes (PayPal integration blueprint - Module 28)
-  app.get("/paypal/setup", async (req, res) => {
+  // Require an authenticated session: these initiate/capture real payments and
+  // must not be reachable anonymously.
+  app.get("/paypal/setup", isAuthenticated, async (req, res) => {
     await loadPaypalDefault(req, res);
   });
 
-  app.post("/paypal/order", async (req, res) => {
+  app.post("/paypal/order", isAuthenticated, async (req, res) => {
     await createPaypalOrder(req, res);
   });
 
-  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+  app.post("/paypal/order/:orderID/capture", isAuthenticated, async (req, res) => {
     await capturePaypalOrder(req, res);
   });
 
@@ -5775,13 +5790,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ message: "Stripe is not configured" });
     }
 
-    try {
-      const event = req.body;
+    // Verify the event came from Stripe. Without this, anyone can POST a forged
+    // "payment_intent.succeeded" event to mark any invoice paid. Requires the
+    // raw request body (captured via express.json's verify hook) and the
+    // STRIPE_WEBHOOK_SECRET signing secret. Fail closed if either is missing.
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      console.error("Stripe webhook rejected: STRIPE_WEBHOOK_SECRET is not configured");
+      return res.status(500).json({ message: "Webhook signing secret not configured" });
+    }
+    const rawBody = (req as any).rawBody;
+    const signature = req.headers["stripe-signature"];
+    if (!rawBody || !signature) {
+      return res.status(400).json({ message: "Missing Stripe signature" });
+    }
 
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(rawBody, signature as string, webhookSecret);
+    } catch (err: any) {
+      console.error("Stripe webhook signature verification failed:", err?.message);
+      return res.status(400).json({ message: "Invalid signature" });
+    }
+
+    try {
       // Handle the event
       if (event.type === 'payment_intent.succeeded') {
-        const paymentIntent = event.data.object;
-        const { invoiceId } = paymentIntent.metadata;
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const { invoiceId } = (paymentIntent.metadata ?? {}) as { invoiceId?: string };
 
         if (invoiceId) {
           // Update invoice as paid
