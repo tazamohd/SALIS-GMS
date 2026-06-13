@@ -15,6 +15,7 @@ export const WithValue = () => (
     <Label htmlFor="diagnosis">Technician Diagnosis</Label>
     <Textarea
       id="diagnosis"
+      rows={5}
       defaultValue={
         "Front brake pads worn below 2mm. Rotors show light scoring; recommend resurfacing. Brake fluid dark — flush advised."
       }
