@@ -29,12 +29,12 @@ export const CustomerSummary = () => (
             <p className="text-sm text-muted-foreground">
               12 visits — SAR 18,640 lifetime spend
             </p>
-            <div className="flex items-center pt-1 text-xs text-muted-foreground">
-              <Car className="mr-1.5 h-3.5 w-3.5 shrink-0" />
+            <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground">
+              <Car className="h-3.5 w-3.5 shrink-0" />
               <span>2 vehicles on file</span>
             </div>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <CalendarDays className="mr-1.5 h-3.5 w-3.5 shrink-0" />
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CalendarDays className="h-3.5 w-3.5 shrink-0" />
               <span>Customer since March 2023</span>
             </div>
           </div>

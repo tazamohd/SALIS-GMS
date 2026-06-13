@@ -13,7 +13,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRail,
   SidebarTrigger,
 } from "rest-express";
 import {
@@ -28,8 +27,8 @@ import {
 } from "lucide-react";
 
 export const GarageAppShell = () => (
-  <SidebarProvider>
-    <Sidebar>
+  <SidebarProvider style={{ minHeight: 0, height: 600, overflow: "hidden" }}>
+    <Sidebar collapsible="none" className="border-r">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -115,7 +114,6 @@ export const GarageAppShell = () => (
           </div>
         </div>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
     <SidebarInset>
       <header className="flex items-center gap-2 border-b px-4" style={{ height: 56 }}>
