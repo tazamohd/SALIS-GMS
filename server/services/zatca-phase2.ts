@@ -73,7 +73,7 @@ export interface ZATCAPhase2Invoice {
 
 /** Clearance API response */
 export interface ClearanceResponse {
-  status: 'CLEARED' | 'REJECTED' | 'REPORTED' | 'ERROR';
+  status: 'CLEARED' | 'REJECTED' | 'REPORTED' | 'ERROR' | 'NOT_CONFIGURED';
   clearanceId?: string;
   invoiceHash?: string;
   qrCode?: string;
@@ -223,24 +223,36 @@ ${lineItemsXml}
  * @param csid - Compliance CSID token (obtained during onboarding)
  * @returns Clearance response from ZATCA
  */
+/**
+ * Whether live ZATCA Phase-2 clearance is configured. Real clearance requires a
+ * Fatoora endpoint and a compliance CSID obtained through ZATCA onboarding
+ * (generate CSR -> submit to the compliance API -> receive production CSID).
+ */
+export function isZatcaClearanceConfigured(csid: string = ''): boolean {
+  return Boolean(process.env.ZATCA_API_URL && (csid || process.env.ZATCA_CSID));
+}
+
 export async function submitToClearance(
   ublInvoice: UBLInvoiceXML,
   csid: string = ''
 ): Promise<ClearanceResponse> {
-  // TODO: Replace with actual ZATCA Fatoora API endpoint
-  // Production: https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/clearance/single
-  // Sandbox:    https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single
-  const ZATCA_CLEARANCE_URL =
-    process.env.ZATCA_API_URL ||
-    'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single';
-
-  // TODO: Obtain real CSID through ZATCA onboarding process
-  // The CSID is generated via:
-  // 1. Generate CSR (Certificate Signing Request)
-  // 2. Submit to ZATCA compliance API
-  // 3. Complete compliance checks
-  // 4. Receive production CSID
+  const ZATCA_CLEARANCE_URL = process.env.ZATCA_API_URL || '';
   const authToken = csid || process.env.ZATCA_CSID || '';
+
+  // Honest deferral: never fabricate a CLEARED result. When ZATCA is not
+  // configured, report NOT_CONFIGURED so callers can surface a 503 instead of
+  // claiming a non-compliant invoice was cleared.
+  if (!isZatcaClearanceConfigured(csid)) {
+    return {
+      status: 'NOT_CONFIGURED',
+      invoiceHash: ublInvoice.hash,
+      errors: [
+        'ZATCA Phase-2 clearance is not configured. Set ZATCA_API_URL and a ' +
+          'compliance ZATCA_CSID (obtained via ZATCA onboarding) to enable live clearance.',
+      ],
+      timestamp: new Date().toISOString(),
+    };
+  }
 
   const requestBody = {
     invoiceHash: ublInvoice.hash,
@@ -249,40 +261,43 @@ export async function submitToClearance(
   };
 
   try {
-    // TODO: Uncomment when integrating with real ZATCA API
-    // const response = await fetch(ZATCA_CLEARANCE_URL, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json',
-    //     'Accept-Version': 'V2',
-    //     'Accept-Language': 'en',
-    //     'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
-    //   },
-    //   body: JSON.stringify(requestBody),
-    // });
-    // const data = await response.json();
-    // return mapClearanceResponse(data);
-
-    // Stub response for development
-    console.log('[ZATCA Phase 2] Clearance submission prepared:', {
-      endpoint: ZATCA_CLEARANCE_URL,
-      invoiceHash: ublInvoice.hash,
+    const response = await fetch(ZATCA_CLEARANCE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Accept-Version': 'V2',
+        'Accept-Language': 'en',
+        Authorization: `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+      },
+      body: JSON.stringify(requestBody),
     });
 
+    if (!response.ok) {
+      return {
+        status: 'ERROR',
+        invoiceHash: ublInvoice.hash,
+        errors: [`ZATCA clearance returned HTTP ${response.status}`],
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    const data: any = await response.json();
+    const cleared = data?.clearanceStatus === 'CLEARED' || data?.status === 'CLEARED';
     return {
-      status: 'CLEARED',
-      clearanceId: `CLR-${Date.now()}`,
+      status: cleared ? 'CLEARED' : 'REPORTED',
+      clearanceId: data?.clearanceId,
       invoiceHash: ublInvoice.hash,
-      qrCode: ublInvoice.encodedInvoice.substring(0, 100),
-      warnings: [],
-      errors: [],
+      qrCode: data?.qrCode,
+      warnings: data?.warnings ?? [],
+      errors: data?.errors ?? [],
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return {
       status: 'ERROR',
+      invoiceHash: ublInvoice.hash,
       errors: [`Clearance submission failed: ${message}`],
       timestamp: new Date().toISOString(),
     };
