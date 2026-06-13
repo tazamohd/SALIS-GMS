@@ -8,7 +8,7 @@
  */
 import { eq, sql, type SQL } from "drizzle-orm";
 import type { AnyColumn } from "drizzle-orm";
-import { getTenantScope } from "./tenant-context";
+import { getTenantScope, hasTenantScope } from "./tenant-context";
 
 /**
  * Resolve the authoritative garage id for a tenant-scoped query.
@@ -37,13 +37,24 @@ export function resolveScopedGarageId(passed?: string | null): string | null {
 }
 
 /**
- * A Drizzle WHERE condition scoping `column` to the current garage, or matching
- * NOTHING (`false`) when no garage can be resolved. Drop-in replacement for the
- * legacy `if (garageId) conditions.push(eq(col, garageId))` pattern, which left
- * the predicate off entirely — and thus returned all tenants — when garageId
- * was absent.
+ * A Drizzle WHERE condition scoping `column` to the current garage.
+ *
+ * Semantics (deny-by-default within a request, non-disruptive for background work):
+ *  - A Tenant Scope IS established (every `/api` request — Story 1.1 sets at least
+ *    an anonymous scope): constrain to the resolved garage, or match NOTHING
+ *    (`false`) when none resolves (anonymous / tenant user without a garage).
+ *  - NO Tenant Scope at all (background jobs, the workflow engine, seeds):
+ *    honor an explicitly passed id, otherwise do not restrict (`true`). These
+ *    paths are trusted and have no request tenant to scope to.
+ *
+ * Drop-in replacement for the legacy `if (garageId) conditions.push(eq(col, id))`
+ * pattern, which omitted the predicate — and thus returned all tenants — whenever
+ * garageId was absent inside a request.
  */
 export function garageScope(column: AnyColumn, passed?: string | null): SQL {
+  if (!hasTenantScope()) {
+    return passed ? eq(column, passed) : sql`true`;
+  }
   const gid = resolveScopedGarageId(passed);
   return gid ? eq(column, gid) : sql`false`;
 }

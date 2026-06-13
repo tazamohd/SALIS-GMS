@@ -52,19 +52,31 @@ describe("resolveScopedGarageId — deny-by-default precedence", () => {
 });
 
 describe("garageScope — condition shape", () => {
-  it("returns a real equality predicate when a garage resolves", () => {
+  it("returns a real equality predicate when a garage resolves in scope", () => {
     runWithTenantScope(tenant({ garageId: "garage-a" }), () => {
       const cond = garageScope(users.garageId, undefined);
       expect(cond).toBeTruthy();
-      // Equality predicates reference the bound value; a deny predicate does not.
       expect(JSON.stringify(cond)).toContain("garage-a");
     });
   });
 
-  it("returns a match-nothing predicate (no tenant value) when nothing resolves", () => {
+  it("DENIES (match-nothing) inside a scope that resolves no garage (anonymous / no-garage user)", () => {
+    runWithTenantScope(tenant({ garageId: null }), () => {
+      const cond = garageScope(users.garageId, "garage-b"); // passed ignored under tenant scope
+      expect(cond).toBeTruthy();
+      expect(JSON.stringify(cond)).not.toContain("garage-");
+    });
+  });
+
+  it("does NOT restrict when there is no Tenant Scope at all (background jobs)", () => {
     const cond = garageScope(users.garageId, undefined);
     expect(cond).toBeTruthy();
     expect(JSON.stringify(cond)).not.toContain("garage-");
+  });
+
+  it("honors an explicit id in a background (no-scope) context", () => {
+    const cond = garageScope(users.garageId, "garage-d");
+    expect(JSON.stringify(cond)).toContain("garage-d");
   });
 });
 

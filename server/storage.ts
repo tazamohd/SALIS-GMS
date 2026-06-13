@@ -2215,7 +2215,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getJobCard(id: string): Promise<JobCard | undefined> {
-    const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
+    // Existence-hiding: a cross-tenant id resolves to undefined (route returns 404).
+    const [jobCard] = await db.select().from(jobCards)
+      .where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)));
     return jobCard;
   }
 
@@ -2533,7 +2535,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAppointment(id: string): Promise<Appointment | undefined> {
-    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    const [appointment] = await db.select().from(appointments)
+      .where(and(eq(appointments.id, id), garageScope(appointments.garageId)));
     return appointment;
   }
 
@@ -2606,7 +2609,7 @@ export class DatabaseStorage implements IStorage {
 
   async getCustomer(id: string): Promise<User | undefined> {
     const [customer] = await db.select().from(users)
-      .where(eq(users.id, id));
+      .where(and(eq(users.id, id), garageScope(users.garageId)));
     return customer;
   }
 
@@ -2630,7 +2633,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVehicle(id: string): Promise<Vehicle | undefined> {
-    const [vehicle] = await db.select().from(vehicles).where(eq(vehicles.id, id));
+    const [vehicle] = await db.select().from(vehicles)
+      .where(and(eq(vehicles.id, id), garageScope(vehicles.garageId)));
     return vehicle;
   }
 
@@ -2823,7 +2827,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSupplier(id: string): Promise<Supplier | undefined> {
-    const [supplier] = await db.select().from(suppliers).where(eq(suppliers.id, id));
+    const [supplier] = await db.select().from(suppliers)
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)));
     return supplier;
   }
 
@@ -3607,7 +3612,8 @@ export class DatabaseStorage implements IStorage {
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
     const { invoices } = await import("@shared/schema");
-    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, id));
+    const [invoice] = await db.select().from(invoices)
+      .where(and(eq(invoices.id, id), garageScope(invoices.garageId)));
     return invoice;
   }
 
