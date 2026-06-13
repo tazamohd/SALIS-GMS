@@ -315,6 +315,7 @@ export default function Chat() {
     if (selectedConversationId) {
       markAsReadMutation.mutate(selectedConversationId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mutation intentionally excluded
   }, [selectedConversationId, messages]);
 
   useEffect(() => {

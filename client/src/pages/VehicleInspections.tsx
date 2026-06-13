@@ -107,6 +107,7 @@ export default function VehicleInspections() {
       templateForm.setValue("garageId", currentUser.garageId);
       inspectionForm.setValue("garageId", currentUser.garageId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seed form from user once available
   }, [currentUser]);
 
   const createTemplateMutation = useMutation({

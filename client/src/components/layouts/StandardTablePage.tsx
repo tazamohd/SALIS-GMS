@@ -104,6 +104,7 @@ export function StandardTablePage<T extends Record<string, any>>({
         filters.map(f => [f.id, f.defaultValue || "all"])
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialise filter defaults once
   }, []);
 
   // Reinitialize filter state when filter structure or defaults change (not on every render)

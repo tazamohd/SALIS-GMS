@@ -228,6 +228,7 @@ export default function DirectMessages() {
     if (selectedConversationId) {
       markAsReadMutation.mutate(selectedConversationId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mutation intentionally excluded
   }, [selectedConversationId, messages.length]);
 
   useEffect(() => {

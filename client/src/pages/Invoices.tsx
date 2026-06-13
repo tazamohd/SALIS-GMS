@@ -567,6 +567,7 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
         }))
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync from props only
   }, [existingItems, isEdit]);
 
   // Reset form when dialog closes
@@ -578,6 +579,7 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
       setItems([]);
       setCurDesc(""); setCurQty(1); setCurPrice(0); setCurType("service");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset form on open toggle only
   }, [open]);
 
   const { subtotal, tax, total } = calcTotals(items);

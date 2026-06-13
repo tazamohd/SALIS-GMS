@@ -3,7 +3,7 @@ import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { db } from "../db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import type { z } from "zod";
 import { computeMonetaryTotals } from "@shared/vatUtils";
 

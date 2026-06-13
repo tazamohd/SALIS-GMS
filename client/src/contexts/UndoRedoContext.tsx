@@ -32,8 +32,9 @@ export function UndoRedoProvider({ children }: { children: ReactNode }) {
 
   // Cleanup on unmount
   useEffect(() => {
+    const controller = abortControllerRef.current;
     return () => {
-      abortControllerRef.current.abort();
+      controller.abort();
     };
   }, []);
 

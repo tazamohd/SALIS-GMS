@@ -260,6 +260,7 @@ export default function SupportChatDashboard() {
         wsRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect only on ticket/user change
   }, [user, selectedTicket?.conversationId]);
 
   useEffect(() => {

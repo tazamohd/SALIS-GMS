@@ -90,6 +90,7 @@ export default function VoiceCommands() {
         recognitionRef.current.stop();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- processCommand intentionally excluded
   }, [toast, t]);
 
   const processCommand = async (command: string) => {

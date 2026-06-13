@@ -208,6 +208,7 @@ export function CustomerChatWidget() {
         wsRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reconnect only on open/user change
   }, [isOpen, user]);
 
   useEffect(() => {

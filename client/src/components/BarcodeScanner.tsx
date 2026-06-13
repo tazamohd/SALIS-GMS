@@ -35,6 +35,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
     return () => {
       stopCamera();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run on open toggle only
   }, [open]);
 
   const startCamera = async () => {

@@ -55,6 +55,7 @@ export default function AIChatbotAssistant() {
         createConversationMutation.mutate({});
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mutation intentionally excluded
   }, [user, conversationId, loadingConversations, existingConversations]);
 
   const createConversationMutation = useMutation({

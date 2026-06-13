@@ -5881,30 +5881,36 @@ export class DatabaseStorage implements IStorage {
     let count = 0;
 
     switch (module) {
-      case 'jobCards':
+      case 'jobCards': {
         const deleteJobCards = await db.delete(jobCards).where(inArray(jobCards.id, ids));
         count = deleteJobCards.rowCount || 0;
         break;
-      case 'customers':
+      }
+      case 'customers': {
         const deleteCustomers = await db.delete(users).where(inArray(users.id, ids));
         count = deleteCustomers.rowCount || 0;
         break;
-      case 'vehicles':
+      }
+      case 'vehicles': {
         const deleteVehicles = await db.delete(vehicles).where(inArray(vehicles.id, ids));
         count = deleteVehicles.rowCount || 0;
         break;
-      case 'invoices':
+      }
+      case 'invoices': {
         const deleteInvoices = await db.delete(invoices).where(inArray(invoices.id, ids));
         count = deleteInvoices.rowCount || 0;
         break;
-      case 'estimates':
+      }
+      case 'estimates': {
         const deleteEstimates = await db.delete(estimates).where(inArray(estimates.id, ids));
         count = deleteEstimates.rowCount || 0;
         break;
-      case 'spareParts':
+      }
+      case 'spareParts': {
         const deleteSpareParts = await db.delete(spareParts).where(inArray(spareParts.id, ids));
         count = deleteSpareParts.rowCount || 0;
         break;
+      }
       default:
         throw new Error(`Bulk delete not supported for module: ${module}`);
     }
@@ -5916,42 +5922,48 @@ export class DatabaseStorage implements IStorage {
     let count = 0;
 
     switch (module) {
-      case 'jobCards':
+      case 'jobCards': {
         const updateJobCards = await db.update(jobCards)
           .set(data)
           .where(inArray(jobCards.id, ids));
         count = updateJobCards.rowCount || 0;
         break;
-      case 'customers':
+      }
+      case 'customers': {
         const updateCustomers = await db.update(users)
           .set(data)
           .where(inArray(users.id, ids));
         count = updateCustomers.rowCount || 0;
         break;
-      case 'vehicles':
+      }
+      case 'vehicles': {
         const updateVehicles = await db.update(vehicles)
           .set(data)
           .where(inArray(vehicles.id, ids));
         count = updateVehicles.rowCount || 0;
         break;
-      case 'invoices':
+      }
+      case 'invoices': {
         const updateInvoices = await db.update(invoices)
           .set(data)
           .where(inArray(invoices.id, ids));
         count = updateInvoices.rowCount || 0;
         break;
-      case 'estimates':
+      }
+      case 'estimates': {
         const updateEstimates = await db.update(estimates)
           .set(data)
           .where(inArray(estimates.id, ids));
         count = updateEstimates.rowCount || 0;
         break;
-      case 'spareParts':
+      }
+      case 'spareParts': {
         const updateSpareParts = await db.update(spareParts)
           .set(data)
           .where(inArray(spareParts.id, ids));
         count = updateSpareParts.rowCount || 0;
         break;
+      }
       default:
         throw new Error(`Bulk update not supported for module: ${module}`);
     }

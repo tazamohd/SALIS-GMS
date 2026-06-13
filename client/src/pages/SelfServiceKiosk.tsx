@@ -94,6 +94,7 @@ export default function SelfServiceKiosk() {
       resetAll();
     }, 120000); // 2 minutes
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- idle reset keyed on screen only
   }, [screen]);
 
   const resetAll = useCallback(() => {

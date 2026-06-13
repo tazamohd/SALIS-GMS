@@ -91,6 +91,7 @@ export default function PayPalButton({
     };
 
     loadPayPalSDK();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load SDK once on mount
   }, []);
   const initPayPal = async () => {
     try {
