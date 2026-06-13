@@ -51,9 +51,9 @@ development_status:
   3-2-deny-by-default-across-both-route-layers: backlog
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-mfa-enrollment-with-recovery-codes: backlog
-  4-2-mfa-enforcement-at-login: backlog
+  epic-4: in-progress
+  4-1-mfa-enrollment-with-recovery-codes: review
+  4-2-mfa-enforcement-at-login: review
   epic-4-retrospective: optional
 
   epic-5: backlog
