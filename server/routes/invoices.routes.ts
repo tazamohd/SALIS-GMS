@@ -5,8 +5,29 @@ import { storage } from "../storage";
 import { db } from "../db";
 import { eq, desc } from "drizzle-orm";
 import type { z } from "zod";
+import { calculateVAT, SAUDI_VAT_RATE } from "@shared/vatUtils";
 
 const router = Router();
+
+const toNum = (v: any) => parseFloat(String(v ?? "0")) || 0;
+
+// Recompute the monetary totals server-side so Saudi VAT (15%) is always applied
+// correctly and a client cannot submit mismatched tax/total figures (ZATCA/VAT
+// compliance). subtotal/discount/paid are taken from the validated invoice; tax,
+// total and balance are derived. Decimal columns are stored as fixed(2) strings.
+function applyServerVat<T extends Record<string, any>>(data: T): T {
+  const subtotal = toNum(data.subtotal);
+  const discount = toNum(data.discountAmount);
+  const paid = toNum(data.paidAmount);
+  const taxable = Math.max(0, subtotal - discount);
+  const { vatAmount, total } = calculateVAT(taxable, SAUDI_VAT_RATE);
+  return {
+    ...data,
+    taxAmount: vatAmount.toFixed(2),
+    totalAmount: total.toFixed(2),
+    balanceAmount: (total - paid).toFixed(2),
+  };
+}
 
 /**
  * Local helper — mirrors sanitizeZodError from the monolith
@@ -87,10 +108,10 @@ router.post("/invoices", isAuthenticated, async (req: any, res) => {
       return res.status(400).json(sanitizeZodError(validationResult.error));
     }
 
-    const invoiceData = {
+    const invoiceData = applyServerVat({
       ...validationResult.data,
       createdBy: userId,
-    };
+    });
 
     const invoice = await storage.createInvoice(invoiceData as any);
     res.status(201).json(invoice);
@@ -139,14 +160,23 @@ router.post("/invoices/with-items", isAuthenticated, async (req: any, res) => {
         .json(sanitizeArrayValidationErrors(invalidItems as any));
     }
 
-    const invoiceData = {
-      ...invoiceValidation.data,
-      createdBy: userId,
-    };
-
     const validItems = itemsValidation
       .map((v: any) => (v.success ? v.data : null))
       .filter(Boolean);
+
+    // Derive the subtotal from the line items so it can't drift from what's billed,
+    // then enforce VAT server-side.
+    const itemsSubtotal = validItems.reduce(
+      (sum: number, it: any) =>
+        sum + (it.lineTotal != null ? toNum(it.lineTotal) : toNum(it.unitPrice) * toNum(it.quantity)),
+      0,
+    );
+
+    const invoiceData = applyServerVat({
+      ...invoiceValidation.data,
+      subtotal: itemsSubtotal.toFixed(2),
+      createdBy: userId,
+    });
 
     const createdInvoice = await storage.createInvoiceWithItems(
       invoiceData as any,
