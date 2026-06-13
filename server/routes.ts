@@ -5765,7 +5765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error("Error creating payment intent:", error);
-      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+      res.status(500).json({ message: "Failed to create payment intent" });
     }
   });
 
@@ -9402,7 +9402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error setting up 2FA:", error);
-      res.status(500).json({ message: "Failed to setup 2FA", error: error.message });
+      res.status(500).json({ message: "Failed to setup 2FA" });
     }
   });
   
@@ -9434,7 +9434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "2FA enabled successfully", twoFactorAuth: updated });
     } catch (error: any) {
       console.error("Error enabling 2FA:", error);
-      res.status(500).json({ message: "Failed to enable 2FA", error: error.message });
+      res.status(500).json({ message: "Failed to enable 2FA" });
     }
   });
   
@@ -9494,7 +9494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error verifying 2FA:", error);
-      res.status(500).json({ message: "Failed to verify 2FA", error: error.message });
+      res.status(500).json({ message: "Failed to verify 2FA" });
     }
   });
   
@@ -9505,7 +9505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "2FA disabled successfully" });
     } catch (error: any) {
       console.error("Error disabling 2FA:", error);
-      res.status(500).json({ message: "Failed to disable 2FA", error: error.message });
+      res.status(500).json({ message: "Failed to disable 2FA" });
     }
   });
   

@@ -12,7 +12,7 @@
 
 SALIS-GMS has solid security scaffolding (bcrypt password hashing, parameterized Drizzle queries, a constant-time CSRF token comparator, an RBAC engine, security headers, audit-log redaction, required `SESSION_SECRET`/`DATABASE_URL` at boot). The dominant risk pattern is **security controls that are defined but not wired in**, plus **authorization that trusts client-supplied identifiers**. The most serious issues — an unauthenticated, unverified Stripe webhook; tenant isolation keyed on a client-controlled `garage_id`; unauthenticated document endpoints; and unauthenticated payment routes — were directly exploitable. These have been remediated. CSRF enforcement, RBAC middleware activation, and 2FA-at-login remain as staged follow-ups.
 
-**Overall risk before this change: CRITICAL. After the applied fixes: HIGH** (residual risk concentrated in the staged CSRF/RBAC/2FA items).
+**Overall risk before this change: CRITICAL. After the applied fixes: MEDIUM** — the unauthenticated/cross-tenant/payment-integrity and CSRF issues are resolved; residual risk is concentrated in 2FA-at-login (F6, needs client) and the default-deny safety net (F15, needs a route audit).
 
 ---
 
@@ -29,16 +29,16 @@ SALIS-GMS has solid security scaffolding (bcrypt password hashing, parameterized
 | F11 | No password complexity check on `/api/register` | Medium | ✅ Fixed |
 | F13 | Strict auth rate limiter missed the modular `/api/auth/*` + customer-portal login | Medium | ✅ Fixed |
 | F14 | Request logger serialized full response bodies (incl. auth) to logs | Medium | ✅ Fixed (sensitive paths redacted) |
-| F2 | CSRF middleware defined but never mounted | Critical | ⏳ Follow-up |
-| F5 | RBAC `loadUserPermissions` never mounted → `requirePermission` inert | High | ⏳ Follow-up |
-| F6 | 2FA never enforced during login | High | ⏳ Follow-up |
-| F15 | `requireAuthByDefault` gate never mounted (fail-open default) | Medium | ⏳ Follow-up |
-| F10 | Cross-tenant bulk export/backup (no garage scoping) | High | ⏳ Follow-up |
-| F16 | `requireRole` uses an unmanaged `user.role` string parallel to RBAC tables | Medium | ⏳ Follow-up |
-| F12 | 2FA secret + backup codes stored in plaintext | Medium | ⏳ Follow-up |
-| F17 | Raw `error.message` returned to clients in some payment/2FA handlers | Low | ⏳ Follow-up |
-| F18 | `loadUserPermissions` fails open on DB error | Low | ⏳ Follow-up |
-| F19 | Dead `customer-portal.ts` defines unauth IDOR endpoints (not mounted) | Info | ⏳ Follow-up |
+| F2 | CSRF middleware defined but never mounted | Critical | ✅ Fixed |
+| F10 | Cross-tenant bulk export/backup (no garage scoping) | High | ✅ Fixed |
+| F17 | Raw `error.message` returned to clients in some payment/2FA handlers | Low | ✅ Fixed |
+| F19 | Dead `customer-portal.ts` defines unauth IDOR endpoints (not mounted) | Info | ✅ Removed |
+| F6 | 2FA never enforced during login | High | ⏳ Follow-up (needs client) |
+| F12 | 2FA secret + backup codes stored in plaintext | Medium | ⏳ Follow-up (with F6) |
+| F15 | `requireAuthByDefault` gate never mounted (fail-open default) | Medium | ⏳ Follow-up (route audit) |
+| F16 | `requireRole` uses an unmanaged `user.role` string parallel to RBAC tables | Medium | ⏳ Follow-up (refactor) |
+| F5 | RBAC `loadUserPermissions` never mounted → `requirePermission` inert | High | N/A — dead code (0 usages) |
+| F18 | `loadUserPermissions` fails open on DB error | Low | N/A — dead code (0 usages) |
 
 ---
 
@@ -71,33 +71,35 @@ SALIS-GMS has solid security scaffolding (bcrypt password hashing, parameterized
 ### F14 — Sensitive response bodies in logs (Medium)
 `server/index.ts` — the request logger no longer serializes response bodies for auth/security/payment paths (`/api/login`, `/api/register`, `/api/auth`, `/api/customer-portal/login`, `/api/security`, `/api/stripe`, `/paypal`).
 
+### F2 — CSRF protection mounted and enforced (Critical)
+`generateCsrfToken` + `validateCsrfToken` are now mounted in `setupAuth` (after `passport.session`, before routes) and `GET /api/csrf-token` is exposed. Design choice: the validator only enforces a token for requests **authenticated via the passport session cookie** — the only credential a cross-site attacker can ride. Public endpoints, server-to-server webhooks, the separately-authenticated customer portal, and kiosk walk-ins carry no ambient session and are therefore not subject to CSRF, which avoids a fragile public-route allowlist. Logout is exempt (forced logout is a nuisance, not a breach). The React client installs a global `fetch` interceptor (`client/src/lib/csrf.ts`, wired in `main.tsx`) that fetches the per-session token once and attaches `x-csrf-token` to every same-origin mutating request — covering both `apiRequest` and direct `fetch`. Authenticated test agents carry the token (`server/__tests__/helpers.ts`); `server/__tests__/csrf.test.ts` locks in the contract.
+
+### F10 — Export/backup scoped to the tenant (High)
+`server/routes/export.ts` (`/export/csv/:type`) and `server/routes/backup.ts` (`/backup/export/:type`) now derive `garageId` from `req.user` (403 if absent) and filter every tenant-scoped query (`users`, `invoices`, `jobCards`, `vehicles`, `appointments`) by garage. `spareParts` is a shared, non-PII catalog (no `garage_id`) and is intentionally not filtered.
+
+### F17 — Generic error responses (Low)
+The Stripe payment-intent handler and the four 2FA handlers (`setup`/`enable`/`verify`/`disable`) no longer echo `error.message` to clients; details are logged server-side only.
+
+### F19 — Dead unauthenticated IDOR file removed (Info)
+`server/routes/customer-portal.ts` — an unmounted file defining unauthenticated `/api/portal/*` endpoints keyed only on a path `customerId` — has been deleted. (The live portal is the inline, `portalAuth`-gated `/api/customer-portal/*` in `routes.ts`.)
+
 ---
 
-## Staged follow-ups (require coordinated client + test changes)
+## Remaining follow-ups (deliberately not auto-applied)
 
-These are real and should be prioritized, but cannot be safely landed in isolation.
+These require either browser end-to-end verification (which the server test suite cannot provide) or a product decision, so they are documented rather than pushed blind.
 
-### F2 — Mount CSRF protection (Critical)
-`server/middleware/csrf.ts` is complete but never mounted. Enforcing it requires:
-1. `app.use(generateCsrfToken)` after session init and `app.use(validateCsrfToken)` before routes, plus exposing `csrfTokenRoute` at `/api/csrf-token`.
-2. The React client (central fetch/`queryClient`) must fetch the token and send it as `x-csrf-token` on all mutating requests.
-3. The test helpers (`server/__tests__/helpers.ts`) must fetch and attach the token for authenticated agents.
-Landing only step 1 would 403 every mutating request from the client **and** turn the test suite red — hence it is staged.
+### F6 / F12 — Enforce and protect 2FA (High / Medium) — needs client
+Login (`server/routes.ts`) authenticates on password alone; 2FA is never checked. Enforcing it needs a pending-2FA session state **and** a coordinated client login step (a 2FA challenge screen). Enabling server enforcement without the client change would lock out every 2FA-enabled user with no way to complete the challenge. Bundle with F12: encrypt the TOTP secret at rest (with a backward-compatible read path for any legacy plaintext) and store only hashes of backup codes.
 
-### F5 / F15 — Activate RBAC and default-deny (High / Medium)
-`loadUserPermissions` (`server/rbac-middleware.ts`) and `requireAuthByDefault` (`server/middleware/defaultAuth.ts`) are never mounted, so `requirePermission`/`requireRole` from the RBAC module cannot function and the API is fail-open. Mounting them globally requires auditing every route for the permissions it should enforce and providing an explicit public allowlist, or it will break legitimate access.
+### F15 — Default-deny gate (Medium) — needs a route audit
+`requireAuthByDefault` (`server/middleware/defaultAuth.ts`) would add defense-in-depth, but mounting it globally requires a complete public-route allowlist. Concrete gaps found in the current allowlist that would break if it were mounted as-is: `/api/stripe/webhook` (server-to-server), `/api/login` & `/api/register` (legacy), `/api/plans`, `/api/customer-portal/*` (separate auth), and the public `/api/kiosk/check-in` / `/api/kiosk/walk-in`. Because a missed public route fails silently (users break, server tests stay green), this needs a deliberate audit before mounting.
 
-### F6 / F12 — Enforce and protect 2FA (High / Medium)
-Login (`server/routes.ts`) authenticates on password alone; 2FA is never checked. Enforcing it needs a pending-2FA session state and a coordinated client login step. Separately, TOTP secrets and backup codes are stored in plaintext — encrypt the secret at rest and store only hashes of backup codes.
+### F16 — Consolidate the role model (Medium) — refactor
+Authorization actually runs through `server/middleware/requireRole.ts` (a string `user.role`), which is functional. The richer RBAC tables are a parallel model; consolidating onto them is a non-trivial refactor, not a point fix.
 
-### F10 — Scope export/backup to the tenant (High)
-`server/routes/export.ts` and `server/routes/backup.ts` select across all garages. Scope every query to `req.user.garageId`; reserve any cross-tenant export for a true platform-admin role.
-
-### F16 — Consolidate the role model (Medium)
-`server/middleware/requireRole.ts` derives roles from a free-form `user.role` string, parallel to (and weaker than) the RBAC tables. Consolidate on the DB-backed RBAC roles.
-
-### F17 / F18 / F19 — Hardening (Low / Info)
-Return generic error messages (log details server-side); decide whether `loadUserPermissions` should fail closed once wired; delete the dead `server/routes/customer-portal.ts` (or secure it before it is ever mounted).
+### F5 / F18 — RBAC permission engine (N/A — dead code)
+`server/rbac-middleware.ts` (`loadUserPermissions` / `requirePermission`) has **zero call sites** in the route tree (verified by grep). It is unused scaffolding, not an active gap — wiring it would be net-new feature work, not a fix. Either adopt it deliberately across routes or remove it.
 
 ---
 

@@ -5,6 +5,7 @@ import { db } from '../db';
 import { storage } from '../storage';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
 import { sql, eq, count } from 'drizzle-orm';
+// NOTE: `eq` is used below to scope export queries to the caller's garage.
 
 const router = Router();
 
@@ -106,6 +107,11 @@ router.get('/backup/list', isAuthenticated, requireAdmin, async (_req, res) => {
 router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
     const { type } = req.params;
+    // Scope every export to the admin's own garage — never dump other tenants.
+    const garageId = (req.user as any)?.garageId;
+    if (!garageId) {
+      return res.status(403).json({ error: 'No garage associated with this account' });
+    }
     let data: any[];
 
     switch (type) {
@@ -122,6 +128,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: users.createdAt,
           })
           .from(users)
+          .where(eq(users.garageId, garageId))
           .limit(5000);
         break;
       }
@@ -143,6 +150,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: invoices.createdAt,
           })
           .from(invoices)
+          .where(eq(invoices.garageId, garageId))
           .limit(5000);
         break;
       }
@@ -162,6 +170,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             completedAt: jobCards.completedAt,
           })
           .from(jobCards)
+          .where(eq(jobCards.garageId, garageId))
           .limit(5000);
         break;
       }
@@ -177,6 +186,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             isActive: spareParts.isActive,
             createdAt: spareParts.createdAt,
           })
+                    // spareParts is a shared catalog (no garage_id) and carries no tenant PII.
           .from(spareParts)
           .limit(5000);
         break;
@@ -196,6 +206,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: appointments.createdAt,
           })
           .from(appointments)
+          .where(eq(appointments.garageId, garageId))
           .limit(5000);
         break;
       }
@@ -215,6 +226,7 @@ router.get('/backup/export/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: vehicles.createdAt,
           })
           .from(vehicles)
+          .where(eq(vehicles.garageId, garageId))
           .limit(5000);
         break;
       }
