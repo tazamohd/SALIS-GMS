@@ -230,6 +230,7 @@ import {
   type ExportJob,
   type InsertExportJob,
   employeeAttendance,
+  timeClockEntries,
   shiftTemplates,
   shiftAssignments,
   commissionRules,
@@ -2342,15 +2343,70 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(jobCards.createdAt));
   }
 
-  async getTechnicianTimeClockEntries(technicianId: string): Promise<any[]> {
-    // TODO: Create timeClockEntries table in schema
-    // For now, return empty array
-    return [];
+  async getTechnicianTimeClockEntries(technicianId: string, garageId?: string): Promise<any[]> {
+    const conditions = [eq(timeClockEntries.employeeId, technicianId)];
+    if (garageId) {
+      conditions.push(eq(timeClockEntries.garageId, garageId));
+    }
+    return await db.select()
+      .from(timeClockEntries)
+      .where(and(...conditions))
+      .orderBy(desc(timeClockEntries.clockInTime));
+  }
+
+  // The currently-open (not yet clocked-out) entry for an employee, if any.
+  async getOpenTimeClockEntry(employeeId: string, garageId?: string): Promise<any | undefined> {
+    const conditions = [
+      eq(timeClockEntries.employeeId, employeeId),
+      isNull(timeClockEntries.clockOutTime),
+    ];
+    if (garageId) {
+      conditions.push(eq(timeClockEntries.garageId, garageId));
+    }
+    const [entry] = await db.select()
+      .from(timeClockEntries)
+      .where(and(...conditions))
+      .orderBy(desc(timeClockEntries.clockInTime));
+    return entry;
+  }
+
+  async getTimeClockEntry(id: string, garageId?: string): Promise<any | undefined> {
+    const conditions = [eq(timeClockEntries.id, id)];
+    if (garageId) {
+      conditions.push(eq(timeClockEntries.garageId, garageId));
+    }
+    const [entry] = await db.select().from(timeClockEntries).where(and(...conditions));
+    return entry;
   }
 
   async createTimeClockEntry(data: any): Promise<any> {
-    // TODO: Implement after timeClockEntries table is created
-    return data;
+    const [entry] = await db.insert(timeClockEntries).values({
+      ...data,
+      clockInTime: data.clockInTime ? new Date(data.clockInTime) : new Date(),
+    }).returning();
+    return entry;
+  }
+
+  // Clock out an open entry: stamp clockOutTime and compute totalHours / overtimeHours
+  // (mirrors the employeeAttendance.clockOut hours math). Overtime = hours beyond 8.
+  async clockOutTimeClockEntry(id: string, garageId?: string): Promise<any | undefined> {
+    const entry = await this.getTimeClockEntry(id, garageId);
+    if (!entry) return undefined;
+    if (entry.clockOutTime) return entry; // already clocked out — idempotent
+
+    const now = new Date();
+    const clockInTime = new Date(entry.clockInTime);
+    const breakMinutes = entry.breakDuration || 0;
+    const workedMinutes = (now.getTime() - clockInTime.getTime()) / (1000 * 60) - breakMinutes;
+    const totalHoursNum = Math.max(0, workedMinutes / 60);
+    const totalHours = totalHoursNum.toFixed(2);
+    const overtimeHours = Math.max(0, totalHoursNum - 8).toFixed(2);
+
+    const [updated] = await db.update(timeClockEntries)
+      .set({ clockOutTime: now, totalHours, overtimeHours })
+      .where(eq(timeClockEntries.id, id))
+      .returning();
+    return updated;
   }
 
   // Task Assignment operations

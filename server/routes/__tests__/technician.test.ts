@@ -6,12 +6,14 @@ import { loginAsAdmin } from "../../__tests__/helpers";
 
 let app: Express;
 let agent: supertest.Agent;
+let userId: string;
 
 beforeAll(async () => {
   const result = await createTestApp();
   app = result.app;
   const login = await loginAsAdmin(app);
   agent = login.agent;
+  userId = login.user?.id;
 });
 
 describe('Technician Mobile API', () => {
@@ -72,6 +74,45 @@ describe('Technician Mobile API', () => {
         expect(res.body).toHaveProperty('stats');
         expect(res.body.stats).toHaveProperty('totalJobs');
       }
+    });
+  });
+
+  describe('Time clock (/api/technicians/:technicianId/time-clock)', () => {
+    let entryId: string;
+
+    it('clock-in creates an open, garage-scoped entry', async () => {
+      const res = await agent.post(`/api/technicians/${userId}/time-clock`).send({});
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body.employeeId).toBe(userId);
+      expect(res.body.garageId).toBeTruthy();
+      expect(res.body.clockInTime).toBeTruthy();
+      expect(res.body.clockOutTime).toBeNull();
+      entryId = res.body.id;
+    });
+
+    it('lists only this technician\'s entries', async () => {
+      const res = await agent.get(`/api/technicians/${userId}/time-clock`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body.every((e: any) => e.employeeId === userId)).toBe(true);
+    });
+
+    it('clock-out stamps clockOutTime and computes totalHours', async () => {
+      const res = await agent.patch(
+        `/api/technicians/${userId}/time-clock/${entryId}/clock-out`,
+      );
+      expect(res.status).toBe(200);
+      expect(res.body.clockOutTime).toBeTruthy();
+      expect(res.body.totalHours).not.toBeNull();
+    });
+
+    it('clock-out on a missing entry returns 404', async () => {
+      const res = await agent.patch(
+        `/api/technicians/${userId}/time-clock/00000000-0000-0000-0000-000000000000/clock-out`,
+      );
+      expect(res.status).toBe(404);
     });
   });
 });

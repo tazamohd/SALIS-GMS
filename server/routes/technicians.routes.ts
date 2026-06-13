@@ -1,8 +1,26 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { insertTimeClockEntrySchema } from "@shared/schema";
+import { z } from "zod";
 
 const router = Router();
+
+function sanitizeZodError(error: z.ZodError) {
+  return {
+    message: "Validation failed",
+    errors: error.errors.map((err) => ({
+      field: err.path.join("."),
+      message: err.message,
+    })),
+  };
+}
+
+// Body fields the client may supply when clocking in; server controls garageId/employeeId
+// (insertTimeClockEntrySchema already omits id + createdAt). clockInTime defaults to now.
+const createTimeClockEntrySchema = insertTimeClockEntrySchema
+  .omit({ garageId: true, employeeId: true })
+  .partial({ clockInTime: true });
 
 // Get all technicians
 router.get("/technicians", isAuthenticated, async (req, res) => {
@@ -94,11 +112,12 @@ router.get("/technicians/:technicianId/job-cards", isAuthenticated, async (req, 
   }
 });
 
-// Get technician's time clock entries
-router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+// Get technician's time clock entries (tenant-scoped)
+router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req: any, res) => {
   try {
     const { technicianId } = req.params;
-    const entries = await storage.getTechnicianTimeClockEntries(technicianId);
+    const garageId = req.user?.garageId;
+    const entries = await storage.getTechnicianTimeClockEntries(technicianId, garageId);
     res.json(entries);
   } catch (error) {
     console.error("Error fetching time clock entries:", error);
@@ -106,20 +125,58 @@ router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req,
   }
 });
 
-// POST clock in/out
-router.post("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+// POST clock in — creates a new open time clock entry for the technician
+router.post("/technicians/:technicianId/time-clock", isAuthenticated, async (req: any, res) => {
   try {
     const { technicianId } = req.params;
-    const entryData = {
-      ...req.body,
-      technicianId,
-    };
-    const entry = await storage.createTimeClockEntry(entryData);
+    const garageId = req.user?.garageId;
+    if (!garageId) {
+      return res.status(400).json({ message: "User has no garage assigned" });
+    }
+
+    const parsed = createTimeClockEntrySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json(sanitizeZodError(parsed.error));
+    }
+
+    // Prevent a second clock-in while a shift is already open.
+    const open = await storage.getOpenTimeClockEntry(technicianId, garageId);
+    if (open) {
+      return res
+        .status(409)
+        .json({ message: "Technician is already clocked in", entry: open });
+    }
+
+    const entry = await storage.createTimeClockEntry({
+      ...parsed.data,
+      employeeId: technicianId,
+      garageId,
+    });
     res.status(201).json(entry);
   } catch (error) {
     console.error("Error creating time clock entry:", error);
     res.status(500).json({ message: "Failed to create time clock entry" });
   }
 });
+
+// PATCH clock out — stamps clock-out time and computes total/overtime hours (tenant-scoped)
+router.patch(
+  "/technicians/:technicianId/time-clock/:entryId/clock-out",
+  isAuthenticated,
+  async (req: any, res) => {
+    try {
+      const { entryId } = req.params;
+      const garageId = req.user?.garageId;
+      const updated = await storage.clockOutTimeClockEntry(entryId, garageId);
+      if (!updated) {
+        return res.status(404).json({ message: "Time clock entry not found" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error clocking out time clock entry:", error);
+      res.status(500).json({ message: "Failed to clock out" });
+    }
+  },
+);
 
 export const technicianRoutes = router;

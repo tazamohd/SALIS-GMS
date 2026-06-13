@@ -767,140 +767,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Smart Search API - searches across customers, vehicles, parts, invoices, job cards, appointments
-  app.get('/api/search', isAuthenticated, async (req: any, res) => {
-    try {
-      const query = (req.query.q as string || '').toLowerCase().trim();
-      if (query.length < 2) {
-        return res.json([]);
-      }
-      
-      const results: Array<{id: string, type: string, title: string, subtitle: string, href: string}> = [];
-      const limit = 5; // Limit per category
-      
-      // Search customers
-      const customers = await storage.getCustomers();
-      const matchingCustomers = customers
-        .filter((c: any) => 
-          c.fullName?.toLowerCase().includes(query) ||
-          c.email?.toLowerCase().includes(query) ||
-          c.phone?.includes(query)
-        )
-        .slice(0, limit);
-      matchingCustomers.forEach((c: any) => {
-        results.push({
-          id: c.id,
-          type: 'customer',
-          title: c.fullName || c.email,
-          subtitle: c.phone || c.email,
-          href: `/customers?id=${c.id}`
-        });
-      });
-      
-      // Search vehicles
-      const vehicles = await storage.getVehicles();
-      const matchingVehicles = vehicles
-        .filter((v: any) => 
-          v.licensePlate?.toLowerCase().includes(query) ||
-          v.vin?.toLowerCase().includes(query) ||
-          v.make?.toLowerCase().includes(query) ||
-          v.model?.toLowerCase().includes(query)
-        )
-        .slice(0, limit);
-      matchingVehicles.forEach((v: any) => {
-        results.push({
-          id: v.id,
-          type: 'vehicle',
-          title: `${v.make} ${v.model} (${v.year || ''})`,
-          subtitle: v.licensePlate || v.vin || 'No plate',
-          href: `/vehicles?id=${v.id}`
-        });
-      });
-      
-      // Search spare parts
-      const parts = await storage.getSpareParts();
-      const matchingParts = parts
-        .filter((p: any) => 
-          p.partNumber?.toLowerCase().includes(query) ||
-          p.name?.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query)
-        )
-        .slice(0, limit);
-      matchingParts.forEach((p: any) => {
-        results.push({
-          id: p.id,
-          type: 'part',
-          title: p.name || p.partNumber,
-          subtitle: `${p.partNumber} - $${p.unitPrice || 0}`,
-          href: `/inventory?id=${p.id}`
-        });
-      });
-      
-      // Search invoices
-      const allInvoices = await storage.getInvoices();
-      const matchingInvoices = allInvoices
-        .filter((inv: any) => 
-          inv.invoiceNumber?.toLowerCase().includes(query) ||
-          inv.id?.includes(query)
-        )
-        .slice(0, limit);
-      matchingInvoices.forEach((inv: any) => {
-        results.push({
-          id: inv.id,
-          type: 'invoice',
-          title: inv.invoiceNumber || `Invoice #${inv.id.substring(0, 8)}`,
-          subtitle: `$${inv.totalAmount || 0} - ${inv.status}`,
-          href: `/invoices?id=${inv.id}`
-        });
-      });
-      
-      // Search job cards
-      const allJobCards = await storage.getJobCards();
-      const matchingJobCards = allJobCards
-        .filter((jc: any) => {
-          const vehicleInfo = jc.vehicleInfo as any;
-          return jc.id?.toLowerCase().includes(query) ||
-            jc.serviceType?.toLowerCase().includes(query) ||
-            vehicleInfo?.make?.toLowerCase().includes(query) ||
-            vehicleInfo?.model?.toLowerCase().includes(query) ||
-            vehicleInfo?.customerName?.toLowerCase().includes(query);
-        })
-        .slice(0, limit);
-      matchingJobCards.forEach((jc: any) => {
-        const vehicleInfo = jc.vehicleInfo as any;
-        results.push({
-          id: jc.id,
-          type: 'jobcard',
-          title: `Job #${jc.id.substring(0, 8).toUpperCase()}`,
-          subtitle: `${vehicleInfo?.make || ''} ${vehicleInfo?.model || ''} - ${jc.status}`,
-          href: `/job-cards?id=${jc.id}`
-        });
-      });
-      
-      // Search appointments
-      const appointments = await storage.getAppointments();
-      const matchingAppointments = appointments
-        .filter((apt: any) => 
-          apt.notes?.toLowerCase().includes(query) ||
-          apt.serviceType?.toLowerCase().includes(query)
-        )
-        .slice(0, limit);
-      matchingAppointments.forEach((apt: any) => {
-        results.push({
-          id: apt.id,
-          type: 'appointment',
-          title: apt.serviceType || 'Appointment',
-          subtitle: apt.scheduledDate ? new Date(apt.scheduledDate).toLocaleDateString() : 'No date',
-          href: `/appointments?id=${apt.id}`
-        });
-      });
-      
-      res.json(results.slice(0, 20)); // Overall limit
-    } catch (error) {
-      console.error("Error in search API:", error);
-      res.status(500).json({ message: "Search failed" });
-    }
-  });
+  // Smart Search API (/api/search) is served by the modular, tenant-scoped
+  // `server/routes/misc.routes.ts` (mounted ahead of this monolith in routes/index.ts).
 
   // Garage management routes
   app.get('/api/garages', isAuthenticated, async (req, res) => {
@@ -6344,12 +6212,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Global Search
   app.get('/api/global-search', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, query, modules } = req.query;
-      
+      const { query, modules } = req.query;
+      // Always scope to the caller's garage; never trust a client-supplied garageId
+      // (prevents cross-tenant search). Fall back to the query param only when the
+      // session has no garage assigned (e.g. platform-level accounts).
+      const garageId = req.user?.garageId || req.query.garageId;
+
       if (!garageId || !query) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
-      
+
       const modulesList = modules ? modules.split(',') : undefined;
       const results = await storage.globalSearch(garageId, query, modulesList);
       res.json(results);

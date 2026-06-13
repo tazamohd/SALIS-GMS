@@ -44,9 +44,10 @@ import { vehicleRoutes } from "./vehicles.routes";
 import { jobCardsRoutes } from "./jobcards.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
-// miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
-// stubs returning empty arrays/messages, shadowing real monolith handlers for
-// /api/search, /api/tools, /api/service-templates, /api/notifications, /api/backup.
+import { miscRoutes } from "./misc.routes";
+// NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
+// /api/tools, /api/service-templates, /api/notifications and /api/backup remain
+// served by the legacy monolith until they are migrated in later sprints.
 
 // Routes for the 8 completed "half-real" pages (mobile devices, smart contracts,
 // AI repair guide, AI predictions, perf analytics, demand forecasting,
@@ -241,6 +242,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", settingsRoutes);
   console.log("✅ Settings Routes Loaded");
 
+  // Smart search (tenant-scoped) — mounted ahead of the monolith
+  app.use("/api", miscRoutes);
+  console.log("✅ Misc (Search) Routes Loaded");
+
   // Completed half-real page endpoints
   app.use("/api", mobileDevicesRoutes);
   console.log("✅ Mobile Devices Routes Loaded");
@@ -260,8 +265,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ OBD Diagnostics Routes Loaded");
   app.use("/api", subscriptionsRoutes);
   console.log("✅ Subscriptions Routes Loaded");
-
-  // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
