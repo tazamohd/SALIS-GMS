@@ -53,3 +53,7 @@ export * from "../client/src/components/ui/toaster";
 export * from "../client/src/components/ui/toggle-group";
 export * from "../client/src/components/ui/toggle";
 export * from "../client/src/components/ui/tooltip";
+
+// Toast state lives in this hook module — exporting it from the bundle lets
+// previews and designs fire toasts against the same instance Toaster reads.
+export { useToast, toast } from "../client/src/hooks/use-toast";
