@@ -47,3 +47,45 @@ export function garageScope(column: AnyColumn, passed?: string | null): SQL {
   const gid = resolveScopedGarageId(passed);
   return gid ? eq(column, gid) : sql`false`;
 }
+
+/**
+ * Record a detected cross-tenant access/mutation attempt (an "Isolation Leak"
+ * attempt). For now this emits a structured, greppable/monitorable warning;
+ * Story 5.1 wires this single hook into the immutable audit pipeline so the
+ * event becomes a durable, tenant-attributed Audit Event.
+ */
+export function recordIsolationLeakAttempt(detail: {
+  action: "create" | "update" | "delete" | "read";
+  table?: string;
+  suppliedGarageId?: string | null;
+  scopedGarageId?: string | null;
+  id?: string;
+}): void {
+  const scope = getTenantScope();
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[ISOLATION-LEAK]",
+    JSON.stringify({
+      ...detail,
+      userId: scope?.userId ?? null,
+      isPlatformPrincipal: scope?.isPlatformPrincipal ?? false,
+      ts: new Date().toISOString(),
+    }),
+  );
+}
+
+/**
+ * Stamp the authoritative garage id onto a create payload, server-side. Any
+ * client-supplied garageId that differs from the request's Tenant Scope is
+ * IGNORED (no client-controlled tenancy, FR-2) and recorded as an Isolation
+ * Leak attempt. When no scope can be resolved (e.g. background jobs) the
+ * provided value is preserved.
+ */
+export function stampGarageId<T extends { garageId?: string | null }>(data: T, table?: string): T {
+  const supplied = data?.garageId ?? null;
+  const scoped = resolveScopedGarageId(supplied);
+  if (supplied && scoped && supplied !== scoped) {
+    recordIsolationLeakAttempt({ action: "create", table, suppliedGarageId: supplied, scopedGarageId: scoped });
+  }
+  return { ...data, garageId: scoped ?? supplied };
+}

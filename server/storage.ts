@@ -765,7 +765,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
-import { garageScope } from "./tenancy/tenant-guard";
+import { garageScope, stampGarageId } from "./tenancy/tenant-guard";
 import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
@@ -2259,12 +2259,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createJobCard(data: any): Promise<JobCard> {
-    const [jobCard] = await db.insert(jobCards).values(data).returning();
+    const [jobCard] = await db.insert(jobCards).values(stampGarageId(data, "job_cards")).returning();
     return jobCard;
   }
 
   async updateJobCard(id: string, data: any): Promise<JobCard> {
-    const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
+    // Scope the mutation to the caller's garage: a cross-tenant id affects 0 rows.
+    const [jobCard] = await db.update(jobCards).set(data)
+      .where(and(eq(jobCards.id, id), garageScope(jobCards.garageId)))
+      .returning();
     return jobCard;
   }
 
@@ -2536,10 +2539,10 @@ export class DatabaseStorage implements IStorage {
 
   async createAppointment(data: Omit<InsertAppointment, 'appointmentNumber' | 'id'>): Promise<Appointment> {
     const appointmentNumber = `APT-${Date.now()}`;
-    const [appointment] = await db.insert(appointments).values({
+    const [appointment] = await db.insert(appointments).values(stampGarageId({
       ...data,
       appointmentNumber,
-    }).returning();
+    }, "appointments")).returning();
     return appointment;
   }
 
@@ -2547,12 +2550,12 @@ export class DatabaseStorage implements IStorage {
     const [appointment] = await db.update(appointments).set({
       ...data,
       updatedAt: new Date()
-    }).where(eq(appointments.id, id)).returning();
+    }).where(and(eq(appointments.id, id), garageScope(appointments.garageId))).returning();
     return appointment;
   }
 
   async deleteAppointment(id: string): Promise<void> {
-    await db.delete(appointments).where(eq(appointments.id, id));
+    await db.delete(appointments).where(and(eq(appointments.id, id), garageScope(appointments.garageId)));
   }
 
   async updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment> {
@@ -2632,7 +2635,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVehicle(data: InsertVehicle): Promise<Vehicle> {
-    const [vehicle] = await db.insert(vehicles).values(data).returning();
+    const [vehicle] = await db.insert(vehicles).values(stampGarageId(data, "vehicles")).returning();
     return vehicle;
   }
 
@@ -2640,12 +2643,13 @@ export class DatabaseStorage implements IStorage {
     const [vehicle] = await db.update(vehicles).set({
       ...data,
       updatedAt: new Date()
-    }).where(eq(vehicles.id, id)).returning();
+    }).where(and(eq(vehicles.id, id), garageScope(vehicles.garageId))).returning();
     return vehicle;
   }
 
   async deleteVehicle(id: string): Promise<void> {
-    await db.update(vehicles).set({ isActive: false }).where(eq(vehicles.id, id));
+    await db.update(vehicles).set({ isActive: false })
+      .where(and(eq(vehicles.id, id), garageScope(vehicles.garageId)));
   }
 
   // Vehicle Service History - Module 22 Enhancements
@@ -2824,14 +2828,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSupplier(data: InsertSupplier): Promise<Supplier> {
-    const [supplier] = await db.insert(suppliers).values(data).returning();
+    const [supplier] = await db.insert(suppliers).values(stampGarageId(data, "suppliers")).returning();
     return supplier;
   }
 
   async updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
     const [supplier] = await db.update(suppliers)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(suppliers.id, id))
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)))
       .returning();
     return supplier;
   }
@@ -2839,7 +2843,7 @@ export class DatabaseStorage implements IStorage {
   async deleteSupplier(id: string): Promise<void> {
     await db.update(suppliers)
       .set({ isActive: false })
-      .where(eq(suppliers.id, id));
+      .where(and(eq(suppliers.id, id), garageScope(suppliers.garageId)));
   }
 
   async getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]> {
@@ -3611,7 +3615,7 @@ export class DatabaseStorage implements IStorage {
     const { invoices } = await import("@shared/schema");
     const invoiceNumber = `INV-${Date.now()}`;
     const [invoice] = await db.insert(invoices)
-      .values({ ...data, invoiceNumber })
+      .values(stampGarageId({ ...data, invoiceNumber }, "invoices"))
       .returning();
     return invoice;
   }
@@ -3620,14 +3624,14 @@ export class DatabaseStorage implements IStorage {
     const { invoices } = await import("@shared/schema");
     const [invoice] = await db.update(invoices)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(invoices.id, id))
+      .where(and(eq(invoices.id, id), garageScope(invoices.garageId)))
       .returning();
     return invoice;
   }
 
   async deleteInvoice(id: string): Promise<void> {
     const { invoices } = await import("@shared/schema");
-    await db.delete(invoices).where(eq(invoices.id, id));
+    await db.delete(invoices).where(and(eq(invoices.id, id), garageScope(invoices.garageId)));
   }
 
   async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {

@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { resolveScopedGarageId, garageScope } from "../tenant-guard";
+import { describe, it, expect, vi } from "vitest";
+import { resolveScopedGarageId, garageScope, stampGarageId } from "../tenant-guard";
 import { runWithTenantScope, type TenantScope } from "../tenant-context";
 import { users } from "@shared/schema";
 
@@ -65,5 +65,36 @@ describe("garageScope — condition shape", () => {
     const cond = garageScope(users.garageId, undefined);
     expect(cond).toBeTruthy();
     expect(JSON.stringify(cond)).not.toContain("garage-");
+  });
+});
+
+describe("stampGarageId — server-stamped tenancy on create", () => {
+  it("stamps the context garage when none is supplied", () => {
+    runWithTenantScope(tenant({ garageId: "garage-a" }), () => {
+      expect(stampGarageId({ name: "x" }).garageId).toBe("garage-a");
+    });
+  });
+
+  it("OVERRIDES a client-supplied garageId with the scope and flags an isolation-leak attempt", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    runWithTenantScope(tenant({ garageId: "garage-a" }), () => {
+      const stamped = stampGarageId({ name: "x", garageId: "garage-b" }, "invoices");
+      expect(stamped.garageId).toBe("garage-a"); // no client-controlled tenancy
+    });
+    expect(warn).toHaveBeenCalledWith("[ISOLATION-LEAK]", expect.stringContaining("garage-b"));
+    warn.mockRestore();
+  });
+
+  it("does not flag when the supplied garageId matches the scope", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    runWithTenantScope(tenant({ garageId: "garage-a" }), () => {
+      stampGarageId({ name: "x", garageId: "garage-a" });
+    });
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("preserves the provided garageId when no scope is established (background jobs)", () => {
+    expect(stampGarageId({ garageId: "garage-d" }).garageId).toBe("garage-d");
   });
 });
