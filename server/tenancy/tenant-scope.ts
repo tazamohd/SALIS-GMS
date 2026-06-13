@@ -60,11 +60,22 @@ export async function resolveTenantScope(req: Request): Promise<TenantScope> {
     branchIds = unique(rows.map((r) => r.branchId));
   }
 
+  // Audited impersonation (Story 5.2): a platform principal may act inside a
+  // specific tenant via an explicit session marker. Only honored for platform
+  // principals so a normal user cannot escalate by forging the field.
+  const session = (req as Request & { session?: { impersonation?: { targetGarageId?: string } } }).session;
+  const targetGarageId = session?.impersonation?.targetGarageId;
+  const impersonation =
+    isPlatformPrincipal && targetGarageId
+      ? { actorUserId: user.id, targetGarageId }
+      : undefined;
+
   return {
     userId: user.id,
     garageId,
     branchIds,
     isBranchRestricted: !isPlatformPrincipal && !isGarageLevelRole && branchIds.length > 0,
     isPlatformPrincipal,
+    impersonation,
   };
 }

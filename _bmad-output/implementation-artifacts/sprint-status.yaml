@@ -58,7 +58,7 @@ development_status:
 
   epic-5: in-progress
   5-1-privileged-action-audit-events: review
-  5-2-audited-impersonation-sessions: backlog
+  5-2-audited-impersonation-sessions: review
   epic-5-retrospective: optional
 
   epic-6: backlog
