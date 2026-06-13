@@ -1,0 +1,26 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Syntax: same as .gitignore
+#
+# --- From .gitignore ---
+
+# .DS_Store
+# server/public
+# vite.config.ts.*
+# *.tar.gz
+# user_credentials.csv
+# .env
+# .env.*
+# *.pem
+# *.key
+
+# --- Detected directories ---
+
+# docs/
+# scripts/
+# migrations/
+
+# --- Test file patterns ---
+
+# *.test.*
+# *.spec.*
+# *.snap
