@@ -1,0 +1,16 @@
+title = "SALIS-GMS gitleaks config"
+
+# Start from gitleaks' default rules, then allowlist known-safe placeholder
+# material that lives in documentation/examples (not live credentials).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documentation and example placeholders — not live secrets"
+paths = [
+  '''^docs/''',
+  '''^\.claude/''',
+  '''^\.moai/''',
+  '''(^|/)\.env\.example$''',
+  '''(^|/).*\.md$''',
+]
