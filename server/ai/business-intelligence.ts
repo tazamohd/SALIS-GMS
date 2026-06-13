@@ -62,7 +62,7 @@ CUSTOMERS:
     // Get AI-powered insights
     const response = await openai.chat.completions.create({
       model: AI_MODEL,
-      max_tokens: AI_MAX_TOKENS,
+      max_completion_tokens: AI_MAX_TOKENS,
       messages: [
         {
           role: 'system',
