@@ -2370,15 +2370,6 @@ export class DatabaseStorage implements IStorage {
     return entry;
   }
 
-  async getTimeClockEntry(id: string, garageId?: string): Promise<any | undefined> {
-    const conditions = [eq(timeClockEntries.id, id)];
-    if (garageId) {
-      conditions.push(eq(timeClockEntries.garageId, garageId));
-    }
-    const [entry] = await db.select().from(timeClockEntries).where(and(...conditions));
-    return entry;
-  }
-
   async createTimeClockEntry(data: any): Promise<any> {
     const [entry] = await db.insert(timeClockEntries).values({
       ...data,
@@ -2389,8 +2380,17 @@ export class DatabaseStorage implements IStorage {
 
   // Clock out an open entry: stamp clockOutTime and compute totalHours / overtimeHours
   // (mirrors the employeeAttendance.clockOut hours math). Overtime = hours beyond 8.
-  async clockOutTimeClockEntry(id: string, garageId?: string): Promise<any | undefined> {
-    const entry = await this.getTimeClockEntry(id, garageId);
+  // Scoped by garageId (tenant) and, when given, employeeId so an entry can only be
+  // closed via its owning technician's path.
+  async clockOutTimeClockEntry(
+    id: string,
+    garageId?: string,
+    employeeId?: string,
+  ): Promise<any | undefined> {
+    const conditions = [eq(timeClockEntries.id, id)];
+    if (garageId) conditions.push(eq(timeClockEntries.garageId, garageId));
+    if (employeeId) conditions.push(eq(timeClockEntries.employeeId, employeeId));
+    const [entry] = await db.select().from(timeClockEntries).where(and(...conditions));
     if (!entry) return undefined;
     if (entry.clockOutTime) return entry; // already clocked out — idempotent
 

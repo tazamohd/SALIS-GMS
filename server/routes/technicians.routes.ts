@@ -16,11 +16,14 @@ function sanitizeZodError(error: z.ZodError) {
   };
 }
 
-// Body fields the client may supply when clocking in; server controls garageId/employeeId
-// (insertTimeClockEntrySchema already omits id + createdAt). clockInTime defaults to now.
+// Allowlist of fields a clock-in may set — everything else (garageId, employeeId,
+// clockOutTime, totalHours/overtimeHours, approvedBy/approvedAt) is server-controlled
+// to prevent mass-assignment (e.g. a technician self-approving or inflating hours).
+// clockInTime is optional and defaults to now; breakDuration must be non-negative.
 const createTimeClockEntrySchema = insertTimeClockEntrySchema
-  .omit({ garageId: true, employeeId: true })
-  .partial({ clockInTime: true });
+  .pick({ clockInTime: true, breakDuration: true, location: true, notes: true })
+  .partial()
+  .extend({ breakDuration: z.number().int().min(0).optional() });
 
 // Get all technicians
 router.get("/technicians", isAuthenticated, async (req, res) => {
@@ -165,9 +168,9 @@ router.patch(
   isAuthenticated,
   async (req: any, res) => {
     try {
-      const { entryId } = req.params;
+      const { technicianId, entryId } = req.params;
       const garageId = req.user?.garageId;
-      const updated = await storage.clockOutTimeClockEntry(entryId, garageId);
+      const updated = await storage.clockOutTimeClockEntry(entryId, garageId, technicianId);
       if (!updated) {
         return res.status(404).json({ message: "Time clock entry not found" });
       }
