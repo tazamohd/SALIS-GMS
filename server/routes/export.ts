@@ -3,7 +3,7 @@ import { isAuthenticated } from '../auth';
 import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
-import { sql, count } from 'drizzle-orm';
+import { sql, count, eq } from 'drizzle-orm';
 
 const router = Router();
 
@@ -46,6 +46,11 @@ function toCsv(rows: Record<string, any>[]): string {
 router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
     const { type } = req.params;
+    // Scope every export to the admin's own garage — never dump other tenants.
+    const garageId = (req.user as any)?.garageId;
+    if (!garageId) {
+      return res.status(403).json({ error: 'No garage associated with this account' });
+    }
     let rows: Record<string, any>[];
 
     switch (type) {
@@ -62,6 +67,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             created_at: users.createdAt,
           })
           .from(users)
+          .where(eq(users.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -81,6 +87,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             paid_amount: invoices.paidAmount,
           })
           .from(invoices)
+          .where(eq(invoices.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -99,6 +106,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             completed_at: jobCards.completedAt,
           })
           .from(jobCards)
+          .where(eq(jobCards.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -117,6 +125,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             engine_type: vehicles.engineType,
           })
           .from(vehicles)
+          .where(eq(vehicles.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -133,6 +142,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             status: appointments.status,
           })
           .from(appointments)
+          .where(eq(appointments.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -148,6 +158,9 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             is_active: spareParts.isActive,
             created_at: spareParts.createdAt,
           })
+          // spareParts is a shared parts catalog (no garage_id; scoped by
+          // isGlobal/visibility instead) and carries no tenant PII, so it is
+          // not garage-filtered here.
           .from(spareParts)
           .limit(10000);
         break;

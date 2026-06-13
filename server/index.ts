@@ -11,7 +11,14 @@ import { requestId } from "./middleware/requestId";
 
 const app = express();
 app.use(requestId);
-app.use(express.json({ limit: '10mb' }));
+// Capture the raw request body so the Stripe webhook can verify its signature
+// (signature verification needs the exact bytes, not the re-serialized JSON).
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, _res, buf) => {
+    (req as any).rawBody = buf;
+  },
+}));
 app.use(express.urlencoded({ extended: false }));
 
 // Security headers
@@ -45,15 +52,35 @@ const authLimiter = rateLimit({
 });
 app.use('/api/login', authLimiter);
 app.use('/api/register', authLimiter);
+// Cover the modular auth + customer-portal login entry points too, so they
+// aren't left with only the looser global limiter.
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/customer-portal/login', authLimiter);
+
+// Response bodies for auth/security/payment endpoints can contain user
+// objects, tokens, 2FA secrets, etc. — never echo them to the logs.
+const SENSITIVE_LOG_PATHS = [
+  "/api/login",
+  "/api/register",
+  "/api/auth",
+  "/api/customer-portal/login",
+  "/api/security",
+  "/api/stripe",
+  "/paypal",
+];
 
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  const isSensitive = SENSITIVE_LOG_PATHS.some((p) => path.startsWith(p));
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
+    if (!isSensitive) {
+      capturedJsonResponse = bodyJson;
+    }
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 

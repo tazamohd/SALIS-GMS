@@ -4,11 +4,37 @@ import { storage } from "../storage";
 
 const router = Router();
 
-// Get all customers
-router.get("/customers", isAuthenticated, async (req, res) => {
+// Resolve the tenant strictly from the authenticated session — never from a
+// client-supplied garage_id, which would allow cross-tenant access (IDOR).
+function sessionGarageId(req: any): string | undefined {
+  return req.user?.garageId;
+}
+
+// Loads a customer and confirms it belongs to the caller's garage. Returns the
+// customer on success, or null after sending the appropriate 403/404 response.
+async function loadOwnedCustomer(req: any, res: any, id: string) {
+  const garageId = sessionGarageId(req);
+  if (!garageId) {
+    res.status(403).json({ message: "No garage associated with this account" });
+    return null;
+  }
+  const customer = await storage.getCustomer(id);
+  if (!customer || (customer as any).garageId !== garageId) {
+    res.status(404).json({ message: "Customer not found" });
+    return null;
+  }
+  return customer;
+}
+
+// Get all customers (scoped to the caller's garage)
+router.get("/customers", isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, search } = req.query;
-    const customers = await storage.getCustomers(garage_id as string, search as string);
+    const garageId = sessionGarageId(req);
+    if (!garageId) {
+      return res.status(403).json({ message: "No garage associated with this account" });
+    }
+    const { search } = req.query;
+    const customers = await storage.getCustomers(garageId, search as string);
     res.json(customers);
   } catch (error) {
     console.error("Error fetching customers:", error);
@@ -16,13 +42,17 @@ router.get("/customers", isAuthenticated, async (req, res) => {
   }
 });
 
-// Create new customer
+// Create new customer (always bound to the caller's garage)
 router.post("/customers", isAuthenticated, async (req: any, res) => {
   try {
-    const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
+    const garageId = sessionGarageId(req);
+    if (!garageId) {
+      return res.status(403).json({ message: "No garage associated with this account" });
+    }
+    const { fullName, firstName, lastName, email, phone, nationalId, address, nationality, preferredLanguage } = req.body;
 
-    if (!fullName || !email || !garageId) {
-      return res.status(400).json({ message: "Name, email, and garage are required" });
+    if (!fullName || !email) {
+      return res.status(400).json({ message: "Name and email are required" });
     }
 
     const existingUser = await storage.getUserByEmail(email);
@@ -66,14 +96,11 @@ router.post("/customers", isAuthenticated, async (req: any, res) => {
   }
 });
 
-// Get customer by ID
-router.get("/customers/:id", isAuthenticated, async (req, res) => {
+// Get customer by ID (ownership enforced)
+router.get("/customers/:id", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const customer = await storage.getCustomer(id);
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
-    }
+    const customer = await loadOwnedCustomer(req, res, req.params.id);
+    if (!customer) return;
     res.json(customer);
   } catch (error) {
     console.error("Error fetching customer:", error);
@@ -82,10 +109,10 @@ router.get("/customers/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get customer vehicles
-router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/vehicles", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const vehicles = await storage.getCustomerVehicles(id);
+    if (!(await loadOwnedCustomer(req, res, req.params.id))) return;
+    const vehicles = await storage.getCustomerVehicles(req.params.id);
     res.json(vehicles);
   } catch (error) {
     console.error("Error fetching customer vehicles:", error);
@@ -94,10 +121,10 @@ router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
 });
 
 // Get customer job cards
-router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/job-cards", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const jobCards = await storage.getCustomerJobCards(id);
+    if (!(await loadOwnedCustomer(req, res, req.params.id))) return;
+    const jobCards = await storage.getCustomerJobCards(req.params.id);
     res.json(jobCards);
   } catch (error) {
     console.error("Error fetching customer job cards:", error);
@@ -106,10 +133,10 @@ router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
 });
 
 // Get customer invoices
-router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/invoices", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const invoices = await storage.getCustomerInvoices(id);
+    if (!(await loadOwnedCustomer(req, res, req.params.id))) return;
+    const invoices = await storage.getCustomerInvoices(req.params.id);
     res.json(invoices);
   } catch (error) {
     console.error("Error fetching customer invoices:", error);
@@ -118,10 +145,10 @@ router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
 });
 
 // Get customer payments
-router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/payments", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const payments = await storage.getCustomerPayments(id);
+    if (!(await loadOwnedCustomer(req, res, req.params.id))) return;
+    const payments = await storage.getCustomerPayments(req.params.id);
     res.json(payments);
   } catch (error) {
     console.error("Error fetching customer payments:", error);
@@ -130,10 +157,10 @@ router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
 });
 
 // Get customer notes
-router.get("/customers/:id/notes", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/notes", isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const notes = await storage.getCustomerNotes(id);
+    if (!(await loadOwnedCustomer(req, res, req.params.id))) return;
+    const notes = await storage.getCustomerNotes(req.params.id);
     res.json(notes);
   } catch (error) {
     console.error("Error fetching customer notes:", error);
@@ -146,6 +173,7 @@ router.post("/customers/:id/notes", isAuthenticated, async (req: any, res) => {
   try {
     const { insertCustomerNoteSchema } = await import("@shared/schema");
     const { id } = req.params;
+    if (!(await loadOwnedCustomer(req, res, id))) return;
     const userId = req.user?.id || "default-user";
 
     const validationResult = insertCustomerNoteSchema.safeParse(req.body);

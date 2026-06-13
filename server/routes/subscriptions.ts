@@ -74,6 +74,16 @@ router.post("/subscriptions/change-plan", isAuthenticated, async (req, res) => {
 
   const stripeReady = !!process.env.STRIPE_SECRET_KEY && parsed.data.plan !== "STARTER";
 
+  // SECURITY: the direct in-DB upgrade below charges nothing. That is acceptable
+  // only as dev scaffolding — in production it would let any user self-upgrade to
+  // a paid tier for free. Block the unpaid upgrade path in production until a
+  // real Checkout flow gates it. (Downgrades to STARTER remain allowed.)
+  if (process.env.NODE_ENV === "production" && parsed.data.plan !== "STARTER") {
+    return res.status(402).json({
+      message: "Paid plan changes require checkout, which is not yet available.",
+    });
+  }
+
   // Until Stripe checkout is wired, do an immediate in-DB upgrade so the rest
   // of the gating works end-to-end. Production will replace this with a
   // Checkout-session redirect.

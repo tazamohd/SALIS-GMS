@@ -67,7 +67,19 @@ export async function loginAsAdmin(app: Express) {
     throw new Error(`Login failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
   }
 
+  await attachCsrfToken(agent);
   return { agent, user: loginRes.body, garageId };
+}
+
+// Fetch the per-session CSRF token and set it as a default header on the agent
+// so every subsequent state-changing request from this authenticated agent
+// passes CSRF validation (mirrors what the real client does).
+export async function attachCsrfToken(agent: supertest.Agent) {
+  const res = await agent.get("/api/csrf-token");
+  if (res.status === 200 && res.body?.csrfToken) {
+    agent.set("x-csrf-token", res.body.csrfToken);
+  }
+  return agent;
 }
 
 export async function loginAsUser(app: Express) {
@@ -86,6 +98,7 @@ export async function loginAsUser(app: Express) {
   if (loginRes.status !== 200) {
     throw new Error(`Login failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
   }
+  await attachCsrfToken(agent);
   return { agent, user: loginRes.body, garageId };
 }
 
