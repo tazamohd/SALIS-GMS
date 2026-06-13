@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-06-13T06:59:55.197Z",
+  "entries": [
+    "2slides-ppt-generator",
+    "audit-skills",
+    "bumblebee",
+    "container-security-hardening",
+    "docs",
+    "fsi-compliance-checker",
+    "github-actions-advanced",
+    "hono",
+    "mise-configurator",
+    "pakistan-payments-stack",
+    "playwright-java",
+    "security/aws-compliance-checker",
+    "security/aws-iam-best-practices",
+    "security/aws-secrets-rotation",
+    "security/aws-security-audit",
+    "skill-audit",
+    "tool-use-guardian",
+    "vibecode-production-qa-validator",
+    "youtube-full"
+  ]
+}
