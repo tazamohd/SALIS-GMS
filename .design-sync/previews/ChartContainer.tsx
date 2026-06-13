@@ -5,7 +5,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "rest-express";
-import type { ChartConfig } from "rest-express";
 import {
   Bar,
   BarChart,
@@ -28,7 +27,7 @@ const weeklyRevenue = [
 const revenueConfig = {
   revenue: { label: "Labour (SAR)", color: "#0A5ED7" },
   parts: { label: "Parts (SAR)", color: "#F97316" },
-} satisfies ChartConfig;
+};
 
 export const WeeklyRevenueBars = () => (
   <div className="w-full">
@@ -61,7 +60,7 @@ const jobsCompleted = [
 
 const jobsConfig = {
   jobs: { label: "Job cards closed", color: "#0BB3FF" },
-} satisfies ChartConfig;
+};
 
 export const JobsCompletedLine = () => (
   <div className="w-full">
