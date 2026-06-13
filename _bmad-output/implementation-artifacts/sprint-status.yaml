@@ -38,7 +38,7 @@ development_status:
   1-4-branch-level-scoping-for-branch-scoped-roles: backlog
   1-5-existence-hiding-error-semantics: review
   1-6-postgres-row-level-security-backstop: backlog
-  1-7-cross-tenant-isolation-test-harness-core: backlog
+  1-7-cross-tenant-isolation-test-harness-core: review
   epic-1-retrospective: optional
 
   epic-2: backlog
