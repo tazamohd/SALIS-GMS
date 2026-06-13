@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatSAR } from "@/lib/currency";
 import { AddVehicleDialog } from "@/components/AddVehicleDialog";
 import { AddCustomerNoteDialog } from "@/components/AddCustomerNoteDialog";
 import { AddCustomerDialog } from "@/components/AddCustomerDialog";
@@ -51,6 +52,11 @@ export function Customers() {
     queryKey: [customersUrl],
     retry: false,
   });
+
+  // Shop-wide totals for the overview cards (independent of the selected customer).
+  const { data: allVehicles } = useQuery<Vehicle[]>({ queryKey: ['/api/vehicles'] });
+  const { data: allJobCards } = useQuery<any[]>({ queryKey: ['/api/job-cards'] });
+  const { data: allInvoices } = useQuery<any[]>({ queryKey: ['/api/invoices'] });
 
   const { data: selectedCustomer } = useQuery<User>({
     queryKey: ['/api/customers', selectedCustomerId],
@@ -136,9 +142,20 @@ export function Customers() {
     job.status !== 'completed' && job.status !== 'cancelled'
   );
 
-  const unpaidInvoices = (customerInvoices ?? []).filter((inv: any) => 
+  const unpaidInvoices = (customerInvoices ?? []).filter((inv: any) =>
     inv.status === 'sent' || inv.status === 'overdue' || inv.status === 'draft'
   );
+
+  // Shop-wide counts for the overview cards, honouring the garage filter.
+  const garageMatches = (garageId: string | null | undefined) =>
+    selectedGarageId === "all" || garageId === selectedGarageId;
+  const totalVehiclesCount = (allVehicles ?? []).filter((v: any) => garageMatches(v.garageId)).length;
+  const activeJobsCount = (allJobCards ?? []).filter((job: any) =>
+    garageMatches(job.garageId) && job.status !== 'completed' && job.status !== 'cancelled'
+  ).length;
+  const unpaidInvoicesCount = (allInvoices ?? []).filter((inv: any) =>
+    garageMatches(inv.garageId) && (inv.status === 'sent' || inv.status === 'overdue' || inv.status === 'draft')
+  ).length;
 
   const { toast } = useToast();
 
@@ -283,7 +300,7 @@ export function Customers() {
             <Car className="w-5 h-5 text-[#0A5ED7]" />
             <span className="text-sm font-medium text-[#64748B]">{t('customers.totalVehicles', 'Total Vehicles')}</span>
           </div>
-          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{customerVehicles?.length || 0}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{totalVehiclesCount}</p>
         </div>
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
           <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" />
@@ -291,7 +308,7 @@ export function Customers() {
             <ClipboardList className="w-5 h-5 text-[#0A5ED7]" />
             <span className="text-sm font-medium text-[#64748B]">{t('customers.activeJobs', 'Active Jobs')}</span>
           </div>
-          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{outstandingJobs.length}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{activeJobsCount}</p>
         </div>
         <div className="relative overflow-hidden rounded-xl bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] p-4">
           <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#F97316]/5 dark:bg-[#F97316]/10" />
@@ -299,7 +316,7 @@ export function Customers() {
             <DollarSign className="w-5 h-5 text-[#F97316]" />
             <span className="text-sm font-medium text-[#64748B]">{t('customers.unpaidInvoices', 'Unpaid Invoices')}</span>
           </div>
-          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{unpaidInvoices.length}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white">{unpaidInvoicesCount}</p>
         </div>
       </div>
 
@@ -441,7 +458,7 @@ export function Customers() {
                         <Alert className="bg-[#F97316]/10 dark:bg-[#F97316]/20 border-[#F97316]/30 dark:border-[#F97316]/40">
                           <AlertCircle className="h-4 w-4 text-[#F97316]" />
                           <AlertDescription className="text-sm text-[#0B1F3B] dark:text-white">
-                            <strong>{t('customers.outstandingPayments', 'Outstanding Payments')}:</strong> ${unpaidInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount || 0), 0).toFixed(2)} {t('customers.dueAcross', 'due across')} {unpaidInvoices.length} {t('customers.invoices', 'invoice(s)')}
+                            <strong>{t('customers.outstandingPayments', 'Outstanding Payments')}:</strong> {formatSAR(unpaidInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount || 0), 0))} {t('customers.dueAcross', 'due across')} {unpaidInvoices.length} {t('customers.invoices', 'invoice(s)')}
                           </AlertDescription>
                         </Alert>
                       )}
@@ -617,7 +634,7 @@ export function Customers() {
                                     <span>{t('customers.service', 'Service')}: {job.serviceType}</span>
                                     <span>{t('customers.vehicle', 'Vehicle')}: {job.vehicleInfo?.make} {job.vehicleInfo?.model}</span>
                                     {job.completedAt && <span>{t('common.completed', 'Completed')}: {new Date(job.completedAt).toLocaleDateString()}</span>}
-                                    {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
+                                    {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">{formatSAR(Number(job.totalCost))}</span>}
                                   </div>
                                   <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
                                     <JobCardDetailsDialog jobCardId={job.id}>
@@ -697,7 +714,7 @@ export function Customers() {
                                   </div>
                                   <div className="flex items-center justify-between">
                                     <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">
-                                      ${Number(invoice.totalAmount || 0).toFixed(2)}
+                                      {formatSAR(Number(invoice.totalAmount || 0))}
                                     </span>
                                     <div className="flex items-center gap-2">
                                       <InvoiceDetailsDialog invoiceId={invoice.id}>
@@ -791,7 +808,7 @@ export function Customers() {
                                       {payment.reference && <span>{t('common.reference', 'Ref')}: {payment.reference}</span>}
                                     </div>
                                     <span className="text-lg font-bold text-[#0A5ED7]">
-                                      ${Number(payment.amount || 0).toFixed(2)}
+                                      {formatSAR(Number(payment.amount || 0))}
                                     </span>
                                   </div>
                                 </div>
