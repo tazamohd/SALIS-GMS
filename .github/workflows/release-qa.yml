@@ -55,8 +55,8 @@ jobs:
       - name: Push Drizzle schema
         run: npx drizzle-kit push --force
 
-      - name: Tests + coverage
-        run: npm run test:coverage
+      - name: Tests
+        run: npm run test
 
       - name: Production build
         run: npm run build

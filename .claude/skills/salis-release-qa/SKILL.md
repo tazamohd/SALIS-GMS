@@ -51,7 +51,7 @@ npm run test                 # full Vitest suite
 # Narrower targets when iterating:
 #   npm run test:server       # server/__tests__
 #   npm run test:integration  # server/routes/__tests__
-npm run test:coverage        # confirm coverage hasn't regressed
+npm run test:coverage        # coverage — requires devDep @vitest/coverage-v8 (not yet installed)
 
 # 4. Database schema + migrations
 npm run db:push              # apply Drizzle schema to the target DB
