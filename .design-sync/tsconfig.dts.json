@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["./ds-entry.ts"],
+  "exclude": ["../node_modules"],
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "../types",
+    "rootDir": "..",
+    "incremental": false,
+    "tsBuildInfoFile": null,
+    "allowImportingTsExtensions": false
+  }
+}
