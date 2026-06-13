@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { formatSAR } from "@/lib/currency";
 import { useToast } from "@/hooks/use-toast";
 import {
   Package,
@@ -59,7 +60,7 @@ import {
 const CHART_COLORS = ["#0A5ED7", "#0BB3FF", "#F97316", "#10B981", "#8B5CF6", "#EC4899", "#F59E0B", "#6366F1"];
 
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  return formatSAR(value);
 }
 
 function StatusBadge({ status }: { status: string }) {

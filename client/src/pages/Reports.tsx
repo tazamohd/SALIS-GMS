@@ -15,6 +15,7 @@ import { DateRangePicker, type DateRange } from "@/components/DateRangePicker";
 import { subDays } from "date-fns";
 import type { Garage } from "@shared/schema";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
+import { formatSAR } from "@/lib/currency";
 
 const COLORS = ['#0A5ED7', '#0BB3FF', '#0A5ED7', '#6366F1', '#0B1F3B', '#64748B'];
 
@@ -25,7 +26,7 @@ const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
         <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: <span className="font-bold">${parseFloat(entry.value).toFixed(2)}</span>
+            {entry.name}: <span className="font-bold">{formatSAR(entry.value)}</span>
           </p>
         ))}
       </div>
@@ -190,7 +191,7 @@ export function Reports() {
               <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${overview?.totalRevenue || "0"}</div>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatSAR(overview?.totalRevenue || 0)}</div>
               <p className="text-xs text-[#64748B] mt-1">{t('analytics.allTime', 'All time')}</p>
             </CardContent>
           </Card>
@@ -241,7 +242,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.totalRevenue || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatSAR(revenueReport?.totalRevenue || 0)}</div>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -249,7 +250,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.paidAmount', 'Paid Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.paidAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatSAR(revenueReport?.paidAmount || 0)}</div>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -257,7 +258,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.pendingAmount', 'Pending Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.pendingAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{formatSAR(revenueReport?.pendingAmount || 0)}</div>
               </CardContent>
             </Card>
           </div>
@@ -272,7 +273,7 @@ export function Reports() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#64748B]">{t('analytics.previousMonth', 'Previous Month')}</span>
-                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{formatSAR(revenueReport.comparison.previousMonth.revenue)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousMonth.change >= 0 ? (
@@ -281,7 +282,7 @@ export function Reports() {
                         <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-mom-down" />
                       )}
                       <span className={`text-xl font-bold ${revenueReport.comparison.previousMonth.change >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-mom-change">
-                        {revenueReport.comparison.previousMonth.change >= 0 ? '+' : ''}${revenueReport.comparison.previousMonth.change.toFixed(2)}
+                        {revenueReport.comparison.previousMonth.change >= 0 ? '+' : ''}{formatSAR(revenueReport.comparison.previousMonth.change)}
                       </span>
                       <span className={`text-sm ${revenueReport.comparison.previousMonth.percentChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-mom-percent">
                         ({revenueReport.comparison.previousMonth.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousMonth.percentChange.toFixed(1)}%)
@@ -299,7 +300,7 @@ export function Reports() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#64748B]">{t('analytics.samePeriodLastYear', 'Same Period Last Year')}</span>
-                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{formatSAR(revenueReport.comparison.previousYear.revenue)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousYear.change >= 0 ? (
@@ -308,7 +309,7 @@ export function Reports() {
                         <ArrowDown className="w-4 h-4 text-[#F97316]" data-testid="icon-yoy-down" />
                       )}
                       <span className={`text-xl font-bold ${revenueReport.comparison.previousYear.change >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-yoy-change">
-                        {revenueReport.comparison.previousYear.change >= 0 ? '+' : ''}${revenueReport.comparison.previousYear.change.toFixed(2)}
+                        {revenueReport.comparison.previousYear.change >= 0 ? '+' : ''}{formatSAR(revenueReport.comparison.previousYear.change)}
                       </span>
                       <span className={`text-sm ${revenueReport.comparison.previousYear.percentChange >= 0 ? 'text-[#0A5ED7]' : 'text-[#F97316]'}`} data-testid="text-yoy-percent">
                         ({revenueReport.comparison.previousYear.percentChange >= 0 ? '+' : ''}{revenueReport.comparison.previousYear.percentChange.toFixed(1)}%)
@@ -330,7 +331,7 @@ export function Reports() {
                   <LineChart data={revenueReport.revenueByMonth}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `$${value}`} />
+                    <YAxis tickFormatter={(value) => `SAR ${value}`} />
                     <Tooltip content={<CustomCurrencyTooltip />} />
                     <Legend />
                     <Line type="monotone" dataKey="revenue" stroke="#0A5ED7" strokeWidth={2} name={t('analytics.revenue', 'Revenue')} />
@@ -379,7 +380,7 @@ export function Reports() {
                       <BarChart data={revenueReport.paymentsByMethod}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="method" />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Bar dataKey="total" fill="#0A5ED7" name={t('analytics.totalAmount', 'Total Amount')} />
                       </BarChart>
@@ -509,7 +510,7 @@ export function Reports() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">{t('analytics.revenueGenerated', 'Revenue Generated')}</span>
                         <span className="font-semibold text-gray-800 dark:text-gray-200" data-testid={`text-revenue-${tech.id}`}>
-                          ${tech.revenueGenerated.toFixed(2)}
+                          {formatSAR(tech.revenueGenerated)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -572,7 +573,7 @@ export function Reports() {
                       <BarChart data={technicianPerformance.technicians}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="revenueGenerated" fill="#404040" name={t('analytics.revenue', 'Revenue')} />
@@ -668,7 +669,7 @@ export function Reports() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">{t('analytics.lifetimeValue', 'Lifetime Value')}</span>
                         <span className="font-semibold text-gray-800 dark:text-gray-200" data-testid={`text-ltv-${customer.id}`}>
-                          ${customer.lifetimeValue.toFixed(2)}
+                          {formatSAR(customer.lifetimeValue)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -686,7 +687,7 @@ export function Reports() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">{t('analytics.avgInvoice', 'Avg. Invoice')}</span>
                         <span className="font-semibold" data-testid={`text-avg-invoice-${customer.id}`}>
-                          ${customer.avgInvoiceValue.toFixed(2)}
+                          {formatSAR(customer.avgInvoiceValue)}
                         </span>
                       </div>
                       {customer.lastVisit && (
@@ -712,7 +713,7 @@ export function Reports() {
                       <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="lifetimeValue" fill="#404040" name={t('analytics.lifetimeValue', 'Lifetime Value')} />
@@ -748,7 +749,7 @@ export function Reports() {
                       <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name={t('analytics.avgInvoice', 'Avg. Invoice')} />

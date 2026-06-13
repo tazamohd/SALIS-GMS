@@ -70,6 +70,20 @@ export function formatCurrency(
 }
 
 /**
+ * Format an amount with the Latin "SAR" prefix (e.g. "SAR 1,234.56").
+ * Matches the convention used on the Invoices screen so all modules render
+ * the same currency. Accepts numbers or numeric strings.
+ */
+export function formatSAR(amount: number | string): string {
+  const value = typeof amount === 'string' ? parseFloat(amount) : amount;
+  const safe = Number.isFinite(value) ? value : 0;
+  return `SAR ${safe.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+/**
  * Format amount with symbol only (shorter format)
  */
 export function formatCurrencyShort(
