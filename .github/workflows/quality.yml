@@ -1,0 +1,43 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  typecheck:
+    name: Typecheck (tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: TypeScript typecheck
+        run: npm run check
+
+  commitlint:
+    name: Conventional Commit PR title
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Validate PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "PR title: $PR_TITLE"
+          # Conventional Commits: type(optional scope)(optional !): subject
+          pattern='^(feat|fix|refactor|test|docs|chore|perf|style|build|ci|revert)(\([a-z0-9._-]+\))?!?: .+'
+          if echo "$PR_TITLE" | grep -Eq "$pattern"; then
+            echo "✓ PR title follows Conventional Commits."
+          else
+            echo "::error::PR title must follow Conventional Commits, e.g. 'feat(invoices): add ZATCA QR'."
+            echo "Allowed types: feat, fix, refactor, test, docs, chore, perf, style, build, ci, revert."
+            exit 1
+          fi
