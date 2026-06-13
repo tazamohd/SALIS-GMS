@@ -105,6 +105,10 @@ export function recordIsolationLeakAttempt(detail: {
       ts: new Date().toISOString(),
     }),
   );
+  // Durably record the attempt (Story 5.1), fire-and-forget so it never blocks.
+  if (detail.action === "create" || detail.action === "update" || detail.action === "delete") {
+    void import("./audit-sink").then((m) => m.persistIsolationLeak(detail)).catch(() => {});
+  }
 }
 
 /**

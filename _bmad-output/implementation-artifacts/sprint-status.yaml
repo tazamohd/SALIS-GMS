@@ -56,8 +56,8 @@ development_status:
   4-2-mfa-enforcement-at-login: review
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-privileged-action-audit-events: backlog
+  epic-5: in-progress
+  5-1-privileged-action-audit-events: review
   5-2-audited-impersonation-sessions: backlog
   epic-5-retrospective: optional
 
