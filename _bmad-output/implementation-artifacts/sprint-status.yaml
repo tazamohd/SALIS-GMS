@@ -1,0 +1,99 @@
+# generated: 2026-06-13
+# last_updated: 2026-06-13
+# project: SALIS-GMS
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+# scope: Multi-Tenant Isolation & Security Hardening
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in implementation-artifacts
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' when its first story is created
+# - Dependency order is Epic 1 -> 2/3/4/5 -> 6; Epic 1 is the foundation everything builds on
+# - Suggested sprint slicing is recorded in the 'sprints' block below
+
+development_status:
+  epic-1: in-progress
+  1-1-establish-request-tenant-scope: review
+  1-2-scoped-reads-with-no-return-all-fallback: backlog
+  1-3-scoped-writes-with-server-stamped-tenancy: backlog
+  1-4-branch-level-scoping-for-branch-scoped-roles: backlog
+  1-5-existence-hiding-error-semantics: backlog
+  1-6-postgres-row-level-security-backstop: backlog
+  1-7-cross-tenant-isolation-test-harness-core: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-block-auth-bypass-in-production: backlog
+  2-2-session-and-cookie-hardening: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-endpoint-policy-registry-shared-authorize-middleware: backlog
+  3-2-deny-by-default-across-both-route-layers: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-mfa-enrollment-with-recovery-codes: backlog
+  4-2-mfa-enforcement-at-login: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-privileged-action-audit-events: backlog
+  5-2-audited-impersonation-sessions: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-extend-isolation-harness-to-high-risk-endpoints-ci-gate: backlog
+  6-2-ci-guard-against-unscoped-tenant-queries: backlog
+  epic-6-retrospective: optional
+
+# Suggested sprint slicing (advisory; reorder freely)
+sprints:
+  sprint-1-foundation:
+    goal: "Provable tenant isolation end-to-end (the security guarantee)"
+    stories:
+      - 1-1-establish-request-tenant-scope
+      - 1-2-scoped-reads-with-no-return-all-fallback
+      - 1-3-scoped-writes-with-server-stamped-tenancy
+      - 1-5-existence-hiding-error-semantics
+      - 1-7-cross-tenant-isolation-test-harness-core
+  sprint-2-isolation-depth:
+    goal: "Branch scoping + database-level backstop"
+    stories:
+      - 1-4-branch-level-scoping-for-branch-scoped-roles
+      - 1-6-postgres-row-level-security-backstop
+      - 6-1-extend-isolation-harness-to-high-risk-endpoints-ci-gate
+      - 6-2-ci-guard-against-unscoped-tenant-queries
+  sprint-3-authn-authz:
+    goal: "Close the auth-bypass hole and make RBAC consistent"
+    stories:
+      - 2-1-block-auth-bypass-in-production
+      - 2-2-session-and-cookie-hardening
+      - 3-1-endpoint-policy-registry-shared-authorize-middleware
+      - 3-2-deny-by-default-across-both-route-layers
+  sprint-4-mfa-audit:
+    goal: "Second factor + immutable accountability"
+    stories:
+      - 4-1-mfa-enrollment-with-recovery-codes
+      - 4-2-mfa-enforcement-at-login
+      - 5-1-privileged-action-audit-events
+      - 5-2-audited-impersonation-sessions

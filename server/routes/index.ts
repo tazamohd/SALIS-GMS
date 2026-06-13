@@ -61,6 +61,7 @@ import { productivityRoutes } from "./productivity";
 import { obdDiagnosticsRoutes } from "./obd-diagnostics";
 import { subscriptionsRoutes } from "./subscriptions";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
+import { tenantContextMiddleware } from "../tenancy/tenant-context.middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -116,6 +117,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Establish the per-request Tenant Scope (AsyncLocalStorage) immediately after
+  // auth so every downstream data access can be isolated without manual garageId
+  // filters. Behavior-neutral on its own; consumed by the scoped data layer (Story 1.2).
+  app.use("/api", tenantContextMiddleware);
+  console.log("✅ Tenant Context Middleware Initialized");
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);

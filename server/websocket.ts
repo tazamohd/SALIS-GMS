@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import type { Server, IncomingMessage } from 'http';
 import { parse as parseCookie } from 'cookie';
 import { unsign } from 'cookie-signature';
+import { runWithTenantScope } from './tenancy/tenant-context';
 
 interface AuthenticatedWebSocket extends WebSocket {
   userId?: string;
@@ -38,7 +39,16 @@ export class ChatWebSocketServer {
       ws.on('message', (data: Buffer) => {
         try {
           const message: WebSocketMessage = JSON.parse(data.toString());
-          this.handleMessage(ws, message);
+          // Once authenticated, run handlers inside the connection's Tenant Scope so
+          // data-layer access from WebSocket handlers is isolated like HTTP requests.
+          if (ws.userId && ws.garageId) {
+            runWithTenantScope(
+              { userId: ws.userId, garageId: ws.garageId, branchIds: [], isPlatformPrincipal: false },
+              () => this.handleMessage(ws, message),
+            );
+          } else {
+            this.handleMessage(ws, message);
+          }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
           this.sendError(ws, 'Invalid message format');
