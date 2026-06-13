@@ -8,6 +8,8 @@
  */
 import { eq, inArray, sql, type SQL } from "drizzle-orm";
 import type { AnyColumn } from "drizzle-orm";
+import { db } from "../db";
+import { userRoleBranch } from "@shared/schema";
 import { getTenantScope, hasTenantScope } from "./tenant-context";
 
 /**
@@ -79,6 +81,26 @@ export function branchScope(branchColumn: AnyColumn): SQL {
     return sql`true`;
   }
   return scope.branchIds.length > 0 ? inArray(branchColumn, scope.branchIds) : sql`false`;
+}
+
+/**
+ * Branch restriction for tables keyed by USER (e.g. staff/technicians in `users`,
+ * which has no branch column). Restricts to users who have a role binding in one
+ * of the caller's branches. No restriction for garage-level/platform/background.
+ */
+export function branchScopeByUserId(userIdColumn: AnyColumn): SQL {
+  const scope = getTenantScope();
+  if (!scope || !scope.isBranchRestricted) {
+    return sql`true`;
+  }
+  if (scope.branchIds.length === 0) {
+    return sql`false`;
+  }
+  const branchMembers = db
+    .select({ userId: userRoleBranch.userId })
+    .from(userRoleBranch)
+    .where(inArray(userRoleBranch.branchId, scope.branchIds));
+  return inArray(userIdColumn, branchMembers);
 }
 
 /**

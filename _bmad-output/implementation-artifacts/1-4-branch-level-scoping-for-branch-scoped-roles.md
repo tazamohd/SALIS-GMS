@@ -1,6 +1,16 @@
 # Story 1.4: Branch-level scoping for branch-scoped roles
 
-Status: in-progress (mechanism delivered; resource application blocked on PRD Open Question #1)
+Status: review (matrix received 2026-06-13 → applied to resources)
+
+## Authorization matrix (resolved with product owner, 2026-06-13)
+- **Garage-level roles** (see all branches): ADMIN, MANAGER, ACCOUNTANT. → ADVISOR & TECHNICIAN are branch-restricted.
+- **Branch-scoped resources**: job cards, appointments/scheduling, technicians/staff. Customers, vehicles, invoices, suppliers remain garage-wide.
+
+## Applied
+- `GARAGE_LEVEL_ROLES` now includes ACCOUNTANT.
+- `getJobCards` → `branchScope(jobCards.branchId)`; `getAppointments` → `branchScope(appointments.branchId)`.
+- `getTechnicians` → `branchScopeByUserId(users.id)` (users have no branch column; restricts to staff with a role binding in the caller's branches).
+- No regression: branch restriction only engages for a non-garage-level role WITH branch bindings; users without `user_role_branch` rows (incl. existing test users) are unrestricted.
 
 ## Story
 

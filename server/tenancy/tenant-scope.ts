@@ -32,7 +32,7 @@ function unique(ids: Array<string | null | undefined>): string[] {
  * per-role / per-resource matrix is PRD Open Question #1. `branchScope` is not
  * yet applied to any resource, so this only populates the scope flag.
  */
-const GARAGE_LEVEL_ROLES = new Set(["ADMIN", "MANAGER", "OWNER", "GARAGE_OWNER", "SUPER_ADMIN"]);
+const GARAGE_LEVEL_ROLES = new Set(["ADMIN", "MANAGER", "ACCOUNTANT", "OWNER", "GARAGE_OWNER", "SUPER_ADMIN"]);
 
 export async function resolveTenantScope(req: Request): Promise<TenantScope> {
   const user = req.user as { id?: string; garageId?: string | null; role?: string | null } | undefined;

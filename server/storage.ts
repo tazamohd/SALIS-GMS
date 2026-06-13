@@ -765,7 +765,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, sql, isNull, gt } from "drizzle-orm";
-import { garageScope, stampGarageId } from "./tenancy/tenant-guard";
+import { garageScope, stampGarageId, branchScope, branchScopeByUserId } from "./tenancy/tenant-guard";
 import { createHash, randomUUID } from "crypto";
 
 // Interface for storage operations
@@ -2122,7 +2122,8 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(users).where(
       and(
         eq(users.userType, 'technician'),
-        garageScope(users.garageId, garageId)
+        garageScope(users.garageId, garageId),
+        branchScopeByUserId(users.id)
       )
     );
   }
@@ -2210,7 +2211,7 @@ export class DatabaseStorage implements IStorage {
   // Job Card operations - Module 8: Job Cards & Task Assignment
   async getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]> {
     // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
-    const conditions = [garageScope(jobCards.garageId, garageId)];
+    const conditions = [garageScope(jobCards.garageId, garageId), branchScope(jobCards.branchId)];
     if (assignedTo) {
       conditions.push(eq(jobCards.assignedTo, assignedTo));
     }
@@ -2520,7 +2521,7 @@ export class DatabaseStorage implements IStorage {
   // Appointment operations - Module 9: Appointments & Scheduling
   async getAppointments(garageId?: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Appointment[]> {
     // Tenant-scoped: always constrain to the resolved garage (deny-by-default).
-    const conditions = [garageScope(appointments.garageId, garageId)];
+    const conditions = [garageScope(appointments.garageId, garageId), branchScope(appointments.branchId)];
 
     if (status) {
       conditions.push(eq(appointments.status, status));
