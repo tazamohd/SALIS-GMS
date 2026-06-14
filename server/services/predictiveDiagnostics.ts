@@ -3,8 +3,10 @@ import OpenAI from "openai";
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
 const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  // Placeholder keeps the SDK from throwing at import when the integration is
-  // unconfigured; call sites guard on the env var before using the client.
+  // Placeholder keeps the SDK from throwing at construction when the integration
+  // is unconfigured (e.g. when tests import this module). With a real key it is a
+  // no-op; without one, the call fails at request time and the error propagates to
+  // the calling route's handler.
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
 });
 
