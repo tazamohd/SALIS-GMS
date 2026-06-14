@@ -29,9 +29,8 @@ export function resolveScopedGarageId(passed?: string | null): string | null {
   if (scope) {
     const fromContext = scope.impersonation?.targetGarageId ?? scope.garageId;
     if (fromContext) return fromContext;
-    // Authenticated platform principal not bound to a garage may target an
-    // explicit id (e.g. support tooling); a normal user with no garage denies.
-    if (scope.isPlatformPrincipal) return passed ?? null;
+    // Story 5.4: a platform principal must use an audited impersonation session to
+    // reach a tenant — no client-supplied `?garageId=` passthrough. Deny otherwise.
     return null;
   }
   // No Tenant Scope established (e.g. background job): honor an explicit id.

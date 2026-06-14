@@ -21,8 +21,8 @@ async function makePlatformPrincipal(email: string) {
   const client = new Client({ connectionString: process.env.DATABASE_URL! });
   await client.connect();
   try {
-    // A Platform Principal is a user not bound to a single garage.
-    await client.query(`UPDATE users SET garage_id = NULL WHERE email = $1`, [email]);
+    // A Platform Principal is an explicit super-admin (Story 5.3).
+    await client.query(`UPDATE users SET is_super_admin = true WHERE email = $1`, [email]);
   } finally {
     await client.end();
   }

@@ -39,9 +39,9 @@ describe("resolveScopedGarageId — deny-by-default precedence", () => {
     });
   });
 
-  it("lets an un-impersonating platform principal target an explicit id", () => {
+  it("DENIES an un-impersonating platform principal (must use audited impersonation; Story 5.4)", () => {
     runWithTenantScope(tenant({ garageId: null, isPlatformPrincipal: true }), () => {
-      expect(resolveScopedGarageId("garage-c")).toBe("garage-c");
+      expect(resolveScopedGarageId("garage-c")).toBeNull();
       expect(resolveScopedGarageId(undefined)).toBeNull();
     });
   });

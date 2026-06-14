@@ -1,6 +1,6 @@
 # Story 5.3: Explicit super-admin flag (replace null-garageId heuristic)
 
-Status: backlog
+Status: review (implemented 2026-06-14)
 
 ## Origin
 Code review 2026-06-13 (decision-needed #1, resolved → adopt explicit flag, deferred here).

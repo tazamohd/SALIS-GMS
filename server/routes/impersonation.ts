@@ -13,10 +13,10 @@ import { logAudit } from "../services/audit-trail";
 
 const router = Router();
 
-/** Only a Platform Principal (no garageId) may impersonate. */
+/** Only an explicit Platform Principal (is_super_admin) may impersonate (Story 5.3). */
 function requirePlatformPrincipal(req: any, res: any, next: any) {
   if (!req.user) return res.status(401).json({ message: "Authentication required" });
-  if (req.user.garageId) {
+  if (req.user.isSuperAdmin !== true) {
     return res.status(403).json({ message: "Only platform administrators may impersonate a tenant" });
   }
   next();

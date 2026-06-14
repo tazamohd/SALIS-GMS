@@ -103,6 +103,9 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
   // Role for access control: ADMIN, MANAGER, ADVISOR, TECHNICIAN, ACCOUNTANT
   role: varchar("role", { length: 50 }).default("ADVISOR"),
+  // Platform principal (super-admin): may impersonate tenants. Explicit flag so a
+  // null garageId is NOT mistaken for super-admin (Story 5.3).
+  isSuperAdmin: boolean("is_super_admin").default(false),
 });
 
 // User Role Branch (Many-to-Many relationship)

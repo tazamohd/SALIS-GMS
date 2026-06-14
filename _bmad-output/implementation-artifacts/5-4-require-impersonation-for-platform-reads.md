@@ -1,6 +1,6 @@
 # Story 5.4: Require audited impersonation for platform cross-tenant reads
 
-Status: backlog
+Status: review (implemented 2026-06-14)
 
 ## Origin
 Code review 2026-06-13 (decision-needed #2, resolved → require impersonation, deferred here).

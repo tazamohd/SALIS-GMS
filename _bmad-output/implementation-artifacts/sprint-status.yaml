@@ -59,8 +59,8 @@ development_status:
   epic-5: in-progress
   5-1-privileged-action-audit-events: done
   5-2-audited-impersonation-sessions: done
-  5-3-explicit-super-admin-flag: backlog
-  5-4-require-impersonation-for-platform-reads: backlog
+  5-3-explicit-super-admin-flag: review
+  5-4-require-impersonation-for-platform-reads: review
   epic-5-retrospective: optional
 
   epic-6: in-progress

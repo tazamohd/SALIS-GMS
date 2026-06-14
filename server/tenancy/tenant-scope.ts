@@ -35,14 +35,16 @@ function unique(ids: Array<string | null | undefined>): string[] {
 const GARAGE_LEVEL_ROLES = new Set(["ADMIN", "MANAGER", "ACCOUNTANT", "OWNER", "GARAGE_OWNER", "SUPER_ADMIN"]);
 
 export async function resolveTenantScope(req: Request): Promise<TenantScope> {
-  const user = req.user as { id?: string; garageId?: string | null; role?: string | null } | undefined;
+  const user = req.user as { id?: string; garageId?: string | null; role?: string | null; isSuperAdmin?: boolean } | undefined;
 
   if (!user?.id) {
     return ANONYMOUS_SCOPE;
   }
 
   const garageId: string | null = user.garageId ?? null;
-  const isPlatformPrincipal = !garageId;
+  // Platform principal is an EXPLICIT flag (Story 5.3) — never inferred from a
+  // missing garageId, so a detached/half-provisioned account is not a super-admin.
+  const isPlatformPrincipal = user.isSuperAdmin === true;
   const isGarageLevelRole = !!user.role && GARAGE_LEVEL_ROLES.has(user.role.toUpperCase());
 
   let branchIds: string[] = [];
