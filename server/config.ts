@@ -14,9 +14,14 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-// Fallback: allow AI_INTEGRATIONS_OPENAI_API_KEY as alias
+// Alias the two accepted OpenAI key names in both directions so a standard
+// OPENAI_API_KEY works everywhere (most services read AI_INTEGRATIONS_OPENAI_API_KEY,
+// a holdover from the Replit AI proxy), and the proxy name keeps working too.
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+}
+if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY && process.env.OPENAI_API_KEY) {
+  process.env.AI_INTEGRATIONS_OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 }
 
 export const config = {

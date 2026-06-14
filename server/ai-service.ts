@@ -3,8 +3,9 @@
 
 import OpenAI from "openai";
 
-// Validate OpenAI credentials with graceful fallback
-const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+// AI is available whenever an OpenAI API key is configured. A custom base URL
+// (e.g. the Replit AI proxy) is optional — without it the SDK targets OpenAI directly.
+const AI_AVAILABLE = !!process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
 
 if (!AI_AVAILABLE) {
   console.warn('⚠️  OpenAI credentials not found. AI features will return mock responses.');
@@ -12,8 +13,10 @@ if (!AI_AVAILABLE) {
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = AI_AVAILABLE ? new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+  ...(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL
+    ? { baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL }
+    : {}),
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
 }) : null;
 
 // AI Chatbot - Module 85
