@@ -63,6 +63,7 @@ import { subscriptionsRoutes } from "./subscriptions";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 import { tenantContextMiddleware } from "../tenancy/tenant-context.middleware";
 import { impersonationRoutes } from "./impersonation";
+import { loadUserPermissions } from "../rbac-middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -118,6 +119,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Load the caller's roles/permissions for every /api request (Epic 3 foundation).
+  // Additive — populates req.userRoles/req.userPermissions (cached); does not deny.
+  // Mounted before tenant context so scope resolution reuses the loaded role bindings.
+  app.use("/api", loadUserPermissions);
+  console.log("✅ User Permissions Loaded");
 
   // Establish the per-request Tenant Scope (AsyncLocalStorage) immediately after
   // auth so every downstream data access can be isolated without manual garageId
