@@ -13908,14 +13908,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/ai-chat-messages", isAuthenticated, async (req, res) => {
+  app.get("/api/ai-chat-messages", isAuthenticated, async (req: any, res) => {
     try {
       const { conversationId } = req.query;
       if (!conversationId) {
         return res.status(400).json({ message: "Conversation ID required" });
       }
-      // TODO: Implement getAIChatMessages in storage
-      res.json([]);
+      // Tenant scope: only return messages for a conversation in the caller's garage
+      const conversation = await storage.getAIChatConversation(String(conversationId));
+      if (!conversation || conversation.garageId !== req.user?.garageId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+      res.json(await storage.getAIChatMessages(String(conversationId)));
     } catch (error) {
       console.error("Error fetching AI messages:", error);
       res.status(500).json({ message: "Failed to fetch messages" });
@@ -13927,23 +13931,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { conversationId, message } = req.body;
       const { streamChatResponse } = await import("./ai-service");
       
-      // Create or get conversation
+      if (!message || typeof message !== "string") {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      // Create or load the conversation, scoped to the caller's garage
       let convId = conversationId;
-      if (!convId) {
+      if (convId) {
+        const existing = await storage.getAIChatConversation(convId);
+        if (!existing || existing.garageId !== req.user?.garageId) {
+          return res.status(404).json({ message: "Conversation not found" });
+        }
+      } else {
         const newConv = await storage.createAIChatConversation({
           userId: req.user?.id,
           garageId: req.user?.garageId,
-          title: message.substring(0, 50) + "...",
+          title: message.substring(0, 50) + (message.length > 50 ? "..." : ""),
           status: "active"
         });
         convId = newConv.id;
       }
 
-      // TODO: Save user message when storage method is available
-      // await storage.createAIChatMessage({ conversationId: convId, role: "user", content: message });
-
-      // Get conversation history (mock for now)
-      const chatHistory = [{ role: "user", content: message }];
+      // Persist the user message, then build history from stored messages
+      await storage.createAIChatMessage({ conversationId: convId, role: "user", content: message });
+      const history = await storage.getAIChatMessages(convId);
+      const chatHistory = history.map((m: any) => ({ role: m.role, content: m.content }));
 
       // Stream AI response
       res.setHeader('Content-Type', 'text/event-stream');
@@ -13956,8 +13968,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
       }
 
-      // TODO: Save AI response when storage method is available
-      // await storage.createAIChatMessage({ conversationId: convId, role: "assistant", content: aiResponse });
+      // Persist the assistant response
+      await storage.createAIChatMessage({ conversationId: convId, role: "assistant", content: aiResponse });
 
       res.write(`data: ${JSON.stringify({ done: true, conversationId: convId })}\n\n`);
       res.end();

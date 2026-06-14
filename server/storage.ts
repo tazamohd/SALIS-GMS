@@ -1337,6 +1337,8 @@ export interface IStorage {
   getAIChatConversations(garageId: string, customerId?: string, status?: string): Promise<any[]>;
   getAIChatConversation(id: string): Promise<any | undefined>;
   createAIChatConversation(data: any): Promise<any>;
+  getAIChatMessages(conversationId: string): Promise<any[]>;
+  createAIChatMessage(data: any): Promise<any>;
   updateAIChatConversation(id: string, data: any): Promise<any>;
   
   // Phase 1: AI & Automation - Voice Commands & OCR
@@ -6705,6 +6707,17 @@ export class DatabaseStorage implements IStorage {
       .where(eq(aiChatConversations.id, id))
       .returning();
     return conversation;
+  }
+
+  async getAIChatMessages(conversationId: string): Promise<any[]> {
+    return await db.select().from(aiChatMessages)
+      .where(eq(aiChatMessages.conversationId, conversationId))
+      .orderBy(aiChatMessages.createdAt);
+  }
+
+  async createAIChatMessage(data: any): Promise<any> {
+    const [message] = await db.insert(aiChatMessages).values(data).returning();
+    return message;
   }
 
   // Phase 1: AI & Automation - Voice Commands & OCR
