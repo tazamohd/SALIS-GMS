@@ -10751,8 +10751,21 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(customReports.createdAt));
   }
 
+  async getCustomReport(id: string): Promise<CustomReport | undefined> {
+    const [report] = await db.select().from(customReports).where(eq(customReports.id, id));
+    return report;
+  }
+
   async createCustomReport(data: InsertCustomReport): Promise<CustomReport> {
     const [report] = await db.insert(customReports).values(data).returning();
+    return report;
+  }
+
+  async updateCustomReport(id: string, data: Partial<CustomReport>): Promise<CustomReport> {
+    const [report] = await db.update(customReports)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(customReports.id, id))
+      .returning();
     return report;
   }
 

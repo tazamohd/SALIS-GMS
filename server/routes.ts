@@ -8189,8 +8189,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/analytics/custom-reports', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      // Return empty array for now - reports can be created
-      res.json([]);
+      if (!garageId) return res.json([]);
+      res.json(await storage.getCustomReports(garageId));
     } catch (error) {
       console.error("Error fetching custom reports:", error);
       res.status(500).json({ message: "Failed to fetch custom reports" });
@@ -8200,22 +8200,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/analytics/custom-reports', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      const { name, description, reportType, schedule } = req.body;
-      
-      // Mock creation - would use storage in production
-      const report = {
-        id: Math.random().toString(36).substring(7),
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const parsed = insertCustomReportSchema
+        .omit({ garageId: true, createdBy: true })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const report = await storage.createCustomReport({
+        ...parsed.data,
         garageId,
-        name,
-        description,
-        reportType,
-        schedule,
-        createdBy: userId,
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(report);
+        createdBy: req.user?.id,
+      });
+      res.status(201).json(report);
     } catch (error) {
       console.error("Error creating custom report:", error);
       res.status(500).json({ message: "Failed to create custom report" });
@@ -8224,8 +8223,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/analytics/custom-reports/:id/run', isAuthenticated, async (req: any, res) => {
     try {
-      // Mock running a report
-      res.json({ success: true, message: "Report generated successfully" });
+      const garageId = req.user?.garageId;
+      const report = await storage.getCustomReport(req.params.id);
+      if (!report || report.garageId !== garageId) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      const updated = await storage.updateCustomReport(req.params.id, { lastRunAt: new Date() });
+      res.json({ success: true, report: updated, ranAt: new Date().toISOString() });
     } catch (error) {
       console.error("Error running report:", error);
       res.status(500).json({ message: "Failed to run report" });
@@ -14222,42 +14226,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   //     res.status(500).json({ message: "Failed to generate heat maps" });
   //   }
   // });
-
-  // Custom Reports Builder (DB-backed, tenant-scoped)
-  app.post("/api/analytics/custom-report", isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      if (!garageId) {
-        return res.status(400).json({ message: "User has no garage assigned" });
-      }
-      const parsed = insertCustomReportSchema
-        .omit({ garageId: true, createdBy: true })
-        .safeParse(req.body);
-      if (!parsed.success) {
-        return res.status(400).json(sanitizeZodError(parsed.error));
-      }
-      const report = await storage.createCustomReport({
-        ...parsed.data,
-        garageId,
-        createdBy: req.user?.id,
-      });
-      res.status(201).json(report);
-    } catch (error) {
-      console.error("Error creating custom report:", error);
-      res.status(500).json({ message: "Failed to create custom report" });
-    }
-  });
-
-  app.get("/api/analytics/custom-reports", isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      if (!garageId) return res.json([]);
-      res.json(await storage.getCustomReports(garageId));
-    } catch (error) {
-      console.error("Error fetching custom reports:", error);
-      res.status(500).json({ message: "Failed to fetch custom reports" });
-    }
-  });
 
   // Dashboard Widgets (DB-backed, scoped to the user + garage)
   app.post("/api/analytics/widgets", isAuthenticated, async (req: any, res) => {

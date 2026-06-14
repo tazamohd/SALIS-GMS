@@ -14,8 +14,8 @@ beforeAll(async () => {
 });
 
 describe("Custom reports (DB-backed, tenant-scoped)", () => {
-  it("creates and lists a custom report scoped to the garage", async () => {
-    const create = await agent.post("/api/analytics/custom-report").send({
+  it("creates, lists, and runs a custom report scoped to the garage", async () => {
+    const create = await agent.post("/api/analytics/custom-reports").send({
       name: `Revenue ${Date.now()}`,
       reportType: "revenue",
       configuration: { groupBy: "month" },
@@ -27,10 +27,22 @@ describe("Custom reports (DB-backed, tenant-scoped)", () => {
     const list = await agent.get("/api/analytics/custom-reports");
     expect(list.status).toBe(200);
     expect(list.body.some((r: any) => r.id === create.body.id)).toBe(true);
+
+    const run = await agent.post(`/api/analytics/custom-reports/${create.body.id}/run`);
+    expect(run.status).toBe(200);
+    expect(run.body.success).toBe(true);
+    expect(run.body.report.lastRunAt).toBeTruthy();
+  });
+
+  it("returns 404 when running a report outside the caller's garage", async () => {
+    const res = await agent.post(
+      "/api/analytics/custom-reports/00000000-0000-0000-0000-000000000000/run",
+    );
+    expect(res.status).toBe(404);
   });
 
   it("rejects an invalid custom report body", async () => {
-    const res = await agent.post("/api/analytics/custom-report").send({ name: "x" });
+    const res = await agent.post("/api/analytics/custom-reports").send({ name: "x" });
     expect(res.status).toBe(400);
   });
 });
