@@ -13779,38 +13779,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   */
 
-  // Parts Auto-Reordering - Module 82
-  app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", partNumber: "OF-123", currentStock: 15, reorderPoint: 20, reorderQuantity: 50, status: "triggered" },
-    ]);
-  });
-
-  app.post("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
-  });
-
-  app.get("/api/auto-reorder/history", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", quantity: 50, supplier: "AutoParts Plus", status: "ordered" },
-    ]);
-  });
-
-  // Time Clock & Payroll - Module 84
-  app.post("/api/timeclock/clock-in", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked in successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.post("/api/timeclock/clock-out", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked out successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.get("/api/payroll/periods", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", periodStart: "2024-10-14", periodEnd: "2024-10-27", status: "draft" },
-    ]);
-  });
-
+  // Parts Auto-Reordering - Module 82, Time Clock - Module 84, payroll/periods:
+  // the DB-backed phase5Service handlers (auto-reorder rules/history, timeclock
+  // clock-in/out, payroll/periods) live in the Phase 5 section below. The mock
+  // stubs that used to be here shadowed them (Express runs the first match), so
+  // they were removed. (payroll/calculate has no real impl yet, so it stays.)
   app.post("/api/payroll/calculate", isAuthenticated, async (req, res) => {
     res.json({ totalGrossPay: 18500, totalDeductions: 3200, totalNetPay: 15300 });
   });
@@ -13832,16 +13805,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ]);
   });
 
-  // Multi-Location Routing - Module 83
-  app.get("/api/routing/routes", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "parts_transfer", stops: 4, distance: 12.5, duration: 45, driver: "Mike Davis", status: "planned" },
-    ]);
-  });
-
-  app.post("/api/routing/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Route optimized", routeId: "route-123" });
-  });
+  // Multi-Location Routing - Module 83: /api/routing/routes and /api/routing/optimize
+  // are handled by the DB-backed phase5Service implementation in the Phase 5 section
+  // below. The mock stubs that shadowed them were removed.
 
   // ========================================
   // PHASE 6: COMPLIANCE & QUALITY
@@ -13865,15 +13831,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ]);
   });
 
-  app.get("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "NC-2024-001", title: "Incorrect torque on wheel nuts", severity: "major", status: "resolved" },
-    ]);
-  });
-
-  app.post("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "NC-NEW", ...req.body });
-  });
+  // /api/quality/non-conformances (GET/POST) are handled by the DB-backed
+  // phase5Service implementation in the Phase 5 section below; the mock stubs that
+  // shadowed them were removed.
 
   // Safety Incidents - Module 88
   app.get("/api/safety-incidents", isAuthenticated, async (req, res) => {

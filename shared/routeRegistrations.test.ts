@@ -6,42 +6,50 @@ import { resolve } from "path";
  * Static guard against duplicate route registrations in the monolith.
  *
  * Express runs the FIRST handler registered for a given method+path; any later
- * registration of the same method+path is dead code (a real bug — see the
- * custom-reports shadowing fixed in Sprint 20). This test parses server/routes.ts
- * and fails if a NEW duplicate appears beyond the documented baseline below.
+ * registration of the same method+path is dead code (a real bug — e.g. mock
+ * handlers shadowing the DB-backed phase5Service ones, fixed in Sprints 20–22).
+ * This parses server/routes.ts (ignoring block and line comments) and fails if a
+ * NEW duplicate appears beyond the documented baseline below.
  *
- * The baseline captures 24 pre-existing duplicates. Drive it toward zero by
- * consolidating handlers and removing entries here — never add to it.
+ * Drive the baseline toward zero by consolidating handlers and removing entries
+ * here — never add to it.
  */
 const BASELINE = new Set<string>([
-  "GET /api/auto-reorder/history",
-  "GET /api/auto-reorder/rules",
   "GET /api/contracts/enhanced",
   "GET /api/hr/performance-reviews",
   "GET /api/loyalty-accounts",
   "GET /api/loyalty-accounts/:id",
   "GET /api/notification-preferences",
   "GET /api/payroll/periods",
-  "GET /api/quality/non-conformances",
-  "GET /api/routing/routes",
-  "GET /api/scheduling/rules",
   "PATCH /api/hr/performance-reviews/:id",
   "PATCH /api/loyalty-accounts/:id",
-  "POST /api/auto-reorder/rules",
   "POST /api/barcode/scan",
   "POST /api/hr/performance-reviews",
   "POST /api/loyalty-accounts",
   "POST /api/marketplace/orders",
-  "POST /api/quality/non-conformances",
-  "POST /api/routing/optimize",
-  "POST /api/scheduling/optimize",
-  "POST /api/timeclock/clock-in",
-  "POST /api/timeclock/clock-out",
   "POST /api/video-estimates",
 ]);
 
+/** Remove block comments while preserving line numbers. */
+function stripBlockComments(src: string): string {
+  let out = "";
+  let i = 0;
+  while (i < src.length) {
+    if (src[i] === "/" && src[i + 1] === "*") {
+      const end = src.indexOf("*/", i + 2);
+      const stop = end === -1 ? src.length : end;
+      out += "\n".repeat((src.slice(i, stop).match(/\n/g) || []).length);
+      i = stop + 2;
+    } else {
+      out += src[i];
+      i += 1;
+    }
+  }
+  return out;
+}
+
 function findDuplicateRoutes(): Map<string, number[]> {
-  const src = readFileSync(resolve(process.cwd(), "server/routes.ts"), "utf8");
+  const src = stripBlockComments(readFileSync(resolve(process.cwd(), "server/routes.ts"), "utf8"));
   const re = /app\.(get|post|put|patch|delete)\(\s*['"]([^'"]+)['"]/;
   const seen = new Map<string, number[]>();
   src.split("\n").forEach((line, idx) => {
