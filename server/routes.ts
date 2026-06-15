@@ -14764,28 +14764,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get financial reports (mobile)
-  app.get("/api/mobile/manager/reports", isAuthenticated, async (req, res) => {
+  // Get financial reports (mobile) — real per-garage figures
+  app.get("/api/mobile/manager/reports", isAuthenticated, async (req: any, res) => {
     try {
-      const { period } = req.query; // period: 'today' | 'week' | 'month'
-      
-      // Mock financial reports
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const { period } = req.query; // 'today' | 'week' | 'month'
+      const now = new Date();
+      const start = new Date();
+      switch (period) {
+        case 'week':
+          start.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          start.setMonth(now.getMonth() - 1);
+          break;
+        default:
+          start.setHours(0, 0, 0, 0); // today
+      }
+      const { generateBusinessIntelligenceReport } = await import("./analytics-service");
+      const report: any = await generateBusinessIntelligenceReport(garageId, { start, end: now });
+      const revenue: any = report.revenue || {};
+      const totalRevenue = Number(revenue.total_revenue || 0);
+      // Cost estimate (65% of revenue), consistent with /api/analytics/dashboard-metrics.
+      const totalExpenses = Math.round(totalRevenue * 0.65);
+      const netProfit = totalRevenue - totalExpenses;
+      const profitMargin = totalRevenue > 0 ? Number(((netProfit / totalRevenue) * 100).toFixed(1)) : 0;
+      const topServices = (report.topServices || []).slice(0, 5).map((s: any) => ({
+        service: s.service_type,
+        revenue: Number(s.revenue || 0),
+        count: Number(s.service_count || 0),
+      }));
       res.json({
         period: period || 'today',
-        totalRevenue: 45890,
-        totalExpenses: 23450,
-        netProfit: 22440,
-        profitMargin: 48.9,
-        breakdown: {
-          labor: 18500,
-          parts: 15670,
-          other: 11720
-        },
-        topServices: [
-          { service: "Oil Change", revenue: 8900, count: 45 },
-          { service: "Brake Repair", revenue: 12300, count: 18 },
-          { service: "Engine Diagnostics", revenue: 15400, count: 12 }
-        ]
+        totalRevenue,
+        totalExpenses,
+        netProfit,
+        profitMargin,
+        topServices,
       });
     } catch (error) {
       console.error("Error fetching reports:", error);

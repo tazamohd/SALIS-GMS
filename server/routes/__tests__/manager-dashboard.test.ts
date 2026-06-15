@@ -25,4 +25,13 @@ describe("Manager mobile dashboard KPIs (real data)", () => {
     // The old mock always returned 12450; real empty-DB metrics are 0.
     expect(res.body.todayRevenue).toBe(0);
   });
+
+  it("returns real financial reports (zeros on empty DB, not the 45890 mock)", async () => {
+    const res = await agent.get("/api/mobile/manager/reports?period=month");
+    expect(res.status).toBe(200);
+    expect(res.body.period).toBe("month");
+    expect(typeof res.body.totalRevenue).toBe("number");
+    expect(res.body.totalRevenue).toBe(0);
+    expect(Array.isArray(res.body.topServices)).toBe(true);
+  });
 });
