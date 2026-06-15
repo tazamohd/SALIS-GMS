@@ -3,6 +3,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
+import { sanitizeForLog } from "./utils/sanitizeForLog";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import {
   hrDepartments,
@@ -5989,7 +5990,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.bulkDelete(module, ids);
       res.json(result);
     } catch (error: any) {
-      console.error("Error in bulk delete:", error);
+      // Sanitize before logging: the error message can embed user-supplied
+      // module/ids values (CWE-117 log injection).
+      console.error("Error in bulk delete:", sanitizeForLog(error));
       res.status(500).json({ message: error.message || "Failed to delete items" });
     }
   });
@@ -6005,7 +6008,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.bulkUpdate(module, ids, data);
       res.json(result);
     } catch (error: any) {
-      console.error("Error in bulk update:", error);
+      // Sanitize before logging: the error message can embed user-supplied
+      // module/ids/data values (CWE-117 log injection).
+      console.error("Error in bulk update:", sanitizeForLog(error));
       res.status(500).json({ message: error.message || "Failed to update items" });
     }
   });
