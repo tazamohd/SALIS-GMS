@@ -64,7 +64,7 @@ development_status:
   epic-5-retrospective: optional
 
   epic-6: in-progress
-  6-1-extend-isolation-harness-to-high-risk-endpoints-ci-gate: backlog
+  6-1-extend-isolation-harness-to-high-risk-endpoints-ci-gate: review
   6-2-ci-guard-against-unscoped-tenant-queries: review
   epic-6-retrospective: optional
 

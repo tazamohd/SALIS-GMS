@@ -149,4 +149,25 @@ describe("Tenant isolation — Garage A cannot reach Garage B", () => {
       expect(blob).not.toContain(bCustomer.id);
     }
   });
+
+  it("customer sub-resource reads are tenant-scoped", async () => {
+    // B's customer owns a vehicle; A querying that customer's sub-resources gets nothing.
+    const bVeh = await seedVehicle(agentB, bCustomer.id, garageB);
+
+    const aSub = await agentA.get(`/api/customers/${bCustomer.id}/vehicles`);
+    expect(aSub.status).toBe(200);
+    expect((aSub.body as any[]).map((v) => v.id)).not.toContain(bVeh.id);
+
+    // B still sees its own customer's vehicle.
+    const bSub = await agentB.get(`/api/customers/${bCustomer.id}/vehicles`);
+    expect((bSub.body as any[]).map((v) => v.id)).toContain(bVeh.id);
+  });
+
+  it("CSV export is tenant-scoped (no whole-database dump)", async () => {
+    const res = await agentA.get("/api/export/csv/customers");
+    expect(res.status).toBe(200);
+    // A's export contains A's customer and NOT B's.
+    expect(res.text).toContain(aCustomer.id);
+    expect(res.text).not.toContain(bCustomer.id);
+  });
 });

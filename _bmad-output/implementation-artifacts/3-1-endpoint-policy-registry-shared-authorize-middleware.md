@@ -19,6 +19,9 @@ Enforce the **existing seeded RBAC** (`roles`/`permissions`/`role_permissions` +
 ## Deliberately deferred to Story 3.2 (high-risk, incremental)
 - The **deny-by-default flip**: applying `requirePermission`/a policy registry across the ~860 endpoints. A blanket flip would lock users out wherever the seeded permissions are incomplete. Plan: introduce a policy registry, enforce module-by-module with CI between each, and surface a coverage report.
 
+## Coverage measured (Story 3.2 input, 2026-06-15)
+A scan (`rbac-coverage-report.md`) quantifies the gap: **767 mutation endpoints, only 9 role-guarded, 758 auth-only**. Confirms deny-by-default must be applied per-endpoint with a product-defined required-role matrix — a blind flip across 758 endpoints would lock users out. Enforcement (3.2) is therefore gated on that matrix; the report is the worksheet.
+
 ## Dev Notes
 - Mount order matters: permissions load → tenant scope → routes. [Source: server/routes/index.ts]
 - `requirePermission` (rbac-middleware) previously 500'd with "Permissions not loaded" because nothing mounted `loadUserPermissions` globally — now resolved.
