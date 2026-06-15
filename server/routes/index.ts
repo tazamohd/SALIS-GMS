@@ -64,6 +64,7 @@ import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../
 import { tenantContextMiddleware } from "../tenancy/tenant-context.middleware";
 import { impersonationRoutes } from "./impersonation";
 import { loadUserPermissions } from "../rbac-middleware";
+import { authorizeByPolicy } from "../authz/authorize.middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -125,6 +126,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mounted before tenant context so scope resolution reuses the loaded role bindings.
   app.use("/api", loadUserPermissions);
   console.log("✅ User Permissions Loaded");
+
+  // Deny-by-default RBAC for mapped mutation route groups (Story 3.2). ADMIN bypass;
+  // unmapped mutations pass (incremental rollout). Centralized so both route layers
+  // get the same decision. Mounted without a prefix so req.path keeps the /api prefix
+  // the policy patterns match against.
+  app.use(authorizeByPolicy);
+  console.log("✅ RBAC Authorize Middleware Initialized");
 
   // Establish the per-request Tenant Scope (AsyncLocalStorage) immediately after
   // auth so every downstream data access can be isolated without manual garageId
