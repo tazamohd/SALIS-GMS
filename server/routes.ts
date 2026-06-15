@@ -6043,81 +6043,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Discounts & Promotions
-  app.get('/api/discounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId, isActive } = req.query;
-      if (!garageId) {
-        return res.status(400).json({ message: "garageId is required" });
-      }
-      const discounts = await storage.getDiscounts(
-        garageId,
-        isActive === 'true' ? true : isActive === 'false' ? false : undefined
-      );
-      res.json(discounts);
-    } catch (error) {
-      console.error("Error fetching discounts:", error);
-      res.status(500).json({ message: "Failed to fetch discounts" });
-    }
-  });
-
-  app.get('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const discount = await storage.getDiscount(id);
-      if (!discount) {
-        return res.status(404).json({ message: "Discount not found" });
-      }
-      res.json(discount);
-    } catch (error) {
-      console.error("Error fetching discount:", error);
-      res.status(500).json({ message: "Failed to fetch discount" });
-    }
-  });
-
-  app.post('/api/discounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const discount = await storage.createDiscount({ ...req.body, createdBy: userId });
-      res.status(201).json(discount);
-    } catch (error) {
-      console.error("Error creating discount:", error);
-      res.status(500).json({ message: "Failed to create discount" });
-    }
-  });
-
-  app.patch('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const discount = await storage.updateDiscount(id, req.body);
-      res.json(discount);
-    } catch (error) {
-      console.error("Error updating discount:", error);
-      res.status(500).json({ message: "Failed to update discount" });
-    }
-  });
-
-  app.delete('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteDiscount(id);
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting discount:", error);
-      res.status(500).json({ message: "Failed to delete discount" });
-    }
-  });
-
-  app.post('/api/discounts/validate', isAuthenticated, async (req: any, res) => {
-    try {
-      const { code, garageId, amount } = req.body;
-      const userId = req.user?.id || 'default-user';
-      const result = await storage.validateDiscount(code, garageId, userId, amount);
-      res.json(result);
-    } catch (error) {
-      console.error("Error validating discount:", error);
-      res.status(500).json({ message: "Failed to validate discount" });
-    }
-  });
+  // Discounts & promotions migrated to server/routes/discounts.routes.ts (tenant-scoped
+  // + RBAC; mutations are ADMIN/MANAGER, validate is authenticated), mounted ahead of
+  // the monolith. Old handlers read garageId from the query/body and lacked per-garage
+  // ownership checks on get/update/delete — removed.
 
   // Tax Calculation
   app.post('/api/calculate-tax', isAuthenticated, async (req: any, res) => {

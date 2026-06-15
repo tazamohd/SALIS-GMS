@@ -53,6 +53,7 @@ import { arRoutes } from "./ar.routes";
 import { inventoryForecastsRoutes } from "./inventory-forecasts.routes";
 import { serviceBaysRoutes } from "./service-bays.routes";
 import { replenishmentOrdersRoutes } from "./replenishment-orders.routes";
+import { discountsRoutes } from "./discounts.routes";
 import { toolRoutes } from "./tools.routes";
 // NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
 // /api/tools, /api/service-templates, /api/notifications and /api/backup remain
@@ -286,6 +287,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Replenishment orders (tenant-scoped + RBAC) — mounted ahead of the monolith
   app.use("/api", replenishmentOrdersRoutes);
   console.log("✅ Replenishment Orders Routes Loaded");
+
+  // Discounts & promotions (tenant-scoped + RBAC) — mounted ahead of the monolith
+  app.use("/api", discountsRoutes);
+  console.log("✅ Discounts Routes Loaded");
 
   // Tools catalogue CRUD — mounted ahead of the monolith
   app.use("/api", toolRoutes);
