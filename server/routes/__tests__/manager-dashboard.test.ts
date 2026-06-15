@@ -34,4 +34,12 @@ describe("Manager mobile dashboard KPIs (real data)", () => {
     expect(res.body.totalRevenue).toBe(0);
     expect(Array.isArray(res.body.topServices)).toBe(true);
   });
+
+  it("returns a real (array) team roster scoped to the garage", async () => {
+    const res = await agent.get("/api/mobile/manager/team");
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    // No hardcoded "Mike Davis" mock rows.
+    expect(res.body.some((m: any) => m.name === "Mike Davis" && m.id === "1")).toBe(false);
+  });
 });

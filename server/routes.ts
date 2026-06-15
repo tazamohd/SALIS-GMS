@@ -14747,17 +14747,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get team overview (mobile)
+  // Get team overview (mobile) — real garage technicians + their active job
   app.get("/api/mobile/manager/team", isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
-      
-      // Mock team data
-      res.json([
-        { id: "1", name: "Mike Davis", role: "Lead Technician", status: "active", currentJob: "JOB-1234", utilization: 92 },
-        { id: "2", name: "Emily Brown", role: "Technician", status: "active", currentJob: "JOB-1235", utilization: 88 },
-        { id: "3", name: "John Smith", role: "Technician", status: "on_break", currentJob: null, utilization: 75 }
-      ]);
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const technicians = await storage.getTechnicians(userGarageId);
+      const jobs = (await storage.getJobCards(userGarageId)) as any[];
+      const activeByTech = new Map<string, any>();
+      for (const j of jobs) {
+        if (j.status === "in_progress" && j.assignedTo && !activeByTech.has(j.assignedTo)) {
+          activeByTech.set(j.assignedTo, j);
+        }
+      }
+      res.json(
+        (technicians as any[]).map((t) => {
+          const job = activeByTech.get(t.id);
+          const name =
+            [t.firstName, t.lastName].filter(Boolean).join(" ") ||
+            t.username ||
+            t.email ||
+            "Technician";
+          return {
+            id: t.id,
+            name,
+            role: t.userType || "technician",
+            status: job ? "active" : "available",
+            currentJob: job ? job.jobCardNumber || job.jobNumber || job.id : null,
+          };
+        }),
+      );
     } catch (error) {
       console.error("Error fetching team data:", error);
       res.status(500).json({ message: "Failed to fetch team data" });
