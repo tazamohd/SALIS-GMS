@@ -57,6 +57,7 @@ import { discountsRoutes } from "./discounts.routes";
 import { taxConfigurationsRoutes } from "./tax-configurations.routes";
 import { filterPresetsRoutes } from "./filter-presets.routes";
 import { exportJobsRoutes } from "./export-jobs.routes";
+import { inventoryTransfersRoutes } from "./inventory-transfers.routes";
 import { toolRoutes } from "./tools.routes";
 // NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
 // /api/tools, /api/service-templates, /api/notifications and /api/backup remain
@@ -306,6 +307,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export jobs (garage + user scoped) — mounted ahead of the monolith
   app.use("/api", exportJobsRoutes);
   console.log("✅ Export Jobs Routes Loaded");
+
+  // Inventory transfers (tenant-scoped + RBAC) — mounted ahead of the monolith
+  app.use("/api", inventoryTransfersRoutes);
+  console.log("✅ Inventory Transfers Routes Loaded");
 
   // Tools catalogue CRUD — mounted ahead of the monolith
   app.use("/api", toolRoutes);

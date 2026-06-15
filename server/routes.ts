@@ -5748,78 +5748,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Inventory Transfers
-  app.get('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId, status } = req.query;
-      if (!garageId) {
-        return res.status(400).json({ message: "garageId is required" });
-      }
-      const transfers = await storage.getInventoryTransfers(garageId as string, status as string);
-      res.json(transfers);
-    } catch (error) {
-      console.error("Error fetching inventory transfers:", error);
-      res.status(500).json({ message: "Failed to fetch inventory transfers" });
-    }
-  });
-
-  app.get('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const transfer = await storage.getInventoryTransfer(id);
-      if (!transfer) {
-        return res.status(404).json({ message: "Transfer not found" });
-      }
-      res.json(transfer);
-    } catch (error) {
-      console.error("Error fetching inventory transfer:", error);
-      res.status(500).json({ message: "Failed to fetch inventory transfer" });
-    }
-  });
-
-  app.post('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
-    try {
-      const transfer = await storage.createInventoryTransfer(req.body);
-      res.status(201).json(transfer);
-    } catch (error) {
-      console.error("Error creating inventory transfer:", error);
-      res.status(500).json({ message: "Failed to create inventory transfer" });
-    }
-  });
-
-  app.patch('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const transfer = await storage.updateInventoryTransfer(id, req.body);
-      res.json(transfer);
-    } catch (error) {
-      console.error("Error updating inventory transfer:", error);
-      res.status(500).json({ message: "Failed to update inventory transfer" });
-    }
-  });
-
-  app.post('/api/inventory-transfers/:id/approve', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const userId = req.user?.id || 'default-user';
-      const transfer = await storage.approveInventoryTransfer(id, userId);
-      res.json(transfer);
-    } catch (error) {
-      console.error("Error approving inventory transfer:", error);
-      res.status(500).json({ message: "Failed to approve inventory transfer" });
-    }
-  });
-
-  app.post('/api/inventory-transfers/:id/complete', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const userId = req.user?.id || 'default-user';
-      const transfer = await storage.completeInventoryTransfer(id, userId);
-      res.json(transfer);
-    } catch (error) {
-      console.error("Error completing inventory transfer:", error);
-      res.status(500).json({ message: "Failed to complete inventory transfer" });
-    }
-  });
+  // Inventory transfers migrated to server/routes/inventory-transfers.routes.ts
+  // (tenant-scoped; create is staff-authenticated, update/approve/complete are
+  // ADMIN/MANAGER), mounted ahead of the monolith. Old handlers read garageId from the
+  // query and lacked per-garage ownership checks on get/update/approve/complete — removed.
 
   // TecDoc Integration
   app.post('/api/tecdoc/search', isAuthenticated, async (req: any, res) => {
