@@ -3,14 +3,17 @@ import type { IStorage } from "../storage";
 import type { JobCard, User, TechnicianProfile } from "@shared/schema";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  // Placeholder keeps the SDK from throwing at construction when the integration
-  // is unconfigured (e.g. when tests import this module). With a real key it is a
-  // no-op; without one, the call fails at request time and the error propagates to
-  // the calling route's handler.
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
+// AI integration is optional. Build the client only when both the base URL and key
+// are configured (the SDK throws at construction otherwise); when unconfigured it
+// is null and callOpenAIForRecommendations guards on it before making a request.
+const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+
+const openai = AI_AVAILABLE
+  ? new OpenAI({
+      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    })
+  : null;
 
 interface TechnicianRecommendation {
   technicianId: string;
@@ -82,6 +85,10 @@ async function buildAssignmentContext(
 async function callOpenAIForRecommendations(
   context: AssignmentContext
 ): Promise<TechnicianRecommendation[]> {
+  if (!openai) {
+    throw new Error("AI integration is not configured");
+  }
+
   const { jobCard, availableTechnicians, assignmentRules } = context;
 
   const systemPrompt = `You are an expert automotive technician assignment system for a garage. Your task is to recommend the best technicians for a given job based on skills, workload, experience, and assignment rules.

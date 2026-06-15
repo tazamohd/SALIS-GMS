@@ -1,14 +1,17 @@
 import OpenAI from "openai";
 
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  // Placeholder keeps the SDK from throwing at construction when the integration
-  // is unconfigured (e.g. when tests import this module). With a real key it is a
-  // no-op; without one, the call fails at request time and the error propagates to
-  // the calling route's handler.
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
+// AI integration is optional. Build the client only when both the base URL and key
+// are configured (the SDK throws at construction otherwise); when unconfigured it
+// is null and each function guards on it before making a request.
+const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+
+const openai = AI_AVAILABLE
+  ? new OpenAI({
+      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    })
+  : null;
 
 export interface VehicleDiagnosticInput {
   vehicleId: string;
@@ -41,6 +44,10 @@ export interface DiagnosticPrediction {
 export async function generatePredictiveDiagnostic(
   input: VehicleDiagnosticInput
 ): Promise<DiagnosticPrediction> {
+  if (!openai) {
+    throw new Error("AI integration is not configured");
+  }
+
   const prompt = `You are an expert automotive diagnostic AI. Analyze the following vehicle data and predict potential failures or maintenance needs.
 
 Vehicle Information:

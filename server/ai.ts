@@ -2,15 +2,19 @@ import OpenAI from "openai";
 
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
 // The newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-// The OpenAI SDK throws at construction when neither apiKey nor OPENAI_API_KEY is
-// set, so a placeholder keeps imports safe when the integration is unconfigured —
-// e.g. the test suite booting the full route tree. With a real key this is a no-op.
-// Without one, calls reach the API and fail at request time; every function below
-// wraps its call in try/catch and returns a graceful fallback.
-export const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
+// AI integration is optional. The OpenAI SDK throws at construction when no key is
+// present, so build the client only when both the base URL and key are configured;
+// otherwise it is null. Each entry point guards on `openai` and degrades gracefully
+// when the integration is unconfigured (local dev, or the test suite importing the
+// full route tree), avoiding a doomed request with placeholder credentials.
+const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+
+export const openai = AI_AVAILABLE
+  ? new OpenAI({
+      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    })
+  : null;
 
 export const AI_MODEL = "gpt-5";
 export const AI_MAX_TOKENS = 8192;
@@ -64,6 +68,15 @@ interface ScheduleOptimizationInput {
 }
 
 export async function estimateJobTime(input: JobEstimationInput) {
+  if (!openai) {
+    return {
+      estimatedHours: 0,
+      estimatedCost: 0,
+      confidence: 0,
+      reasoning: "AI service unavailable",
+      error: "AI integration is not configured"
+    };
+  }
   try {
     const prompt = `You are an expert automotive service estimator. Analyze the following job and provide a time and cost estimation.
 
@@ -129,6 +142,12 @@ Provide your estimation in JSON format with the following structure:
 }
 
 export async function predictMaintenance(input: MaintenancePredictionInput) {
+  if (!openai) {
+    return {
+      predictions: [],
+      error: "AI integration is not configured"
+    };
+  }
   try {
     const prompt = `You are an expert automotive diagnostician. Analyze the vehicle service history and predict potential maintenance needs.
 
@@ -190,6 +209,15 @@ Identify potential upcoming maintenance needs or issues. Provide your analysis i
 }
 
 export async function recommendParts(input: PartsRecommendationInput) {
+  if (!openai) {
+    return {
+      parts: [],
+      totalEstimatedCost: 0,
+      reasoning: "AI service unavailable",
+      confidence: 0,
+      error: "AI integration is not configured"
+    };
+  }
   try {
     const prompt = `You are an expert automotive parts specialist. Recommend the necessary parts for the following service.
 
@@ -261,6 +289,15 @@ Provide parts recommendations in JSON format:
 }
 
 export async function optimizeSchedule(input: ScheduleOptimizationInput) {
+  if (!openai) {
+    return {
+      conflicts: [],
+      suggestions: [],
+      totalPotentialTimeSaved: 0,
+      reasoning: "AI service unavailable",
+      error: "AI integration is not configured"
+    };
+  }
   try {
     const prompt = `You are an expert in automotive service scheduling optimization. Analyze the current schedule and provide optimization suggestions.
 
@@ -339,8 +376,15 @@ Identify scheduling conflicts, inefficiencies, and provide optimization suggesti
 }
 
 export async function chatWithCustomer(message: string, conversationHistory: Array<{ role: string; content: string }>, garageContext: any) {
+  if (!openai) {
+    return {
+      response: "I apologize, but I'm experiencing technical difficulties. Please contact staff for assistance.",
+      shouldHandoff: true,
+      error: "AI integration is not configured"
+    };
+  }
   try {
-    const systemPrompt = `You are a helpful customer support assistant for an automotive service garage. 
+    const systemPrompt = `You are a helpful customer support assistant for an automotive service garage.
 
 Garage Information:
 - Name: ${garageContext.garageName}

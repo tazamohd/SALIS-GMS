@@ -59,6 +59,12 @@ CUSTOMERS:
 - No-Show Rate: ${customerMetrics.noShowRate}%
 `;
 
+    // Fall back to rule-based insights when the AI integration is not configured
+    if (!openai) {
+      insights.push(...await getRuleBasedInsights(garageId));
+      return insights;
+    }
+
     // Get AI-powered insights
     const response = await openai.chat.completions.create({
       model: AI_MODEL,

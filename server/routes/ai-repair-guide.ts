@@ -104,8 +104,8 @@ router.post("/ai/repair-guide", isAuthenticated, requirePlan("ENTERPRISE"), asyn
     /* non-fatal — fall through with generic vehicleInfo */
   }
 
-  // Graceful fallback when no AI integration key is configured
-  if (!process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
+  // Graceful fallback when the AI integration is not configured
+  if (!openai) {
     return res.json({
       vehicleInfo,
       steps: fallbackSteps(parsed.data.guide),

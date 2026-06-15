@@ -1,14 +1,17 @@
 import OpenAI from "openai";
 
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
-const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  // Placeholder keeps the SDK from throwing at construction when the integration
-  // is unconfigured (e.g. when tests import this module). With a real key it is a
-  // no-op; without one, calls fail at request time and are handled by each
-  // function's try/catch below.
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
+// AI integration is optional. Build the client only when both the base URL and key
+// are configured (the SDK throws at construction otherwise); when unconfigured it
+// is null and each function guards on it before making a request.
+const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
+
+const openai = AI_AVAILABLE
+  ? new OpenAI({
+      baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    })
+  : null;
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -31,6 +34,10 @@ export async function generateChatbotResponse(
   context: ChatbotContext,
   userMessage: string
 ): Promise<string> {
+  if (!openai) {
+    throw new Error("AI integration is not configured");
+  }
+
   const systemPrompt = `You are an AI assistant for SALIS AUTO, a world-class automotive service center. Your role is to:
 
 1. Answer customer questions about services, pricing, and vehicle maintenance
@@ -82,6 +89,10 @@ export async function extractBookingIntent(message: string): Promise<{
   preferredDate?: string;
   urgency?: "low" | "medium" | "high";
 }> {
+  if (!openai) {
+    return { isBookingRequest: false };
+  }
+
   const prompt = `Analyze this customer message and determine if they want to book a service appointment.
 
 Customer message: "${message}"
@@ -124,6 +135,10 @@ export async function diagnoseProblem(symptoms: string, vehicleInfo?: {
   urgency: "low" | "medium" | "high" | "critical";
   estimatedCost?: string;
 }> {
+  if (!openai) {
+    throw new Error("AI integration is not configured");
+  }
+
   const prompt = `As an automotive diagnostic expert, analyze these vehicle symptoms and provide diagnosis.
 
 ${vehicleInfo ? `Vehicle: ${vehicleInfo.year} ${vehicleInfo.make} ${vehicleInfo.model}${vehicleInfo.mileage ? `, Mileage: ${vehicleInfo.mileage}` : ""}` : ""}
