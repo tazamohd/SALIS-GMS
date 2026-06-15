@@ -10920,6 +10920,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(serviceBays).orderBy(serviceBays.bayNumber);
   }
 
+  async getServiceBay(id: string): Promise<ServiceBay | undefined> {
+    const [bay] = await db.select().from(serviceBays).where(eq(serviceBays.id, id));
+    return bay;
+  }
+
   async getServiceBaysWithSessions(garageId?: string): Promise<any[]> {
     const bays = await this.getServiceBays(garageId);
     
@@ -11069,8 +11074,14 @@ export class DatabaseStorage implements IStorage {
       .set({ endTime: new Date() })
       .where(eq(bayOccupancySessions.id, sessionId))
       .returning();
-    
+
     return updatedSession;
+  }
+
+  async getBaySession(id: string): Promise<BayOccupancySession | undefined> {
+    const [session] = await db.select().from(bayOccupancySessions)
+      .where(eq(bayOccupancySessions.id, id));
+    return session;
   }
 
   // Automated Inventory Reordering Module

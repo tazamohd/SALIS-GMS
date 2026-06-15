@@ -51,6 +51,7 @@ import { workshopResourcesRoutes } from "./workshop-resources.routes";
 import { loyaltyTiersRoutes } from "./loyalty-tiers.routes";
 import { arRoutes } from "./ar.routes";
 import { inventoryForecastsRoutes } from "./inventory-forecasts.routes";
+import { serviceBaysRoutes } from "./service-bays.routes";
 import { toolRoutes } from "./tools.routes";
 // NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
 // /api/tools, /api/service-templates, /api/notifications and /api/backup remain
@@ -276,6 +277,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inventory forecasts (tenant-scoped) — mounted ahead of the monolith
   app.use("/api", inventoryForecastsRoutes);
   console.log("✅ Inventory Forecasts Routes Loaded");
+
+  // Service bays + occupancy sessions (tenant-scoped) — mounted ahead of the monolith
+  app.use("/api", serviceBaysRoutes);
+  console.log("✅ Service Bays Routes Loaded");
 
   // Tools catalogue CRUD — mounted ahead of the monolith
   app.use("/api", toolRoutes);
