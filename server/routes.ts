@@ -5992,55 +5992,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Tax Configurations
-  app.get('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId, isActive } = req.query;
-      if (!garageId) {
-        return res.status(400).json({ message: "garageId is required" });
-      }
-      const configs = await storage.getTaxConfigurations(
-        garageId, 
-        isActive === 'true' ? true : isActive === 'false' ? false : undefined
-      );
-      res.json(configs);
-    } catch (error) {
-      console.error("Error fetching tax configurations:", error);
-      res.status(500).json({ message: "Failed to fetch tax configurations" });
-    }
-  });
-
-  app.post('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const config = await storage.createTaxConfiguration({ ...req.body, createdBy: userId });
-      res.status(201).json(config);
-    } catch (error) {
-      console.error("Error creating tax configuration:", error);
-      res.status(500).json({ message: "Failed to create tax configuration" });
-    }
-  });
-
-  app.patch('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const config = await storage.updateTaxConfiguration(id, req.body);
-      res.json(config);
-    } catch (error) {
-      console.error("Error updating tax configuration:", error);
-      res.status(500).json({ message: "Failed to update tax configuration" });
-    }
-  });
-
-  app.delete('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteTaxConfiguration(id);
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting tax configuration:", error);
-      res.status(500).json({ message: "Failed to delete tax configuration" });
-    }
-  });
+  // Tax configurations migrated to server/routes/tax-configurations.routes.ts
+  // (tenant-scoped + RBAC; mutations are ADMIN/MANAGER), mounted ahead of the monolith.
+  // Old handlers read garageId from the query and lacked per-garage ownership checks on
+  // update/delete — removed.
 
   // Discounts & Promotions
   // Discounts & promotions migrated to server/routes/discounts.routes.ts (tenant-scoped
