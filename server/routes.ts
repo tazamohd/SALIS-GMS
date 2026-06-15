@@ -20470,57 +20470,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // (tenant-scoped + Zod), mounted ahead of the monolith. Old handlers read garageId
   // from the query (cross-garage read) and spread raw req.body — removed.
 
-  app.get('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId, status } = req.query;
-      const orders = await storage.getReplenishmentOrders(garageId as string, status as string);
-      res.json(orders);
-    } catch (error: any) {
-      console.error("Error fetching replenishment orders:", error);
-      res.status(500).json({ message: "Failed to fetch replenishment orders" });
-    }
-  });
-
-  app.get('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const order = await storage.getReplenishmentOrder(req.params.id);
-      if (!order) return res.status(404).json({ message: "Order not found" });
-      res.json(order);
-    } catch (error: any) {
-      console.error("Error fetching replenishment order:", error);
-      res.status(500).json({ message: "Failed to fetch replenishment order" });
-    }
-  });
-
-  app.post('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const order = await storage.createReplenishmentOrder(req.body);
-      res.status(201).json(order);
-    } catch (error: any) {
-      console.error("Error creating replenishment order:", error);
-      res.status(500).json({ message: "Failed to create replenishment order" });
-    }
-  });
-
-  app.patch('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const order = await storage.updateReplenishmentOrder(req.params.id, req.body);
-      res.json(order);
-    } catch (error: any) {
-      console.error("Error updating replenishment order:", error);
-      res.status(500).json({ message: "Failed to update replenishment order" });
-    }
-  });
-
-  app.post('/api/replenishment-orders/:id/approve', isAuthenticated, async (req: any, res) => {
-    try {
-      const order = await storage.approveReplenishmentOrder(req.params.id, req.user?.id || 'system');
-      res.json(order);
-    } catch (error: any) {
-      console.error("Error approving replenishment order:", error);
-      res.status(500).json({ message: "Failed to approve replenishment order" });
-    }
-  });
+  // Replenishment orders migrated to server/routes/replenishment-orders.routes.ts
+  // (tenant-scoped + RBAC; mutations and approve are ADMIN/MANAGER), mounted ahead of
+  // the monolith. Old handlers read garageId from the query and lacked per-garage
+  // ownership checks on get/update/approve — removed.
 
   // ==========================================
   // Customer Loyalty Program API
