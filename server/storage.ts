@@ -301,6 +301,8 @@ import {
   type InsertActionHistory,
   dashboardWidgets,
   customReports,
+  managerApprovals,
+  managerAlerts,
   type DashboardWidget,
   type InsertDashboardWidget,
   customerPortalSessions,
@@ -10767,6 +10769,49 @@ export class DatabaseStorage implements IStorage {
       .where(eq(customReports.id, id))
       .returning();
     return report;
+  }
+
+  // Manager Approvals
+  async getManagerApprovals(garageId: string, status?: string): Promise<ManagerApproval[]> {
+    const conds = [eq(managerApprovals.garageId, garageId)];
+    if (status) conds.push(eq(managerApprovals.status, status));
+    return await db.select().from(managerApprovals)
+      .where(and(...conds))
+      .orderBy(desc(managerApprovals.createdAt));
+  }
+
+  async getManagerApproval(id: string): Promise<ManagerApproval | undefined> {
+    const [a] = await db.select().from(managerApprovals).where(eq(managerApprovals.id, id));
+    return a;
+  }
+
+  async createManagerApproval(data: InsertManagerApproval): Promise<ManagerApproval> {
+    const [a] = await db.insert(managerApprovals).values(data).returning();
+    return a;
+  }
+
+  async updateManagerApproval(id: string, data: Partial<ManagerApproval>): Promise<ManagerApproval> {
+    const [a] = await db.update(managerApprovals).set(data).where(eq(managerApprovals.id, id)).returning();
+    return a;
+  }
+
+  // Manager Alerts
+  async getManagerAlerts(garageId: string, includeResolved = false): Promise<ManagerAlert[]> {
+    const conds = [eq(managerAlerts.garageId, garageId)];
+    if (!includeResolved) conds.push(eq(managerAlerts.isResolved, false));
+    return await db.select().from(managerAlerts)
+      .where(and(...conds))
+      .orderBy(desc(managerAlerts.createdAt));
+  }
+
+  async createManagerAlert(data: InsertManagerAlert): Promise<ManagerAlert> {
+    const [a] = await db.insert(managerAlerts).values(data).returning();
+    return a;
+  }
+
+  async resolveManagerAlert(id: string): Promise<ManagerAlert | undefined> {
+    const [a] = await db.update(managerAlerts).set({ isResolved: true }).where(eq(managerAlerts.id, id)).returning();
+    return a;
   }
 
   async getDashboardWidgets(userId: string, garageId: string): Promise<DashboardWidget[]> {

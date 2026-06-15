@@ -4779,6 +4779,34 @@ export const dashboardWidgets = pgTable("dashboard_widgets", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Manager Approvals & Alerts (manager mobile app)
+export const managerApprovals = pgTable("manager_approvals", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // estimate, time_off, refund, discount, purchase
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  amount: decimal("amount", { precision: 12, scale: 2 }),
+  referenceId: varchar("reference_id"),
+  requestedBy: varchar("requested_by").references(() => users.id),
+  status: varchar("status", { length: 20 }).notNull().default("pending"), // pending, approved, rejected
+  notes: text("notes"),
+  resolvedBy: varchar("resolved_by").references(() => users.id),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const managerAlerts = pgTable("manager_alerts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // safety, inventory, customer, financial, system
+  severity: varchar("severity", { length: 20 }).notNull().default("medium"), // low, medium, high
+  message: text("message").notNull(),
+  referenceId: varchar("reference_id"),
+  isResolved: boolean("is_resolved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Module 68: Profit Margin Analysis
 export const profitAnalysis = pgTable("profit_analysis", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -4879,6 +4907,24 @@ export type InsertDashboardWidget = typeof dashboardWidgets.$inferInsert;
 export const insertDashboardWidgetSchema = createInsertSchema(dashboardWidgets).omit({
   id: true,
   createdAt: true,
+});
+
+export type ManagerApproval = typeof managerApprovals.$inferSelect;
+export type InsertManagerApproval = typeof managerApprovals.$inferInsert;
+export const insertManagerApprovalSchema = createInsertSchema(managerApprovals).omit({
+  id: true,
+  createdAt: true,
+  resolvedAt: true,
+  resolvedBy: true,
+  status: true,
+});
+
+export type ManagerAlert = typeof managerAlerts.$inferSelect;
+export type InsertManagerAlert = typeof managerAlerts.$inferInsert;
+export const insertManagerAlertSchema = createInsertSchema(managerAlerts).omit({
+  id: true,
+  createdAt: true,
+  isResolved: true,
 });
 
 export type ProfitAnalysis = typeof profitAnalysis.$inferSelect;

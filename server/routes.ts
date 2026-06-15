@@ -38,6 +38,8 @@ import {
   insertCustomReportSchema,
   insertDashboardWidgetSchema,
   insertTechnicianProfileSchema,
+  insertManagerApprovalSchema,
+  insertManagerAlertSchema,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -14715,32 +14717,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get pending approvals (mobile)
-  app.get("/api/mobile/manager/approvals", isAuthenticated, async (req, res) => {
+  app.get("/api/mobile/manager/approvals", isAuthenticated, async (req: any, res) => {
     try {
-      // Mock pending approvals
-      res.json([
-        { id: "1", type: "estimate", customer: "John Smith", amount: 450, vehicle: "2020 Honda Civic", status: "pending" },
-        { id: "2", type: "time_off", employee: "Mike Davis", startDate: "2024-11-01", endDate: "2024-11-05", status: "pending" },
-        { id: "3", type: "refund", customer: "Sarah Johnson", amount: 120, reason: "Service not completed", status: "pending" }
-      ]);
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.json([]);
+      const { status } = req.query; // defaults to pending
+      res.json(await storage.getManagerApprovals(garageId, (status as string) || "pending"));
     } catch (error) {
       console.error("Error fetching approvals:", error);
       res.status(500).json({ message: "Failed to fetch approvals" });
     }
   });
 
-  // Approve/reject item (mobile)
-  app.patch("/api/mobile/manager/approvals/:id", isAuthenticated, async (req, res) => {
+  // Create an approval request (mobile)
+  app.post("/api/mobile/manager/approvals", isAuthenticated, async (req: any, res) => {
     try {
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const parsed = insertManagerApprovalSchema
+        .omit({ garageId: true, requestedBy: true })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const approval = await storage.createManagerApproval({
+        ...parsed.data,
+        garageId,
+        requestedBy: req.user?.id,
+      });
+      res.status(201).json(approval);
+    } catch (error) {
+      console.error("Error creating approval:", error);
+      res.status(500).json({ message: "Failed to create approval" });
+    }
+  });
+
+  // Approve/reject item (mobile)
+  app.patch("/api/mobile/manager/approvals/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
       const { id } = req.params;
       const { action, notes } = req.body; // action: 'approve' | 'reject'
-      
-      res.json({
-        id,
-        status: action === 'approve' ? 'approved' : 'rejected',
+      if (action !== "approve" && action !== "reject") {
+        return res.status(400).json({ message: "action must be 'approve' or 'reject'" });
+      }
+      const existing = await storage.getManagerApproval(id);
+      if (!existing || existing.garageId !== garageId) {
+        return res.status(404).json({ message: "Approval not found" });
+      }
+      const updated = await storage.updateManagerApproval(id, {
+        status: action === "approve" ? "approved" : "rejected",
         notes,
-        message: `Successfully ${action}d`
+        resolvedBy: req.user?.id,
+        resolvedAt: new Date(),
       });
+      res.json(updated);
     } catch (error) {
       console.error("Error processing approval:", error);
       res.status(500).json({ message: "Failed to process approval" });
@@ -14833,17 +14866,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get critical alerts (mobile)
-  app.get("/api/mobile/manager/alerts", isAuthenticated, async (req, res) => {
+  app.get("/api/mobile/manager/alerts", isAuthenticated, async (req: any, res) => {
     try {
-      // Mock critical alerts
-      res.json([
-        { id: "1", type: "safety", severity: "high", message: "Safety incident reported in Bay 2", timestamp: "2024-10-26T14:30:00Z" },
-        { id: "2", type: "inventory", severity: "medium", message: "Low stock alert: Oil filters (5 remaining)", timestamp: "2024-10-26T13:15:00Z" },
-        { id: "3", type: "customer", severity: "high", message: "Customer complaint: Service delay over 2 hours", timestamp: "2024-10-26T12:00:00Z" }
-      ]);
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.json([]);
+      const includeResolved = req.query.includeResolved === "true";
+      res.json(await storage.getManagerAlerts(garageId, includeResolved));
     } catch (error) {
       console.error("Error fetching alerts:", error);
       res.status(500).json({ message: "Failed to fetch alerts" });
+    }
+  });
+
+  // Create a manager alert (mobile)
+  app.post("/api/mobile/manager/alerts", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const parsed = insertManagerAlertSchema.omit({ garageId: true }).safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const alert = await storage.createManagerAlert({ ...parsed.data, garageId });
+      res.status(201).json(alert);
+    } catch (error) {
+      console.error("Error creating alert:", error);
+      res.status(500).json({ message: "Failed to create alert" });
+    }
+  });
+
+  // Resolve a manager alert (mobile)
+  app.patch("/api/mobile/manager/alerts/:id/resolve", isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      const alerts = await storage.getManagerAlerts(garageId, true);
+      const target = alerts.find((a: any) => a.id === req.params.id);
+      if (!target) {
+        return res.status(404).json({ message: "Alert not found" });
+      }
+      res.json(await storage.resolveManagerAlert(req.params.id));
+    } catch (error) {
+      console.error("Error resolving alert:", error);
+      res.status(500).json({ message: "Failed to resolve alert" });
     }
   });
 
