@@ -74,6 +74,16 @@ highest-value ECC surfaces here:
    `security-reviewer`.
 5. `npm run check && npm test` (+ relevant e2e) before commit.
 
+## Project rules (travel with the repo)
+
+SALIS-tuned rules live in `.claude/rules/` and extend the global ECC packs:
+
+- `.claude/rules/security.md` — **highest priority**: payments, auth/RBAC/2FA, PII, ZATCA/VAT.
+- `.claude/rules/typescript.md` — strict TS + Express boundary validation.
+- `.claude/rules/react.md` — client conventions (TanStack Query, Radix, RTL/a11y).
+- `.claude/rules/database.md` — Drizzle/Neon schema, migrations, money-as-integer.
+- `.claude/rules/testing.md` — Vitest + Playwright, TDD, compliance-math coverage.
+
 ## Project-specific guardrails
 
 - **Never** weaken `strict` in `tsconfig.json` to make types pass.
