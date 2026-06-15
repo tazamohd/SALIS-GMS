@@ -5869,7 +5869,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.calculateTax(garageId, amount, category);
       res.json(result);
     } catch (error) {
-      console.error("Error calculating tax:", error);
+      // Sanitize before logging: the error can embed user-supplied
+      // garageId/amount/category values (CWE-117 log injection).
+      console.error("Error calculating tax:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to calculate tax" });
     }
   });

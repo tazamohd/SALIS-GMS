@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertRefundSchema } from "@shared/schema";
 
 const router = Router();
@@ -34,7 +35,7 @@ router.get("/refunds", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getRefunds(garageId, req.query.status as string | undefined));
   } catch (error) {
-    console.error("Error fetching refunds:", error);
+    console.error("Error fetching refunds:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch refunds" });
   }
 });
@@ -45,7 +46,7 @@ router.get("/refunds/:id", isAuthenticated, async (req: any, res) => {
     if (!refund) return;
     res.json(refund);
   } catch (error) {
-    console.error("Error fetching refund:", error);
+    console.error("Error fetching refund:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch refund" });
   }
 });
@@ -65,7 +66,7 @@ router.post("/refunds", isAuthenticated, async (req: any, res) => {
     } as any);
     res.status(201).json(refund);
   } catch (error) {
-    console.error("Error creating refund:", error);
+    console.error("Error creating refund:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create refund" });
   }
 });
@@ -77,7 +78,7 @@ router.patch("/refunds/:id", isAuthenticated, manager, async (req: any, res) => 
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateRefund(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating refund:", error);
+    console.error("Error updating refund:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update refund" });
   }
 });
@@ -93,7 +94,7 @@ router.post("/refunds/:id/approve", isAuthenticated, manager, async (req: any, r
       }),
     );
   } catch (error) {
-    console.error("Error approving refund:", error);
+    console.error("Error approving refund:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to approve refund" });
   }
 });
@@ -109,7 +110,7 @@ router.post("/refunds/:id/process", isAuthenticated, manager, async (req: any, r
       }),
     );
   } catch (error) {
-    console.error("Error processing refund:", error);
+    console.error("Error processing refund:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to process refund" });
   }
 });

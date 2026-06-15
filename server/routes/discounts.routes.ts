@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertDiscountPromotionSchema } from "@shared/schema";
 
 const router = Router();
@@ -42,7 +43,7 @@ router.get("/discounts", isAuthenticated, async (req: any, res) => {
       req.query.isActive === "true" ? true : req.query.isActive === "false" ? false : undefined;
     res.json(await storage.getDiscounts(garageId, isActive));
   } catch (error) {
-    console.error("Error fetching discounts:", error);
+    console.error("Error fetching discounts:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch discounts" });
   }
 });
@@ -56,7 +57,7 @@ router.post("/discounts/validate", isAuthenticated, async (req: any, res) => {
     const result = await storage.validateDiscount(code, garageId, req.user?.id, amount);
     res.json(result);
   } catch (error) {
-    console.error("Error validating discount:", error);
+    console.error("Error validating discount:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to validate discount" });
   }
 });
@@ -67,7 +68,7 @@ router.get("/discounts/:id", isAuthenticated, async (req: any, res) => {
     if (!discount) return;
     res.json(discount);
   } catch (error) {
-    console.error("Error fetching discount:", error);
+    console.error("Error fetching discount:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch discount" });
   }
 });
@@ -85,7 +86,7 @@ router.post("/discounts", isAuthenticated, manager, async (req: any, res) => {
     });
     res.status(201).json(discount);
   } catch (error) {
-    console.error("Error creating discount:", error);
+    console.error("Error creating discount:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create discount" });
   }
 });
@@ -97,7 +98,7 @@ router.patch("/discounts/:id", isAuthenticated, manager, async (req: any, res) =
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateDiscount(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating discount:", error);
+    console.error("Error updating discount:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update discount" });
   }
 });
@@ -108,7 +109,7 @@ router.delete("/discounts/:id", isAuthenticated, manager, async (req: any, res) 
     await storage.deleteDiscount(req.params.id);
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting discount:", error);
+    console.error("Error deleting discount:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to delete discount" });
   }
 });

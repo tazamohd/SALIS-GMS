@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertInventoryForecastSchema } from "@shared/schema";
 
 const router = Router();
@@ -23,7 +24,7 @@ router.get("/inventory-forecasts", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getInventoryForecasts(garageId));
   } catch (error) {
-    console.error("Error fetching inventory forecasts:", error);
+    console.error("Error fetching inventory forecasts:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch inventory forecasts" });
   }
 });
@@ -36,7 +37,7 @@ router.get("/inventory-forecasts/:id", isAuthenticated, async (req: any, res) =>
     }
     res.json(forecast);
   } catch (error) {
-    console.error("Error fetching inventory forecast:", error);
+    console.error("Error fetching inventory forecast:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch inventory forecast" });
   }
 });
@@ -49,7 +50,7 @@ router.post("/inventory-forecasts", isAuthenticated, async (req: any, res) => {
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.status(201).json(await storage.createInventoryForecast({ ...parsed.data, garageId }));
   } catch (error) {
-    console.error("Error creating inventory forecast:", error);
+    console.error("Error creating inventory forecast:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create inventory forecast" });
   }
 });

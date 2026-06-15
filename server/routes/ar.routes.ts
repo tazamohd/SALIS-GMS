@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import {
   insertArWorkInstructionSchema,
   insertArSessionLogSchema,
@@ -41,7 +42,7 @@ router.get("/ar-instructions", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getArWorkInstructions(garageId));
   } catch (error) {
-    console.error("Error fetching AR instructions:", error);
+    console.error("Error fetching AR instructions:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch AR instructions" });
   }
 });
@@ -52,7 +53,7 @@ router.get("/ar-instructions/:id", isAuthenticated, async (req: any, res) => {
     if (!row) return;
     res.json(row);
   } catch (error) {
-    console.error("Error fetching AR instruction:", error);
+    console.error("Error fetching AR instruction:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch AR instruction" });
   }
 });
@@ -69,7 +70,7 @@ router.post(
       if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
       res.status(201).json(await storage.createArWorkInstruction({ ...parsed.data, garageId }));
     } catch (error) {
-      console.error("Error creating AR instruction:", error);
+      console.error("Error creating AR instruction:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to create AR instruction" });
     }
   },
@@ -86,7 +87,7 @@ router.patch(
       if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
       res.json(await storage.updateArWorkInstruction(req.params.id, parsed.data));
     } catch (error) {
-      console.error("Error updating AR instruction:", error);
+      console.error("Error updating AR instruction:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to update AR instruction" });
     }
   },
@@ -102,7 +103,7 @@ router.delete(
       await storage.deleteArWorkInstruction(req.params.id);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting AR instruction:", error);
+      console.error("Error deleting AR instruction:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to delete AR instruction" });
     }
   },
@@ -126,7 +127,7 @@ router.get("/ar-sessions", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getArSessionLogs(garageId, req.query.technicianId as string | undefined));
   } catch (error) {
-    console.error("Error fetching AR sessions:", error);
+    console.error("Error fetching AR sessions:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch AR sessions" });
   }
 });
@@ -139,7 +140,7 @@ router.post("/ar-sessions", isAuthenticated, async (req: any, res) => {
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.status(201).json(await storage.createArSessionLog({ ...parsed.data, garageId }));
   } catch (error) {
-    console.error("Error creating AR session:", error);
+    console.error("Error creating AR session:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create AR session" });
   }
 });
@@ -151,7 +152,7 @@ router.patch("/ar-sessions/:id", isAuthenticated, async (req: any, res) => {
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateArSessionLog(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating AR session:", error);
+    console.error("Error updating AR session:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update AR session" });
   }
 });
@@ -174,7 +175,7 @@ router.get("/ar-devices", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getArDevicePairings(garageId));
   } catch (error) {
-    console.error("Error fetching AR devices:", error);
+    console.error("Error fetching AR devices:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch AR devices" });
   }
 });
@@ -185,7 +186,7 @@ router.get("/ar-devices/:id", isAuthenticated, async (req: any, res) => {
     if (!row) return;
     res.json(row);
   } catch (error) {
-    console.error("Error fetching AR device:", error);
+    console.error("Error fetching AR device:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch AR device" });
   }
 });
@@ -198,7 +199,7 @@ router.post("/ar-devices", isAuthenticated, async (req: any, res) => {
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.status(201).json(await storage.createArDevicePairing({ ...parsed.data, garageId }));
   } catch (error) {
-    console.error("Error creating AR device pairing:", error);
+    console.error("Error creating AR device pairing:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create AR device pairing" });
   }
 });
@@ -210,7 +211,7 @@ router.patch("/ar-devices/:id", isAuthenticated, async (req: any, res) => {
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateArDevicePairing(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating AR device:", error);
+    console.error("Error updating AR device:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update AR device" });
   }
 });
@@ -221,7 +222,7 @@ router.delete("/ar-devices/:id", isAuthenticated, async (req: any, res) => {
     await storage.deleteArDevicePairing(req.params.id);
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting AR device:", error);
+    console.error("Error deleting AR device:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to delete AR device" });
   }
 });

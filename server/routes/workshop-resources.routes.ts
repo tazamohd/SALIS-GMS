@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertWorkshopResourceSchema } from "@shared/schema";
 
 const router = Router();
@@ -33,7 +34,7 @@ router.get("/workshop-resources", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getWorkshopResources(garageId));
   } catch (error) {
-    console.error("Error fetching workshop resources:", error);
+    console.error("Error fetching workshop resources:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch workshop resources" });
   }
 });
@@ -44,7 +45,7 @@ router.get("/workshop-resources/:id", isAuthenticated, async (req: any, res) => 
     if (!resource) return;
     res.json(resource);
   } catch (error) {
-    console.error("Error fetching workshop resource:", error);
+    console.error("Error fetching workshop resource:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch workshop resource" });
   }
 });
@@ -62,7 +63,7 @@ router.post(
       const resource = await storage.createWorkshopResource({ ...parsed.data, garageId });
       res.status(201).json(resource);
     } catch (error) {
-      console.error("Error creating workshop resource:", error);
+      console.error("Error creating workshop resource:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to create workshop resource" });
     }
   },
@@ -80,7 +81,7 @@ router.patch(
       const resource = await storage.updateWorkshopResource(req.params.id, parsed.data);
       res.json(resource);
     } catch (error) {
-      console.error("Error updating workshop resource:", error);
+      console.error("Error updating workshop resource:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to update workshop resource" });
     }
   },
@@ -96,7 +97,7 @@ router.delete(
       await storage.deleteWorkshopResource(req.params.id);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting workshop resource:", error);
+      console.error("Error deleting workshop resource:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to delete workshop resource" });
     }
   },

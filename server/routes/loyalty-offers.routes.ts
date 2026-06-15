@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertLoyaltyOfferSchema } from "@shared/schema";
 
 const router = Router();
@@ -35,7 +36,7 @@ router.get("/loyalty-offers", isAuthenticated, async (req: any, res) => {
       req.query.isActive === "true" ? true : req.query.isActive === "false" ? false : undefined;
     res.json(await storage.getLoyaltyOffers(garageId, isActive));
   } catch (error) {
-    console.error("Error fetching loyalty offers:", error);
+    console.error("Error fetching loyalty offers:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch loyalty offers" });
   }
 });
@@ -46,7 +47,7 @@ router.get("/loyalty-offers/:id", isAuthenticated, async (req: any, res) => {
     if (!offer) return;
     res.json(offer);
   } catch (error) {
-    console.error("Error fetching loyalty offer:", error);
+    console.error("Error fetching loyalty offer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch loyalty offer" });
   }
 });
@@ -64,7 +65,7 @@ router.post(
       const offer = await storage.createLoyaltyOffer({ ...parsed.data, garageId });
       res.status(201).json(offer);
     } catch (error) {
-      console.error("Error creating loyalty offer:", error);
+      console.error("Error creating loyalty offer:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to create loyalty offer" });
     }
   },
@@ -82,7 +83,7 @@ router.patch(
       const offer = await storage.updateLoyaltyOffer(req.params.id, parsed.data);
       res.json(offer);
     } catch (error) {
-      console.error("Error updating loyalty offer:", error);
+      console.error("Error updating loyalty offer:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to update loyalty offer" });
     }
   },
@@ -98,7 +99,7 @@ router.delete(
       await storage.deleteLoyaltyOffer(req.params.id);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting loyalty offer:", error);
+      console.error("Error deleting loyalty offer:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to delete loyalty offer" });
     }
   },

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertServiceBaySchema } from "@shared/schema";
 
 const router = Router();
@@ -33,7 +34,7 @@ router.get("/service-bays", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getServiceBays(garageId));
   } catch (error) {
-    console.error("Error fetching service bays:", error);
+    console.error("Error fetching service bays:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch service bays" });
   }
 });
@@ -45,7 +46,7 @@ router.get("/service-bays/with-sessions", isAuthenticated, async (req: any, res)
     if (!garageId) return res.json([]);
     res.json(await storage.getServiceBaysWithSessions(garageId));
   } catch (error) {
-    console.error("Error fetching service bays with sessions:", error);
+    console.error("Error fetching service bays with sessions:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch service bays with sessions" });
   }
 });
@@ -65,7 +66,7 @@ router.get("/service-bays/statistics", isAuthenticated, async (req: any, res) =>
     }
     res.json(await storage.getServiceBayStatistics(garageId));
   } catch (error) {
-    console.error("Error fetching service bay statistics:", error);
+    console.error("Error fetching service bay statistics:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch service bay statistics" });
   }
 });
@@ -83,7 +84,7 @@ router.post(
       if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
       res.status(201).json(await storage.createServiceBay({ ...parsed.data, garageId }));
     } catch (error) {
-      console.error("Error creating service bay:", error);
+      console.error("Error creating service bay:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to create service bay" });
     }
   },
@@ -100,7 +101,7 @@ router.patch("/service-bays/:id/status", isAuthenticated, async (req: any, res) 
     const bay = await storage.updateServiceBayStatus(req.params.id, parsed.data.status);
     res.json(bay);
   } catch (error) {
-    console.error("Error updating service bay status:", error);
+    console.error("Error updating service bay status:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update service bay status" });
   }
 });
@@ -122,7 +123,7 @@ router.post("/service-bays/:bayId/sessions", isAuthenticated, async (req: any, r
     );
     res.status(201).json(session);
   } catch (error) {
-    console.error("Error starting bay session:", error);
+    console.error("Error starting bay session:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to start bay session" });
   }
 });
@@ -135,7 +136,7 @@ router.patch("/service-bays/sessions/:sessionId/end", isAuthenticated, async (re
     if (!(await loadOwnedBay(req, res, session.bayId))) return;
     res.json(await storage.endBaySession(req.params.sessionId));
   } catch (error) {
-    console.error("Error ending bay session:", error);
+    console.error("Error ending bay session:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to end bay session" });
   }
 });

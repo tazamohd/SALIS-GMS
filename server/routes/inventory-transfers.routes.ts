@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertInventoryTransferSchema } from "@shared/schema";
 
 const router = Router();
@@ -37,7 +38,7 @@ router.get("/inventory-transfers", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getInventoryTransfers(garageId, req.query.status as string | undefined));
   } catch (error) {
-    console.error("Error fetching inventory transfers:", error);
+    console.error("Error fetching inventory transfers:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch inventory transfers" });
   }
 });
@@ -48,7 +49,7 @@ router.get("/inventory-transfers/:id", isAuthenticated, async (req: any, res) =>
     if (!transfer) return;
     res.json(transfer);
   } catch (error) {
-    console.error("Error fetching inventory transfer:", error);
+    console.error("Error fetching inventory transfer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch inventory transfer" });
   }
 });
@@ -73,7 +74,7 @@ router.post("/inventory-transfers", isAuthenticated, async (req: any, res) => {
     } as any);
     res.status(201).json(transfer);
   } catch (error) {
-    console.error("Error creating inventory transfer:", error);
+    console.error("Error creating inventory transfer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create inventory transfer" });
   }
 });
@@ -85,7 +86,7 @@ router.patch("/inventory-transfers/:id", isAuthenticated, manager, async (req: a
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateInventoryTransfer(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating inventory transfer:", error);
+    console.error("Error updating inventory transfer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update inventory transfer" });
   }
 });
@@ -95,7 +96,7 @@ router.post("/inventory-transfers/:id/approve", isAuthenticated, manager, async 
     if (!(await loadOwnedTransfer(req, res, req.params.id))) return;
     res.json(await storage.approveInventoryTransfer(req.params.id, req.user?.id || "system"));
   } catch (error) {
-    console.error("Error approving inventory transfer:", error);
+    console.error("Error approving inventory transfer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to approve inventory transfer" });
   }
 });
@@ -105,7 +106,7 @@ router.post("/inventory-transfers/:id/complete", isAuthenticated, manager, async
     if (!(await loadOwnedTransfer(req, res, req.params.id))) return;
     res.json(await storage.completeInventoryTransfer(req.params.id, req.user?.id || "system"));
   } catch (error) {
-    console.error("Error completing inventory transfer:", error);
+    console.error("Error completing inventory transfer:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to complete inventory transfer" });
   }
 });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertTaxConfigurationSchema } from "@shared/schema";
 
 const router = Router();
@@ -36,7 +37,7 @@ router.get("/tax-configurations", isAuthenticated, async (req: any, res) => {
       req.query.isActive === "true" ? true : req.query.isActive === "false" ? false : undefined;
     res.json(await storage.getTaxConfigurations(garageId, isActive));
   } catch (error) {
-    console.error("Error fetching tax configurations:", error);
+    console.error("Error fetching tax configurations:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch tax configurations" });
   }
 });
@@ -47,7 +48,7 @@ router.get("/tax-configurations/:id", isAuthenticated, async (req: any, res) => 
     if (!config) return;
     res.json(config);
   } catch (error) {
-    console.error("Error fetching tax configuration:", error);
+    console.error("Error fetching tax configuration:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch tax configuration" });
   }
 });
@@ -65,7 +66,7 @@ router.post("/tax-configurations", isAuthenticated, manager, async (req: any, re
     });
     res.status(201).json(config);
   } catch (error) {
-    console.error("Error creating tax configuration:", error);
+    console.error("Error creating tax configuration:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create tax configuration" });
   }
 });
@@ -77,7 +78,7 @@ router.patch("/tax-configurations/:id", isAuthenticated, manager, async (req: an
     if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
     res.json(await storage.updateTaxConfiguration(req.params.id, parsed.data));
   } catch (error) {
-    console.error("Error updating tax configuration:", error);
+    console.error("Error updating tax configuration:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to update tax configuration" });
   }
 });
@@ -88,7 +89,7 @@ router.delete("/tax-configurations/:id", isAuthenticated, manager, async (req: a
     await storage.deleteTaxConfiguration(req.params.id);
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting tax configuration:", error);
+    console.error("Error deleting tax configuration:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to delete tax configuration" });
   }
 });

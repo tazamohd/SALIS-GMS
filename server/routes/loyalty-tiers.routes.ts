@@ -3,6 +3,7 @@ import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 import { insertLoyaltyTierSchema } from "@shared/schema";
 
 const router = Router();
@@ -33,7 +34,7 @@ router.get("/loyalty-tiers", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getLoyaltyTiers(garageId));
   } catch (error) {
-    console.error("Error fetching loyalty tiers:", error);
+    console.error("Error fetching loyalty tiers:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch loyalty tiers" });
   }
 });
@@ -44,7 +45,7 @@ router.get("/loyalty-tiers/:id", isAuthenticated, async (req: any, res) => {
     if (!tier) return;
     res.json(tier);
   } catch (error) {
-    console.error("Error fetching loyalty tier:", error);
+    console.error("Error fetching loyalty tier:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to fetch loyalty tier" });
   }
 });
@@ -62,7 +63,7 @@ router.post(
       const tier = await storage.createLoyaltyTier({ ...parsed.data, garageId });
       res.status(201).json(tier);
     } catch (error) {
-      console.error("Error creating loyalty tier:", error);
+      console.error("Error creating loyalty tier:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to create loyalty tier" });
     }
   },
@@ -80,7 +81,7 @@ router.patch(
       const tier = await storage.updateLoyaltyTier(req.params.id, parsed.data);
       res.json(tier);
     } catch (error) {
-      console.error("Error updating loyalty tier:", error);
+      console.error("Error updating loyalty tier:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to update loyalty tier" });
     }
   },
@@ -96,7 +97,7 @@ router.delete(
       await storage.deleteLoyaltyTier(req.params.id);
       res.status(204).send();
     } catch (error) {
-      console.error("Error deleting loyalty tier:", error);
+      console.error("Error deleting loyalty tier:", sanitizeForLog(error));
       res.status(500).json({ message: "Failed to delete loyalty tier" });
     }
   },

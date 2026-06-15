@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { isAuthenticated } from "../auth";
 import { storage } from "../storage";
+import { sanitizeForLog } from "../utils/sanitizeForLog";
 
 const router = Router();
 
@@ -29,7 +30,7 @@ router.get("/export-jobs", isAuthenticated, async (req: any, res) => {
     if (!garageId) return res.json([]);
     res.json(await storage.getExportJobs(garageId, req.user?.id));
   } catch (error) {
-    console.error("Error getting export jobs:", error);
+    console.error("Error getting export jobs:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to get export jobs" });
   }
 });
@@ -40,7 +41,7 @@ router.get("/export-jobs/:id", isAuthenticated, async (req: any, res) => {
     if (!job) return;
     res.json(job);
   } catch (error) {
-    console.error("Error getting export job:", error);
+    console.error("Error getting export job:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to get export job" });
   }
 });
@@ -123,7 +124,7 @@ router.post("/export", isAuthenticated, async (req: any, res) => {
 
     res.status(202).json(job);
   } catch (error) {
-    console.error("Error creating export:", error);
+    console.error("Error creating export:", sanitizeForLog(error));
     res.status(500).json({ message: "Failed to create export" });
   }
 });
