@@ -20623,47 +20623,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer Loyalty Program API
   // ==========================================
 
-  app.get('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      if (!garageId) return res.status(400).json({ message: "garageId is required" });
-      const tiers = await storage.getLoyaltyTiers(garageId as string);
-      res.json(tiers);
-    } catch (error: any) {
-      console.error("Error fetching loyalty tiers:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty tiers" });
-    }
-  });
-
-  app.post('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
-    try {
-      const tier = await storage.createLoyaltyTier(req.body);
-      res.status(201).json(tier);
-    } catch (error: any) {
-      console.error("Error creating loyalty tier:", error);
-      res.status(500).json({ message: "Failed to create loyalty tier" });
-    }
-  });
-
-  app.patch('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const tier = await storage.updateLoyaltyTier(req.params.id, req.body);
-      res.json(tier);
-    } catch (error: any) {
-      console.error("Error updating loyalty tier:", error);
-      res.status(500).json({ message: "Failed to update loyalty tier" });
-    }
-  });
-
-  app.delete('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      await storage.deleteLoyaltyTier(req.params.id);
-      res.status(204).send();
-    } catch (error: any) {
-      console.error("Error deleting loyalty tier:", error);
-      res.status(500).json({ message: "Failed to delete loyalty tier" });
-    }
-  });
+  // Loyalty tiers migrated to server/routes/loyalty-tiers.routes.ts (tenant-scoped +
+  // RBAC), mounted ahead of the monolith. Old handlers read garageId from the query
+  // and lacked ownership checks on update/delete — removed.
 
   // /api/loyalty-accounts (GET, GET/:id, POST, PATCH) are defined earlier with the
   // correct storage params (getLoyaltyAccounts(programId, customerId),
