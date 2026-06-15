@@ -46,6 +46,7 @@ import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
 import { miscRoutes } from "./misc.routes";
 import { serviceTemplateRoutes } from "./service-templates.routes";
+import { loyaltyOffersRoutes } from "./loyalty-offers.routes";
 import { toolRoutes } from "./tools.routes";
 // NOTE: misc.routes.ts now hosts only the DB-backed, tenant-scoped /api/search.
 // /api/tools, /api/service-templates, /api/notifications and /api/backup remain
@@ -251,6 +252,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Service templates (tenant-scoped) — mounted ahead of the monolith
   app.use("/api", serviceTemplateRoutes);
   console.log("✅ Service Template Routes Loaded");
+
+  // Loyalty offers (tenant-scoped + RBAC) — mounted ahead of the monolith
+  app.use("/api", loyaltyOffersRoutes);
+  console.log("✅ Loyalty Offers Routes Loaded");
 
   // Tools catalogue CRUD — mounted ahead of the monolith
   app.use("/api", toolRoutes);
