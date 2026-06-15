@@ -14,10 +14,9 @@ import { resolve } from "path";
  * Drive the baseline toward zero by consolidating handlers and removing entries
  * here — never add to it.
  */
-const BASELINE = new Set<string>([
-  "GET /api/notification-preferences",
-  "GET /api/payroll/periods",
-]);
+// Baseline is empty: routes.ts has no remaining duplicate registrations. Keep it
+// that way — any new duplicate fails the test below.
+const BASELINE = new Set<string>([]);
 
 /** Remove block comments while preserving line numbers. */
 function stripBlockComments(src: string): string {
