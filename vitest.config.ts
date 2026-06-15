@@ -26,17 +26,13 @@ process.env.PAYPAL_CLIENT_SECRET ||= 'test-paypal-client-secret';
 process.env.SESSION_SECRET ||= 'test-session-secret';
 
 // Use DB global setup only when running server tests (not shared-only)
-const needsDb = !process.argv.some(a => a === 'shared/' || a.startsWith('shared/'));
+const needsDb = !process.argv.some((a) => a === 'shared/' || a.startsWith('shared/'));
 
 export default defineConfig({
   test: {
     globals: true,
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      'e2e/**',
-    ],
+    exclude: ['**/node_modules/**', '**/dist/**', 'e2e/**'],
     environmentMatchGlobs: [
       ['server/**', 'node'],
       ['client/**', 'jsdom'],
@@ -49,6 +45,23 @@ export default defineConfig({
     pool: 'forks',
     forks: {
       singleFork: true,
+    },
+    coverage: {
+      // Requires @vitest/coverage-v8 (installed in CI by the quality-gate workflow).
+      // Enforced against .coverage-thresholds.json via scripts/coverage-gate.mjs.
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: './coverage',
+      include: ['server/**', 'shared/**', 'client/src/**'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/__tests__/**',
+        '**/*.{test,spec}.{ts,tsx,js,jsx}',
+        'e2e/**',
+        'server/paypal.ts',
+        '**/*.d.ts',
+      ],
     },
   },
   resolve: {

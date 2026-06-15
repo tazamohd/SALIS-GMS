@@ -1,0 +1,15 @@
+{
+  "$comment": "Global coverage floor enforced by scripts/coverage-gate.mjs and the quality-gate CI workflow. Raise these over time; never lower without a recorded decision in .claude/knowledge/. Percentages are minimums (inclusive).",
+  "global": {
+    "lines": 35,
+    "statements": 35,
+    "functions": 40,
+    "branches": 60
+  },
+  "perPath": {
+    "$comment": "Higher bars for pure, well-isolated domain math. These files already carry dedicated unit tests.",
+    "shared/vatUtils.ts": { "lines": 90, "functions": 90, "branches": 80 },
+    "shared/zatcaUtils.ts": { "lines": 85, "functions": 85, "branches": 75 },
+    "shared/hijriUtils.ts": { "lines": 80, "functions": 80, "branches": 70 }
+  }
+}
