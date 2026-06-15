@@ -15,12 +15,8 @@ import { resolve } from "path";
  * here — never add to it.
  */
 const BASELINE = new Set<string>([
-  "GET /api/contracts/enhanced",
   "GET /api/notification-preferences",
   "GET /api/payroll/periods",
-  "POST /api/barcode/scan",
-  "POST /api/marketplace/orders",
-  "POST /api/video-estimates",
 ]);
 
 /** Remove block comments while preserving line numbers. */

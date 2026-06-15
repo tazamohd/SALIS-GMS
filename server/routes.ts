@@ -8592,30 +8592,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { marketplace, partNumber, partName, quantity, unitPrice } = req.body;
-      
-      const order = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        marketplace,
-        partNumber,
-        partName,
-        quantity,
-        unitPrice,
-        totalPrice: quantity * unitPrice,
-        orderStatus: "pending",
-        orderDate: new Date().toISOString(),
-      };
-      
-      res.json(order);
-    } catch (error) {
-      console.error("Error creating marketplace order:", error);
-      res.status(500).json({ message: "Failed to create marketplace order" });
-    }
-  });
+  // POST /api/marketplace/orders is defined earlier (phase3Service.placeMarketplaceOrder)
+  // and wins; this duplicate mock was removed.
 
   // Phase 4: Customer Experience Routes
   app.get('/api/service-tracking/active', isAuthenticated, async (req: any, res) => {
@@ -8638,29 +8616,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      const { customerId, vehicleId, estimatedCost } = req.body;
-      
-      const estimate = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        customerId,
-        vehicleId,
-        technicianId: userId,
-        estimatedCost,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(estimate);
-    } catch (error) {
-      console.error("Error creating video estimate:", error);
-      res.status(500).json({ message: "Failed to create video estimate" });
-    }
-  });
+  // POST /api/video-estimates is handled by the DB-backed phase4Service +
+  // videoEstimateSchema implementation later in the file; this mock stub that
+  // shadowed it was removed.
 
   app.post('/api/video-estimates/:id/send', isAuthenticated, async (req: any, res) => {
     try {
@@ -11226,56 +11184,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Contract Management API Routes
   // Get all contracts with enhanced data (utilization, SLA metrics, renewals)
-  app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
-    try {
-      const { db } = await import('./storage');
-      const { fleetContracts, fleetGroups, contractUtilization, contractSLAMetrics, contractRenewals } = await import('@shared/schema');
-      const { eq, desc } = await import('drizzle-orm');
-
-      const contracts = await db
-        .select()
-        .from(fleetContracts)
-        .orderBy(desc(fleetContracts.createdAt));
-
-      const enrichedContracts = await Promise.all(contracts.map(async (contract) => {
-        const [fleetGroup] = await db
-          .select()
-          .from(fleetGroups)
-          .where(eq(fleetGroups.id, contract.fleetGroupId));
-
-        const utilization = await db
-          .select()
-          .from(contractUtilization)
-          .where(eq(contractUtilization.contractId, contract.id))
-          .orderBy(desc(contractUtilization.serviceDate));
-
-        const slaMetrics = await db
-          .select()
-          .from(contractSLAMetrics)
-          .where(eq(contractSLAMetrics.contractId, contract.id))
-          .orderBy(desc(contractSLAMetrics.incidentDate));
-
-        const renewals = await db
-          .select()
-          .from(contractRenewals)
-          .where(eq(contractRenewals.contractId, contract.id))
-          .orderBy(desc(contractRenewals.createdAt));
-
-        return {
-          ...contract,
-          fleetGroup,
-          utilization,
-          slaMetrics,
-          renewals,
-        };
-      }));
-
-      res.json(enrichedContracts);
-    } catch (error) {
-      console.error("Error fetching enhanced contracts:", error);
-      res.status(500).json({ message: "Failed to fetch contracts" });
-    }
-  });
+  // GET /api/contracts/enhanced is defined earlier with garage scoping (filters by
+  // req.user.garageId) and wins; this duplicate — which was NOT tenant-scoped and
+  // returned every garage's contracts — was removed.
 
   // Trigger renewal workflow for a contract
   app.post('/api/contracts/:contractId/trigger-renewal', isAuthenticated, async (req: any, res) => {
@@ -15912,31 +15823,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Barcode/QR Scanner - POST alias
-  app.post('/api/barcode/scan', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      
-      const { barcodeData, scanType, itemType, itemId } = req.body;
-      
-      const scanData = {
-        garageId,
-        scanType,
-        barcodeData,
-        partId: scanType === 'part_inventory' ? itemId : undefined,
-        vehicleId: scanType === 'vehicle_checkin' ? itemId : undefined,
-        toolId: scanType === 'tool_tracking' ? itemId : undefined,
-        scannedBy: userId,
-        location: req.body.location,
-        associatedAction: req.body.associatedAction,
-      };
-      const scan = await phase7Service.recordBarcodeScan(scanData);
-      res.status(201).json(scan);
-    } catch (error) {
-      console.error("Error recording barcode scan:", error);
-      res.status(500).json({ message: "Failed to record barcode scan" });
-    }
-  });
+  // POST /api/barcode/scan is defined earlier with barcodeScanSchema validation
+  // (phase7Service.recordBarcodeScan) and wins; this un-validated duplicate was removed.
 
   // Kiosk Check-In - POST alias
   app.post('/api/kiosk/checkin', isAuthenticated, async (req, res) => {
