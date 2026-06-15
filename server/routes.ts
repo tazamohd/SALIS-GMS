@@ -20375,63 +20375,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // HR Performance Reviews
-  app.get('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
-    try {
-      const { employeeId, status } = req.query;
-      let query = db.select().from(hrPerformanceReviews);
-      
-      if (employeeId) {
-        query = query.where(eq(hrPerformanceReviews.employeeId, employeeId as string)) as any;
-      }
-      if (status) {
-        query = query.where(eq(hrPerformanceReviews.status, status as string)) as any;
-      }
-      
-      const reviews = await query.orderBy(desc(hrPerformanceReviews.createdAt));
-      res.json(reviews);
-    } catch (error: any) {
-      console.error("Error fetching performance reviews:", error);
-      res.status(500).json({ message: "Failed to fetch performance reviews" });
-    }
-  });
-
-  app.post('/api/hr/performance-reviews', isAuthenticated, async (req: any, res) => {
-    try {
-      const validation = insertHrPerformanceReviewSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json(sanitizeZodError(validation.error));
-      }
-      const [review] = await db.insert(hrPerformanceReviews).values(validation.data).returning();
-      res.status(201).json(review);
-    } catch (error: any) {
-      console.error("Error creating performance review:", error);
-      res.status(500).json({ message: "Failed to create performance review" });
-    }
-  });
-
-  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const updateData: any = { ...req.body, updatedAt: new Date() };
-      
-      if (req.body.status === 'completed') {
-        updateData.completedAt = new Date();
-      }
-      
-      const [updated] = await db.update(hrPerformanceReviews)
-        .set(updateData)
-        .where(eq(hrPerformanceReviews.id, id))
-        .returning();
-      if (!updated) {
-        return res.status(404).json({ message: "Performance review not found" });
-      }
-      res.json(updated);
-    } catch (error: any) {
-      console.error("Error updating performance review:", error);
-      res.status(500).json({ message: "Failed to update performance review" });
-    }
-  });
+  // /api/hr/performance-reviews (GET, POST, PATCH) are defined earlier with proper
+  // tenant scoping (garageId 403 checks) and Zod validation, and win. These later
+  // duplicates were NOT tenant-scoped (the GET leaked every garage's reviews) and
+  // were removed.
 
   // HR Announcements
   app.get('/api/hr/announcements', isAuthenticated, async (req: any, res) => {
@@ -20733,47 +20680,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      const accounts = await storage.getLoyaltyAccounts(garageId as string);
-      res.json(accounts);
-    } catch (error: any) {
-      console.error("Error fetching loyalty accounts:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty accounts" });
-    }
-  });
-
-  app.get('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.getLoyaltyAccount(req.params.id);
-      if (!account) return res.status(404).json({ message: "Account not found" });
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error fetching loyalty account:", error);
-      res.status(500).json({ message: "Failed to fetch loyalty account" });
-    }
-  });
-
-  app.post('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.createLoyaltyAccount(req.body);
-      res.status(201).json(account);
-    } catch (error: any) {
-      console.error("Error creating loyalty account:", error);
-      res.status(500).json({ message: "Failed to create loyalty account" });
-    }
-  });
-
-  app.patch('/api/loyalty-accounts/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const account = await storage.updateLoyaltyAccount(req.params.id, req.body);
-      res.json(account);
-    } catch (error: any) {
-      console.error("Error updating loyalty account:", error);
-      res.status(500).json({ message: "Failed to update loyalty account" });
-    }
-  });
+  // /api/loyalty-accounts (GET, GET/:id, POST, PATCH) are defined earlier with the
+  // correct storage params (getLoyaltyAccounts(programId, customerId),
+  // getLoyaltyAccountById) and win; these duplicate stubs were removed.
 
   app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, async (req: any, res) => {
     try {

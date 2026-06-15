@@ -16,16 +16,9 @@ import { resolve } from "path";
  */
 const BASELINE = new Set<string>([
   "GET /api/contracts/enhanced",
-  "GET /api/hr/performance-reviews",
-  "GET /api/loyalty-accounts",
-  "GET /api/loyalty-accounts/:id",
   "GET /api/notification-preferences",
   "GET /api/payroll/periods",
-  "PATCH /api/hr/performance-reviews/:id",
-  "PATCH /api/loyalty-accounts/:id",
   "POST /api/barcode/scan",
-  "POST /api/hr/performance-reviews",
-  "POST /api/loyalty-accounts",
   "POST /api/marketplace/orders",
   "POST /api/video-estimates",
 ]);
