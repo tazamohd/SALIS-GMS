@@ -20545,27 +20545,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Automated Inventory Reordering API
   // ==========================================
   
-  app.get('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      if (!garageId) return res.status(400).json({ message: "garageId is required" });
-      const forecasts = await storage.getInventoryForecasts(garageId as string);
-      res.json(forecasts);
-    } catch (error: any) {
-      console.error("Error fetching inventory forecasts:", error);
-      res.status(500).json({ message: "Failed to fetch inventory forecasts" });
-    }
-  });
-
-  app.post('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
-    try {
-      const forecast = await storage.createInventoryForecast(req.body);
-      res.status(201).json(forecast);
-    } catch (error: any) {
-      console.error("Error creating inventory forecast:", error);
-      res.status(500).json({ message: "Failed to create inventory forecast" });
-    }
-  });
+  // Inventory forecasts migrated to server/routes/inventory-forecasts.routes.ts
+  // (tenant-scoped + Zod), mounted ahead of the monolith. Old handlers read garageId
+  // from the query (cross-garage read) and spread raw req.body — removed.
 
   app.get('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
     try {
