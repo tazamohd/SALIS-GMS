@@ -14691,24 +14691,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // MANAGER MOBILE APP API
   // ==========================================
 
-  // Get manager dashboard KPIs (mobile)
+  // Get manager dashboard KPIs (mobile) — real per-garage metrics
   app.get("/api/mobile/manager/dashboard", isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
-      
-      // Mock KPIs
+      if (!userGarageId) {
+        return res.status(400).json({ message: "User has no garage assigned" });
+      }
+      const { getRealtimeKPIs } = await import("./analytics-service");
+      const kpis: any = await getRealtimeKPIs(userGarageId);
       res.json({
-        todayRevenue: 12450,
-        activeJobs: 23,
-        technicianUtilization: 87,
-        customerSatisfaction: 4.7,
-        pendingApprovals: 5,
-        trends: {
-          revenueChange: 12.5,
-          jobsChange: -3.2,
-          utilizationChange: 5.1,
-          satisfactionChange: 0.3
-        }
+        todayRevenue: Number(kpis.revenue_today || 0),
+        jobsToday: Number(kpis.jobs_today || 0),
+        activeJobs: Number(kpis.in_progress || 0),
+        completedToday: Number(kpis.completed_today || 0),
+        activeTechnicians: Number(kpis.active_technicians || 0),
+        appointmentsToday: Number(kpis.appointments_today || 0),
       });
     } catch (error) {
       console.error("Error fetching dashboard KPIs:", error);
