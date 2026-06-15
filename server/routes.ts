@@ -5845,84 +5845,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Refunds
-  app.get('/api/refunds', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId, status } = req.query;
-      const refunds = await storage.getRefunds(garageId, status);
-      res.json(refunds);
-    } catch (error) {
-      console.error("Error fetching refunds:", error);
-      res.status(500).json({ message: "Failed to fetch refunds" });
-    }
-  });
-
-  app.get('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const refund = await storage.getRefund(id);
-      if (!refund) {
-        return res.status(404).json({ message: "Refund not found" });
-      }
-      res.json(refund);
-    } catch (error) {
-      console.error("Error fetching refund:", error);
-      res.status(500).json({ message: "Failed to fetch refund" });
-    }
-  });
-
-  app.post('/api/refunds', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      const refund = await storage.createRefund({ ...req.body, requestedBy: userId });
-      res.status(201).json(refund);
-    } catch (error) {
-      console.error("Error creating refund:", error);
-      res.status(500).json({ message: "Failed to create refund" });
-    }
-  });
-
-  app.patch('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const refund = await storage.updateRefund(id, req.body);
-      res.json(refund);
-    } catch (error) {
-      console.error("Error updating refund:", error);
-      res.status(500).json({ message: "Failed to update refund" });
-    }
-  });
-
-  app.post('/api/refunds/:id/approve', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const userId = req.user?.id || 'default-user';
-      const refund = await storage.updateRefund(id, {
-        status: 'approved',
-        approvedBy: userId,
-        approvedAt: new Date(),
-      });
-      res.json(refund);
-    } catch (error) {
-      console.error("Error approving refund:", error);
-      res.status(500).json({ message: "Failed to approve refund" });
-    }
-  });
-
-  app.post('/api/refunds/:id/process', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const userId = req.user?.id || 'default-user';
-      const refund = await storage.updateRefund(id, {
-        status: 'processed',
-        processedBy: userId,
-        processedAt: new Date(),
-      });
-      res.json(refund);
-    } catch (error) {
-      console.error("Error processing refund:", error);
-      res.status(500).json({ message: "Failed to process refund" });
-    }
-  });
+  // Refunds migrated to server/routes/refunds.routes.ts (tenant-scoped; create is
+  // staff-authenticated, update/approve/process are ADMIN/MANAGER), mounted ahead of
+  // the monolith. Old handlers read garageId from the query and lacked per-garage
+  // ownership checks on get/update/approve/process — removed.
 
   // Tax Configurations
   // Tax configurations migrated to server/routes/tax-configurations.routes.ts
