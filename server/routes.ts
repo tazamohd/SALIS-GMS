@@ -20699,47 +20699,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workshop Calendar API
   // ==========================================
 
-  app.get('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garageId } = req.query;
-      if (!garageId) return res.status(400).json({ message: "garageId is required" });
-      const resources = await storage.getWorkshopResources(garageId as string);
-      res.json(resources);
-    } catch (error: any) {
-      console.error("Error fetching workshop resources:", error);
-      res.status(500).json({ message: "Failed to fetch workshop resources" });
-    }
-  });
-
-  app.post('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
-    try {
-      const resource = await storage.createWorkshopResource(req.body);
-      res.status(201).json(resource);
-    } catch (error: any) {
-      console.error("Error creating workshop resource:", error);
-      res.status(500).json({ message: "Failed to create workshop resource" });
-    }
-  });
-
-  app.patch('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const resource = await storage.updateWorkshopResource(req.params.id, req.body);
-      res.json(resource);
-    } catch (error: any) {
-      console.error("Error updating workshop resource:", error);
-      res.status(500).json({ message: "Failed to update workshop resource" });
-    }
-  });
-
-  app.delete('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      await storage.deleteWorkshopResource(req.params.id);
-      res.status(204).send();
-    } catch (error: any) {
-      console.error("Error deleting workshop resource:", error);
-      res.status(500).json({ message: "Failed to delete workshop resource" });
-    }
-  });
+  // Workshop resources migrated to server/routes/workshop-resources.routes.ts
+  // (tenant-scoped + RBAC), mounted ahead of the monolith. Old handlers read garageId
+  // from the query and lacked ownership checks on update/delete — removed.
 
   /* MOVED TO scheduling.routes.ts — 6 endpoints (calendar-appointments) */
   /*
