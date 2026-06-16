@@ -11,6 +11,7 @@ import {
 } from '../../shared/schema';
 import { eq, and, gte, lte, sql, count, desc } from 'drizzle-orm';
 import { openai, AI_MODEL, AI_MAX_TOKENS } from '../ai';
+import { BUSINESS_INTELLIGENCE_PROMPT } from './prompts';
 import type { AIInsight, RevenueForecast, DemandPrediction } from '../../shared/workflows';
 
 /**
@@ -66,16 +67,7 @@ CUSTOMERS:
       messages: [
         {
           role: 'system',
-          content: `You are a business intelligence analyst for SALIS AUTO, a garage management system in Saudi Arabia. Analyze the data and provide actionable insights. Return a JSON array of insights with this structure:
-[{
-  "category": "revenue|demand|parts|workforce|customer|cashflow|anomaly",
-  "title": "Short title",
-  "description": "1-2 sentence insight",
-  "impact": "high|medium|low",
-  "actionable": true/false,
-  "suggestedAction": "What to do about it"
-}]
-Return ONLY valid JSON. Provide 3-6 insights focused on the most impactful findings.`,
+          content: BUSINESS_INTELLIGENCE_PROMPT,
         },
         {
           role: 'user',

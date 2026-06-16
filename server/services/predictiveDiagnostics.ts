@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { PREDICTIVE_DIAGNOSTIC_PROMPT } from "../ai/prompts";
 
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
 const openai = new OpenAI({
@@ -39,7 +40,7 @@ export interface DiagnosticPrediction {
 export async function generatePredictiveDiagnostic(
   input: VehicleDiagnosticInput
 ): Promise<DiagnosticPrediction> {
-  const prompt = `You are an expert automotive diagnostic AI. Analyze the following vehicle data and predict potential failures or maintenance needs.
+  const prompt = `Analyze the following vehicle data and predict potential failures or maintenance needs.
 
 Vehicle Information:
 - Make: ${input.vehicleMake || "Unknown"}
@@ -78,7 +79,10 @@ Consider factors like:
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-5", // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        { role: "system", content: PREDICTIVE_DIAGNOSTIC_PROMPT },
+        { role: "user", content: prompt },
+      ],
       response_format: { type: "json_object" },
     });
 

@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import type { IStorage } from "../storage";
 import type { JobCard, User, TechnicianProfile } from "@shared/schema";
+import { technicianAssignmentPrompt } from "../ai/prompts";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = new OpenAI({
@@ -82,19 +83,7 @@ async function callOpenAIForRecommendations(
 ): Promise<TechnicianRecommendation[]> {
   const { jobCard, availableTechnicians, assignmentRules } = context;
 
-  const systemPrompt = `You are an expert automotive technician assignment system for a garage. Your task is to recommend the best technicians for a given job based on skills, workload, experience, and assignment rules.
-
-Assignment Rules:
-${JSON.stringify(assignmentRules, null, 2)}
-
-Consider these factors:
-1. Technician skills match with job requirements
-2. Current workload (active jobs vs max capacity)
-3. Experience level appropriate for job priority/complexity
-4. Hourly rate vs job budget
-5. Assignment rules (if any)
-
-Return the top 3 technician recommendations with confidence scores and detailed rationale.`;
+  const systemPrompt = technicianAssignmentPrompt(assignmentRules);
 
   const userPrompt = `Job Details:
 - Service Type: ${jobCard.serviceType}

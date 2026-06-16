@@ -1,4 +1,11 @@
 import OpenAI from "openai";
+import {
+  JOB_ESTIMATOR_PROMPT,
+  MAINTENANCE_PREDICTION_PROMPT,
+  PARTS_SPECIALIST_PROMPT,
+  SCHEDULE_OPTIMIZER_PROMPT,
+  customerAssistantPrompt,
+} from "./ai/prompts";
 
 // This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
 // The newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
@@ -86,7 +93,7 @@ Provide your estimation in JSON format with the following structure:
       messages: [
         {
           role: "system",
-          content: "You are an expert automotive service estimator. Provide accurate time and cost estimates based on industry standards and historical data. Always respond with valid JSON."
+          content: JOB_ESTIMATOR_PROMPT
         },
         {
           role: "user",
@@ -156,7 +163,7 @@ Identify potential upcoming maintenance needs or issues. Provide your analysis i
       messages: [
         {
           role: "system",
-          content: "You are an expert automotive diagnostician specializing in predictive maintenance. Analyze service history to identify potential future issues. Always respond with valid JSON."
+          content: MAINTENANCE_PREDICTION_PROMPT
         },
         {
           role: "user",
@@ -218,7 +225,7 @@ Provide parts recommendations in JSON format:
       messages: [
         {
           role: "system",
-          content: "You are an expert automotive parts specialist. Recommend appropriate parts based on the service type and vehicle details. Always respond with valid JSON."
+          content: PARTS_SPECIALIST_PROMPT
         },
         {
           role: "user",
@@ -296,7 +303,7 @@ Identify scheduling conflicts, inefficiencies, and provide optimization suggesti
       messages: [
         {
           role: "system",
-          content: "You are an expert in automotive service scheduling optimization. Analyze schedules to minimize conflicts and maximize efficiency. Always respond with valid JSON."
+          content: SCHEDULE_OPTIMIZER_PROMPT
         },
         {
           role: "user",
@@ -340,22 +347,11 @@ Identify scheduling conflicts, inefficiencies, and provide optimization suggesti
 
 export async function chatWithCustomer(message: string, conversationHistory: Array<{ role: string; content: string }>, garageContext: any) {
   try {
-    const systemPrompt = `You are a helpful customer support assistant for an automotive service garage. 
-
-Garage Information:
-- Name: ${garageContext.garageName}
-- Services: ${garageContext.services?.join(', ') || 'General automotive repair and maintenance'}
-- Working Hours: ${garageContext.workingHours || 'Contact us for hours'}
-
-Your role is to:
-1. Answer customer questions about services, pricing, and availability
-2. Help customers schedule appointments
-3. Provide general automotive advice
-4. Escalate complex issues to human staff when necessary
-
-If you cannot answer a question or if the customer needs immediate assistance, politely inform them and offer to connect them with a staff member.
-
-Always be professional, friendly, and helpful.`;
+    const systemPrompt = customerAssistantPrompt({
+      garageName: garageContext.garageName,
+      services: garageContext.services,
+      workingHours: garageContext.workingHours,
+    });
 
     const messages: any[] = [
       {

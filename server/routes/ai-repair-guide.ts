@@ -14,6 +14,7 @@ import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
 import { requirePlan } from "../middleware/requirePlan";
 import { openai, AI_MODEL } from "../ai";
+import { REPAIR_GUIDE_PROMPT } from "../ai/prompts";
 
 const router = Router();
 
@@ -120,8 +121,7 @@ router.post("/ai/repair-guide", isAuthenticated, requirePlan("ENTERPRISE"), asyn
       messages: [
         {
           role: "system",
-          content:
-            "You are an expert automotive technician. Produce a JSON object with key `steps` containing an ordered array of 5-10 repair steps. Each step has `id` (number), `title` (short imperative), and `description` (one sentence). Be specific to the vehicle and procedure. Respond with ONLY valid JSON.",
+          content: REPAIR_GUIDE_PROMPT,
         },
         {
           role: "user",

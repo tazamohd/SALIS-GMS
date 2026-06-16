@@ -2,6 +2,13 @@
 // Using Replit AI Integrations for OpenAI access (no API key needed, billed to credits)
 
 import OpenAI from "openai";
+import {
+  SERVICE_CHATBOT_PROMPT,
+  PREDICTIVE_MAINTENANCE_PROMPT,
+  PARTS_RECOMMENDATION_BRIEF_PROMPT,
+  OCR_ANALYSIS_PROMPT,
+  SERVICE_SUGGESTIONS_PROMPT,
+} from "./ai/prompts";
 
 // Validate OpenAI credentials with graceful fallback
 const AI_AVAILABLE = !!(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL && process.env.AI_INTEGRATIONS_OPENAI_API_KEY);
@@ -29,15 +36,7 @@ export async function* streamChatResponse(messages: any[]) {
       messages: [
         {
           role: "system",
-          content: `You are an expert automotive service assistant for SALIS AUTO, a professional garage management system. 
-          You help with:
-          - Vehicle diagnostics and troubleshooting
-          - Service recommendations and maintenance schedules
-          - Parts identification and compatibility
-          - Repair procedures and best practices
-          - Customer service inquiries
-          
-          Provide clear, professional, and helpful responses. If you're unsure about something, acknowledge it honestly.`
+          content: SERVICE_CHATBOT_PROMPT
         },
         ...messages
       ],
@@ -78,8 +77,7 @@ export async function analyzePredictiveMaintenance(vehicleData: {
     messages: [
       {
         role: "system",
-        content: `You are an automotive maintenance prediction AI. Analyze vehicle data and predict upcoming maintenance needs.
-        Return predictions in JSON format with: { predictions: [{ issue, probability, estimatedMiles, severity, recommendation }] }`
+        content: PREDICTIVE_MAINTENANCE_PROMPT
       },
       {
         role: "user",
@@ -124,8 +122,7 @@ export async function generatePartsRecommendations(context: {
     messages: [
       {
         role: "system",
-        content: `You are a parts recommendation AI for automotive repair. 
-        Return recommendations in JSON format: { recommendations: [{ partName, partNumber, compatibility, priority, estimatedCost, reason }] }`
+        content: PARTS_RECOMMENDATION_BRIEF_PROMPT
       },
       {
         role: "user",
@@ -160,8 +157,7 @@ export async function analyzeOCRDocument(extractedText: string, documentType: st
     messages: [
       {
         role: "system",
-        content: `You are a document analysis AI. Parse automotive documents and extract structured data.
-        Return data in JSON format: { type, fields: { ... }, summary }`
+        content: OCR_ANALYSIS_PROMPT
       },
       {
         role: "user",
@@ -202,8 +198,7 @@ export async function generateServiceSuggestions(context: {
     messages: [
       {
         role: "system",
-        content: `You are an automotive service advisor AI. Based on symptoms and vehicle data, suggest services.
-        Return suggestions in JSON format: { suggestions: [{ service, reason, priority, estimatedCost, estimatedTime }] }`
+        content: SERVICE_SUGGESTIONS_PROMPT
       },
       {
         role: "user",
