@@ -44,6 +44,11 @@ type RolePermissions = {
 };
 
 const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
+  // Non-login system account used only to author automated AI replies
+  // (see storage.ensureAiAssistantUser). It never authenticates, so it
+  // intentionally holds no module permissions.
+  ai_assistant: {},
+
   business_owner: {
     dashboard: ['view', 'export', 'view_reports'],
     customers: ['view', 'export'],
