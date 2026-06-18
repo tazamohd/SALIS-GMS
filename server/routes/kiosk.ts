@@ -30,13 +30,61 @@ const services: KioskService[] = [
   { id: 'svc-10', name: 'Car Wash & Detailing', nameAr: 'غسيل وتلميع السيارة', category: 'Cosmetic', estimatedDurationMinutes: 60, priceRangeMin: 50, priceRangeMax: 300, currency: 'SAR', popular: true },
 ];
 
-// Demo appointment data (simulates existing bookings; lookup-only)
-const demoAppointments = [
-  { id: 'appt-101', customerName: 'Ahmed Al-Rashid', phone: '0501234567', vehiclePlate: 'ABC 1234', vehicleInfo: '2022 Toyota Camry', serviceType: 'Oil Change', scheduledTime: '10:00 AM' },
-  { id: 'appt-102', customerName: 'Fatima Hassan', phone: '0559876543', vehiclePlate: 'XYZ 5678', vehicleInfo: '2021 Hyundai Sonata', serviceType: 'Brake Inspection & Repair', scheduledTime: '10:30 AM' },
-  { id: 'appt-103', customerName: 'Omar Khalid', phone: '0541112233', vehiclePlate: 'KSA 9012', vehicleInfo: '2023 Nissan Patrol', serviceType: 'AC Service', scheduledTime: '11:00 AM' },
-  { id: 'appt-104', customerName: 'Sara Al-Qahtani', phone: '0567778899', vehiclePlate: 'RYD 3456', vehicleInfo: '2020 Honda Accord', serviceType: 'Tire Rotation & Balancing', scheduledTime: '11:30 AM' },
-];
+// ─── Appointment lookup ───────────────────────────────────────────────────
+
+// Active appointment statuses a customer can check in against (excludes
+// completed / cancelled / no_show). Mirrors the schema's status vocabulary.
+const ACTIVE_APPOINTMENT_STATUSES = new Set(["scheduled", "confirmed", "in_progress"]);
+
+const digitsOnly = (s: unknown) => String(s ?? "").replace(/\D/g, "");
+const normalizePlate = (s: unknown) => String(s ?? "").replace(/\s+/g, "").toLowerCase();
+
+// Find an active appointment by customer phone or vehicle plate. The
+// appointments table denormalizes customerName/customerPhone and a vehicleInfo
+// jsonb ({make, model, year, licensePlate}), so no joins are needed. Phone
+// matching follows the existing /api/kiosk/lookup-customer convention
+// (digit-only, bidirectional substring); plate matching is exact on the
+// normalized value. Single-tenant like the rest of this kiosk module.
+async function findAppointmentForCheckIn(phone?: string, plateNumber?: string) {
+  const wantPhone = phone ? digitsOnly(phone) : "";
+  const wantPlate = plateNumber ? normalizePlate(plateNumber) : "";
+
+  const all = await storage.getAppointments();
+  const matches = all.filter((apt: any) => {
+    if (apt.status && !ACTIVE_APPOINTMENT_STATUSES.has(apt.status)) return false;
+    if (wantPhone) {
+      const aptPhone = digitsOnly(apt.customerPhone);
+      if (aptPhone && (aptPhone.includes(wantPhone) || wantPhone.includes(aptPhone))) return true;
+    }
+    if (wantPlate) {
+      const plate = normalizePlate(apt.vehicleInfo?.licensePlate);
+      if (plate && plate === wantPlate) return true;
+    }
+    return false;
+  });
+  if (matches.length === 0) return null;
+
+  // Prefer the soonest upcoming appointment; fall back to the most recent.
+  matches.sort(
+    (a: any, b: any) =>
+      new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime(),
+  );
+  const now = Date.now();
+  const apt: any =
+    matches.find((a: any) => new Date(a.appointmentDate).getTime() >= now) ??
+    matches[matches.length - 1];
+
+  const vi = apt.vehicleInfo ?? {};
+  return {
+    id: apt.id,
+    customerName: apt.customerName,
+    phone: apt.customerPhone,
+    vehiclePlate: vi.licensePlate ?? "",
+    vehicleInfo: [vi.year, vi.make, vi.model].filter(Boolean).join(" ").trim(),
+    serviceType: apt.serviceType,
+    scheduledTime: new Date(apt.appointmentDate).toLocaleString(),
+  };
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────
 
@@ -95,11 +143,7 @@ router.post('/kiosk/check-in', async (req, res) => {
     });
   }
 
-  const appointment = demoAppointments.find(a => {
-    if (phone) return a.phone === String(phone).replace(/\s+/g, '');
-    if (plateNumber) return a.vehiclePlate.replace(/\s+/g, '').toLowerCase() === String(plateNumber).replace(/\s+/g, '').toLowerCase();
-    return false;
-  });
+  const appointment = await findAppointmentForCheckIn(phone, plateNumber);
 
   if (!appointment) {
     return res.json({
