@@ -34,7 +34,6 @@
     "POST /api/hr/employees",
     "POST /api/hr/leave-requests",
     "POST /api/hr/performance-reviews",
-    "POST /api/kiosk/check-in",
     "POST /api/login",
     "POST /api/logout",
     "POST /api/loyalty-accounts",

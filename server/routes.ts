@@ -547,16 +547,6 @@ const kioskSessionSchema = z.object({
   sessionType: z.enum(['check-in', 'survey', 'payment', 'info']),
 });
 
-const kioskCheckInSchema = z.object({
-  sessionId: z.string(),
-  customerId: z.string(),
-  vehicleId: z.string(),
-  appointmentId: z.string().optional(),
-  checkInType: z.enum(['appointment', 'walk-in', 'pickup']),
-  signature: z.string().optional(),
-  additionalNotes: z.string().optional(),
-});
-
 const securityCameraSchema = z.object({
   cameraName: z.string(),
   location: z.string(),
@@ -16015,29 +16005,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/kiosk/check-in', isAuthenticated, async (req, res) => {
-    try {
-      const validated = kioskCheckInSchema.parse(req.body);
-      
-      const checkInData = {
-        sessionId: validated.sessionId,
-        customerId: validated.customerId,
-        vehicleId: validated.vehicleId,
-        appointmentId: validated.appointmentId,
-        checkInType: validated.checkInType,
-        signature: validated.signature,
-        additionalNotes: validated.additionalNotes,
-      };
-      const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
-      res.status(201).json(checkIn);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error completing kiosk check-in:", error);
-      res.status(500).json({ message: "Failed to complete kiosk check-in" });
-    }
-  });
+  // NOTE: POST /api/kiosk/check-in was removed here. It was dead code: the
+  // modular router (server/routes/kiosk.ts) mounts the same path FIRST in the
+  // hybrid router, so this staff/signature handler was never reachable. The
+  // signature-based staff flow remains available via POST /api/kiosk/checkin
+  // (no hyphen) below, which calls the same phase7Service.completeKioskCheckIn.
+  // See docs/adr/0001-hybrid-router-migration.md and the route-parity guard.
 
   // Security Camera Integration
   app.post('/api/security/cameras', isAuthenticated, async (req: any, res) => {
