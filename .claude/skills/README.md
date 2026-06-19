@@ -23,6 +23,11 @@ Claude activates a skill automatically when a request matches its description/tr
 - **fullstack-guardian** — end-to-end feature coherence
 - **websocket-engineer** — real-time WebSocket features
 - **legacy-modernizer** — refactoring (see REFACTORING_CHECKLIST.md)
+- **cloud-architect** — deploy targets (Railway / Render / Docker / Replit), DR, cost
+
+### Product & specs
+- **feature-forge** — requirements workshops, user stories, acceptance criteria
+- **spec-miner** — reverse-engineer specs from the existing 104-module codebase
 
 ### Quality, testing & debugging
 - **test-master** — Vitest / integration test strategy
@@ -36,6 +41,7 @@ Claude activates a skill automatically when a request matches its description/tr
 - **secure-code-guardian** — secure coding (bcrypt, 2FA, sessions)
 - **devops-engineer** — Docker / Railway / Render deploy & CI
 - **monitoring-expert** — logging, auditing, observability
+- **sre-engineer** — SLOs, incident response, capacity planning for production
 
 ### AI
 - **prompt-engineer** — OpenAI integration prompting
