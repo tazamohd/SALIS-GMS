@@ -34,6 +34,8 @@ Insurance · Car rentals · Ride-share. (Periodic inspection added as an easy Wa
 | `03-roadmap-and-resourcing.md` | Phased timeline, headcount & burn by phase |
 | `04-team-roles.md` | Every role + required knowledge/skills (governance/planning core, delivery roles, and the **marketing & growth team**) |
 | `05-delivery-operating-model.md` | Pods, ownership matrix, stage gates, RACI, cadence |
+| `06-agent-org.md` | The **AI agent army** (`.claude/agents/`) and how it maps to human roles |
+| `07-master-plan-and-schedule.md` | Living master plan: gap analysis, epics, estimates, dependencies, **sprint schedule** |
 
 ## How to resume
 
