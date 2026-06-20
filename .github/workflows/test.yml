@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Vitest (Postgres 16)
+    name: Build, Lint & Test
     runs-on: ubuntu-latest
 
     services:
@@ -41,6 +41,18 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Typecheck
+        run: npm run check
+
+      - name: Lint
+        # eslint is not yet wired into this repo (no config/dependency). Keep the
+        # step present but non-blocking so it activates automatically once added.
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
 
       - name: Push Drizzle schema
         run: npx drizzle-kit push --force
