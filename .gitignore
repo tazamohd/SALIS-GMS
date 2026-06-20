@@ -18,3 +18,7 @@ user_credentials.csv
 .claude-flow/logs/
 .claude-flow/sessions/
 ruvector.db
+
+# Test/coverage artifacts
+coverage/
+pg-test-data/

@@ -37,11 +37,11 @@ export default defineConfig({
       '**/dist/**',
       'e2e/**',
     ],
-    environmentMatchGlobs: [
-      ['server/**', 'node'],
-      ['client/**', 'jsdom'],
-      ['shared/**', 'node'],
-    ],
+    // Vitest 4 removed `environmentMatchGlobs`. Default everything to `node`
+    // (server + shared). DOM-dependent client tests opt into jsdom with a
+    // `// @vitest-environment jsdom` docblock at the top of the file
+    // (see client/src/test/setup.ts for the convention).
+    environment: 'node',
     setupFiles: ['./client/src/test/setup.ts'],
     globalSetup: needsDb ? ['./server/__tests__/globalSetup.ts'] : [],
     testTimeout: 30000,
@@ -50,6 +50,37 @@ export default defineConfig({
     forks: {
       singleFork: true,
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text-summary', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      include: ['server/**/*.ts', 'shared/**/*.ts', 'client/src/**/*.{ts,tsx}'],
+      exclude: [
+        '**/*.{test,spec}.{ts,tsx}',
+        '**/__tests__/**',
+        'server/**/seed*.ts',
+        'server/**/seeds/**',
+        'shared/**/*.test.ts',
+        'client/src/test/**',
+        'client/src/components/ui/**', // generated shadcn primitives
+        '**/*.d.ts',
+      ],
+      // Wave 0 floor: a non-zero baseline that blocks regression to zero.
+      // Ratcheted toward 70% in the Wave 6 coverage-backfill (see plan).
+      thresholds: {
+        lines: 10,
+        functions: 10,
+        statements: 10,
+        branches: 25,
+      },
+    },
+  },
+  // Client components use the automatic JSX runtime (the app's vite.config.ts
+  // applies @vitejs/plugin-react). Mirror that here so component tests don't
+  // need to import React explicitly.
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'react',
   },
   resolve: {
     alias: {
