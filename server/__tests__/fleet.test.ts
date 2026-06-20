@@ -19,43 +19,39 @@ beforeAll(async () => {
 describe("Fleet - Groups", () => {
   it("GET /api/fleet/groups returns array", async () => {
     const res = await agent.get("/api/fleet/groups");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(Array.isArray(res.body)).toBe(true);
-    }
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
   });
 
-  it("POST /api/fleet/groups creates group", async () => {
+  it("POST /api/fleet/groups creates a group", async () => {
     const res = await agent.post("/api/fleet/groups").send({
       garageId,
-      name: "Test Fleet",
+      name: `Test Fleet ${Date.now()}`,
       description: "Test fleet group",
     });
-    // Accept 200/201 or 404 if endpoint not yet wired
-    expect([200, 201, 404, 500]).toContain(res.status);
-    if ([200, 201].includes(res.status)) {
-      expect(res.body).toHaveProperty("id");
-    }
+    expect([200, 201]).toContain(res.status);
+    expect(res.body).toHaveProperty("id");
+    expect(res.body.fleetName).toContain("Test Fleet");
+  });
+
+  it("POST /api/fleet/groups rejects a missing name", async () => {
+    const res = await agent.post("/api/fleet/groups").send({ garageId });
+    expect(res.status).toBe(400);
   });
 });
 
 describe("Fleet - Vehicles", () => {
-  it("GET /api/fleet/vehicles returns array", async () => {
+  it("GET /api/fleet/vehicles returns { vehicles: [...] }", async () => {
     const res = await agent.get("/api/fleet/vehicles");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      // Route returns { vehicles: [...] } (see server/routes/fleet.ts)
-      expect(Array.isArray(res.body.vehicles)).toBe(true);
-    }
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.vehicles)).toBe(true);
   });
 });
 
 describe("Fleet - Auth Guard", () => {
-  it("GET /api/fleet/groups without auth returns 401 or 404", async () => {
+  it("GET /api/fleet/groups without auth returns 401", async () => {
     const { default: supertest } = await import("supertest");
     const res = await supertest(app).get("/api/fleet/groups");
-    expect([401, 404]).toContain(res.status);
+    expect(res.status).toBe(401);
   });
 });

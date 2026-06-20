@@ -19,41 +19,43 @@ beforeAll(async () => {
 describe("Settings - Feature Flags", () => {
   it("GET /api/feature-flags returns array", async () => {
     const res = await agent.get("/api/feature-flags");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(Array.isArray(res.body)).toBe(true);
-    }
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
   });
 });
 
 describe("Settings - CRUD", () => {
-  it("GET /api/settings returns 200", async () => {
+  it("GET /api/settings returns the user's settings object", async () => {
     const res = await agent.get("/api/settings");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(typeof res.body).toBe("object");
-    }
+    expect(res.status).toBe(200);
+    expect(typeof res.body).toBe("object");
+    expect(res.body).not.toBeNull();
   });
 
-  it("PATCH /api/settings updates a setting", async () => {
+  it("PATCH /api/settings updates and persists settings", async () => {
     const res = await agent.patch("/api/settings").send({
       timezone: "Asia/Riyadh",
       currency: "SAR",
     });
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(typeof res.body).toBe("object");
-    }
+    expect(res.status).toBe(200);
+    expect(res.body.timezone).toBe("Asia/Riyadh");
+    expect(res.body.currency).toBe("SAR");
+
+    // Persisted on the next read.
+    const after = await agent.get("/api/settings");
+    expect(after.body.currency).toBe("SAR");
+  });
+
+  it("PATCH /api/settings rejects an invalid field type", async () => {
+    const res = await agent.patch("/api/settings").send({ compactMode: "not-a-boolean" });
+    expect(res.status).toBe(400);
   });
 });
 
 describe("Settings - Auth Guard", () => {
-  it("GET /api/settings without auth returns 401 or 404", async () => {
+  it("GET /api/settings without auth returns 401", async () => {
     const { default: supertest } = await import("supertest");
     const res = await supertest(app).get("/api/settings");
-    expect([401, 404]).toContain(res.status);
+    expect(res.status).toBe(401);
   });
 });

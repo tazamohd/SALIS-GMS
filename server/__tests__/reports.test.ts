@@ -17,33 +17,29 @@ beforeAll(async () => {
 });
 
 describe("Reports - Overview", () => {
-  it("GET /api/reports/overview returns object with stats", async () => {
+  it("GET /api/reports/overview returns summary stats", async () => {
     const res = await agent.get("/api/reports/overview");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(typeof res.body).toBe("object");
-      expect(res.body).not.toBeNull();
-    }
+    expect(res.status).toBe(200);
+    expect(res.body).not.toBeNull();
+    expect(res.body).toHaveProperty("totalRevenue");
+    expect(res.body).toHaveProperty("totalJobCards");
+    expect(res.body).toHaveProperty("totalCustomers");
   });
 });
 
 describe("Reports - Revenue", () => {
-  it("GET /api/reports/revenue returns object", async () => {
+  it("GET /api/reports/revenue returns a data set", async () => {
     const res = await agent.get("/api/reports/revenue");
-    // Accept 200 or 404 if endpoint not yet wired
-    expect([200, 404, 500]).toContain(res.status);
-    if (res.status === 200) {
-      expect(typeof res.body).toBe("object");
-      expect(res.body).not.toBeNull();
-    }
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("data");
+    expect(Array.isArray(res.body.data)).toBe(true);
   });
 });
 
 describe("Reports - Auth Guard", () => {
-  it("GET /api/reports/overview without auth returns 401 or 404", async () => {
+  it("GET /api/reports/overview without auth returns 401", async () => {
     const { default: supertest } = await import("supertest");
     const res = await supertest(app).get("/api/reports/overview");
-    expect([401, 404]).toContain(res.status);
+    expect(res.status).toBe(401);
   });
 });

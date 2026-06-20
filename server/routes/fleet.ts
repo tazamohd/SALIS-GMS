@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { storage } from '../storage';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -230,6 +231,42 @@ router.get('/fleet/analytics', async (_req, res) => {
   } catch (err) {
     console.error('Fleet analytics error:', err);
     res.status(500).json({ message: 'Failed to compute fleet analytics' });
+  }
+});
+
+// GET /api/fleet/groups — fleet groups for the authenticated user's garage
+router.get('/fleet/groups', isAuthenticated, async (req, res) => {
+  try {
+    const garageId = (req as any).user?.garageId;
+    if (!garageId) return res.json([]);
+    const groups = await storage.getFleetGroupsByGarage(garageId);
+    res.json(groups);
+  } catch (err) {
+    console.error('Fleet groups list error:', err);
+    res.status(500).json({ message: 'Failed to load fleet groups' });
+  }
+});
+
+// POST /api/fleet/groups — create a fleet group
+router.post('/fleet/groups', isAuthenticated, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const garageId = req.body.garageId || user?.garageId;
+    const fleetName = req.body.fleetName || req.body.name;
+    if (!garageId || !fleetName) {
+      return res.status(400).json({ message: 'garageId and name are required' });
+    }
+    const group = await storage.createFleetGroup({
+      garageId,
+      customerId: req.body.customerId || user?.id,
+      fleetName,
+      companyName: req.body.companyName || null,
+      notes: req.body.description || req.body.notes || null,
+    });
+    res.status(201).json(group);
+  } catch (err) {
+    console.error('Fleet group create error:', err);
+    res.status(500).json({ message: 'Failed to create fleet group' });
   }
 });
 

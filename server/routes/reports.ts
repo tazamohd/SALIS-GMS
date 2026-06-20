@@ -1,8 +1,22 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { storage } from '../storage';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
+
+// GET /api/reports/overview - Executive dashboard overview (revenue, jobs, customers, recents)
+router.get('/reports/overview', isAuthenticated, async (req, res) => {
+  try {
+    const garageId = (req as any).user?.garageId;
+    const overview = await storage.getReportsOverview(garageId);
+    res.json(overview);
+  } catch (e) {
+    console.error('Reports overview error:', e);
+    res.status(500).json({ message: 'Failed to load reports overview' });
+  }
+});
 
 // GET /api/reports/revenue - Revenue report with date range
 router.get('/reports/revenue', async (req, res) => {
