@@ -32,7 +32,7 @@ Insurance · Car rentals · Ride-share. (Periodic inspection added as an easy Wa
 | `01-strategy-and-architecture.md` | Concept, 7 services → 3 waves, target architecture, KSA regulatory map |
 | `02-tech-stack.md` | Full stack: keep vs add |
 | `03-roadmap-and-resourcing.md` | Phased timeline, headcount & burn by phase |
-| `04-team-roles.md` | Every role + required knowledge/skills (incl. PM, architects, analysts, docs) |
+| `04-team-roles.md` | Every role + required knowledge/skills (governance/planning core, delivery roles, and the **marketing & growth team**) |
 | `05-delivery-operating-model.md` | Pods, ownership matrix, stage gates, RACI, cadence |
 
 ## How to resume
