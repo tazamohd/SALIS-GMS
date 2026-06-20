@@ -3,7 +3,8 @@
     "developer-kit": {
       "source": {
         "source": "github",
-        "repo": "giuseppe-trisciuoglio/developer-kit"
+        "repo": "giuseppe-trisciuoglio/developer-kit",
+        "sha": "f125b1c3cd57c7f8f1fa3de16bca10e0041c9dab"
       }
     }
   },
