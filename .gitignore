@@ -17,3 +17,4 @@ user_credentials.csv
 .claude-flow/data/
 .claude-flow/logs/
 .claude-flow/sessions/
+ruvector.db
