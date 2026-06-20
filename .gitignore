@@ -11,3 +11,9 @@ user_credentials.csv
 .env.*
 *.pem
 *.key
+# Ruflo / claude-flow runtime (local, not for VCS)
+.swarm/
+.claude/memory.db
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
