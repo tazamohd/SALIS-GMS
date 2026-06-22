@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Phase 3: Enhanced Integrations Service for SALIS AUTO
 // Real implementations for accounting, email, social media, video, and marketplace integrations
 
@@ -25,7 +24,7 @@ let stripe: Stripe | null = null;
 if (STRIPE_AVAILABLE) {
   try {
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-09-30.clover",
+      apiVersion: "2025-09-30.clover" as any,
     });
     console.log('✅ Stripe initialized successfully');
   } catch (error) {
@@ -79,7 +78,7 @@ export async function syncAccountingData(
 ) {
   // Get connection details
   const connection = await db.query.accountingConnections.findFirst({
-    where: (ac, { eq }) => eq(ac.id, connectionId)
+    where: (ac: any, { eq }: any) => eq(ac.id, connectionId)
   });
 
   if (!connection || !connection.isActive) {
@@ -121,7 +120,7 @@ export async function syncAccountingData(
 export async function getAccountingDashboard(garageId: string) {
   // Get all connections
   const connections = await db.query.accountingConnections.findMany({
-    where: (ac, { eq }) => eq(ac.garageId, garageId)
+    where: (ac: any, { eq }: any) => eq(ac.garageId, garageId)
   });
 
   // Get recent sync history
@@ -139,7 +138,7 @@ export async function getAccountingDashboard(garageId: string) {
     recentSyncs: recentSyncs.rows,
     summary: {
       totalConnections: connections.length,
-      activeConnections: connections.filter(c => c.isActive).length,
+      activeConnections: connections.filter((c: any) => c.isActive).length,
       lastSyncAt: recentSyncs.rows[0]?.synced_at || null
     }
   };
@@ -181,7 +180,7 @@ export async function createEmailCampaign(data: {
 export async function sendEmailCampaign(campaignId: string) {
   // Get campaign details
   const campaign = await db.query.emailCampaigns.findFirst({
-    where: (ec, { eq }) => eq(ec.id, campaignId)
+    where: (ec: any, { eq }: any) => eq(ec.id, campaignId)
   });
 
   if (!campaign) {
@@ -400,7 +399,7 @@ export async function placeMarketplaceOrder(data: {
 export async function trackMarketplaceOrder(orderId: string) {
   // In production, this would call marketplace tracking API
   const order = await db.query.marketplaceOrders.findFirst({
-    where: (mo, { eq }) => eq(mo.id, orderId)
+    where: (mo: any, { eq }: any) => eq(mo.id, orderId)
   });
 
   if (!order) {

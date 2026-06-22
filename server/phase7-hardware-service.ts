@@ -1,4 +1,3 @@
-// @ts-nocheck
 // PHASE 7 - ADVANCED HARDWARE BACKEND SERVICE
 // 5 modules with database operations
 
@@ -56,9 +55,9 @@ export async function getBarcodeScanHistory(garageId: string, scanType?: string)
         id: barcodeScans.id,
         scanType: barcodeScans.scanType,
         barcodeData: barcodeScans.barcodeData,
-        partName: spareParts.partName,
+        partName: spareParts.name,
         vehiclePlate: vehicles.licensePlate,
-        toolName: tools.toolName,
+        toolName: tools.name,
         scannedBy: users.fullName,
         location: barcodeScans.location,
         associatedAction: barcodeScans.associatedAction,
@@ -167,7 +166,7 @@ export async function getActiveContentForDisplay(displayId: string) {
       .orderBy(desc(signageContent.priority));
     
     // Filter in memory to handle nullable validFrom/validUntil
-    return content.filter(c => {
+    return content.filter((c: any) => {
       const validFrom = c.validFrom ? new Date(c.validFrom) : null;
       const validUntil = c.validUntil ? new Date(c.validUntil) : null;
       const isAfterStart = !validFrom || validFrom <= now;

@@ -61,6 +61,20 @@ Direct exploration overturned the original "Phase 5 is 50% stubbed" assessment:
   optimizer callbacks. `phase5-operations-service.ts` is now under the type-check gate.
 - Local gates: tsc CLEAN, lint 0 errors, build PASS.
 
+### Wave 3 — Phase 6 verified + phase-service type-safety hardening ✅ (local gates green)
+- **Phase 6 (Compliance & Quality):** the service `phase6-compliance-service.ts` (environmental,
+  ISO 9001 quality, safety incidents, insurance claims) is **already fully implemented AND
+  type-safe** (no `@ts-nocheck`). Its HTTP exposure has the same mock-shadowing / missing-route
+  issues as Phase 5 (mock handlers at routes.ts ~14053; real `phase6Service` handlers at ~15629/
+  ~18463 on different paths; insurance-claims & ISO-quality have no real route) → Wave 7.
+- **Cleared the remaining `@ts-nocheck` landmines** (same bug class as Phase 5):
+  - `phase3-integrations-service.ts`: removed `@ts-nocheck`; fixed 10 errors (Stripe apiVersion
+    cast, typed drizzle `where` callbacks, typed a `.filter`).
+  - `phase7-hardware-service.ts`: removed `@ts-nocheck`; fixed the barcode-scan query's
+    nonexistent `spareParts.partName`/`tools.toolName` → `.name` (silent-`[]` bug), typed a filter.
+  - **All `server/phase*-service.ts` are now type-checked** (zero `@ts-nocheck` remaining).
+- Local gates: tsc CLEAN, lint 0 errors, build PASS.
+
 ### Tooling setup (commits `1c34614`, `5362484`, `d7c9fed`)
 - Installed the ruflo agent harness (`.claude/`, `.claude-flow/`, `.mcp.json`, `CLAUDE.md`).
 - Initialized the memory DB and seeded SALIS architecture/conventions/commands/compliance.
@@ -73,8 +87,8 @@ Direct exploration overturned the original "Phase 5 is 50% stubbed" assessment:
 | 0 | Foundation: ESLint, coverage, CI gates, client harness | ✅ CI green |
 | 1 | Empty domains & consolidation (settings/fleet-groups/reports-overview) | ✅ CI green |
 | 2 | Phase 5 Operations: type-safety & query correctness (logic was already implemented) | ✅ local gates green |
-| 3 | Phase 6 Compliance & Quality (ISO, environmental, safety, insurance) | pending |
-| 4 | Phase 7 Hardware (barcode, signage, camera, LPR, AR) | pending |
+| 3 | Phase 6 verified + phase-service type-safety hardening (phase3/phase7) | ✅ local gates green |
+| 4 | Phase 7 Hardware feature/route completion (service now type-safe) | pending |
 | 5 | External integrations (ZATCA Fatoora, accounting OAuth, comms) | pending |
 | 6 | Test/coverage backfill → ratchet to target | pending |
 | 7 | Monolith retirement (`server/routes.ts`) | pending |
@@ -89,8 +103,9 @@ Direct exploration overturned the original "Phase 5 is 50% stubbed" assessment:
   deleting the mock block and wiring any mock-only paths (e.g. `GET /api/calibration/records`,
   `/api/payroll/periods`, `/api/timeclock/clock-out`, `/api/routing/routes`) to the service —
   monolith surgery best done in Wave 7 with parity tests.
-- **Other phase services still `@ts-nocheck`:** `phase3-integrations-service.ts`,
-  `phase7-hardware-service.ts` (address in their respective waves).
+- **Phase 6 route shadowing / missing routes** (same class as Phase 5): mock handlers at
+  routes.ts ~14053 vs real `phase6Service` handlers at ~15629/~18463; `/api/insurance-claims` and
+  ISO-quality have only mock routes — reconcile in Wave 7.
 
 ## Notes
 - Server tests can't run in the dev sandbox (Postgres won't run as root); they are validated by
