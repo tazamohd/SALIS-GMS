@@ -46,6 +46,21 @@ A consolidation, not "fill 4 stubs."
 - **Hardened tests:** fleet/reports/settings integration tests upgraded from 404-tolerant smoke
   checks to real 200 gates (+ validation, persistence, auth-guard) — green under real Postgres.
 
+### Wave 2 — Phase 5 Operations: type-safety & correctness ✅ (local gates green)
+Direct exploration overturned the original "Phase 5 is 50% stubbed" assessment:
+- The service `server/phase5-operations-service.ts` (all 5 modules — scheduling optimizer, parts
+  auto-reorder, multi-location routing, time-clock/payroll, equipment calibration) is **fully
+  implemented** with real DB logic.
+- BUT it carried `// @ts-nocheck`, which hid **real bugs**: the auto-reorder and calibration
+  queries referenced **non-existent columns** (`spareParts.partName/partNumber/quantityInStock/
+  garageId`, `tools.toolName/toolNumber`) — they would throw at runtime and silently return `[]`
+  via catch blocks.
+- **Fix:** removed `@ts-nocheck`; rewrote auto-reorder to join `sparePartInventories` for stock
+  (garage scoping via `autoReorderRules.garageId`) and use `spareParts.name`/`.sku`; fixed
+  calibration to use `tools.name` (dropped nonexistent `toolNumber`); typed the scheduling
+  optimizer callbacks. `phase5-operations-service.ts` is now under the type-check gate.
+- Local gates: tsc CLEAN, lint 0 errors, build PASS.
+
 ### Tooling setup (commits `1c34614`, `5362484`, `d7c9fed`)
 - Installed the ruflo agent harness (`.claude/`, `.claude-flow/`, `.mcp.json`, `CLAUDE.md`).
 - Initialized the memory DB and seeded SALIS architecture/conventions/commands/compliance.
@@ -57,13 +72,25 @@ A consolidation, not "fill 4 stubs."
 |------|-------|--------|
 | 0 | Foundation: ESLint, coverage, CI gates, client harness | ✅ CI green |
 | 1 | Empty domains & consolidation (settings/fleet-groups/reports-overview) | ✅ CI green |
-| 2 | Phase 5 Operations (AI scheduling, parts auto-reorder, time-clock, calibration) | ⏭️ planning |
+| 2 | Phase 5 Operations: type-safety & query correctness (logic was already implemented) | ✅ local gates green |
 | 3 | Phase 6 Compliance & Quality (ISO, environmental, safety, insurance) | pending |
 | 4 | Phase 7 Hardware (barcode, signage, camera, LPR, AR) | pending |
 | 5 | External integrations (ZATCA Fatoora, accounting OAuth, comms) | pending |
 | 6 | Test/coverage backfill → ratchet to target | pending |
 | 7 | Monolith retirement (`server/routes.ts`) | pending |
 | 8 | Hardening: security audit, perf budgets, E2E, emerging-tech | pending |
+
+## Known defects (deferred to Wave 7 — monolith retirement)
+- **Phase 5 route shadowing:** in `server/routes.ts`, a block of hardcoded **mock** handlers
+  (~lines 13985–14040, "Module 82–85": `/api/auto-reorder/*`, `/api/timeclock/*`, `/api/payroll/*`,
+  `/api/calibration/*`, `/api/routing/routes`) is registered **before** the real
+  `phase5Service`-backed handlers (~line 15439+). Express uses the first match, so these endpoints
+  currently return **mock data** instead of the real (now-corrected) service. Resolving this means
+  deleting the mock block and wiring any mock-only paths (e.g. `GET /api/calibration/records`,
+  `/api/payroll/periods`, `/api/timeclock/clock-out`, `/api/routing/routes`) to the service —
+  monolith surgery best done in Wave 7 with parity tests.
+- **Other phase services still `@ts-nocheck`:** `phase3-integrations-service.ts`,
+  `phase7-hardware-service.ts` (address in their respective waves).
 
 ## Notes
 - Server tests can't run in the dev sandbox (Postgres won't run as root); they are validated by
