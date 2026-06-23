@@ -24,11 +24,10 @@ const guarded = [
   "/api/analytics/performance",
   "/api/forecasting/demand",
   "/api/productivity",
+  "/api/dashboard/summary",
 ];
 
-// NOTE: /api/dashboard/summary currently has NO auth guard (tracked as a
-// security follow-up). Smoke-tested for "wired + no crash" only, not 401.
-const all = [...guarded, "/api/dashboard/summary"];
+const all = guarded;
 
 describe("Modular route smoke — authenticated", () => {
   for (const path of all) {
