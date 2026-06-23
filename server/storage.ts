@@ -3514,27 +3514,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
-    const conditions = [];
-    
-    if (garageId) {
-      conditions.push(eq(purchaseOrders.garageId, garageId));
-    }
-    
+    // Tenant-scoped: deny-by-default (removes legacy return-all fallback).
+    const conditions = [garageScope(purchaseOrders.garageId, garageId)];
     if (status) {
       conditions.push(eq(purchaseOrders.status, status));
     }
-    
-    if (conditions.length > 0) {
-      return await db.select().from(purchaseOrders)
-        .where(and(...conditions))
-        .orderBy(desc(purchaseOrders.createdAt));
-    }
-    
-    return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
+    return await db.select().from(purchaseOrders)
+      .where(and(...conditions))
+      .orderBy(desc(purchaseOrders.createdAt));
   }
 
   async getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined> {
-    const [po] = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, id));
+    const [po] = await db.select().from(purchaseOrders)
+      .where(and(eq(purchaseOrders.id, id), garageScope(purchaseOrders.garageId)));
     return po;
   }
 
@@ -3549,18 +3541,20 @@ export class DatabaseStorage implements IStorage {
   async updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder> {
     const [po] = await db.update(purchaseOrders)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(purchaseOrders.id, id))
+      .where(and(eq(purchaseOrders.id, id), garageScope(purchaseOrders.garageId)))
       .returning();
     return po;
   }
 
   async deletePurchaseOrder(id: string): Promise<void> {
-    await db.delete(purchaseOrders).where(eq(purchaseOrders.id, id));
+    await db.delete(purchaseOrders).where(and(eq(purchaseOrders.id, id), garageScope(purchaseOrders.garageId)));
   }
 
   async getPurchaseOrderItems(purchaseOrderId: string): Promise<PurchaseOrderItem[]> {
+    // purchaseOrderItems has no garage column — scope via the parent PO.
+    const garagePoIds = db.select({ id: purchaseOrders.id }).from(purchaseOrders).where(garageScope(purchaseOrders.garageId));
     return await db.select().from(purchaseOrderItems)
-      .where(eq(purchaseOrderItems.purchaseOrderId, purchaseOrderId))
+      .where(and(eq(purchaseOrderItems.purchaseOrderId, purchaseOrderId), inArray(purchaseOrderItems.purchaseOrderId, garagePoIds)))
       .orderBy(desc(purchaseOrderItems.createdAt));
   }
 
@@ -3708,27 +3702,19 @@ export class DatabaseStorage implements IStorage {
 
   // Estimates & Quotes - Module 23
   async getEstimates(garageId?: string, status?: string): Promise<Estimate[]> {
-    const conditions = [];
-    
-    if (garageId) {
-      conditions.push(eq(estimates.garageId, garageId));
-    }
-    
+    // Tenant-scoped: deny-by-default (removes legacy return-all fallback).
+    const conditions = [garageScope(estimates.garageId, garageId)];
     if (status) {
       conditions.push(eq(estimates.status, status));
     }
-    
-    if (conditions.length > 0) {
-      return await db.select().from(estimates)
-        .where(and(...conditions))
-        .orderBy(desc(estimates.createdAt));
-    }
-    
-    return await db.select().from(estimates).orderBy(desc(estimates.createdAt));
+    return await db.select().from(estimates)
+      .where(and(...conditions))
+      .orderBy(desc(estimates.createdAt));
   }
 
   async getEstimate(id: string): Promise<Estimate | undefined> {
-    const [estimate] = await db.select().from(estimates).where(eq(estimates.id, id));
+    const [estimate] = await db.select().from(estimates)
+      .where(and(eq(estimates.id, id), garageScope(estimates.garageId)));
     return estimate;
   }
 
@@ -3743,18 +3729,20 @@ export class DatabaseStorage implements IStorage {
   async updateEstimate(id: string, data: Partial<Estimate>): Promise<Estimate> {
     const [estimate] = await db.update(estimates)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(estimates.id, id))
+      .where(and(eq(estimates.id, id), garageScope(estimates.garageId)))
       .returning();
     return estimate;
   }
 
   async deleteEstimate(id: string): Promise<void> {
-    await db.delete(estimates).where(eq(estimates.id, id));
+    await db.delete(estimates).where(and(eq(estimates.id, id), garageScope(estimates.garageId)));
   }
 
   async getEstimateItems(estimateId: string): Promise<EstimateItem[]> {
+    // estimateItems has no garage column — scope via the parent estimate.
+    const garageEstimateIds = db.select({ id: estimates.id }).from(estimates).where(garageScope(estimates.garageId));
     return await db.select().from(estimateItems)
-      .where(eq(estimateItems.estimateId, estimateId))
+      .where(and(eq(estimateItems.estimateId, estimateId), inArray(estimateItems.estimateId, garageEstimateIds)))
       .orderBy(desc(estimateItems.createdAt));
   }
 

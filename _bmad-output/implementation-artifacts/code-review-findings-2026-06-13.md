@@ -34,7 +34,7 @@ Triage buckets: **[D]** decision-needed · **[P]** patch (unambiguous) · **[Def
 
 ## ⚪ Deferred (real but phased / pre-existing — tracked, not fixed now)
 
-- [x] **[Defer] Long-tail unscoped methods** — estimates, purchase_orders, spare parts, HR detail getters/mutators, job-card sub-resources; legacy `else return ALL` in `getEstimates`/`getPurchaseOrders`. The documented ~170-method tail (RLS 1.6 + CI guard 6.2 + harness 6.1). **Note:** the RLS migration's table list currently omits these too. (edge+auditor)
+- [x] **[Defer] Long-tail unscoped methods** — estimates, purchase_orders, spare parts, HR detail getters/mutators, job-card sub-resources; legacy `else return ALL` in `getEstimates`/`getPurchaseOrders`. The documented ~170-method tail (RLS 1.6 + CI guard 6.2 + harness 6.1). **Note:** the RLS migration's table list currently omits these too. **UPDATE 2026-06-15: estimates + purchase_orders (reads/detail/update/delete + items-via-parent) now app-layer scoped; `getEstimates`/`getPurchaseOrders` return-all fallbacks removed. spareParts confirmed a GLOBAL catalog (no garage_id) — correctly not scoped. Remaining tail: HR by-id getters, job-card sub-resources.** (edge+auditor)
 - [x] **[Defer] MFA not required for privileged un-enrolled roles** — `mfaRequiredForRole` is dead code; documented staged rollout. (blind+edge+auditor)
 - [x] **[Defer] 2FA lockout in-memory/per-process + RMW race** — pre-existing in `twoFactorAuth.ts`; bypassable across instances. (edge)
 - [x] **[Defer] Isolation-leak audit fires only on create mismatch** — update/delete cross-tenant 0-row case emits no audit (FR-2 AC#3 partial). (auditor+blind)
