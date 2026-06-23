@@ -2,6 +2,7 @@
 // Saudi Arabia's Zakat, Tax and Customs Authority
 // Phase 2 requires real-time invoice clearance through ZATCA's Fatoora platform
 
+import { createHash } from 'crypto';
 import {
   ZATCAInvoiceData,
   generateZATCAQRCode,
@@ -225,21 +226,17 @@ ${lineItemsXml}
  */
 export async function submitToClearance(
   ublInvoice: UBLInvoiceXML,
-  csid: string = ''
+  csid: string = '',
+  fetchImpl: typeof fetch = fetch
 ): Promise<ClearanceResponse> {
-  // TODO: Replace with actual ZATCA Fatoora API endpoint
   // Production: https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/clearance/single
   // Sandbox:    https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single
   const ZATCA_CLEARANCE_URL =
     process.env.ZATCA_API_URL ||
     'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single';
 
-  // TODO: Obtain real CSID through ZATCA onboarding process
-  // The CSID is generated via:
-  // 1. Generate CSR (Certificate Signing Request)
-  // 2. Submit to ZATCA compliance API
-  // 3. Complete compliance checks
-  // 4. Receive production CSID
+  // The CSID is obtained through ZATCA onboarding (generate CSR → submit to the
+  // compliance API → complete checks → receive production CSID).
   const authToken = csid || process.env.ZATCA_CSID || '';
 
   const requestBody = {
@@ -248,45 +245,86 @@ export async function submitToClearance(
     invoice: ublInvoice.encodedInvoice,
   };
 
-  try {
-    // TODO: Uncomment when integrating with real ZATCA API
-    // const response = await fetch(ZATCA_CLEARANCE_URL, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json',
-    //     'Accept-Version': 'V2',
-    //     'Accept-Language': 'en',
-    //     'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
-    //   },
-    //   body: JSON.stringify(requestBody),
-    // });
-    // const data = await response.json();
-    // return mapClearanceResponse(data);
-
-    // Stub response for development
-    console.log('[ZATCA Phase 2] Clearance submission prepared:', {
-      endpoint: ZATCA_CLEARANCE_URL,
-      invoiceHash: ublInvoice.hash,
-    });
-
+  // Without onboarding credentials we cannot reach Fatoora. Prepare the payload
+  // and return an honest dev-mode result rather than claiming clearance.
+  if (!authToken) {
     return {
-      status: 'CLEARED',
-      clearanceId: `CLR-${Date.now()}`,
+      status: 'REPORTED',
       invoiceHash: ublInvoice.hash,
-      qrCode: ublInvoice.encodedInvoice.substring(0, 100),
-      warnings: [],
+      warnings: [
+        'ZATCA credentials (CSID) not configured — invoice prepared but not submitted to Fatoora.',
+      ],
       errors: [],
       timestamp: new Date().toISOString(),
     };
+  }
+
+  try {
+    const response = await fetchImpl(ZATCA_CLEARANCE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'Accept-Version': 'V2',
+        'Accept-Language': 'en',
+        Authorization: `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return {
+        status: 'REJECTED',
+        invoiceHash: ublInvoice.hash,
+        warnings: extractMessages(data, 'warning'),
+        errors: extractMessages(data, 'error').length
+          ? extractMessages(data, 'error')
+          : [`ZATCA clearance failed with HTTP ${response.status}`],
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    return mapClearanceResponse(data, ublInvoice.hash);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return {
       status: 'ERROR',
+      invoiceHash: ublInvoice.hash,
       errors: [`Clearance submission failed: ${message}`],
       timestamp: new Date().toISOString(),
     };
   }
+}
+
+/** Map ZATCA's clearance/reporting API payload into our ClearanceResponse. */
+export function mapClearanceResponse(data: any, invoiceHash: string): ClearanceResponse {
+  const cleared = data?.clearanceStatus === 'CLEARED';
+  const reported = data?.reportingStatus === 'REPORTED';
+  const status: ClearanceResponse['status'] = cleared
+    ? 'CLEARED'
+    : reported
+      ? 'REPORTED'
+      : 'REJECTED';
+
+  return {
+    status,
+    clearanceId: data?.clearanceId || data?.uuid || undefined,
+    invoiceHash,
+    qrCode: data?.qrCode || undefined,
+    warnings: extractMessages(data, 'warning'),
+    errors: extractMessages(data, 'error'),
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/** Pull warning/error messages out of ZATCA's validationResults block. */
+function extractMessages(data: any, kind: 'warning' | 'error'): string[] {
+  const key = kind === 'warning' ? 'warningMessages' : 'errorMessages';
+  const list = data?.validationResults?.[key];
+  if (!Array.isArray(list)) return [];
+  return list.map((m: any) => (typeof m === 'string' ? m : m?.message)).filter(Boolean);
 }
 
 // ─── QR Code Generation ────────────────────────────────────────────────────────
@@ -398,9 +436,8 @@ function generateUUID(): string {
 }
 
 function computeInvoiceHash(xml: string): string {
-  // Use Node.js crypto for SHA-256 hashing
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(xml, 'utf-8').digest('base64');
+  // SHA-256 hash of the canonical XML, base64-encoded.
+  return createHash('sha256').update(xml, 'utf-8').digest('base64');
 }
 
 function extractUUIDFromXml(xml: string): string {

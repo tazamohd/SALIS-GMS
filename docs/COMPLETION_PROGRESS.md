@@ -102,6 +102,24 @@ further work needed.
 - `client/src/hooks/use-mobile.test.tsx` (first hook test via `renderHook`).
 - Client+shared suite: **64 passing**; tsc CLEAN, lint 0 errors.
 
+### External integrations — ZATCA Fatoora e-invoicing wired ✅
+`server/services/zatca-phase2.ts`: `submitToClearance` previously had the real API call commented
+out and always returned a stubbed `CLEARED` (even with no credentials).
+- Now performs a real `fetch` to the Fatoora clearance endpoint when a CSID is configured
+  (`ZATCA_CSID` / arg), with Basic auth; **honest `REPORTED` dev-mode** response (no false
+  "CLEARED") when credentials are absent; `REJECTED`/`ERROR` mapping for HTTP/network failures.
+- `fetch` is injectable, so the flow is unit-tested without live credentials or a DB.
+- Fixed a latent ESM bug: `computeInvoiceHash` used `require('crypto')` (undefined in this
+  `type:module` / esbuild-ESM build → e-invoice generation would throw) → top-level `import`.
+- New `server/services/__tests__/zatca-phase2.test.ts` (no-creds, cleared, rejected, error,
+  mapping, XML generation). Local gates: tsc CLEAN, lint 0 errors, build PASS.
+- Activation: set `ZATCA_CSID` (+ optional `ZATCA_API_URL` for sandbox) once ZATCA onboarding
+  provides the production CSID.
+
+### More test coverage (client/shared) ✅
+`currency.test.ts`, `use-toast.test.ts`, `use-mobile.test.tsx`, `plans.test.ts`,
+`queryClient.test.ts` — client+shared suite **81 passing**.
+
 ### Tooling setup (commits `1c34614`, `5362484`, `d7c9fed`)
 - Installed the ruflo agent harness (`.claude/`, `.claude-flow/`, `.mcp.json`, `CLAUDE.md`).
 - Initialized the memory DB and seeded SALIS architecture/conventions/commands/compliance.
