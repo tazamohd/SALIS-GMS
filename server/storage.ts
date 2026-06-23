@@ -6103,7 +6103,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAttendance(id: string): Promise<EmployeeAttendance | undefined> {
-    const [record] = await db.select().from(employeeAttendance).where(eq(employeeAttendance.id, id));
+    const [record] = await db.select().from(employeeAttendance).where(and(eq(employeeAttendance.id, id), garageScope(employeeAttendance.garageId)));
     return record;
   }
 
@@ -6180,7 +6180,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getShiftTemplate(id: string): Promise<ShiftTemplate | undefined> {
-    const [template] = await db.select().from(shiftTemplates).where(eq(shiftTemplates.id, id));
+    const [template] = await db.select().from(shiftTemplates).where(and(eq(shiftTemplates.id, id), garageScope(shiftTemplates.garageId)));
     return template;
   }
 
@@ -6220,7 +6220,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getShiftAssignment(id: string): Promise<ShiftAssignment | undefined> {
-    const [assignment] = await db.select().from(shiftAssignments).where(eq(shiftAssignments.id, id));
+    const [assignment] = await db.select().from(shiftAssignments).where(and(eq(shiftAssignments.id, id), garageScope(shiftAssignments.garageId)));
     return assignment;
   }
 
@@ -6249,7 +6249,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCommissionRule(id: string): Promise<CommissionRule | undefined> {
-    const [rule] = await db.select().from(commissionRules).where(eq(commissionRules.id, id));
+    const [rule] = await db.select().from(commissionRules).where(and(eq(commissionRules.id, id), garageScope(commissionRules.garageId)));
     return rule;
   }
 
@@ -6289,7 +6289,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCommission(id: string): Promise<Commission | undefined> {
-    const [commission] = await db.select().from(commissions).where(eq(commissions.id, id));
+    const [commission] = await db.select().from(commissions).where(and(eq(commissions.id, id), garageScope(commissions.garageId)));
     return commission;
   }
 
@@ -6365,7 +6365,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPerformanceReview(id: string): Promise<PerformanceReview | undefined> {
-    const [review] = await db.select().from(performanceReviews).where(eq(performanceReviews.id, id));
+    const [review] = await db.select().from(performanceReviews).where(and(eq(performanceReviews.id, id), garageScope(performanceReviews.garageId)));
     return review;
   }
 
@@ -6394,7 +6394,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTraining(id: string): Promise<Training | undefined> {
-    const [training] = await db.select().from(trainings).where(eq(trainings.id, id));
+    const [training] = await db.select().from(trainings).where(and(eq(trainings.id, id), garageScope(trainings.garageId)));
     return training;
   }
 
@@ -6431,7 +6431,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getEmployeeTraining(id: string): Promise<EmployeeTraining | undefined> {
-    const [record] = await db.select().from(employeeTrainings).where(eq(employeeTrainings.id, id));
+    const [record] = await db.select().from(employeeTrainings).where(and(eq(employeeTrainings.id, id), garageScope(employeeTrainings.garageId)));
     return record;
   }
 
