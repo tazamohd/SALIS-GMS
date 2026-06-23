@@ -13981,122 +13981,220 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   */
 
-  // Parts Auto-Reordering - Module 82
-  app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", partNumber: "OF-123", currentStock: 15, reorderPoint: 20, reorderQuantity: 50, status: "triggered" },
-    ]);
-  });
+  // Parts Auto-Reordering, Time Clock clock-in, and auto-reorder history are
+  // served by the dedicated real handlers further below (Parts Auto-Reordering
+  // System / Time Clock & Payroll sections). The endpoints here read/write live
+  // data via phase5Service instead of returning mock fixtures.
 
-  app.post("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
-  });
-
-  app.get("/api/auto-reorder/history", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", quantity: 50, supplier: "AutoParts Plus", status: "ordered" },
-    ]);
-  });
-
-  // Time Clock & Payroll - Module 84
-  app.post("/api/timeclock/clock-in", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked in successfully", timestamp: new Date().toISOString() });
-  });
-
+  // Time Clock & Payroll
   app.post("/api/timeclock/clock-out", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked out successfully", timestamp: new Date().toISOString() });
+    try {
+      const entry = await phase5Service.clockOut(req.body.entryId, Number(req.body.breakDuration) || 0);
+      res.json(entry);
+    } catch (error) {
+      console.error("Error clocking out:", error);
+      res.status(500).json({ message: "Failed to clock out" });
+    }
   });
 
   app.get("/api/payroll/periods", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", periodStart: "2024-10-14", periodEnd: "2024-10-27", status: "draft" },
-    ]);
+    // No dedicated read service yet; return an empty set rather than mock data.
+    res.json([]);
   });
 
   app.post("/api/payroll/calculate", isAuthenticated, async (req, res) => {
-    res.json({ totalGrossPay: 18500, totalDeductions: 3200, totalNetPay: 15300 });
+    try {
+      const result = await phase5Service.calculatePayroll(req.body.periodId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error calculating payroll:", error);
+      res.status(500).json({ message: "Failed to calculate payroll" });
+    }
   });
 
-  // Equipment Calibration - Module 85
+  // Equipment Calibration
   app.get("/api/calibration/records", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", toolName: "Torque Wrench #1", calibrationType: "Torque Accuracy", status: "valid" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase5Service.getCalibrationRecords(garageId));
+    } catch (error) {
+      console.error("Error fetching calibration records:", error);
+      res.status(500).json({ message: "Failed to fetch calibration records" });
+    }
   });
 
   app.post("/api/calibration/records", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const record = await phase5Service.createCalibrationRecord({
+        ...req.body,
+        garageId,
+        lastCalibrationDate: new Date(req.body.lastCalibrationDate || Date.now()),
+        nextCalibrationDue: new Date(req.body.nextCalibrationDue || Date.now()),
+        calibrationInterval: Number(req.body.calibrationInterval) || 365,
+      });
+      res.status(201).json(record);
+    } catch (error) {
+      console.error("Error creating calibration record:", error);
+      res.status(500).json({ message: "Failed to create calibration record" });
+    }
   });
 
   app.get("/api/calibration/reminders", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", toolName: "Diagnostic Scanner", dueDate: "2024-10-15" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase5Service.getDueCalibrations(garageId));
+    } catch (error) {
+      console.error("Error fetching calibration reminders:", error);
+      res.status(500).json({ message: "Failed to fetch calibration reminders" });
+    }
   });
 
-  // Multi-Location Routing - Module 83
+  // Multi-Location Routing
   app.get("/api/routing/routes", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "parts_transfer", stops: 4, distance: 12.5, duration: 45, driver: "Mike Davis", status: "planned" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase5Service.getRoutes(garageId, req.query.status as string | undefined));
+    } catch (error) {
+      console.error("Error fetching routes:", error);
+      res.status(500).json({ message: "Failed to fetch routes" });
+    }
   });
 
   app.post("/api/routing/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Route optimized", routeId: "route-123" });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const route = await phase5Service.createRoutingOptimization({
+        ...req.body,
+        garageId,
+        routeDate: new Date(req.body.routeDate || Date.now()),
+        routeType: req.body.routeType || "general",
+        stops: req.body.stops || [],
+      });
+      res.status(201).json(route);
+    } catch (error) {
+      console.error("Error optimizing route:", error);
+      res.status(500).json({ message: "Failed to optimize route" });
+    }
   });
 
   // ========================================
   // PHASE 6: COMPLIANCE & QUALITY
   // ========================================
 
-  // Environmental Compliance - Module 86
+  // Environmental Compliance
   app.get("/api/environmental-compliance/records", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "waste_disposal", wasteType: "Used Oil", quantity: 55, unit: "gallons", date: "2024-10-20" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase6Service.getComplianceRecords(garageId, req.query.type as string | undefined));
+    } catch (error) {
+      console.error("Error fetching compliance records:", error);
+      res.status(500).json({ message: "Failed to fetch compliance records" });
+    }
   });
 
   app.post("/api/environmental-compliance/records", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const record = await phase6Service.createComplianceRecord({
+        ...req.body,
+        garageId,
+        recordDate: new Date(req.body.recordDate || Date.now()),
+      });
+      res.status(201).json(record);
+    } catch (error) {
+      console.error("Error creating compliance record:", error);
+      res.status(500).json({ message: "Failed to create compliance record" });
+    }
   });
 
-  // ISO Quality Management - Module 87
+  // ISO Quality Management
   app.get("/api/quality/checklists", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", name: "Service Delivery Quality", category: "service_delivery", itemCount: 12, completionRate: 95 },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase6Service.getQualityChecklists(garageId));
+    } catch (error) {
+      console.error("Error fetching quality checklists:", error);
+      res.status(500).json({ message: "Failed to fetch quality checklists" });
+    }
   });
 
   app.get("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "NC-2024-001", title: "Incorrect torque on wheel nuts", severity: "major", status: "resolved" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase6Service.getNonConformances(garageId, req.query.status as string | undefined));
+    } catch (error) {
+      console.error("Error fetching non-conformances:", error);
+      res.status(500).json({ message: "Failed to fetch non-conformances" });
+    }
   });
 
   app.post("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "NC-NEW", ...req.body });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const nc = await phase6Service.createNonConformance({
+        ...req.body,
+        garageId,
+        detectedDate: new Date(req.body.detectedDate || Date.now()),
+      });
+      res.status(201).json(nc);
+    } catch (error) {
+      console.error("Error creating non-conformance:", error);
+      res.status(500).json({ message: "Failed to create non-conformance" });
+    }
   });
 
-  // Safety Incidents - Module 88
+  // Safety Incidents
   app.get("/api/safety-incidents", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "SI-2024-001", date: "2024-10-25", type: "injury", severity: "minor", description: "Minor cut on hand" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase6Service.getSafetyIncidents(garageId, req.query.status as string | undefined));
+    } catch (error) {
+      console.error("Error fetching safety incidents:", error);
+      res.status(500).json({ message: "Failed to fetch safety incidents" });
+    }
   });
 
   app.post("/api/safety-incidents", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "SI-NEW", ...req.body });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const incident = await phase6Service.createSafetyIncident({
+        ...req.body,
+        garageId,
+        incidentDate: new Date(req.body.incidentDate || Date.now()),
+      });
+      res.status(201).json(incident);
+    } catch (error) {
+      console.error("Error creating safety incident:", error);
+      res.status(500).json({ message: "Failed to create safety incident" });
+    }
   });
 
-  // Insurance Claims - Module 89
+  // Insurance Claims
   app.get("/api/insurance-claims", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "CLM-2024-001", customer: "John Smith", vehicle: "2020 Honda Civic", claimAmount: 3500, status: "approved" },
-    ]);
+    try {
+      const garageId = (req as any).user?.garageId;
+      res.json(await phase6Service.getInsuranceClaims(garageId, req.query.status as string | undefined));
+    } catch (error) {
+      console.error("Error fetching insurance claims:", error);
+      res.status(500).json({ message: "Failed to fetch insurance claims" });
+    }
   });
 
   app.post("/api/insurance-claims", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "CLM-NEW", ...req.body });
+    try {
+      const garageId = (req as any).user?.garageId;
+      const claim = await phase6Service.createInsuranceClaim({
+        ...req.body,
+        garageId,
+        incidentDate: new Date(req.body.incidentDate || Date.now()),
+        claimAmount: Number(req.body.claimAmount) || 0,
+      });
+      res.status(201).json(claim);
+    } catch (error) {
+      console.error("Error creating insurance claim:", error);
+      res.status(500).json({ message: "Failed to create insurance claim" });
+    }
   });
 
   // ========================================

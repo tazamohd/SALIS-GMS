@@ -75,6 +75,21 @@ Direct exploration overturned the original "Phase 5 is 50% stubbed" assessment:
   - **All `server/phase*-service.ts` are now type-checked** (zero `@ts-nocheck` remaining).
 - Local gates: tsc CLEAN, lint 0 errors, build PASS.
 
+### Wave — Mock-route shadowing fix (Phase 5 & 6) ✅ (local gates green; CI-gated)
+The biggest user-facing defect: the monolith served **mock data** for Phase 5/6 endpoints
+because hardcoded mock handlers were registered before the real service-backed ones.
+- Replaced the Phase 5 mock block (routes.ts ~13984) and Phase 6 mock block (~14052) with
+  real `phase5Service`/`phase6Service` calls — **same paths**, so no client breakage, just real data:
+  calibration records/reminders, routing routes, clock-out, payroll calc; environmental, ISO
+  quality checklists/non-conformances, safety incidents, insurance claims (GET reads + POST creates,
+  with `garageId` injected from session and date/number coercion).
+- Removed the 4 true-shadow mocks (auto-reorder rules GET/POST, auto-reorder history, timeclock
+  clock-in) so the dedicated real handlers downstream serve them.
+- New test `server/__tests__/phase5-6-unshadow.test.ts` asserts each endpoint returns real data
+  (empty DB → `[]`) with **no mock fingerprint** (`Oil Filter`, `SI-2024-001`, …) + an auth guard.
+- Local gates: tsc CLEAN, build PASS (validates monolith syntax — `routes.ts` is `@ts-nocheck`),
+  lint 0 errors. Endpoint behavior gated by CI (real Postgres).
+
 ### Tooling setup (commits `1c34614`, `5362484`, `d7c9fed`)
 - Installed the ruflo agent harness (`.claude/`, `.claude-flow/`, `.mcp.json`, `CLAUDE.md`).
 - Initialized the memory DB and seeded SALIS architecture/conventions/commands/compliance.
