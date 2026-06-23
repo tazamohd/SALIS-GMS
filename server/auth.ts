@@ -9,6 +9,7 @@ import type { User } from "@shared/schema";
 import { db } from "./db";
 import { garages } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { DEMO_EMAIL_DOMAIN, isDemoModeEnabled } from "./demo-config";
 
 const SALT_ROUNDS = 10;
 
@@ -59,6 +60,16 @@ export async function setupAuth(app: Express) {
         try {
           const user = await storage.getUserByEmail(email);
           if (!user) {
+            return done(null, false, { message: "Invalid email or password" });
+          }
+
+          // Defense in depth: demo accounts (shared, well-known password) must
+          // never authenticate via the normal login form once demo mode is off,
+          // regardless of whether the rows still exist in the database.
+          if (
+            String(email).toLowerCase().endsWith(`@${DEMO_EMAIL_DOMAIN}`) &&
+            !isDemoModeEnabled()
+          ) {
             return done(null, false, { message: "Invalid email or password" });
           }
 

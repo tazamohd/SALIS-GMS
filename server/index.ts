@@ -79,6 +79,8 @@ const authLimiter = rateLimit({
 });
 app.use('/api/login', authLimiter);
 app.use('/api/register', authLimiter);
+// Demo one-click login creates sessions like /api/login — same strict limiter.
+app.use('/api/demo/login', authLimiter);
 
 app.use((req, res, next) => {
   const start = Date.now();

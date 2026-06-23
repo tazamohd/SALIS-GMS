@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function PurchaseAgentLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
 
   const navigation = [
@@ -65,7 +65,7 @@ export function PurchaseAgentLayout({ children }: { children: React.ReactNode })
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = "/api/logout"}
+                onClick={() => logoutMutation.mutate()}
                 data-testid="button-logout"
               >
                 <LogOut className="h-4 w-4" />

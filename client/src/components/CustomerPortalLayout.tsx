@@ -10,6 +10,7 @@ import {
   Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -24,6 +25,8 @@ import type { User } from "@shared/schema";
 export function CustomerPortalLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
+  const { logoutMutation } = useAuth();
+
   const { data: user } = useQuery<User>({
     queryKey: ['/api/customer/profile'],
   });
@@ -37,7 +40,7 @@ export function CustomerPortalLayout({ children }: { children: React.ReactNode }
   ];
 
   const handleLogout = () => {
-    window.location.href = '/api/auth/logout';
+    logoutMutation.mutate();
   };
 
   const initials = user?.fullName

@@ -18,6 +18,7 @@ import crmRoutes from "./crm";
 import hrPayrollRoutes from "./hr-payroll";
 import inventoryManagementRoutes from "./inventory-management";
 import dashboardRoutes from "./dashboard";
+import demoRoutes from "./demo";
 import qualityControlRoutes from "./quality-control";
 import warrantyRoutes from "./warranty";
 import kioskRoutes from "./kiosk";
@@ -181,6 +182,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard aggregation routes
   app.use("/api", dashboardRoutes);
   console.log("✅ Dashboard Routes Loaded");
+
+  // Demo access routes (public + demo-mode-gated): role list + one-click login
+  app.use("/api", demoRoutes);
+  console.log("✅ Demo Access Routes Loaded");
 
   // Quality Control & Inspections routes
   app.use("/api/qc", qualityControlRoutes);
