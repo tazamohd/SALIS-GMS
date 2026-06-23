@@ -150,6 +150,16 @@ out and always returned a stubbed `CLEARED` (even with no credentials).
   for triage. CI test asserts 401 on a representative sample.
 - **Dashboard endpoints auth-guarded** (server/routes/dashboard.ts) — `/dashboard/summary`,
   `/recent-activity`, `/trends`.
+- **External-module triage (complete):** only `kiosk` (anonymous walk-in check-in — intentionally
+  public) and `api-docs` (public API docs) are mounted; both are legitimately public. The
+  sensitive portal files (`customer-portal`, `technician-mobile`, `supplier-portal`, `docs`) are
+  **not mounted (dead code)** → no live exposure. So the internal remediation above covers all
+  live unguarded sensitive surface.
+
+## Known latent issues (not live)
+- The unmounted portal files key data off URL params (`:customerId`/`:techId`) with no ownership
+  check (IDOR) and no auth. Harmless while unmounted, but must get `isAuthenticated` **and**
+  ownership verification before anyone mounts them.
 
 ## Known defects (deferred to Wave 7 — monolith retirement)
 - **Phase 5 route shadowing:** in `server/routes.ts`, a block of hardcoded **mock** handlers
