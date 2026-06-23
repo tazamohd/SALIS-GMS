@@ -36,6 +36,7 @@ import backupRoutes from "./backup";
 import exportRoutes from "./export";
 import featureFlagRoutes from "./feature-flags";
 import healthRoutes from "./health";
+import { fleetRoutes } from "./fleet.routes";
 import { customerRoutes } from "./customers.routes";
 import { schedulingRoutes } from "./scheduling.routes";
 import { inventoryRoutes } from "./inventory.routes";
@@ -176,9 +177,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Estimates routes intentionally NOT mounted here — see import block comment.
   // Monolith serves /api/estimates with DB-backed CRUD (routes.ts:4418+).
 
-  // Fleet Management routes
+  // Fleet Management routes (legacy in-memory)
   app.use("/api", fleetManagementRoutes);
   console.log("✅ Fleet Management Routes Loaded");
+
+  // Fleet routes (super-app, DB-backed)
+  app.use("/api", fleetRoutes);
+  console.log("✅ Fleet Super-App Routes Loaded");
 
   // WhatsApp Business Integration routes
   app.use("/api", whatsappRoutes);
