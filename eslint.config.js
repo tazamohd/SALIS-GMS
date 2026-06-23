@@ -34,6 +34,7 @@ export default tseslint.config(
       "no-case-declarations": "warn",
       "no-useless-assignment": "warn",
       "no-empty": "warn",
+      "preserve-caught-error": "warn",
     },
   },
 );
