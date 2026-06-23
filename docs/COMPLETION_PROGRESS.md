@@ -90,6 +90,18 @@ because hardcoded mock handlers were registered before the real service-backed o
 - Local gates: tsc CLEAN, build PASS (validates monolith syntax — `routes.ts` is `@ts-nocheck`),
   lint 0 errors. Endpoint behavior gated by CI (real Postgres).
 
+### Phase 7 (Hardware) — verified already real ✅
+Phase 7 routes (barcode scans, signage, cameras, LPR, kiosk, vehicle entry logs) **already call
+`phase7Service`** directly (routes.ts ~14581+) — no mock shadowing. Wave 3 already fixed the
+service's underlying `partName`/`toolName` bug, so these endpoints now return correct data. No
+further work needed.
+
+### Test coverage increments (client + shared) ✅
+- `roleAccess.test.ts`, `hijriDateFormatter.test.ts` (Wave 6 start).
+- `shared/plans.test.ts` (plan-gating `meetsMinPlan` + hierarchy).
+- `client/src/hooks/use-mobile.test.tsx` (first hook test via `renderHook`).
+- Client+shared suite: **64 passing**; tsc CLEAN, lint 0 errors.
+
 ### Tooling setup (commits `1c34614`, `5362484`, `d7c9fed`)
 - Installed the ruflo agent harness (`.claude/`, `.claude-flow/`, `.mcp.json`, `CLAUDE.md`).
 - Initialized the memory DB and seeded SALIS architecture/conventions/commands/compliance.
