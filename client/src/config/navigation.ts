@@ -118,9 +118,6 @@ export const navigationConfig: NavGroup[] = [
     ],
   },
   {
-<<<<<<< HEAD
-    title: "System",
-=======
     title: "Analytics & Business Intelligence",
     icon: BarChart3,
     roles: ['ADMIN', 'MANAGER', 'ACCOUNTANT'],
@@ -263,22 +260,18 @@ export const navigationConfig: NavGroup[] = [
   },
   {
     title: "System & Settings",
->>>>>>> main
     icon: Settings,
     items: [
       { title: "Subscription", href: "/subscriptions", icon: CreditCard, roles: ['ADMIN', 'MANAGER'] },
       { title: "Settings", href: "/settings", icon: Settings },
       { title: "Backup & Export", href: "/data-backup", icon: Database, roles: ['ADMIN', 'MANAGER'] },
       { title: "Profile", href: "/profile", icon: UserIcon },
-<<<<<<< HEAD
-=======
       { title: "Notifications", href: "/notifications", icon: Bell },
       { title: "Notification Center", href: "/notification-center", icon: Bell },
       { title: "Document Management", href: "/document-management", icon: FileText },
       { title: "Data Import/Export", href: "/data-import-export", icon: DatabaseBackup },
       { title: "Integrations", href: "/integrations", icon: Plug2 },
       { title: "Digital Signage", href: "/digital-signage", icon: Monitor },
->>>>>>> main
     ],
   },
 ];
