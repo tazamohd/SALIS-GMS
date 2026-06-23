@@ -140,6 +140,9 @@ out and always returned a stubbed `CLEARED` (even with no credentials).
 | 8 | Hardening: security audit, perf budgets, E2E, emerging-tech | pending |
 
 ## Known defects (deferred to Wave 7 — monolith retirement)
+- **`/api/dashboard/summary` has no auth guard** (server/routes/dashboard.ts) — unauthenticated
+  callers can reach it. Security follow-up: add `isAuthenticated`. Surfaced by the modular-route
+  smoke tests.
 - **Phase 5 route shadowing:** in `server/routes.ts`, a block of hardcoded **mock** handlers
   (~lines 13985–14040, "Module 82–85": `/api/auto-reorder/*`, `/api/timeclock/*`, `/api/payroll/*`,
   `/api/calibration/*`, `/api/routing/routes`) is registered **before** the real
