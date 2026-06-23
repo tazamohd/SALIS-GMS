@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../auth';
 import { Router } from 'express';
 
 const router = Router();
@@ -235,7 +236,7 @@ let nextCampaignId = 6;
 // --- Routes ---
 
 // GET /api/sms/campaigns - List all campaigns
-router.get('/sms/campaigns', (_req, res) => {
+router.get('/sms/campaigns', isAuthenticated, (_req, res) => {
   const list = campaigns.map(c => ({
     id: c.id,
     name: c.name,
@@ -257,7 +258,7 @@ router.get('/sms/campaigns', (_req, res) => {
 });
 
 // POST /api/sms/campaigns - Create a new campaign
-router.post('/sms/campaigns', (req, res) => {
+router.post('/sms/campaigns', isAuthenticated, (req, res) => {
   const { name, templateId, audienceFilter, scheduledAt } = req.body;
 
   if (!name || !templateId || !audienceFilter) {
@@ -296,7 +297,7 @@ router.post('/sms/campaigns', (req, res) => {
 });
 
 // GET /api/sms/campaigns/:id - Campaign detail with delivery stats
-router.get('/sms/campaigns/:id', (req, res) => {
+router.get('/sms/campaigns/:id', isAuthenticated, (req, res) => {
   const campaign = campaigns.find(c => c.id === req.params.id);
   if (!campaign) {
     return res.status(404).json({ error: 'Campaign not found' });
@@ -326,7 +327,7 @@ router.get('/sms/campaigns/:id', (req, res) => {
 });
 
 // POST /api/sms/campaigns/:id/send - Execute/send a campaign
-router.post('/sms/campaigns/:id/send', (req, res) => {
+router.post('/sms/campaigns/:id/send', isAuthenticated, (req, res) => {
   const campaign = campaigns.find(c => c.id === req.params.id);
   if (!campaign) {
     return res.status(404).json({ error: 'Campaign not found' });
@@ -356,12 +357,12 @@ router.post('/sms/campaigns/:id/send', (req, res) => {
 });
 
 // GET /api/sms/templates - List all SMS templates
-router.get('/sms/templates', (_req, res) => {
+router.get('/sms/templates', isAuthenticated, (_req, res) => {
   res.json({ templates });
 });
 
 // GET /api/sms/stats - Overall SMS stats
-router.get('/sms/stats', (_req, res) => {
+router.get('/sms/stats', isAuthenticated, (_req, res) => {
   const sentCampaigns = campaigns.filter(c => c.status === 'sent');
   const totalSent = sentCampaigns.reduce((sum, c) => sum + c.sentCount, 0);
   const totalDelivered = sentCampaigns.reduce((sum, c) => sum + c.deliveredCount, 0);

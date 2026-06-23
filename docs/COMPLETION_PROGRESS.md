@@ -140,9 +140,16 @@ out and always returned a stubbed `CLEARED` (even with no credentials).
 | 8 | Hardening: security audit, perf budgets, E2E, emerging-tech | pending |
 
 ## Security fixes
-- **Dashboard endpoints now auth-guarded** (server/routes/dashboard.ts) — `/dashboard/summary`,
-  `/dashboard/recent-activity`, `/dashboard/trends` lacked `isAuthenticated` and fell back to
-  garage `'1'` for anonymous callers (cross-tenant leak). Added the guard; smoke test asserts 401.
+- **Systemic auth-guard remediation.** Audit found no global auth middleware and ~26 modular route
+  files reachable unauthenticated (falling back to garage `'1'` — cross-tenant leak). Added
+  `isAuthenticated` per-route to **19 internal/sensitive modules** (~91 routes): audit, financial,
+  inventory-management, notifications, crm, marketing, currency, warranty, franchise,
+  command-center, ai-insights, iot, workflow, workflow-hooks, parts-recommendations,
+  predictive-maintenance, saudi, sms-campaigns, whatsapp. External-facing modules
+  (customer-portal, technician-mobile, supplier-portal, kiosk, api-docs/docs) intentionally left
+  for triage. CI test asserts 401 on a representative sample.
+- **Dashboard endpoints auth-guarded** (server/routes/dashboard.ts) — `/dashboard/summary`,
+  `/recent-activity`, `/trends`.
 
 ## Known defects (deferred to Wave 7 — monolith retirement)
 - **Phase 5 route shadowing:** in `server/routes.ts`, a block of hardcoded **mock** handlers

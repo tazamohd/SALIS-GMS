@@ -1,9 +1,10 @@
+import { isAuthenticated } from '../auth';
 import { Router } from 'express';
 
 const router = Router();
 
 // GET /api/iot/sensors - List all IoT sensors with latest readings
-router.get('/iot/sensors', async (req, res) => {
+router.get('/iot/sensors', isAuthenticated, async (req, res) => {
   // Return mock sensor data structure that IoTDashboard expects
   const sensors = [
     { id: '1', name: 'Bay 1 - Temperature', type: 'temperature', value: 22.5, unit: '°C', status: 'normal', lastReading: new Date().toISOString() },
@@ -17,7 +18,7 @@ router.get('/iot/sensors', async (req, res) => {
 });
 
 // GET /api/iot/alerts - List recent IoT alerts
-router.get('/iot/alerts', async (req, res) => {
+router.get('/iot/alerts', isAuthenticated, async (req, res) => {
   const alerts = [
     { id: '1', sensorId: '3', sensorName: 'Compressor - Pressure', type: 'warning', message: 'Pressure above normal range', value: 120, threshold: 100, timestamp: new Date().toISOString(), acknowledged: false },
     { id: '2', sensorId: '6', sensorName: 'Bay 2 - Temperature', type: 'warning', message: 'Temperature elevated', value: 28.3, threshold: 26, timestamp: new Date().toISOString(), acknowledged: false },
@@ -26,7 +27,7 @@ router.get('/iot/alerts', async (req, res) => {
 });
 
 // GET /api/iot/summary - Dashboard summary
-router.get('/iot/summary', async (req, res) => {
+router.get('/iot/summary', isAuthenticated, async (req, res) => {
   res.json({ totalSensors: 6, onlineSensors: 6, warnings: 2, criticalAlerts: 0, avgTemperature: 25.4, avgHumidity: 45 });
 });
 

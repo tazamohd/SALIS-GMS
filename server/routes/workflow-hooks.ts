@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../auth';
 /**
  * SALIS AUTO - Workflow Hooks
  * Intercepts entity status changes and routes them through the workflow engine
@@ -18,7 +19,7 @@ const router = Router();
 // ─── POST /api/job-cards/:id/transition ───────────────────────────────────
 // Validated state transition for job cards via the workflow engine.
 
-router.post('/job-cards/:id/transition', validate(jobTransitionSchema), async (req: Request, res: Response) => {
+router.post('/job-cards/:id/transition', isAuthenticated, validate(jobTransitionSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -110,7 +111,7 @@ router.post('/job-cards/:id/transition', validate(jobTransitionSchema), async (r
 // ─── POST /api/appointments/:id/check-in ──────────────────────────────────
 // Checks in an appointment and auto-creates a draft job card.
 
-router.post('/appointments/:id/check-in', validate(appointmentCheckInSchema), async (req: Request, res: Response) => {
+router.post('/appointments/:id/check-in', isAuthenticated, validate(appointmentCheckInSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -221,7 +222,7 @@ router.post('/appointments/:id/check-in', validate(appointmentCheckInSchema), as
 // ─── POST /api/inventory/check-levels ─────────────────────────────────────
 // Checks all inventory levels and emits low-stock events for items below threshold.
 
-router.post('/inventory/check-levels', validate(inventoryCheckSchema), async (req: Request, res: Response) => {
+router.post('/inventory/check-levels', isAuthenticated, validate(inventoryCheckSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {

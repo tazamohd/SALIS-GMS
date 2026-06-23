@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../auth';
 import { Router } from 'express';
 import { getNotifications, markAsRead, markAllAsRead, getUnreadCount, deleteNotification, createNotification, getPreferences, updatePreferences } from '../services/notification-center';
 import { validate } from '../middleware/validate';
@@ -5,7 +6,7 @@ import { notificationPreferencesSchema } from '../schemas/validation';
 
 const router = Router();
 
-router.get('/notifications', async (req, res) => {
+router.get('/notifications', isAuthenticated, async (req, res) => {
   const userId = (req as any).user?.id || '1';
   const { unreadOnly, category, limit } = req.query;
   const notifs = await getNotifications(userId, {
@@ -17,40 +18,40 @@ router.get('/notifications', async (req, res) => {
   res.json({ notifications: notifs, unreadCount });
 });
 
-router.get('/notifications/unread-count', async (req, res) => {
+router.get('/notifications/unread-count', isAuthenticated, async (req, res) => {
   const userId = (req as any).user?.id || '1';
   res.json({ count: await getUnreadCount(userId) });
 });
 
-router.post('/notifications/:id/read', async (req, res) => {
+router.post('/notifications/:id/read', isAuthenticated, async (req, res) => {
   await markAsRead(req.params.id);
   res.json({ success: true });
 });
 
-router.post('/notifications/read-all', async (req, res) => {
+router.post('/notifications/read-all', isAuthenticated, async (req, res) => {
   const userId = (req as any).user?.id || '1';
   const count = await markAllAsRead(userId);
   res.json({ success: true, markedCount: count });
 });
 
-router.delete('/notifications/:id', async (req, res) => {
+router.delete('/notifications/:id', isAuthenticated, async (req, res) => {
   await deleteNotification(req.params.id);
   res.json({ success: true });
 });
 
-router.get('/notifications/preferences', (req, res) => {
+router.get('/notifications/preferences', isAuthenticated, (req, res) => {
   const userId = (req as any).user?.id || '1';
   res.json({ preferences: getPreferences(userId) });
 });
 
-router.put('/notifications/preferences', validate(notificationPreferencesSchema), (req, res) => {
+router.put('/notifications/preferences', isAuthenticated, validate(notificationPreferencesSchema), (req, res) => {
   const userId = (req as any).user?.id || '1';
   updatePreferences(userId, req.body.preferences);
   res.json({ success: true });
 });
 
 // Demo: seed some notifications
-router.post('/notifications/seed', async (req, res) => {
+router.post('/notifications/seed', isAuthenticated, async (req, res) => {
   const userId = (req as any).user?.id || '1';
   const garageId = (req as any).user?.garageId || '1';
   const demos = [

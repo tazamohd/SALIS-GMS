@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../auth';
 /**
  * SALIS AUTO - AI Business Intelligence API Routes
  */
@@ -12,7 +13,7 @@ import {
 const router = Router();
 
 // GET /api/ai/insights — Generate AI-powered business insights
-router.get('/ai/insights', async (req: Request, res: Response) => {
+router.get('/ai/insights', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -27,7 +28,7 @@ router.get('/ai/insights', async (req: Request, res: Response) => {
 });
 
 // GET /api/ai/forecast/revenue — Revenue forecast
-router.get('/ai/forecast/revenue', async (req: Request, res: Response) => {
+router.get('/ai/forecast/revenue', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -42,7 +43,7 @@ router.get('/ai/forecast/revenue', async (req: Request, res: Response) => {
 });
 
 // GET /api/ai/forecast/demand — Service demand predictions
-router.get('/ai/forecast/demand', async (req: Request, res: Response) => {
+router.get('/ai/forecast/demand', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
