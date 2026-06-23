@@ -33,8 +33,20 @@
  * ENTERPRISE (tables 351-391):
  * - franchise, multiLocation, analytics
  *
- * Future: Split into domain-specific files when doing a major refactor.
- * Each domain module would export its own tables and be re-exported from schema.ts.
+ * SUPER-APP SHARED RAILS (shared/schema/*.ts — new):
+ * - identity.ts: userIdentities, memberships, kycVerifications
+ * - ledger.ts: accounts, ledgerTransactions, ledgerEntries, accountBalances
+ * - payment-intents.ts: paymentIntents, payouts
+ * - catalog.ts: providers, servicesCatalog, providerServices
+ * - orders.ts: orders (super_orders), orderItems, orderEvents
+ * - notifications-ext.ts: deviceTokens, notificationPrefs
+ * - fleet.ts: fleetAccounts, fleetVehicles, fleetDrivers, telematicsEvents,
+ *             fleetTrips, fleetGeofences, fleetMaintenanceRecords,
+ *             fuelTransactions, fleetDocuments
+ * - index.ts: barrel re-export of all shared-rail modules
+ *
+ * The shared-rail tables extend (not replace) the existing schema.
+ * Import from 'shared/schema/index' for new super-app code.
  */
 
 // Re-export everything from schema for backwards compatibility
