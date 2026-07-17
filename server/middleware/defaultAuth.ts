@@ -13,6 +13,9 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   "/api/ready",
   /^\/api\/public\/.*/,
   /^\/api\/plans$/,
+  // Demo access (role list + one-click demo login) is intentionally anonymous
+  // and is itself gated by isDemoModeEnabled() inside the handlers.
+  /^\/api\/demo\/.*/,
   // Self-service kiosk lives in shop-floor tablets without a user session.
   // The walk-in queue, service catalog, and registration endpoints must be
   // reachable anonymously by design.

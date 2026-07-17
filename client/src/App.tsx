@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 
-import { LoginDashboard } from "@/pages/LoginDashboard";
 import { Layout } from "@/components/Layout";
 import { CustomerPortalLayout } from "@/components/CustomerPortalLayout";
 import { Dashboard } from "@/pages/Dashboard";
@@ -349,7 +348,6 @@ function Router() {
       <Route path="/welcome" component={WelcomePage} />
 
       {/* Garage Management Routes */}
-      <Route path="/old-dashboard" component={LoginDashboard} />
       <Route path="/dashboard">
         <Layout>
           <Dashboard />

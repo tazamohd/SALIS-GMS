@@ -64,11 +64,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out",
-      });
+      // Hard-navigate to the login page: the full page unload tears down the
+      // React tree and in-memory query cache, guaranteeing a clean
+      // unauthenticated state with no stale dashboard left mounted.
+      window.location.href = "/login";
     },
     onError: (error: Error) => {
       toast({

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import logoImage from "@assets/Logo_blue_orange_1760743036292.png";
@@ -132,6 +132,8 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? t('auth.hidePassword', 'Hide password') : t('auth.showPassword', 'Show password')}
+                    aria-pressed={showPassword}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] dark:text-[#9BA4B0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] transition-colors"
                     data-testid="toggle-password-visibility"
                   >
@@ -160,18 +162,115 @@ export default function Login() {
             </form>
           </CardContent>
         </Card>
-        
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-white/60 dark:bg-[#151A23]/60 backdrop-blur-sm rounded-xl border border-[#E2E8F0] dark:border-[#232A36]">
-          <p className="text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0] text-center mb-2 uppercase tracking-wider">
-            {t('auth.demoCredentials', 'Demo Credentials')}
-          </p>
-          <div className="space-y-1 text-xs font-mono text-center text-[#0B1F3B] dark:text-[#E6EAF0]">
-            <p>admin@salisauto.com / admin123</p>
-            <p>tech@salisauto.com / tech123</p>
-          </div>
-        </div>
+
+        {/* Demo quick access (only renders when the server has demo mode on) */}
+        <DemoQuickPick />
       </div>
+    </div>
+  );
+}
+
+type DemoAccount = {
+  roleKey: string;
+  roleName: string;
+  guardRole: string;
+  email: string;
+  label?: string;
+  description?: string;
+};
+
+type DemoAccountsResponse = {
+  enabled: boolean;
+  accounts?: DemoAccount[];
+};
+
+function DemoQuickPick() {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery<DemoAccountsResponse>({
+    queryKey: ["/api/demo/accounts"],
+    queryFn: async () => {
+      const res = await fetch("/api/demo/accounts", { credentials: "include" });
+      if (!res.ok) return { enabled: false, accounts: [] };
+      return res.json();
+    },
+    retry: false,
+  });
+
+  const demoLogin = useMutation({
+    mutationFn: async (roleKey: string) => {
+      const res = await apiRequest("POST", "/api/demo/login", { roleKey });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      window.location.href = "/";
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t("auth.loginFailed", "Login Failed"),
+        description: error.message || t("auth.demoUnavailable", "Demo login is unavailable"),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const accounts = data?.accounts ?? [];
+  if (!data?.enabled || accounts.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-6 p-4 bg-white/60 dark:bg-[#151A23]/60 backdrop-blur-sm rounded-xl border border-[#E2E8F0] dark:border-[#232A36]">
+      <p className="text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0] text-center mb-3 uppercase tracking-wider">
+        {t("auth.demoQuickAccess", "Demo quick access")}
+      </p>
+      <div
+        role="group"
+        aria-label={t("auth.demoAccounts", "Demo accounts")}
+        className="flex flex-col gap-2"
+      >
+        {accounts.map((acc) => {
+          const isActive = demoLogin.isPending && demoLogin.variables === acc.roleKey;
+          const label = acc.label ?? acc.roleName;
+          return (
+            <Button
+              key={acc.roleKey}
+              type="button"
+              variant="outline"
+              disabled={demoLogin.isPending}
+              aria-busy={isActive}
+              aria-label={t("auth.demoLoginAs", "Sign in as {{role}} ({{email}})", {
+                role: label,
+                email: acc.email,
+              })}
+              onClick={() => demoLogin.mutate(acc.roleKey)}
+              data-testid={`demo-login-${acc.roleKey.toLowerCase()}`}
+              className="flex flex-col items-start justify-center gap-0.5 h-auto py-2.5 px-3 text-left font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
+              title={acc.email}
+            >
+              <span className="flex w-full items-center justify-between gap-2">
+                <span className="text-sm font-semibold">{label}</span>
+                {isActive && (
+                  <span className="text-[10px] font-normal text-[#64748B] dark:text-[#9BA4B0]">
+                    {t("auth.signingIn", "Signing in...")}
+                  </span>
+                )}
+              </span>
+              {acc.description && (
+                <span className="text-[11px] font-normal text-[#64748B] dark:text-[#9BA4B0] normal-case">
+                  {acc.description}
+                </span>
+              )}
+            </Button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[10px] font-poppins text-[#94A3B8] dark:text-[#6B7280] text-center">
+        {t("auth.demoOneClickNote", "Demo only · one-click sign-in, no password needed")}
+      </p>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { jobCards, users } from "../../shared/schema";
 import { and, eq, gte, isNotNull, sql, count } from "drizzle-orm";
 import { getTechnicianStats } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";
+import { isManagementUser } from "../middleware/managementAccess";
 
 const router = Router();
 
@@ -33,13 +34,12 @@ function periodDays(period: string | undefined) {
   }
 }
 
-// Manager+ only — productivity tracker exposes per-technician completion stats.
-const MANAGEMENT_TYPES = new Set(["admin", "manager", "owner", "accountant", "staff"]);
-
 router.get("/productivity", isAuthenticated, async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
-  if (user.userType && !MANAGEMENT_TYPES.has(user.userType)) {
+  // Manager+ only — productivity tracker exposes per-technician completion stats.
+  // Fail-closed via shared helper (audit H-1).
+  if (!isManagementUser(user)) {
     return res.status(403).json({ message: "Insufficient privileges for productivity tracker" });
   }
   const days = periodDays(String(req.query.period ?? "today"));

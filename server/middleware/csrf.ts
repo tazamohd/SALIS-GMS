@@ -33,6 +33,8 @@ const CSRF_EXEMPT_PATHS = new Set([
   "/api/auth/login",
   "/api/auth/register",
   "/api/customer-portal/login",
+  // Demo one-click login creates a session (like /api/login) and is demo-gated.
+  "/api/demo/login",
 ]);
 
 export function validateCsrfToken(req: Request, res: Response, next: NextFunction): void {
