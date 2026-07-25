@@ -41,9 +41,11 @@ test-run-full.log
 # Uploaded files (M3.1 file uploads)
 uploads/
 
-# IDE / toolchain binaries that leaked into the tree (JetBrains, Kotlin, Apple SDK)
-lib/
-bin/
+# IDE / toolchain binaries that leaked into the tree (JetBrains, Kotlin, Apple SDK).
+# Anchored to the repo root — unanchored these match at every depth and silently
+# swallow application source such as client/src/lib/.
+/lib/
+/bin/
 
 # Stale duplicate forks of the live monolith sources — DEAD, nothing imports them.
 # Live source of truth is shared/schema.ts and server/storage.ts (newer, tracked).
