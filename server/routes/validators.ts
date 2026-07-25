@@ -315,3 +315,26 @@ export const chatbotConversationSchema = z.object({
   sessionId: z.string().min(1).max(100).optional(),
   context: z.string().max(1000).optional(),
 }).strict();
+
+// Saudi Tax (ZATCA Phase 2 / Fatoora e-invoicing)
+// A Saudi VAT registration number is exactly 15 digits and always begins with 3.
+const zatcaVatNumber = z
+  .string()
+  .regex(/^3\d{14}$/, 'VAT registration number must be 15 digits starting with 3');
+
+export const zatcaInvoiceSchema = z.object({
+  sellerName: z.string().min(1).max(300),
+  vatRegistrationNumber: zatcaVatNumber,
+  timestamp: z.string().datetime(),
+  // Zero is valid — a free service still clears through FATOORA.
+  totalWithVAT: z.number().nonnegative(),
+  vatAmount: z.number().nonnegative(),
+}).strict();
+
+export const zatcaComplianceCheckSchema = z.object({
+  sellerName: z.string().min(1).max(300),
+  vatRegistrationNumber: zatcaVatNumber,
+  timestamp: z.string().datetime(),
+  invoiceTotal: z.number().nonnegative(),
+  vatAmount: z.number().nonnegative(),
+}).strict();

@@ -20,11 +20,17 @@
  */
 
 import "../config";
-import { Pool } from "pg";
+// `pg` is CommonJS and exposes no named ESM exports, so a static
+// `import { Pool } from "pg"` fails at runtime under "type": "module".
+// Destructure off the default export instead (server/db.ts sidesteps the
+// same problem with a dynamic import).
+import pg from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import path from "path";
 import { fileURLToPath } from "url";
+
+const { Pool } = pg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
