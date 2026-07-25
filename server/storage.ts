@@ -756,11 +756,6 @@ import {
   type InsertDeliveryTimelineEvent,
   type LiveDeliveryStatus,
   type InsertLiveDeliveryStatus,
-  type Vehicle,
-  type SparePart,
-  type Invoice,
-  type JobCard,
-  type Appointment,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
