@@ -10,6 +10,19 @@ import { db } from "./db";
 import { garages } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
+// Passport declares `Express.User` as an empty interface, so every
+// `req.user.garageId` read was a type error even though deserializeUser
+// puts the full row there. Describe what is actually attached: the users
+// row with `password` stripped, plus the subscription plan resolved from
+// the owning garage.
+declare global {
+  namespace Express {
+    interface User extends Omit<import("@shared/schema").User, "password"> {
+      subscriptionPlan?: string;
+    }
+  }
+}
+
 const SALT_ROUNDS = 10;
 
 export function validateSessionSecret(): string {
