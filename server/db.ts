@@ -1,4 +1,5 @@
 import * as schema from "@shared/schema";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -7,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 let pool: any;
-let db: any;
+let db: NodePgDatabase<typeof schema>;
 
 const isNeon = process.env.DATABASE_URL.includes('neon.tech');
 

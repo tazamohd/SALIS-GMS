@@ -153,7 +153,12 @@ import {
   insertIoTSensorSchema,
   insertIoTSensorReadingSchema,
   insertIoTAlertSchema,
-  insertJobTrackingEventSchema
+  insertJobTrackingEventSchema,
+  fleetContracts,
+  contractUtilization,
+  contractRenewals,
+  // Declared in schema.ts as contractSLAMetrics; aliased to match call sites.
+  contractSLAMetrics as contractSlaMetrics
 } from "@shared/schema";
 import Stripe from "stripe";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
@@ -1476,7 +1481,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1503,7 +1507,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1602,7 +1605,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1624,7 +1626,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1663,7 +1664,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1700,7 +1700,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1722,7 +1721,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1758,7 +1756,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1780,7 +1777,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1814,7 +1810,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1851,7 +1846,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1873,7 +1867,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1903,7 +1896,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1924,7 +1916,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1983,7 +1974,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2004,7 +1994,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2887,7 +2876,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2955,7 +2943,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2986,7 +2973,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3261,7 +3247,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3514,7 +3499,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3622,7 +3606,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3749,7 +3732,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -15382,7 +15364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/emerging-tech/iot-readings', isAuthenticated, async (req, res) => {
     try {
       const { sensorId, vehicleId } = req.query;
-      const readings = await storage.getIotSensorReadings(
+      const readings = await storage.getIoTSensorReadings(
         sensorId as string | undefined,
         vehicleId as string | undefined
       );
@@ -17544,7 +17526,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17568,7 +17549,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17592,7 +17572,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17616,7 +17595,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }

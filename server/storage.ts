@@ -756,6 +756,11 @@ import {
   type InsertDeliveryTimelineEvent,
   type LiveDeliveryStatus,
   type InsertLiveDeliveryStatus,
+  vehicleLocationHistory,
+  geofenceZones,
+  geofenceEvents,
+  fleetRoutes,
+  routeCheckpoints,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
@@ -12063,9 +12068,7 @@ export class DatabaseStorage implements IStorage {
   // ==================== Search methods (server-side filtered, OOM-safe) ====================
 
   async searchCustomers(garageId: string, pattern: string, limit: number): Promise<User[]> {
-    const { users, or, like, and, eq } = await import("@shared/schema").then(m => ({
-      users: m.users, or: m.or, like: m.like, and: m.and, eq: m.eq
-    }));
+    const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     return await db
       .select()
       .from(users)
@@ -12084,9 +12087,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchVehicles(garageId: string, pattern: string, limit: number): Promise<Vehicle[]> {
-    const { vehicles, sql, or, like, and, eq } = await import("@shared/schema").then(m => ({
-      vehicles: m.vehicles, sql: m.sql, or: m.or, like: m.like, and: m.and, eq: m.eq
-    }));
+    const { vehicles } = await import("@shared/schema").then(m => ({ vehicles: m.vehicles }));
     return await db
       .select()
       .from(vehicles)
@@ -12105,9 +12106,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchParts(garageId: string, pattern: string, limit: number): Promise<SparePart[]> {
-    const { spareParts, sql, or, like, and, eq } = await import("@shared/schema").then(m => ({
-      spareParts: m.spareParts, sql: m.sql, or: m.or, like: m.like, and: m.and, eq: m.eq
-    }));
+    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
     return await db
       .select()
       .from(spareParts)
@@ -12125,9 +12124,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchInvoices(garageId: string, pattern: string, limit: number): Promise<Invoice[]> {
-    const { invoices, like, and, eq } = await import("@shared/schema").then(m => ({
-      invoices: m.invoices, like: m.like, and: m.and, eq: m.eq
-    }));
+    const { invoices } = await import("@shared/schema").then(m => ({ invoices: m.invoices }));
     return await db
       .select()
       .from(invoices)
@@ -12141,9 +12138,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchJobCards(garageId: string, pattern: string, limit: number): Promise<JobCard[]> {
-    const { jobCards, or, ilike, and, eq } = await import("@shared/schema").then(m => ({
-      jobCards: m.jobCards, or: m.or, ilike: m.ilike, and: m.and, eq: m.eq
-    }));
+    const { jobCards } = await import("@shared/schema").then(m => ({ jobCards: m.jobCards }));
     return await db
       .select()
       .from(jobCards)
@@ -12160,9 +12155,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchAppointments(garageId: string, pattern: string, limit: number): Promise<Appointment[]> {
-    const { appointments, or, ilike, and, eq } = await import("@shared/schema").then(m => ({
-      appointments: m.appointments, or: m.or, ilike: m.ilike, and: m.and, eq: m.eq
-    }));
+    const { appointments } = await import("@shared/schema").then(m => ({ appointments: m.appointments }));
     return await db
       .select()
       .from(appointments)
@@ -12181,9 +12174,7 @@ export class DatabaseStorage implements IStorage {
   // ==================== Paginated list methods (SA-017) ====================
 
   async getCustomersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]> {
-    const { users, eq, and } = await import("@shared/schema").then(m => ({
-      users: m.users, eq: m.eq, and: m.and
-    }));
+    const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'customer');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
     return await db
@@ -12196,9 +12187,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countCustomers(garageId: string | undefined): Promise<number> {
-    const { users, eq, and, sql } = await import("@shared/schema").then(m => ({
-      users: m.users, eq: m.eq, and: m.and, sql: m.sql
-    }));
+    const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'customer');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
     const result = await db.select({ count: sql<number>`count(*)` }).from(users).where(where);
@@ -12206,9 +12195,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVehiclesPaginated(garageId: string | undefined, limit: number, offset: number): Promise<Vehicle[]> {
-    const { vehicles, eq } = await import("@shared/schema").then(m => ({
-      vehicles: m.vehicles, eq: m.eq
-    }));
+    const { vehicles } = await import("@shared/schema").then(m => ({ vehicles: m.vehicles }));
     const where = garageId ? eq(vehicles.garageId, garageId) : undefined;
     const query = db.select().from(vehicles);
     if (where) {
@@ -12218,9 +12205,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countVehicles(garageId: string | undefined): Promise<number> {
-    const { vehicles, eq, sql } = await import("@shared/schema").then(m => ({
-      vehicles: m.vehicles, eq: m.eq, sql: m.sql
-    }));
+    const { vehicles } = await import("@shared/schema").then(m => ({ vehicles: m.vehicles }));
     const where = garageId ? eq(vehicles.garageId, garageId) : undefined;
     const query = db.select({ count: sql<number>`count(*)` }).from(vehicles);
     const result = where ? await query.where(where) : await query;
@@ -12228,9 +12213,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getJobCardsPaginated(garageId: string | undefined, assignedTo: string | undefined, limit: number, offset: number): Promise<JobCard[]> {
-    const { jobCards, eq, and } = await import("@shared/schema").then(m => ({
-      jobCards: m.jobCards, eq: m.eq, and: m.and
-    }));
+    const { jobCards } = await import("@shared/schema").then(m => ({ jobCards: m.jobCards }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(jobCards.garageId, garageId));
     if (assignedTo) conditions.push(eq(jobCards.assignedTo, assignedTo));
@@ -12243,9 +12226,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countJobCards(garageId: string | undefined, assignedTo: string | undefined): Promise<number> {
-    const { jobCards, eq, and, sql } = await import("@shared/schema").then(m => ({
-      jobCards: m.jobCards, eq: m.eq, and: m.and, sql: m.sql
-    }));
+    const { jobCards } = await import("@shared/schema").then(m => ({ jobCards: m.jobCards }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(jobCards.garageId, garageId));
     if (assignedTo) conditions.push(eq(jobCards.assignedTo, assignedTo));
@@ -12256,9 +12237,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInvoicesPaginated(garageId: string | undefined, status: string | undefined, limit: number, offset: number): Promise<Invoice[]> {
-    const { invoices, eq, and } = await import("@shared/schema").then(m => ({
-      invoices: m.invoices, eq: m.eq, and: m.and
-    }));
+    const { invoices } = await import("@shared/schema").then(m => ({ invoices: m.invoices }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(invoices.garageId, garageId));
     if (status) conditions.push(eq(invoices.status, status));
@@ -12271,9 +12250,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countInvoices(garageId: string | undefined, status: string | undefined): Promise<number> {
-    const { invoices, eq, and, sql } = await import("@shared/schema").then(m => ({
-      invoices: m.invoices, eq: m.eq, and: m.and, sql: m.sql
-    }));
+    const { invoices } = await import("@shared/schema").then(m => ({ invoices: m.invoices }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(invoices.garageId, garageId));
     if (status) conditions.push(eq(invoices.status, status));
@@ -12284,9 +12261,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAppointmentsPaginated(garageId: string | undefined, limit: number, offset: number): Promise<Appointment[]> {
-    const { appointments, eq } = await import("@shared/schema").then(m => ({
-      appointments: m.appointments, eq: m.eq
-    }));
+    const { appointments } = await import("@shared/schema").then(m => ({ appointments: m.appointments }));
     const where = garageId ? eq(appointments.garageId, garageId) : undefined;
     const query = db.select().from(appointments);
     if (where) {
@@ -12296,9 +12271,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countAppointments(garageId: string | undefined): Promise<number> {
-    const { appointments, eq, sql } = await import("@shared/schema").then(m => ({
-      appointments: m.appointments, eq: m.eq, sql: m.sql
-    }));
+    const { appointments } = await import("@shared/schema").then(m => ({ appointments: m.appointments }));
     const where = garageId ? eq(appointments.garageId, garageId) : undefined;
     const query = db.select({ count: sql<number>`count(*)` }).from(appointments);
     const result = where ? await query.where(where) : await query;
@@ -12306,9 +12279,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSparePartsPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SparePart[]> {
-    const { spareParts, eq } = await import("@shared/schema").then(m => ({
-      spareParts: m.spareParts, eq: m.eq
-    }));
+    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
     const where = garageId ? eq(spareParts.garageId, garageId) : undefined;
     const query = db.select().from(spareParts);
     if (where) {
@@ -12318,9 +12289,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countSpareParts(garageId: string | undefined): Promise<number> {
-    const { spareParts, eq, sql } = await import("@shared/schema").then(m => ({
-      spareParts: m.spareParts, eq: m.eq, sql: m.sql
-    }));
+    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
     const where = garageId ? eq(spareParts.garageId, garageId) : undefined;
     const query = db.select({ count: sql<number>`count(*)` }).from(spareParts);
     const result = where ? await query.where(where) : await query;
@@ -12328,9 +12297,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSuppliersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<any[]> {
-    const { suppliers, eq } = await import("@shared/schema").then(m => ({
-      suppliers: m.suppliers, eq: m.eq
-    }));
+    const { suppliers } = await import("@shared/schema").then(m => ({ suppliers: m.suppliers }));
     const where = garageId ? eq(suppliers.garageId, garageId) : undefined;
     const query = db.select().from(suppliers);
     if (where) {
@@ -12340,9 +12307,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countSuppliers(garageId: string | undefined): Promise<number> {
-    const { suppliers, eq, sql } = await import("@shared/schema").then(m => ({
-      suppliers: m.suppliers, eq: m.eq, sql: m.sql
-    }));
+    const { suppliers } = await import("@shared/schema").then(m => ({ suppliers: m.suppliers }));
     const where = garageId ? eq(suppliers.garageId, garageId) : undefined;
     const query = db.select({ count: sql<number>`count(*)` }).from(suppliers);
     const result = where ? await query.where(where) : await query;
@@ -12350,33 +12315,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getGaragesPaginated(limit: number, offset: number): Promise<any[]> {
-    const { garages } = await import("@shared/schema").then(m => ({
-      garages: m.garages
-    }));
+    const { garages } = await import("@shared/schema").then(m => ({ garages: m.garages }));
     return await db.select().from(garages).orderBy(garages.createdAt).limit(limit).offset(offset);
   }
 
   async countGarages(): Promise<number> {
-    const { garages, sql } = await import("@shared/schema").then(m => ({
-      garages: m.garages, sql: m.sql
-    }));
+    const { garages } = await import("@shared/schema").then(m => ({ garages: m.garages }));
     const result = await db.select({ count: sql<number>`count(*)` }).from(garages);
     return Number(result[0]?.count ?? 0);
   }
 
   async getTechniciansPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]> {
-    const { users, eq, and } = await import("@shared/schema").then(m => ({
-      users: m.users, eq: m.eq, and: m.and
-    }));
+    const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'technician');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
     return await db.select().from(users).where(where).orderBy(users.createdAt).limit(limit).offset(offset);
   }
 
   async countTechnicians(garageId: string | undefined): Promise<number> {
-    const { users, eq, and, sql } = await import("@shared/schema").then(m => ({
-      users: m.users, eq: m.eq, and: m.and, sql: m.sql
-    }));
+    const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'technician');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
     const result = await db.select({ count: sql<number>`count(*)` }).from(users).where(where);
@@ -12384,9 +12341,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getEstimatesPaginated(garageId: string | undefined, status: string | undefined, limit: number, offset: number): Promise<any[]> {
-    const { estimates, eq, and } = await import("@shared/schema").then(m => ({
-      estimates: m.estimates, eq: m.eq, and: m.and
-    }));
+    const { estimates } = await import("@shared/schema").then(m => ({ estimates: m.estimates }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(estimates.garageId, garageId));
     if (status) conditions.push(eq(estimates.status, status));
@@ -12399,9 +12354,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countEstimates(garageId: string | undefined, status: string | undefined): Promise<number> {
-    const { estimates, eq, and, sql } = await import("@shared/schema").then(m => ({
-      estimates: m.estimates, eq: m.eq, and: m.and, sql: m.sql
-    }));
+    const { estimates } = await import("@shared/schema").then(m => ({ estimates: m.estimates }));
     const conditions: any[] = [];
     if (garageId) conditions.push(eq(estimates.garageId, garageId));
     if (status) conditions.push(eq(estimates.status, status));
