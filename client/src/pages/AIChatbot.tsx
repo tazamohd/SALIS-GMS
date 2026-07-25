@@ -1,0 +1,482 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { TabsPageLayout, TabConfig } from "@/components/layouts/TabsPageLayout";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send, Bot, User, MessageSquare, TrendingUp, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import type { AiChatMessage, AIChatConversation } from "@shared/schema";
+
+export default function AIChatbot() {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("chat");
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [messageInput, setMessageInput] = useState("");
+  const [localMessages, setLocalMessages] = useState<any[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  const { data: conversations = [] } = useQuery<AIChatConversation[]>({ queryKey: ["/api/ai-chat-conversations"] });
+  const { data: fetchedMessages = [] } = useQuery<AiChatMessage[]>({ 
+    queryKey: ["/api/ai-chat-messages", selectedConversation],
+    enabled: !!selectedConversation 
+  });
+
+  const messages = localMessages.length > 0 ? localMessages : fetchedMessages;
+
+  const getStatusBadge = (status: string) => {
+    const statuses: { [key: string]: { bg: string; text: string; icon: string } } = {
+      active: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', icon: '🟢' },
+      resolved: { bg: 'bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20', text: 'text-[#0A5ED7] dark:text-[#0BB3FF]', icon: '✅' },
+      escalated: { bg: 'bg-[#F97316]/10 dark:bg-[#F97316]/20', text: 'text-[#F97316]', icon: '⚠️' },
+    };
+    const s = statuses[status] || statuses.active;
+    return <Badge className={`${s.bg} ${s.text} border-0`}>{s.icon} {status}</Badge>;
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageInput.trim() || isStreaming) return;
+    
+    const userMessage = messageInput;
+    setMessageInput("");
+    setIsStreaming(true);
+
+    const userMsg = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: userMessage,
+      createdAt: new Date().toISOString()
+    };
+    
+    const aiMsgId = `ai-${Date.now()}`;
+    const aiMsg = {
+      id: aiMsgId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date().toISOString()
+    };
+
+    setLocalMessages([...fetchedMessages, userMsg, aiMsg]);
+
+    let streamController: AbortController | null = null;
+    let streamTimeout: NodeJS.Timeout | null = null;
+
+    try {
+      const controller = new AbortController();
+      streamController = controller;
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      const response = await fetch('/api/ai-chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: selectedConversation || undefined,
+          message: userMessage
+        }),
+        credentials: 'include',
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      let accumulatedText = '';
+      let newConvId = selectedConversation;
+      let buffer = '';
+
+      const resetStreamTimeout = () => {
+        if (streamTimeout) clearTimeout(streamTimeout);
+        streamTimeout = setTimeout(() => {
+          if (streamController) {
+            streamController.abort();
+          }
+        }, 30000);
+      };
+
+      resetStreamTimeout();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          if (streamTimeout) clearTimeout(streamTimeout);
+          break;
+        }
+
+        resetStreamTimeout();
+
+        buffer += decoder.decode(value, { stream: true });
+        
+        const frames = buffer.split('\n\n');
+        
+        buffer = frames.pop() || '';
+        
+        for (const frame of frames) {
+          if (!frame.trim()) continue;
+          
+          const lines = frame.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.slice(6);
+                const data = JSON.parse(jsonStr);
+                
+                if (data.chunk) {
+                  accumulatedText += data.chunk;
+                  setLocalMessages(prev => prev.map(msg =>
+                    msg.id === aiMsgId ? { ...msg, content: accumulatedText } : msg
+                  ));
+                }
+                if (data.done && data.conversationId) {
+                  newConvId = data.conversationId;
+                }
+              } catch (e) {
+                console.warn('Failed to parse SSE data:', line, e);
+              }
+            }
+          }
+        }
+      }
+
+      if (newConvId && !selectedConversation) {
+        setSelectedConversation(newConvId);
+      }
+      
+      setLocalMessages([]);
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-chat-messages", newConvId || selectedConversation] });
+      
+    } catch (error: any) {
+      console.error('Streaming error:', error);
+      
+      const isAborted = error.name === 'AbortError' || error.message?.includes('abort');
+      const errorMessage = isAborted 
+        ? t('aiChatbot.requestTimedOut', 'Request timed out. Please try again.')
+        : t('aiChatbot.failedToSend', 'Failed to send message. Please try again.');
+      
+      toast({ 
+        title: t('common.error', 'Error'), 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      
+      setLocalMessages([]);
+    } finally {
+      if (streamTimeout) clearTimeout(streamTimeout);
+      setIsStreaming(false);
+    }
+  };
+
+  const tabs: TabConfig[] = [
+    {
+      id: "chat",
+      label: t('aiChatbot.liveChat', 'Live Chat'),
+      icon: MessageSquare,
+      content: (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
+              {t('aiChatbot.chatWithAI', 'Chat with AI Assistant')}
+            </h2>
+            
+            <ScrollArea className="h-[500px] mb-4 border border-[#E2E8F0] dark:border-[#232A36] rounded p-4 bg-[#F8FAFC] dark:bg-[#0E1117]">
+              {messages.length === 0 ? (
+                <div className="text-center text-[#64748B] py-12">
+                  <Bot className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
+                  <p className="font-['Poppins']">{t('aiChatbot.startConversation', 'Start a conversation with the AI assistant')}</p>
+                  <p className="text-sm mt-2">{t('aiChatbot.askAbout', 'Ask about appointments, services, or vehicle status')}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      data-testid={`message-${msg.id}`}
+                    >
+                      <div className={`max-w-[80%] ${msg.role === 'user' ? 'bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white' : 'bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]'} rounded-lg p-3`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          {msg.role === 'user' ? (
+                            <User className="w-4 h-4" />
+                          ) : (
+                            <Bot className="w-4 h-4 text-[#0A5ED7]" />
+                          )}
+                          <span className="text-xs font-semibold">
+                            {msg.role === 'user' ? t('aiChatbot.you', 'You') : t('aiChatbot.aiAssistant', 'AI Assistant')}
+                          </span>
+                          {msg.intent && (
+                            <Badge className="text-xs bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-0">
+                              {msg.intent}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className={`text-sm font-['Poppins'] ${msg.role === 'user' ? 'text-white' : 'text-[#0B1F3B] dark:text-white'}`}>
+                          {msg.content}
+                        </p>
+                        {msg.confidence && (
+                          <p className="text-xs text-[#64748B] mt-1">
+                            {t('aiChatbot.confidence', 'Confidence')}: {Number(msg.confidence).toFixed(0)}%
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+
+            <div className="flex gap-2">
+              <Input
+                placeholder={t('aiChatbot.typeMessage', 'Type your message...')}
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                disabled={isStreaming}
+                data-testid="input-message"
+                className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={isStreaming || !messageInput.trim()}
+                data-testid="button-send"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+              >
+                {isStreaming ? "..." : <Send className="w-4 h-4" />}
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
+              {t('common.quick_actions', 'Quick Actions')}
+            </h3>
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                onClick={() => setMessageInput(t('aiChatbot.bookAppointmentMessage', 'I want to book an appointment'))}
+                data-testid="button-book-appointment"
+              >
+                📅 {t('aiChatbot.bookAppointment', 'Book Appointment')}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                onClick={() => setMessageInput(t('aiChatbot.checkStatusMessage', 'Check my vehicle status'))}
+                data-testid="button-check-status"
+              >
+                🚗 {t('aiChatbot.checkVehicleStatus', 'Check Vehicle Status')}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                onClick={() => setMessageInput(t('aiChatbot.getQuoteMessage', 'Get a quote for service'))}
+                data-testid="button-get-quote"
+              >
+                💰 {t('aiChatbot.getQuote', 'Get Quote')}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                onClick={() => setMessageInput(t('aiChatbot.viewHistoryMessage', 'View my service history'))}
+                data-testid="button-service-history"
+              >
+                📋 {t('aiChatbot.serviceHistory', 'Service History')}
+              </Button>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-[#E2E8F0] dark:border-[#232A36]">
+              <h4 className="text-sm font-semibold mb-2 text-[#0B1F3B] dark:text-white">
+                {t('aiChatbot.aiCapabilities', 'AI Capabilities')}
+              </h4>
+              <ul className="space-y-2 text-sm text-[#64748B] font-['Poppins']">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
+                  {t('aiChatbot.capability1', 'Book & manage appointments')}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
+                  {t('aiChatbot.capability2', 'Check service status')}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
+                  {t('aiChatbot.capability3', 'Generate instant quotes')}
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 text-green-500" />
+                  {t('aiChatbot.capability4', 'Answer common questions')}
+                </li>
+              </ul>
+            </div>
+          </Card>
+        </div>
+      )
+    },
+    {
+      id: "conversations",
+      label: t('aiChatbot.conversations', 'Conversations'),
+      icon: Bot,
+      content: (
+        <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+          <h2 className="text-xl font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
+            {t('aiChatbot.recentConversations', 'Recent Conversations')}
+          </h2>
+          
+          {conversations.length === 0 ? (
+            <div className="text-center text-[#64748B] py-12">
+              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
+              <p className="font-['Poppins']">{t('aiChatbot.noConversations', 'No conversations yet')}</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
+                  <tr className="text-left text-sm font-semibold text-[#64748B] font-['Poppins']">
+                    <th className="pb-3">{t('aiChatbot.session', 'Session')}</th>
+                    <th className="pb-3">{t('common.status', 'Status')}</th>
+                    <th className="pb-3">{t('aiChatbot.handler', 'Handler')}</th>
+                    <th className="pb-3">{t('aiChatbot.source', 'Source')}</th>
+                    <th className="pb-3">{t('aiChatbot.created', 'Created')}</th>
+                    <th className="pb-3">{t('common.actions', 'Actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm font-['Poppins']">
+                  {conversations.map((conv) => (
+                    <tr
+                      key={conv.id}
+                      className="border-b border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
+                      data-testid={`conversation-${conv.id}`}
+                    >
+                      <td className="py-3 text-[#0B1F3B] dark:text-white">
+                        {conv.sessionId || 'N/A'}
+                      </td>
+                      <td className="py-3">{getStatusBadge(conv.status || 'active')}</td>
+                      <td className="py-3">
+                        <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-0">
+                          {conv.handoffTo ? t('aiChatbot.escalated', 'Escalated') : t('aiChatbot.ai', 'AI')}
+                        </Badge>
+                      </td>
+                      <td className="py-3">
+                        <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-0">
+                          web
+                        </Badge>
+                      </td>
+                      <td className="py-3 text-[#64748B]">
+                        {conv.createdAt ? new Date(conv.createdAt).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="py-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedConversation(conv.id)}
+                          data-testid={`button-view-${conv.id}`}
+                          className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                        >
+                          {t('common.view', 'View')}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      )
+    },
+    {
+      id: "analytics",
+      label: t('aiChatbot.analytics', 'Analytics'),
+      icon: TrendingUp,
+      content: (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-[#0A5ED7]/10 rounded-lg">
+                  <MessageSquare className="w-6 h-6 text-[#0A5ED7]" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
+                    {t('aiChatbot.totalConversations', 'Total Conversations')}
+                  </p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-total-conversations">
+                    {conversations.length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
+                    {t('aiChatbot.resolved', 'Resolved')}
+                  </p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-resolved">
+                    {conversations.filter(c => c.status === 'resolved').length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-[#F97316]/10 rounded-lg">
+                  <AlertCircle className="w-6 h-6 text-[#F97316]" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#64748B] font-['Poppins']">
+                    {t('common.active', 'Active')}
+                  </p>
+                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white font-['Montserrat']" data-testid="text-active">
+                    {conversations.filter(c => c.status === 'active').length}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <Card className="p-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+            <h3 className="text-lg font-bold font-['Montserrat'] mb-4 text-[#0B1F3B] dark:text-white">
+              📊 {t('aiChatbot.performanceMetrics', 'Performance Metrics')}
+            </h3>
+            <div className="text-center text-[#64748B] py-8">
+              <Clock className="w-12 h-12 mx-auto mb-2 text-[#64748B]" />
+              <p className="font-['Poppins']">{t('aiChatbot.advancedAnalytics', 'Advanced analytics coming soon')}</p>
+              <p className="text-sm mt-1">{t('aiChatbot.analyticsDescription', 'Response time, satisfaction scores, intent analysis')}</p>
+            </div>
+          </Card>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <TabsPageLayout
+      title={t('aiChatbot.title', 'AI Chatbot')}
+      description={t('aiChatbot.description', 'AI-powered customer support with OpenAI integration for intelligent responses and automated tasks')}
+      icon={Bot}
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    />
+  );
+}

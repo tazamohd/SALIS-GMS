@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1760585030645,
+      "tag": "0000_add-financial-module",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761828390115,
+      "tag": "0001_cultured_apocalypse",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762107827180,
+      "tag": "0002_real_daredevil",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782482490639,
+      "tag": "0003_reflective_legion",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+/* ==========================================================================
+   RTL (Right-to-Left) Layout Support for Arabic
+   Applied when document.documentElement.dir === 'rtl'
+   ========================================================================== */
+
+/* Sidebar positioning */
+[dir="rtl"] .sidebar {
+  right: 0;
+  left: auto;
+}
+
+[dir="rtl"] .main-content {
+  margin-right: 256px;
+  margin-left: 0;
+}
+
+/* Flex direction reversal for row layouts */
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+/* Table text alignment */
+[dir="rtl"] table th,
+[dir="rtl"] table td {
+  text-align: right;
+}
+
+/* Fixed sidebar in RTL mode */
+[dir="rtl"] aside.fixed {
+  right: 0;
+  left: auto;
+}
+
+/* Mobile sidebar slide-in from right */
+[dir="rtl"] aside.-translate-x-full {
+  transform: translateX(100%);
+}
+
+[dir="rtl"] aside.translate-x-0 {
+  transform: translateX(0);
+}
+
+/* Resize handle on left side in RTL */
+[dir="rtl"] [data-testid="sidebar-resize-handle"] {
+  right: auto;
+  left: 0;
+}
+
+/* Dropdown and popover alignment */
+[dir="rtl"] [data-radix-popper-content-wrapper] {
+  direction: rtl;
+}
+
+/* Icon margins - swap left/right */
+[dir="rtl"] .mr-2 {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .mr-3 {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+[dir="rtl"] .ml-3 {
+  margin-left: 0;
+  margin-right: 0.75rem;
+}
+
+/* Padding adjustments for navigation items */
+[dir="rtl"] .pl-6 {
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+
+[dir="rtl"] .pr-3 {
+  padding-right: 0;
+  padding-left: 0.75rem;
+}
+
+/* Text alignment */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Form input text direction */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Badges and tags */
+[dir="rtl"] .gap-2 {
+  direction: rtl;
+}
+
+/* Breadcrumb / chevron icons flip */
+[dir="rtl"] .lucide-chevron-right {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .lucide-chevron-left {
+  transform: scaleX(-1);
+}
+
+/* Scroll area */
+[dir="rtl"] .overflow-y-auto {
+  direction: rtl;
+}
+
+/* Arabic font stack - prefer Noto Sans Arabic for consistency */
+[dir="rtl"] body {
+  font-family: 'Noto Sans Arabic', 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+}
+
+/* Ensure numbers stay LTR in RTL context */
+[dir="rtl"] .tabular-nums,
+[dir="rtl"] [data-numeric],
+[dir="rtl"] .font-mono {
+  direction: ltr;
+  unicode-bidi: embed;
+}

@@ -1,0 +1,76 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Sensitive files
+user_credentials.csv
+.env
+.env.*
+# ...but env TEMPLATES are documentation, not secrets — keep them versioned
+!.env.production.example
+*.pem
+*.key
+# Production DB dumps written by scripts/backup-db.sh / the backup sidecar
+backups/
+# Planned-but-unwired scaffolding (job queue / redis) � not yet in scope
+_planned/
+
+# Local Postgres data directories (embedded-postgres / local dev clusters)
+pg-data/
+pg-local-data/
+pg-test-data/
+.test-garage-id
+
+# Claude Code session state (settings.json IS versioned; local/session files are not)
+.claude/worktrees/
+.claude/launch.json
+.claude/settings.local.json
+.config/
+.local/
+
+# Session transcripts and scratch artifacts
+SLIS-GMS/
+C--Users-TAZAM-Downloads-SLIS-GMS--claude-worktrees-happy-mcclintock/
+conversation.md
+test-run-full.log
+
+
+# Uploaded files (M3.1 file uploads)
+uploads/
+
+# IDE / toolchain binaries that leaked into the tree (JetBrains, Kotlin, Apple SDK)
+lib/
+bin/
+
+# Stale duplicate forks of the live monolith sources — DEAD, nothing imports them.
+# Live source of truth is shared/schema.ts and server/storage.ts (newer, tracked).
+# Kept on disk but out of git to avoid resolver confusion. Safe to delete.
+shared/schema/
+server/storage/
+
+# Unmounted, stale modular extraction — NOT registered in routes/index.ts, and the
+# Tier-3 security gate flagged it (no tenant scoping / RBAC / IDOR). Live payment
+# routes are in the monolith server/routes.ts. Do not commit until rewritten.
+server/routes/payments.routes.ts
+
+# Design dumps & root-level scratch — not part of the application source.
+/UIUX DARKMOOD/
+/DESIGN
+/SLIS-GMS
+/index.html
+/style.css
+/script.js
+/generated-icon*.png
+/neon_*.webp
+/count_stats.cjs
+/count_stats.py
+
+# Foreign Kotlin/Native LLDB helper that leaked in (cf. lib/ bin/ above)
+/scripts/konan_lldb.py
+
+# Local Claude agent config (you opted to keep this out of git; the .gitignore
+# note above intends settings.json to be versioned — re-add if the team wants it)
+.claude/settings.json

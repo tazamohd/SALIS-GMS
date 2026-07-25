@@ -1,0 +1,280 @@
+import { Clock, AlertCircle, CheckCircle, Wrench, Search, ClipboardList } from "lucide-react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TaskDetailsDialog } from "@/components/TaskDetailsDialog";
+import { DashboardPage } from "@/components/layouts";
+import type { JobCard } from "@shared/schema";
+
+export function TasksManagement() {
+  const { t } = useTranslation();
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [selectedTask, setSelectedTask] = useState<JobCard | null>(null);
+  const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
+
+  const handleViewTask = (task: JobCard) => {
+    setSelectedTask(task);
+    setTaskDetailsOpen(true);
+  };
+
+  const { data: jobCards, isLoading } = useQuery<JobCard[]>({
+    queryKey: ['/api/job-cards'],
+    retry: false,
+  });
+
+  const checkInCount = (jobCards?.filter(jc => jc.status === 'pending') ?? []).length;
+  const repairCount = (jobCards?.filter(jc => jc.status === 'in_progress') ?? []).length;
+  const qualityCheckCount = (jobCards?.filter(jc => jc.status === 'completed') ?? []).length;
+  const completionCount = (jobCards?.filter(jc => jc.status === 'delivered') ?? []).length;
+
+  const allFilteredTasks = jobCards?.filter(task => {
+    const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+    const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+    const matchesSearch = searchQuery === '' || 
+      task.serviceType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (task.vehicleInfo as any)?.owner?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesStatus && matchesPriority && matchesSearch;
+  }) || [];
+
+  const totalPages = Math.ceil(allFilteredTasks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const filteredTasks = allFilteredTasks.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleFilterChange = (type: 'status' | 'priority' | 'search', value: string) => {
+    setCurrentPage(1);
+    if (type === 'status') setStatusFilter(value);
+    if (type === 'priority') setPriorityFilter(value);
+    if (type === 'search') setSearchQuery(value);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusColors: { [key: string]: string } = {
+      'pending': 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
+      'in_progress': 'bg-gray-100 dark:bg-salis-gray-dark text-gray-900 dark:text-white',
+      'completed': 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+      'delivered': 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white',
+      'cancelled': 'bg-salis-black dark:bg-white text-white dark:text-salis-black',
+    };
+    return statusColors[status] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labelMap: Record<string, string> = {
+      pending: t('tasks.status.pending', 'Pending'),
+      in_progress: t('tasks.status.inProgress', 'In Progress'),
+      completed: t('tasks.status.completed', 'Completed'),
+      delivered: t('tasks.status.delivered', 'Delivered'),
+      cancelled: t('tasks.status.cancelled', 'Cancelled'),
+    };
+    return labelMap[status] || status;
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    const priorityColors: { [key: string]: string } = {
+      'high': 'bg-salis-black dark:bg-white text-white dark:text-salis-black',
+      'medium': 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
+      'low': 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+    };
+    return priorityColors[priority] || 'bg-gray-100 dark:bg-salis-gray-dark text-gray-700 dark:text-gray-300';
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    const labelMap: Record<string, string> = {
+      high: t('tasks.priority.high', 'High'),
+      medium: t('tasks.priority.medium', 'Medium'),
+      low: t('tasks.priority.low', 'Low'),
+    };
+    return labelMap[priority] || priority;
+  };
+
+  const metrics = [
+    { label: t('tasks.checkIn', 'Check-in'), value: checkInCount.toString(), icon: Clock, color: "text-gray-700 dark:text-gray-300" },
+    { label: t('tasks.repair', 'Repair'), value: repairCount.toString(), icon: Wrench, color: "text-gray-900 dark:text-white" },
+    { label: t('tasks.qualityCheck', 'Quality Check'), value: qualityCheckCount.toString(), icon: AlertCircle, color: "text-gray-900 dark:text-white" },
+    { label: t('tasks.completion', 'Completion'), value: completionCount.toString(), icon: CheckCircle, color: "text-gray-800 dark:text-gray-200" },
+  ];
+
+  return (
+    <DashboardPage
+      title={t('tasks.title', 'Tasks Management')}
+      description={t('tasks.description', 'Manage and track all service tasks')}
+      icon={ClipboardList}
+      metrics={metrics}
+    >
+
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border mb-6">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+              <SelectTrigger data-testid="select-status">
+                <SelectValue placeholder={t('common.status', 'Status')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('tasks.allStatus', 'All Status')}</SelectItem>
+                <SelectItem value="pending">{t('tasks.status.pending', 'Pending')}</SelectItem>
+                <SelectItem value="in_progress">{t('tasks.status.inProgress', 'In Progress')}</SelectItem>
+                <SelectItem value="completed">{t('tasks.status.completed', 'Completed')}</SelectItem>
+                <SelectItem value="delivered">{t('tasks.status.delivered', 'Delivered')}</SelectItem>
+                <SelectItem value="cancelled">{t('tasks.status.cancelled', 'Cancelled')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={priorityFilter} onValueChange={(value) => handleFilterChange('priority', value)}>
+              <SelectTrigger data-testid="select-priority">
+                <SelectValue placeholder={t('tasks.priority', 'Priority')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('tasks.allPriority', 'All Priority')}</SelectItem>
+                <SelectItem value="high">{t('tasks.priority.high', 'High')}</SelectItem>
+                <SelectItem value="medium">{t('tasks.priority.medium', 'Medium')}</SelectItem>
+                <SelectItem value="low">{t('tasks.priority.low', 'Low')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="md:col-span-2 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-900 dark:text-white/60" />
+              <Input
+                type="text"
+                placeholder={t('common.search', 'Search')}
+                value={searchQuery}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="pl-10 border-gray-200 dark:border-salis-gray-dark"
+                data-testid="input-search-tasks"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white dark:bg-salis-black border-gray-200 dark:border-salis-gray-dark border">
+        <CardContent className="p-6">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.taskId', 'Task ID')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.customerName', 'Customer Name')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.serviceType', 'Service Type')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.dueDateTime', 'Due Date/Time')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.priority', 'Priority')}</th>
+                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.actions', 'Action')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center">
+                      <div className="animate-pulse">{t('common.loading', 'Loading...')}</div>
+                    </td>
+                  </tr>
+                ) : filteredTasks.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-gray-900 dark:text-white/60">{t('tasks.noTasks', 'No tasks available')}</td>
+                  </tr>
+                ) : (
+                  filteredTasks.map((task) => (
+                    <tr key={task.id} className="border-b border-gray-200 dark:border-salis-gray-dark hover:bg-gray-50 dark:hover:bg-salis-gray-dark" data-testid={`row-task-${task.id}`}>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white">
+                        #{task.id}
+                      </td>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white">
+                        {(task.vehicleInfo as any)?.owner || t('common.notAvailable', 'N/A')}
+                      </td>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white">
+                        {task.serviceType}
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className={`${getStatusBadge(task.status)} border-0`} data-testid={`badge-status-${task.id}`}>
+                          {getStatusLabel(task.status)}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4 font-['Poppins',Helvetica] font-normal text-sm text-gray-900 dark:text-white/60">
+                        {task.createdAt ? new Date(task.createdAt).toLocaleString() : t('common.notAvailable', 'N/A')}
+                      </td>
+                      <td className="py-4 px-4">
+                        <Badge className={`${getPriorityBadge(task.priority)} border-0`} data-testid={`badge-priority-${task.id}`}>
+                          {getPriorityLabel(task.priority)}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-4">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleViewTask(task)}
+                          data-testid={`button-view-${task.id}`}
+                        >
+                          {t('common.view', 'View')}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 0 && (
+            <div className="flex items-center justify-between mt-6">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                data-testid="button-previous"
+              >
+                {t('common.previous', 'Previous')}
+              </Button>
+              <div className="flex gap-2">
+                {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((page) => (
+                  <Button 
+                    key={page} 
+                    variant={page === currentPage ? 'default' : 'outline'} 
+                    size="sm"
+                    className="min-w-[40px]"
+                    onClick={() => goToPage(page)}
+                    data-testid={`button-page-${page}`}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                data-testid="button-next"
+              >
+                {t('common.next', 'Next')}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <TaskDetailsDialog 
+        open={taskDetailsOpen}
+        onOpenChange={setTaskDetailsOpen}
+        task={selectedTask}
+      />
+    </DashboardPage>
+  );
+}

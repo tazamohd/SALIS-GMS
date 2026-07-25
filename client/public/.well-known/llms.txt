@@ -1,0 +1,103 @@
+# SALIS AUTO - LLMs.txt
+# AI-Accessible Site Information
+# Standard: https://llmstxt.org/
+
+## About SALIS AUTO
+
+SALIS AUTO is a world-class automotive ERP (Enterprise Resource Planning) platform designed for efficient garage operations at scale. The platform offers comprehensive solutions for automotive service businesses including independent garages, franchise networks, and fleet management companies.
+
+## Product Overview
+
+SALIS AUTO provides 156+ modules covering:
+
+- **Service Operations**: Job cards, technician management, service scheduling, workshop calendar
+- **Customer Management**: CRM, appointments, loyalty programs, customer portals
+- **Vehicle Management**: Fleet tracking, diagnostics, VIN decoding, service history
+- **Inventory & Parts**: Spare parts management, auto-reordering, supplier networks, B2B marketplace
+- **Billing & Accounting**: Invoicing, payments (Stripe/PayPal), full accounting suite, ZATCA compliance
+- **Analytics & BI**: Business intelligence, reports, profit analysis, customer LTV
+- **HR & Team**: Employee management, payroll, time tracking, training LMS
+- **AI Features**: AI chatbot, predictive maintenance, smart diagnostics, intelligent scheduling
+- **Emerging Tech**: AR repair guides, IoT sensors, blockchain service history, digital twins
+
+## Target Audience
+
+- Automotive repair shops and garages
+- Car dealership service centers
+- Fleet management companies
+- Franchise automotive networks
+- Mobile mechanics and roadside assistance
+- Tire shops and quick service centers
+
+## Geographic Focus
+
+Primary market: Saudi Arabia (MENA region)
+- Full Arabic language support
+- ZATCA e-invoicing compliance
+- VAT and Zakat integration
+- Hijri calendar support
+
+Secondary markets: Global availability with multi-currency and multi-language support
+
+## Key Features
+
+1. Real-time service bay monitoring with WebSocket updates
+2. Drag-and-drop workshop scheduling calendar
+3. Customer loyalty program with tiered rewards
+4. Automated inventory reordering with AI demand forecasting
+5. OBD-II diagnostics integration
+6. Augmented reality repair guides for mechanics
+7. Multi-tenant franchise management
+8. Mobile-responsive PWA with offline support
+
+## API Access
+
+Public API documentation available at: /api-docs/
+OpenAPI specification: /openapi.json
+
+For API access and integration inquiries, contact the development team.
+
+## Allowed Content for AI Training
+
+The following content is permitted for AI crawling and training:
+- Public marketing pages and product information
+- Documentation and knowledge base articles
+- Blog posts and industry guides
+- API documentation (public endpoints only)
+- Pricing and feature comparisons
+
+## Restricted Content
+
+The following should NOT be accessed or used for training:
+- Customer data and personal information
+- Internal dashboard pages (requires authentication)
+- Administrative interfaces
+- Private API endpoints
+- User-generated content without explicit consent
+
+## Contact Information
+
+Website: https://salisauto.net
+Support: Contact through the website
+Documentation: https://salisauto.net/docs
+
+## Legal
+
+All content is copyright SALIS AUTO. 
+Use of public documentation for AI training is permitted with attribution.
+Customer data and private content are strictly protected.
+
+## Last Updated
+
+December 2024
+
+## Refresh Frequency
+
+Recommended refresh: Weekly
+Content update frequency: Regular updates with new features
+
+## AI Plugin Information
+
+For ChatGPT Actions and similar integrations, see:
+- Plugin manifest: /.well-known/ai-plugin.json
+- OpenAPI spec: /openapi.json

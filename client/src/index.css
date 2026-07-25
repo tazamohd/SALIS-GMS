@@ -1,0 +1,739 @@
+/* SALIS AUTO Typography - Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* RTL / Arabic layout support */
+@import './styles/rtl.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+:root {
+  /* SALIS AUTO Brand Design System */
+  
+  /* Primary Brand Colors - Blue Gradient */
+  --salis-blue-start: #0A5ED7;
+  --salis-blue-end: #0BB3FF;
+  --salis-blue-gradient: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+  
+  /* Deep Navy */
+  --salis-navy: #0B1F3B;
+  
+  /* Accent Orange - for decisions/warnings/CTAs */
+  --salis-orange: #F97316;
+  
+  /* Dark Mode Neutrals */
+  --salis-bg-dark: #0E1117;
+  --salis-surface-dark: #151A23;
+  --salis-border-dark: #232A36;
+  --salis-text-primary-dark: #E6EAF0;
+  --salis-text-muted-dark: #9BA4B0;
+  
+  /* Light Mode Neutrals - Logo-Only Palette */
+  --salis-bg-light: #E6E9ED;
+  --salis-surface-light: #FFFFFF;
+  --salis-border-light: #C9D1DA;
+  --salis-text-primary-light: #2A2F3A;
+  --salis-text-muted-light: #6B7280;
+  
+  /* Legacy compatibility - Approved palette only */
+  --salis-black: #0B1F3B;
+  --salis-white: #FFFFFF;
+  --salis-gray: #9BA4B0;
+  --salis-gray-light: #C9D1DA;
+  --salis-gray-dark: #2A2F3A;
+  --salis-50-black: #9BA4B0;
+
+  /* SALIS AUTO Typography Variables - Inter Primary */
+  --14-regular-font-family: "Inter", "SF Pro", Helvetica;
+  --14-regular-font-size: 14px;
+  --14-regular-font-style: normal;
+  --14-regular-font-weight: 400;
+  --14-regular-letter-spacing: 0px;
+  --14-regular-line-height: 140%;
+  
+  --body-base-font-family: "Inter", "SF Pro", Helvetica;
+  --body-base-font-size: 16px;
+  --body-base-font-style: normal;
+  --body-base-font-weight: 400;
+  --body-base-letter-spacing: 0px;
+  --body-base-line-height: 140%;
+  
+  --body-bold-small-font-family: "Inter", Helvetica;
+  --body-bold-small-font-size: 12px;
+  --body-bold-small-font-style: normal;
+  --body-bold-small-font-weight: 500;
+  --body-bold-small-letter-spacing: -0.3px;
+  --body-bold-small-line-height: 140%;
+  
+  --body-emphasized-font-family: "Inter", Helvetica;
+  --body-emphasized-font-size: 17px;
+  --body-emphasized-font-style: normal;
+  --body-emphasized-font-weight: 400;
+  --body-emphasized-letter-spacing: -0.43px;
+  --body-emphasized-line-height: 22px;
+  
+  --body-medium-font-family: "Inter", Helvetica;
+  --body-medium-font-size: 14px;
+  --body-medium-font-style: normal;
+  --body-medium-font-weight: 500;
+  --body-medium-letter-spacing: 0px;
+  --body-medium-line-height: 140%;
+  
+  --body-regular-font-family: "Inter", Helvetica;
+  --body-regular-font-size: 14px;
+  --body-regular-font-style: normal;
+  --body-regular-font-weight: 400;
+  --body-regular-letter-spacing: 0px;
+  --body-regular-line-height: 140%;
+  
+  --body-regular-medium-font-family: "Inter", Helvetica;
+  --body-regular-medium-font-size: 14px;
+  --body-regular-medium-font-style: normal;
+  --body-regular-medium-font-weight: 400;
+  --body-regular-medium-letter-spacing: -0.5px;
+  --body-regular-medium-line-height: 140%;
+  
+  --body-semibold-font-family: "Inter", Helvetica;
+  --body-semibold-font-size: 14px;
+  --body-semibold-font-style: normal;
+  --body-semibold-font-weight: 600;
+  --body-semibold-letter-spacing: 0px;
+  --body-semibold-line-height: 140%;
+  
+  --caps-md-font-family: "Inter", Helvetica;
+  --caps-md-font-size: 12px;
+  --caps-md-font-style: normal;
+  --caps-md-font-weight: 500;
+  --caps-md-letter-spacing: 0.3px;
+  --caps-md-line-height: 140%;
+  
+  --display-large-semibold-font-family: "Inter", Helvetica;
+  --display-large-semibold-font-size: 32px;
+  --display-large-semibold-font-style: normal;
+  --display-large-semibold-font-weight: 700;
+  --display-large-semibold-letter-spacing: -0.03em;
+  --display-large-semibold-line-height: 1.2;
+  
+  --display-medium-semibold-font-family: "Inter", Helvetica;
+  --display-medium-semibold-font-size: 24px;
+  --display-medium-semibold-font-style: normal;
+  --display-medium-semibold-font-weight: 600;
+  --display-medium-semibold-letter-spacing: -0.02em;
+  --display-medium-semibold-line-height: 1.3;
+  
+  --display-small-semibold-font-family: "Inter", Helvetica;
+  --display-small-semibold-font-size: 20px;
+  --display-small-semibold-font-style: normal;
+  --display-small-semibold-font-weight: 500;
+  --display-small-semibold-letter-spacing: -0.02em;
+  --display-small-semibold-line-height: 1.4;
+  
+  --drop-shadow-100: 0px 1px 4px 0px rgba(1, 1, 1, 0.1);
+  
+  --headline-bold-font-family: "Inter", Helvetica;
+  --headline-bold-font-size: 20px;
+  --headline-bold-font-style: normal;
+  --headline-bold-font-weight: 700;
+  --headline-bold-letter-spacing: -0.02em;
+  --headline-bold-line-height: 1.3;
+  
+  --headline-medium-font-family: "Inter", Helvetica;
+  --headline-medium-font-size: 20px;
+  --headline-medium-font-style: normal;
+  --headline-medium-font-weight: 500;
+  --headline-medium-letter-spacing: -0.02em;
+  --headline-medium-line-height: 1.3;
+  
+  --headline-semibold-font-family: "Inter", Helvetica;
+  --headline-semibold-font-size: 20px;
+  --headline-semibold-font-style: normal;
+  --headline-semibold-font-weight: 600;
+  --headline-semibold-letter-spacing: -0.02em;
+  --headline-semibold-line-height: 1.3;
+  
+  --label-medium-font-family: "Inter", Helvetica;
+  --label-medium-font-size: 12px;
+  --label-medium-font-style: normal;
+  --label-medium-font-weight: 500;
+  --label-medium-letter-spacing: 0.025em;
+  --label-medium-line-height: 140%;
+  
+  --label-regular-font-family: "Inter", Helvetica;
+  --label-regular-font-size: 12px;
+  --label-regular-font-style: normal;
+  --label-regular-font-weight: 400;
+  --label-regular-letter-spacing: 0px;
+  --label-regular-line-height: 140%;
+  
+  --label-small-font-family: "Inter", Helvetica;
+  --label-small-font-size: 11px;
+  --label-small-font-style: normal;
+  --label-small-font-weight: 400;
+  --label-small-letter-spacing: 0.025em;
+  --label-small-line-height: normal;
+  
+  --m3-title-small-font-family: "Inter", Helvetica;
+  --m3-title-small-font-size: 14px;
+  --m3-title-small-font-style: normal;
+  --m3-title-small-font-weight: 500;
+  --m3-title-small-letter-spacing: 0.01em;
+  --m3-title-small-line-height: 20px;
+  
+  --shadow: 0px 1px 3px 1px rgba(1, 1, 1, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+  --shadow-black-lg: 0px 4px 6px -2px rgba(1, 1, 1, 0.05), 0px 12px 16px -4px rgba(1, 1, 1, 0.1);
+  --shadow-black-sm: 0px 1px 2px 0px rgba(1, 1, 1, 0.06), 0px 1px 3px 0px rgba(1, 1, 1, 0.1);
+  
+  --single-line-body-base-font-family: "Inter", Helvetica;
+  --single-line-body-base-font-size: 16px;
+  --single-line-body-base-font-style: normal;
+  --single-line-body-base-font-weight: 400;
+  --single-line-body-base-letter-spacing: 0px;
+  --single-line-body-base-line-height: 100%;
+  
+  --text-sm-medium-font-family: "Inter", Helvetica;
+  --text-sm-medium-font-size: 14px;
+  --text-sm-medium-font-style: normal;
+  --text-sm-medium-font-weight: 500;
+  --text-sm-medium-letter-spacing: 0px;
+  --text-sm-medium-line-height: 20px;
+  
+  --text-sm-normal-font-family: "Inter", Helvetica;
+  --text-sm-normal-font-size: 14px;
+  --text-sm-normal-font-style: normal;
+  --text-sm-normal-font-weight: 400;
+  --text-sm-normal-letter-spacing: 0px;
+  --text-sm-normal-line-height: 20px;
+  
+  --text-xs-medium-font-family: "Inter", Helvetica;
+  --text-xs-medium-font-size: 12px;
+  --text-xs-medium-font-style: normal;
+  --text-xs-medium-font-weight: 500;
+  --text-xs-medium-letter-spacing: 0px;
+  --text-xs-medium-line-height: 18px;
+  
+  --title-medium-font-family: "Inter", Helvetica;
+  --title-medium-font-size: 16px;
+  --title-medium-font-style: normal;
+  --title-medium-font-weight: 500;
+  --title-medium-letter-spacing: -0.01em;
+  --title-medium-line-height: 1.4;
+  
+  --title-regular-font-family: "Inter", Helvetica;
+  --title-regular-font-size: 16px;
+  --title-regular-font-style: normal;
+  --title-regular-font-weight: 400;
+  --title-regular-letter-spacing: 0px;
+  --title-regular-line-height: 1.4;
+  
+  --title-semibold-font-family: "Inter", Helvetica;
+  --title-semibold-font-size: 16px;
+  --title-semibold-font-style: normal;
+  --title-semibold-font-weight: 600;
+  --title-semibold-letter-spacing: -0.01em;
+  --title-semibold-line-height: 1.4;
+}
+
+@layer base {
+  :root {
+    /* SALIS AUTO Brand Theme - Light Mode (Logo-Only Palette) */
+    --background: 216 14% 91%;  /* #E6E9ED - Silver Light */
+    --foreground: 220 16% 20%;  /* #2A2F3A - Graphite Gray */
+
+    --muted: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
+    --muted-foreground: 217 14% 45%;  /* Muted text */
+
+    --accent: 212 14% 82%;  /* Cool Gray Light */
+    --accent-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    --popover: 0 0% 100%;  /* White */
+    --popover-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    --border: 212 14% 82%;  /* #C9D1DA - Cool Gray Light */
+    --input: 212 14% 82%;  /* Cool Gray Light */
+
+    --card: 0 0% 100%;  /* White surface */
+    --card-foreground: 220 16% 20%;  /* Graphite Gray */
+
+    /* Primary Blue - Brand Color #0A5ED7 */
+    --primary: 214 90% 44%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Bright Blue #0BB3FF */
+    --secondary: 197 100% 52%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Destructive/Warning Orange - #F97316 (warnings/critical CTAs ONLY) */
+    --destructive: 24 95% 53%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 214 90% 44%;  /* Blue ring */
+    --radius: 0.5rem;
+    
+    /* SALIS AUTO Semantic Colors - Light Mode */
+    --success: 214 90% 44%;  /* Blue for success (no green) */
+    --success-foreground: 0 0% 100%;
+    --warning: 24 95% 53%;  /* Orange for warnings */
+    --warning-foreground: 0 0% 100%;
+    --info: 197 100% 52%;  /* Bright blue for info */
+    --info-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    /* SALIS AUTO Brand Theme - Dark Mode (Logo-Only Palette) */
+    --background: 220 20% 5%;  /* #0E1117 - Dark BG */
+    --foreground: 220 20% 93%;  /* #E6EAF0 - Text Primary Dark */
+
+    --muted: 220 15% 13%;  /* #151A23 - Card Surface Dark */
+    --muted-foreground: 217 14% 65%;  /* #9BA4B0 - Text Muted Dark */
+
+    --accent: 220 15% 13%;  /* Card Surface Dark */
+    --accent-foreground: 220 20% 93%;  /* Text Primary Dark */
+
+    --popover: 220 15% 13%;  /* #151A23 */
+    --popover-foreground: 220 20% 93%;
+
+    --border: 220 12% 18%;  /* #232A36 - Border Dark */
+    --input: 220 12% 18%;
+
+    --card: 220 15% 13%;  /* #151A23 - Card Surface Dark */
+    --card-foreground: 220 20% 93%;
+
+    /* Primary Blue - Bright Blue for dark mode */
+    --primary: 197 100% 52%;  /* #0BB3FF */
+    --primary-foreground: 220 20% 5%;
+
+    /* Secondary - Deep Blue */
+    --secondary: 214 90% 44%;  /* #0A5ED7 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Destructive/Warning Orange (warnings/critical CTAs ONLY) */
+    --destructive: 24 95% 53%;  /* #F97316 */
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 197 100% 52%;
+    --radius: 0.5rem;
+    
+    /* SALIS AUTO Semantic Colors - Dark Mode */
+    --success: 197 100% 52%;  /* Bright blue for success (no green) */
+    --success-foreground: 220 20% 5%;
+    --warning: 24 95% 53%;  /* Orange for warnings */
+    --warning-foreground: 0 0% 100%;
+    --info: 214 90% 44%;  /* Deep blue for info */
+    --info-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'SF Pro', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* SALIS AUTO Typography Hierarchy - Strict Scale */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', 'SF Pro', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  
+  /* H1: 28-32px, bold, tight tracking */
+  h1 {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+  
+  /* H2: 20-24px, medium */
+  h2 {
+    font-size: 1.375rem; /* 22px */
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  
+  /* H3: 16-18px, medium */
+  h3 {
+    font-size: 1.0625rem; /* 17px */
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  
+  /* Body: 14-15px, regular */
+  p, span, div {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+  
+  /* Label: 11-12px, uppercase, muted */
+  label {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+  
+  /* Monospace for metrics */
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Inter Mono', 'SF Mono', monospace;
+  }
+}
+
+@layer components {
+  /* SALIS AUTO Gradient Text Utility - Brand Blue */
+  .text-gradient-salis {
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* SALIS AUTO Primary Button - Gradient Blue */
+  .btn-primary {
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    color: #FFFFFF;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #0952C0 0%, #0AA3EE 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10, 94, 215, 0.3);
+  }
+  
+  /* SALIS AUTO Secondary Button - Outline Blue */
+  .btn-secondary {
+    background-color: transparent;
+    color: #0A5ED7;
+    border: 1.5px solid #0A5ED7;
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(10, 94, 215, 0.1);
+  }
+  
+  /* SALIS AUTO Danger/Critical Button - Orange */
+  .btn-danger {
+    background-color: #F97316;
+    color: #FFFFFF;
+  }
+  
+  .btn-danger:hover {
+    background-color: #EA580C;
+  }
+  
+  /* Brand Card Styles */
+  .brand-card {
+    @apply rounded-xl border transition-all duration-200;
+    background-color: var(--salis-surface-light);
+    border-color: var(--salis-border-light);
+  }
+  
+  .dark .brand-card {
+    background-color: var(--salis-surface-dark);
+    border-color: var(--salis-border-dark);
+  }
+  
+  .brand-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(10, 94, 215, 0.1);
+  }
+  
+  /* Status pills: use the <StatusBadge> component instead — it's driven by
+   * the --success/--warning/--info/--destructive semantic tokens and adapts
+   * to dark mode without per-class overrides. The legacy `.status-pill-*`
+   * classes (hardcoded brand hex) were removed. */
+
+  /* Enhanced Typography Utilities */
+  .text-display-lg {
+    font-family: var(--display-large-semibold-font-family);
+    font-size: var(--display-large-semibold-font-size);
+    font-weight: var(--display-large-semibold-font-weight);
+    letter-spacing: var(--display-large-semibold-letter-spacing);
+    line-height: var(--display-large-semibold-line-height);
+  }
+  
+  .text-display-md {
+    font-family: var(--display-medium-semibold-font-family);
+    font-size: var(--display-medium-semibold-font-size);
+    font-weight: var(--display-medium-semibold-font-weight);
+    letter-spacing: var(--display-medium-semibold-letter-spacing);
+    line-height: var(--display-medium-semibold-line-height);
+  }
+  
+  .text-display-sm {
+    font-family: var(--display-small-semibold-font-family);
+    font-size: var(--display-small-semibold-font-size);
+    font-weight: var(--display-small-semibold-font-weight);
+    letter-spacing: var(--display-small-semibold-letter-spacing);
+    line-height: var(--display-small-semibold-line-height);
+  }
+  
+  .text-headline {
+    font-family: var(--headline-semibold-font-family);
+    font-size: var(--headline-semibold-font-size);
+    font-weight: var(--headline-semibold-font-weight);
+    letter-spacing: var(--headline-semibold-letter-spacing);
+    line-height: var(--headline-semibold-line-height);
+  }
+  
+  /* Enhanced Card Styles */
+  .card-elevated {
+    box-shadow: var(--shadow-black-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-elevated:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 8px 16px -4px rgba(1, 1, 1, 0.1), 0px 16px 24px -6px rgba(1, 1, 1, 0.15);
+  }
+  
+  /* Stat Card Styles */
+  .stat-card {
+    @apply rounded-xl p-8 border-2 transition-all duration-300;
+  }
+  
+  .stat-card-number {
+    @apply font-bold text-5xl tracking-tight;
+    font-family: 'JetBrains Mono', 'Inter', monospace;
+  }
+  
+  .stat-card-label {
+    @apply font-medium text-sm uppercase tracking-wider;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .stat-card-subtitle {
+    @apply font-normal text-xs;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* Improved Spacing Utilities */
+  .section-spacing {
+    @apply space-y-8;
+  }
+  
+  .content-spacing {
+    @apply space-y-6;
+  }
+  
+  .item-spacing {
+    @apply space-y-4;
+  }
+  
+  /* Interactive States - Hover, Focus, Active */
+  .interactive-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .interactive-hover:hover {
+    @apply bg-accent/50 cursor-pointer;
+  }
+  
+  .interactive-card {
+    @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer;
+  }
+  
+  /* Touch-Friendly Sizing (WCAG 2.1 AA - minimum 44x44px) */
+  .btn-touch {
+    @apply min-h-[44px] min-w-[44px] px-4 py-3;
+  }
+  
+  .input-touch {
+    @apply min-h-[44px] px-4 py-3 text-base;
+  }
+  
+  /* Accessibility - Focus States */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+  
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus-visible-ring;
+  }
+  
+  /* High Contrast Text for Accessibility (WCAG AAA) */
+  .text-high-contrast {
+    @apply text-foreground dark:text-foreground;
+    font-weight: 500;
+  }
+  
+  /* Responsive Table Utilities */
+  .table-responsive {
+    @apply w-full overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
+  }
+  
+  .table-responsive table {
+    @apply min-w-full;
+  }
+  
+  .table-sticky-header thead {
+    @apply sticky top-0 bg-background z-10 shadow-sm;
+  }
+  
+  /* Empty State Utilities */
+  .empty-state-container {
+    @apply flex flex-col items-center justify-center py-16 px-4 text-center;
+  }
+  
+  .empty-state-icon {
+    @apply w-24 h-24 mb-6 text-muted-foreground/40;
+  }
+  
+  .empty-state-title {
+    @apply text-xl font-semibold text-foreground mb-2;
+  }
+  
+  .empty-state-description {
+    @apply text-sm text-muted-foreground mb-6 max-w-md;
+  }
+  
+  /* Loading States - Linear Progress Only (No Spinners) */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  .linear-loader {
+    @apply h-1 w-full bg-muted overflow-hidden rounded-full;
+  }
+  
+  .linear-loader::after {
+    content: '';
+    display: block;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(135deg, #0A5ED7 0%, #0BB3FF 100%);
+    animation: linear-progress 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes linear-progress {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(350%); }
+  }
+  
+  /* Page Transition Animations */
+  .page-enter {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  
+  .page-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .page-exit {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .page-exit-active {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  /* Hover Effects - Lift + Blue Border Glow */
+  .hover-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px rgba(11, 179, 255, 0.3), 0 8px 16px rgba(10, 94, 215, 0.15);
+  }
+  
+  /* Chart Animation - Left to Right */
+  .chart-animate {
+    animation: chart-reveal 0.8s ease-out forwards;
+  }
+  
+  @keyframes chart-reveal {
+    0% {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0;
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
+  }
+  
+  /* Fade In Animation */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Slide Up Animation */
+  .slide-up {
+    animation: slideUp 0.3s ease-out forwards;
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Mobile-First Responsive Breakpoints */
+  @media (max-width: 768px) {
+    .mobile-stack {
+      @apply flex-col space-y-2;
+    }
+    
+    .mobile-full-width {
+      @apply w-full;
+    }
+    
+    .mobile-hide {
+      @apply hidden;
+    }
+  }
+  
+  /* Smooth Scrolling for Better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom Scrollbar for Dark Theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}

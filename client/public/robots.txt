@@ -1,0 +1,102 @@
+# SALIS AUTO - Robots.txt
+# Website: salisauto.replit.app
+# AI-Friendly Configuration - Full Bot Access
+
+# Allow all standard search engine crawlers
+User-agent: *
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Allow: /sitemap.xml
+Disallow: /api/login
+Disallow: /api/logout
+Disallow: /api/register
+Disallow: /api/user
+Disallow: /api/hr/
+Disallow: /api/admin/
+Crawl-delay: 1
+
+# OpenAI GPTBot - Full Access for ChatGPT
+User-agent: GPTBot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Allow: /sitemap.xml
+Disallow: /api/login
+Disallow: /api/logout
+Crawl-delay: 1
+
+# ChatGPT User Agent
+User-agent: ChatGPT-User
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
+
+# Google Gemini / Bard
+User-agent: Google-Extended
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
+
+# Anthropic Claude
+User-agent: anthropic-ai
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Allow: /openapi.json
+Crawl-delay: 1
+
+# Common Crawl (used by many AI models)
+User-agent: CCBot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Allow: /.well-known/
+Crawl-delay: 2
+
+# Microsoft Bing
+User-agent: Bingbot
+Allow: /
+Allow: /api/public/
+Allow: /public/
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://salisauto.replit.app/sitemap.xml
+
+# LLMs.txt location (AI-specific metadata)
+# See: https://llmstxt.org/
+# Available at: /.well-known/llms.txt
+
+# Public API Documentation
+# OpenAPI Spec: /openapi.json
+# AI Plugin: /.well-known/ai-plugin.json
+# Public APIs: /api/public/*

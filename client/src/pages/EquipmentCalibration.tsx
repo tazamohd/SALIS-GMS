@@ -1,0 +1,145 @@
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Wrench, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { DashboardPage } from "@/components/layouts";
+
+export default function EquipmentCalibration() {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+
+  const { data: records = [] } = useQuery<any[]>({
+    queryKey: ['/api/calibration/due'],
+  });
+
+  const addCalibrationMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('POST', '/api/calibration', {
+        equipmentId: 'sample-equipment-id',
+        equipmentName: 'Sample Equipment',
+        calibrationDate: new Date().toISOString(),
+        nextDueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        certificationNumber: `CAL-${Date.now()}`,
+        calibratedBy: 'Technician',
+        notes: 'Standard calibration performed',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: t('calibration.calibrationAdded', 'Calibration Added'),
+        description: t('calibration.calibrationAddedSuccess', 'Calibration record has been added successfully'),
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/calibration/due'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('calibration.failedToAdd', 'Failed to Add'),
+        description: error.message || t('calibration.failedToAddCalibration', 'Failed to add calibration record'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const stats = {
+    totalEquipment: records.length,
+    valid: records.filter((r: any) => r.status === 'valid').length,
+    due: records.filter((r: any) => r.status === 'due').length,
+    overdue: records.filter((r: any) => r.status === 'overdue').length,
+  };
+
+  const getStatusBadge = (status: string) => {
+    const config = {
+      valid: { variant: "default" as const, icon: CheckCircle, color: "text-green-600" },
+      due: { variant: "secondary" as const, icon: Clock, color: "text-[#F97316]" },
+      overdue: { variant: "destructive" as const, icon: AlertCircle, color: "text-red-600" },
+    };
+    const { variant, icon: Icon, color } = config[status as keyof typeof config] || config.valid;
+    return (
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 ${color}`} />
+        <Badge variant={variant}>{status}</Badge>
+      </div>
+    );
+  };
+
+  const metrics = [
+    {
+      label: t('calibration.totalEquipment', 'Total Equipment'),
+      value: stats.totalEquipment,
+      icon: Wrench,
+      color: "text-[#0A5ED7]",
+    },
+    {
+      label: t('calibration.valid', 'Valid'),
+      value: stats.valid,
+      icon: CheckCircle,
+      color: "text-green-600",
+    },
+    {
+      label: t('calibration.dueSoon', 'Due Soon'),
+      value: stats.due,
+      icon: Clock,
+      color: "text-[#F97316]",
+    },
+    {
+      label: t('calibration.overdue', 'Overdue'),
+      value: stats.overdue,
+      icon: AlertCircle,
+      color: "text-red-600",
+    },
+  ];
+
+  return (
+    <DashboardPage
+      title={t('calibration.equipmentCalibration', 'Equipment Calibration')}
+      description={t('calibration.description', 'Track tool calibration and certifications')}
+      icon={Wrench}
+      metrics={metrics}
+    >
+      <Button 
+        onClick={() => addCalibrationMutation.mutate()}
+        disabled={addCalibrationMutation.isPending}
+        data-testid="button-add-calibration"
+        className="absolute top-8 right-8 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
+      >
+        {addCalibrationMutation.isPending ? t('calibration.adding', 'Adding...') : t('calibration.addCalibration', 'Add Calibration')}
+      </Button>
+
+      <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+        <CardHeader>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t('calibration.calibrationRecords', 'Calibration Records')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {records.length === 0 ? (
+            <div className="text-center py-8 text-[#64748B]">
+              {t('calibration.noRecordsAvailable', 'No calibration records available. Click "Add Calibration" to create a new record.')}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {records.map((record: any) => (
+                <div key={record.id} className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]" data-testid={`calibration-${record.id}`}>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{record.toolName || `#${record.toolNumber}`}</h3>
+                    <p className="text-sm text-[#64748B]">
+                      {record.calibrationType || t('calibration.standardCalibration', 'Standard Calibration')}
+                    </p>
+                  </div>
+                  <div className="text-right mr-4">
+                    <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">
+                      {t('calibration.due', 'Due')}: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : t('common.notAvailable', 'N/A')}
+                    </p>
+                  </div>
+                  {getStatusBadge(record.status)}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </DashboardPage>
+  );
+}
