@@ -10939,3 +10939,328 @@ export const insertDeliveryTimelineEventSchema = createInsertSchema(deliveryTime
 export type LiveDeliveryStatus = typeof liveDeliveryStatuses.$inferSelect;
 export type InsertLiveDeliveryStatus = typeof liveDeliveryStatuses.$inferInsert;
 export const insertLiveDeliveryStatusSchema = createInsertSchema(liveDeliveryStatuses).omit({ id: true, createdAt: true, updatedAt: true });
+
+// ============================================================================
+// Schema-drift catch-up tables
+//
+// These 17 tables were created by migrations 0003-0008 but were never declared
+// here, so every route and storage method that touched them failed to compile.
+// Column definitions below mirror the migration DDL exactly:
+//   backup_history, currency_transactions, document_library_items,
+//   fleet_accounts, fleet_account_vehicles, fleet_maintenance_entries,
+//   hr_leave_request_entries, kiosk_tickets, mobile_devices, qc_inspections,
+//   qc_defects, scheduling_optimization_runs, subscriptions,
+//   supplier_parts_availability  -> 0003/0004
+//   vat_config, gosi_config                                    -> 0007
+//   gate_passes                                                -> 0008
+// ============================================================================
+
+export const backupHistory = pgTable("backup_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  backupRef: varchar("backup_ref", { length: 100 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  size: integer("size").notNull(),
+  totalRecords: integer("total_records").default(0).notNull(),
+  tableCounts: jsonb("table_counts").default({}).notNull(),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const currencyTransactions = pgTable("currency_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  txDate: timestamp("tx_date").defaultNow().notNull(),
+  description: text("description").notNull(),
+  originalAmount: decimal("original_amount", { precision: 18, scale: 4 }).notNull(),
+  originalCurrency: varchar("original_currency", { length: 10 }).notNull(),
+  rateUsed: decimal("rate_used", { precision: 18, scale: 6 }).notNull(),
+  sarEquivalent: decimal("sar_equivalent", { precision: 18, scale: 4 }).notNull(),
+  type: varchar("type", { length: 30 }).notNull(),
+  reference: varchar("reference", { length: 100 }),
+  customerName: varchar("customer_name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const documentLibraryItems = pgTable("document_library_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 500 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  size: integer("size").default(0).notNull(),
+  uploadedBy: varchar("uploaded_by", { length: 255 }),
+  tags: jsonb("tags").default([]).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const fleetAccounts = pgTable("fleet_accounts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  contactPerson: varchar("contact_person", { length: 255 }),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  contractStatus: varchar("contract_status", { length: 30 }).default("pending").notNull(),
+  contractStart: date("contract_start"),
+  contractEnd: date("contract_end"),
+  monthlySpend: decimal("monthly_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  discountPercentage: integer("discount_percentage").default(0).notNull(),
+  paymentTerms: varchar("payment_terms", { length: 50 }).default("Net 30"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const fleetAccountVehicles = pgTable("fleet_account_vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  fleetAccountId: uuid("fleet_account_id").notNull(),
+  plateNumber: varchar("plate_number", { length: 50 }).notNull(),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  year: integer("year").notNull(),
+  vin: varchar("vin", { length: 50 }),
+  status: varchar("status", { length: 30 }).default("active").notNull(),
+  mileage: integer("mileage").default(0).notNull(),
+  lastServiceDate: date("last_service_date"),
+  lastServiceType: varchar("last_service_type", { length: 100 }),
+  nextServiceDue: date("next_service_due"),
+  nextServiceType: varchar("next_service_type", { length: 100 }),
+  avgMonthlyCost: decimal("avg_monthly_cost", { precision: 12, scale: 2 }).default("0"),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const fleetMaintenanceEntries = pgTable("fleet_maintenance_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  vehicleId: uuid("vehicle_id").notNull(),
+  fleetAccountId: uuid("fleet_account_id").notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  scheduledDate: date("scheduled_date").notNull(),
+  status: varchar("status", { length: 30 }).default("scheduled").notNull(),
+  estimatedCost: decimal("estimated_cost", { precision: 12, scale: 2 }).default("0").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const hrLeaveRequestEntries = pgTable("hr_leave_request_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id", { length: 100 }).notNull(),
+  employeeName: varchar("employee_name", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  days: integer("days").notNull(),
+  reason: text("reason"),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  approvedBy: varchar("approved_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const kioskTickets = pgTable("kiosk_tickets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketNumber: varchar("ticket_number", { length: 20 }).notNull(),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  vehiclePlate: varchar("vehicle_plate", { length: 50 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 255 }),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  status: varchar("status", { length: 20 }).default("waiting").notNull(),
+  type: varchar("type", { length: 20 }).default("walk-in").notNull(),
+  appointmentId: varchar("appointment_id", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const mobileDevices = pgTable("mobile_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull(),
+  deviceName: varchar("device_name", { length: 200 }).notNull(),
+  deviceType: varchar("device_type", { length: 30 }).notNull(),
+  assignedTo: varchar("assigned_to"),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  batteryLevel: integer("battery_level"),
+  lastSync: timestamp("last_sync"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const qcInspections = pgTable("qc_inspections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardRef: varchar("job_card_ref", { length: 100 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 500 }).notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  inspector: varchar("inspector", { length: 255 }),
+  inspectorId: varchar("inspector_id", { length: 100 }),
+  result: varchar("result", { length: 20 }).default("pending").notNull(),
+  notes: text("notes"),
+  checklistId: varchar("checklist_id", { length: 50 }),
+  completedItems: integer("completed_items").default(0).notNull(),
+  totalItems: integer("total_items").default(0).notNull(),
+  inspectionTimeMinutes: integer("inspection_time_minutes").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const qcDefects = pgTable("qc_defects", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  inspectionId: uuid("inspection_id"),
+  jobCardRef: varchar("job_card_ref", { length: 100 }),
+  description: text("description").notNull(),
+  severity: varchar("severity", { length: 20 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  status: varchar("status", { length: 30 }).default("open").notNull(),
+  resolutionNotes: text("resolution_notes"),
+  reportedBy: varchar("reported_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
+export const schedulingOptimizationRuns = pgTable("scheduling_optimization_runs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  runAt: timestamp("run_at").defaultNow().notNull(),
+  appointmentsOptimized: integer("appointments_optimized").default(0).notNull(),
+  efficiencyGain: varchar("efficiency_gain", { length: 20 }),
+  technicianUtilization: jsonb("technician_utilization").default({}).notNull(),
+  suggestions: jsonb("suggestions").default([]).notNull(),
+  assignments: jsonb("assignments").default([]).notNull(),
+  report: jsonb("report").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().unique(),
+  plan: varchar("plan", { length: 20 }).default("STARTER").notNull(),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAt: timestamp("cancel_at"),
+  canceledAt: timestamp("canceled_at"),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 120 }).unique(),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 120 }),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// supplier_parts_availability was already declared earlier in this file, so it
+// is deliberately not repeated here despite also originating in migration 0003.
+
+export const vatConfig = pgTable("vat_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: varchar("country_code", { length: 2 }).default("SA").notNull(),
+  vatRate: doublePrecision("vat_rate").default(0.15).notNull(),
+  vatRegistrationNumber: varchar("vat_registration_number", { length: 50 }),
+  companyNameEn: varchar("company_name_en", { length: 255 }),
+  companyNameAr: varchar("company_name_ar", { length: 255 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  effectiveFrom: timestamp("effective_from").defaultNow().notNull(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gosiConfig = pgTable("gosi_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  saudiEmployeeRate: doublePrecision("saudi_employee_rate").default(0.0975).notNull(),
+  saudiEmployerRate: doublePrecision("saudi_employer_rate").default(0.1175).notNull(),
+  nonSaudiEmployeeRate: doublePrecision("non_saudi_employee_rate").default(0).notNull(),
+  nonSaudiEmployerRate: doublePrecision("non_saudi_employer_rate").default(0.02).notNull(),
+  maxContributionSalary: decimal("max_contribution_salary", { precision: 12, scale: 2 })
+    .default("45000")
+    .notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  effectiveFrom: timestamp("effective_from").defaultNow().notNull(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gatePasses = pgTable("gate_passes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id")
+    .references(() => invoices.id, { onDelete: "cascade" })
+    .notNull(),
+  garageId: uuid("garage_id").references(() => garages.id),
+  customerId: varchar("customer_id"),
+  vehicleId: uuid("vehicle_id"),
+  passCode: varchar("pass_code", { length: 20 }).notNull().unique(),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  issuedBy: varchar("issued_by"),
+  issuedAt: timestamp("issued_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"),
+  usedAt: timestamp("used_at"),
+  usedBy: varchar("used_by"),
+  notes: text("notes"),
+});
+
+// Types + insert schemas for the drift catch-up tables above.
+export type BackupHistory = typeof backupHistory.$inferSelect;
+export type InsertBackupHistory = typeof backupHistory.$inferInsert;
+export const insertBackupHistorySchema = createInsertSchema(backupHistory).omit({ id: true, createdAt: true });
+
+export type CurrencyTransaction = typeof currencyTransactions.$inferSelect;
+export type InsertCurrencyTransaction = typeof currencyTransactions.$inferInsert;
+export const insertCurrencyTransactionSchema = createInsertSchema(currencyTransactions).omit({ id: true, createdAt: true });
+
+export type DocumentLibraryItem = typeof documentLibraryItems.$inferSelect;
+export type InsertDocumentLibraryItem = typeof documentLibraryItems.$inferInsert;
+export const insertDocumentLibraryItemSchema = createInsertSchema(documentLibraryItems).omit({ id: true, createdAt: true });
+
+export type FleetAccount = typeof fleetAccounts.$inferSelect;
+export type InsertFleetAccount = typeof fleetAccounts.$inferInsert;
+export const insertFleetAccountSchema = createInsertSchema(fleetAccounts).omit({ id: true, createdAt: true });
+
+export type FleetAccountVehicle = typeof fleetAccountVehicles.$inferSelect;
+export type InsertFleetAccountVehicle = typeof fleetAccountVehicles.$inferInsert;
+export const insertFleetAccountVehicleSchema = createInsertSchema(fleetAccountVehicles).omit({ id: true, createdAt: true });
+
+export type FleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferSelect;
+export type InsertFleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferInsert;
+export const insertFleetMaintenanceEntrySchema = createInsertSchema(fleetMaintenanceEntries).omit({ id: true, createdAt: true });
+
+export type HrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferSelect;
+export type InsertHrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferInsert;
+export const insertHrLeaveRequestEntrySchema = createInsertSchema(hrLeaveRequestEntries).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type KioskTicket = typeof kioskTickets.$inferSelect;
+export type InsertKioskTicket = typeof kioskTickets.$inferInsert;
+export const insertKioskTicketSchema = createInsertSchema(kioskTickets).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type MobileDevice = typeof mobileDevices.$inferSelect;
+export type InsertMobileDevice = typeof mobileDevices.$inferInsert;
+export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type QcInspection = typeof qcInspections.$inferSelect;
+export type InsertQcInspection = typeof qcInspections.$inferInsert;
+export const insertQcInspectionSchema = createInsertSchema(qcInspections).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type QcDefect = typeof qcDefects.$inferSelect;
+export type InsertQcDefect = typeof qcDefects.$inferInsert;
+export const insertQcDefectSchema = createInsertSchema(qcDefects).omit({ id: true, createdAt: true });
+
+export type SchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferSelect;
+export type InsertSchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferInsert;
+export const insertSchedulingOptimizationRunSchema = createInsertSchema(schedulingOptimizationRuns).omit({ id: true, createdAt: true });
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type VatConfig = typeof vatConfig.$inferSelect;
+export type InsertVatConfig = typeof vatConfig.$inferInsert;
+export const insertVatConfigSchema = createInsertSchema(vatConfig).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GosiConfig = typeof gosiConfig.$inferSelect;
+export type InsertGosiConfig = typeof gosiConfig.$inferInsert;
+export const insertGosiConfigSchema = createInsertSchema(gosiConfig).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GatePass = typeof gatePasses.$inferSelect;
+export type InsertGatePass = typeof gatePasses.$inferInsert;
+export const insertGatePassSchema = createInsertSchema(gatePasses).omit({ id: true, issuedAt: true });
