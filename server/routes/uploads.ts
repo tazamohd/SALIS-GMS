@@ -225,9 +225,9 @@ router.post(
         });
       }
 
-      const user = (req as Request & {
-        user?: { id?: string; fullName?: string; email?: string };
-      }).user ?? {};
+      // req.user is typed globally in server/auth.ts. The previous local cast
+      // fell back to `{}`, which widened the union and hid id/fullName/email.
+      const user = req.user;
       const garageId = resolveGarageScope(req);
       if (!garageId) {
         removeQuietly(file.path);
@@ -253,7 +253,7 @@ router.post(
           fileSize: file.size,
           mimeType: file.mimetype,
           tags,
-          uploadedBy: user.id ?? null,
+          uploadedBy: user?.id ?? null,
           status: "active",
         })
         .returning();
@@ -267,7 +267,7 @@ router.post(
           type: ext,
           category: parsed.data.category,
           size: file.size,
-          uploadedBy: user.fullName || user.email || "System User",
+          uploadedBy: user?.fullName || user?.email || "System User",
           tags: [...tags, `file:${doc.id}`],
           description: parsed.data.description,
         });
