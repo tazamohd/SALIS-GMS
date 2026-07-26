@@ -3319,7 +3319,9 @@ export const vehicleLocationHistory = pgTable("vehicle_location_history", {
 }, (table) => ({
   vehicleTimestampIdx: index("vehicle_location_history_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("vehicle_location_history_timestamp_idx").on(table.timestamp.desc()),
-  vehicleLatestIdx: uniqueIndex("vehicle_location_history_vehicle_latest_idx").on(table.vehicleId, table.timestamp.desc()).where(sql`timestamp >= NOW() - INTERVAL '1 hour'`),
+  // A "latest location" partial index keyed on NOW() cannot be created: Postgres
+  // requires index predicates to be IMMUTABLE. vehicleTimestampIdx above already
+  // covers the (vehicle, most-recent-first) lookup this was meant to serve.
 }));
 
 export const geofenceZones = pgTable("geofence_zones", {
@@ -3403,7 +3405,10 @@ export const geofenceEvents = pgTable("geofence_events", {
   geofenceTimestampIdx: index("geofence_events_geofence_timestamp_idx").on(table.geofenceZoneId, table.timestamp.desc()),
   vehicleTimestampIdx: index("geofence_events_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("geofence_events_timestamp_idx").on(table.timestamp.desc()),
-  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false AND timestamp >= NOW() - INTERVAL '1 hour'`),
+  // The NOW() half of this predicate is dropped: index predicates must be
+  // IMMUTABLE. Filtering to unsent events is the part that makes the index
+  // selective; callers still bound the time range in the query itself.
+  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false`),
 }));
 
 export const fleetRoutes = pgTable("fleet_routes", {
@@ -9800,7 +9805,7 @@ export const hrDepartments = pgTable("hr_departments", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 50 }),
@@ -9818,7 +9823,7 @@ export const hrPositions = pgTable("hr_positions", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   title: varchar("title", { length: 255 }).notNull(),
   titleAr: varchar("title_ar", { length: 255 }),
@@ -9839,7 +9844,7 @@ export const hrEmployeeProfiles = pgTable("hr_employee_profiles", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   employeeNumber: varchar("employee_number", { length: 50 }),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   positionId: uuid("position_id").references(() => hrPositions.id),
@@ -9924,7 +9929,7 @@ export const hrLeaveTypes = pgTable("hr_leave_types", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 20 }),
@@ -9986,7 +9991,7 @@ export const hrJobPostings = pgTable("hr_job_postings", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   positionId: uuid("position_id").references(() => hrPositions.id),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -10064,7 +10069,7 @@ export const hrBenefitPlans = pgTable("hr_benefit_plans", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   type: varchar("type", { length: 100 }).notNull(), // "health_insurance", "life_insurance", "dental", "vision", "retirement", "housing", "transportation", "education", "other"
@@ -10153,7 +10158,7 @@ export const hrAnnouncements = pgTable("hr_announcements", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   type: varchar("type", { length: 50 }).default("general"), // "general", "policy", "event", "holiday", "urgent"
