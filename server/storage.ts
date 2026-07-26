@@ -761,6 +761,18 @@ import {
   geofenceEvents,
   fleetRoutes,
   routeCheckpoints,
+  kioskTickets,
+  type KioskTicket,
+  type InsertKioskTicket,
+  backupHistory,
+  type BackupHistory,
+  type InsertBackupHistory,
+  currencyTransactions,
+  type CurrencyTransaction,
+  type InsertCurrencyTransaction,
+  documentLibraryItems,
+  type DocumentLibraryItem,
+  type InsertDocumentLibraryItem,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
@@ -12362,6 +12374,211 @@ export class DatabaseStorage implements IStorage {
     const query = db.select({ count: sql<number>`count(*)` }).from(estimates);
     const result = where ? await query.where(where) : await query;
     return Number(result[0]?.count ?? 0);
+  }
+
+  // ==========================================================================
+  // Kiosk queue
+  // ==========================================================================
+
+  async listKioskTickets(filter?: { statuses?: string[] }): Promise<KioskTicket[]> {
+    const base = db.select().from(kioskTickets);
+    const rows = filter?.statuses?.length
+      ? await base.where(inArray(kioskTickets.status, filter.statuses))
+      : await base;
+    // Queue order is arrival order; callers derive position from this.
+    return rows.sort(
+      (a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0),
+    );
+  }
+
+  async getKioskTicket(id: string): Promise<KioskTicket | undefined> {
+    // Callers pass a user-supplied path segment that may not be a uuid, and a
+    // malformed uuid makes Postgres raise rather than return no rows.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      return undefined;
+    }
+    const [row] = await db.select().from(kioskTickets).where(eq(kioskTickets.id, id));
+    return row;
+  }
+
+  async getKioskTicketByNumber(ticketNumber: string): Promise<KioskTicket | undefined> {
+    const [row] = await db
+      .select()
+      .from(kioskTickets)
+      .where(eq(kioskTickets.ticketNumber, ticketNumber));
+    return row;
+  }
+
+  async getNextKioskTicketNumber(): Promise<string> {
+    // Tickets reset daily: A-001, A-002, ... scoped to today's rows.
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const [row] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(kioskTickets)
+      .where(gte(kioskTickets.createdAt, startOfDay));
+    const next = Number(row?.count ?? 0) + 1;
+    return `A-${String(next).padStart(3, "0")}`;
+  }
+
+  /** Guards against issuing a second ticket for an appointment already checked in. */
+  async findKioskTicketByAppointment(
+    appointmentId: string,
+  ): Promise<KioskTicket | undefined> {
+    const [row] = await db
+      .select()
+      .from(kioskTickets)
+      .where(
+        and(
+          eq(kioskTickets.appointmentId, appointmentId),
+          inArray(kioskTickets.status, ["waiting", "in-progress"]),
+        ),
+      );
+    return row;
+  }
+
+  /** Same guard for walk-ins, which are identified by phone rather than appointment. */
+  async findActiveKioskTicketByPhone(phone: string): Promise<KioskTicket | undefined> {
+    const [row] = await db
+      .select()
+      .from(kioskTickets)
+      .where(
+        and(
+          eq(kioskTickets.phone, phone),
+          inArray(kioskTickets.status, ["waiting", "in-progress"]),
+        ),
+      );
+    return row;
+  }
+
+  async createKioskTicket(data: InsertKioskTicket): Promise<KioskTicket> {
+    const [row] = await db.insert(kioskTickets).values(data).returning();
+    return row;
+  }
+
+  async updateKioskTicket(
+    id: string,
+    data: Partial<InsertKioskTicket>,
+  ): Promise<KioskTicket | undefined> {
+    const [row] = await db
+      .update(kioskTickets)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(kioskTickets.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Backup history
+  // ==========================================================================
+
+  async listBackupHistory(): Promise<BackupHistory[]> {
+    return await db.select().from(backupHistory).orderBy(desc(backupHistory.createdAt));
+  }
+
+  async getLatestBackup(): Promise<BackupHistory | undefined> {
+    const [row] = await db
+      .select()
+      .from(backupHistory)
+      .orderBy(desc(backupHistory.createdAt))
+      .limit(1);
+    return row;
+  }
+
+  async getBackupStats(): Promise<{ count: number; totalSize: number }> {
+    const [row] = await db
+      .select({
+        count: sql<number>`count(*)`,
+        totalSize: sql<number>`coalesce(sum(${backupHistory.size}), 0)`,
+      })
+      .from(backupHistory);
+    return { count: Number(row?.count ?? 0), totalSize: Number(row?.totalSize ?? 0) };
+  }
+
+  async createBackupHistory(data: InsertBackupHistory): Promise<BackupHistory> {
+    const [row] = await db.insert(backupHistory).values(data).returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Currency transactions
+  // ==========================================================================
+
+  async listCurrencyTransactions(filter?: {
+    type?: string;
+    currency?: string;
+    limit?: number;
+  }): Promise<CurrencyTransaction[]> {
+    const conditions: any[] = [];
+    if (filter?.type) conditions.push(eq(currencyTransactions.type, filter.type));
+    if (filter?.currency)
+      conditions.push(eq(currencyTransactions.originalCurrency, filter.currency));
+
+    const query = db
+      .select()
+      .from(currencyTransactions)
+      .orderBy(desc(currencyTransactions.txDate))
+      .limit(filter?.limit ?? 50);
+
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createCurrencyTransaction(
+    data: InsertCurrencyTransaction,
+  ): Promise<CurrencyTransaction> {
+    const [row] = await db.insert(currencyTransactions).values(data).returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Document library
+  // ==========================================================================
+
+  async listDocumentLibraryItems(filter?: {
+    category?: string;
+    tag?: string;
+    search?: string;
+  }): Promise<DocumentLibraryItem[]> {
+    const conditions: any[] = [];
+    if (filter?.category) conditions.push(eq(documentLibraryItems.category, filter.category));
+    if (filter?.search) conditions.push(ilike(documentLibraryItems.name, `%${filter.search}%`));
+    // tags is jsonb; containment keeps the match inside Postgres.
+    if (filter?.tag)
+      conditions.push(sql`${documentLibraryItems.tags} @> ${JSON.stringify([filter.tag])}::jsonb`);
+
+    const query = db
+      .select()
+      .from(documentLibraryItems)
+      .orderBy(desc(documentLibraryItems.createdAt));
+
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async getDocumentLibraryItem(id: string): Promise<DocumentLibraryItem | undefined> {
+    const [row] = await db
+      .select()
+      .from(documentLibraryItems)
+      .where(eq(documentLibraryItems.id, id));
+    return row;
+  }
+
+  async createDocumentLibraryItem(
+    data: InsertDocumentLibraryItem,
+  ): Promise<DocumentLibraryItem> {
+    const [row] = await db.insert(documentLibraryItems).values(data).returning();
+    return row;
+  }
+
+  async deleteDocumentLibraryItem(id: string): Promise<boolean> {
+    const rows = await db
+      .delete(documentLibraryItems)
+      .where(eq(documentLibraryItems.id, id))
+      .returning();
+    return rows.length > 0;
   }
 }
 
