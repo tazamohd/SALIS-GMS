@@ -12998,6 +12998,395 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return row;
   }
+
+  // ==========================================================================
+  // Compliance (all garage-scoped)
+  // ==========================================================================
+
+  async getCompliancePolicies(garageId: string, status?: string): Promise<any[]> {
+    const conditions: any[] = [eq(compliancePolicies.garageId, garageId)];
+    if (status) conditions.push(eq(compliancePolicies.status, status));
+    return await db
+      .select()
+      .from(compliancePolicies)
+      .where(and(...conditions))
+      .orderBy(desc(compliancePolicies.createdAt));
+  }
+
+  async createCompliancePolicy(data: any): Promise<any> {
+    const [row] = await db.insert(compliancePolicies).values(data).returning();
+    return row;
+  }
+
+  async getComplianceAudits(
+    garageId: string,
+    policyId?: string,
+    status?: string,
+  ): Promise<any[]> {
+    const conditions: any[] = [eq(complianceAudits.garageId, garageId)];
+    if (policyId) conditions.push(eq(complianceAudits.policyId, policyId));
+    if (status) conditions.push(eq(complianceAudits.status, status));
+    return await db
+      .select()
+      .from(complianceAudits)
+      .where(and(...conditions))
+      .orderBy(desc(complianceAudits.auditDate));
+  }
+
+  async createComplianceAudit(data: any): Promise<any> {
+    const [row] = await db.insert(complianceAudits).values(data).returning();
+    return row;
+  }
+
+  async getComplianceTasks(
+    garageId: string,
+    policyId?: string,
+    status?: string,
+  ): Promise<any[]> {
+    const conditions: any[] = [eq(complianceTasks.garageId, garageId)];
+    if (policyId) conditions.push(eq(complianceTasks.policyId, policyId));
+    if (status) conditions.push(eq(complianceTasks.status, status));
+    return await db
+      .select()
+      .from(complianceTasks)
+      .where(and(...conditions))
+      .orderBy(asc(complianceTasks.dueDate));
+  }
+
+  async createComplianceTask(data: any): Promise<any> {
+    const [row] = await db.insert(complianceTasks).values(data).returning();
+    return row;
+  }
+
+  async completeComplianceTask(id: string): Promise<any | undefined> {
+    const [row] = await db
+      .update(complianceTasks)
+      .set({ status: "completed", completedAt: new Date(), updatedAt: new Date() })
+      .where(eq(complianceTasks.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Expenses (garage-scoped)
+  // ==========================================================================
+
+  async getExpenseCategories(garageId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(expenseCategories)
+      .where(eq(expenseCategories.garageId, garageId))
+      .orderBy(asc(expenseCategories.name));
+  }
+
+  async createExpenseCategory(data: any): Promise<any> {
+    const [row] = await db.insert(expenseCategories).values(data).returning();
+    return row;
+  }
+
+  async getExpenses(
+    garageId: string,
+    status?: string,
+    categoryId?: string,
+  ): Promise<any[]> {
+    const conditions: any[] = [eq(expenses.garageId, garageId)];
+    if (status) conditions.push(eq(expenses.status, status));
+    if (categoryId) conditions.push(eq(expenses.categoryId, categoryId));
+    return await db
+      .select()
+      .from(expenses)
+      .where(and(...conditions))
+      .orderBy(desc(expenses.date));
+  }
+
+  async createExpense(data: any): Promise<any> {
+    const [row] = await db.insert(expenses).values(data).returning();
+    return row;
+  }
+
+  async approveExpense(id: string, approvedBy: string): Promise<any | undefined> {
+    const [row] = await db
+      .update(expenses)
+      .set({ status: "approved", approvedBy, approvedAt: new Date() })
+      .where(eq(expenses.id, id))
+      .returning();
+    return row;
+  }
+
+  async rejectExpense(id: string, approvedBy: string): Promise<any | undefined> {
+    // approvedBy doubles as "actioned by" — the column records who decided,
+    // not that the decision was an approval.
+    const [row] = await db
+      .update(expenses)
+      .set({ status: "rejected", approvedBy, approvedAt: new Date() })
+      .where(eq(expenses.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Payroll
+  // ==========================================================================
+
+  async getPayrollEmployees(garageId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(payrollEmployees)
+      .where(eq(payrollEmployees.garageId, garageId))
+      .orderBy(asc(payrollEmployees.employeeNumber));
+  }
+
+  async createPayrollEmployee(data: any): Promise<any> {
+    const [row] = await db.insert(payrollEmployees).values(data).returning();
+    return row;
+  }
+
+  async updatePayrollEmployee(id: string, data: any): Promise<any | undefined> {
+    const [row] = await db
+      .update(payrollEmployees)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(payrollEmployees.id, id))
+      .returning();
+    return row;
+  }
+
+  async deletePayrollEmployee(id: string): Promise<boolean> {
+    const rows = await db
+      .delete(payrollEmployees)
+      .where(eq(payrollEmployees.id, id))
+      .returning();
+    return rows.length > 0;
+  }
+
+  async getPayPeriods(garageId: string, status?: string): Promise<any[]> {
+    const conditions: any[] = [eq(payPeriods.garageId, garageId)];
+    if (status) conditions.push(eq(payPeriods.status, status));
+    return await db
+      .select()
+      .from(payPeriods)
+      .where(and(...conditions))
+      .orderBy(desc(payPeriods.startDate));
+  }
+
+  async createPayPeriod(data: any): Promise<any> {
+    const [row] = await db.insert(payPeriods).values(data).returning();
+    return row;
+  }
+
+  async getPayrollRuns(payPeriodId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(payrollRuns)
+      .where(eq(payrollRuns.payPeriodId, payPeriodId))
+      .orderBy(desc(payrollRuns.createdAt));
+  }
+
+  async createPayrollRun(data: any): Promise<any> {
+    const [row] = await db.insert(payrollRuns).values(data).returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Knowledge base / training / GMB writes
+  // ==========================================================================
+
+  async createArticleCategory(data: any): Promise<any> {
+    const [row] = await db.insert(articleCategories).values(data).returning();
+    return row;
+  }
+
+  async createKnowledgeArticle(data: any): Promise<any> {
+    const [row] = await db.insert(knowledgeArticles).values(data).returning();
+    return row;
+  }
+
+  async updateKnowledgeArticle(id: string, data: any): Promise<any | undefined> {
+    const [row] = await db
+      .update(knowledgeArticles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(knowledgeArticles.id, id))
+      .returning();
+    return row;
+  }
+
+  async createTrainingModule(data: any): Promise<any> {
+    const [row] = await db.insert(trainingModules).values(data).returning();
+    return row;
+  }
+
+  async createCertification(data: any): Promise<any> {
+    const [row] = await db.insert(certifications).values(data).returning();
+    return row;
+  }
+
+  async createCertificationAttempt(data: any): Promise<any> {
+    const [row] = await db.insert(certificationAttempts).values(data).returning();
+    return row;
+  }
+
+  async createGoogleBusinessProfile(data: any): Promise<any> {
+    const [row] = await db.insert(googleBusinessProfiles).values(data).returning();
+    return row;
+  }
+
+  async createGmbPost(data: any): Promise<any> {
+    const [row] = await db.insert(gmbPosts).values(data).returning();
+    return row;
+  }
+
+  async publishGmbPost(id: string): Promise<any | undefined> {
+    const [row] = await db
+      .update(gmbPosts)
+      .set({ status: "published", publishedAt: new Date(), updatedAt: new Date() })
+      .where(eq(gmbPosts.id, id))
+      .returning();
+    return row;
+  }
+
+  async createGmbReview(data: any): Promise<any> {
+    const [row] = await db.insert(gmbReviews).values(data).returning();
+    return row;
+  }
+
+  async respondToGmbReview(id: string, responseText: string): Promise<any | undefined> {
+    const [row] = await db
+      .update(gmbReviews)
+      .set({ responseText, respondedAt: new Date(), updatedAt: new Date() })
+      .where(eq(gmbReviews.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Telematics
+  // ==========================================================================
+
+  async getTelematicsFeeds(vehicleId?: string, deviceId?: string): Promise<any[]> {
+    const conditions: any[] = [];
+    if (vehicleId) conditions.push(eq(telematicsFeeds.vehicleId, vehicleId));
+    if (deviceId) conditions.push(eq(telematicsFeeds.deviceId, deviceId));
+
+    const query = db.select().from(telematicsFeeds).orderBy(desc(telematicsFeeds.timestamp));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createTelematicsFeed(data: any): Promise<any> {
+    const [row] = await db.insert(telematicsFeeds).values(data).returning();
+    return row;
+  }
+
+  async getTelematicsAlerts(vehicleId?: string, isResolved?: boolean): Promise<any[]> {
+    const conditions: any[] = [];
+    if (vehicleId) conditions.push(eq(telematicsAlerts.vehicleId, vehicleId));
+    if (isResolved !== undefined)
+      conditions.push(eq(telematicsAlerts.isResolved, isResolved));
+
+    const query = db.select().from(telematicsAlerts).orderBy(desc(telematicsAlerts.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createTelematicsAlert(data: any): Promise<any> {
+    const [row] = await db.insert(telematicsAlerts).values(data).returning();
+    return row;
+  }
+
+  async resolveTelematicsAlert(id: string, resolvedBy: string): Promise<any | undefined> {
+    const [row] = await db
+      .update(telematicsAlerts)
+      .set({ isResolved: true, resolvedBy, resolvedAt: new Date() })
+      .where(eq(telematicsAlerts.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Towing and vehicle storage
+  // ==========================================================================
+
+  async getTowingJobs(garageId: string, status?: string): Promise<any[]> {
+    const conditions: any[] = [eq(towingJobs.garageId, garageId)];
+    if (status) conditions.push(eq(towingJobs.status, status));
+    return await db
+      .select()
+      .from(towingJobs)
+      .where(and(...conditions))
+      .orderBy(desc(towingJobs.requestedAt));
+  }
+
+  async createTowingJob(data: any): Promise<any> {
+    const [row] = await db.insert(towingJobs).values(data).returning();
+    return row;
+  }
+
+  async updateTowingJob(id: string, data: any): Promise<any | undefined> {
+    const [row] = await db
+      .update(towingJobs)
+      .set(data)
+      .where(eq(towingJobs.id, id))
+      .returning();
+    return row;
+  }
+
+  async getStorageFacilities(garageId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(storageFacilities)
+      .where(eq(storageFacilities.garageId, garageId))
+      .orderBy(asc(storageFacilities.name));
+  }
+
+  async createStorageFacility(data: any): Promise<any> {
+    const [row] = await db.insert(storageFacilities).values(data).returning();
+    return row;
+  }
+
+  async getVehicleStorageAssignments(
+    facilityId?: string,
+    vehicleId?: string,
+  ): Promise<any[]> {
+    const conditions: any[] = [];
+    if (facilityId) conditions.push(eq(vehicleStorageAssignments.facilityId, facilityId));
+    if (vehicleId) conditions.push(eq(vehicleStorageAssignments.vehicleId, vehicleId));
+
+    const query = db
+      .select()
+      .from(vehicleStorageAssignments)
+      .orderBy(desc(vehicleStorageAssignments.startDate));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createVehicleStorageAssignment(data: any): Promise<any> {
+    const [row] = await db.insert(vehicleStorageAssignments).values(data).returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Misc
+  // ==========================================================================
+
+  /** Singular lookup by id; getLoyaltyAccounts (plural) already exists and
+   *  lists by garage. */
+  async getLoyaltyAccount(id: string): Promise<any | undefined> {
+    const [row] = await db
+      .select()
+      .from(loyaltyAccounts)
+      .where(eq(loyaltyAccounts.id, id));
+    return row;
+  }
+
+  async getVehiclesByCustomer(customerId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(vehicles)
+      .where(eq(vehicles.customerId, customerId))
+      .orderBy(desc(vehicles.createdAt));
+  }
 }
 
 export const storage = new DatabaseStorage();
