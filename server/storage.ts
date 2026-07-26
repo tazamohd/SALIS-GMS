@@ -773,6 +773,25 @@ import {
   documentLibraryItems,
   type DocumentLibraryItem,
   type InsertDocumentLibraryItem,
+  qcInspections,
+  type QcInspection,
+  type InsertQcInspection,
+  qcDefects,
+  type QcDefect,
+  type InsertQcDefect,
+  fleetAccounts,
+  type FleetAccount,
+  type InsertFleetAccount,
+  fleetAccountVehicles,
+  type FleetAccountVehicle,
+  fleetMaintenanceEntries,
+  type FleetMaintenanceEntry,
+  mobileDevices,
+  type MobileDevice,
+  type InsertMobileDevice,
+  subscriptions,
+  type Subscription,
+  type InsertSubscription,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
@@ -12579,6 +12598,192 @@ export class DatabaseStorage implements IStorage {
       .where(eq(documentLibraryItems.id, id))
       .returning();
     return rows.length > 0;
+  }
+
+  // ==========================================================================
+  // Quality control
+  // ==========================================================================
+
+  async listQcInspections(filter?: {
+    result?: string;
+    inspector?: string;
+  }): Promise<QcInspection[]> {
+    const conditions: any[] = [];
+    if (filter?.result) conditions.push(eq(qcInspections.result, filter.result));
+    if (filter?.inspector) conditions.push(eq(qcInspections.inspector, filter.inspector));
+
+    const query = db.select().from(qcInspections).orderBy(desc(qcInspections.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createQcInspection(data: InsertQcInspection): Promise<QcInspection> {
+    const [row] = await db.insert(qcInspections).values(data).returning();
+    return row;
+  }
+
+  async updateQcInspection(
+    id: string,
+    data: Partial<InsertQcInspection>,
+  ): Promise<QcInspection | undefined> {
+    const [row] = await db
+      .update(qcInspections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(qcInspections.id, id))
+      .returning();
+    return row;
+  }
+
+  async listQcDefects(filter?: {
+    severity?: string;
+    status?: string;
+    category?: string;
+  }): Promise<QcDefect[]> {
+    const conditions: any[] = [];
+    if (filter?.severity) conditions.push(eq(qcDefects.severity, filter.severity));
+    if (filter?.status) conditions.push(eq(qcDefects.status, filter.status));
+    if (filter?.category) conditions.push(eq(qcDefects.category, filter.category));
+
+    const query = db.select().from(qcDefects).orderBy(desc(qcDefects.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async createQcDefect(data: InsertQcDefect): Promise<QcDefect> {
+    const [row] = await db.insert(qcDefects).values(data).returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Fleet accounts
+  // ==========================================================================
+
+  async listFleetAccounts(): Promise<FleetAccount[]> {
+    return await db.select().from(fleetAccounts).orderBy(desc(fleetAccounts.createdAt));
+  }
+
+  async getFleetAccount(id: string): Promise<FleetAccount | undefined> {
+    const [row] = await db.select().from(fleetAccounts).where(eq(fleetAccounts.id, id));
+    return row;
+  }
+
+  async createFleetAccount(data: InsertFleetAccount): Promise<FleetAccount> {
+    const [row] = await db.insert(fleetAccounts).values(data).returning();
+    return row;
+  }
+
+  /** Without an account id this returns every vehicle — the list route needs
+   *  the full set to compute per-account counts in one pass. */
+  async listFleetAccountVehicles(fleetAccountId?: string): Promise<FleetAccountVehicle[]> {
+    const query = db.select().from(fleetAccountVehicles);
+    return fleetAccountId
+      ? await query.where(eq(fleetAccountVehicles.fleetAccountId, fleetAccountId))
+      : await query;
+  }
+
+  async listFleetMaintenanceEntries(
+    fleetAccountId?: string,
+  ): Promise<FleetMaintenanceEntry[]> {
+    const query = db
+      .select()
+      .from(fleetMaintenanceEntries)
+      .orderBy(asc(fleetMaintenanceEntries.scheduledDate));
+    return fleetAccountId
+      ? await query.where(eq(fleetMaintenanceEntries.fleetAccountId, fleetAccountId))
+      : await query;
+  }
+
+  // ==========================================================================
+  // Mobile devices (garage-scoped)
+  // ==========================================================================
+
+  async getMobileDevices(garageId: string): Promise<MobileDevice[]> {
+    return await db
+      .select()
+      .from(mobileDevices)
+      .where(eq(mobileDevices.garageId, garageId))
+      .orderBy(desc(mobileDevices.createdAt));
+  }
+
+  async createMobileDevice(
+    garageId: string,
+    data: Omit<InsertMobileDevice, "garageId">,
+  ): Promise<MobileDevice> {
+    // garageId comes from the session, never the request body, so a caller
+    // cannot plant a device in another tenant's garage.
+    const [row] = await db
+      .insert(mobileDevices)
+      .values({ ...data, garageId })
+      .returning();
+    return row;
+  }
+
+  async updateMobileDevice(
+    id: string,
+    garageId: string,
+    data: Partial<Omit<InsertMobileDevice, "garageId">>,
+  ): Promise<MobileDevice | undefined> {
+    const [row] = await db
+      .update(mobileDevices)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(mobileDevices.id, id), eq(mobileDevices.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  async deleteMobileDevice(id: string, garageId: string): Promise<boolean> {
+    const rows = await db
+      .delete(mobileDevices)
+      .where(and(eq(mobileDevices.id, id), eq(mobileDevices.garageId, garageId)))
+      .returning();
+    return rows.length > 0;
+  }
+
+  // ==========================================================================
+  // Subscriptions
+  // ==========================================================================
+
+  async listAllSubscriptions(): Promise<Subscription[]> {
+    return await db.select().from(subscriptions).orderBy(desc(subscriptions.createdAt));
+  }
+
+  /** Every garage is treated as having a subscription; absent rows default to
+   *  the STARTER plan rather than forcing callers to handle undefined. */
+  async ensureSubscription(garageId: string): Promise<Subscription> {
+    const [existing] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.garageId, garageId));
+    if (existing) return existing;
+
+    const [created] = await db
+      .insert(subscriptions)
+      .values({ garageId, plan: "STARTER", status: "active" })
+      .onConflictDoNothing({ target: subscriptions.garageId })
+      .returning();
+    if (created) return created;
+
+    // Lost an insert race; the winning row is now present.
+    const [row] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.garageId, garageId));
+    return row;
+  }
+
+  async updateSubscription(
+    garageId: string,
+    data: Partial<Omit<InsertSubscription, "garageId">>,
+  ): Promise<Subscription | undefined> {
+    await this.ensureSubscription(garageId);
+    const [row] = await db
+      .update(subscriptions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(subscriptions.garageId, garageId))
+      .returning();
+    return row;
   }
 }
 
