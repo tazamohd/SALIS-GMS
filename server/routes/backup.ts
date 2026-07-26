@@ -12,8 +12,8 @@ const router = Router();
 router.get('/backup/status', isAuthenticated, requireAdmin, async (_req, res) => {
   try {
     const [latest, stats] = await Promise.all([
-      storage.getLatestBackup(),
-      storage.getBackupStats(),
+      storage.getLatestBackupHistory(),
+      storage.getBackupHistoryStats(),
     ]);
     res.json({
       lastBackupTime: latest?.createdAt ?? null,

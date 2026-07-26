@@ -792,6 +792,12 @@ import {
   subscriptions,
   type Subscription,
   type InsertSubscription,
+  schedulingOptimizationRuns,
+  type SchedulingOptimizationRun,
+  type InsertSchedulingOptimizationRun,
+  hrLeaveRequestEntries,
+  type HrLeaveRequestEntry,
+  type InsertHrLeaveRequestEntry,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
@@ -12495,7 +12501,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(backupHistory).orderBy(desc(backupHistory.createdAt));
   }
 
-  async getLatestBackup(): Promise<BackupHistory | undefined> {
+  // Named *BackupHistory rather than *Backup: getLatestBackup/getBackupStats
+  // already exist above for the garage-scoped backup_jobs table, which the
+  // legacy monolith uses. These operate on backup_history and take no garage.
+  async getLatestBackupHistory(): Promise<BackupHistory | undefined> {
     const [row] = await db
       .select()
       .from(backupHistory)
@@ -12504,7 +12513,7 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async getBackupStats(): Promise<{ count: number; totalSize: number }> {
+  async getBackupHistoryStats(): Promise<{ count: number; totalSize: number }> {
     const [row] = await db
       .select({
         count: sql<number>`count(*)`,
@@ -12782,6 +12791,210 @@ export class DatabaseStorage implements IStorage {
       .update(subscriptions)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(subscriptions.garageId, garageId))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Knowledge base
+  // ==========================================================================
+
+  async getArticleCategories(): Promise<any[]> {
+    return await db.select().from(articleCategories).orderBy(asc(articleCategories.sortOrder));
+  }
+
+  async getKnowledgeArticles(categoryId?: string, isPublished?: boolean): Promise<any[]> {
+    const conditions: any[] = [];
+    if (categoryId) conditions.push(eq(knowledgeArticles.categoryId, categoryId));
+    if (isPublished !== undefined)
+      conditions.push(eq(knowledgeArticles.isPublished, isPublished));
+
+    const query = db.select().from(knowledgeArticles).orderBy(desc(knowledgeArticles.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async getKnowledgeArticle(id: string): Promise<any | undefined> {
+    const [row] = await db
+      .select()
+      .from(knowledgeArticles)
+      .where(eq(knowledgeArticles.id, id));
+    return row;
+  }
+
+  /** Incremented in SQL rather than read-modify-write so concurrent views
+   *  cannot lose counts. */
+  async incrementArticleViews(id: string): Promise<void> {
+    await db
+      .update(knowledgeArticles)
+      .set({ views: sql`coalesce(${knowledgeArticles.views}, 0) + 1` })
+      .where(eq(knowledgeArticles.id, id));
+  }
+
+  // ==========================================================================
+  // Training and certifications
+  // ==========================================================================
+
+  async getTrainingModules(isActive?: boolean): Promise<any[]> {
+    const query = db.select().from(trainingModules).orderBy(desc(trainingModules.createdAt));
+    return isActive !== undefined
+      ? await query.where(eq(trainingModules.isActive, isActive))
+      : await query;
+  }
+
+  async getCertifications(isActive?: boolean): Promise<any[]> {
+    const query = db.select().from(certifications).orderBy(desc(certifications.createdAt));
+    return isActive !== undefined
+      ? await query.where(eq(certifications.isActive, isActive))
+      : await query;
+  }
+
+  async getCertificationAttempts(
+    userId?: string,
+    certificationId?: string,
+  ): Promise<any[]> {
+    const conditions: any[] = [];
+    if (userId) conditions.push(eq(certificationAttempts.userId, userId));
+    if (certificationId)
+      conditions.push(eq(certificationAttempts.certificationId, certificationId));
+
+    const query = db
+      .select()
+      .from(certificationAttempts)
+      .orderBy(desc(certificationAttempts.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  // ==========================================================================
+  // Google My Business
+  // ==========================================================================
+
+  async getGoogleBusinessProfiles(garageId?: string): Promise<any[]> {
+    const query = db
+      .select()
+      .from(googleBusinessProfiles)
+      .orderBy(desc(googleBusinessProfiles.createdAt));
+    return garageId
+      ? await query.where(eq(googleBusinessProfiles.garageId, garageId))
+      : await query;
+  }
+
+  async getGmbPosts(profileId?: string, status?: string): Promise<any[]> {
+    const conditions: any[] = [];
+    if (profileId) conditions.push(eq(gmbPosts.profileId, profileId));
+    if (status) conditions.push(eq(gmbPosts.status, status));
+
+    const query = db.select().from(gmbPosts).orderBy(desc(gmbPosts.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  async getGmbReviews(profileId?: string): Promise<any[]> {
+    const query = db.select().from(gmbReviews).orderBy(desc(gmbReviews.reviewDate));
+    return profileId ? await query.where(eq(gmbReviews.profileId, profileId)) : await query;
+  }
+
+  // ==========================================================================
+  // Scheduling optimisation history
+  // ==========================================================================
+
+  async createSchedulingOptimizationRun(
+    data: InsertSchedulingOptimizationRun,
+  ): Promise<SchedulingOptimizationRun> {
+    const [row] = await db.insert(schedulingOptimizationRuns).values(data).returning();
+    return row;
+  }
+
+  async listSchedulingOptimizationRuns(
+    limit = 20,
+  ): Promise<SchedulingOptimizationRun[]> {
+    return await db
+      .select()
+      .from(schedulingOptimizationRuns)
+      .orderBy(desc(schedulingOptimizationRuns.runAt))
+      .limit(limit);
+  }
+
+  // ==========================================================================
+  // HR leave requests
+  // ==========================================================================
+
+  async listLeaveRequestEntries(filter?: {
+    status?: string;
+    employeeId?: string;
+  }): Promise<HrLeaveRequestEntry[]> {
+    const conditions: any[] = [];
+    if (filter?.status) conditions.push(eq(hrLeaveRequestEntries.status, filter.status));
+    if (filter?.employeeId)
+      conditions.push(eq(hrLeaveRequestEntries.employeeId, filter.employeeId));
+
+    const query = db
+      .select()
+      .from(hrLeaveRequestEntries)
+      .orderBy(desc(hrLeaveRequestEntries.createdAt));
+    return conditions.length
+      ? await query.where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      : await query;
+  }
+
+  /** Counts every status in one grouped query rather than three round trips. */
+  async countLeaveRequestEntriesByStatus(): Promise<{
+    pending: number;
+    approved: number;
+    rejected: number;
+  }> {
+    const rows = await db
+      .select({
+        status: hrLeaveRequestEntries.status,
+        count: sql<number>`count(*)`,
+      })
+      .from(hrLeaveRequestEntries)
+      .groupBy(hrLeaveRequestEntries.status);
+
+    const counts = { pending: 0, approved: 0, rejected: 0 };
+    for (const r of rows) {
+      if (r.status in counts) counts[r.status as keyof typeof counts] = Number(r.count);
+    }
+    return counts;
+  }
+
+  async createLeaveRequestEntry(
+    data: InsertHrLeaveRequestEntry,
+  ): Promise<HrLeaveRequestEntry> {
+    const [row] = await db.insert(hrLeaveRequestEntries).values(data).returning();
+    return row;
+  }
+
+  async updateLeaveRequestEntry(
+    id: string,
+    data: Partial<InsertHrLeaveRequestEntry>,
+  ): Promise<HrLeaveRequestEntry | undefined> {
+    const [row] = await db
+      .update(hrLeaveRequestEntries)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(hrLeaveRequestEntries.id, id))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Smart contracts
+  // ==========================================================================
+
+  /** Garage-scoped: a wrong-tenant id matches no rows and yields undefined. */
+  async updateSmartContractStatus(
+    id: string,
+    garageId: string,
+    status: string,
+  ): Promise<any | undefined> {
+    const [row] = await db
+      .update(smartContracts)
+      .set({ status, updatedAt: new Date() })
+      .where(and(eq(smartContracts.id, id), eq(smartContracts.garageId, garageId)))
       .returning();
     return row;
   }
