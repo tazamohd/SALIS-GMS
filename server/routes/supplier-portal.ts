@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -239,12 +240,12 @@ const demoPurchaseOrders: PurchaseOrder[] = [
 // ─── Routes ──────────────────────────────────────────────────────────────────
 
 // GET /api/supplier-portal/suppliers — Supplier list
-router.get('/supplier-portal/suppliers', (req, res) => {
+router.get('/supplier-portal/suppliers', isAuthenticated, (req, res) => {
   res.json({ suppliers: demoSuppliers });
 });
 
 // GET /api/supplier-portal/suppliers/:id — Supplier detail with order history
-router.get('/supplier-portal/suppliers/:id', (req, res) => {
+router.get('/supplier-portal/suppliers/:id', isAuthenticated, (req, res) => {
   const supplier = demoSuppliers.find(s => s.id === req.params.id);
   if (!supplier) {
     return res.status(404).json({ error: 'Supplier not found' });
@@ -254,7 +255,7 @@ router.get('/supplier-portal/suppliers/:id', (req, res) => {
 });
 
 // POST /api/supplier-portal/suppliers — Add new supplier
-router.post('/supplier-portal/suppliers', (req, res) => {
+router.post('/supplier-portal/suppliers', isAuthenticated, (req, res) => {
   const { name, contactPerson, email, phone, address, categories, paymentTerms, leadTimeDays } = req.body;
   if (!name || !contactPerson || !email) {
     return res.status(400).json({ error: 'name, contactPerson, and email are required' });
@@ -280,12 +281,12 @@ router.post('/supplier-portal/suppliers', (req, res) => {
 });
 
 // GET /api/supplier-portal/orders — All purchase orders
-router.get('/supplier-portal/orders', (req, res) => {
+router.get('/supplier-portal/orders', isAuthenticated, (req, res) => {
   res.json({ orders: demoPurchaseOrders });
 });
 
 // GET /api/supplier-portal/performance — Supplier performance comparison
-router.get('/supplier-portal/performance', (req, res) => {
+router.get('/supplier-portal/performance', isAuthenticated, (req, res) => {
   const activeSuppliers = demoSuppliers.filter(s => s.status === 'active');
   const performance = activeSuppliers.map(supplier => {
     const orders = demoPurchaseOrders.filter(o => o.supplierId === supplier.id);
@@ -319,7 +320,7 @@ router.get('/supplier-portal/performance', (req, res) => {
 });
 
 // GET /api/supplier-portal/analytics — Spend analytics
-router.get('/supplier-portal/analytics', (req, res) => {
+router.get('/supplier-portal/analytics', isAuthenticated, (req, res) => {
   // Spend by supplier
   const spendBySupplier = demoSuppliers
     .filter(s => s.totalSpend > 0)

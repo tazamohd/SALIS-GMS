@@ -12,11 +12,12 @@ import {
 import { eq, and, gte, sql, count } from 'drizzle-orm';
 import { eventBus } from '../engine/event-bus';
 import type { CommandCenterData, AlertItem } from '../../shared/workflows';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
 // GET /api/command-center/live — Real-time aggregated dashboard data
-router.get('/command-center/live', async (req: Request, res: Response) => {
+router.get('/command-center/live', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -201,7 +202,7 @@ router.get('/command-center/live', async (req: Request, res: Response) => {
 });
 
 // GET /api/command-center/events — Recent workflow events
-router.get('/command-center/events', async (req: Request, res: Response) => {
+router.get('/command-center/events', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     const limit = parseInt(req.query.limit as string) || 50;
@@ -214,7 +215,7 @@ router.get('/command-center/events', async (req: Request, res: Response) => {
 });
 
 // GET /api/command-center/event-stats — Event statistics
-router.get('/command-center/event-stats', async (req: Request, res: Response) => {
+router.get('/command-center/event-stats', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     const since = req.query.since ? new Date(req.query.since as string) : undefined;
@@ -227,7 +228,7 @@ router.get('/command-center/event-stats', async (req: Request, res: Response) =>
 });
 
 // GET /api/command-center/health — System health metrics
-router.get('/command-center/health', async (req: Request, res: Response) => {
+router.get('/command-center/health', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const startTime = process.uptime();
 

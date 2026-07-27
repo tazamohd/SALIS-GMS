@@ -52,7 +52,24 @@ import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
 import deliveryRoutes from "./deliveries";
 import schedulingRoutes from "./scheduling";
+import aiInsightsRoutes from "./ai-insights";
+import apiDocsRoutes from "./api-docs";
 import autoReorderRoutes from './auto-reorder';
+import commandCenterRoutes from "./command-center";
+import crmRoutes from "./crm";
+import customerPortalRoutes from "./customer-portal";
+import docsRoutes from "./docs";
+import exportRoutes from "./export";
+import featureFlagRoutes from "./feature-flags";
+import financialRoutes from "./financial";
+import franchiseRoutes from "./franchise";
+import inventoryManagementRoutes from "./inventory-management";
+import saudiRoutes from "./saudi";
+import smsCampaignRoutes from "./sms-campaigns";
+import { subscriptionsRoutes } from "./subscriptions";
+import supplierPortalRoutes from "./supplier-portal";
+import warrantyRoutes from "./warranty";
+import whatsappRoutes from "./whatsapp";
 import backupRoutes from "./backup";
 import currencyRoutes from "./currency";
 import demoRoutes from "./demo";
@@ -348,6 +365,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", trainingLmsRoutes);
   app.use("/api", uploadRoutes);
   console.log("Module Routes Loaded (auto-reorder, backup, currency, demo, documents, fleet, gate-pass, gmb-sync, hr, kiosk, payments, qc, quick-actions, tax, training, uploads)");
+
+  // Feature routers the client already calls but which were never mounted —
+  // financial statements, CRM, warranty, messaging campaigns, Saudi
+  // compliance, portals, subscriptions, inventory overview, exports, flags,
+  // franchise, command center, AI insights and API docs. Every route carries
+  // isAuthenticated (added when these were wired up; most shipped with none).
+  app.use("/api", aiInsightsRoutes);
+  app.use("/api", apiDocsRoutes);
+  app.use("/api", commandCenterRoutes);
+  app.use("/api", crmRoutes);
+  app.use("/api", customerPortalRoutes);
+  app.use("/api", docsRoutes);
+  app.use("/api", exportRoutes);
+  app.use("/api", featureFlagRoutes);
+  app.use("/api", financialRoutes);
+  app.use("/api", franchiseRoutes);
+  app.use("/api", inventoryManagementRoutes);
+  app.use("/api", saudiRoutes);
+  app.use("/api", smsCampaignRoutes);
+  app.use("/api", subscriptionsRoutes);
+  app.use("/api", supplierPortalRoutes);
+  app.use("/api", warrantyRoutes);
+  app.use("/api", whatsappRoutes);
+  console.log("Feature Routes Loaded (ai-insights, api-docs, command-center, crm, customer-portal, docs, export, feature-flags, financial, franchise, inventory-mgmt, saudi, sms, subscriptions, supplier-portal, warranty, whatsapp)");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

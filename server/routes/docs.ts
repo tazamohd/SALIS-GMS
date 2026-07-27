@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -47,7 +48,7 @@ const apiDocs = {
   },
 };
 
-router.get('/docs', (_req, res) => {
+router.get('/docs', isAuthenticated, (_req, res) => {
   res.json(apiDocs);
 });
 

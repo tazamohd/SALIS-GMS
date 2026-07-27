@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -363,7 +364,7 @@ const endpoints: EndpointEntry[] = [
 ];
 
 // GET /api/docs/endpoints
-router.get('/docs/endpoints', (req, res) => {
+router.get('/docs/endpoints', isAuthenticated, (req, res) => {
   const { module, method, search } = req.query;
 
   let filtered = [...endpoints];
@@ -401,7 +402,7 @@ router.get('/docs/endpoints', (req, res) => {
 });
 
 // GET /api/docs/stats
-router.get('/docs/stats', (req, res) => {
+router.get('/docs/stats', isAuthenticated, (req, res) => {
   const modules = [...new Set(endpoints.map(e => e.module))];
   const methods: Record<string, number> = {};
   for (const ep of endpoints) {
