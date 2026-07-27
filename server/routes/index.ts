@@ -51,6 +51,14 @@ import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
 import deliveryRoutes from "./deliveries";
 import schedulingRoutes from "./scheduling";
+import { aiPredictionsRoutes } from "./ai-predictions";
+import { aiRepairGuideRoutes } from "./ai-repair-guide";
+import { analyticsPerformanceRoutes } from "./analytics-performance";
+import { forecastingDemandRoutes } from "./forecasting-demand";
+import { mobileDevicesRoutes } from "./mobile-devices";
+import { obdDiagnosticsRoutes } from "./obd-diagnostics";
+import { productivityRoutes } from "./productivity";
+import { smartContractsRoutes } from "./smart-contracts";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -286,6 +294,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Chatbot routes
   app.use("/api", chatbotRoutes);
   console.log("AI Chatbot Routes Loaded");
+
+  // Completed half-real page routes. These routers existed but were never
+  // mounted, so their endpoints 404ed; the completed-pages test suites
+  // specify them as live, auth-gated routes.
+  app.use("/api", aiPredictionsRoutes);
+  app.use("/api", aiRepairGuideRoutes);
+  app.use("/api", analyticsPerformanceRoutes);
+  app.use("/api", forecastingDemandRoutes);
+  app.use("/api", mobileDevicesRoutes);
+  app.use("/api", obdDiagnosticsRoutes);
+  app.use("/api", productivityRoutes);
+  app.use("/api", smartContractsRoutes);
+  console.log("Completed-Pages Routes Loaded");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

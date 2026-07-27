@@ -11260,7 +11260,9 @@ export const insertKioskTicketSchema = createInsertSchema(kioskTickets).omit({ i
 
 export type MobileDevice = typeof mobileDevices.$inferSelect;
 export type InsertMobileDevice = typeof mobileDevices.$inferInsert;
-export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({ id: true, createdAt: true, updatedAt: true });
+// garageId is omitted because the route always takes it from the session —
+// requiring it here made every valid client payload a 400.
+export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({ id: true, garageId: true, createdAt: true, updatedAt: true });
 
 export type QcInspection = typeof qcInspections.$inferSelect;
 export type InsertQcInspection = typeof qcInspections.$inferInsert;

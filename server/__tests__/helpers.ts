@@ -34,9 +34,12 @@ async function attachUserToGarage(email: string, garageId: string, role = "ADMIN
   const client = new Client({ connectionString: url });
   await client.connect();
   try {
+    // user_type drives the management-analytics gate (isManagementUser),
+    // a parallel authority surface to role — set both so an ADMIN login
+    // actually clears management-only endpoints.
     await client.query(
-      `UPDATE users SET garage_id = $1, role = $2 WHERE email = $3`,
-      [garageId, role, email],
+      `UPDATE users SET garage_id = $1, role = $2, user_type = $3 WHERE email = $4`,
+      [garageId, role, role === "ADMIN" ? "admin" : "staff", email],
     );
   } finally {
     await client.end();
