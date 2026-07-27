@@ -15,7 +15,7 @@
  * here is scoped via resolveGarageScope (same pattern as the modular routes).
  */
 import { Router, type Request, type Response, type NextFunction } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -94,7 +94,11 @@ const uploadsLimiter = rateLimit({
   limit: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => (req as Request & { user?: { id?: string } }).user?.id || req.ip || "anon",
+  // ipKeyGenerator collapses IPv6 addresses to their /56 so a single v6
+  // host can't rotate through addresses to dodge the limit (ERR_ERL_KEY_GEN_IPV6).
+  keyGenerator: (req: Request) =>
+    (req as Request & { user?: { id?: string } }).user?.id ||
+    (req.ip ? ipKeyGenerator(req.ip) : "anon"),
   message: { error: "Too many uploads — try again later" },
 });
 
