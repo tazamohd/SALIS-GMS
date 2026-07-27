@@ -3,7 +3,7 @@ import { isAuthenticated } from '../auth';
 import { requireAdmin } from '../middleware/requireRole';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
-import { sql, count } from 'drizzle-orm';
+import { sql, count, eq } from 'drizzle-orm';
 
 const router = Router();
 
@@ -45,6 +45,9 @@ function toCsv(rows: Record<string, any>[]): string {
 // GET /api/export/csv/:type — Export table data as CSV download
 router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
+    // Exports are tenant data: even an admin only exports their own garage.
+    const garageId = (req.user as any)?.garageId;
+    if (!garageId) return res.status(403).json({ error: 'No garage associated' });
     const { type } = req.params;
     let rows: Record<string, any>[];
 
@@ -62,6 +65,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             created_at: users.createdAt,
           })
           .from(users)
+          .where(eq(users.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -81,6 +85,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             paid_amount: invoices.paidAmount,
           })
           .from(invoices)
+          .where(eq(invoices.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -99,6 +104,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             completed_at: jobCards.completedAt,
           })
           .from(jobCards)
+          .where(eq(jobCards.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -117,6 +123,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             engine_type: vehicles.engineType,
           })
           .from(vehicles)
+          .where(eq(vehicles.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -133,6 +140,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
             status: appointments.status,
           })
           .from(appointments)
+          .where(eq(appointments.garageId, garageId))
           .limit(10000);
         break;
       }
@@ -173,6 +181,9 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
 // GET /api/export/report/:type — Generate printer-friendly HTML report
 router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, res) => {
   try {
+    // Same tenancy rule as the CSV export.
+    const garageId = (req.user as any)?.garageId;
+    if (!garageId) return res.status(403).json({ error: 'No garage associated' });
     const { type } = req.params;
     let title = '';
     let tableHtml = '';
@@ -210,7 +221,8 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             paidAmount: sql<string>`coalesce(sum(${invoices.paidAmount}), 0)`,
             taxAmount: sql<string>`coalesce(sum(${invoices.taxAmount}), 0)`,
           })
-          .from(invoices);
+          .from(invoices)
+          .where(eq(invoices.garageId, garageId));
 
         const statusBreakdown = await db
           .select({
@@ -219,6 +231,7 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             total: sql<string>`coalesce(sum(${invoices.totalAmount}), 0)`,
           })
           .from(invoices)
+          .where(eq(invoices.garageId, garageId))
           .groupBy(invoices.status);
 
         const totalAmt = parseFloat(invoiceStats?.totalAmount ?? '0');
@@ -280,7 +293,8 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             totalStock: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
             totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
           })
-          .from(sparePartInventories);
+          .from(sparePartInventories)
+          .where(eq(sparePartInventories.garageId, garageId));
 
         tableHtml = `
           <div class="summary-grid">
@@ -321,11 +335,13 @@ router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, re
             createdAt: users.createdAt,
           })
           .from(users)
+          .where(eq(users.garageId, garageId))
           .limit(1000);
 
         const [customerStats] = await db
           .select({ total: count() })
-          .from(users);
+          .from(users)
+          .where(eq(users.garageId, garageId));
 
         tableHtml = `
           <div class="summary-grid">

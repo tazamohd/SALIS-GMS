@@ -5,11 +5,23 @@ import { isAuthenticated } from '../auth';
 
 const router = Router();
 
+/** Every CRM query is tenant data — resolve the caller's garage or refuse. */
+function requireGarageId(req: any, res: any): string | undefined {
+  const garageId = req.user?.garageId;
+  if (!garageId) {
+    res.status(403).json({ error: "No garage associated" });
+    return undefined;
+  }
+  return garageId;
+}
+
 // ---------------------------------------------------------------------------
 // GET /api/crm/customers — Customer list with visit count, total spend, etc.
 // ---------------------------------------------------------------------------
 router.get('/crm/customers', isAuthenticated, async (req, res) => {
   try {
+    const garageId = requireGarageId(req, res);
+    if (!garageId) return;
     const search = (req.query.search as string) || '';
     const searchFilter = search
       ? sql` AND (u.full_name ILIKE ${'%' + search + '%'} OR u.email ILIKE ${'%' + search + '%'} OR u.phone ILIKE ${'%' + search + '%'})`
@@ -39,11 +51,12 @@ router.get('/crm/customers', isAuthenticated, async (req, res) => {
           MAX(j.completed_at) AS last_visit
         FROM job_cards j
         LEFT JOIN invoices i ON i.job_card_id = j.id
-        WHERE j.customer_id = u.id
+        WHERE j.customer_id = u.id AND j.garage_id = ${garageId}::uuid
       ) stats ON true
-      WHERE (u.user_type = 'customer' OR u.role = 'CUSTOMER' OR EXISTS (
-        SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id
-      ))
+      WHERE u.garage_id = ${garageId}::uuid
+        AND (u.user_type = 'customer' OR u.role = 'CUSTOMER' OR EXISTS (
+          SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id
+        ))
       ${searchFilter}
       ORDER BY stats.total_spend DESC NULLS LAST
       LIMIT 200
@@ -61,6 +74,8 @@ router.get('/crm/customers', isAuthenticated, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
   try {
+    const garageId = requireGarageId(req, res);
+    if (!garageId) return;
     const { id } = req.params;
 
     const customerResult = await db.execute(sql`
@@ -71,7 +86,7 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
         u.phone,
         u.created_at AS "createdAt",
         u.profile_image_url AS "profileImageUrl"
-      FROM users u WHERE u.id = ${id}
+      FROM users u WHERE u.id = ${id} AND u.garage_id = ${garageId}::uuid
     `);
 
     if (!customerResult.rows?.length) {
@@ -82,7 +97,7 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
       SELECT j.id, j.job_number AS "jobNumber", j.service_type AS "serviceType",
         j.description, j.status, j.total_cost AS "totalCost",
         j.created_at AS "createdAt", j.completed_at AS "completedAt"
-      FROM job_cards j WHERE j.customer_id = ${id}
+      FROM job_cards j WHERE j.customer_id = ${id} AND j.garage_id = ${garageId}::uuid
       ORDER BY j.created_at DESC LIMIT 50
     `);
 
@@ -90,7 +105,7 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
       SELECT i.id, i.invoice_number AS "invoiceNumber", i.status,
         i.total_amount AS "totalAmount", i.paid_amount AS "paidAmount",
         i.invoice_date AS "invoiceDate"
-      FROM invoices i WHERE i.customer_id = ${id}
+      FROM invoices i WHERE i.customer_id = ${id} AND i.garage_id = ${garageId}::uuid
       ORDER BY i.invoice_date DESC LIMIT 50
     `);
 
@@ -98,7 +113,7 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
       SELECT a.id, a.appointment_number AS "appointmentNumber",
         a.service_type AS "serviceType", a.status,
         a.scheduled_date AS "scheduledDate"
-      FROM appointments a WHERE a.customer_id = ${id}
+      FROM appointments a WHERE a.customer_id = ${id} AND a.garage_id = ${garageId}::uuid
       ORDER BY a.scheduled_date DESC LIMIT 50
     `);
 
@@ -136,6 +151,8 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/crm/segments', isAuthenticated, async (req, res) => {
   try {
+    const garageId = requireGarageId(req, res);
+    if (!garageId) return;
     const result = await db.execute(sql`
       WITH customer_stats AS (
         SELECT
@@ -144,10 +161,11 @@ router.get('/crm/segments', isAuthenticated, async (req, res) => {
           MAX(j.completed_at) AS last_visit,
           COALESCE(SUM(i.total_amount), 0)::numeric AS total_spend
         FROM users u
-        LEFT JOIN job_cards j ON j.customer_id = u.id
-        LEFT JOIN invoices i ON i.customer_id = u.id
-        WHERE u.user_type = 'customer' OR u.role = 'CUSTOMER'
-          OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id)
+        LEFT JOIN job_cards j ON j.customer_id = u.id AND j.garage_id = ${garageId}::uuid
+        LEFT JOIN invoices i ON i.customer_id = u.id AND i.garage_id = ${garageId}::uuid
+        WHERE u.garage_id = ${garageId}::uuid
+          AND (u.user_type = 'customer' OR u.role = 'CUSTOMER'
+            OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id))
         GROUP BY u.id
       )
       SELECT
@@ -185,12 +203,15 @@ router.get('/crm/segments', isAuthenticated, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/crm/loyalty/summary', isAuthenticated, async (req, res) => {
   try {
+    const garageId = requireGarageId(req, res);
+    if (!garageId) return;
     // Derive loyalty stats from real invoice / job data
     const membersResult = await db.execute(sql`
       SELECT COUNT(DISTINCT u.id)::int AS total_members
       FROM users u
-      WHERE u.user_type = 'customer' OR u.role = 'CUSTOMER'
-        OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id)
+      WHERE u.garage_id = ${garageId}::uuid
+        AND (u.user_type = 'customer' OR u.role = 'CUSTOMER'
+          OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id))
     `);
 
     const spendResult = await db.execute(sql`
@@ -198,15 +219,17 @@ router.get('/crm/loyalty/summary', isAuthenticated, async (req, res) => {
         COALESCE(SUM(i.total_amount), 0)::numeric AS total_revenue,
         COALESCE(SUM(i.paid_amount), 0)::numeric AS total_paid
       FROM invoices i
+      WHERE i.garage_id = ${garageId}::uuid
     `);
 
     const tierResult = await db.execute(sql`
       WITH cs AS (
         SELECT u.id, COALESCE(SUM(i.total_amount), 0)::numeric AS total_spend
         FROM users u
-        LEFT JOIN invoices i ON i.customer_id = u.id
-        WHERE u.user_type = 'customer' OR u.role = 'CUSTOMER'
-          OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id)
+        LEFT JOIN invoices i ON i.customer_id = u.id AND i.garage_id = ${garageId}::uuid
+        WHERE u.garage_id = ${garageId}::uuid
+          AND (u.user_type = 'customer' OR u.role = 'CUSTOMER'
+            OR EXISTS (SELECT 1 FROM job_cards jc WHERE jc.customer_id = u.id))
         GROUP BY u.id
       )
       SELECT
@@ -270,11 +293,13 @@ router.post('/crm/loyalty/points', isAuthenticated, async (req, res) => {
 // ---------------------------------------------------------------------------
 router.get('/crm/retention', isAuthenticated, async (req, res) => {
   try {
+    const garageId = requireGarageId(req, res);
+    if (!garageId) return;
     const repeatResult = await db.execute(sql`
       WITH cj AS (
         SELECT customer_id, COUNT(*)::int AS job_count
         FROM job_cards
-        WHERE customer_id IS NOT NULL
+        WHERE customer_id IS NOT NULL AND garage_id = ${garageId}::uuid
         GROUP BY customer_id
       )
       SELECT
@@ -291,7 +316,7 @@ router.get('/crm/retention', isAuthenticated, async (req, res) => {
       FROM (
         SELECT customer_id, COALESCE(SUM(total_amount), 0)::numeric AS total_spend
         FROM invoices
-        WHERE customer_id IS NOT NULL
+        WHERE customer_id IS NOT NULL AND garage_id = ${garageId}::uuid
         GROUP BY customer_id
       ) cs
     `);
@@ -306,9 +331,10 @@ router.get('/crm/retention', isAuthenticated, async (req, res) => {
         COUNT(j.id)::int AS "visitCount",
         COALESCE(SUM(i.total_amount), 0)::numeric AS "totalSpend"
       FROM users u
-      JOIN job_cards j ON j.customer_id = u.id
-      LEFT JOIN invoices i ON i.customer_id = u.id
-      WHERE j.completed_at < NOW() - INTERVAL '60 days'
+      JOIN job_cards j ON j.customer_id = u.id AND j.garage_id = ${garageId}::uuid
+      LEFT JOIN invoices i ON i.customer_id = u.id AND i.garage_id = ${garageId}::uuid
+      WHERE u.garage_id = ${garageId}::uuid
+        AND j.completed_at < NOW() - INTERVAL '60 days'
       GROUP BY u.id, u.full_name, u.email, u.phone
       HAVING MAX(j.completed_at) < NOW() - INTERVAL '60 days'
       ORDER BY MAX(j.completed_at) ASC
@@ -333,11 +359,13 @@ router.get('/crm/retention', isAuthenticated, async (req, res) => {
               SELECT customer_id FROM job_cards
               WHERE completed_at < DATE_TRUNC('month', j.completed_at)
                 AND customer_id IS NOT NULL
+                AND garage_id = ${garageId}::uuid
             )
           )::int AS returning_customers
         FROM job_cards j
         WHERE j.completed_at >= NOW() - INTERVAL '6 months'
           AND j.customer_id IS NOT NULL
+          AND j.garage_id = ${garageId}::uuid
         GROUP BY DATE_TRUNC('month', j.completed_at)
       )
       SELECT
