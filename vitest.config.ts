@@ -56,6 +56,11 @@ export default defineConfig({
           environment: 'node',
           include: ['server/**/*.test.{ts,tsx}'],
           exclude: ['**/node_modules/**', '**/dist/**'],
+          // Provisions the test database (TEST_DATABASE_URL or embedded PG),
+          // pushes the schema and seeds a garage. The setup file predates
+          // this entry but was never referenced from the config, so
+          // integration tests always started against an empty database.
+          globalSetup: ['./server/__tests__/globalSetup.ts'],
         },
         resolve: {
           alias: {

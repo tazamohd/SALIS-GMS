@@ -16,8 +16,16 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createSchemaFactory } from "drizzle-zod";
 import { z } from "zod";
+
+// JSON clients send timestamps as ISO strings; the plain factory derives
+// z.date() for timestamp columns and rejects every such request with a 400.
+// Coercing dates at the API boundary fixes that for all insert schemas at
+// once.
+const { createInsertSchema, createSelectSchema } = createSchemaFactory({
+  coerce: { date: true },
+});
 
 // Session storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.

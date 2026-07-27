@@ -13,12 +13,13 @@ import fs from 'fs';
 import path from 'path';
 
 describe('/api/health endpoint', () => {
-  const routesPath = path.resolve(process.cwd(), 'server/routes.ts');
+  // The handler lives in the modular system router, not the legacy monolith.
+  const routesPath = path.resolve(process.cwd(), 'server/routes/system.ts');
   const source = fs.readFileSync(routesPath, 'utf-8');
 
   function getHealthHandler() {
-    const startIdx = source.indexOf("app.get('/api/health'");
-    const endIdx = source.indexOf("app.", startIdx + 30);
+    const startIdx = source.indexOf("router.get('/api/health'");
+    const endIdx = source.indexOf('router.use', startIdx + 30);
     return source.slice(startIdx, endIdx > startIdx ? endIdx : startIdx + 2000);
   }
 
