@@ -15591,9 +15591,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user?.garageId;
       const userId = req.user?.id || 'default-user';
 
-      // Get first vehicle for testing (or use a sample vehicle ID)
+      // Seeding hangs sample rows off a real vehicle; without one the
+      // NOT NULL vehicle_id FKs cannot be satisfied.
       const vehicles = await storage.getVehicles(garageId);
-      const vehicleId = vehicles[0]?.id || 'sample-vehicle-id';
+      const vehicleId = vehicles[0]?.id;
+      if (!vehicleId) {
+        return res.status(400).json({ message: "Seed requires at least one vehicle in this garage" });
+      }
 
       const results = {
         blockchain: 0,
@@ -15612,25 +15616,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed Blockchain Records (3 records)
       for (let i = 0; i < 3; i++) {
+        // blockchain_records: the event is record_type/record_data, and
+        // timestamp is NOT NULL.
         await storage.createBlockchainRecord({
           vehicleId,
           garageId,
           transactionHash: `0x${Math.random().toString(16).substring(2, 66)}`,
           blockNumber: 15000000 + i,
-          eventType: ['service_completed', 'ownership_transfer', 'warranty_claim'][i % 3],
-          eventData: { description: `Sample event ${i + 1}`, amount: 100 + i * 50 },
-          verified: true,
+          recordType: ['service_completed', 'ownership_transfer', 'warranty_claim'][i % 3],
+          recordData: { description: `Sample event ${i + 1}`, amount: 100 + i * 50 },
+          timestamp: new Date(),
         });
         results.blockchain++;
       }
 
       // Seed AR Repair Guides (2 guides)
       for (let i = 0; i < 2; i++) {
+        // ar_repair_guides: title (not guideName), a single make/model pair
+        // and repair_category rather than free-form description fields.
         await storage.createArRepairGuide({
           garageId,
-          guideName: `${['Engine Repair', 'Brake Service'][i]} AR Guide`,
-          description: `Step-by-step AR instructions for ${['engine repair', 'brake service'][i]}`,
-          targetVehicleModels: ['Toyota Camry', 'Honda Accord'],
+          title: `${['Engine Repair', 'Brake Service'][i]} AR Guide`,
+          vehicleMake: ['Toyota', 'Honda'][i],
+          vehicleModel: ['Camry', 'Accord'][i],
+          repairCategory: ['engine', 'brakes'][i],
           difficultyLevel: ['intermediate', 'beginner'][i],
           estimatedDuration: [60, 45][i],
           arModelUrl: `https://example.com/ar/model-${i + 1}.glb`,
@@ -15646,13 +15655,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed IoT Sensors (4 sensors)
       for (let i = 0; i < 4; i++) {
+        // iot_sensors: sensor_identifier is the unique device id, and the
+        // install date column is installation_date (a timestamp).
         await storage.createIotSensor({
           vehicleId,
           sensorType: ['temperature', 'pressure', 'vibration', 'fuel_level'][i],
-          sensorId: `IOT-${1000 + i}`,
+          sensorIdentifier: `IOT-${Date.now()}-${i}`,
           manufacturer: 'SensorTech',
-          installDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          calibrationDate: new Date().toISOString(),
+          installationDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
           status: 'active',
         });
         results.iotSensors++;
@@ -15660,110 +15670,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed 3D Parts Models (3 models)
       for (let i = 0; i < 3; i++) {
+        // parts_3d_models is a global catalogue (no garage_id); files are
+        // model_file_url/texture_file_url and file_size is integer KB.
         await storage.createParts3DModel({
-          garageId,
           partName: ['Brake Rotor', 'Oil Filter', 'Air Filter'][i],
           partNumber: `PART-${2000 + i}`,
           manufacturer: 'AutoParts Inc',
-          modelUrl: `https://example.com/3d/part-${i + 1}.glb`,
-          thumbnailUrl: `https://example.com/3d/thumb-${i + 1}.jpg`,
-          fileSize: 5.2 + i * 0.5,
+          modelFileUrl: `https://example.com/3d/part-${i + 1}.glb`,
+          textureFileUrl: `https://example.com/3d/thumb-${i + 1}.jpg`,
+          fileSize: 5200 + i * 500,
           polygonCount: 10000 + i * 2000,
           category: 'Brake System',
+          uploadedBy: userId,
         });
         results.models3D++;
       }
 
       // Seed Drone Inspections (2 inspections)
       for (let i = 0; i < 2; i++) {
+        // drone_inspections: the pilot is a user reference, images are
+        // image_count, and the AI outcome lives in the boolean flags.
         await storage.createDroneInspection({
           garageId,
           vehicleId,
           inspectionType: ['exterior_damage', 'roof_inspection'][i],
-          pilotName: 'John Pilot',
-          flightDuration: 15 + i * 5,
-          capturedImages: 25 + i * 10,
-          aiAnalysisResults: { damageDetected: i === 0, confidence: 0.95, issues: i === 0 ? ['Dent on hood', 'Scratch on door'] : [] },
-          status: 'completed',
+          pilotId: userId,
+          flightDuration: (15 + i * 5) * 60,
+          imageCount: 25 + i * 10,
+          damageDetected: i === 0,
+          aiAnalysisCompleted: true,
+          inspectionStatus: 'completed',
+          completedAt: new Date(),
         });
         results.droneInspections++;
       }
 
       // Seed AI Video Analysis (2 analyses)
       for (let i = 0; i < 2; i++) {
+        // ai_video_analysis: customer_id references customer_profiles (the
+        // admin has none, and it is nullable), the category column is
+        // triage_category, decimals take strings, and the state column is
+        // analysis_status.
         await storage.createAiVideoAnalysis({
-          customerId: userId,
           vehicleId,
           videoUrl: `https://example.com/videos/analysis-${i + 1}.mp4`,
-          analysisType: ['damage_assessment', 'walkaround'][i],
+          triageCategory: ['damage_assessment', 'walkaround'][i],
           aiModel: 'GPT-5-Vision',
           detectedIssues: i === 0 ? ['Minor dent', 'Paint scratch'] : [],
-          estimatedCost: i === 0 ? 350.00 : 0,
-          confidence: 0.92,
-          status: 'completed',
+          estimatedCost: i === 0 ? '350.00' : '0',
+          confidence: '0.92',
+          analysisStatus: 'completed',
         });
         results.aiVideo++;
       }
 
       // Seed Digital Twins (1 twin)
+      // digital_twins is keyed by vehicle (no twin_name); counts live in
+      // data_points, predictions in predicted_failures, health inside
+      // performance_metrics, and the state column is twin_status.
       await storage.createDigitalTwin({
         vehicleId,
-        twinName: `Digital Twin - ${vehicleId.substring(0, 8)}`,
-        lastSyncTime: new Date().toISOString(),
-        sensorDataPoints: 1250,
-        predictedIssues: ['Brake pad wear in 2 months', 'Oil change due in 3 weeks'],
-        healthScore: 85,
-        status: 'active',
+        lastSyncedAt: new Date(),
+        dataPoints: 1250,
+        predictedFailures: ['Brake pad wear in 2 months', 'Oil change due in 3 weeks'],
+        performanceMetrics: { healthScore: 85 },
+        twinStatus: 'active',
       });
       results.digitalTwins++;
 
       // Seed Fraud Detection Cases (2 cases)
       for (let i = 0; i < 2; i++) {
+        // fraud_detection_cases: risk_score is a decimal string, the model
+        // is detection_method, triggers are anomaly_indicators, and
+        // detected_at takes a Date.
         await storage.createFraudDetectionCase({
           garageId,
           caseType: ['invoice_manipulation', 'parts_theft'][i],
-          detectedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-          riskScore: [75, 60][i],
-          mlModel: 'FraudDetector-v2',
-          indicators: i === 0 ? ['Unusual pricing', 'Multiple edits'] : ['Inventory mismatch'],
+          detectedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
+          riskScore: ['75', '60'][i],
+          detectionMethod: 'ml_algorithm',
+          anomalyIndicators: i === 0 ? ['Unusual pricing', 'Multiple edits'] : ['Inventory mismatch'],
           status: 'investigating',
         });
         results.fraudCases++;
       }
 
       // Seed Biometric Profile (1 profile)
+      // biometric_profiles: face_embedding is encrypted text, dates are
+      // enrollment_date/last_verified, and counters are
+      // verification_count/failed_attempts.
       await storage.createBiometricProfile({
         userId,
         fingerprintHash: `FP-${Math.random().toString(36).substring(7).toUpperCase()}`,
-        faceEmbedding: Array(128).fill(0).map(() => Math.random()),
-        enrolledAt: new Date().toISOString(),
-        lastAuthAt: new Date().toISOString(),
-        authSuccessCount: 42,
-        authFailureCount: 2,
-        status: 'active',
+        faceEmbedding: JSON.stringify(Array(128).fill(0).map(() => Math.random())),
+        enrollmentDate: new Date(),
+        lastVerified: new Date(),
+        verificationCount: 42,
+        failedAttempts: 2,
+        isActive: true,
       });
       results.biometricProfile = 1;
 
       // Seed Collaboration Sessions (2 sessions)
       for (let i = 0; i < 2; i++) {
+        // collaboration_sessions: the host is host_user_id, job_card_id is
+        // a real uuid FK (no sentinel strings), duration is seconds, and
+        // annotations have no column — shared_notes carries them.
         await storage.createCollaborationSession({
           garageId,
-          jobCardId: 'sample-job-' + i,
-          technicianId: userId,
+          hostUserId: userId,
           sessionType: ['video_call', 'ar_annotation'][i],
-          duration: 25 + i * 10,
+          sessionStatus: 'completed',
+          duration: (25 + i * 10) * 60,
           recordingUrl: `https://example.com/recordings/session-${i + 1}.mp4`,
-          annotations: i === 1 ? [{ x: 100, y: 200, note: 'Check here' }] : [],
+          sharedNotes: i === 1 ? 'Annotation at (100,200): Check here' : undefined,
         });
         results.collaborationSessions++;
       }
 
       // Seed Edge Devices (3 devices)
       for (let i = 0; i < 3; i++) {
+        // edge_devices requires a unique device_id.
         await storage.createEdgeDevice({
           garageId,
           deviceName: `Edge Gateway ${i + 1}`,
           deviceType: 'diagnostic_hub',
+          deviceId: `EDGE-${Date.now()}-${i}`,
           ipAddress: `192.168.1.${100 + i}`,
           macAddress: `00:1B:44:11:3A:${(10 + i).toString(16).toUpperCase()}`,
           firmwareVersion: '2.1.0',
@@ -15774,15 +15806,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed Pricing Optimizations (2 optimizations)
       for (let i = 0; i < 2; i++) {
+        // pricing_optimization: prices are decimal strings, revenue is
+        // estimated_revenue_impact, confidence is confidence_score, and the
+        // service is referenced by uuid — the label rides in factors.
         await storage.createPricingOptimization({
           garageId,
           optimizationType: 'dynamic_pricing',
-          targetService: ['Oil Change', 'Brake Service'][i],
-          currentPrice: [45.00, 220.00][i],
-          optimizedPrice: [49.99, 199.99][i],
-          expectedRevenue: [1250.00, 3500.00][i],
-          confidence: 0.88,
-          factors: ['Market demand', 'Competition', 'Time of day'],
+          currentPrice: ['45.00', '220.00'][i],
+          optimizedPrice: ['49.99', '199.99'][i],
+          estimatedRevenueImpact: ['1250.00', '3500.00'][i],
+          confidenceScore: '0.88',
+          factors: {
+            service: ['Oil Change', 'Brake Service'][i],
+            drivers: ['Market demand', 'Competition', 'Time of day'],
+          },
         });
         results.pricingOptimizations++;
       }
@@ -16605,7 +16642,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // 1. Neural Diagnostics - Create 3 neural diagnostics with realistic AI prediction data
       for (let i = 0; i < 3; i++) {
-        const diagnostic = await storage.createNeuralDiagnostic({
+        // neural_diagnostics: predictions live in predicted_failures (jsonb,
+        // NOT NULL), confidence is a decimal string named confidence_score,
+        // and timing is processing_time_ms.
+        await storage.createNeuralDiagnostic({
           garageId,
           vehicleId,
           modelVersion: ['v2.5', 'v3.0', 'v2.8'][i],
@@ -16615,21 +16655,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fuelLevel: 75 - i * 10,
             batteryVoltage: 12.6 + i * 0.1
           },
-          prediction: ['engine_maintenance_required', 'normal_operation', 'oil_change_soon'][i],
-          confidence: 0.92 + i * 0.02,
-          processingTime: 150 + i * 50,
+          predictedFailures: [['engine_maintenance_required', 'normal_operation', 'oil_change_soon'][i]],
+          confidenceScore: (0.92 + i * 0.02).toFixed(2),
+          processingTimeMs: 150 + i * 50,
           status: 'completed',
         });
-        
+
         if (i < 2) {
+          // neural_training_sessions is standalone (no diagnostic FK); the
+          // sample size column is dataset_size and decimals take strings.
           await storage.createNeuralTrainingSession({
             garageId,
-            diagnosticId: diagnostic.id,
-            trainingDataCount: 5000 + i * 1000,
+            modelVersion: ['v2.5', 'v3.0'][i],
+            datasetSize: 5000 + i * 1000,
             epochs: 50 + i * 10,
-            accuracy: 0.94 + i * 0.02,
-            loss: 0.08 - i * 0.01,
+            accuracy: (0.94 + i * 0.02).toFixed(2),
+            loss: (0.08 - i * 0.01).toFixed(6),
             status: 'completed',
+            completedAt: new Date(),
           });
           totalRecords++;
         }
@@ -16638,34 +16681,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // 2. Computer Vision - Create 2 quality checks with defect detection results
       for (let i = 0; i < 2; i++) {
+        // vision_quality_checks: check_type and ai_model are NOT NULL,
+        // quality_score is a decimal string, and defects_detected is jsonb.
         const qualityCheck = await storage.createVisionQualityCheck({
           garageId,
           vehicleId,
+          checkType: 'exterior_inspection',
           imageUrl: `https://storage.example.com/qc/${Date.now()}-${i}.jpg`,
-          modelVersion: 'YOLOv8-QC',
-          overallScore: 88 + i * 5,
-          defectsDetected: i === 0 ? 2 : 0,
-          processingTime: 320 + i * 80,
-          status: 'completed',
+          aiModel: 'YOLOv8-QC',
+          qualityScore: String(88 + i * 5),
+          defectsDetected: i === 0 ? ['paint_scratch', 'dent'] : [],
+          passedInspection: i !== 0,
+          processingTimeMs: 320 + i * 80,
         });
 
         if (i === 0) {
+          // vision_defects: location is jsonb (NOT NULL), the box is
+          // `dimensions`, and confidence is a decimal string.
           await storage.createVisionDefect({
             qualityCheckId: qualityCheck.id,
             defectType: 'paint_scratch',
             severity: 'minor',
-            confidence: 0.89,
-            boundingBox: { x: 245, y: 156, width: 85, height: 42 },
-            location: 'front_door_panel',
+            confidence: '0.89',
+            dimensions: { x: 245, y: 156, width: 85, height: 42 },
+            location: { panel: 'front_door_panel' },
           });
 
           await storage.createVisionDefect({
             qualityCheckId: qualityCheck.id,
             defectType: 'dent',
             severity: 'moderate',
-            confidence: 0.93,
-            boundingBox: { x: 512, y: 234, width: 120, height: 95 },
-            location: 'rear_bumper',
+            confidence: '0.93',
+            dimensions: { x: 512, y: 234, width: 120, height: 95 },
+            location: { panel: 'rear_bumper' },
           });
           totalRecords += 2;
         }
@@ -16679,14 +16727,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Air conditioning is not cooling properly and makes a rattling sound'
       ];
 
+      // nlp_service_requests.customer_id references customer_profiles, so the
+      // seeding user needs a profile row (ignore the conflict on re-runs).
+      await storage.createCustomerProfile({ userId }).catch(() => undefined);
+
       for (let i = 0; i < 3; i++) {
+        // Columns: processed_complaint, extracted_symptoms (text[]),
+        // urgency_level; confidence is a decimal string.
         await storage.createNLPServiceRequest({
           garageId,
           customerId: userId,
           vehicleId,
           originalComplaint: complaints[i],
-          processedText: complaints[i].toLowerCase(),
-          detectedIssues: [
+          processedComplaint: complaints[i].toLowerCase(),
+          extractedSymptoms: [
             ['brake_noise', 'brake_service'],
             ['engine_misfire', 'fuel_leak', 'diagnostic_required'],
             ['ac_malfunction', 'ac_compressor']
@@ -16697,38 +16751,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ['AC System Diagnostic', 'AC Compressor Service']
           ][i],
           sentiment: ['neutral', 'concerned', 'frustrated'][i],
-          priority: ['medium', 'high', 'medium'][i],
-          confidence: 0.91 + i * 0.02,
-          modelVersion: 'GPT-4-Turbo',
-          status: 'processed',
+          urgencyLevel: ['medium', 'high', 'medium'][i],
+          confidence: (0.91 + i * 0.02).toFixed(2),
         });
         totalRecords++;
       }
 
       // 4. RL Parts Optimizer - Create 2 parts optimizations with learning metrics
-      for (let i = 0; i < 2; i++) {
-        const optimization = await storage.createRLPartsOptimization({
+      // rl_parts_optimizations references a real spare part (part_id is a
+      // NOT NULL FK) and requires expected_demand/lead_time; there is no
+      // part_category or cost_savings column. Skip if no parts are seeded.
+      const sparePartsForRl = await storage.getSpareParts();
+      for (let i = 0; i < 2 && i < sparePartsForRl.length; i++) {
+        await storage.createRLPartsOptimization({
           garageId,
-          partCategory: ['brake_pads', 'oil_filters'][i],
+          partId: sparePartsForRl[i].id,
           currentStockLevel: 45 + i * 15,
           recommendedStockLevel: 60 + i * 10,
           reorderPoint: 25 + i * 5,
           reorderQuantity: 30 + i * 10,
-          confidenceScore: 0.88 + i * 0.04,
-          costSavings: 450 + i * 200,
-          agentVersion: 'RL-Agent-v1.2',
-          status: 'active',
+          expectedDemand: String(55 + i * 5),
+          leadTime: 7,
+          confidenceLevel: (0.88 + i * 0.04).toFixed(2),
+          reward: (0.85 + i * 0.05).toFixed(2),
+          actionTaken: 'reorder_triggered',
+          modelVersion: 'RL-Agent-v1.2',
         });
 
+        // rl_learning_episodes is per garage (no optimization FK); rewards
+        // and rates are decimal strings and steps_completed is NOT NULL.
         await storage.createRLLearningEpisode({
-          optimizationId: optimization.id,
+          garageId,
           episodeNumber: 150 + i * 50,
-          reward: 0.85 + i * 0.05,
-          loss: 0.12 - i * 0.02,
-          epsilon: 0.15 - i * 0.03,
-          learningRate: 0.001,
-          stateData: { stockLevel: 45 + i * 15, demandForecast: 55 },
-          actionTaken: 'reorder_triggered',
+          totalReward: (0.85 + i * 0.05).toFixed(2),
+          explorationRate: (0.15 - i * 0.03).toFixed(4),
+          learningRate: '0.0010',
+          stepsCompleted: 500 + i * 100,
+          convergenceMetric: (0.12 - i * 0.02).toFixed(6),
+          status: 'completed',
         });
         totalRecords += 2;
       }
@@ -16761,7 +16821,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sessionId: `visitor-${visitTime}-${i}`,
           duration: 15 + i * 8,
           interactionCount: 12 + i * 5,
-          vehiclesViewed: String(vehicleId),
+          // vehicles_viewed is a text array.
+          vehiclesViewed: [vehicleId],
           leadGenerated: i === 1,
           deviceType: i === 0 ? 'vr-headset' : 'browser',
         });
@@ -16826,34 +16887,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       totalRecords++;
 
+      // spatial_diagnostic_sessions: no garage/status columns; the work done
+      // is recorded in diagnostics_performed (jsonb, NOT NULL) with counters
+      // for issues/assets/gestures, and accuracy is a decimal string.
       await storage.createSpatialDiagnosticSession({
         workstationId: workstation.id,
-        garageId,
         technicianId: userId,
         vehicleId,
-        diagnosticType: 'comprehensive',
-        spatialMarkers: 8,
-        annotationsCreated: 5,
-        measurementsTaken: 12,
-        sessionDuration: 45,
-        accuracy: 0.97,
-        status: 'completed',
+        sessionType: 'comprehensive',
+        diagnosticsPerformed: { spatialMarkers: 8, annotationsCreated: 5, measurementsTaken: 12 },
+        issuesFound: 2,
+        virtualAssetsLoaded: 5,
+        handGesturesUsed: 12,
+        duration: 45 * 60,
+        accuracy: '0.97',
+        endedAt: new Date(),
       });
       totalRecords++;
 
       // 8. Autonomous Robots - Create 2 robots with 3 tasks
       const robots = [];
       for (let i = 0; i < 2; i++) {
+        // autonomous_robots: serial_number is NOT NULL/unique and the
+        // maintenance column is last_maintenance (a timestamp).
         const robot = await storage.createAutonomousRobot({
           garageId,
           robotName: ['AutoBot-Inspect-01', 'AutoBot-Parts-02'][i],
           robotType: i === 0 ? 'inspection' : 'parts_delivery',
-          capabilities: i === 0 
+          serialNumber: `ROBOT-${Date.now()}-${i}`,
+          capabilities: i === 0
             ? ['undercarriage_scan', 'fluid_level_check', 'tire_pressure_check']
             : ['parts_retrieval', 'parts_delivery', 'inventory_scan'],
           batteryLevel: 85 + i * 10,
           firmwareVersion: 'v4.2.1',
-          lastMaintenanceDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          lastMaintenance: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
           status: 'active',
         });
         robots.push(robot);
@@ -16862,61 +16929,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const taskTypes = ['undercarriage_inspection', 'parts_retrieval', 'inventory_scan'];
       for (let i = 0; i < 3; i++) {
+        // robot_tasks: no vehicle/estimate/percentage columns — duration is
+        // seconds, success_rate a decimal string, completed_at a Date.
         await storage.createRobotTask({
           robotId: robots[i % 2].id,
           taskType: taskTypes[i],
-          vehicleId: i === 0 ? vehicleId : undefined,
           priority: ['high', 'medium', 'low'][i],
-          estimatedDuration: [15, 8, 12][i],
-          actualDuration: [14, 9, 11][i],
-          completionPercentage: 100,
+          description: i === 0 ? `Inspection for vehicle ${vehicleId}` : undefined,
+          duration: [14, 9, 11][i] * 60,
+          successRate: '100.00',
           status: 'completed',
-          completedAt: new Date(Date.now() - (2 - i) * 60 * 60 * 1000).toISOString(),
+          assignedBy: userId,
+          completedAt: new Date(Date.now() - (2 - i) * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 9. Drone Fleet - Create 1 drone with 2 missions
+      // drone_fleets: drone_model/serial_number/max_flight_time/max_range are
+      // NOT NULL, sensors carries the capability list, hours are a decimal
+      // string, and last_maintenance is a timestamp.
       const drone = await storage.createDroneFleet({
         garageId,
         droneName: 'SkyInspect-Alpha',
-        droneType: 'inspection',
-        model: 'DJI Matrice 300 RTK',
-        capabilities: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
+        droneModel: 'DJI Matrice 300 RTK',
+        serialNumber: `DRONE-${Date.now()}`,
+        maxFlightTime: 55,
+        maxRange: '15.00',
+        sensors: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
         batteryLevel: 92,
-        flightHours: 245,
-        lastMaintenanceDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'ready',
+        totalFlightHours: '245.00',
+        lastMaintenance: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        status: 'available',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // drone_missions: target_location is jsonb (NOT NULL), media counts
+        // land in media_collected, findings in issues_detected (a count), and
+        // the completion time is end_time.
         await storage.createDroneMission({
           droneId: drone.id,
           missionType: i === 0 ? 'roof_inspection' : 'facility_survey',
-          targetLocation: i === 0 ? 'Customer Location - Warehouse' : 'Garage Facility',
-          flightDuration: 18 + i * 7,
-          imagesCaptured: 45 + i * 20,
-          videoRecorded: i === 0,
-          findingsDetected: i === 0 ? ['roof_damage', 'gutter_blockage'] : [],
+          targetLocation: { name: i === 0 ? 'Customer Location - Warehouse' : 'Garage Facility' },
+          flightDuration: (18 + i * 7) * 60,
+          mediaCollected: 45 + i * 20,
+          issuesDetected: i === 0 ? 2 : 0,
           pilotId: userId,
           status: 'completed',
-          completedAt: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+          endTime: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 10. Smart Contracts - Create 1 smart contract with 2 events
+      // smart_contracts: the network column is `blockchain` and there is no
+      // abi column — the interface definition rides inside terms.
       const contract = await storage.createSmartContract({
         garageId,
         contractType: 'service_warranty',
-        blockchainNetwork: 'Ethereum',
+        blockchain: 'Ethereum',
         contractAddress: '0x' + Math.random().toString(16).substring(2, 42),
-        abi: JSON.stringify([{ type: 'function', name: 'claimWarranty' }]),
         terms: {
           warrantyPeriod: '12 months',
           coverageAmount: 5000,
-          conditions: ['regular_maintenance', 'authorized_parts']
+          conditions: ['regular_maintenance', 'authorized_parts'],
+          abi: [{ type: 'function', name: 'claimWarranty' }],
         },
         partyA: garageId,
         partyB: userId,
@@ -16925,162 +17003,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // contract_events: gas_used is a decimal string and there is no
+        // event_date column (created_at defaults).
         await storage.createContractEvent({
           contractId: contract.id,
           eventType: i === 0 ? 'contract_created' : 'milestone_reached',
           transactionHash: '0x' + Math.random().toString(16).substring(2, 66),
           blockNumber: 18500000 + i * 100,
-          eventData: i === 0 
+          eventData: i === 0
             ? { action: 'contract_deployed', parties: 2 }
             : { milestone: 'first_service_completed', value: 1200 },
-          gasUsed: 21000 + i * 5000,
-          eventDate: new Date(Date.now() - (1 - i) * 12 * 60 * 60 * 1000).toISOString(),
+          gasUsed: String(21000 + i * 5000),
+          triggeredBy: userId,
         });
         totalRecords++;
       }
 
       // 11. Carbon Credits - Create 1 credit and 2 emission records
+      // carbon_credits: credit_type/quantity/unit_price/total_value are the
+      // NOT NULL core; there is no credit_amount or issuance_date.
       const carbonCredit = await storage.createCarbonCredit({
         garageId,
-        creditAmount: 15.5,
-        carbonOffsetTons: 15.5,
+        creditType: 'offset',
+        quantity: '15.50',
+        unitPrice: '25.00',
+        totalValue: '387.50',
         projectName: 'Solar Panel Installation & EV Fleet Conversion',
         verificationStandard: 'Gold Standard',
-        issuanceDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
+        vintageYear: new Date().getFullYear() - 1,
+        expiryDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000),
         certificateUrl: 'https://certificates.example.com/carbon/' + garageId,
-        status: 'active',
+        status: 'available',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // carbon_emissions: the offset link is offset_by, the amount is
+        // co2_equivalent (decimal string), the date is emission_date, and
+        // verified_by references users, so free text cannot go there.
         await storage.createCarbonEmission({
           garageId,
-          creditId: carbonCredit.id,
+          offsetBy: carbonCredit.id,
+          isOffset: true,
           emissionSource: i === 0 ? 'electricity_usage' : 'vehicle_fleet',
-          co2Tons: i === 0 ? 8.5 : 6.2,
-          calculationMethod: 'EPA Standard',
-          verifiedBy: 'Third-party Auditor',
+          co2Equivalent: i === 0 ? '8.50' : '6.20',
+          unit: 'tons',
+          activity: 'EPA Standard calculation',
           reportingPeriod: `2024-Q${i + 3}`,
-          recordDate: new Date(Date.now() - (1 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          emissionDate: new Date(Date.now() - (1 - i) * 30 * 24 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 12. Green Energy - Create 1 solar asset and 1 EV charging station
+      // green_energy_assets: decimals take strings, the unit column is
+      // `unit`, dates are timestamps, and there is no model column.
       await storage.createGreenEnergyAsset({
         garageId,
         assetName: 'Rooftop Solar Array - Main Building',
         assetType: 'solar_panel',
-        capacity: 50.0,
-        capacityUnit: 'kW',
-        installationDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+        capacity: '50.00',
+        unit: 'kW',
+        installationDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
         manufacturer: 'SunPower',
-        model: 'Maxeon 5',
-        efficiency: 0.22,
-        currentOutput: 38.5,
-        totalEnergyGenerated: 15250.0,
+        efficiency: '22.00',
+        currentOutput: '38.50',
+        totalEnergyGenerated: '15250.00',
         status: 'operational',
       });
       totalRecords++;
 
+      // ev_charging_stations: charger_type/power_rating are the NOT NULL
+      // pair, connectors are an array, energy is total_energy_delivered and
+      // the state column is current_status.
       await storage.createEVChargingStation({
         garageId,
         stationName: 'Customer EV Charger - Bay 1',
-        stationType: 'Level 2',
-        powerOutput: 7.2,
-        connector: 'J1772',
-        manufacturer: 'ChargePoint',
-        installationDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-        utilizationRate: 0.68,
+        chargerType: 'Level 2',
+        powerRating: '7.20',
+        connectorTypes: ['J1772'],
+        networkProvider: 'ChargePoint',
         totalChargingSessions: 245,
-        totalEnergyDispensed: 3580.5,
-        status: 'available',
+        totalEnergyDelivered: '3580.50',
+        currentStatus: 'available',
       });
       totalRecords++;
 
       // 13. Circular Economy - Create 2 recycled parts and 1 sustainability metric
       for (let i = 0; i < 2; i++) {
+        // recycled_parts: condition and recycling_method are the NOT NULL
+        // pair; savings figures live in the environmental_savings jsonb, and
+        // part numbers/suppliers have no columns of their own.
         await storage.createRecycledPart({
           garageId,
           partName: ['Alternator - Remanufactured', 'Starter Motor - Refurbished'][i],
-          partNumber: `RCY-${10000 + i}`,
-          originalPartSource: i === 0 ? 'Toyota Camry 2020' : 'Honda Accord 2019',
-          recyclingProcess: i === 0 ? 'remanufacturing' : 'refurbishment',
+          condition: i === 0 ? 'remanufactured' : 'refurbished',
+          recyclingMethod: i === 0 ? 'remanufacturing' : 'refurbishment',
           qualityGrade: i === 0 ? 'A' : 'A-',
-          costSavings: i === 0 ? 250 : 180,
-          co2Saved: i === 0 ? 12.5 : 9.8,
+          sellingPrice: i === 0 ? '250.00' : '180.00',
+          environmentalSavings: {
+            costSavings: i === 0 ? 250 : 180,
+            co2SavedTons: i === 0 ? 12.5 : 9.8,
+            source: i === 0 ? 'Toyota Camry 2020' : 'Honda Accord 2019',
+            supplier: 'GreenParts International',
+          },
           certificationNumber: `CERT-RCY-${2025000 + i}`,
-          supplier: 'GreenParts International',
           status: 'available',
         });
         totalRecords++;
       }
 
+      // sustainability_metrics: values are decimal strings, the benchmark is
+      // target_value, progress is achievement_rate, and certifications is a
+      // text array; there is no notes/record_date.
       await storage.createSustainabilityMetric({
         garageId,
         metricType: 'waste_recycling',
-        metricValue: 78.5,
+        metricValue: '78.50',
         unit: 'percentage',
         reportingPeriod: '2024-Q4',
-        benchmark: 75.0,
-        improvement: 5.2,
-        certificationBody: 'ISO 14001',
-        notes: 'Exceeded quarterly recycling target',
-        recordDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        targetValue: '75.00',
+        achievementRate: '104.67',
+        certifications: ['ISO 14001'],
+        verified: false,
       });
       totalRecords++;
 
       // 14. Satellite - Create 1 satellite connection with 2 usage logs
+      // satellite_connections: provider (not providerName), location is
+      // jsonb NOT NULL, bandwidth is a decimal string in Mbps, terminal_id
+      // must be unique, and the allowance column is data_limit.
       const satellite = await storage.createSatelliteConnection({
         garageId,
-        providerName: 'Starlink Business',
-        connectionType: 'satellite_internet',
-        bandwidth: '250 Mbps',
+        provider: 'Starlink Business',
+        terminalId: `STARLINK-${garageId.substring(0, 8)}-${Date.now()}`,
+        location: { site: 'main_facility' },
+        bandwidth: '250.00',
         latency: 35,
-        terminalId: 'STARLINK-' + garageId.substring(0, 8),
-        installationDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
-        monthlyDataAllowance: 1000.0,
+        dataLimit: '1000.00',
         status: 'active',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // satellite_usage_logs: a session window (session_start NOT NULL)
+        // with data_transferred/average_speed as decimal strings.
         await storage.createSatelliteUsageLog({
           connectionId: satellite.id,
-          dataUsed: 45.5 + i * 12.3,
-          peakBandwidth: 185 + i * 25,
-          averageLatency: 38 + i * 3,
-          uptime: 99.8 - i * 0.2,
-          usageDate: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+          sessionStart: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000),
+          sessionEnd: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000),
+          dataTransferred: (45.5 + i * 12.3).toFixed(2),
+          averageSpeed: String(185 + i * 25),
+          applicationUsed: 'telematics_sync',
+          userId,
         });
         totalRecords++;
       }
 
       // 15. Quantum Encryption - Create 1 encryption key and 2 secure messages
+      // quantum_encryption_keys: key_type and key_size are the NOT NULL
+      // pair; expiry is expires_at and generation defaults server-side.
       const quantumKey = await storage.createQuantumEncryptionKey({
         garageId,
         keyName: 'Master Encryption Key - Q1',
+        keyType: 'lattice',
         algorithm: 'Lattice-based-Kyber-1024',
-        keyLength: 1024,
-        generatedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        expirationDate: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000).toISOString(),
-        quantumResistant: true,
+        keySize: 1024,
+        expiresAt: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000),
         usageCount: 24,
         status: 'active',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // quantum_secure_messages: garage-scoped, the key link is
+        // encryption_key_id, payload/hash are encrypted_content/
+        // integrity_hash, message_type is NOT NULL, and delivery state is
+        // delivery_status.
         await storage.createQuantumSecureMessage({
-          keyId: quantumKey.id,
+          garageId,
+          encryptionKeyId: quantumKey.id,
           senderId: userId,
           recipientId: userId,
-          encryptedPayload: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
-          encryptionAlgorithm: 'Lattice-based-Kyber-1024',
-          messageHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
-          transmissionDate: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000).toISOString(),
-          status: i === 0 ? 'delivered' : 'pending',
+          messageType: 'notification',
+          encryptedContent: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
+          integrityHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
+          transmissionMethod: 'quantum_channel',
+          deliveryStatus: i === 0 ? 'delivered' : 'pending',
+          sentAt: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
