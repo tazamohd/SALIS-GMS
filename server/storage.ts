@@ -803,6 +803,23 @@ import { db } from "./db";
 import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
 
+/**
+ * A users row with the bcrypt hash removed.
+ *
+ * Only the credential check may see `password`. Every method that hands user
+ * rows to a caller for display returns SafeUser instead, because those rows are
+ * serialised straight into API responses — /api/customers was returning
+ * `$2b$10$...` hashes for every customer in the garage to any authenticated
+ * caller.
+ */
+export type SafeUser = Omit<User, "password">;
+
+/** Drop the hash from a row on its way out of the storage layer. */
+function stripPassword(row: User): SafeUser {
+  const { password: _discarded, ...rest } = row;
+  return rest;
+}
+
 // Interface for storage operations
 export interface IStorage {
   // User operations
@@ -811,7 +828,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   createUser(user: UpsertUser): Promise<User>;
   deleteUser(id: string): Promise<void>;
-  getTechnicians(garageId?: string): Promise<User[]>;
+  getTechnicians(garageId?: string): Promise<SafeUser[]>;
   getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined>;
   createTechnicianProfile(data: InsertTechnicianProfile): Promise<TechnicianProfile>;
   updateTechnicianProfile(userId: string, data: Partial<TechnicianProfile>): Promise<TechnicianProfile>;
@@ -900,8 +917,8 @@ export interface IStorage {
   updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment>;
   
   // Customer Management operations - Module 10
-  getCustomers(garageId?: string, searchQuery?: string): Promise<User[]>;
-  getCustomer(id: string): Promise<User | undefined>;
+  getCustomers(garageId?: string, searchQuery?: string): Promise<SafeUser[]>;
+  getCustomer(id: string): Promise<SafeUser | undefined>;
   getVehicles(garageId?: string): Promise<Vehicle[]>;
   getCustomerVehicles(customerId: string): Promise<Vehicle[]>;
   getVehicle(id: string): Promise<Vehicle | undefined>;
@@ -2157,7 +2174,7 @@ export interface IStorage {
   calculateDynamicPrice(params: { serviceType: string; vehicleMake?: string; vehicleYear?: number; vehicleClass?: string; region?: string }): Promise<{ basePrice: number; suggestedPrice: number; minPrice: number; maxPrice: number; factors: any; confidence: number }>;
 
   // Search methods (server-side filtered, garage-scoped — fixes OOM in /api/search)
-  searchCustomers(garageId: string, pattern: string, limit: number): Promise<User[]>;
+  searchCustomers(garageId: string, pattern: string, limit: number): Promise<SafeUser[]>;
   searchVehicles(garageId: string, pattern: string, limit: number): Promise<Vehicle[]>;
   searchParts(garageId: string, pattern: string, limit: number): Promise<SparePart[]>;
   searchInvoices(garageId: string, pattern: string, limit: number): Promise<Invoice[]>;
@@ -2165,7 +2182,7 @@ export interface IStorage {
   searchAppointments(garageId: string, pattern: string, limit: number): Promise<Appointment[]>;
 
   // Paginated list methods (SA-017)
-  getCustomersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]>;
+  getCustomersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SafeUser[]>;
   countCustomers(garageId: string | undefined): Promise<number>;
   getVehiclesPaginated(garageId: string | undefined, limit: number, offset: number): Promise<Vehicle[]>;
   countVehicles(garageId: string | undefined): Promise<number>;
@@ -2181,7 +2198,7 @@ export interface IStorage {
   countSuppliers(garageId: string | undefined): Promise<number>;
   getGaragesPaginated(limit: number, offset: number): Promise<any[]>;
   countGarages(): Promise<number>;
-  getTechniciansPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]>;
+  getTechniciansPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SafeUser[]>;
   countTechnicians(garageId: string | undefined): Promise<number>;
   getEstimatesPaginated(garageId: string | undefined, status: string | undefined, limit: number, offset: number): Promise<any[]>;
   countEstimates(garageId: string | undefined, status: string | undefined): Promise<number>;
@@ -2225,16 +2242,16 @@ export class DatabaseStorage implements IStorage {
     await db.delete(users).where(eq(users.id, id));
   }
 
-  async getTechnicians(garageId?: string): Promise<User[]> {
+  async getTechnicians(garageId?: string): Promise<SafeUser[]> {
     if (garageId) {
-      return await db.select().from(users).where(
+      return (await db.select().from(users).where(
         and(
           eq(users.userType, 'technician'),
           eq(users.garageId, garageId)
         )
-      );
+      )).map(stripPassword);
     }
-    return await db.select().from(users).where(eq(users.userType, 'technician'));
+    return (await db.select().from(users).where(eq(users.userType, 'technician'))).map(stripPassword);
   }
 
   async getTechnicianProfile(userId: string): Promise<TechnicianProfile | undefined> {
@@ -2704,7 +2721,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Customer Management operations - Module 10
-  async getCustomers(garageId?: string, searchQuery?: string): Promise<User[]> {
+  async getCustomers(garageId?: string, searchQuery?: string): Promise<SafeUser[]> {
     const conditions = [eq(users.userType, "customer")];
     
     if (garageId) {
@@ -2724,13 +2741,13 @@ export class DatabaseStorage implements IStorage {
     
     let query = db.select().from(users).where(and(...conditions));
     
-    return await query.orderBy(desc(users.createdAt));
+    return (await query.orderBy(desc(users.createdAt))).map(stripPassword);
   }
 
-  async getCustomer(id: string): Promise<User | undefined> {
+  async getCustomer(id: string): Promise<SafeUser | undefined> {
     const [customer] = await db.select().from(users)
       .where(eq(users.id, id));
-    return customer;
+    return customer ? stripPassword(customer) : undefined;
   }
 
   async getVehicles(garageId?: string): Promise<Vehicle[]> {
@@ -12104,9 +12121,9 @@ export class DatabaseStorage implements IStorage {
 
   // ==================== Search methods (server-side filtered, OOM-safe) ====================
 
-  async searchCustomers(garageId: string, pattern: string, limit: number): Promise<User[]> {
+  async searchCustomers(garageId: string, pattern: string, limit: number): Promise<SafeUser[]> {
     const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
-    return await db
+    return (await db
       .select()
       .from(users)
       .where(
@@ -12120,7 +12137,7 @@ export class DatabaseStorage implements IStorage {
           )
         )
       )
-      .limit(limit);
+      .limit(limit)).map(stripPassword);
   }
 
   async searchVehicles(garageId: string, pattern: string, limit: number): Promise<Vehicle[]> {
@@ -12210,17 +12227,17 @@ export class DatabaseStorage implements IStorage {
 
   // ==================== Paginated list methods (SA-017) ====================
 
-  async getCustomersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]> {
+  async getCustomersPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SafeUser[]> {
     const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'customer');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
-    return await db
+    return (await db
       .select()
       .from(users)
       .where(where)
       .orderBy(users.createdAt)
       .limit(limit)
-      .offset(offset);
+      .offset(offset)).map(stripPassword);
   }
 
   async countCustomers(garageId: string | undefined): Promise<number> {
@@ -12362,11 +12379,11 @@ export class DatabaseStorage implements IStorage {
     return Number(result[0]?.count ?? 0);
   }
 
-  async getTechniciansPaginated(garageId: string | undefined, limit: number, offset: number): Promise<User[]> {
+  async getTechniciansPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SafeUser[]> {
     const { users } = await import("@shared/schema").then(m => ({ users: m.users }));
     const baseWhere = eq(users.userType, 'technician');
     const where = garageId ? and(baseWhere, eq(users.garageId, garageId)) : baseWhere;
-    return await db.select().from(users).where(where).orderBy(users.createdAt).limit(limit).offset(offset);
+    return (await db.select().from(users).where(where).orderBy(users.createdAt).limit(limit).offset(offset)).map(stripPassword);
   }
 
   async countTechnicians(garageId: string | undefined): Promise<number> {
