@@ -155,6 +155,7 @@ import {
   insertIoTSensorReadingSchema,
   insertIoTAlertSchema,
   insertJobTrackingEventSchema,
+  insertServiceFeedbackSchema,
   fleetContracts,
   fleetGroups,
   contractUtilization,
@@ -401,9 +402,10 @@ const videoEstimateSchema = z.object({
 });
 
 const digitalWalkaroundSchema = z.object({
-  jobCardId: z.string().optional(),
+  // digital_walkarounds.job_card_id is NOT NULL — a walkaround only exists
+  // in the context of a job.
+  jobCardId: z.string(),
   vehicleId: z.string(),
-  customerId: z.string(),
   technicianId: z.string(),
   inspectionType: z.enum(['pre-service', 'post-service', 'damage-assessment']),
   photos: z.array(z.object({
@@ -429,6 +431,11 @@ const reviewResponseSchema = z.object({
 
 const generateReferralCodeSchema = z.object({
   customerId: z.string(),
+  // customer_referrals requires the program and the referee's email
+  // (program_id and referee_email are NOT NULL).
+  programId: z.string(),
+  refereeEmail: z.string().email(),
+  refereeName: z.string().optional(),
 });
 
 const applyReferralCodeSchema = z.object({
@@ -6923,10 +6930,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (jobCards.length > 0) {
           // Use GPT-5 AI to analyze service patterns and predict maintenance needs
+          // job_cards has no mileage column; the closest reading is the
+          // vehicle's own odometer.
           const serviceHistory = jobCards.map(jc => ({
             date: jc.createdAt,
             description: jc.description || 'Service performed',
-            mileage: jc.mileage || vehicle.mileage,
+            mileage: vehicle.mileage ?? 0,
             cost: jc.totalCost || 0
           }));
 
@@ -6947,7 +6956,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               predictedIssue: aiPred.issue || `Maintenance needed for ${vehicle.make} ${vehicle.model}`,
               severity: aiPred.severity || 'medium',
               recommendedAction: aiPred.recommendation || 'Schedule inspection',
-              estimatedTimeframe: `Around ${aiPred.estimatedMiles || vehicle.mileage + 1000} miles`,
+              estimatedTimeframe: `Around ${aiPred.estimatedMiles || (vehicle.mileage ?? 0) + 1000} miles`,
               confidence: Math.round((aiPred.probability || 0.75) * 100),
               basedOnData: {
                 serviceHistory: serviceHistory.slice(-3),
@@ -14265,7 +14274,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/service-tracking/:jobCardId', isAuthenticated, async (req, res) => {
     try {
       const { jobCardId } = req.params;
-      const timeline = await phase4Service.getServiceTrackingTimeline(jobCardId);
+      // The service exports this as getJobCardTimeline.
+      const timeline = await phase4Service.getJobCardTimeline(jobCardId);
       res.json(timeline);
     } catch (error) {
       console.error("Error fetching service tracking timeline:", error);
@@ -14280,15 +14290,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = serviceTrackingUpdateSchema.parse(req.body);
       
+      // createServiceUpdate writes service_tracking_updates, whose columns
+      // are title/description/technicianId/photoUrls — not message/photoUrl.
       const updateData = {
         jobCardId,
-        userId,
+        technicianId: userId,
         status: validated.status,
-        message: validated.message,
-        photoUrl: validated.photoUrl,
+        title: validated.status,
+        description: validated.message,
+        photoUrls: validated.photoUrl ? [validated.photoUrl] : undefined,
         estimatedCompletion: validated.estimatedCompletion ? new Date(validated.estimatedCompletion) : undefined,
       };
-      const update = await phase4Service.postServiceUpdate(updateData);
+      const update = await phase4Service.createServiceUpdate(updateData);
       res.status(201).json(update);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14315,7 +14328,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         thumbnailUrl: validated.thumbnailUrl,
         duration: validated.duration,
         transcription: validated.transcription,
-        estimatedCost: validated.estimatedCost,
+        // The service takes the cost as a number and stringifies it for the
+        // decimal column itself.
+        estimatedCost: Number(validated.estimatedCost) || undefined,
         recommendedServices: validated.recommendedServices,
       };
       const estimate = await phase4Service.createVideoEstimate(estimateData);
@@ -14343,7 +14358,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/video-estimates/:id/approve', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const estimate = await phase4Service.approveVideoEstimate(id);
+      // The service's status updater covers approval.
+      const estimate = await phase4Service.updateVideoEstimateStatus(id, 'approved');
       res.json(estimate);
     } catch (error) {
       console.error("Error approving video estimate:", error);
@@ -14358,15 +14374,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = digitalWalkaroundSchema.parse(req.body);
       
+      // digital_walkarounds has no garage_id or customer_id; its type column
+      // is walkaround_type and free-form damage notes land in
+      // new_damage_identified.
       const walkaroundData = {
-        garageId,
         jobCardId: validated.jobCardId,
         vehicleId: validated.vehicleId,
-        customerId: validated.customerId,
         technicianId: validated.technicianId,
-        inspectionType: validated.inspectionType,
+        walkaroundType: validated.inspectionType,
         photos: validated.photos,
-        damageNotes: validated.damageNotes,
+        newDamageIdentified: validated.damageNotes,
       };
       const walkaround = await phase4Service.createDigitalWalkaround(walkaroundData);
       res.status(201).json(walkaround);
@@ -14400,16 +14417,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = customerReviewSchema.parse(req.body);
       
+      // customer_reviews keeps the text in `comment`; there is no review_url
+      // column, so the URL travels with the comment when provided.
       const reviewData = {
         garageId,
         customerId: validated.customerId,
         jobCardId: validated.jobCardId,
         platform: validated.platform,
         rating: validated.rating,
-        reviewText: validated.reviewText,
-        reviewUrl: validated.reviewUrl,
+        comment: validated.reviewUrl
+          ? [validated.reviewText, validated.reviewUrl].filter(Boolean).join('\n')
+          : validated.reviewText,
       };
-      const review = await phase4Service.postCustomerReview(reviewData);
+      const review = await phase4Service.createCustomerReview(reviewData);
       res.status(201).json(review);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14424,8 +14444,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { platform } = req.query;
-      const reviews = await phase4Service.getReviewsByPlatform(garageId, platform as string);
-      res.json(reviews);
+      // The service lists a garage's public reviews; platform filtering
+      // happens here since getGarageReviews does not take one.
+      const reviews = await phase4Service.getGarageReviews(garageId);
+      res.json(platform ? reviews.filter((r) => r.platform === platform) : reviews);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       res.status(500).json({ message: "Failed to fetch reviews" });
@@ -14457,8 +14479,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = generateReferralCodeSchema.parse(req.body);
       
-      const code = await phase4Service.generateReferralCode(garageId, validated.customerId);
-      res.json({ code });
+      const referral = await phase4Service.generateReferralCode(
+        validated.customerId,
+        validated.programId,
+        validated.refereeEmail,
+        validated.refereeName,
+      );
+      res.json({ code: referral.referralCode });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json(sanitizeZodError(error));
@@ -14474,7 +14501,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = applyReferralCodeSchema.parse(req.body);
       
-      const result = await phase4Service.applyReferralCode(garageId, validated.referralCode, validated.newCustomerId);
+      // applyReferralCode resolves the referral by its code; the garage
+      // plays no part in the lookup.
+      const result = await phase4Service.applyReferralCode(validated.referralCode, validated.newCustomerId);
       res.json(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14581,13 +14610,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = routingOptimizationSchema.parse(req.body);
       
+      // routing_optimizations.start_location is varchar and the service takes
+      // total_distance as a number, so both need converting from the
+      // validator's shapes.
       const routeData = {
         garageId,
         routeDate: new Date(validated.routeDate),
         routeType: validated.routeType,
-        startLocation: validated.startLocation,
+        startLocation: validated.startLocation.address,
         stops: validated.stops,
-        totalDistance: validated.totalDistance,
+        totalDistance: Number(validated.totalDistance) || undefined,
         estimatedDuration: validated.estimatedDuration,
         assignedDriver: validated.assignedDriver,
       };
@@ -14619,7 +14651,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const garageId = req.user?.garageId;
-      const entry = await phase5Service.clockIn(garageId, userId);
+      // clockIn is (employeeId, garageId) — the arguments were reversed, so
+      // every entry recorded the garage as the employee.
+      const entry = await phase5Service.clockIn(userId, garageId);
       res.status(201).json(entry);
     } catch (error) {
       console.error("Error clocking in:", error);
@@ -14630,7 +14664,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/timeclock/clock-out', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const entry = await phase5Service.clockOut(userId);
+      // clockOut takes a time-clock entry id; the caller only knows who they
+      // are, so resolve their open entry first.
+      const entry = await phase5Service.clockOutByEmployee(userId, req.body?.breakDuration ?? 0);
       res.json(entry);
     } catch (error) {
       console.error("Error clocking out:", error);
@@ -14693,7 +14729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { days } = req.query;
-      const dueCalibrations = await phase5Service.getCalibrationsDue(garageId, days ? parseInt(days) : 30);
+      const dueCalibrations = await phase5Service.getDueCalibrations(garageId, days ? parseInt(days) : 30);
       res.json(dueCalibrations);
     } catch (error) {
       console.error("Error fetching due calibrations:", error);
@@ -14717,12 +14753,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         complianceType: validated.complianceType,
         recordDate: new Date(validated.recordDate),
         wasteType: validated.wasteType,
-        quantity: validated.quantity,
+        quantity: validated.quantity !== undefined ? Number(validated.quantity) || undefined : undefined,
         unit: validated.unit,
         disposalMethod: validated.disposalMethod,
         disposalCompany: validated.disposalCompany,
         certificationNumber: validated.certificationNumber,
-        cost: validated.cost,
+        // The service takes numbers and stringifies them for the decimal
+        // columns itself.
+        cost: validated.cost !== undefined ? Number(validated.cost) || undefined : undefined,
         regulatoryStandard: validated.regulatoryStandard,
         attachments: validated.attachments,
         notes: validated.notes,
@@ -14754,11 +14792,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
-      const analytics = await phase6Service.getComplianceAnalytics(
-        garageId,
-        startDate ? new Date(startDate as string) : undefined,
-        endDate ? new Date(endDate as string) : undefined
-      );
+      // The service aggregates over a closed date range; default to the
+      // trailing year when the caller doesn't narrow it.
+      const to = endDate ? new Date(endDate as string) : new Date();
+      const from = startDate
+        ? new Date(startDate as string)
+        : new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getComplianceAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching compliance analytics:", error);
@@ -14775,9 +14815,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const checklistData = {
         garageId,
-        checklistName: validated.checklistName,
-        checklistType: validated.checklistType,
-        items: validated.items,
+        // quality_checklists calls these name/category/checklist_items.
+        name: validated.checklistName,
+        category: validated.checklistType,
+        checklistItems: validated.items,
       };
       const checklist = await phase6Service.createQualityChecklist(checklistData);
       res.status(201).json(checklist);
@@ -14800,9 +14841,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId,
         ncNumber: validated.ncNumber,
         jobCardId: validated.jobCardId,
+        // non_conformances requires a title and records who found it as
+        // detected_by/detected_date. Derive the title from the description.
+        title: validated.description.slice(0, 120),
         description: validated.description,
         severity: validated.severity,
-        reportedBy: validated.reportedBy,
+        detectedBy: validated.reportedBy,
+        detectedDate: new Date(),
         category: validated.category,
       };
       const nonConformance = await phase6Service.createNonConformance(ncData);
@@ -14878,11 +14923,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
-      const analytics = await phase6Service.getSafetyAnalytics(
-        garageId,
-        startDate ? new Date(startDate as string) : undefined,
-        endDate ? new Date(endDate as string) : undefined
-      );
+      // Same closed-range contract as the compliance analytics: default to
+      // the trailing year.
+      const to = endDate ? new Date(endDate as string) : new Date();
+      const from = startDate
+        ? new Date(startDate as string)
+        : new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getSafetyAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching safety analytics:", error);
@@ -14909,11 +14956,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         policyNumber: validated.data.policyNumber,
         claimType: validated.data.claimType,
         incidentDate: new Date(validated.data.incidentDate),
-        claimAmount: validated.data.claimAmount,
-        deductible: validated.data.deductible,
+        // The service takes amounts as numbers (it stringifies for the
+        // decimal columns), names the contact adjuster_contact, and stores
+        // free text in notes.
+        claimAmount: Number(validated.data.claimAmount) || 0,
+        deductible: validated.data.deductible !== undefined ? Number(validated.data.deductible) || undefined : undefined,
         adjusterName: validated.data.adjusterName,
-        adjusterPhone: validated.data.adjusterPhone,
-        description: validated.data.description,
+        adjusterContact: validated.data.adjusterPhone,
+        notes: validated.data.description,
         documents: validated.data.documents,
       };
       const claim = await phase6Service.createInsuranceClaim(claimData);
@@ -14944,10 +14994,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = validatePatchBody(req, res, updateInsuranceClaimSchema);
       if (!validated.ok) return;
 
+      // updateClaimStatus's third parameter is the approved amount, not
+      // free-text notes.
       const claim = await phase6Service.updateClaimStatus(
         id,
         validated.data.status!,
-        validated.data.notes
+        validated.data.approvedAmount !== undefined ? Number(validated.data.approvedAmount) : undefined
       );
       res.json(claim);
     } catch (error) {
@@ -14959,7 +15011,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/insurance/claims/analytics', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const analytics = await phase6Service.getClaimsAnalytics(garageId);
+      // Closed date range required; default to the trailing year.
+      const to = new Date();
+      const from = new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getClaimsAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching claims analytics:", error);
@@ -14978,12 +15033,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = barcodeScanSchema.parse(req.body);
       
+      // barcode_scans stores the payload as scan_type/barcode_data and links
+      // the scanned entity through the part/vehicle/tool id columns.
       const scanData = {
         garageId,
-        barcodeValue: validated.barcodeValue,
-        barcodeType: validated.barcodeType,
-        entityType: validated.entityType,
-        entityId: validated.entityId,
+        scanType: validated.entityType,
+        barcodeData: validated.barcodeValue,
+        partId: validated.entityType === 'part' ? validated.entityId : undefined,
+        vehicleId: validated.entityType === 'vehicle' ? validated.entityId : undefined,
+        toolId: validated.entityType === 'tool' ? validated.entityId : undefined,
         scannedBy: validated.scannedBy,
         location: validated.location,
       };
@@ -15001,12 +15059,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/barcode/history', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const { entityType, limit } = req.query;
-      const history = await phase7Service.getScanHistory(
-        garageId,
-        entityType as string,
-        limit ? parseInt(limit) : 100
-      );
+      const { entityType } = req.query;
+      // Exported as getBarcodeScanHistory; it filters by scan type and caps
+      // its own result size.
+      const history = await phase7Service.getBarcodeScanHistory(garageId, entityType as string | undefined);
       res.json(history);
     } catch (error) {
       console.error("Error fetching scan history:", error);
@@ -15043,12 +15099,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = signageContentSchema.parse(req.body);
       
+      // signage_content keeps the payload in a single jsonb `content` column
+      // rather than separate url/title/description fields.
       const contentData = {
         displayId: validated.displayId,
         contentType: validated.contentType,
-        contentUrl: validated.contentUrl,
-        title: validated.title,
-        description: validated.description,
+        content: {
+          url: validated.contentUrl,
+          title: validated.title,
+          description: validated.description,
+        },
         duration: validated.duration,
         validFrom: validated.validFrom ? new Date(validated.validFrom) : undefined,
         validUntil: validated.validUntil ? new Date(validated.validUntil) : undefined,
@@ -15083,12 +15143,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = kioskSessionSchema.parse(req.body);
       
-      const sessionData = {
-        garageId,
-        kioskId: validated.kioskId,
-        sessionType: validated.sessionType,
-      };
-      const session = await phase7Service.createKioskSession(sessionData);
+      // Exported as startKioskSession(garageId, kioskId); kiosk_sessions has
+      // no session_type column.
+      const session = await phase7Service.startKioskSession(garageId, validated.kioskId);
       res.status(201).json(session);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -15103,14 +15160,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = kioskCheckInSchema.parse(req.body);
       
+      // kiosk_check_ins stores the requested service as jsonb and the
+      // signature as signature_url; there is no check_in_type or notes
+      // column, so those travel inside service_requested.
       const checkInData = {
         sessionId: validated.sessionId,
         customerId: validated.customerId,
         vehicleId: validated.vehicleId,
         appointmentId: validated.appointmentId,
-        checkInType: validated.checkInType,
-        signature: validated.signature,
-        additionalNotes: validated.additionalNotes,
+        serviceRequested: {
+          checkInType: validated.checkInType,
+          notes: validated.additionalNotes,
+        },
+        signatureUrl: validated.signature,
       };
       const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
       res.status(201).json(checkIn);
@@ -15154,10 +15216,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = cameraRecordingSchema.parse(req.body);
       
+      // camera_recordings names the window recording_start/recording_end.
       const recordingData = {
         cameraId: validated.cameraId,
-        startTime: new Date(validated.startTime),
-        endTime: new Date(validated.endTime),
+        recordingStart: new Date(validated.startTime),
+        recordingEnd: new Date(validated.endTime),
         recordingUrl: validated.recordingUrl,
         fileSize: validated.fileSize,
         eventType: validated.eventType,
@@ -15862,36 +15925,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create quality check record
-      const checkData = {
+      // Create quality check record. vision_quality_checks requires
+      // image_url, defects_detected and ai_model, keeps the score as a
+      // decimal string, and links the vehicle by uuid — no 'demo-vehicle'
+      // sentinel.
+      const check = await storage.createVisionQualityCheck({
         garageId: req.user!.garageId!,
-        vehicleId: vehicleId || 'demo-vehicle',
+        vehicleId: vehicleId || undefined,
         checkType: checkType || 'paint_inspection',
-        inspectionDate: new Date().toISOString(),
-        qualityScore,
-        passed: qualityScore >= 80,
-        defectsFound: defects.length,
-        inspector: req.user!.id,
-        aiAnalysis: {
-          model: 'gpt-5-vision',
-          confidence: 0.85,
-          processingTime: 2.3
-        }
-      };
+        imageUrl: req.body.imageUrl || 'simulated://no-image',
+        defectsDetected: defects,
+        qualityScore: qualityScore.toString(),
+        passedInspection: qualityScore >= 80,
+        inspectorId: req.user!.id,
+        aiModel: 'gpt-5-vision',
+        processingTimeMs: 2300,
+      });
 
-      const check = await storage.createVisionQualityCheck(checkData);
-
-      // Create defect records
+      // Create defect records. vision_defects hangs off the quality check
+      // (no garage_id/status columns), takes location as jsonb and
+      // confidence as a decimal string.
       for (const defect of defects) {
         await storage.createVisionDefect({
-          garageId: req.user!.garageId!,
-          checkId: check.id,
+          qualityCheckId: check.id,
           defectType: defect.type,
           severity: defect.severity,
           description: defect.description,
-          location: JSON.stringify(defect.location),
-          confidence: defect.confidence,
-          status: 'pending'
+          location: defect.location,
+          confidence: defect.confidence.toString(),
         });
       }
 
@@ -18411,7 +18472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit feedback
   app.post('/api/feedback', isAuthenticated, async (req: any, res) => {
     try {
-      const validated = schema.insertServiceFeedbackSchema.parse(req.body);
+      const validated = insertServiceFeedbackSchema.parse(req.body);
       const feedback = await storage.createServiceFeedback(validated);
       
       // Update technician summary asynchronously

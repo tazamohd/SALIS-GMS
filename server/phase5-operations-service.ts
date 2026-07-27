@@ -467,6 +467,43 @@ export async function clockOut(entryId: string, breakDuration: number = 0) {
   }
 }
 
+/** Clock-out for callers that only know who they are: resolves the
+ *  employee's open entry (no clock-out time yet) and closes it. */
+export async function clockOutByEmployee(employeeId: string, breakDuration: number = 0) {
+  const [open] = await db
+    .select({ id: timeClockEntries.id })
+    .from(timeClockEntries)
+    .where(and(
+      eq(timeClockEntries.employeeId, employeeId),
+      sql`${timeClockEntries.clockOutTime} IS NULL`
+    ))
+    .orderBy(desc(timeClockEntries.clockInTime))
+    .limit(1);
+
+  if (!open) {
+    throw new Error('No open time clock entry for this employee');
+  }
+
+  return await clockOut(open.id, breakDuration);
+}
+
+export async function getPayrollPeriods(garageId: string, status?: string) {
+  try {
+    const conditions = [eq(payrollPeriods.garageId, garageId)];
+    if (status) conditions.push(eq(payrollPeriods.status, status));
+
+    return await db
+      .select()
+      .from(payrollPeriods)
+      .where(and(...conditions))
+      .orderBy(desc(payrollPeriods.periodStart))
+      .limit(50);
+  } catch (error) {
+    console.error('Error fetching payroll periods:', error);
+    return [];
+  }
+}
+
 export async function getTimeEntries(employeeId: string, startDate: Date, endDate: Date) {
   try {
     const entries = await db
@@ -578,10 +615,10 @@ export async function createCalibrationRecord(data: {
   }
 }
 
-export async function getDueCalibrations(garageId: string) {
+export async function getDueCalibrations(garageId: string, daysAhead: number = 30) {
   try {
     const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 30); // Next 30 days
+    dueDate.setDate(dueDate.getDate() + daysAhead);
     
     const dueCals = await db
       .select({

@@ -7562,7 +7562,8 @@ export class DatabaseStorage implements IStorage {
     return ticket;
   }
 
-  async createSupportTicket(data: InsertSupportTicket): Promise<SupportTicket> {
+  // ticketNumber is generated here, so callers must not supply one.
+  async createSupportTicket(data: Omit<InsertSupportTicket, "ticketNumber">): Promise<SupportTicket> {
     const year = new Date().getFullYear();
     const garageIdSuffix = data.garageId.substring(0, 4).toUpperCase();
     
