@@ -16675,16 +16675,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const visitTime = Date.now();
       for (let i = 0; i < 2; i++) {
+        // Mapped onto metaverse_visits as declared: sessionId, duration,
+        // vehiclesViewed, interactionCount, deviceType. visitorId/visitorType/
+        // virtualAssistantUsed/visitDate are not columns.
         await storage.createMetaverseVisit({
           showroomId: showroom.id,
-          visitorId: `visitor-${Date.now()}-${i}`,
-          visitorType: i === 0 ? 'customer' : 'prospect',
-          durationMinutes: 15 + i * 8,
-          interactionsCount: 12 + i * 5,
-          viewedVehicles: [vehicleId],
-          virtualAssistantUsed: i === 0,
+          sessionId: `visitor-${visitTime}-${i}`,
+          duration: 15 + i * 8,
+          interactionCount: 12 + i * 5,
+          vehiclesViewed: String(vehicleId),
           leadGenerated: i === 1,
-          visitDate: new Date(visitTime - (i * 24 * 60 * 60 * 1000)).toISOString(),
+          deviceType: i === 0 ? 'vr-headset' : 'browser',
         });
         totalRecords++;
       }
@@ -16693,34 +16694,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 0; i < 2; i++) {
         const guide = await storage.createHolographicGuide({
           garageId,
-          guideName: ['Engine Oil Change Holographic Guide', 'Brake Service AR Guide'][i],
-          targetService: ['oil_change', 'brake_service'][i],
-          vehicleModels: ['Toyota Camry', 'Honda Accord', 'Nissan Altima'],
+          // holographic_guides uses title/description/difficulty/vehicleMake/
+          // vehicleModel; guideName, targetService and vehicleModels are not
+          // columns, and vehicle make/model are separate scalars here.
+          title: ['Engine Oil Change Holographic Guide', 'Brake Service AR Guide'][i],
+          description: `Step-by-step holographic guide for ${['oil_change', 'brake_service'][i]}`,
+          vehicleMake: 'Toyota',
+          vehicleModel: 'Camry',
           hologramModelUrl: `https://holograms.example.com/guides/${i + 1}.glb`,
           steps: [
             { stepNumber: 1, instruction: 'Prepare tools and safety equipment', duration: 120 },
             { stepNumber: 2, instruction: 'Locate service points', duration: 180 },
             { stepNumber: 3, instruction: 'Perform service procedure', duration: 600 }
           ],
-          difficultyLevel: i === 0 ? 'beginner' : 'intermediate',
+          difficulty: i === 0 ? 'beginner' : 'intermediate',
           estimatedDuration: i === 0 ? 30 : 60,
-          createdBy: userId,
-          status: 'published',
+          isActive: true,
         });
 
         if (i === 0) {
+          // holographic_sessions has no garageId/vehicleId/completionPercentage/
+          // status: it hangs off the guide, and completion is a boolean.
           await storage.createHolographicSession({
             guideId: guide.id,
-            garageId,
             technicianId: userId,
-            vehicleId,
             deviceType: 'HoloLens 3',
             sessionDuration: 28,
-            completionPercentage: 100,
             stepsCompleted: 3,
             totalSteps: 3,
+            errorsMade: 0,
+            completed: true,
+            rating: 5,
             feedback: 'Very helpful and clear instructions',
-            status: 'completed',
           });
           totalRecords++;
         }
@@ -16730,12 +16735,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 7. Spatial Computing - Create 1 workstation with 1 diagnostic session
       const workstation = await storage.createSpatialWorkstation({
         garageId,
-        workstationName: 'Bay 3 - Diagnostic Station',
+        // spatial_workstations uses name/lastCalibration/calibrationStatus/
+        // isActive; workstationName, capabilities, calibrationDate and status
+        // are not columns.
+        name: 'Bay 3 - Diagnostic Station',
         location: 'Service Bay 3',
         deviceType: 'Apple Vision Pro',
-        capabilities: ['3D overlay', 'parts identification', 'torque specs display', 'AR instructions'],
-        calibrationDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'active',
+        lastCalibration: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        calibrationStatus: 'calibrated',
+        assignedTechnician: userId,
+        isActive: true,
       });
       totalRecords++;
 
