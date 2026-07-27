@@ -30,6 +30,7 @@ import serviceChatRoutes from "./service-chat";
 import jobCardRoutes from "./job-cards";
 import serviceBayRoutes from "./service-bays";
 import gamificationRoutes from "./gamification";
+import dashboardRoutes from "./dashboard";
 import dashboardWidgetRoutes from "./dashboard-widgets";
 import assignmentRoutes from "./assignments";
 import availabilityRoutes from "./availability";
@@ -203,6 +204,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Gamification Routes Loaded");
 
   // Dashboard widget read routes
+  // Dashboard KPI/trends/activity routes — existed unmounted; the
+  // garage-scope suite specifies them.
+  app.use("/api", dashboardRoutes);
   app.use("/api", dashboardWidgetRoutes);
   console.log("Dashboard Widget Routes Loaded");
 

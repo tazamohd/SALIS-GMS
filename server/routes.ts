@@ -13074,42 +13074,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // AI Scheduling Optimizer - Module 81
-  app.post("/api/scheduling/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Optimization started", optimizationId: "opt-123" });
-  });
-
-  // Parts Auto-Reordering - Module 82
-  app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", partNumber: "OF-123", currentStock: 15, reorderPoint: 20, reorderQuantity: 50, status: "triggered" },
-    ]);
-  });
-
-  app.post("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
-  });
-
-  app.get("/api/auto-reorder/history", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", quantity: 50, supplier: "AutoParts Plus", status: "ordered" },
-    ]);
-  });
-
-  // Time Clock & Payroll - Module 84
-  app.post("/api/timeclock/clock-in", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked in successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.post("/api/timeclock/clock-out", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked out successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.get("/api/payroll/periods", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", periodStart: "2024-10-14", periodEnd: "2024-10-27", status: "draft" },
-    ]);
-  });
-
   app.post("/api/payroll/calculate", isAuthenticated, async (req, res) => {
     res.json({ totalGrossPay: 18500, totalDeductions: 3200, totalNetPay: 15300 });
   });
@@ -13129,17 +13093,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json([
       { id: "1", toolName: "Diagnostic Scanner", dueDate: "2024-10-15" },
     ]);
-  });
-
-  // Multi-Location Routing - Module 83
-  app.get("/api/routing/routes", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "parts_transfer", stops: 4, distance: 12.5, duration: 45, driver: "Mike Davis", status: "planned" },
-    ]);
-  });
-
-  app.post("/api/routing/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Route optimized", routeId: "route-123" });
   });
 
   // ========================================
@@ -14537,71 +14490,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Garage ID is required. Please ensure you are associated with a garage." });
       }
       const optimization = await phase5Service.runSchedulingOptimization(garageId);
-      res.status(201).json(optimization);
+      res.json(optimization);
     } catch (error) {
       console.error("Error running scheduling optimization:", error);
       res.status(500).json({ message: "Failed to run scheduling optimization" });
     }
   });
 
-  // Parts Auto-Reordering System
-  app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = autoReorderRuleSchema.parse(req.body);
-      
-      const ruleData = {
-        garageId,
-        partId: validated.partId,
-        minQuantity: validated.minQuantity,
-        reorderQuantity: validated.reorderQuantity,
-        preferredSupplierId: validated.preferredSupplierId,
-      };
-      const rule = await phase5Service.createAutoReorderRule(ruleData);
-      res.status(201).json(rule);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating auto-reorder rule:", error);
-      res.status(500).json({ message: "Failed to create auto-reorder rule" });
-    }
-  });
-
-  app.get('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const rules = await phase5Service.getAutoReorderRules(garageId);
-      res.json(rules);
-    } catch (error) {
-      console.error("Error fetching auto-reorder rules:", error);
-      res.status(500).json({ message: "Failed to fetch auto-reorder rules" });
-    }
-  });
-
-  app.post('/api/auto-reorder/check', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const triggeredOrders = await phase5Service.checkAndTriggerReorders(garageId);
-      res.json({ triggered: triggeredOrders.length, orders: triggeredOrders });
-    } catch (error) {
-      console.error("Error checking auto-reorders:", error);
-      res.status(500).json({ message: "Failed to check auto-reorders" });
-    }
-  });
-
-  app.get('/api/auto-reorder/history', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { limit } = req.query;
-      const history = await phase5Service.getReorderHistory(garageId, limit ? parseInt(limit) : 50);
-      res.json(history);
-    } catch (error) {
-      console.error("Error fetching reorder history:", error);
-      res.status(500).json({ message: "Failed to fetch reorder history" });
-    }
-  });
+  // Parts auto-reordering lives in server/routes/auto-reorder.ts (Wave J).
 
   // Multi-Location Routing Optimizer
   app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
