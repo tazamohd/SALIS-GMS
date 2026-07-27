@@ -9819,9 +9819,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getParts3DModels(garageId?: string): Promise<Parts3DModel[]> {
-    if (garageId) {
-      return await db.select().from(parts3DModels).where(eq(parts3DModels.garageId, garageId));
-    }
+    // parts_3d_models is a global catalogue — it has no garage_id, so the
+    // parameter cannot narrow anything. Kept for signature compatibility.
+    void garageId;
     return await db.select().from(parts3DModels);
   }
 
@@ -9841,10 +9841,11 @@ export class DatabaseStorage implements IStorage {
     if (garageId) conditions.push(eq(droneInspections.garageId, garageId));
     if (vehicleId) conditions.push(eq(droneInspections.vehicleId, vehicleId));
     
+    // drone_inspections has scheduled_at/completed_at, not inspection_date.
     if (conditions.length === 0) {
-      return await db.select().from(droneInspections).orderBy(desc(droneInspections.inspectionDate));
+      return await db.select().from(droneInspections).orderBy(desc(droneInspections.scheduledAt));
     }
-    return await db.select().from(droneInspections).where(and(...conditions)).orderBy(desc(droneInspections.inspectionDate));
+    return await db.select().from(droneInspections).where(and(...conditions)).orderBy(desc(droneInspections.scheduledAt));
   }
 
   async getDroneInspection(id: string): Promise<DroneInspection | undefined> {
@@ -9907,7 +9908,9 @@ export class DatabaseStorage implements IStorage {
   async getFraudDetectionCases(garageId?: string, riskLevel?: string): Promise<FraudDetectionCase[]> {
     const conditions = [];
     if (garageId) conditions.push(eq(fraudDetectionCases.garageId, garageId));
-    if (riskLevel) conditions.push(eq(fraudDetectionCases.riskLevel, riskLevel));
+    // fraud_detection_cases has no risk_level column; the closest
+    // discriminator with those semantics is status.
+    if (riskLevel) conditions.push(eq(fraudDetectionCases.status, riskLevel));
     
     if (conditions.length === 0) {
       return await db.select().from(fraudDetectionCases).orderBy(desc(fraudDetectionCases.detectedAt)).limit(100);
@@ -9943,12 +9946,13 @@ export class DatabaseStorage implements IStorage {
   async getCollaborationSessions(garageId?: string, status?: string): Promise<CollaborationSession[]> {
     const conditions = [];
     if (garageId) conditions.push(eq(collaborationSessions.garageId, garageId));
-    if (status) conditions.push(eq(collaborationSessions.status, status));
-    
+    // Columns are session_status and started_at.
+    if (status) conditions.push(eq(collaborationSessions.sessionStatus, status));
+
     if (conditions.length === 0) {
-      return await db.select().from(collaborationSessions).orderBy(desc(collaborationSessions.startTime));
+      return await db.select().from(collaborationSessions).orderBy(desc(collaborationSessions.startedAt));
     }
-    return await db.select().from(collaborationSessions).where(and(...conditions)).orderBy(desc(collaborationSessions.startTime));
+    return await db.select().from(collaborationSessions).where(and(...conditions)).orderBy(desc(collaborationSessions.startedAt));
   }
 
   async updateCollaborationSession(id: string, data: Partial<CollaborationSession>): Promise<CollaborationSession> {
@@ -9982,10 +9986,11 @@ export class DatabaseStorage implements IStorage {
     if (deviceId) conditions.push(eq(edgeDiagnostics.deviceId, deviceId));
     if (vehicleId) conditions.push(eq(edgeDiagnostics.vehicleId, vehicleId));
     
+    // edge_diagnostics has no diagnosed_at; created_at is the event time.
     if (conditions.length === 0) {
-      return await db.select().from(edgeDiagnostics).orderBy(desc(edgeDiagnostics.diagnosedAt)).limit(500);
+      return await db.select().from(edgeDiagnostics).orderBy(desc(edgeDiagnostics.createdAt)).limit(500);
     }
-    return await db.select().from(edgeDiagnostics).where(and(...conditions)).orderBy(desc(edgeDiagnostics.diagnosedAt)).limit(500);
+    return await db.select().from(edgeDiagnostics).where(and(...conditions)).orderBy(desc(edgeDiagnostics.createdAt)).limit(500);
   }
 
   // Quantum-Inspired Pricing
@@ -9995,21 +10000,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPricingOptimizations(garageId: string, serviceType?: string): Promise<PricingOptimization[]> {
+    // pricing_optimization keys services by service_id and orders by
+    // created_at; there is no service_type or calculated_at.
     if (serviceType) {
       return await db.select()
         .from(pricingOptimization)
-        .where(and(eq(pricingOptimization.garageId, garageId), eq(pricingOptimization.serviceType, serviceType)))
-        .orderBy(desc(pricingOptimization.calculatedAt));
+        .where(and(eq(pricingOptimization.garageId, garageId), eq(pricingOptimization.serviceId, serviceType)))
+        .orderBy(desc(pricingOptimization.createdAt));
     }
     return await db.select()
       .from(pricingOptimization)
       .where(eq(pricingOptimization.garageId, garageId))
-      .orderBy(desc(pricingOptimization.calculatedAt));
+      .orderBy(desc(pricingOptimization.createdAt));
   }
 
   async updatePricingOptimization(id: string, data: Partial<PricingOptimization>): Promise<PricingOptimization> {
     const [pricing] = await db.update(pricingOptimization)
-      .set({ ...data, calculatedAt: new Date() })
+      .set({ ...data, updatedAt: new Date() })
       .where(eq(pricingOptimization.id, id))
       .returning();
     return pricing;
@@ -10038,7 +10045,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTwinSimulations(twinId: string): Promise<any[]> {
-    return await db.select().from(twinSimulations).where(eq(twinSimulations.twinId, twinId)).orderBy(desc(twinSimulations.simulatedAt));
+    // twin_simulations has no simulated_at; created_at is the run time.
+    return await db.select().from(twinSimulations).where(eq(twinSimulations.twinId, twinId)).orderBy(desc(twinSimulations.createdAt));
   }
 
   async createCollaborationExpert(data: any): Promise<any> {
@@ -10068,7 +10076,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getBiometricLogs(userId: string): Promise<any[]> {
-    return await db.select().from(biometricLogs).where(eq(biometricLogs.userId, userId)).orderBy(desc(biometricLogs.timestamp)).limit(100);
+    // biometric_logs points at the biometric profile, and the profile is
+    // what carries user_id.
+    return await db.select().from(biometricLogs)
+      .where(sql`EXISTS (SELECT 1 FROM ${biometricProfiles} WHERE ${biometricProfiles.id} = ${biometricLogs.profileId} AND ${biometricProfiles.userId} = ${userId})`)
+      .orderBy(desc(biometricLogs.timestamp)).limit(100);
   }
 
   async createFraudDetectionRule(data: any): Promise<any> {
@@ -10077,9 +10089,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getFraudDetectionRules(garageId?: string): Promise<any[]> {
-    if (garageId) {
-      return await db.select().from(fraudDetectionRules).where(eq(fraudDetectionRules.garageId, garageId)).orderBy(fraudDetectionRules.ruleName);
-    }
+    // fraud_detection_rules is a global rule set — no garage_id column.
+    void garageId;
     return await db.select().from(fraudDetectionRules).orderBy(fraudDetectionRules.ruleName);
   }
   
@@ -10113,7 +10124,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getVisionDefects(garageId: string): Promise<VisionDefect[]> {
-    return await db.select().from(visionDefects).where(eq(visionDefects.garageId, garageId)).orderBy(desc(visionDefects.createdAt));
+    // visionDefects has no garage_id; the garage lives on the parent row.
+    return await db.select().from(visionDefects)
+      .where(sql`EXISTS (SELECT 1 FROM ${visionQualityChecks} WHERE ${visionQualityChecks.id} = ${visionDefects.qualityCheckId} AND ${visionQualityChecks.garageId} = ${garageId})`)
+      .orderBy(desc(visionDefects.createdAt));
   }
   
   async createVisionDefect(data: InsertVisionDefect): Promise<VisionDefect> {
@@ -10170,7 +10184,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getMetaverseVisits(garageId: string): Promise<MetaverseVisit[]> {
-    return await db.select().from(metaverseVisits).where(eq(metaverseVisits.garageId, garageId)).orderBy(desc(metaverseVisits.createdAt));
+    // metaverseVisits has no garage_id; the garage lives on the parent row.
+    return await db.select().from(metaverseVisits)
+      .where(sql`EXISTS (SELECT 1 FROM ${metaverseShowrooms} WHERE ${metaverseShowrooms.id} = ${metaverseVisits.showroomId} AND ${metaverseShowrooms.garageId} = ${garageId})`)
+      .orderBy(desc(metaverseVisits.createdAt));
   }
   
   async createMetaverseVisit(data: InsertMetaverseVisit): Promise<MetaverseVisit> {
@@ -10189,7 +10206,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getHolographicSessions(garageId: string): Promise<HolographicSession[]> {
-    return await db.select().from(holographicSessions).where(eq(holographicSessions.garageId, garageId)).orderBy(desc(holographicSessions.createdAt));
+    // holographicSessions has no garage_id; the garage lives on the parent row.
+    return await db.select().from(holographicSessions)
+      .where(sql`EXISTS (SELECT 1 FROM ${holographicGuides} WHERE ${holographicGuides.id} = ${holographicSessions.guideId} AND ${holographicGuides.garageId} = ${garageId})`)
+      .orderBy(desc(holographicSessions.createdAt));
   }
   
   async createHolographicSession(data: InsertHolographicSession): Promise<HolographicSession> {
@@ -10208,7 +10228,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getSpatialDiagnosticSessions(garageId: string): Promise<SpatialDiagnosticSession[]> {
-    return await db.select().from(spatialDiagnosticSessions).where(eq(spatialDiagnosticSessions.garageId, garageId)).orderBy(desc(spatialDiagnosticSessions.createdAt));
+    // spatialDiagnosticSessions has no garage_id; the garage lives on the parent row.
+    return await db.select().from(spatialDiagnosticSessions)
+      .where(sql`EXISTS (SELECT 1 FROM ${spatialWorkstations} WHERE ${spatialWorkstations.id} = ${spatialDiagnosticSessions.workstationId} AND ${spatialWorkstations.garageId} = ${garageId})`)
+      .orderBy(desc(spatialDiagnosticSessions.createdAt));
   }
   
   async createSpatialDiagnosticSession(data: InsertSpatialDiagnosticSession): Promise<SpatialDiagnosticSession> {
@@ -10227,7 +10250,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getRobotTasks(garageId: string): Promise<RobotTask[]> {
-    return await db.select().from(robotTasks).where(eq(robotTasks.garageId, garageId)).orderBy(desc(robotTasks.createdAt));
+    // robotTasks has no garage_id; the garage lives on the parent row.
+    return await db.select().from(robotTasks)
+      .where(sql`EXISTS (SELECT 1 FROM ${autonomousRobots} WHERE ${autonomousRobots.id} = ${robotTasks.robotId} AND ${autonomousRobots.garageId} = ${garageId})`)
+      .orderBy(desc(robotTasks.createdAt));
   }
   
   async createRobotTask(data: InsertRobotTask): Promise<RobotTask> {
@@ -10246,7 +10272,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getDroneMissions(garageId: string): Promise<DroneMission[]> {
-    return await db.select().from(droneMissions).where(eq(droneMissions.garageId, garageId)).orderBy(desc(droneMissions.createdAt));
+    // droneMissions has no garage_id; the garage lives on the parent row.
+    return await db.select().from(droneMissions)
+      .where(sql`EXISTS (SELECT 1 FROM ${droneFleets} WHERE ${droneFleets.id} = ${droneMissions.droneId} AND ${droneFleets.garageId} = ${garageId})`)
+      .orderBy(desc(droneMissions.createdAt));
   }
   
   async createDroneMission(data: InsertDroneMission): Promise<DroneMission> {
@@ -10265,7 +10294,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getContractEvents(garageId: string): Promise<ContractEvent[]> {
-    return await db.select().from(contractEvents).where(eq(contractEvents.garageId, garageId)).orderBy(desc(contractEvents.createdAt));
+    // contractEvents has no garage_id; the garage lives on the parent row.
+    return await db.select().from(contractEvents)
+      .where(sql`EXISTS (SELECT 1 FROM ${smartContracts} WHERE ${smartContracts.id} = ${contractEvents.contractId} AND ${smartContracts.garageId} = ${garageId})`)
+      .orderBy(desc(contractEvents.createdAt));
   }
   
   async createContractEvent(data: InsertContractEvent): Promise<ContractEvent> {
@@ -10341,7 +10373,10 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getSatelliteUsageLogs(garageId: string): Promise<SatelliteUsageLog[]> {
-    return await db.select().from(satelliteUsageLogs).where(eq(satelliteUsageLogs.garageId, garageId)).orderBy(desc(satelliteUsageLogs.createdAt));
+    // satelliteUsageLogs has no garage_id; the garage lives on the parent row.
+    return await db.select().from(satelliteUsageLogs)
+      .where(sql`EXISTS (SELECT 1 FROM ${satelliteConnections} WHERE ${satelliteConnections.id} = ${satelliteUsageLogs.connectionId} AND ${satelliteConnections.garageId} = ${garageId})`)
+      .orderBy(desc(satelliteUsageLogs.createdAt));
   }
   
   async createSatelliteUsageLog(data: InsertSatelliteUsageLog): Promise<SatelliteUsageLog> {
@@ -10517,7 +10552,8 @@ export class DatabaseStorage implements IStorage {
         alertType: sensor.sensorType,
         severity: readingValue > 120 ? 'critical' : 'high',
         message: `${sensor.sensorType} reading of ${readingValue} exceeds normal range`,
-        triggerValue: readingValue,
+        // trigger_value is a decimal column, so it takes a string.
+        triggerValue: readingValue.toString(),
         status: 'active',
       }).returning();
       
