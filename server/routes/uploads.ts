@@ -25,6 +25,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { documents } from "@shared/schema";
 import { storage } from "../storage";
+import { isAuthenticated } from "../auth";
 import { resolveGarageScope, isCrossGarageRole } from "../middleware/garageScope";
 import { logger } from "../logger";
 
@@ -203,6 +204,10 @@ function removeQuietly(filePath: string | undefined): void {
 
 router.post(
   "/uploads",
+  // No global auth-by-default exists on this app — the guard has to be
+  // explicit or anonymous callers reach multer and get a 403/400 instead
+  // of the 401 the contract expects.
+  isAuthenticated,
   uploadsLimiter,
   upload.single("file"),
   handleUploadErrors,
@@ -299,7 +304,7 @@ router.post(
 
 // ── GET /api/uploads/:id ─────────────────────────────────────────────────────
 
-router.get("/uploads/:id", async (req: Request, res: Response) => {
+router.get("/uploads/:id", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const idCheck = idParamSchema.safeParse(req.params.id);
     if (!idCheck.success) {

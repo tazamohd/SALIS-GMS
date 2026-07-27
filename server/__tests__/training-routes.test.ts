@@ -26,9 +26,11 @@ describe('Training LMS read route extraction (Wave J)', () => {
 
   it('preserves active-status filters for modules and certifications', () => {
     expect(trainingRoutesSource).toMatch(/router\.get\(['"]\/training\/modules['"],\s*isAuthenticated/);
-    expect(trainingRoutesSource).toMatch(/storage\.getTrainingModules\(req\.query\.isActive === ['"]true['"]\)/);
+    // The filter only applies when ?isActive is present — a bare `=== 'true'`
+    // turned an absent param into isActive=false and hid every active row.
+    expect(trainingRoutesSource).toMatch(/storage\.getTrainingModules\(req\.query\.isActive === undefined \? undefined : req\.query\.isActive === ['"]true['"]\)/);
     expect(trainingRoutesSource).toMatch(/router\.get\(['"]\/training\/certifications['"],\s*isAuthenticated/);
-    expect(trainingRoutesSource).toMatch(/storage\.getCertifications\(req\.query\.isActive === ['"]true['"]\)/);
+    expect(trainingRoutesSource).toMatch(/storage\.getCertifications\(req\.query\.isActive === undefined \? undefined : req\.query\.isActive === ['"]true['"]\)/);
   });
 
   it('preserves certification attempt user and certification filters', () => {
