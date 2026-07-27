@@ -44,7 +44,8 @@ import { smsService } from "./services/smsService";
 import { initializeChatWebSocket, getChatWebSocketServer } from "./websocket";
 import { z } from "zod";
 import { 
-  insertNotificationSchema, 
+  insertNotificationSchema,
+  type InsertNotification,
   insertSavedFilterPresetSchema, 
   insertExportJobSchema,
   insertEmployeeAttendanceSchema,
@@ -10516,7 +10517,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all contracts with enhanced data (utilization, SLA metrics, renewals)
   app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, fleetGroups, contractUtilization, contractSLAMetrics, contractRenewals } = await import('@shared/schema');
       const { eq, desc } = await import('drizzle-orm');
 
@@ -10568,7 +10569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trigger renewal workflow for a contract
   app.post('/api/contracts/:contractId/trigger-renewal', isAuthenticated, async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, contractRenewals } = await import('@shared/schema');
       const { eq } = await import('drizzle-orm');
       const { addMonths, addDays } = await import('date-fns');
@@ -10615,7 +10616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Accept a renewal
   app.post('/api/contracts/:contractId/renewals/:renewalId/accept', isAuthenticated, async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, contractRenewals } = await import('@shared/schema');
       const { eq } = await import('drizzle-orm');
 

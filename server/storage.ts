@@ -9787,12 +9787,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // AI Video Analysis
-  async createAiVideoAnalysis(data: InsertAiVideoAnalysis): Promise<AiVideoAnalysis> {
+  async createAiVideoAnalysis(data: InsertAIVideoAnalysis): Promise<AIVideoAnalysis> {
     const [analysis] = await db.insert(aiVideoAnalysis).values(data).returning();
     return analysis;
   }
 
-  async getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AiVideoAnalysis[]> {
+  async getAiVideoAnalyses(customerId?: string, vehicleId?: string): Promise<AIVideoAnalysis[]> {
     const conditions = [];
     if (customerId) conditions.push(eq(aiVideoAnalysis.customerId, customerId));
     if (vehicleId) conditions.push(eq(aiVideoAnalysis.vehicleId, vehicleId));
@@ -9803,7 +9803,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(aiVideoAnalysis).where(and(...conditions)).orderBy(desc(aiVideoAnalysis.uploadedAt));
   }
 
-  async updateAiVideoAnalysis(id: string, data: Partial<AiVideoAnalysis>): Promise<AiVideoAnalysis> {
+  async updateAiVideoAnalysis(id: string, data: Partial<AIVideoAnalysis>): Promise<AIVideoAnalysis> {
     const [analysis] = await db.update(aiVideoAnalysis)
       .set(data)
       .where(eq(aiVideoAnalysis.id, id))
