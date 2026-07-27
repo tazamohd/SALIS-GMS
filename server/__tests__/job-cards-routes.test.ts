@@ -34,7 +34,8 @@ describe('Job card read route extraction (Wave J)', () => {
     expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards['"],\s*isAuthenticated/);
     expect(jobCardRoutesSource).toMatch(/parsePagination\(req\)/);
     expect(jobCardRoutesSource).toMatch(/const \{ garage_id,\s*assigned_to \} = req\.query/);
-    expect(jobCardRoutesSource).toMatch(/const gid = \(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    // Session garage takes precedence over ?garage_id (tenant isolation).
+    expect(jobCardRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
     expect(jobCardRoutesSource).toMatch(/const assignedTo = assigned_to as string \| undefined/);
     expect(jobCardRoutesSource).toMatch(/storage\.getJobCardsPaginated\(gid,\s*assignedTo,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(jobCardRoutesSource).toMatch(/storage\.countJobCards\(gid,\s*assignedTo\)/);

@@ -13,14 +13,17 @@ router.get('/customers', isAuthenticated, async (req, res) => {
     // Otherwise return a paginated list. (SA-017)
     if (search && typeof search === 'string' && search.length >= 2) {
       const searchPattern = `%${search.toLowerCase()}%`;
+      // Pin to the caller's garage; honor ?garage_id only when the session
+      // has none (platform admins). The reverse order let any tenant read
+      // another garage's customers by forging the query param.
       const results = await storage.searchCustomers(
-        (garage_id as string) || (req.user as any)?.garageId,
+        (req.user as any)?.garageId || (garage_id as string),
         searchPattern,
         pagination.limit,
       );
       return sendPaginated(res, results, results.length, pagination, pagination.explicit);
     }
-    const garageId = (garage_id as string) || (req.user as any)?.garageId;
+    const garageId = (req.user as any)?.garageId || (garage_id as string);
     const [data, total] = await Promise.all([
       storage.getCustomersPaginated(garageId, pagination.limit, pagination.offset),
       storage.countCustomers(garageId),

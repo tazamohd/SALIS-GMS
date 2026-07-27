@@ -25,7 +25,8 @@ describe('Vehicle read route extraction (Wave J)', () => {
   it('preserves paginated vehicle list behavior and garage scoping', () => {
     expect(vehicleRoutesSource).toMatch(/router\.get\(['"]\/vehicles['"],\s*isAuthenticated/);
     expect(vehicleRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(vehicleRoutesSource).toMatch(/const gid = \(garageId as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    // Session garage takes precedence over ?garageId (tenant isolation).
+    expect(vehicleRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garageId as string\)/);
     expect(vehicleRoutesSource).toMatch(/storage\.getVehiclesPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(vehicleRoutesSource).toMatch(/storage\.countVehicles\(gid\)/);
     expect(vehicleRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

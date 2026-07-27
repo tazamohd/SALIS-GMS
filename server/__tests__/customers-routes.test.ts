@@ -34,8 +34,10 @@ describe('Customer read route extraction (Wave J)', () => {
     expect(customerRoutesSource).toMatch(/router\.get\(['"]\/customers['"],\s*isAuthenticated/);
     expect(customerRoutesSource).toMatch(/parsePagination\(req\)/);
     expect(customerRoutesSource).toMatch(/const \{ garage_id,\s*search \} = req\.query/);
-    expect(customerRoutesSource).toMatch(/storage\.searchCustomers\(\s*\(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId,\s*searchPattern,\s*pagination\.limit,\s*\)/);
-    expect(customerRoutesSource).toMatch(/const garageId = \(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    // Session garage takes precedence over ?garage_id — the reverse order was
+    // a cross-tenant read (see tenant-isolation.test.ts).
+    expect(customerRoutesSource).toMatch(/storage\.searchCustomers\(\s*\(req\.user as any\)\?\.garageId \|\| \(garage_id as string\),\s*searchPattern,\s*pagination\.limit,\s*\)/);
+    expect(customerRoutesSource).toMatch(/const garageId = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
     expect(customerRoutesSource).toMatch(/storage\.getCustomersPaginated\(garageId,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(customerRoutesSource).toMatch(/storage\.countCustomers\(garageId\)/);
     expect(customerRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

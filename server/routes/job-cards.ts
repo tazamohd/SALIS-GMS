@@ -12,7 +12,8 @@ router.get('/job-cards', isAuthenticated, async (req, res) => {
   try {
     const { garage_id, assigned_to } = req.query;
     const pagination = parsePagination(req);
-    const gid = (garage_id as string) || (req.user as any)?.garageId;
+    // Session garage wins; ?garage_id only serves garageless sessions.
+    const gid = (req.user as any)?.garageId || (garage_id as string);
     const assignedTo = assigned_to as string | undefined;
     const [data, total] = await Promise.all([
       storage.getJobCardsPaginated(gid, assignedTo, pagination.limit, pagination.offset),

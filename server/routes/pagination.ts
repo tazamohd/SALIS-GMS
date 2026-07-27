@@ -25,13 +25,19 @@ export interface PaginationParams {
 export function parsePagination(req: Request): PaginationParams {
   const rawLimit = parseInt(req.query.limit as string, 10);
   const rawOffset = parseInt(req.query.offset as string, 10);
+  const rawPage = parseInt(req.query.page as string, 10);
 
-  const explicit = Number.isFinite(rawLimit) || Number.isFinite(rawOffset);
+  const explicit =
+    Number.isFinite(rawLimit) || Number.isFinite(rawOffset) || Number.isFinite(rawPage);
 
   let limit = Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : DEFAULT_LIMIT;
   if (limit > MAX_LIMIT) limit = MAX_LIMIT;
 
+  // ?page is 1-based sugar over offset; an explicit offset wins when both are sent.
   let offset = Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0;
+  if (!Number.isFinite(rawOffset) && Number.isFinite(rawPage) && rawPage > 0) {
+    offset = (rawPage - 1) * limit;
+  }
 
   return { limit, offset, explicit };
 }
@@ -55,6 +61,7 @@ export function sendPaginated<T>(
         total,
         limit: params.limit,
         offset: params.offset,
+        page: Math.floor(params.offset / params.limit) + 1,
         hasMore: params.offset + data.length < total,
       },
     });
