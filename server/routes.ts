@@ -16658,13 +16658,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 5. Metaverse Showroom - Create 1 showroom with 2 virtual visits
       const showroom = await storage.createMetaverseShowroom({
         garageId,
-        showroomName: 'Virtual Service Center - Premium',
-        metaversePlatform: 'Decentraland',
-        showroomUrl: 'https://metaverse.example.com/garage/' + garageId,
-        virtualCoordinates: 'X:125, Y:67, Z:3',
-        featuredVehicles: [vehicleId],
-        interactiveFeatures: ['3D vehicle viewer', 'service history', 'live chat'],
-        status: 'active',
+        // Field names match metaverse_showrooms in shared/schema.ts. The
+        // previous literal used showroomName / metaversePlatform /
+        // showroomUrl / virtualCoordinates / featuredVehicles /
+        // interactiveFeatures / status — none are columns, so this insert
+        // threw before reaching the database.
+        name: 'Virtual Service Center - Premium',
+        platform: 'Decentraland',
+        virtualWorldUrl: 'https://metaverse.example.com/garage/' + garageId,
+        // vehiclesDisplayed is a count, not a list of ids.
+        vehiclesDisplayed: 1,
+        description: 'Premium virtual showroom with 3D vehicle viewer, service history and live chat',
+        isActive: true,
       });
       totalRecords++;
 
