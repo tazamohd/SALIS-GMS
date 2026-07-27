@@ -51,6 +51,22 @@ import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
 import deliveryRoutes from "./deliveries";
 import schedulingRoutes from "./scheduling";
+import autoReorderRoutes from './auto-reorder';
+import backupRoutes from "./backup";
+import currencyRoutes from "./currency";
+import demoRoutes from "./demo";
+import documentsRoutes from "./documents";
+import fleetAccountRoutes from "./fleet";
+import gatePassRoutes from "./gate-pass.routes";
+import gmbSyncRoutes from "./gmb-sync.routes";
+import hrPayrollRoutes from "./hr-payroll";
+import kioskRoutes from "./kiosk";
+import paymentsGatewayRoutes from "./payments-gateway.routes";
+import qualityControlRoutes from "./quality-control";
+import quickActionsRoutes from "./quick-actions.routes";
+import taxConfigRoutes from "./tax-config.routes";
+import trainingLmsRoutes from "./training-lms.routes";
+import uploadRoutes from "./uploads";
 import { aiPredictionsRoutes } from "./ai-predictions";
 import { aiRepairGuideRoutes } from "./ai-repair-guide";
 import { analyticsPerformanceRoutes } from "./analytics-performance";
@@ -307,6 +323,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", productivityRoutes);
   app.use("/api", smartContractsRoutes);
   console.log("Completed-Pages Routes Loaded");
+
+  // These routers also existed without a mount — every endpoint below 404ed
+  // into the SPA catch-all while its integration suite specified it as live.
+  app.use("/api", autoReorderRoutes);
+  app.use("/api", backupRoutes);
+  app.use("/api", currencyRoutes);
+  app.use("/api", demoRoutes);
+  app.use("/api", documentsRoutes);
+  app.use("/api", fleetAccountRoutes);
+  app.use("/api", gatePassRoutes);
+  app.use("/api", gmbSyncRoutes);
+  app.use("/api", hrPayrollRoutes);
+  app.use("/api", kioskRoutes);
+  app.use("/api", paymentsGatewayRoutes);
+  // quality-control declares bare /inspections etc.; its public path is /api/qc.
+  app.use("/api/qc", qualityControlRoutes);
+  app.use("/api", quickActionsRoutes);
+  app.use("/api", taxConfigRoutes);
+  app.use("/api", trainingLmsRoutes);
+  app.use("/api", uploadRoutes);
+  console.log("Module Routes Loaded (auto-reorder, backup, currency, demo, documents, fleet, gate-pass, gmb-sync, hr, kiosk, payments, qc, quick-actions, tax, training, uploads)");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);
