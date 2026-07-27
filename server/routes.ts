@@ -164,7 +164,10 @@ import {
   contractSLAMetrics as contractSlaMetrics
 } from "@shared/schema";
 import Stripe from "stripe";
-import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+// server/paypal.ts throws at import time when PAYPAL_CLIENT_ID/SECRET are
+// absent (and its banner forbids editing it), so it is loaded lazily inside
+// the PayPal routes — the server boots without credentials and those three
+// endpoints report 503 instead.
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 import { analyzePredictiveMaintenance, generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
@@ -4884,16 +4887,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PayPal Routes (PayPal integration blueprint - Module 28)
+  const withPaypal = async (
+    res: any,
+    run: (mod: typeof import("./paypal")) => Promise<unknown>,
+  ) => {
+    if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
+      return res.status(503).json({ message: "PayPal is not configured on this server" });
+    }
+    await run(await import("./paypal"));
+  };
+
   app.get("/paypal/setup", async (req, res) => {
-    await loadPaypalDefault(req, res);
+    await withPaypal(res, (paypal) => paypal.loadPaypalDefault(req, res));
   });
 
   app.post("/paypal/order", async (req, res) => {
-    await createPaypalOrder(req, res);
+    await withPaypal(res, (paypal) => paypal.createPaypalOrder(req, res));
   });
 
   app.post("/paypal/order/:orderID/capture", async (req, res) => {
-    await capturePaypalOrder(req, res);
+    await withPaypal(res, (paypal) => paypal.capturePaypalOrder(req, res));
   });
 
   // Webhook to handle Stripe events

@@ -800,7 +800,7 @@ CREATE TABLE "google_business_profiles" (
 --> statement-breakpoint
 CREATE TABLE "hr_announcements" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"content" text NOT NULL,
 	"type" varchar(50) DEFAULT 'general',
@@ -832,7 +832,7 @@ CREATE TABLE "hr_benefit_enrollments" (
 --> statement-breakpoint
 CREATE TABLE "hr_benefit_plans" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"name_ar" varchar(255),
 	"type" varchar(100) NOT NULL,
@@ -899,7 +899,7 @@ CREATE TABLE "hr_contracts" (
 --> statement-breakpoint
 CREATE TABLE "hr_departments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"name_ar" varchar(255),
 	"code" varchar(50),
@@ -932,7 +932,7 @@ CREATE TABLE "hr_documents" (
 CREATE TABLE "hr_employee_profiles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"employee_number" varchar(50),
 	"department_id" uuid,
 	"position_id" uuid,
@@ -986,7 +986,7 @@ CREATE TABLE "hr_interviews" (
 --> statement-breakpoint
 CREATE TABLE "hr_job_postings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"position_id" uuid,
 	"title" varchar(255) NOT NULL,
 	"description" text,
@@ -1046,7 +1046,7 @@ CREATE TABLE "hr_leave_requests" (
 --> statement-breakpoint
 CREATE TABLE "hr_leave_types" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"name_ar" varchar(255),
 	"code" varchar(20),
@@ -1108,7 +1108,7 @@ CREATE TABLE "hr_performance_reviews" (
 --> statement-breakpoint
 CREATE TABLE "hr_positions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"garage_id" varchar NOT NULL,
+	"garage_id" uuid NOT NULL,
 	"department_id" uuid,
 	"title" varchar(255) NOT NULL,
 	"title_ar" varchar(255),
@@ -3024,7 +3024,7 @@ CREATE UNIQUE INDEX "geofence_alert_recipients_zone_user_idx" ON "geofence_alert
 CREATE INDEX "geofence_events_geofence_timestamp_idx" ON "geofence_events" USING btree ("geofence_zone_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
 CREATE INDEX "geofence_events_vehicle_timestamp_idx" ON "geofence_events" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
 CREATE INDEX "geofence_events_timestamp_idx" ON "geofence_events" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "geofence_events_pending_notification_idx" ON "geofence_events" USING btree ("notification_sent") WHERE notification_sent = false AND timestamp >= NOW() - INTERVAL '1 hour';--> statement-breakpoint
+CREATE INDEX "geofence_events_pending_notification_idx" ON "geofence_events" USING btree ("notification_sent") WHERE notification_sent = false;--> statement-breakpoint
 CREATE UNIQUE INDEX "geofence_zone_vehicles_zone_vehicle_idx" ON "geofence_zone_vehicles" USING btree ("geofence_zone_id","vehicle_id");--> statement-breakpoint
 CREATE INDEX "geofence_zones_garage_active_idx" ON "geofence_zones" USING btree ("garage_id","is_active");--> statement-breakpoint
 CREATE INDEX "job_tracking_events_job_card_created_idx" ON "job_tracking_events" USING btree ("job_card_id","created_at");--> statement-breakpoint
@@ -3053,7 +3053,7 @@ CREATE UNIQUE INDEX "telem_readings_stream_recorded_unique" ON "telematics_readi
 CREATE INDEX "telem_streams_device_idx" ON "telematics_streams" USING btree ("device_id");--> statement-breakpoint
 CREATE INDEX "vehicle_location_history_vehicle_timestamp_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
 CREATE INDEX "vehicle_location_history_timestamp_idx" ON "vehicle_location_history" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE UNIQUE INDEX "vehicle_location_history_vehicle_latest_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST) WHERE timestamp >= NOW() - INTERVAL '1 hour';--> statement-breakpoint
+CREATE INDEX "vehicle_location_history_vehicle_latest_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
 ALTER TABLE "iot_alerts" ADD CONSTRAINT "iot_alerts_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "service_reminders" ADD CONSTRAINT "service_reminders_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_iot_alerts_sensor_status" ON "iot_alerts" USING btree ("sensor_id","status");--> statement-breakpoint

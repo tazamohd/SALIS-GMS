@@ -1,4 +1,9 @@
-CREATE TABLE "agent_performance_snapshots" (
+-- Schema drift catch-up. Overlaps migrations 0001-0003 on databases that
+-- already carry some of these objects, so every statement here must be
+-- idempotent: IF NOT EXISTS on creates, and constraint/column adds wrapped
+-- to swallow duplicates. (Rewritten when the migration chain was repaired —
+-- the original plain CREATEs aborted the whole file on the first overlap.)
+CREATE TABLE IF NOT EXISTS "agent_performance_snapshots" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"agent_user_id" varchar NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -13,7 +18,7 @@ CREATE TABLE "agent_performance_snapshots" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "ai_assignment_recommendations" (
+CREATE TABLE IF NOT EXISTS "ai_assignment_recommendations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -28,7 +33,7 @@ CREATE TABLE "ai_assignment_recommendations" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "appointment_reminder_logs" (
+CREATE TABLE IF NOT EXISTS "appointment_reminder_logs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"appointment_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -55,7 +60,7 @@ CREATE TABLE "appointment_reminder_logs" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "appointment_reminder_settings" (
+CREATE TABLE IF NOT EXISTS "appointment_reminder_settings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"sms_enabled" boolean DEFAULT true,
@@ -79,7 +84,7 @@ CREATE TABLE "appointment_reminder_settings" (
 	CONSTRAINT "appointment_reminder_settings_garage_id_unique" UNIQUE("garage_id")
 );
 --> statement-breakpoint
-CREATE TABLE "ar_assets" (
+CREATE TABLE IF NOT EXISTS "ar_assets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"asset_name" varchar(255) NOT NULL,
@@ -103,7 +108,7 @@ CREATE TABLE "ar_assets" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "ar_device_pairings" (
+CREATE TABLE IF NOT EXISTS "ar_device_pairings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"technician_id" varchar NOT NULL,
@@ -121,7 +126,7 @@ CREATE TABLE "ar_device_pairings" (
 	CONSTRAINT "ar_device_pairings_device_id_unique" UNIQUE("device_id")
 );
 --> statement-breakpoint
-CREATE TABLE "ar_session_logs" (
+CREATE TABLE IF NOT EXISTS "ar_session_logs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"technician_id" varchar NOT NULL,
@@ -145,7 +150,7 @@ CREATE TABLE "ar_session_logs" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "ar_work_instructions" (
+CREATE TABLE IF NOT EXISTS "ar_work_instructions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"instruction_name" varchar(255) NOT NULL,
@@ -175,7 +180,7 @@ CREATE TABLE "ar_work_instructions" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "article_categories" (
+CREATE TABLE IF NOT EXISTS "article_categories" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"description" text,
@@ -184,7 +189,7 @@ CREATE TABLE "article_categories" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "assignment_history" (
+CREATE TABLE IF NOT EXISTS "assignment_history" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -197,7 +202,7 @@ CREATE TABLE "assignment_history" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "assignment_rules" (
+CREATE TABLE IF NOT EXISTS "assignment_rules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"rule_name" varchar(255) NOT NULL,
@@ -210,7 +215,7 @@ CREATE TABLE "assignment_rules" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "backup_history" (
+CREATE TABLE IF NOT EXISTS "backup_history" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"backup_ref" varchar(100) NOT NULL,
 	"type" varchar(50) NOT NULL,
@@ -221,7 +226,7 @@ CREATE TABLE "backup_history" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "bay_occupancy_sessions" (
+CREATE TABLE IF NOT EXISTS "bay_occupancy_sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"bay_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -239,7 +244,7 @@ CREATE TABLE "bay_occupancy_sessions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "bay_telemetry_events" (
+CREATE TABLE IF NOT EXISTS "bay_telemetry_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"bay_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -249,7 +254,7 @@ CREATE TABLE "bay_telemetry_events" (
 	"timestamp" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "calendar_activity_log" (
+CREATE TABLE IF NOT EXISTS "calendar_activity_log" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"appointment_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -261,7 +266,7 @@ CREATE TABLE "calendar_activity_log" (
 	"performed_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "calendar_appointments" (
+CREATE TABLE IF NOT EXISTS "calendar_appointments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"appointment_id" uuid,
@@ -295,7 +300,7 @@ CREATE TABLE "calendar_appointments" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "calendar_conflicts" (
+CREATE TABLE IF NOT EXISTS "calendar_conflicts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"appointment_1_id" uuid NOT NULL,
@@ -310,7 +315,7 @@ CREATE TABLE "calendar_conflicts" (
 	"detected_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_disposition_codes" (
+CREATE TABLE IF NOT EXISTS "call_disposition_codes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"code" varchar(50) NOT NULL,
@@ -322,7 +327,7 @@ CREATE TABLE "call_disposition_codes" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_events" (
+CREATE TABLE IF NOT EXISTS "call_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"session_id" uuid NOT NULL,
 	"event_type" varchar(50) NOT NULL,
@@ -330,7 +335,7 @@ CREATE TABLE "call_events" (
 	"occurred_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_notes" (
+CREATE TABLE IF NOT EXISTS "call_notes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"session_id" uuid NOT NULL,
 	"author_user_id" varchar NOT NULL,
@@ -340,7 +345,7 @@ CREATE TABLE "call_notes" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_queue_members" (
+CREATE TABLE IF NOT EXISTS "call_queue_members" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"queue_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -351,7 +356,7 @@ CREATE TABLE "call_queue_members" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_queues" (
+CREATE TABLE IF NOT EXISTS "call_queues" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -365,7 +370,7 @@ CREATE TABLE "call_queues" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_recordings" (
+CREATE TABLE IF NOT EXISTS "call_recordings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"session_id" uuid NOT NULL,
 	"twilio_recording_sid" varchar(100),
@@ -377,7 +382,7 @@ CREATE TABLE "call_recordings" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "call_sessions" (
+CREATE TABLE IF NOT EXISTS "call_sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"queue_id" uuid,
@@ -401,7 +406,7 @@ CREATE TABLE "call_sessions" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "certification_attempts" (
+CREATE TABLE IF NOT EXISTS "certification_attempts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"certification_id" uuid NOT NULL,
 	"user_id" varchar NOT NULL,
@@ -414,7 +419,7 @@ CREATE TABLE "certification_attempts" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "certifications" (
+CREATE TABLE IF NOT EXISTS "certifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"description" text,
@@ -424,7 +429,7 @@ CREATE TABLE "certifications" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "chat_attachments" (
+CREATE TABLE IF NOT EXISTS "chat_attachments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"message_id" uuid NOT NULL,
 	"file_name" varchar(255) NOT NULL,
@@ -436,7 +441,7 @@ CREATE TABLE "chat_attachments" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "compliance_audits" (
+CREATE TABLE IF NOT EXISTS "compliance_audits" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"policy_id" uuid,
@@ -451,7 +456,7 @@ CREATE TABLE "compliance_audits" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "compliance_policies" (
+CREATE TABLE IF NOT EXISTS "compliance_policies" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"title" varchar(255) NOT NULL,
@@ -466,7 +471,7 @@ CREATE TABLE "compliance_policies" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "compliance_tasks" (
+CREATE TABLE IF NOT EXISTS "compliance_tasks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"policy_id" uuid,
@@ -482,7 +487,7 @@ CREATE TABLE "compliance_tasks" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "contract_renewals" (
+CREATE TABLE IF NOT EXISTS "contract_renewals" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"contract_id" uuid NOT NULL,
 	"renewal_type" varchar(50) NOT NULL,
@@ -501,7 +506,7 @@ CREATE TABLE "contract_renewals" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "contract_sla_metrics" (
+CREATE TABLE IF NOT EXISTS "contract_sla_metrics" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"contract_id" uuid NOT NULL,
 	"job_card_id" uuid,
@@ -517,7 +522,7 @@ CREATE TABLE "contract_sla_metrics" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "contract_utilization" (
+CREATE TABLE IF NOT EXISTS "contract_utilization" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"contract_id" uuid NOT NULL,
 	"job_card_id" uuid,
@@ -532,7 +537,7 @@ CREATE TABLE "contract_utilization" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "currency_transactions" (
+CREATE TABLE IF NOT EXISTS "currency_transactions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tx_date" timestamp DEFAULT now() NOT NULL,
 	"description" text NOT NULL,
@@ -546,7 +551,7 @@ CREATE TABLE "currency_transactions" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "customer_communication_preferences" (
+CREATE TABLE IF NOT EXISTS "customer_communication_preferences" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"customer_id" varchar NOT NULL,
 	"preferred_channel" varchar(20) DEFAULT 'sms',
@@ -571,7 +576,7 @@ CREATE TABLE "customer_communication_preferences" (
 	CONSTRAINT "customer_communication_preferences_customer_id_unique" UNIQUE("customer_id")
 );
 --> statement-breakpoint
-CREATE TABLE "document_library_items" (
+CREATE TABLE IF NOT EXISTS "document_library_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(500) NOT NULL,
 	"type" varchar(50) NOT NULL,
@@ -583,7 +588,7 @@ CREATE TABLE "document_library_items" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "dynamic_pricing_suggestions" (
+CREATE TABLE IF NOT EXISTS "dynamic_pricing_suggestions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"job_card_id" uuid,
@@ -607,7 +612,7 @@ CREATE TABLE "dynamic_pricing_suggestions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "expense_categories" (
+CREATE TABLE IF NOT EXISTS "expense_categories" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"name" varchar(100) NOT NULL,
@@ -617,7 +622,7 @@ CREATE TABLE "expense_categories" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "expenses" (
+CREATE TABLE IF NOT EXISTS "expenses" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"category_id" uuid,
@@ -635,7 +640,7 @@ CREATE TABLE "expenses" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "fleet_account_vehicles" (
+CREATE TABLE IF NOT EXISTS "fleet_account_vehicles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"external_ref" varchar(50),
 	"fleet_account_id" uuid NOT NULL,
@@ -656,7 +661,7 @@ CREATE TABLE "fleet_account_vehicles" (
 	CONSTRAINT "fleet_account_vehicles_external_ref_unique" UNIQUE("external_ref")
 );
 --> statement-breakpoint
-CREATE TABLE "fleet_accounts" (
+CREATE TABLE IF NOT EXISTS "fleet_accounts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"external_ref" varchar(50),
 	"company_name" varchar(255) NOT NULL,
@@ -675,7 +680,7 @@ CREATE TABLE "fleet_accounts" (
 	CONSTRAINT "fleet_accounts_external_ref_unique" UNIQUE("external_ref")
 );
 --> statement-breakpoint
-CREATE TABLE "fleet_maintenance_entries" (
+CREATE TABLE IF NOT EXISTS "fleet_maintenance_entries" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"external_ref" varchar(50),
 	"vehicle_id" uuid NOT NULL,
@@ -689,7 +694,7 @@ CREATE TABLE "fleet_maintenance_entries" (
 	CONSTRAINT "fleet_maintenance_entries_external_ref_unique" UNIQUE("external_ref")
 );
 --> statement-breakpoint
-CREATE TABLE "fleet_routes" (
+CREATE TABLE IF NOT EXISTS "fleet_routes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"route_name" varchar(255) NOT NULL,
@@ -716,14 +721,14 @@ CREATE TABLE "fleet_routes" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "gamification_badge_awards" (
+CREATE TABLE IF NOT EXISTS "gamification_badge_awards" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"technician_id" varchar NOT NULL,
 	"badge_id" uuid NOT NULL,
 	"awarded_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "gamification_badges" (
+CREATE TABLE IF NOT EXISTS "gamification_badges" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"description" text,
@@ -734,7 +739,7 @@ CREATE TABLE "gamification_badges" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "gamification_event_definitions" (
+CREATE TABLE IF NOT EXISTS "gamification_event_definitions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"event_key" varchar(100) NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -747,7 +752,7 @@ CREATE TABLE "gamification_event_definitions" (
 	CONSTRAINT "gamification_event_definitions_event_key_unique" UNIQUE("event_key")
 );
 --> statement-breakpoint
-CREATE TABLE "gamification_events" (
+CREATE TABLE IF NOT EXISTS "gamification_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"technician_id" varchar NOT NULL,
 	"event_key" varchar(100) NOT NULL,
@@ -756,7 +761,7 @@ CREATE TABLE "gamification_events" (
 	"occurred_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "geofence_alert_recipients" (
+CREATE TABLE IF NOT EXISTS "geofence_alert_recipients" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"geofence_zone_id" uuid NOT NULL,
 	"user_id" varchar NOT NULL,
@@ -764,7 +769,7 @@ CREATE TABLE "geofence_alert_recipients" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "geofence_events" (
+CREATE TABLE IF NOT EXISTS "geofence_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"geofence_zone_id" uuid NOT NULL,
 	"vehicle_id" uuid NOT NULL,
@@ -779,14 +784,14 @@ CREATE TABLE "geofence_events" (
 	"metadata" jsonb
 );
 --> statement-breakpoint
-CREATE TABLE "geofence_zone_vehicles" (
+CREATE TABLE IF NOT EXISTS "geofence_zone_vehicles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"geofence_zone_id" uuid NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "geofence_zones" (
+CREATE TABLE IF NOT EXISTS "geofence_zones" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -805,7 +810,7 @@ CREATE TABLE "geofence_zones" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "gmb_posts" (
+CREATE TABLE IF NOT EXISTS "gmb_posts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"profile_id" uuid NOT NULL,
 	"post_type" varchar(50) NOT NULL,
@@ -821,7 +826,7 @@ CREATE TABLE "gmb_posts" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "gmb_reviews" (
+CREATE TABLE IF NOT EXISTS "gmb_reviews" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"profile_id" uuid NOT NULL,
 	"review_id" varchar(255) NOT NULL,
@@ -836,7 +841,7 @@ CREATE TABLE "gmb_reviews" (
 	CONSTRAINT "gmb_reviews_review_id_unique" UNIQUE("review_id")
 );
 --> statement-breakpoint
-CREATE TABLE "google_business_profiles" (
+CREATE TABLE IF NOT EXISTS "google_business_profiles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"account_id" varchar(255) NOT NULL,
@@ -848,7 +853,7 @@ CREATE TABLE "google_business_profiles" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_announcements" (
+CREATE TABLE IF NOT EXISTS "hr_announcements" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"title" varchar(255) NOT NULL,
@@ -865,7 +870,7 @@ CREATE TABLE "hr_announcements" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_benefit_enrollments" (
+CREATE TABLE IF NOT EXISTS "hr_benefit_enrollments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"benefit_plan_id" uuid NOT NULL,
@@ -880,7 +885,7 @@ CREATE TABLE "hr_benefit_enrollments" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_benefit_plans" (
+CREATE TABLE IF NOT EXISTS "hr_benefit_plans" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -899,7 +904,7 @@ CREATE TABLE "hr_benefit_plans" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_candidates" (
+CREATE TABLE IF NOT EXISTS "hr_candidates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_posting_id" uuid NOT NULL,
 	"first_name" varchar(255) NOT NULL,
@@ -925,7 +930,7 @@ CREATE TABLE "hr_candidates" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_contracts" (
+CREATE TABLE IF NOT EXISTS "hr_contracts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"contract_type" varchar(50) NOT NULL,
@@ -947,7 +952,7 @@ CREATE TABLE "hr_contracts" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_departments" (
+CREATE TABLE IF NOT EXISTS "hr_departments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -962,7 +967,7 @@ CREATE TABLE "hr_departments" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_documents" (
+CREATE TABLE IF NOT EXISTS "hr_documents" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"document_type" varchar(100) NOT NULL,
@@ -979,7 +984,7 @@ CREATE TABLE "hr_documents" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_employee_profiles" (
+CREATE TABLE IF NOT EXISTS "hr_employee_profiles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -1017,7 +1022,7 @@ CREATE TABLE "hr_employee_profiles" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_interviews" (
+CREATE TABLE IF NOT EXISTS "hr_interviews" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"candidate_id" uuid NOT NULL,
 	"interview_type" varchar(100) NOT NULL,
@@ -1034,7 +1039,7 @@ CREATE TABLE "hr_interviews" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_job_postings" (
+CREATE TABLE IF NOT EXISTS "hr_job_postings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"position_id" uuid,
@@ -1060,7 +1065,7 @@ CREATE TABLE "hr_job_postings" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_leave_balances" (
+CREATE TABLE IF NOT EXISTS "hr_leave_balances" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"leave_type_id" uuid NOT NULL,
@@ -1074,7 +1079,7 @@ CREATE TABLE "hr_leave_balances" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_leave_request_entries" (
+CREATE TABLE IF NOT EXISTS "hr_leave_request_entries" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" varchar(100) NOT NULL,
 	"employee_name" varchar(255),
@@ -1089,7 +1094,7 @@ CREATE TABLE "hr_leave_request_entries" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_leave_requests" (
+CREATE TABLE IF NOT EXISTS "hr_leave_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"leave_type_id" uuid NOT NULL,
@@ -1109,7 +1114,7 @@ CREATE TABLE "hr_leave_requests" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_leave_types" (
+CREATE TABLE IF NOT EXISTS "hr_leave_types" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -1128,7 +1133,7 @@ CREATE TABLE "hr_leave_types" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_performance_goals" (
+CREATE TABLE IF NOT EXISTS "hr_performance_goals" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"review_id" uuid,
@@ -1146,7 +1151,7 @@ CREATE TABLE "hr_performance_goals" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_performance_reviews" (
+CREATE TABLE IF NOT EXISTS "hr_performance_reviews" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"reviewer_id" varchar NOT NULL,
@@ -1171,7 +1176,7 @@ CREATE TABLE "hr_performance_reviews" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_positions" (
+CREATE TABLE IF NOT EXISTS "hr_positions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"department_id" uuid,
@@ -1188,7 +1193,7 @@ CREATE TABLE "hr_positions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "hr_self_service_requests" (
+CREATE TABLE IF NOT EXISTS "hr_self_service_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"employee_id" uuid NOT NULL,
 	"request_type" varchar(100) NOT NULL,
@@ -1206,7 +1211,7 @@ CREATE TABLE "hr_self_service_requests" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "inventory_forecasts" (
+CREATE TABLE IF NOT EXISTS "inventory_forecasts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"part_id" uuid NOT NULL,
@@ -1222,7 +1227,7 @@ CREATE TABLE "inventory_forecasts" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "job_card_parts" (
+CREATE TABLE IF NOT EXISTS "job_card_parts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"spare_part_id" uuid NOT NULL,
@@ -1237,7 +1242,7 @@ CREATE TABLE "job_card_parts" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "job_tracking_events" (
+CREATE TABLE IF NOT EXISTS "job_tracking_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"task_id" uuid,
@@ -1250,7 +1255,7 @@ CREATE TABLE "job_tracking_events" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "kiosk_tickets" (
+CREATE TABLE IF NOT EXISTS "kiosk_tickets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"ticket_number" varchar(20) NOT NULL,
 	"customer_name" varchar(255) NOT NULL,
@@ -1265,7 +1270,7 @@ CREATE TABLE "kiosk_tickets" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "knowledge_articles" (
+CREATE TABLE IF NOT EXISTS "knowledge_articles" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"category_id" uuid,
 	"title" varchar(500) NOT NULL,
@@ -1281,7 +1286,7 @@ CREATE TABLE "knowledge_articles" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "leaderboard_snapshots" (
+CREATE TABLE IF NOT EXISTS "leaderboard_snapshots" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"period" varchar(50) NOT NULL,
 	"period_start" timestamp NOT NULL,
@@ -1292,7 +1297,7 @@ CREATE TABLE "leaderboard_snapshots" (
 	"generated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "loyalty_accounts" (
+CREATE TABLE IF NOT EXISTS "loyalty_accounts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -1319,7 +1324,7 @@ CREATE TABLE "loyalty_accounts" (
 	CONSTRAINT "loyalty_accounts_referral_code_unique" UNIQUE("referral_code")
 );
 --> statement-breakpoint
-CREATE TABLE "loyalty_offers" (
+CREATE TABLE IF NOT EXISTS "loyalty_offers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"offer_name" varchar(255) NOT NULL,
@@ -1347,7 +1352,7 @@ CREATE TABLE "loyalty_offers" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "loyalty_tiers" (
+CREATE TABLE IF NOT EXISTS "loyalty_tiers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"tier_name" varchar(100) NOT NULL,
@@ -1368,7 +1373,7 @@ CREATE TABLE "loyalty_tiers" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "maintenance_recommendations" (
+CREATE TABLE IF NOT EXISTS "maintenance_recommendations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"rule_id" uuid,
@@ -1385,7 +1390,7 @@ CREATE TABLE "maintenance_recommendations" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "maintenance_trigger_rules" (
+CREATE TABLE IF NOT EXISTS "maintenance_trigger_rules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"rule_name" varchar(255) NOT NULL,
@@ -1400,7 +1405,7 @@ CREATE TABLE "maintenance_trigger_rules" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "market_pricing_data" (
+CREATE TABLE IF NOT EXISTS "market_pricing_data" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"region" varchar(100) NOT NULL,
@@ -1422,7 +1427,7 @@ CREATE TABLE "market_pricing_data" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_accounts" (
+CREATE TABLE IF NOT EXISTS "marketing_accounts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"provider_id" uuid NOT NULL,
@@ -1442,7 +1447,7 @@ CREATE TABLE "marketing_accounts" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_ad_campaigns" (
+CREATE TABLE IF NOT EXISTS "marketing_ad_campaigns" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"campaign_name" varchar(255) NOT NULL,
@@ -1469,7 +1474,7 @@ CREATE TABLE "marketing_ad_campaigns" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_comment_threads" (
+CREATE TABLE IF NOT EXISTS "marketing_comment_threads" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"campaign_id" uuid,
@@ -1485,7 +1490,7 @@ CREATE TABLE "marketing_comment_threads" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_comments" (
+CREATE TABLE IF NOT EXISTS "marketing_comments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"thread_id" uuid NOT NULL,
 	"parent_comment_id" uuid,
@@ -1505,7 +1510,7 @@ CREATE TABLE "marketing_comments" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_conversations" (
+CREATE TABLE IF NOT EXISTS "marketing_conversations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"customer_id" varchar,
@@ -1526,7 +1531,7 @@ CREATE TABLE "marketing_conversations" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_creatives" (
+CREATE TABLE IF NOT EXISTS "marketing_creatives" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid,
 	"campaign_id" uuid,
@@ -1545,7 +1550,7 @@ CREATE TABLE "marketing_creatives" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_messages" (
+CREATE TABLE IF NOT EXISTS "marketing_messages" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"conversation_id" uuid NOT NULL,
 	"provider_message_id" varchar(255),
@@ -1563,7 +1568,7 @@ CREATE TABLE "marketing_messages" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_notes" (
+CREATE TABLE IF NOT EXISTS "marketing_notes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid,
 	"campaign_id" uuid,
@@ -1574,7 +1579,7 @@ CREATE TABLE "marketing_notes" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_providers" (
+CREATE TABLE IF NOT EXISTS "marketing_providers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"code" varchar(50) NOT NULL,
@@ -1588,7 +1593,7 @@ CREATE TABLE "marketing_providers" (
 	CONSTRAINT "marketing_providers_code_unique" UNIQUE("code")
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_spend_snapshots" (
+CREATE TABLE IF NOT EXISTS "marketing_spend_snapshots" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid NOT NULL,
 	"campaign_id" uuid,
@@ -1604,7 +1609,7 @@ CREATE TABLE "marketing_spend_snapshots" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "marketing_tasks" (
+CREATE TABLE IF NOT EXISTS "marketing_tasks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" uuid,
 	"campaign_id" uuid,
@@ -1622,7 +1627,7 @@ CREATE TABLE "marketing_tasks" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "mobile_app_sessions" (
+CREATE TABLE IF NOT EXISTS "mobile_app_sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"garage_id" uuid,
@@ -1641,7 +1646,7 @@ CREATE TABLE "mobile_app_sessions" (
 	CONSTRAINT "mobile_app_sessions_session_token_unique" UNIQUE("session_token")
 );
 --> statement-breakpoint
-CREATE TABLE "mobile_devices" (
+CREATE TABLE IF NOT EXISTS "mobile_devices" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"device_name" varchar(200) NOT NULL,
@@ -1654,7 +1659,7 @@ CREATE TABLE "mobile_devices" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "mobile_quick_actions" (
+CREATE TABLE IF NOT EXISTS "mobile_quick_actions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"app_type" varchar(20) NOT NULL,
@@ -1669,7 +1674,7 @@ CREATE TABLE "mobile_quick_actions" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "no_show_tracking" (
+CREATE TABLE IF NOT EXISTS "no_show_tracking" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"appointment_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -1698,7 +1703,7 @@ CREATE TABLE "no_show_tracking" (
 	CONSTRAINT "no_show_tracking_appointment_id_unique" UNIQUE("appointment_id")
 );
 --> statement-breakpoint
-CREATE TABLE "notification_schedules" (
+CREATE TABLE IF NOT EXISTS "notification_schedules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"trigger_type" varchar NOT NULL,
@@ -1709,7 +1714,7 @@ CREATE TABLE "notification_schedules" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "parts_network_members" (
+CREATE TABLE IF NOT EXISTS "parts_network_members" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar,
 	"garage_id" uuid,
@@ -1749,7 +1754,7 @@ CREATE TABLE "parts_network_members" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "parts_network_notifications" (
+CREATE TABLE IF NOT EXISTS "parts_network_notifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"member_id" uuid NOT NULL,
 	"notification_type" varchar(50) NOT NULL,
@@ -1764,7 +1769,7 @@ CREATE TABLE "parts_network_notifications" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "parts_network_orders" (
+CREATE TABLE IF NOT EXISTS "parts_network_orders" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"order_number" varchar(50) NOT NULL,
 	"request_id" uuid NOT NULL,
@@ -1792,7 +1797,7 @@ CREATE TABLE "parts_network_orders" (
 	CONSTRAINT "parts_network_orders_order_number_unique" UNIQUE("order_number")
 );
 --> statement-breakpoint
-CREATE TABLE "parts_quotation_messages" (
+CREATE TABLE IF NOT EXISTS "parts_quotation_messages" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"request_id" uuid NOT NULL,
 	"response_id" uuid,
@@ -1808,7 +1813,7 @@ CREATE TABLE "parts_quotation_messages" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "parts_quotation_requests" (
+CREATE TABLE IF NOT EXISTS "parts_quotation_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"request_number" varchar(50) NOT NULL,
 	"requester_id" uuid NOT NULL,
@@ -1842,7 +1847,7 @@ CREATE TABLE "parts_quotation_requests" (
 	CONSTRAINT "parts_quotation_requests_request_number_unique" UNIQUE("request_number")
 );
 --> statement-breakpoint
-CREATE TABLE "parts_quotation_responses" (
+CREATE TABLE IF NOT EXISTS "parts_quotation_responses" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"request_id" uuid NOT NULL,
 	"responder_id" uuid NOT NULL,
@@ -1874,7 +1879,7 @@ CREATE TABLE "parts_quotation_responses" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "pay_periods" (
+CREATE TABLE IF NOT EXISTS "pay_periods" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"start_date" timestamp NOT NULL,
@@ -1884,7 +1889,7 @@ CREATE TABLE "pay_periods" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "payroll_employees" (
+CREATE TABLE IF NOT EXISTS "payroll_employees" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"garage_id" uuid,
@@ -1899,7 +1904,7 @@ CREATE TABLE "payroll_employees" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "payroll_runs" (
+CREATE TABLE IF NOT EXISTS "payroll_runs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"pay_period_id" uuid NOT NULL,
 	"employee_id" uuid NOT NULL,
@@ -1915,7 +1920,7 @@ CREATE TABLE "payroll_runs" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "permissions" (
+CREATE TABLE IF NOT EXISTS "permissions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"resource" varchar(100) NOT NULL,
 	"action" varchar(50) NOT NULL,
@@ -1925,7 +1930,7 @@ CREATE TABLE "permissions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "push_notification_tokens" (
+CREATE TABLE IF NOT EXISTS "push_notification_tokens" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"garage_id" uuid,
@@ -1939,7 +1944,7 @@ CREATE TABLE "push_notification_tokens" (
 	CONSTRAINT "push_notification_tokens_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "push_notifications" (
+CREATE TABLE IF NOT EXISTS "push_notifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"user_id" varchar,
@@ -1969,7 +1974,7 @@ CREATE TABLE "push_notifications" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "push_subscriptions" (
+CREATE TABLE IF NOT EXISTS "push_subscriptions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar,
 	"customer_id" varchar,
@@ -1984,7 +1989,7 @@ CREATE TABLE "push_subscriptions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "qc_defects" (
+CREATE TABLE IF NOT EXISTS "qc_defects" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"inspection_id" uuid,
 	"job_card_ref" varchar(100),
@@ -1998,7 +2003,7 @@ CREATE TABLE "qc_defects" (
 	"resolved_at" timestamp
 );
 --> statement-breakpoint
-CREATE TABLE "qc_inspections" (
+CREATE TABLE IF NOT EXISTS "qc_inspections" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_ref" varchar(100) NOT NULL,
 	"vehicle_info" varchar(500) NOT NULL,
@@ -2015,7 +2020,7 @@ CREATE TABLE "qc_inspections" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "replenishment_order_items" (
+CREATE TABLE IF NOT EXISTS "replenishment_order_items" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"order_id" uuid NOT NULL,
 	"part_id" uuid NOT NULL,
@@ -2028,7 +2033,7 @@ CREATE TABLE "replenishment_order_items" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "replenishment_orders" (
+CREATE TABLE IF NOT EXISTS "replenishment_orders" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"order_number" varchar(100) NOT NULL,
@@ -2050,7 +2055,7 @@ CREATE TABLE "replenishment_orders" (
 	CONSTRAINT "replenishment_orders_order_number_unique" UNIQUE("order_number")
 );
 --> statement-breakpoint
-CREATE TABLE "role_permissions" (
+CREATE TABLE IF NOT EXISTS "role_permissions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"role_id" uuid NOT NULL,
 	"permission_id" uuid NOT NULL,
@@ -2058,7 +2063,7 @@ CREATE TABLE "role_permissions" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "route_checkpoints" (
+CREATE TABLE IF NOT EXISTS "route_checkpoints" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"route_id" uuid NOT NULL,
 	"sequence_number" integer NOT NULL,
@@ -2076,7 +2081,7 @@ CREATE TABLE "route_checkpoints" (
 	"metadata" jsonb
 );
 --> statement-breakpoint
-CREATE TABLE "scheduling_optimization_runs" (
+CREATE TABLE IF NOT EXISTS "scheduling_optimization_runs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"run_at" timestamp DEFAULT now() NOT NULL,
 	"appointments_optimized" integer DEFAULT 0 NOT NULL,
@@ -2088,7 +2093,7 @@ CREATE TABLE "scheduling_optimization_runs" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "seasonal_tire_storage" (
+CREATE TABLE IF NOT EXISTS "seasonal_tire_storage" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -2123,7 +2128,7 @@ CREATE TABLE "seasonal_tire_storage" (
 	CONSTRAINT "seasonal_tire_storage_storage_number_unique" UNIQUE("storage_number")
 );
 --> statement-breakpoint
-CREATE TABLE "service_bays" (
+CREATE TABLE IF NOT EXISTS "service_bays" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"branch_id" uuid,
@@ -2145,7 +2150,7 @@ CREATE TABLE "service_bays" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "service_chat_messages" (
+CREATE TABLE IF NOT EXISTS "service_chat_messages" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"sender_id" varchar NOT NULL,
@@ -2156,7 +2161,7 @@ CREATE TABLE "service_chat_messages" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "service_feedback" (
+CREATE TABLE IF NOT EXISTS "service_feedback" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid,
 	"vehicle_id" uuid,
@@ -2180,7 +2185,7 @@ CREATE TABLE "service_feedback" (
 	"response" text
 );
 --> statement-breakpoint
-CREATE TABLE "service_reminder_templates" (
+CREATE TABLE IF NOT EXISTS "service_reminder_templates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"name" varchar(255) NOT NULL,
@@ -2199,7 +2204,7 @@ CREATE TABLE "service_reminder_templates" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "service_reviews" (
+CREATE TABLE IF NOT EXISTS "service_reviews" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -2209,7 +2214,7 @@ CREATE TABLE "service_reviews" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "service_signatures" (
+CREATE TABLE IF NOT EXISTS "service_signatures" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"job_card_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -2220,7 +2225,7 @@ CREATE TABLE "service_signatures" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "storage_facilities" (
+CREATE TABLE IF NOT EXISTS "storage_facilities" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -2231,7 +2236,7 @@ CREATE TABLE "storage_facilities" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "subscriptions" (
+CREATE TABLE IF NOT EXISTS "subscriptions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"plan" varchar(20) DEFAULT 'STARTER' NOT NULL,
@@ -2249,7 +2254,7 @@ CREATE TABLE "subscriptions" (
 	CONSTRAINT "subscriptions_stripe_subscription_id_unique" UNIQUE("stripe_subscription_id")
 );
 --> statement-breakpoint
-CREATE TABLE "supplier_parts_availability" (
+CREATE TABLE IF NOT EXISTS "supplier_parts_availability" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"spare_part_id" uuid,
@@ -2268,7 +2273,7 @@ CREATE TABLE "supplier_parts_availability" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "support_ticket_events" (
+CREATE TABLE IF NOT EXISTS "support_ticket_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"ticket_id" uuid NOT NULL,
 	"user_id" varchar NOT NULL,
@@ -2279,7 +2284,7 @@ CREATE TABLE "support_ticket_events" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "support_tickets" (
+CREATE TABLE IF NOT EXISTS "support_tickets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"conversation_id" uuid NOT NULL,
 	"garage_id" uuid NOT NULL,
@@ -2302,7 +2307,7 @@ CREATE TABLE "support_tickets" (
 	CONSTRAINT "support_tickets_ticket_number_unique" UNIQUE("ticket_number")
 );
 --> statement-breakpoint
-CREATE TABLE "technician_feedback_summary" (
+CREATE TABLE IF NOT EXISTS "technician_feedback_summary" (
 	"technician_id" varchar PRIMARY KEY NOT NULL,
 	"total_reviews" integer DEFAULT 0,
 	"average_rating" numeric(3, 2),
@@ -2315,7 +2320,7 @@ CREATE TABLE "technician_feedback_summary" (
 	"last_updated" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "technician_metric_definitions" (
+CREATE TABLE IF NOT EXISTS "technician_metric_definitions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"metric_key" varchar(100) NOT NULL,
 	"label" varchar(255) NOT NULL,
@@ -2328,7 +2333,7 @@ CREATE TABLE "technician_metric_definitions" (
 	CONSTRAINT "technician_metric_definitions_metric_key_unique" UNIQUE("metric_key")
 );
 --> statement-breakpoint
-CREATE TABLE "technician_metric_preferences" (
+CREATE TABLE IF NOT EXISTS "technician_metric_preferences" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" varchar NOT NULL,
 	"metric_key" varchar(100) NOT NULL,
@@ -2338,7 +2343,7 @@ CREATE TABLE "technician_metric_preferences" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "technician_performance_rollups" (
+CREATE TABLE IF NOT EXISTS "technician_performance_rollups" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"technician_id" varchar NOT NULL,
 	"interval_type" varchar(20) NOT NULL,
@@ -2348,7 +2353,7 @@ CREATE TABLE "technician_performance_rollups" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "technician_performance_stream" (
+CREATE TABLE IF NOT EXISTS "technician_performance_stream" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"technician_id" varchar NOT NULL,
 	"job_card_id" uuid,
@@ -2358,7 +2363,7 @@ CREATE TABLE "technician_performance_stream" (
 	"recorded_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_alerts" (
+CREATE TABLE IF NOT EXISTS "telematics_alerts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"alert_type" varchar(50) NOT NULL,
@@ -2370,7 +2375,7 @@ CREATE TABLE "telematics_alerts" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_devices" (
+CREATE TABLE IF NOT EXISTS "telematics_devices" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"provider_id" uuid NOT NULL,
@@ -2384,7 +2389,7 @@ CREATE TABLE "telematics_devices" (
 	CONSTRAINT "telematics_devices_external_device_id_unique" UNIQUE("external_device_id")
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_feeds" (
+CREATE TABLE IF NOT EXISTS "telematics_feeds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"device_id" uuid,
 	"vehicle_id" uuid,
@@ -2398,7 +2403,7 @@ CREATE TABLE "telematics_feeds" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_providers" (
+CREATE TABLE IF NOT EXISTS "telematics_providers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"api_type" varchar(50) NOT NULL,
@@ -2408,7 +2413,7 @@ CREATE TABLE "telematics_providers" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_readings" (
+CREATE TABLE IF NOT EXISTS "telematics_readings" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"stream_id" uuid NOT NULL,
 	"recorded_at" timestamp NOT NULL,
@@ -2417,7 +2422,7 @@ CREATE TABLE "telematics_readings" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "telematics_streams" (
+CREATE TABLE IF NOT EXISTS "telematics_streams" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"device_id" uuid NOT NULL,
 	"stream_type" varchar(100) NOT NULL,
@@ -2427,7 +2432,7 @@ CREATE TABLE "telematics_streams" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "tire_inventory" (
+CREATE TABLE IF NOT EXISTS "tire_inventory" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"brand" varchar(100) NOT NULL,
@@ -2451,7 +2456,7 @@ CREATE TABLE "tire_inventory" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "tire_recommendations" (
+CREATE TABLE IF NOT EXISTS "tire_recommendations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -2473,7 +2478,7 @@ CREATE TABLE "tire_recommendations" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "tire_rotation_schedules" (
+CREATE TABLE IF NOT EXISTS "tire_rotation_schedules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"customer_id" varchar NOT NULL,
@@ -2494,7 +2499,7 @@ CREATE TABLE "tire_rotation_schedules" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "tire_service_records" (
+CREATE TABLE IF NOT EXISTS "tire_service_records" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"vehicle_id" uuid NOT NULL,
@@ -2528,7 +2533,7 @@ CREATE TABLE "tire_service_records" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "towing_jobs" (
+CREATE TABLE IF NOT EXISTS "towing_jobs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"customer_id" varchar,
@@ -2548,7 +2553,7 @@ CREATE TABLE "towing_jobs" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "training_modules" (
+CREATE TABLE IF NOT EXISTS "training_modules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"description" text,
@@ -2562,7 +2567,7 @@ CREATE TABLE "training_modules" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "vehicle_location_history" (
+CREATE TABLE IF NOT EXISTS "vehicle_location_history" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid NOT NULL,
 	"latitude" double precision NOT NULL,
@@ -2581,7 +2586,7 @@ CREATE TABLE "vehicle_location_history" (
 	"battery_voltage" double precision
 );
 --> statement-breakpoint
-CREATE TABLE "vehicle_pricing_factors" (
+CREATE TABLE IF NOT EXISTS "vehicle_pricing_factors" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"vehicle_make" varchar(100) NOT NULL,
@@ -2598,7 +2603,7 @@ CREATE TABLE "vehicle_pricing_factors" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "vehicle_storage_assignments" (
+CREATE TABLE IF NOT EXISTS "vehicle_storage_assignments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"facility_id" uuid NOT NULL,
 	"vehicle_id" uuid NOT NULL,
@@ -2613,7 +2618,7 @@ CREATE TABLE "vehicle_storage_assignments" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "vehicle_tracking" (
+CREATE TABLE IF NOT EXISTS "vehicle_tracking" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid,
 	"vehicle_id" uuid,
@@ -2636,7 +2641,7 @@ CREATE TABLE "vehicle_tracking" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "vehicle_tracking_history" (
+CREATE TABLE IF NOT EXISTS "vehicle_tracking_history" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" uuid,
 	"latitude" numeric(10, 7),
@@ -2649,7 +2654,7 @@ CREATE TABLE "vehicle_tracking_history" (
 	"recorded_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "workshop_resources" (
+CREATE TABLE IF NOT EXISTS "workshop_resources" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"garage_id" uuid NOT NULL,
 	"resource_type" varchar(100) NOT NULL,
@@ -2666,427 +2671,1443 @@ CREATE TABLE "workshop_resources" (
 ALTER TABLE "iot_alerts" ALTER COLUMN "trigger_value" SET DATA TYPE numeric(12, 4);--> statement-breakpoint
 ALTER TABLE "iot_sensor_readings" ALTER COLUMN "value" SET DATA TYPE numeric(12, 4);--> statement-breakpoint
 ALTER TABLE "iot_sensor_readings" ALTER COLUMN "threshold" SET DATA TYPE numeric(12, 4);--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "contract_value" numeric(12, 2);--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "service_cap" numeric(12, 2);--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "renewal_notice_days" integer DEFAULT 30;--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "sla_response_time" integer;--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "sla_completion_time" integer;--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "sla_uptime_percentage" numeric(5, 2);--> statement-breakpoint
-ALTER TABLE "fleet_contracts" ADD COLUMN "penalty_rate" numeric(5, 2);--> statement-breakpoint
-ALTER TABLE "garages" ADD COLUMN "subscription_plan" varchar(50) DEFAULT 'STARTER';--> statement-breakpoint
-ALTER TABLE "iot_alerts" ADD COLUMN "job_card_id" uuid;--> statement-breakpoint
-ALTER TABLE "job_cards" ADD COLUMN "estimated_completion_at" timestamp;--> statement-breakpoint
-ALTER TABLE "job_cards" ADD COLUMN "eta_last_calculated_at" timestamp;--> statement-breakpoint
-ALTER TABLE "job_cards" ADD COLUMN "eta_manual_override" boolean DEFAULT false;--> statement-breakpoint
-ALTER TABLE "job_cards" ADD COLUMN "public_tracking_token" varchar(64);--> statement-breakpoint
-ALTER TABLE "job_cards" ADD COLUMN "public_tracking_token_expires_at" timestamp;--> statement-breakpoint
-ALTER TABLE "service_reminders" ADD COLUMN "customer_id" varchar;--> statement-breakpoint
-ALTER TABLE "users" ADD COLUMN "role" varchar(50) DEFAULT 'ADVISOR';--> statement-breakpoint
-ALTER TABLE "agent_performance_snapshots" ADD CONSTRAINT "agent_performance_snapshots_agent_user_id_users_id_fk" FOREIGN KEY ("agent_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "agent_performance_snapshots" ADD CONSTRAINT "agent_performance_snapshots_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_recommended_technician_id_users_id_fk" FOREIGN KEY ("recommended_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "appointment_reminder_settings" ADD CONSTRAINT "appointment_reminder_settings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_assets" ADD CONSTRAINT "ar_assets_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_assets" ADD CONSTRAINT "ar_assets_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_device_pairings" ADD CONSTRAINT "ar_device_pairings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_device_pairings" ADD CONSTRAINT "ar_device_pairings_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_instruction_id_ar_work_instructions_id_fk" FOREIGN KEY ("instruction_id") REFERENCES "public"."ar_work_instructions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_work_instructions" ADD CONSTRAINT "ar_work_instructions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ar_work_instructions" ADD CONSTRAINT "ar_work_instructions_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_previous_technician_id_users_id_fk" FOREIGN KEY ("previous_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_new_technician_id_users_id_fk" FOREIGN KEY ("new_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_assigned_by_users_id_fk" FOREIGN KEY ("assigned_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_ai_recommendation_id_ai_assignment_recommendations_id_fk" FOREIGN KEY ("ai_recommendation_id") REFERENCES "public"."ai_assignment_recommendations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_rules" ADD CONSTRAINT "assignment_rules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "assignment_rules" ADD CONSTRAINT "assignment_rules_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_telemetry_events" ADD CONSTRAINT "bay_telemetry_events_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "bay_telemetry_events" ADD CONSTRAINT "bay_telemetry_events_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_appointment_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_performed_by_users_id_fk" FOREIGN KEY ("performed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_resource_id_workshop_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "public"."workshop_resources"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_locked_by_users_id_fk" FOREIGN KEY ("locked_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_appointment_1_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_1_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_appointment_2_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_2_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_resource_id_workshop_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "public"."workshop_resources"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_resolved_by_users_id_fk" FOREIGN KEY ("resolved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_disposition_codes" ADD CONSTRAINT "call_disposition_codes_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_events" ADD CONSTRAINT "call_events_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_notes" ADD CONSTRAINT "call_notes_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_notes" ADD CONSTRAINT "call_notes_author_user_id_users_id_fk" FOREIGN KEY ("author_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_queue_id_call_queues_id_fk" FOREIGN KEY ("queue_id") REFERENCES "public"."call_queues"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_agent_user_id_users_id_fk" FOREIGN KEY ("agent_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_queues" ADD CONSTRAINT "call_queues_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_recordings" ADD CONSTRAINT "call_recordings_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_queue_id_call_queues_id_fk" FOREIGN KEY ("queue_id") REFERENCES "public"."call_queues"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_assigned_agent_id_users_id_fk" FOREIGN KEY ("assigned_agent_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_outcome_code_id_call_disposition_codes_id_fk" FOREIGN KEY ("outcome_code_id") REFERENCES "public"."call_disposition_codes"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_certification_id_certifications_id_fk" FOREIGN KEY ("certification_id") REFERENCES "public"."certifications"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_module_id_training_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."training_modules"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "chat_attachments" ADD CONSTRAINT "chat_attachments_message_id_chat_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."chat_messages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "chat_attachments" ADD CONSTRAINT "chat_attachments_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_policy_id_compliance_policies_id_fk" FOREIGN KEY ("policy_id") REFERENCES "public"."compliance_policies"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_auditor_users_id_fk" FOREIGN KEY ("auditor") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_policies" ADD CONSTRAINT "compliance_policies_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_policy_id_compliance_policies_id_fk" FOREIGN KEY ("policy_id") REFERENCES "public"."compliance_policies"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_audit_id_compliance_audits_id_fk" FOREIGN KEY ("audit_id") REFERENCES "public"."compliance_audits"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_renewed_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("renewed_contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_sla_metrics" ADD CONSTRAINT "contract_sla_metrics_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_sla_metrics" ADD CONSTRAINT "contract_sla_metrics_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "customer_communication_preferences" ADD CONSTRAINT "customer_communication_preferences_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_accepted_by_users_id_fk" FOREIGN KEY ("accepted_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "expense_categories" ADD CONSTRAINT "expense_categories_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "expenses" ADD CONSTRAINT "expenses_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "expenses" ADD CONSTRAINT "expenses_category_id_expense_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."expense_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "expenses" ADD CONSTRAINT "expenses_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "expenses" ADD CONSTRAINT "expenses_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_account_vehicles" ADD CONSTRAINT "fleet_account_vehicles_fleet_account_id_fleet_accounts_id_fk" FOREIGN KEY ("fleet_account_id") REFERENCES "public"."fleet_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_maintenance_entries" ADD CONSTRAINT "fleet_maintenance_entries_vehicle_id_fleet_account_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."fleet_account_vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_maintenance_entries" ADD CONSTRAINT "fleet_maintenance_entries_fleet_account_id_fleet_accounts_id_fk" FOREIGN KEY ("fleet_account_id") REFERENCES "public"."fleet_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gamification_badge_awards" ADD CONSTRAINT "gamification_badge_awards_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gamification_badge_awards" ADD CONSTRAINT "gamification_badge_awards_badge_id_gamification_badges_id_fk" FOREIGN KEY ("badge_id") REFERENCES "public"."gamification_badges"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gamification_event_definitions" ADD CONSTRAINT "gamification_event_definitions_badge_id_gamification_badges_id_fk" FOREIGN KEY ("badge_id") REFERENCES "public"."gamification_badges"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gamification_events" ADD CONSTRAINT "gamification_events_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_alert_recipients" ADD CONSTRAINT "geofence_alert_recipients_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_alert_recipients" ADD CONSTRAINT "geofence_alert_recipients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_zone_vehicles" ADD CONSTRAINT "geofence_zone_vehicles_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_zone_vehicles" ADD CONSTRAINT "geofence_zone_vehicles_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_zones" ADD CONSTRAINT "geofence_zones_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "geofence_zones" ADD CONSTRAINT "geofence_zones_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gmb_posts" ADD CONSTRAINT "gmb_posts_profile_id_google_business_profiles_id_fk" FOREIGN KEY ("profile_id") REFERENCES "public"."google_business_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "gmb_reviews" ADD CONSTRAINT "gmb_reviews_profile_id_google_business_profiles_id_fk" FOREIGN KEY ("profile_id") REFERENCES "public"."google_business_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "google_business_profiles" ADD CONSTRAINT "google_business_profiles_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_target_department_id_hr_departments_id_fk" FOREIGN KEY ("target_department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_benefit_enrollments" ADD CONSTRAINT "hr_benefit_enrollments_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_benefit_enrollments" ADD CONSTRAINT "hr_benefit_enrollments_benefit_plan_id_hr_benefit_plans_id_fk" FOREIGN KEY ("benefit_plan_id") REFERENCES "public"."hr_benefit_plans"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_benefit_plans" ADD CONSTRAINT "hr_benefit_plans_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_job_posting_id_hr_job_postings_id_fk" FOREIGN KEY ("job_posting_id") REFERENCES "public"."hr_job_postings"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_referred_by_users_id_fk" FOREIGN KEY ("referred_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_contracts" ADD CONSTRAINT "hr_contracts_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_departments" ADD CONSTRAINT "hr_departments_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_departments" ADD CONSTRAINT "hr_departments_manager_id_users_id_fk" FOREIGN KEY ("manager_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_verified_by_users_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_position_id_hr_positions_id_fk" FOREIGN KEY ("position_id") REFERENCES "public"."hr_positions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_manager_id_users_id_fk" FOREIGN KEY ("manager_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_interviews" ADD CONSTRAINT "hr_interviews_candidate_id_hr_candidates_id_fk" FOREIGN KEY ("candidate_id") REFERENCES "public"."hr_candidates"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_interviews" ADD CONSTRAINT "hr_interviews_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_position_id_hr_positions_id_fk" FOREIGN KEY ("position_id") REFERENCES "public"."hr_positions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_balances" ADD CONSTRAINT "hr_leave_balances_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_balances" ADD CONSTRAINT "hr_leave_balances_leave_type_id_hr_leave_types_id_fk" FOREIGN KEY ("leave_type_id") REFERENCES "public"."hr_leave_types"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_leave_type_id_hr_leave_types_id_fk" FOREIGN KEY ("leave_type_id") REFERENCES "public"."hr_leave_types"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_handover_to_users_id_fk" FOREIGN KEY ("handover_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_leave_types" ADD CONSTRAINT "hr_leave_types_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_performance_goals" ADD CONSTRAINT "hr_performance_goals_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_performance_goals" ADD CONSTRAINT "hr_performance_goals_review_id_hr_performance_reviews_id_fk" FOREIGN KEY ("review_id") REFERENCES "public"."hr_performance_reviews"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_performance_reviews" ADD CONSTRAINT "hr_performance_reviews_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_performance_reviews" ADD CONSTRAINT "hr_performance_reviews_reviewer_id_users_id_fk" FOREIGN KEY ("reviewer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_positions" ADD CONSTRAINT "hr_positions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_positions" ADD CONSTRAINT "hr_positions_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_processed_by_users_id_fk" FOREIGN KEY ("processed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "inventory_forecasts" ADD CONSTRAINT "inventory_forecasts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "inventory_forecasts" ADD CONSTRAINT "inventory_forecasts_part_id_spare_parts_id_fk" FOREIGN KEY ("part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_spare_part_id_spare_parts_id_fk" FOREIGN KEY ("spare_part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_spare_part_inventory_id_spare_part_inventories_id_fk" FOREIGN KEY ("spare_part_inventory_id") REFERENCES "public"."spare_part_inventories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_task_id_task_assignments_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."task_assignments"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "knowledge_articles" ADD CONSTRAINT "knowledge_articles_category_id_article_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."article_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "knowledge_articles" ADD CONSTRAINT "knowledge_articles_author_users_id_fk" FOREIGN KEY ("author") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "leaderboard_snapshots" ADD CONSTRAINT "leaderboard_snapshots_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_tier_id_loyalty_tiers_id_fk" FOREIGN KEY ("tier_id") REFERENCES "public"."loyalty_tiers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_referred_by_loyalty_accounts_id_fk" FOREIGN KEY ("referred_by") REFERENCES "public"."loyalty_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_tier_restriction_loyalty_tiers_id_fk" FOREIGN KEY ("tier_restriction") REFERENCES "public"."loyalty_tiers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "loyalty_tiers" ADD CONSTRAINT "loyalty_tiers_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "maintenance_recommendations" ADD CONSTRAINT "maintenance_recommendations_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "maintenance_recommendations" ADD CONSTRAINT "maintenance_recommendations_rule_id_maintenance_trigger_rules_id_fk" FOREIGN KEY ("rule_id") REFERENCES "public"."maintenance_trigger_rules"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "maintenance_trigger_rules" ADD CONSTRAINT "maintenance_trigger_rules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "market_pricing_data" ADD CONSTRAINT "market_pricing_data_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_provider_id_marketing_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."marketing_providers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_ad_campaigns" ADD CONSTRAINT "marketing_ad_campaigns_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_ad_campaigns" ADD CONSTRAINT "marketing_ad_campaigns_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_comment_threads" ADD CONSTRAINT "marketing_comment_threads_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_comment_threads" ADD CONSTRAINT "marketing_comment_threads_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_comments" ADD CONSTRAINT "marketing_comments_thread_id_marketing_comment_threads_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."marketing_comment_threads"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_comments" ADD CONSTRAINT "marketing_comments_replied_by_users_id_fk" FOREIGN KEY ("replied_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_messages" ADD CONSTRAINT "marketing_messages_conversation_id_marketing_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."marketing_conversations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_messages" ADD CONSTRAINT "marketing_messages_sent_by_users_id_fk" FOREIGN KEY ("sent_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_spend_snapshots" ADD CONSTRAINT "marketing_spend_snapshots_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_spend_snapshots" ADD CONSTRAINT "marketing_spend_snapshots_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_completed_by_users_id_fk" FOREIGN KEY ("completed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "mobile_app_sessions" ADD CONSTRAINT "mobile_app_sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "mobile_app_sessions" ADD CONSTRAINT "mobile_app_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "mobile_devices" ADD CONSTRAINT "mobile_devices_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "mobile_devices" ADD CONSTRAINT "mobile_devices_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "mobile_quick_actions" ADD CONSTRAINT "mobile_quick_actions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_marked_by_users_id_fk" FOREIGN KEY ("marked_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_rescheduled_appointment_id_appointments_id_fk" FOREIGN KEY ("rescheduled_appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "notification_schedules" ADD CONSTRAINT "notification_schedules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_notifications" ADD CONSTRAINT "parts_network_notifications_member_id_parts_network_members_id_fk" FOREIGN KEY ("member_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_response_id_parts_quotation_responses_id_fk" FOREIGN KEY ("response_id") REFERENCES "public"."parts_quotation_responses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_buyer_id_parts_network_members_id_fk" FOREIGN KEY ("buyer_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_seller_id_parts_network_members_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_response_id_parts_quotation_responses_id_fk" FOREIGN KEY ("response_id") REFERENCES "public"."parts_quotation_responses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_sender_id_parts_network_members_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_receiver_id_parts_network_members_id_fk" FOREIGN KEY ("receiver_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_requests" ADD CONSTRAINT "parts_quotation_requests_requester_id_parts_network_members_id_fk" FOREIGN KEY ("requester_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_requests" ADD CONSTRAINT "parts_quotation_requests_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_responses" ADD CONSTRAINT "parts_quotation_responses_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "parts_quotation_responses" ADD CONSTRAINT "parts_quotation_responses_responder_id_parts_network_members_id_fk" FOREIGN KEY ("responder_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "pay_periods" ADD CONSTRAINT "pay_periods_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "payroll_employees" ADD CONSTRAINT "payroll_employees_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "payroll_employees" ADD CONSTRAINT "payroll_employees_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "payroll_runs" ADD CONSTRAINT "payroll_runs_pay_period_id_pay_periods_id_fk" FOREIGN KEY ("pay_period_id") REFERENCES "public"."pay_periods"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "payroll_runs" ADD CONSTRAINT "payroll_runs_employee_id_payroll_employees_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."payroll_employees"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_notification_tokens" ADD CONSTRAINT "push_notification_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_notification_tokens" ADD CONSTRAINT "push_notification_tokens_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_subscription_id_push_subscriptions_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."push_subscriptions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "qc_defects" ADD CONSTRAINT "qc_defects_inspection_id_qc_inspections_id_fk" FOREIGN KEY ("inspection_id") REFERENCES "public"."qc_inspections"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_order_items" ADD CONSTRAINT "replenishment_order_items_order_id_replenishment_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."replenishment_orders"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_order_items" ADD CONSTRAINT "replenishment_order_items_part_id_spare_parts_id_fk" FOREIGN KEY ("part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_rule_id_auto_reorder_rules_id_fk" FOREIGN KEY ("rule_id") REFERENCES "public"."auto_reorder_rules"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_permission_id_permissions_id_fk" FOREIGN KEY ("permission_id") REFERENCES "public"."permissions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_route_id_fleet_routes_id_fk" FOREIGN KEY ("route_id") REFERENCES "public"."fleet_routes"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_completed_by_users_id_fk" FOREIGN KEY ("completed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_branch_id_branches_id_fk" FOREIGN KEY ("branch_id") REFERENCES "public"."branches"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_vehicle_id_vehicles_id_fk" FOREIGN KEY ("current_vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_job_card_id_job_cards_id_fk" FOREIGN KEY ("current_job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_technician_id_users_id_fk" FOREIGN KEY ("current_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_chat_messages" ADD CONSTRAINT "service_chat_messages_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_chat_messages" ADD CONSTRAINT "service_chat_messages_sender_id_users_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_reviews" ADD CONSTRAINT "service_reviews_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_reviews" ADD CONSTRAINT "service_reviews_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_signatures" ADD CONSTRAINT "service_signatures_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_signatures" ADD CONSTRAINT "service_signatures_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "storage_facilities" ADD CONSTRAINT "storage_facilities_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_spare_part_id_spare_parts_id_fk" FOREIGN KEY ("spare_part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_ticket_events" ADD CONSTRAINT "support_ticket_events_ticket_id_support_tickets_id_fk" FOREIGN KEY ("ticket_id") REFERENCES "public"."support_tickets"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_ticket_events" ADD CONSTRAINT "support_ticket_events_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_conversation_id_chat_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."chat_conversations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "technician_feedback_summary" ADD CONSTRAINT "technician_feedback_summary_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "technician_metric_preferences" ADD CONSTRAINT "technician_metric_preferences_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "technician_performance_rollups" ADD CONSTRAINT "technician_performance_rollups_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "technician_performance_stream" ADD CONSTRAINT "technician_performance_stream_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "technician_performance_stream" ADD CONSTRAINT "technician_performance_stream_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_alerts" ADD CONSTRAINT "telematics_alerts_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_alerts" ADD CONSTRAINT "telematics_alerts_resolved_by_users_id_fk" FOREIGN KEY ("resolved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_devices" ADD CONSTRAINT "telematics_devices_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_devices" ADD CONSTRAINT "telematics_devices_provider_id_telematics_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."telematics_providers"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_feeds" ADD CONSTRAINT "telematics_feeds_device_id_obd_devices_id_fk" FOREIGN KEY ("device_id") REFERENCES "public"."obd_devices"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_feeds" ADD CONSTRAINT "telematics_feeds_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_readings" ADD CONSTRAINT "telematics_readings_stream_id_telematics_streams_id_fk" FOREIGN KEY ("stream_id") REFERENCES "public"."telematics_streams"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "telematics_streams" ADD CONSTRAINT "telematics_streams_device_id_telematics_devices_id_fk" FOREIGN KEY ("device_id") REFERENCES "public"."telematics_devices"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_inventory" ADD CONSTRAINT "tire_inventory_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_converted_to_job_card_id_job_cards_id_fk" FOREIGN KEY ("converted_to_job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_last_service_record_id_tire_service_records_id_fk" FOREIGN KEY ("last_service_record_id") REFERENCES "public"."tire_service_records"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_tire_inventory_id_tire_inventory_id_fk" FOREIGN KEY ("tire_inventory_id") REFERENCES "public"."tire_inventory"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_assigned_driver_id_users_id_fk" FOREIGN KEY ("assigned_driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_pricing_factors" ADD CONSTRAINT "vehicle_pricing_factors_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_facility_id_storage_facilities_id_fk" FOREIGN KEY ("facility_id") REFERENCES "public"."storage_facilities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_tracking" ADD CONSTRAINT "vehicle_tracking_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "vehicle_tracking_history" ADD CONSTRAINT "vehicle_tracking_history_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "workshop_resources" ADD CONSTRAINT "workshop_resources_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "agent_performance_agent_idx" ON "agent_performance_snapshots" USING btree ("agent_user_id");--> statement-breakpoint
-CREATE INDEX "agent_performance_garage_idx" ON "agent_performance_snapshots" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "ai_recommendations_job_card_idx" ON "ai_assignment_recommendations" USING btree ("job_card_id");--> statement-breakpoint
-CREATE INDEX "ai_recommendations_garage_idx" ON "ai_assignment_recommendations" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "disposition_codes_garage_idx" ON "call_disposition_codes" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "call_events_session_idx" ON "call_events" USING btree ("session_id");--> statement-breakpoint
-CREATE INDEX "call_notes_session_idx" ON "call_notes" USING btree ("session_id");--> statement-breakpoint
-CREATE INDEX "queue_members_queue_idx" ON "call_queue_members" USING btree ("queue_id");--> statement-breakpoint
-CREATE INDEX "queue_members_garage_idx" ON "call_queue_members" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "queue_members_agent_idx" ON "call_queue_members" USING btree ("agent_user_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "queue_members_unique_agent_queue" ON "call_queue_members" USING btree ("queue_id","agent_user_id");--> statement-breakpoint
-CREATE INDEX "call_queues_garage_idx" ON "call_queues" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "call_recordings_session_idx" ON "call_recordings" USING btree ("session_id");--> statement-breakpoint
-CREATE INDEX "call_sessions_garage_idx" ON "call_sessions" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "call_sessions_queue_idx" ON "call_sessions" USING btree ("queue_id");--> statement-breakpoint
-CREATE INDEX "call_sessions_customer_idx" ON "call_sessions" USING btree ("customer_id");--> statement-breakpoint
-CREATE INDEX "call_sessions_agent_idx" ON "call_sessions" USING btree ("assigned_agent_id");--> statement-breakpoint
-CREATE INDEX "call_sessions_status_idx" ON "call_sessions" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "call_sessions_twilio_idx" ON "call_sessions" USING btree ("twilio_call_sid");--> statement-breakpoint
-CREATE UNIQUE INDEX "gamif_badge_awards_tech_badge_unique" ON "gamification_badge_awards" USING btree ("technician_id","badge_id");--> statement-breakpoint
-CREATE INDEX "gamif_events_technician_idx" ON "gamification_events" USING btree ("technician_id");--> statement-breakpoint
-CREATE INDEX "gamif_events_occurred_at_idx" ON "gamification_events" USING btree ("occurred_at");--> statement-breakpoint
-CREATE UNIQUE INDEX "geofence_alert_recipients_zone_user_idx" ON "geofence_alert_recipients" USING btree ("geofence_zone_id","user_id");--> statement-breakpoint
-CREATE INDEX "geofence_events_geofence_timestamp_idx" ON "geofence_events" USING btree ("geofence_zone_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "geofence_events_vehicle_timestamp_idx" ON "geofence_events" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "geofence_events_timestamp_idx" ON "geofence_events" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "geofence_events_pending_notification_idx" ON "geofence_events" USING btree ("notification_sent") WHERE notification_sent = false;--> statement-breakpoint
-CREATE UNIQUE INDEX "geofence_zone_vehicles_zone_vehicle_idx" ON "geofence_zone_vehicles" USING btree ("geofence_zone_id","vehicle_id");--> statement-breakpoint
-CREATE INDEX "geofence_zones_garage_active_idx" ON "geofence_zones" USING btree ("garage_id","is_active");--> statement-breakpoint
-CREATE INDEX "job_tracking_events_job_card_created_idx" ON "job_tracking_events" USING btree ("job_card_id","created_at");--> statement-breakpoint
-CREATE INDEX "job_tracking_events_visible_idx" ON "job_tracking_events" USING btree ("job_card_id") WHERE "job_tracking_events"."is_visible_to_customer" = true;--> statement-breakpoint
-CREATE INDEX "leaderboard_period_tech_idx" ON "leaderboard_snapshots" USING btree ("period","technician_id");--> statement-breakpoint
-CREATE INDEX "leaderboard_period_rank_idx" ON "leaderboard_snapshots" USING btree ("period","rank");--> statement-breakpoint
-CREATE INDEX "maint_rec_vehicle_status_idx" ON "maintenance_recommendations" USING btree ("vehicle_id","status");--> statement-breakpoint
-CREATE INDEX "maint_rec_predicted_due_idx" ON "maintenance_recommendations" USING btree ("predicted_due_at");--> statement-breakpoint
-CREATE INDEX "maint_rules_garage_idx" ON "maintenance_trigger_rules" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "mobile_devices_garage_idx" ON "mobile_devices" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "route_checkpoints_route_sequence_idx" ON "route_checkpoints" USING btree ("route_id","sequence_number");--> statement-breakpoint
-CREATE INDEX "feedback_job_card_idx" ON "service_feedback" USING btree ("job_card_id");--> statement-breakpoint
-CREATE INDEX "feedback_technician_idx" ON "service_feedback" USING btree ("technician_id");--> statement-breakpoint
-CREATE INDEX "feedback_submitted_at_idx" ON "service_feedback" USING btree ("submitted_at");--> statement-breakpoint
-CREATE INDEX "feedback_sentiment_idx" ON "service_feedback" USING btree ("sentiment");--> statement-breakpoint
-CREATE INDEX "subscriptions_garage_idx" ON "subscriptions" USING btree ("garage_id");--> statement-breakpoint
-CREATE INDEX "subscriptions_stripe_sub_idx" ON "subscriptions" USING btree ("stripe_subscription_id");--> statement-breakpoint
-CREATE INDEX "spa_garage_part_supplier_idx" ON "supplier_parts_availability" USING btree ("garage_id","spare_part_id","supplier_id");--> statement-breakpoint
-CREATE INDEX "spa_supplier_sync_idx" ON "supplier_parts_availability" USING btree ("supplier_id","last_synced_at");--> statement-breakpoint
-CREATE UNIQUE INDEX "tech_metric_pref_user_metric_unique" ON "technician_metric_preferences" USING btree ("user_id","metric_key");--> statement-breakpoint
-CREATE INDEX "perf_rollup_tech_interval_idx" ON "technician_performance_rollups" USING btree ("technician_id","interval_start");--> statement-breakpoint
-CREATE INDEX "perf_stream_technician_idx" ON "technician_performance_stream" USING btree ("technician_id");--> statement-breakpoint
-CREATE INDEX "perf_stream_recorded_at_idx" ON "technician_performance_stream" USING btree ("recorded_at");--> statement-breakpoint
-CREATE INDEX "perf_stream_metric_key_idx" ON "technician_performance_stream" USING btree ("metric_key");--> statement-breakpoint
-CREATE INDEX "telem_devices_vehicle_idx" ON "telematics_devices" USING btree ("vehicle_id");--> statement-breakpoint
-CREATE INDEX "telem_devices_provider_idx" ON "telematics_devices" USING btree ("provider_id");--> statement-breakpoint
-CREATE INDEX "telem_readings_stream_recorded_idx" ON "telematics_readings" USING btree ("stream_id","recorded_at");--> statement-breakpoint
-CREATE UNIQUE INDEX "telem_readings_stream_recorded_unique" ON "telematics_readings" USING btree ("stream_id","recorded_at");--> statement-breakpoint
-CREATE INDEX "telem_streams_device_idx" ON "telematics_streams" USING btree ("device_id");--> statement-breakpoint
-CREATE INDEX "vehicle_location_history_vehicle_timestamp_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "vehicle_location_history_timestamp_idx" ON "vehicle_location_history" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "vehicle_location_history_vehicle_latest_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
-ALTER TABLE "iot_alerts" ADD CONSTRAINT "iot_alerts_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "service_reminders" ADD CONSTRAINT "service_reminders_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "invoices_garage_status_invoice_date_idx" ON "invoices" USING btree ("garage_id","status","invoice_date");--> statement-breakpoint
-CREATE INDEX "idx_iot_alerts_sensor_status" ON "iot_alerts" USING btree ("sensor_id","status");--> statement-breakpoint
-CREATE INDEX "idx_iot_alerts_vehicle" ON "iot_alerts" USING btree ("vehicle_id");--> statement-breakpoint
-CREATE INDEX "idx_iot_alerts_status" ON "iot_alerts" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "idx_iot_readings_sensor_timestamp" ON "iot_sensor_readings" USING btree ("sensor_id","timestamp");--> statement-breakpoint
-CREATE INDEX "idx_iot_readings_timestamp" ON "iot_sensor_readings" USING btree ("timestamp");--> statement-breakpoint
-CREATE INDEX "job_cards_public_tracking_token_idx" ON "job_cards" USING btree ("public_tracking_token");--> statement-breakpoint
-CREATE INDEX "job_cards_garage_created_idx" ON "job_cards" USING btree ("garage_id","created_at");--> statement-breakpoint
-CREATE INDEX "job_cards_garage_completed_idx" ON "job_cards" USING btree ("garage_id","completed_at");--> statement-breakpoint
-CREATE INDEX "job_cards_garage_status_idx" ON "job_cards" USING btree ("garage_id","status");--> statement-breakpoint
-ALTER TABLE "job_cards" ADD CONSTRAINT "job_cards_public_tracking_token_unique" UNIQUE("public_tracking_token");
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "contract_value" numeric(12, 2);--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "service_cap" numeric(12, 2);--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "renewal_notice_days" integer DEFAULT 30;--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "sla_response_time" integer;--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "sla_completion_time" integer;--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "sla_uptime_percentage" numeric(5, 2);--> statement-breakpoint
+ALTER TABLE "fleet_contracts" ADD COLUMN IF NOT EXISTS "penalty_rate" numeric(5, 2);--> statement-breakpoint
+ALTER TABLE "garages" ADD COLUMN IF NOT EXISTS "subscription_plan" varchar(50) DEFAULT 'STARTER';--> statement-breakpoint
+ALTER TABLE "iot_alerts" ADD COLUMN IF NOT EXISTS "job_card_id" uuid;--> statement-breakpoint
+ALTER TABLE "job_cards" ADD COLUMN IF NOT EXISTS "estimated_completion_at" timestamp;--> statement-breakpoint
+ALTER TABLE "job_cards" ADD COLUMN IF NOT EXISTS "eta_last_calculated_at" timestamp;--> statement-breakpoint
+ALTER TABLE "job_cards" ADD COLUMN IF NOT EXISTS "eta_manual_override" boolean DEFAULT false;--> statement-breakpoint
+ALTER TABLE "job_cards" ADD COLUMN IF NOT EXISTS "public_tracking_token" varchar(64);--> statement-breakpoint
+ALTER TABLE "job_cards" ADD COLUMN IF NOT EXISTS "public_tracking_token_expires_at" timestamp;--> statement-breakpoint
+ALTER TABLE "service_reminders" ADD COLUMN IF NOT EXISTS "customer_id" varchar;--> statement-breakpoint
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "role" varchar(50) DEFAULT 'ADVISOR';--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "agent_performance_snapshots" ADD CONSTRAINT "agent_performance_snapshots_agent_user_id_users_id_fk" FOREIGN KEY ("agent_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "agent_performance_snapshots" ADD CONSTRAINT "agent_performance_snapshots_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ai_assignment_recommendations" ADD CONSTRAINT "ai_assignment_recommendations_recommended_technician_id_users_id_fk" FOREIGN KEY ("recommended_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "appointment_reminder_logs" ADD CONSTRAINT "appointment_reminder_logs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "appointment_reminder_settings" ADD CONSTRAINT "appointment_reminder_settings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_assets" ADD CONSTRAINT "ar_assets_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_assets" ADD CONSTRAINT "ar_assets_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_device_pairings" ADD CONSTRAINT "ar_device_pairings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_device_pairings" ADD CONSTRAINT "ar_device_pairings_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_session_logs" ADD CONSTRAINT "ar_session_logs_instruction_id_ar_work_instructions_id_fk" FOREIGN KEY ("instruction_id") REFERENCES "public"."ar_work_instructions"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_work_instructions" ADD CONSTRAINT "ar_work_instructions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "ar_work_instructions" ADD CONSTRAINT "ar_work_instructions_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_previous_technician_id_users_id_fk" FOREIGN KEY ("previous_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_new_technician_id_users_id_fk" FOREIGN KEY ("new_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_assigned_by_users_id_fk" FOREIGN KEY ("assigned_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_history" ADD CONSTRAINT "assignment_history_ai_recommendation_id_ai_assignment_recommendations_id_fk" FOREIGN KEY ("ai_recommendation_id") REFERENCES "public"."ai_assignment_recommendations"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_rules" ADD CONSTRAINT "assignment_rules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "assignment_rules" ADD CONSTRAINT "assignment_rules_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_occupancy_sessions" ADD CONSTRAINT "bay_occupancy_sessions_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_telemetry_events" ADD CONSTRAINT "bay_telemetry_events_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "bay_telemetry_events" ADD CONSTRAINT "bay_telemetry_events_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_appointment_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_activity_log" ADD CONSTRAINT "calendar_activity_log_performed_by_users_id_fk" FOREIGN KEY ("performed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_resource_id_workshop_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "public"."workshop_resources"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_bay_id_service_bays_id_fk" FOREIGN KEY ("bay_id") REFERENCES "public"."service_bays"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_locked_by_users_id_fk" FOREIGN KEY ("locked_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_appointments" ADD CONSTRAINT "calendar_appointments_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_appointment_1_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_1_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_appointment_2_id_calendar_appointments_id_fk" FOREIGN KEY ("appointment_2_id") REFERENCES "public"."calendar_appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_resource_id_workshop_resources_id_fk" FOREIGN KEY ("resource_id") REFERENCES "public"."workshop_resources"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "calendar_conflicts" ADD CONSTRAINT "calendar_conflicts_resolved_by_users_id_fk" FOREIGN KEY ("resolved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_disposition_codes" ADD CONSTRAINT "call_disposition_codes_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_events" ADD CONSTRAINT "call_events_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_notes" ADD CONSTRAINT "call_notes_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_notes" ADD CONSTRAINT "call_notes_author_user_id_users_id_fk" FOREIGN KEY ("author_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_queue_id_call_queues_id_fk" FOREIGN KEY ("queue_id") REFERENCES "public"."call_queues"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_queue_members" ADD CONSTRAINT "call_queue_members_agent_user_id_users_id_fk" FOREIGN KEY ("agent_user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_queues" ADD CONSTRAINT "call_queues_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_recordings" ADD CONSTRAINT "call_recordings_session_id_call_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."call_sessions"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_queue_id_call_queues_id_fk" FOREIGN KEY ("queue_id") REFERENCES "public"."call_queues"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_assigned_agent_id_users_id_fk" FOREIGN KEY ("assigned_agent_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "call_sessions" ADD CONSTRAINT "call_sessions_outcome_code_id_call_disposition_codes_id_fk" FOREIGN KEY ("outcome_code_id") REFERENCES "public"."call_disposition_codes"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_certification_id_certifications_id_fk" FOREIGN KEY ("certification_id") REFERENCES "public"."certifications"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "certification_attempts" ADD CONSTRAINT "certification_attempts_module_id_training_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."training_modules"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "chat_attachments" ADD CONSTRAINT "chat_attachments_message_id_chat_messages_id_fk" FOREIGN KEY ("message_id") REFERENCES "public"."chat_messages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "chat_attachments" ADD CONSTRAINT "chat_attachments_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_policy_id_compliance_policies_id_fk" FOREIGN KEY ("policy_id") REFERENCES "public"."compliance_policies"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_audits" ADD CONSTRAINT "compliance_audits_auditor_users_id_fk" FOREIGN KEY ("auditor") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_policies" ADD CONSTRAINT "compliance_policies_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_policy_id_compliance_policies_id_fk" FOREIGN KEY ("policy_id") REFERENCES "public"."compliance_policies"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_audit_id_compliance_audits_id_fk" FOREIGN KEY ("audit_id") REFERENCES "public"."compliance_audits"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "compliance_tasks" ADD CONSTRAINT "compliance_tasks_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_renewed_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("renewed_contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_renewals" ADD CONSTRAINT "contract_renewals_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_sla_metrics" ADD CONSTRAINT "contract_sla_metrics_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_sla_metrics" ADD CONSTRAINT "contract_sla_metrics_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_contract_id_fleet_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."fleet_contracts"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "contract_utilization" ADD CONSTRAINT "contract_utilization_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "customer_communication_preferences" ADD CONSTRAINT "customer_communication_preferences_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "dynamic_pricing_suggestions" ADD CONSTRAINT "dynamic_pricing_suggestions_accepted_by_users_id_fk" FOREIGN KEY ("accepted_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "expense_categories" ADD CONSTRAINT "expense_categories_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "expenses" ADD CONSTRAINT "expenses_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "expenses" ADD CONSTRAINT "expenses_category_id_expense_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."expense_categories"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "expenses" ADD CONSTRAINT "expenses_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "expenses" ADD CONSTRAINT "expenses_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_account_vehicles" ADD CONSTRAINT "fleet_account_vehicles_fleet_account_id_fleet_accounts_id_fk" FOREIGN KEY ("fleet_account_id") REFERENCES "public"."fleet_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_maintenance_entries" ADD CONSTRAINT "fleet_maintenance_entries_vehicle_id_fleet_account_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."fleet_account_vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_maintenance_entries" ADD CONSTRAINT "fleet_maintenance_entries_fleet_account_id_fleet_accounts_id_fk" FOREIGN KEY ("fleet_account_id") REFERENCES "public"."fleet_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "fleet_routes" ADD CONSTRAINT "fleet_routes_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gamification_badge_awards" ADD CONSTRAINT "gamification_badge_awards_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gamification_badge_awards" ADD CONSTRAINT "gamification_badge_awards_badge_id_gamification_badges_id_fk" FOREIGN KEY ("badge_id") REFERENCES "public"."gamification_badges"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gamification_event_definitions" ADD CONSTRAINT "gamification_event_definitions_badge_id_gamification_badges_id_fk" FOREIGN KEY ("badge_id") REFERENCES "public"."gamification_badges"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gamification_events" ADD CONSTRAINT "gamification_events_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_alert_recipients" ADD CONSTRAINT "geofence_alert_recipients_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_alert_recipients" ADD CONSTRAINT "geofence_alert_recipients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_events" ADD CONSTRAINT "geofence_events_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_zone_vehicles" ADD CONSTRAINT "geofence_zone_vehicles_geofence_zone_id_geofence_zones_id_fk" FOREIGN KEY ("geofence_zone_id") REFERENCES "public"."geofence_zones"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_zone_vehicles" ADD CONSTRAINT "geofence_zone_vehicles_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_zones" ADD CONSTRAINT "geofence_zones_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "geofence_zones" ADD CONSTRAINT "geofence_zones_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gmb_posts" ADD CONSTRAINT "gmb_posts_profile_id_google_business_profiles_id_fk" FOREIGN KEY ("profile_id") REFERENCES "public"."google_business_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "gmb_reviews" ADD CONSTRAINT "gmb_reviews_profile_id_google_business_profiles_id_fk" FOREIGN KEY ("profile_id") REFERENCES "public"."google_business_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "google_business_profiles" ADD CONSTRAINT "google_business_profiles_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_target_department_id_hr_departments_id_fk" FOREIGN KEY ("target_department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_announcements" ADD CONSTRAINT "hr_announcements_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_benefit_enrollments" ADD CONSTRAINT "hr_benefit_enrollments_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_benefit_enrollments" ADD CONSTRAINT "hr_benefit_enrollments_benefit_plan_id_hr_benefit_plans_id_fk" FOREIGN KEY ("benefit_plan_id") REFERENCES "public"."hr_benefit_plans"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_benefit_plans" ADD CONSTRAINT "hr_benefit_plans_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_job_posting_id_hr_job_postings_id_fk" FOREIGN KEY ("job_posting_id") REFERENCES "public"."hr_job_postings"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_referred_by_users_id_fk" FOREIGN KEY ("referred_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_candidates" ADD CONSTRAINT "hr_candidates_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_contracts" ADD CONSTRAINT "hr_contracts_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_departments" ADD CONSTRAINT "hr_departments_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_departments" ADD CONSTRAINT "hr_departments_manager_id_users_id_fk" FOREIGN KEY ("manager_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_verified_by_users_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_documents" ADD CONSTRAINT "hr_documents_uploaded_by_users_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_position_id_hr_positions_id_fk" FOREIGN KEY ("position_id") REFERENCES "public"."hr_positions"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_employee_profiles" ADD CONSTRAINT "hr_employee_profiles_manager_id_users_id_fk" FOREIGN KEY ("manager_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_interviews" ADD CONSTRAINT "hr_interviews_candidate_id_hr_candidates_id_fk" FOREIGN KEY ("candidate_id") REFERENCES "public"."hr_candidates"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_interviews" ADD CONSTRAINT "hr_interviews_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_position_id_hr_positions_id_fk" FOREIGN KEY ("position_id") REFERENCES "public"."hr_positions"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_job_postings" ADD CONSTRAINT "hr_job_postings_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_balances" ADD CONSTRAINT "hr_leave_balances_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_balances" ADD CONSTRAINT "hr_leave_balances_leave_type_id_hr_leave_types_id_fk" FOREIGN KEY ("leave_type_id") REFERENCES "public"."hr_leave_types"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_leave_type_id_hr_leave_types_id_fk" FOREIGN KEY ("leave_type_id") REFERENCES "public"."hr_leave_types"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_requests" ADD CONSTRAINT "hr_leave_requests_handover_to_users_id_fk" FOREIGN KEY ("handover_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_leave_types" ADD CONSTRAINT "hr_leave_types_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_performance_goals" ADD CONSTRAINT "hr_performance_goals_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_performance_goals" ADD CONSTRAINT "hr_performance_goals_review_id_hr_performance_reviews_id_fk" FOREIGN KEY ("review_id") REFERENCES "public"."hr_performance_reviews"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_performance_reviews" ADD CONSTRAINT "hr_performance_reviews_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_performance_reviews" ADD CONSTRAINT "hr_performance_reviews_reviewer_id_users_id_fk" FOREIGN KEY ("reviewer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_positions" ADD CONSTRAINT "hr_positions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_positions" ADD CONSTRAINT "hr_positions_department_id_hr_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."hr_departments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_employee_id_hr_employee_profiles_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."hr_employee_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "hr_self_service_requests" ADD CONSTRAINT "hr_self_service_requests_processed_by_users_id_fk" FOREIGN KEY ("processed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "inventory_forecasts" ADD CONSTRAINT "inventory_forecasts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "inventory_forecasts" ADD CONSTRAINT "inventory_forecasts_part_id_spare_parts_id_fk" FOREIGN KEY ("part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_spare_part_id_spare_parts_id_fk" FOREIGN KEY ("spare_part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_card_parts" ADD CONSTRAINT "job_card_parts_spare_part_inventory_id_spare_part_inventories_id_fk" FOREIGN KEY ("spare_part_inventory_id") REFERENCES "public"."spare_part_inventories"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_task_id_task_assignments_id_fk" FOREIGN KEY ("task_id") REFERENCES "public"."task_assignments"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_tracking_events" ADD CONSTRAINT "job_tracking_events_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "knowledge_articles" ADD CONSTRAINT "knowledge_articles_category_id_article_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."article_categories"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "knowledge_articles" ADD CONSTRAINT "knowledge_articles_author_users_id_fk" FOREIGN KEY ("author") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "leaderboard_snapshots" ADD CONSTRAINT "leaderboard_snapshots_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_tier_id_loyalty_tiers_id_fk" FOREIGN KEY ("tier_id") REFERENCES "public"."loyalty_tiers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_accounts" ADD CONSTRAINT "loyalty_accounts_referred_by_loyalty_accounts_id_fk" FOREIGN KEY ("referred_by") REFERENCES "public"."loyalty_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_tier_restriction_loyalty_tiers_id_fk" FOREIGN KEY ("tier_restriction") REFERENCES "public"."loyalty_tiers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_offers" ADD CONSTRAINT "loyalty_offers_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "loyalty_tiers" ADD CONSTRAINT "loyalty_tiers_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "maintenance_recommendations" ADD CONSTRAINT "maintenance_recommendations_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "maintenance_recommendations" ADD CONSTRAINT "maintenance_recommendations_rule_id_maintenance_trigger_rules_id_fk" FOREIGN KEY ("rule_id") REFERENCES "public"."maintenance_trigger_rules"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "maintenance_trigger_rules" ADD CONSTRAINT "maintenance_trigger_rules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "market_pricing_data" ADD CONSTRAINT "market_pricing_data_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_provider_id_marketing_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."marketing_providers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_accounts" ADD CONSTRAINT "marketing_accounts_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_ad_campaigns" ADD CONSTRAINT "marketing_ad_campaigns_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_ad_campaigns" ADD CONSTRAINT "marketing_ad_campaigns_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_comment_threads" ADD CONSTRAINT "marketing_comment_threads_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_comment_threads" ADD CONSTRAINT "marketing_comment_threads_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_comments" ADD CONSTRAINT "marketing_comments_thread_id_marketing_comment_threads_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."marketing_comment_threads"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_comments" ADD CONSTRAINT "marketing_comments_replied_by_users_id_fk" FOREIGN KEY ("replied_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_conversations" ADD CONSTRAINT "marketing_conversations_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_creatives" ADD CONSTRAINT "marketing_creatives_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_messages" ADD CONSTRAINT "marketing_messages_conversation_id_marketing_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."marketing_conversations"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_messages" ADD CONSTRAINT "marketing_messages_sent_by_users_id_fk" FOREIGN KEY ("sent_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_notes" ADD CONSTRAINT "marketing_notes_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_spend_snapshots" ADD CONSTRAINT "marketing_spend_snapshots_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_spend_snapshots" ADD CONSTRAINT "marketing_spend_snapshots_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_account_id_marketing_accounts_id_fk" FOREIGN KEY ("account_id") REFERENCES "public"."marketing_accounts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_campaign_id_marketing_ad_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."marketing_ad_campaigns"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_completed_by_users_id_fk" FOREIGN KEY ("completed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "marketing_tasks" ADD CONSTRAINT "marketing_tasks_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "mobile_app_sessions" ADD CONSTRAINT "mobile_app_sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "mobile_app_sessions" ADD CONSTRAINT "mobile_app_sessions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "mobile_devices" ADD CONSTRAINT "mobile_devices_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "mobile_devices" ADD CONSTRAINT "mobile_devices_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "mobile_quick_actions" ADD CONSTRAINT "mobile_quick_actions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_marked_by_users_id_fk" FOREIGN KEY ("marked_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "no_show_tracking" ADD CONSTRAINT "no_show_tracking_rescheduled_appointment_id_appointments_id_fk" FOREIGN KEY ("rescheduled_appointment_id") REFERENCES "public"."appointments"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "notification_schedules" ADD CONSTRAINT "notification_schedules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_members" ADD CONSTRAINT "parts_network_members_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_notifications" ADD CONSTRAINT "parts_network_notifications_member_id_parts_network_members_id_fk" FOREIGN KEY ("member_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_response_id_parts_quotation_responses_id_fk" FOREIGN KEY ("response_id") REFERENCES "public"."parts_quotation_responses"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_buyer_id_parts_network_members_id_fk" FOREIGN KEY ("buyer_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_network_orders" ADD CONSTRAINT "parts_network_orders_seller_id_parts_network_members_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_response_id_parts_quotation_responses_id_fk" FOREIGN KEY ("response_id") REFERENCES "public"."parts_quotation_responses"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_sender_id_parts_network_members_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_messages" ADD CONSTRAINT "parts_quotation_messages_receiver_id_parts_network_members_id_fk" FOREIGN KEY ("receiver_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_requests" ADD CONSTRAINT "parts_quotation_requests_requester_id_parts_network_members_id_fk" FOREIGN KEY ("requester_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_requests" ADD CONSTRAINT "parts_quotation_requests_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_responses" ADD CONSTRAINT "parts_quotation_responses_request_id_parts_quotation_requests_id_fk" FOREIGN KEY ("request_id") REFERENCES "public"."parts_quotation_requests"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "parts_quotation_responses" ADD CONSTRAINT "parts_quotation_responses_responder_id_parts_network_members_id_fk" FOREIGN KEY ("responder_id") REFERENCES "public"."parts_network_members"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "pay_periods" ADD CONSTRAINT "pay_periods_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "payroll_employees" ADD CONSTRAINT "payroll_employees_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "payroll_employees" ADD CONSTRAINT "payroll_employees_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "payroll_runs" ADD CONSTRAINT "payroll_runs_pay_period_id_pay_periods_id_fk" FOREIGN KEY ("pay_period_id") REFERENCES "public"."pay_periods"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "payroll_runs" ADD CONSTRAINT "payroll_runs_employee_id_payroll_employees_id_fk" FOREIGN KEY ("employee_id") REFERENCES "public"."payroll_employees"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_notification_tokens" ADD CONSTRAINT "push_notification_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_notification_tokens" ADD CONSTRAINT "push_notification_tokens_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_notifications" ADD CONSTRAINT "push_notifications_subscription_id_push_subscriptions_id_fk" FOREIGN KEY ("subscription_id") REFERENCES "public"."push_subscriptions"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "push_subscriptions" ADD CONSTRAINT "push_subscriptions_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "qc_defects" ADD CONSTRAINT "qc_defects_inspection_id_qc_inspections_id_fk" FOREIGN KEY ("inspection_id") REFERENCES "public"."qc_inspections"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_order_items" ADD CONSTRAINT "replenishment_order_items_order_id_replenishment_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."replenishment_orders"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_order_items" ADD CONSTRAINT "replenishment_order_items_part_id_spare_parts_id_fk" FOREIGN KEY ("part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_rule_id_auto_reorder_rules_id_fk" FOREIGN KEY ("rule_id") REFERENCES "public"."auto_reorder_rules"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "replenishment_orders" ADD CONSTRAINT "replenishment_orders_approved_by_users_id_fk" FOREIGN KEY ("approved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_permission_id_permissions_id_fk" FOREIGN KEY ("permission_id") REFERENCES "public"."permissions"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_route_id_fleet_routes_id_fk" FOREIGN KEY ("route_id") REFERENCES "public"."fleet_routes"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "route_checkpoints" ADD CONSTRAINT "route_checkpoints_completed_by_users_id_fk" FOREIGN KEY ("completed_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "seasonal_tire_storage" ADD CONSTRAINT "seasonal_tire_storage_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_branch_id_branches_id_fk" FOREIGN KEY ("branch_id") REFERENCES "public"."branches"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_vehicle_id_vehicles_id_fk" FOREIGN KEY ("current_vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_job_card_id_job_cards_id_fk" FOREIGN KEY ("current_job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_bays" ADD CONSTRAINT "service_bays_current_technician_id_users_id_fk" FOREIGN KEY ("current_technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_chat_messages" ADD CONSTRAINT "service_chat_messages_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_chat_messages" ADD CONSTRAINT "service_chat_messages_sender_id_users_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_customer_id_customer_profiles_user_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."customer_profiles"("user_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_feedback" ADD CONSTRAINT "service_feedback_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_reviews" ADD CONSTRAINT "service_reviews_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_reviews" ADD CONSTRAINT "service_reviews_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_signatures" ADD CONSTRAINT "service_signatures_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_signatures" ADD CONSTRAINT "service_signatures_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "storage_facilities" ADD CONSTRAINT "storage_facilities_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_spare_part_id_spare_parts_id_fk" FOREIGN KEY ("spare_part_id") REFERENCES "public"."spare_parts"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "supplier_parts_availability" ADD CONSTRAINT "supplier_parts_availability_supplier_id_suppliers_id_fk" FOREIGN KEY ("supplier_id") REFERENCES "public"."suppliers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_ticket_events" ADD CONSTRAINT "support_ticket_events_ticket_id_support_tickets_id_fk" FOREIGN KEY ("ticket_id") REFERENCES "public"."support_tickets"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_ticket_events" ADD CONSTRAINT "support_ticket_events_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_conversation_id_chat_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."chat_conversations"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_assigned_to_users_id_fk" FOREIGN KEY ("assigned_to") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "support_tickets" ADD CONSTRAINT "support_tickets_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "technician_feedback_summary" ADD CONSTRAINT "technician_feedback_summary_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "technician_metric_preferences" ADD CONSTRAINT "technician_metric_preferences_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "technician_performance_rollups" ADD CONSTRAINT "technician_performance_rollups_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "technician_performance_stream" ADD CONSTRAINT "technician_performance_stream_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "technician_performance_stream" ADD CONSTRAINT "technician_performance_stream_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_alerts" ADD CONSTRAINT "telematics_alerts_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_alerts" ADD CONSTRAINT "telematics_alerts_resolved_by_users_id_fk" FOREIGN KEY ("resolved_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_devices" ADD CONSTRAINT "telematics_devices_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_devices" ADD CONSTRAINT "telematics_devices_provider_id_telematics_providers_id_fk" FOREIGN KEY ("provider_id") REFERENCES "public"."telematics_providers"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_feeds" ADD CONSTRAINT "telematics_feeds_device_id_obd_devices_id_fk" FOREIGN KEY ("device_id") REFERENCES "public"."obd_devices"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_feeds" ADD CONSTRAINT "telematics_feeds_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_readings" ADD CONSTRAINT "telematics_readings_stream_id_telematics_streams_id_fk" FOREIGN KEY ("stream_id") REFERENCES "public"."telematics_streams"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "telematics_streams" ADD CONSTRAINT "telematics_streams_device_id_telematics_devices_id_fk" FOREIGN KEY ("device_id") REFERENCES "public"."telematics_devices"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_inventory" ADD CONSTRAINT "tire_inventory_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_recommendations" ADD CONSTRAINT "tire_recommendations_converted_to_job_card_id_job_cards_id_fk" FOREIGN KEY ("converted_to_job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_rotation_schedules" ADD CONSTRAINT "tire_rotation_schedules_last_service_record_id_tire_service_records_id_fk" FOREIGN KEY ("last_service_record_id") REFERENCES "public"."tire_service_records"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_technician_id_users_id_fk" FOREIGN KEY ("technician_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "tire_service_records" ADD CONSTRAINT "tire_service_records_tire_inventory_id_tire_inventory_id_fk" FOREIGN KEY ("tire_inventory_id") REFERENCES "public"."tire_inventory"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "towing_jobs" ADD CONSTRAINT "towing_jobs_assigned_driver_id_users_id_fk" FOREIGN KEY ("assigned_driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_driver_id_users_id_fk" FOREIGN KEY ("driver_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_location_history" ADD CONSTRAINT "vehicle_location_history_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_pricing_factors" ADD CONSTRAINT "vehicle_pricing_factors_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_facility_id_storage_facilities_id_fk" FOREIGN KEY ("facility_id") REFERENCES "public"."storage_facilities"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_storage_assignments" ADD CONSTRAINT "vehicle_storage_assignments_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_tracking" ADD CONSTRAINT "vehicle_tracking_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "vehicle_tracking_history" ADD CONSTRAINT "vehicle_tracking_history_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "workshop_resources" ADD CONSTRAINT "workshop_resources_garage_id_garages_id_fk" FOREIGN KEY ("garage_id") REFERENCES "public"."garages"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "agent_performance_agent_idx" ON "agent_performance_snapshots" USING btree ("agent_user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "agent_performance_garage_idx" ON "agent_performance_snapshots" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "ai_recommendations_job_card_idx" ON "ai_assignment_recommendations" USING btree ("job_card_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "ai_recommendations_garage_idx" ON "ai_assignment_recommendations" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "disposition_codes_garage_idx" ON "call_disposition_codes" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_events_session_idx" ON "call_events" USING btree ("session_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_notes_session_idx" ON "call_notes" USING btree ("session_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "queue_members_queue_idx" ON "call_queue_members" USING btree ("queue_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "queue_members_garage_idx" ON "call_queue_members" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "queue_members_agent_idx" ON "call_queue_members" USING btree ("agent_user_id");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "queue_members_unique_agent_queue" ON "call_queue_members" USING btree ("queue_id","agent_user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_queues_garage_idx" ON "call_queues" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_recordings_session_idx" ON "call_recordings" USING btree ("session_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_garage_idx" ON "call_sessions" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_queue_idx" ON "call_sessions" USING btree ("queue_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_customer_idx" ON "call_sessions" USING btree ("customer_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_agent_idx" ON "call_sessions" USING btree ("assigned_agent_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_status_idx" ON "call_sessions" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "call_sessions_twilio_idx" ON "call_sessions" USING btree ("twilio_call_sid");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "gamif_badge_awards_tech_badge_unique" ON "gamification_badge_awards" USING btree ("technician_id","badge_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "gamif_events_technician_idx" ON "gamification_events" USING btree ("technician_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "gamif_events_occurred_at_idx" ON "gamification_events" USING btree ("occurred_at");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "geofence_alert_recipients_zone_user_idx" ON "geofence_alert_recipients" USING btree ("geofence_zone_id","user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "geofence_events_geofence_timestamp_idx" ON "geofence_events" USING btree ("geofence_zone_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "geofence_events_vehicle_timestamp_idx" ON "geofence_events" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "geofence_events_timestamp_idx" ON "geofence_events" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "geofence_events_pending_notification_idx" ON "geofence_events" USING btree ("notification_sent") WHERE notification_sent = false;--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "geofence_zone_vehicles_zone_vehicle_idx" ON "geofence_zone_vehicles" USING btree ("geofence_zone_id","vehicle_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "geofence_zones_garage_active_idx" ON "geofence_zones" USING btree ("garage_id","is_active");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_tracking_events_job_card_created_idx" ON "job_tracking_events" USING btree ("job_card_id","created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_tracking_events_visible_idx" ON "job_tracking_events" USING btree ("job_card_id") WHERE "job_tracking_events"."is_visible_to_customer" = true;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "leaderboard_period_tech_idx" ON "leaderboard_snapshots" USING btree ("period","technician_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "leaderboard_period_rank_idx" ON "leaderboard_snapshots" USING btree ("period","rank");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "maint_rec_vehicle_status_idx" ON "maintenance_recommendations" USING btree ("vehicle_id","status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "maint_rec_predicted_due_idx" ON "maintenance_recommendations" USING btree ("predicted_due_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "maint_rules_garage_idx" ON "maintenance_trigger_rules" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "mobile_devices_garage_idx" ON "mobile_devices" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "route_checkpoints_route_sequence_idx" ON "route_checkpoints" USING btree ("route_id","sequence_number");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "feedback_job_card_idx" ON "service_feedback" USING btree ("job_card_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "feedback_technician_idx" ON "service_feedback" USING btree ("technician_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "feedback_submitted_at_idx" ON "service_feedback" USING btree ("submitted_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "feedback_sentiment_idx" ON "service_feedback" USING btree ("sentiment");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "subscriptions_garage_idx" ON "subscriptions" USING btree ("garage_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "subscriptions_stripe_sub_idx" ON "subscriptions" USING btree ("stripe_subscription_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "spa_garage_part_supplier_idx" ON "supplier_parts_availability" USING btree ("garage_id","spare_part_id","supplier_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "spa_supplier_sync_idx" ON "supplier_parts_availability" USING btree ("supplier_id","last_synced_at");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "tech_metric_pref_user_metric_unique" ON "technician_metric_preferences" USING btree ("user_id","metric_key");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "perf_rollup_tech_interval_idx" ON "technician_performance_rollups" USING btree ("technician_id","interval_start");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "perf_stream_technician_idx" ON "technician_performance_stream" USING btree ("technician_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "perf_stream_recorded_at_idx" ON "technician_performance_stream" USING btree ("recorded_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "perf_stream_metric_key_idx" ON "technician_performance_stream" USING btree ("metric_key");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "telem_devices_vehicle_idx" ON "telematics_devices" USING btree ("vehicle_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "telem_devices_provider_idx" ON "telematics_devices" USING btree ("provider_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "telem_readings_stream_recorded_idx" ON "telematics_readings" USING btree ("stream_id","recorded_at");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "telem_readings_stream_recorded_unique" ON "telematics_readings" USING btree ("stream_id","recorded_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "telem_streams_device_idx" ON "telematics_streams" USING btree ("device_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "vehicle_location_history_vehicle_timestamp_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "vehicle_location_history_timestamp_idx" ON "vehicle_location_history" USING btree ("timestamp" DESC NULLS LAST);--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "vehicle_location_history_vehicle_latest_idx" ON "vehicle_location_history" USING btree ("vehicle_id","timestamp" DESC NULLS LAST);--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "iot_alerts" ADD CONSTRAINT "iot_alerts_job_card_id_job_cards_id_fk" FOREIGN KEY ("job_card_id") REFERENCES "public"."job_cards"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "service_reminders" ADD CONSTRAINT "service_reminders_customer_id_users_id_fk" FOREIGN KEY ("customer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "invoices_garage_status_invoice_date_idx" ON "invoices" USING btree ("garage_id","status","invoice_date");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_iot_alerts_sensor_status" ON "iot_alerts" USING btree ("sensor_id","status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_iot_alerts_vehicle" ON "iot_alerts" USING btree ("vehicle_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_iot_alerts_status" ON "iot_alerts" USING btree ("status");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_iot_readings_sensor_timestamp" ON "iot_sensor_readings" USING btree ("sensor_id","timestamp");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_iot_readings_timestamp" ON "iot_sensor_readings" USING btree ("timestamp");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_cards_public_tracking_token_idx" ON "job_cards" USING btree ("public_tracking_token");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_cards_garage_created_idx" ON "job_cards" USING btree ("garage_id","created_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_cards_garage_completed_idx" ON "job_cards" USING btree ("garage_id","completed_at");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "job_cards_garage_status_idx" ON "job_cards" USING btree ("garage_id","status");--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "job_cards" ADD CONSTRAINT "job_cards_public_tracking_token_unique" UNIQUE("public_tracking_token");
+EXCEPTION WHEN duplicate_object OR duplicate_table THEN NULL; END $$;
