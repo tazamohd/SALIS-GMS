@@ -800,7 +800,8 @@ import {
   type InsertHrLeaveRequestEntry,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt } from "drizzle-orm";
+import { eq, desc, asc, or, inArray, and, gte, lte, ilike, like, sql, isNull, gt, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { createHash, randomUUID } from "crypto";
 
 /**
@@ -1961,7 +1962,9 @@ export interface IStorage {
   getPayrollEmployee(id: string): Promise<PayrollEmployee | undefined>;
   createPayrollEmployee(data: InsertPayrollEmployee): Promise<PayrollEmployee>;
   updatePayrollEmployee(id: string, data: Partial<PayrollEmployee>): Promise<PayrollEmployee>;
-  deletePayrollEmployee(id: string): Promise<void>;
+  /** Resolves false when no row matched, so callers can distinguish a
+   *  no-op delete from a successful one. */
+  deletePayrollEmployee(id: string): Promise<boolean>;
   getPayPeriods(garageId: string, status?: string): Promise<PayPeriod[]>;
   getPayPeriod(id: string): Promise<PayPeriod | undefined>;
   createPayPeriod(data: InsertPayPeriod): Promise<PayPeriod>;
@@ -2364,22 +2367,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getJobCardWithDetails(id: string): Promise<any> {
-    const { diagnosticReports, maintenanceRecommendations, invoices, invoiceItems, payments, vehicles, users, jobTrackingEvents } = await import("@shared/schema");
-    
+    const { diagnosticReports, obdSessions, maintenanceRecommendations, invoices, invoiceItems, payments, vehicles, users, jobTrackingEvents } = await import("@shared/schema");
+
     const [jobCard] = await db.select().from(jobCards).where(eq(jobCards.id, id));
     if (!jobCard) return null;
 
-    const [vehicle] = jobCard.vehicleId 
-      ? await db.select().from(vehicles).where(eq(vehicles.id, jobCard.vehicleId))
-      : [null];
+    // job_cards keeps the vehicle as a jsonb snapshot (vehicle_info); there is
+    // no vehicle_id foreign key. Resolve the registered vehicle by VIN within
+    // the same garage, and fall back to the snapshot when there is no match.
+    const vehicleInfo = (jobCard.vehicleInfo ?? {}) as { vin?: string };
+    const [registeredVehicle] = vehicleInfo.vin
+      ? await db.select().from(vehicles).where(
+          and(eq(vehicles.vin, vehicleInfo.vin), eq(vehicles.garageId, jobCard.garageId)),
+        )
+      : [];
+    const vehicle = registeredVehicle ?? jobCard.vehicleInfo ?? null;
 
     const [technician] = jobCard.assignedTo
       ? await db.select().from(users).where(eq(users.id, jobCard.assignedTo))
       : [null];
 
-    const diagnostics = await db.select().from(diagnosticReports).where(eq(diagnosticReports.jobCardId, id));
+    // diagnostic_reports hangs off an OBD session; the session is what carries
+    // job_card_id, so reaching the reports takes the extra hop.
+    const diagnostics = await db
+      .select(getTableColumns(diagnosticReports))
+      .from(diagnosticReports)
+      .innerJoin(obdSessions, eq(diagnosticReports.sessionId, obdSessions.id))
+      .where(eq(obdSessions.jobCardId, id));
 
-    const recommendations = await db.select().from(maintenanceRecommendations).where(eq(maintenanceRecommendations.jobCardId, id));
+    // maintenance_recommendations are keyed by vehicle, not by job card.
+    const recommendations = registeredVehicle
+      ? await db.select().from(maintenanceRecommendations)
+          .where(eq(maintenanceRecommendations.vehicleId, registeredVehicle.id))
+      : [];
 
     const trackingEvents = await db.select().from(jobTrackingEvents).where(eq(jobTrackingEvents.jobCardId, id)).orderBy(desc(jobTrackingEvents.createdAt));
 
@@ -2475,7 +2495,8 @@ export class DatabaseStorage implements IStorage {
   async getTechnicianJobCards(technicianId: string): Promise<JobCard[]> {
     return await db.select()
       .from(jobCards)
-      .where(eq(jobCards.assignedTechnicianId, technicianId))
+      // job_cards names the column assigned_to, not assigned_technician_id.
+      .where(eq(jobCards.assignedTo, technicianId))
       .orderBy(desc(jobCards.createdAt));
   }
 
@@ -3120,10 +3141,13 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (filters?.partName) {
-      conditions.push(or(
+      // or() is typed as possibly-undefined (it is, for an empty argument
+      // list), so it has to be narrowed before joining the condition list.
+      const nameMatch = or(
         ilike(supplierPartsAvailability.externalPartNumber, `%${filters.partName}%`),
         ilike(supplierPartsAvailability.externalSku, `%${filters.partName}%`)
-      ));
+      );
+      if (nameMatch) conditions.push(nameMatch);
     }
     
     return await db.select().from(supplierPartsAvailability)
@@ -4851,6 +4875,15 @@ export class DatabaseStorage implements IStorage {
     const [notification] = await db
       .update(notifications)
       .set({ ...data, updatedAt: new Date() })
+      .where(eq(notifications.id, id))
+      .returning();
+    return notification;
+  }
+
+  async markNotificationAsRead(id: string): Promise<Notification> {
+    const [notification] = await db
+      .update(notifications)
+      .set({ status: 'read', readAt: new Date(), updatedAt: new Date() })
       .where(eq(notifications.id, id))
       .returning();
     return notification;
@@ -10868,14 +10901,19 @@ export class DatabaseStorage implements IStorage {
 
   // Get feedback by ID
   async getServiceFeedbackById(id: string): Promise<any | null> {
+    // customer_profiles only holds address/nationality/preferred_language —
+    // the name, email and phone are on users. The customer therefore needs a
+    // second, aliased join against users, since the unaliased one is already
+    // taken by the technician.
+    const customerUsers = alias(users, "customer_users");
     const [feedback] = await db.select({
       feedback: serviceFeedback,
       customer: {
-        id: customerProfiles.userId,
-        firstName: customerProfiles.firstName,
-        lastName: customerProfiles.lastName,
-        email: customerProfiles.email,
-        phone: customerProfiles.phone,
+        id: customerUsers.id,
+        firstName: customerUsers.firstName,
+        lastName: customerUsers.lastName,
+        email: customerUsers.email,
+        phone: customerUsers.phone,
       },
       technician: {
         id: users.id,
@@ -10895,7 +10933,7 @@ export class DatabaseStorage implements IStorage {
         status: jobCards.status,
       },
     }).from(serviceFeedback)
-      .leftJoin(customerProfiles, eq(serviceFeedback.customerId, customerProfiles.userId))
+      .leftJoin(customerUsers, eq(serviceFeedback.customerId, customerUsers.id))
       .leftJoin(users, eq(serviceFeedback.technicianId, users.id))
       .leftJoin(vehicles, eq(serviceFeedback.vehicleId, vehicles.id))
       .leftJoin(jobCards, eq(serviceFeedback.jobCardId, jobCards.id))
@@ -11226,12 +11264,15 @@ export class DatabaseStorage implements IStorage {
         ));
       
       // Insert new session
+      // garage_id is NOT NULL and was omitted entirely; take it from the bay
+      // that was just locked. The column is service_type, not session_type.
       const [session] = await tx.insert(bayOccupancySessions).values({
         bayId,
+        garageId: lockedBay.garageId,
         vehicleId: vehicleId || null,
         jobCardId: jobCardId || null,
         startTime: new Date(),
-        sessionType: 'service',
+        serviceType: 'service',
       }).returning();
       
       if (!session) {
@@ -11884,8 +11925,12 @@ export class DatabaseStorage implements IStorage {
       eq(serviceReminders.isActive, true),
       lte(serviceReminders.triggerDate, now)
     ];
-    if (garageId) conditions.push(eq(serviceReminders.garageId, garageId));
-    
+    // service_reminders has no garage_id — it hangs off a vehicle, and the
+    // vehicle is what carries the garage. Scope through it.
+    if (garageId) {
+      conditions.push(sql`EXISTS (SELECT 1 FROM ${vehicles} WHERE ${vehicles.id} = ${serviceReminders.vehicleId} AND ${vehicles.garageId} = ${garageId})`);
+    }
+
     return await db.select().from(serviceReminders)
       .where(and(...conditions))
       .orderBy(asc(serviceReminders.triggerDate));
@@ -12017,7 +12062,11 @@ export class DatabaseStorage implements IStorage {
     return notification;
   }
 
-  async markNotificationAsRead(id: string): Promise<PushNotification> {
+  // Distinct from markNotificationAsRead: push_notifications and
+  // notifications are separate tables with separate ids, and sharing one
+  // method meant PATCH /api/notifications/:id/read matched nothing and
+  // silently returned an empty body.
+  async markPushNotificationAsRead(id: string): Promise<PushNotification> {
     const [notification] = await db.update(pushNotifications)
       .set({ status: 'read', readAt: new Date() })
       .where(eq(pushNotifications.id, id))

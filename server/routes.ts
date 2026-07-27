@@ -20558,7 +20558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
     try {
-      const notification = await storage.markNotificationAsRead(req.params.id);
+      const notification = await storage.markPushNotificationAsRead(req.params.id);
       res.json(notification);
     } catch (error: any) {
       console.error("Error marking notification as read:", error);
