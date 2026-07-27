@@ -156,6 +156,7 @@ import {
   insertIoTAlertSchema,
   insertJobTrackingEventSchema,
   fleetContracts,
+  fleetGroups,
   contractUtilization,
   contractRenewals,
   // Declared in schema.ts as contractSLAMetrics; aliased to match call sites.
@@ -10299,7 +10300,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user?.garageId;
       
       // Fetch all contracts for the garage
-      const contracts = await db.select().from(fleetContracts).where(eq(fleetContracts.garageId, garageId));
+      // fleet_contracts has no garage_id — it belongs to a fleet_group, and
+      // that is what carries the garage. Scope through the group.
+      const contracts = await db
+        .select()
+        .from(fleetContracts)
+        .where(sql`EXISTS (SELECT 1 FROM ${fleetGroups} WHERE ${fleetGroups.id} = ${fleetContracts.fleetGroupId} AND ${fleetGroups.garageId} = ${garageId})`);
       
       // Fetch related data for each contract
       const enhancedContracts = await Promise.all(contracts.map(async (contract) => {
@@ -10339,14 +10345,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newEndDate = new Date(contract.endDate);
       newEndDate.setFullYear(newEndDate.getFullYear() + 1);
 
+      // Column names follow contract_renewals: status (not renewalStatus),
+      // proposedMonthlyFee (not proposedValue), notes (not proposedTerms).
+      // The date columns are timestamps, so they take Date, not ISO strings.
+      // renewalType is NOT NULL and had no value at all here.
       const [renewal] = await db.insert(contractRenewals).values({
         contractId,
-        renewalStatus: 'pending',
+        renewalType: 'standard',
+        status: 'pending',
         proposedStartDate: contract.endDate,
-        proposedEndDate: newEndDate.toISOString(),
-        proposedValue: contract.monthlyValue ? contract.monthlyValue * 12 : contract.totalValue,
-        proposedTerms: contract.terms,
-        notificationSentAt: new Date().toISOString(),
+        proposedEndDate: newEndDate,
+        proposedMonthlyFee: contract.monthlyFee ?? contract.contractValue,
+        notes: contract.terms,
+        notificationSentAt: new Date(),
       }).returning();
 
       res.status(201).json(renewal);
@@ -10368,8 +10379,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update renewal status
       await db.update(contractRenewals)
         .set({
-          renewalStatus: 'accepted',
-          acceptedAt: new Date().toISOString(),
+          // contract_renewals records the customer's answer in
+          // customerResponse/customerResponseDate; there is no acceptedAt,
+          // and the state column is `status`, not `renewalStatus`.
+          status: 'accepted',
+          customerResponse: 'accepted',
+          customerResponseDate: new Date(),
         })
         .where(eq(contractRenewals.id, renewalId));
 
@@ -10385,8 +10400,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({
           startDate: renewal.proposedStartDate,
           endDate: renewal.proposedEndDate,
-          totalValue: renewal.proposedValue,
-          terms: renewal.proposedTerms,
+          // fleet_contracts carries monthlyFee/contractValue; the renewal
+          // proposes a monthly fee, and its free text lives in notes.
+          monthlyFee: renewal.proposedMonthlyFee,
+          terms: renewal.notes,
           status: 'active',
         })
         .where(eq(fleetContracts.id, contractId))
