@@ -1766,8 +1766,10 @@ export interface IStorage {
   getIotSensors(vehicleId?: string): Promise<IoTSensor[]>;
   updateIotSensor(id: string, data: Partial<IoTSensor>): Promise<IoTSensor>;
   deleteIotSensor(id: string): Promise<void>;
-  createIotSensorReading(data: InsertIoTSensorReading): Promise<IoTSensorReading>;
-  getIotSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]>;
+  // IoT rather than Iot: the implementations and the route call sites both
+  // use that casing, so the interface was declaring methods nothing had.
+  createIoTSensorReading(data: InsertIoTSensorReading): Promise<IoTSensorReading>;
+  getIoTSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]>;
   createIotAlert(data: InsertIoTAlert): Promise<IoTAlert>;
   getIotAlerts(sensorId?: string, status?: string): Promise<IoTAlert[]>;
   updateIotAlert(id: string, data: Partial<IoTAlert>): Promise<IoTAlert>;
@@ -9797,7 +9799,12 @@ export class DatabaseStorage implements IStorage {
   async getIoTSensorReadings(sensorId?: string, vehicleId?: string): Promise<IoTSensorReading[]> {
     const conditions = [];
     if (sensorId) conditions.push(eq(iotSensorReadings.sensorId, sensorId));
-    
+    // The reading knows its sensor; the sensor knows its vehicle. vehicleId
+    // was accepted and then silently dropped.
+    if (vehicleId) {
+      conditions.push(sql`EXISTS (SELECT 1 FROM ${iotSensors} WHERE ${iotSensors.id} = ${iotSensorReadings.sensorId} AND ${iotSensors.vehicleId} = ${vehicleId})`);
+    }
+
     if (conditions.length === 0) {
       return await db.select().from(iotSensorReadings).orderBy(desc(iotSensorReadings.timestamp)).limit(500);
     }
@@ -10416,23 +10423,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSensorReadings(sensorId: string, startDate?: Date, endDate?: Date): Promise<any[]> {
-    let query = db.select().from(iotSensorReadings).where(eq(iotSensorReadings.sensorId, sensorId));
-    
+    // A second .where() on the same builder replaces the first rather than
+    // adding to it, so the date range has to join the condition list.
+    const conditions = [eq(iotSensorReadings.sensorId, sensorId)];
     if (startDate && endDate) {
-      query = query.where(and(
-        gte(iotSensorReadings.timestamp, startDate),
-        lte(iotSensorReadings.timestamp, endDate)
-      )) as any;
+      conditions.push(gte(iotSensorReadings.timestamp, startDate));
+      conditions.push(lte(iotSensorReadings.timestamp, endDate));
     }
-    
-    return await query.orderBy(desc(iotSensorReadings.timestamp)).limit(1000);
+
+    return await db.select().from(iotSensorReadings)
+      .where(and(...conditions))
+      .orderBy(desc(iotSensorReadings.timestamp))
+      .limit(1000);
   }
 
   async getRecentAnomalies(vehicleId: string, limit: number = 10): Promise<any[]> {
+    // iot_sensor_readings has no vehicle_id; the sensor is what is fitted to
+    // the vehicle, so the filter goes through iot_sensors.
     return await db.select()
       .from(iotSensorReadings)
       .where(and(
-        eq(iotSensorReadings.vehicleId, vehicleId),
+        sql`EXISTS (SELECT 1 FROM ${iotSensors} WHERE ${iotSensors.id} = ${iotSensorReadings.sensorId} AND ${iotSensors.vehicleId} = ${vehicleId})`,
         eq(iotSensorReadings.isAbnormal, true)
       ))
       .orderBy(desc(iotSensorReadings.timestamp))
@@ -13470,6 +13481,407 @@ export class DatabaseStorage implements IStorage {
       .from(vehicles)
       .where(eq(vehicles.customerId, customerId))
       .orderBy(desc(vehicles.createdAt));
+  }
+
+  // ==================== Single-row reads, updates and deletes ====================
+  // Declared on IStorage but never implemented, so any route reaching for one
+  // of them threw "is not a function". Each is the plain by-id form over the
+  // table its return type already infers from.
+
+  async getArticleCategory(id: string): Promise<ArticleCategory | undefined> {
+    const [row] = await db.select().from(articleCategories).where(eq(articleCategories.id, id));
+    return row;
+  }
+
+  async updateArticleCategory(id: string, data: Partial<ArticleCategory>): Promise<ArticleCategory> {
+    const [row] = await db.update(articleCategories).set(data).where(eq(articleCategories.id, id)).returning();
+    return row;
+  }
+
+  async deleteArticleCategory(id: string): Promise<void> {
+    await db.delete(articleCategories).where(eq(articleCategories.id, id));
+  }
+
+  async getCertification(id: string): Promise<Certification | undefined> {
+    const [row] = await db.select().from(certifications).where(eq(certifications.id, id));
+    return row;
+  }
+
+  async updateCertification(id: string, data: Partial<Certification>): Promise<Certification> {
+    const [row] = await db.update(certifications).set(data).where(eq(certifications.id, id)).returning();
+    return row;
+  }
+
+  async getCertificationAttempt(id: string): Promise<CertificationAttempt | undefined> {
+    const [row] = await db.select().from(certificationAttempts).where(eq(certificationAttempts.id, id));
+    return row;
+  }
+
+  async updateCertificationAttempt(id: string, data: Partial<CertificationAttempt>): Promise<CertificationAttempt> {
+    const [row] = await db.update(certificationAttempts).set(data).where(eq(certificationAttempts.id, id)).returning();
+    return row;
+  }
+
+  async getComplianceAudit(id: string): Promise<ComplianceAudit | undefined> {
+    const [row] = await db.select().from(complianceAudits).where(eq(complianceAudits.id, id));
+    return row;
+  }
+
+  async updateComplianceAudit(id: string, data: Partial<ComplianceAudit>): Promise<ComplianceAudit> {
+    const [row] = await db.update(complianceAudits).set({ ...data, updatedAt: new Date() }).where(eq(complianceAudits.id, id)).returning();
+    return row;
+  }
+
+  async deleteComplianceAudit(id: string): Promise<void> {
+    await db.delete(complianceAudits).where(eq(complianceAudits.id, id));
+  }
+
+  async getCompliancePolicy(id: string): Promise<CompliancePolicy | undefined> {
+    const [row] = await db.select().from(compliancePolicies).where(eq(compliancePolicies.id, id));
+    return row;
+  }
+
+  async updateCompliancePolicy(id: string, data: Partial<CompliancePolicy>): Promise<CompliancePolicy> {
+    const [row] = await db.update(compliancePolicies).set({ ...data, updatedAt: new Date() }).where(eq(compliancePolicies.id, id)).returning();
+    return row;
+  }
+
+  async deleteCompliancePolicy(id: string): Promise<void> {
+    await db.delete(compliancePolicies).where(eq(compliancePolicies.id, id));
+  }
+
+  async getComplianceTask(id: string): Promise<ComplianceTask | undefined> {
+    const [row] = await db.select().from(complianceTasks).where(eq(complianceTasks.id, id));
+    return row;
+  }
+
+  async updateComplianceTask(id: string, data: Partial<ComplianceTask>): Promise<ComplianceTask> {
+    const [row] = await db.update(complianceTasks).set({ ...data, updatedAt: new Date() }).where(eq(complianceTasks.id, id)).returning();
+    return row;
+  }
+
+  async deleteComplianceTask(id: string): Promise<void> {
+    await db.delete(complianceTasks).where(eq(complianceTasks.id, id));
+  }
+
+  async getExpense(id: string): Promise<Expense | undefined> {
+    const [row] = await db.select().from(expenses).where(eq(expenses.id, id));
+    return row;
+  }
+
+  async updateExpense(id: string, data: Partial<Expense>): Promise<Expense> {
+    const [row] = await db.update(expenses).set({ ...data, updatedAt: new Date() }).where(eq(expenses.id, id)).returning();
+    return row;
+  }
+
+  async deleteExpense(id: string): Promise<void> {
+    await db.delete(expenses).where(eq(expenses.id, id));
+  }
+
+  async getExpenseCategory(id: string): Promise<ExpenseCategory | undefined> {
+    const [row] = await db.select().from(expenseCategories).where(eq(expenseCategories.id, id));
+    return row;
+  }
+
+  async updateExpenseCategory(id: string, data: Partial<ExpenseCategory>): Promise<ExpenseCategory> {
+    const [row] = await db.update(expenseCategories).set(data).where(eq(expenseCategories.id, id)).returning();
+    return row;
+  }
+
+  async deleteExpenseCategory(id: string): Promise<void> {
+    await db.delete(expenseCategories).where(eq(expenseCategories.id, id));
+  }
+
+  async getGmbPost(id: string): Promise<GmbPost | undefined> {
+    const [row] = await db.select().from(gmbPosts).where(eq(gmbPosts.id, id));
+    return row;
+  }
+
+  async updateGmbPost(id: string, data: Partial<GmbPost>): Promise<GmbPost> {
+    const [row] = await db.update(gmbPosts).set({ ...data, updatedAt: new Date() }).where(eq(gmbPosts.id, id)).returning();
+    return row;
+  }
+
+  async deleteGmbPost(id: string): Promise<void> {
+    await db.delete(gmbPosts).where(eq(gmbPosts.id, id));
+  }
+
+  async getGmbReview(id: string): Promise<GmbReview | undefined> {
+    const [row] = await db.select().from(gmbReviews).where(eq(gmbReviews.id, id));
+    return row;
+  }
+
+  async updateGmbReview(id: string, data: Partial<GmbReview>): Promise<GmbReview> {
+    const [row] = await db.update(gmbReviews).set({ ...data, updatedAt: new Date() }).where(eq(gmbReviews.id, id)).returning();
+    return row;
+  }
+
+  async getGoogleBusinessProfile(id: string): Promise<GoogleBusinessProfile | undefined> {
+    const [row] = await db.select().from(googleBusinessProfiles).where(eq(googleBusinessProfiles.id, id));
+    return row;
+  }
+
+  async updateGoogleBusinessProfile(id: string, data: Partial<GoogleBusinessProfile>): Promise<GoogleBusinessProfile> {
+    const [row] = await db.update(googleBusinessProfiles).set({ ...data, updatedAt: new Date() }).where(eq(googleBusinessProfiles.id, id)).returning();
+    return row;
+  }
+
+  async deleteGoogleBusinessProfile(id: string): Promise<void> {
+    await db.delete(googleBusinessProfiles).where(eq(googleBusinessProfiles.id, id));
+  }
+
+  async getPayPeriod(id: string): Promise<PayPeriod | undefined> {
+    const [row] = await db.select().from(payPeriods).where(eq(payPeriods.id, id));
+    return row;
+  }
+
+  async updatePayPeriod(id: string, data: Partial<PayPeriod>): Promise<PayPeriod> {
+    const [row] = await db.update(payPeriods).set(data).where(eq(payPeriods.id, id)).returning();
+    return row;
+  }
+
+  async deletePayPeriod(id: string): Promise<void> {
+    await db.delete(payPeriods).where(eq(payPeriods.id, id));
+  }
+
+  async getPayrollEmployee(id: string): Promise<PayrollEmployee | undefined> {
+    const [row] = await db.select().from(payrollEmployees).where(eq(payrollEmployees.id, id));
+    return row;
+  }
+
+  async getPayrollRun(id: string): Promise<PayrollRun | undefined> {
+    const [row] = await db.select().from(payrollRuns).where(eq(payrollRuns.id, id));
+    return row;
+  }
+
+  async updatePayrollRun(id: string, data: Partial<PayrollRun>): Promise<PayrollRun> {
+    const [row] = await db.update(payrollRuns).set(data).where(eq(payrollRuns.id, id)).returning();
+    return row;
+  }
+
+  async deletePayrollRun(id: string): Promise<void> {
+    await db.delete(payrollRuns).where(eq(payrollRuns.id, id));
+  }
+
+  async getStorageFacility(id: string): Promise<StorageFacility | undefined> {
+    const [row] = await db.select().from(storageFacilities).where(eq(storageFacilities.id, id));
+    return row;
+  }
+
+  async updateStorageFacility(id: string, data: Partial<StorageFacility>): Promise<StorageFacility> {
+    const [row] = await db.update(storageFacilities).set(data).where(eq(storageFacilities.id, id)).returning();
+    return row;
+  }
+
+  async deleteStorageFacility(id: string): Promise<void> {
+    await db.delete(storageFacilities).where(eq(storageFacilities.id, id));
+  }
+
+  async getTelematicsAlert(id: string): Promise<TelematicsAlert | undefined> {
+    const [row] = await db.select().from(telematicsAlerts).where(eq(telematicsAlerts.id, id));
+    return row;
+  }
+
+  async updateTelematicsAlert(id: string, data: Partial<TelematicsAlert>): Promise<TelematicsAlert> {
+    const [row] = await db.update(telematicsAlerts).set(data).where(eq(telematicsAlerts.id, id)).returning();
+    return row;
+  }
+
+  async getTelematicsFeed(id: string): Promise<TelematicsFeed | undefined> {
+    const [row] = await db.select().from(telematicsFeeds).where(eq(telematicsFeeds.id, id));
+    return row;
+  }
+
+  async getTowingJob(id: string): Promise<TowingJob | undefined> {
+    const [row] = await db.select().from(towingJobs).where(eq(towingJobs.id, id));
+    return row;
+  }
+
+  async deleteTowingJob(id: string): Promise<void> {
+    await db.delete(towingJobs).where(eq(towingJobs.id, id));
+  }
+
+  async getTrainingModule(id: string): Promise<TrainingModule | undefined> {
+    const [row] = await db.select().from(trainingModules).where(eq(trainingModules.id, id));
+    return row;
+  }
+
+  async updateTrainingModule(id: string, data: Partial<TrainingModule>): Promise<TrainingModule> {
+    const [row] = await db.update(trainingModules).set({ ...data, updatedAt: new Date() }).where(eq(trainingModules.id, id)).returning();
+    return row;
+  }
+
+  async deleteTrainingModule(id: string): Promise<void> {
+    await db.delete(trainingModules).where(eq(trainingModules.id, id));
+  }
+
+  async getVehicleStorageAssignment(id: string): Promise<VehicleStorageAssignment | undefined> {
+    const [row] = await db.select().from(vehicleStorageAssignments).where(eq(vehicleStorageAssignments.id, id));
+    return row;
+  }
+
+  async updateVehicleStorageAssignment(id: string, data: Partial<VehicleStorageAssignment>): Promise<VehicleStorageAssignment> {
+    const [row] = await db.update(vehicleStorageAssignments).set({ ...data, updatedAt: new Date() }).where(eq(vehicleStorageAssignments.id, id)).returning();
+    return row;
+  }
+
+  async deleteVehicleStorageAssignment(id: string): Promise<void> {
+    await db.delete(vehicleStorageAssignments).where(eq(vehicleStorageAssignments.id, id));
+  }
+
+  async updateBlockchainRecord(id: string, data: Partial<BlockchainRecord>): Promise<BlockchainRecord> {
+    const [row] = await db.update(blockchainRecords).set(data).where(eq(blockchainRecords.id, id)).returning();
+    return row;
+  }
+
+  async deleteBlockchainRecord(id: string): Promise<void> {
+    await db.delete(blockchainRecords).where(eq(blockchainRecords.id, id));
+  }
+
+  async updateDroneInspection(id: string, data: Partial<DroneInspection>): Promise<DroneInspection> {
+    const [row] = await db.update(droneInspections).set({ ...data, updatedAt: new Date() }).where(eq(droneInspections.id, id)).returning();
+    return row;
+  }
+
+  async deleteDroneInspection(id: string): Promise<void> {
+    await db.delete(droneInspections).where(eq(droneInspections.id, id));
+  }
+
+  async updateEdgeDevice(id: string, data: Partial<EdgeDevice>): Promise<EdgeDevice> {
+    const [row] = await db.update(edgeDevices).set({ ...data, updatedAt: new Date() }).where(eq(edgeDevices.id, id)).returning();
+    return row;
+  }
+
+  async updateEdgeDiagnostic(id: string, data: Partial<EdgeDiagnostic>): Promise<EdgeDiagnostic> {
+    const [row] = await db.update(edgeDiagnostics).set(data).where(eq(edgeDiagnostics.id, id)).returning();
+    return row;
+  }
+
+  async deleteEdgeDiagnostic(id: string): Promise<void> {
+    await db.delete(edgeDiagnostics).where(eq(edgeDiagnostics.id, id));
+  }
+
+  async updateFraudDetectionCase(id: string, data: Partial<FraudDetectionCase>): Promise<FraudDetectionCase> {
+    const [row] = await db.update(fraudDetectionCases).set({ ...data, updatedAt: new Date() }).where(eq(fraudDetectionCases.id, id)).returning();
+    return row;
+  }
+
+  async deleteFraudDetectionCase(id: string): Promise<void> {
+    await db.delete(fraudDetectionCases).where(eq(fraudDetectionCases.id, id));
+  }
+
+  async updateFraudDetectionRule(id: string, data: Partial<FraudDetectionRule>): Promise<FraudDetectionRule> {
+    const [row] = await db.update(fraudDetectionRules).set({ ...data, updatedAt: new Date() }).where(eq(fraudDetectionRules.id, id)).returning();
+    return row;
+  }
+
+  async deleteFraudDetectionRule(id: string): Promise<void> {
+    await db.delete(fraudDetectionRules).where(eq(fraudDetectionRules.id, id));
+  }
+
+  async updateIotAlert(id: string, data: Partial<IoTAlert>): Promise<IoTAlert> {
+    const [row] = await db.update(iotAlerts).set(data).where(eq(iotAlerts.id, id)).returning();
+    return row;
+  }
+
+  async updateParts3DModel(id: string, data: Partial<Parts3DModel>): Promise<Parts3DModel> {
+    const [row] = await db.update(parts3DModels).set({ ...data, updatedAt: new Date() }).where(eq(parts3DModels.id, id)).returning();
+    return row;
+  }
+
+  async deleteParts3DModel(id: string): Promise<void> {
+    await db.delete(parts3DModels).where(eq(parts3DModels.id, id));
+  }
+
+  async updatePricingRule(id: string, data: Partial<PricingRule>): Promise<PricingRule> {
+    const [row] = await db.update(pricingRules).set({ ...data, updatedAt: new Date() }).where(eq(pricingRules.id, id)).returning();
+    return row;
+  }
+
+  async deletePricingRule(id: string): Promise<void> {
+    await db.delete(pricingRules).where(eq(pricingRules.id, id));
+  }
+
+  async updateTwinSimulation(id: string, data: Partial<TwinSimulation>): Promise<TwinSimulation> {
+    const [row] = await db.update(twinSimulations).set(data).where(eq(twinSimulations.id, id)).returning();
+    return row;
+  }
+
+  async deleteAiVideoAnalysis(id: string): Promise<void> {
+    await db.delete(aiVideoAnalysis).where(eq(aiVideoAnalysis.id, id));
+  }
+
+  async deleteArGuideSession(id: string): Promise<void> {
+    await db.delete(arGuideSessions).where(eq(arGuideSessions.id, id));
+  }
+
+  async deleteArRepairGuide(id: string): Promise<void> {
+    await db.delete(arRepairGuides).where(eq(arRepairGuides.id, id));
+  }
+
+  async deleteCollaborationSession(id: string): Promise<void> {
+    await db.delete(collaborationSessions).where(eq(collaborationSessions.id, id));
+  }
+
+  async deleteDigitalTwin(id: string): Promise<void> {
+    await db.delete(digitalTwins).where(eq(digitalTwins.id, id));
+  }
+
+  async deleteKnowledgeArticle(id: string): Promise<void> {
+    await db.delete(knowledgeArticles).where(eq(knowledgeArticles.id, id));
+  }
+
+  async deletePricingOptimization(id: string): Promise<void> {
+    await db.delete(pricingOptimization).where(eq(pricingOptimization.id, id));
+  }
+
+  async deleteCertification(id: string): Promise<void> {
+    await db.delete(certifications).where(eq(certifications.id, id));
+  }
+
+  async deleteEdgeDevice(id: string): Promise<void> {
+    await db.delete(edgeDevices).where(eq(edgeDevices.id, id));
+  }
+
+  // ---- The remainder are not plain by-id forms ----
+
+  /** biometric_profiles is keyed by user_id, one profile per user. */
+  async deleteBiometricProfile(userId: string): Promise<void> {
+    await db.delete(biometricProfiles).where(eq(biometricProfiles.userId, userId));
+  }
+
+  /** Records a reader's vote against the article's running tallies. */
+  async markArticleHelpful(id: string, isHelpful: boolean): Promise<void> {
+    const column = isHelpful ? knowledgeArticles.helpfulCount : knowledgeArticles.unhelpfulCount;
+    await db.update(knowledgeArticles)
+      .set({
+        [isHelpful ? "helpfulCount" : "unhelpfulCount"]: sql`COALESCE(${column}, 0) + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(knowledgeArticles.id, id));
+  }
+
+  async getArGuideSessions(guideId?: string, technicianId?: string): Promise<ARGuideSession[]> {
+    const conditions = [];
+    if (guideId) conditions.push(eq(arGuideSessions.guideId, guideId));
+    if (technicianId) conditions.push(eq(arGuideSessions.technicianId, technicianId));
+
+    const query = db.select().from(arGuideSessions);
+    return conditions.length
+      ? await query.where(and(...conditions)).orderBy(desc(arGuideSessions.startedAt))
+      : await query.orderBy(desc(arGuideSessions.startedAt));
+  }
+
+  async createParts3DViewSession(data: InsertParts3DViewSession): Promise<Parts3DViewSession> {
+    const [row] = await db.insert(parts3DViewSessions).values(data).returning();
+    return row;
+  }
+
+  async getParts3DViewSessions(modelId?: string): Promise<Parts3DViewSession[]> {
+    const query = db.select().from(parts3DViewSessions);
+    return modelId
+      ? await query.where(eq(parts3DViewSessions.modelId, modelId)).orderBy(desc(parts3DViewSessions.createdAt))
+      : await query.orderBy(desc(parts3DViewSessions.createdAt));
   }
 }
 
