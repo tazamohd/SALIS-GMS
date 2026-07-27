@@ -4522,7 +4522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const { eventMap } = req.body;
-      const preferences = await storage.upsertNotificationPreferences(userId, eventMap);
+      const preferences = await storage.upsertNotificationPreferences({ userId, eventMap });
       res.json(preferences);
     } catch (error) {
       console.error("Error saving notification preferences:", error);

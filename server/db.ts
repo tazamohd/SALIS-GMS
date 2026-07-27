@@ -29,4 +29,17 @@ if (isNeon) {
   db = drizzle({ client: pool, schema });
 }
 
-export { pool, db };
+/**
+ * Round-trips a trivial query so a readiness probe reports the connection
+ * state rather than just the process being alive.
+ */
+async function checkDatabaseHealth(): Promise<boolean> {
+  try {
+    await pool.query("SELECT 1");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export { pool, db, checkDatabaseHealth };

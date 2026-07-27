@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   date,
   decimal,
@@ -1227,6 +1228,13 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  // ZATCA Phase 2 (Fatoora) clearance tracking.
+  // See migrations/0009_zatca_clearance.sql.
+  zatcaClearanceStatus: varchar("zatca_clearance_status", { length: 20 }),
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaClearedAt: timestamp("zatca_cleared_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -2579,9 +2587,9 @@ export const auditLogs = pgTable("audit_logs", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: uuid("garage_id")
-    .references(() => garages.id)
-    .notNull(),
+  // Nullable: platform-admin actions are cross-tenant and belong to no
+  // single garage. See migrations/0010_audit_logs_nullable_garage.sql.
+  garageId: uuid("garage_id").references(() => garages.id),
   userId: varchar("user_id")
     .references(() => users.id)
     .notNull(),
@@ -10409,7 +10417,9 @@ export const loyaltyAccounts = pgTable("loyalty_accounts", {
   totalVisits: integer("total_visits").default(0),
   lastVisitDate: timestamp("last_visit_date"),
   referralCode: varchar("referral_code", { length: 50 }).unique(),
-  referredBy: uuid("referred_by").references(() => loyaltyAccounts.id),
+  // Self-reference: without the explicit return type the table's own type
+  // depends on itself and TypeScript falls back to `any`.
+  referredBy: uuid("referred_by").references((): AnyPgColumn => loyaltyAccounts.id),
   referralCount: integer("referral_count").default(0),
   birthdayMonth: integer("birthday_month"),
   preferredContactMethod: varchar("preferred_contact_method", { length: 50 }), // "email", "sms", "whatsapp"
@@ -10898,7 +10908,9 @@ export const insertPushNotificationSchema = createInsertSchema(pushNotifications
 
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
-export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+// notification_preferences is keyed by user_id and has no id/createdAt/
+// updatedAt columns, so there is nothing to omit.
+export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences);
 
 // Purchase Agent - Task Inbox
 export type PurchaseTask = typeof purchaseTasks.$inferSelect;

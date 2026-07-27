@@ -851,7 +851,7 @@ export interface IStorage {
   getUserRoles(userId: string): Promise<any[]>;
   
   // Job Card operations - Module 8
-  getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]>;
+  getJobCards(garageId?: string, assignedTo?: string, customerId?: string): Promise<JobCard[]>;
   getJobCard(id: string): Promise<JobCard | undefined>;
   getJobCardWithDetails(id: string): Promise<any>;
   createJobCard(data: any): Promise<JobCard>;
@@ -1189,8 +1189,8 @@ export interface IStorage {
   deleteNotificationSchedule(id: string): Promise<void>;
   
   // Notification preferences - Module 24
-  getNotificationPreferences(userId: string): Promise<any | undefined>;
-  upsertNotificationPreferences(userId: string, eventMap: string): Promise<any>;
+  getNotificationPreferences(userId: string): Promise<NotificationPreference | undefined>;
+  upsertNotificationPreferences(data: InsertNotificationPreference): Promise<NotificationPreference>;
 
   // Calendar & Scheduling - Module 26
   // Technician availability
@@ -2113,11 +2113,15 @@ export interface IStorage {
   createLoyaltyTier(data: InsertLoyaltyTier): Promise<LoyaltyTier>;
   updateLoyaltyTier(id: string, data: Partial<LoyaltyTier>): Promise<LoyaltyTier>;
   deleteLoyaltyTier(id: string): Promise<void>;
-  getLoyaltyAccounts(garageId?: string): Promise<LoyaltyAccount[]>;
+  // The loyalty_accounts table is the older of the two loyalty models; the
+  // current one is customer_loyalty_accounts, which owns the unsuffixed
+  // names declared above. Redeclaring them here merged the two into
+  // overloads that no implementation could satisfy.
+  getLoyaltyAccountsLegacy(garageId?: string): Promise<LoyaltyAccount[]>;
   getLoyaltyAccount(id: string): Promise<LoyaltyAccount | undefined>;
-  getLoyaltyAccountByCustomer(customerId: string): Promise<LoyaltyAccount | undefined>;
-  createLoyaltyAccount(data: InsertLoyaltyAccount): Promise<LoyaltyAccount>;
-  updateLoyaltyAccount(id: string, data: Partial<LoyaltyAccount>): Promise<LoyaltyAccount>;
+  getLoyaltyAccountByCustomerLegacy(customerId: string): Promise<LoyaltyAccount | undefined>;
+  createLoyaltyAccountLegacy(data: InsertLoyaltyAccount): Promise<LoyaltyAccount>;
+  updateLoyaltyAccountLegacy(id: string, data: Partial<LoyaltyAccount>): Promise<LoyaltyAccount>;
   addLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount>;
   redeemLoyaltyPoints(accountId: string, points: number): Promise<LoyaltyAccount>;
   getLoyaltyOffers(garageId?: string, isActive?: boolean): Promise<LoyaltyOffer[]>;
@@ -2335,7 +2339,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Job Card operations - Module 8: Job Cards & Task Assignment
-  async getJobCards(garageId?: string, assignedTo?: string): Promise<JobCard[]> {
+  async getJobCards(garageId?: string, assignedTo?: string, customerId?: string): Promise<JobCard[]> {
     const conditions = [];
     if (garageId) {
       conditions.push(eq(jobCards.garageId, garageId));
@@ -2343,7 +2347,11 @@ export class DatabaseStorage implements IStorage {
     if (assignedTo) {
       conditions.push(eq(jobCards.assignedTo, assignedTo));
     }
-    
+    // Customer-role callers pass their own id so they only see their jobs.
+    if (customerId) {
+      conditions.push(eq(jobCards.customerId, customerId));
+    }
+
     if (conditions.length > 0) {
       return await db.select().from(jobCards).where(and(...conditions)).orderBy(desc(jobCards.createdAt));
     }
@@ -12049,31 +12057,29 @@ export class DatabaseStorage implements IStorage {
 
   // ==================== Notification Preferences ====================
 
-  async getNotificationPreferences(userId?: string, customerId?: string): Promise<NotificationPreference | undefined> {
-    const conditions: any[] = [];
-    if (userId) conditions.push(eq(notificationPreferences.userId, userId));
-    if (customerId) conditions.push(eq(notificationPreferences.customerId, customerId));
-    
-    if (conditions.length === 0) return undefined;
-    
+  async getNotificationPreferences(userId: string): Promise<NotificationPreference | undefined> {
+    if (!userId) return undefined;
     const [prefs] = await db.select().from(notificationPreferences)
-      .where(conditions.length > 1 ? and(...conditions) : conditions[0]);
+      .where(eq(notificationPreferences.userId, userId));
     return prefs;
   }
 
   async upsertNotificationPreferences(data: InsertNotificationPreference): Promise<NotificationPreference> {
-    const existing = await this.getNotificationPreferences(data.userId || undefined, data.customerId || undefined);
-    
-    if (existing) {
-      const [updated] = await db.update(notificationPreferences)
-        .set({ ...data, updatedAt: new Date() })
-        .where(eq(notificationPreferences.id, existing.id))
-        .returning();
-      return updated;
-    } else {
-      const [created] = await db.insert(notificationPreferences).values(data).returning();
-      return created;
-    }
+    // user_id is the table's primary key, so this is a plain ON CONFLICT
+    // rather than a read-then-branch. The route is a PUT, so an existing row
+    // is replaced wholesale — omitted fields fall back to their defaults.
+    const [saved] = await db.insert(notificationPreferences)
+      .values(data)
+      .onConflictDoUpdate({
+        target: notificationPreferences.userId,
+        set: {
+          channel: data.channel ?? null,
+          eventMap: data.eventMap ?? null,
+          isLockedByAdmin: data.isLockedByAdmin ?? false,
+        },
+      })
+      .returning();
+    return saved;
   }
 
   // ==================== Auto Service Reminder Generation ====================
