@@ -12160,15 +12160,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchParts(garageId: string, pattern: string, limit: number): Promise<SparePart[]> {
-    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
+    const { spareParts, sparePartInventories } = await import("@shared/schema")
+      .then(m => ({ spareParts: m.spareParts, sparePartInventories: m.sparePartInventories }));
+    // spare_parts is a global catalogue with no garage_id — per-garage stock
+    // lives in spare_part_inventories, so scoping goes through that table.
+    // partNumber is likewise not a column; the catalogue identifiers are
+    // sku and barcode.
     return await db
       .select()
       .from(spareParts)
       .where(
         and(
-          eq(spareParts.garageId, garageId),
+          sql`EXISTS (SELECT 1 FROM ${sparePartInventories} WHERE ${sparePartInventories.sparePartId} = ${spareParts.id} AND ${sparePartInventories.garageId} = ${garageId})`,
           or(
-            like(spareParts.partNumber, pattern),
+            like(spareParts.sku, pattern),
             like(spareParts.name, pattern),
             like(spareParts.description, pattern)
           )
@@ -12333,8 +12338,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSparePartsPaginated(garageId: string | undefined, limit: number, offset: number): Promise<SparePart[]> {
-    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
-    const where = garageId ? eq(spareParts.garageId, garageId) : undefined;
+    const { spareParts, sparePartInventories } = await import("@shared/schema")
+      .then(m => ({ spareParts: m.spareParts, sparePartInventories: m.sparePartInventories }));
+    // Scoped through spare_part_inventories: the catalogue itself is global.
+    const where = garageId
+      ? sql`EXISTS (SELECT 1 FROM ${sparePartInventories} WHERE ${sparePartInventories.sparePartId} = ${spareParts.id} AND ${sparePartInventories.garageId} = ${garageId})`
+      : undefined;
     const query = db.select().from(spareParts);
     if (where) {
       return await query.where(where).orderBy(spareParts.createdAt).limit(limit).offset(offset);
@@ -12343,8 +12352,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async countSpareParts(garageId: string | undefined): Promise<number> {
-    const { spareParts } = await import("@shared/schema").then(m => ({ spareParts: m.spareParts }));
-    const where = garageId ? eq(spareParts.garageId, garageId) : undefined;
+    const { spareParts, sparePartInventories } = await import("@shared/schema")
+      .then(m => ({ spareParts: m.spareParts, sparePartInventories: m.sparePartInventories }));
+    const where = garageId
+      ? sql`EXISTS (SELECT 1 FROM ${sparePartInventories} WHERE ${sparePartInventories.sparePartId} = ${spareParts.id} AND ${sparePartInventories.garageId} = ${garageId})`
+      : undefined;
     const query = db.select({ count: sql<number>`count(*)` }).from(spareParts);
     const result = where ? await query.where(where) : await query;
     return Number(result[0]?.count ?? 0);
