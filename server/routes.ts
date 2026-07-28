@@ -5447,7 +5447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/refunds', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const refund = await storage.createRefund({ ...req.body, requestedBy: userId });
+      const refund = await storage.createRefund({ ...req.body, garageId: req.user?.garageId || req.body.garageId, status: 'pending', requestedBy: userId });
       res.status(201).json(refund);
     } catch (error) {
       console.error("Error creating refund:", error);
@@ -5521,7 +5521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const config = await storage.createTaxConfiguration({ ...req.body, createdBy: userId });
+      const config = await storage.createTaxConfiguration({ ...req.body, garageId: req.user?.garageId || req.body.garageId, createdBy: userId });
       res.status(201).json(config);
     } catch (error) {
       console.error("Error creating tax configuration:", error);
@@ -11666,7 +11666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loyalty Accounts
   app.post("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
-      const account = await storage.createLoyaltyAccount(req.body);
+      const account = await storage.createLoyaltyAccount({ ...req.body, garageId: req.user?.garageId || req.body.garageId });
       res.status(201).json(account);
     } catch (error: any) {
       console.error("Error creating loyalty account:", error);
