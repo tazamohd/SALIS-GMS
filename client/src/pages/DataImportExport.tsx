@@ -48,7 +48,7 @@ export default function DataImportExport() {
         garageId,
         module: selectedModule,
         format: selectedFormat,
-      });
+      }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -68,7 +68,7 @@ export default function DataImportExport() {
         garageId,
         module: selectedModule,
         data,
-      });
+      }).then((r) => r.json());
     },
     onSuccess: (result: any) => {
       toast({ 

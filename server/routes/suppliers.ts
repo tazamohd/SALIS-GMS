@@ -30,6 +30,11 @@ router.get('/suppliers/:id', isAuthenticated, async (req, res) => {
     if (!supplier) {
       return res.status(404).json({ message: 'Supplier not found' });
     }
+    // Ownership check (404, not 403, to avoid confirming existence).
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && (supplier as any).garageId && (supplier as any).garageId !== sessionGarage) {
+      return res.status(404).json({ message: 'Supplier not found' });
+    }
     res.json(supplier);
   } catch (error) {
     console.error('Error fetching supplier:', error);

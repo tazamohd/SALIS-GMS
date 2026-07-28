@@ -30,7 +30,7 @@ export default function TechnicianPerformance() {
   const userId = user?.id || '';
   
   const { data: metricPreferences = [] } = useQuery<any[]>({
-    queryKey: ['/api/technician-performance/metrics/preferences', userId],
+    queryKey: ['/api/technician-performance/preferences', userId],
     enabled: !!userId,
   });
 
@@ -92,13 +92,13 @@ export default function TechnicianPerformance() {
 
   const handleMetricPreferenceChange = async (metricKey: string, isVisible: boolean) => {
     try {
-      await apiRequest('POST', '/api/technician-performance/metrics/preferences', {
+      await apiRequest('POST', '/api/technician-performance/preferences', {
         userId,
         metricKey,
         isVisible,
         sortOrder: metricPreferences.length + 1,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/technician-performance/metrics/preferences', userId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/technician-performance/preferences', userId] });
       toast({
         title: t('performance.preferencesUpdated', 'Preferences Updated'),
         description: t('performance.preferencesSaved', 'Your metric preferences have been saved.'),

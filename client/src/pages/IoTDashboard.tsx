@@ -110,7 +110,7 @@ export default function IoTDashboard() {
   });
 
   const { data: latestReadings } = useQuery<Record<string, SensorReading>>({
-    queryKey: ['/api/iot/vehicles', selectedVehicleId, 'latest-readings'],
+    queryKey: [`/api/iot/vehicles/${selectedVehicleId}/latest-readings`],
     enabled: !!selectedVehicleId,
     refetchInterval: 10000,
   });

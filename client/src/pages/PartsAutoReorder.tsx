@@ -21,7 +21,7 @@ export default function PartsAutoReorder() {
 
   const checkReordersMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("POST", "/api/auto-reorder/check", {});
+      return apiRequest("POST", "/api/auto-reorder/check", {}).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       toast({ title: t('partsAutoReorder.checkComplete', 'Auto-Reorder Check Complete'), description: `${data.triggered || 0} ${t('partsAutoReorder.ordersTriggered', 'orders triggered')}` });

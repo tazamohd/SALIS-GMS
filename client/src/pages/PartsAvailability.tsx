@@ -33,7 +33,7 @@ export function PartsAvailability() {
   });
 
   const syncMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/supplier-availability/sync', data),
+    mutationFn: (data: any) => apiRequest('POST', '/api/supplier-availability/sync', data).then((r) => r.json()),
     onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/supplier-availability/search'] });
       toast({

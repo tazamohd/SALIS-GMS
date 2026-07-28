@@ -50,7 +50,7 @@ export function MediaGallery({
       await apiRequest('DELETE', `/api/media-attachments/${id}`);
 
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/media-attachments', relatedType, relatedId] 
+        queryKey: [`/api/media-attachments/${relatedType}/${relatedId}`] 
       });
 
       toast({

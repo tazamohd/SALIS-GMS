@@ -41,8 +41,8 @@ describe('Spare part read route extraction (Wave J)', () => {
   it('preserves spare part inventory read validation and storage lookup', () => {
     expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-part-inventories['"],\s*isAuthenticated/);
     expect(sparePartRoutesSource).toMatch(/const \{ garage_id,\s*spare_part_id \} = req\.query/);
-    expect(sparePartRoutesSource).toMatch(/if \(!garage_id\)/);
+    expect(sparePartRoutesSource).toMatch(/if \(!gid\)/);
     expect(sparePartRoutesSource).toMatch(/garage_id is required/);
-    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartInventories\(\s*garage_id as string,\s*spare_part_id as string,\s*\)/);
+    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartInventories\(\s*gid,\s*spare_part_id as string,\s*\)/);
   });
 });

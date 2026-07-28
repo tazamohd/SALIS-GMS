@@ -70,11 +70,11 @@ export default function AutomatedReordering() {
   const [selectedTimeframe, setSelectedTimeframe] = useState("30d");
 
   const { data: forecasts = [], isLoading: loadingForecasts } = useQuery<InventoryForecast[]>({
-    queryKey: ['/api/inventory/forecasts', selectedTimeframe],
+    queryKey: ['/api/inventory-forecasts', selectedTimeframe],
   });
 
   const { data: rules = [], isLoading: loadingRules } = useQuery<ReorderRule[]>({
-    queryKey: ['/api/inventory/reorder-rules'],
+    queryKey: ['/api/auto-reorder/rules'],
   });
 
   const { data: apiPendingOrders, isFetched: pendingOrdersFetched, isError: pendingOrdersError } = useQuery<any[]>({

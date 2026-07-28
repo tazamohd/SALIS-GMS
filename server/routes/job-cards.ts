@@ -66,7 +66,26 @@ router.get('/job-cards/:id/details', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
+
+/** Sub-resource guard: parent job card must belong to the caller's garage. */
+async function requireOwnJobCard(req: any, res: any, next: any) {
+  try {
+    const id = req.params.jobCardId || req.params.id;
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && id) {
+      const jobCard = await storage.getJobCard(id);
+      if (!jobCard || ((jobCard as any).garageId && (jobCard as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: 'Job card not found' });
+      }
+    }
+    next();
+  } catch (e) {
+    console.error('Job card ownership check failed:', e);
+    res.status(500).json({ message: 'Failed to verify job card' });
+  }
+}
+
+router.get('/job-cards/:jobCardId/parts', isAuthenticated, requireOwnJobCard, async (req, res) => {
   try {
     const { jobCardId } = req.params;
     const parts = await db.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, jobCardId));
@@ -77,7 +96,7 @@ router.get('/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/job-cards/:jobCardId/tasks', isAuthenticated, async (req, res) => {
+router.get('/job-cards/:jobCardId/tasks', isAuthenticated, requireOwnJobCard, async (req, res) => {
   try {
     const { jobCardId } = req.params;
     const tasks = await storage.getTaskAssignments(jobCardId);

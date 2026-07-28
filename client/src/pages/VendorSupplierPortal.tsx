@@ -151,7 +151,7 @@ export default function VendorSupplierPortal() {
   });
 
   const { data: priceComparison = [] } = useQuery<SupplierPriceList[]>({
-    queryKey: ["/api/supplier-price-lists/compare", priceComparePartId],
+    queryKey: [`/api/supplier-price-lists/compare/${priceComparePartId}`],
     enabled: !!priceComparePartId,
   });
 

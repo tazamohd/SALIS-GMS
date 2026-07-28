@@ -3611,6 +3611,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
+      // Parent ownership: items inherit the invoice's garage scope.
+      const sessionGarage = (req.user as any)?.garageId;
+      if (sessionGarage) {
+        const invoice = await storage.getInvoice(id);
+        if (!invoice || ((invoice as any).garageId && (invoice as any).garageId !== sessionGarage)) {
+          return res.status(404).json({ message: "Invoice not found" });
+        }
+      }
       const items = await storage.getInvoiceItems(id);
       res.json(items);
     } catch (error) {
@@ -5580,11 +5588,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/global-search', isAuthenticated, async (req: any, res) => {
     try {
       const { garageId: garageIdParam, query, modules } = req.query;
-      // Session garage wins; ?garageId honored only for garage-less principals.
-      const garageId = req.user?.garageId || garageIdParam;
       // Session garage wins — the query param let any tenant search another
       // garage's data. Honored only for garage-less principals (platform admin).
-      const gid = req.user?.garageId || garageId;
+      const gid = req.user?.garageId || garageIdParam;
 
       if (!gid || !query) {
         return res.status(400).json({ message: "Missing required parameters" });
@@ -20854,7 +20860,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/parts-3d-models/:id', async (req, res) => {
     try {
-      const result = await db.execute(sql`SELECT * FROM parts_3d_models WHERE id = ${req.params.id}`);
+      const result = await db.execute(sql`SELECT * FROM parts_3d_models WHERE id = ${req.params.id} AND is_public = true`);
       if (result.rows && result.rows.length > 0) {
         // Increment view count
         await db.execute(sql`UPDATE parts_3d_models SET view_count = view_count + 1 WHERE id = ${req.params.id}`);

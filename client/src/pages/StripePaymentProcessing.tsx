@@ -64,7 +64,7 @@ export default function StripePaymentProcessing() {
 
   const createPaymentMutation = useMutation({
     mutationFn: async ({ amount, currency }: { amount: number; currency: string }) => {
-      return apiRequest('POST', '/api/stripe/create-payment-intent', { amount, currency });
+      return apiRequest('POST', '/api/stripe/create-payment-intent', { amount, currency }).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       toast({
@@ -86,7 +86,7 @@ export default function StripePaymentProcessing() {
 
   const refundMutation = useMutation({
     mutationFn: async ({ paymentIntentId, amount }: { paymentIntentId: string; amount?: number }) => {
-      return apiRequest('POST', '/api/stripe/refund', { paymentIntentId, amount });
+      return apiRequest('POST', '/api/stripe/refund', { paymentIntentId, amount }).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       toast({

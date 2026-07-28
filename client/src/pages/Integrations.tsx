@@ -41,7 +41,7 @@ export default function Integrations() {
 
   const toggleConnectionMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return await apiRequest('PATCH', `/api/integrations/connections/${id}`, { isActive });
+      return await apiRequest('PATCH', `/api/integrations/connections/${id}`, { isActive }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/connections'] });
@@ -61,7 +61,7 @@ export default function Integrations() {
 
   const syncAccountingMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('POST', '/api/integrations/accounting/sync', undefined);
+      return await apiRequest('POST', '/api/integrations/accounting/sync', undefined).then((r) => r.json());
     },
     onSuccess: async (res) => {
       const result = await res.json();
@@ -89,7 +89,7 @@ export default function Integrations() {
 
   const obdScanMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('POST', '/api/integrations/obd/scan');
+      return await apiRequest('POST', '/api/integrations/obd/scan').then((r) => r.json());
     },
     onSuccess: (result) => {
       if (result.success) {

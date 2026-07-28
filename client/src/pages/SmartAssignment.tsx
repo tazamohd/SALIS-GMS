@@ -33,7 +33,7 @@ export function SmartAssignment() {
 
   const recommendationsMutation = useMutation({
     mutationFn: async (jobId: string) => {
-      return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {});
+      return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {}).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       setRecommendations(data.recommendations || []);
@@ -50,7 +50,7 @@ export function SmartAssignment() {
 
   const assignMutation = useMutation({
     mutationFn: async (params: { jobCardId: string; technicianId: string; aiRecommendationId?: string }) => {
-      return await apiRequest("POST", "/api/assignments/assign", params);
+      return await apiRequest("POST", "/api/assignments/assign", params).then((r) => r.json());
     },
     onSuccess: () => {
       toast({

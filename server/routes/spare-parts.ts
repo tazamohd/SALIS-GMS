@@ -40,11 +40,13 @@ router.get('/spare-parts/:id', isAuthenticated, async (req, res) => {
 router.get('/spare-part-inventories', isAuthenticated, async (req, res) => {
   try {
     const { garage_id, spare_part_id } = req.query;
-    if (!garage_id) {
+    // Session garage wins; ?garage_id honored only for garage-less principals.
+    const gid = (req.user as any)?.garageId || (garage_id as string);
+    if (!gid) {
       return res.status(400).json({ message: 'garage_id is required' });
     }
     const inventories = await storage.getSparePartInventories(
-      garage_id as string,
+      gid,
       spare_part_id as string,
     );
     res.json(inventories);

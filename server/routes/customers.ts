@@ -55,7 +55,29 @@ router.get('/customers/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/vehicles', isAuthenticated, async (req, res) => {
+
+/**
+ * Sub-resource guard: the parent customer must belong to the caller's garage
+ * (404 on cross-garage access; garage-less platform admins pass).
+ */
+async function requireOwnCustomer(req: any, res: any, next: any) {
+  try {
+    const id = req.params.id || req.params.customerId;
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && id) {
+      const customer = await storage.getCustomer(id);
+      if (!customer || (customer as any).garageId && (customer as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+    }
+    next();
+  } catch (e) {
+    console.error('Customer ownership check failed:', e);
+    res.status(500).json({ message: 'Failed to verify customer' });
+  }
+}
+
+router.get('/customers/:id/vehicles', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const vehicles = await storage.getCustomerVehicles(id);
@@ -66,7 +88,7 @@ router.get('/customers/:id/vehicles', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/job-cards', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/job-cards', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const jobCards = await storage.getCustomerJobCards(id);
@@ -77,7 +99,7 @@ router.get('/customers/:id/job-cards', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/invoices', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/invoices', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const invoices = await storage.getCustomerInvoices(id);
@@ -88,7 +110,7 @@ router.get('/customers/:id/invoices', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/payments', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/payments', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const payments = await storage.getCustomerPayments(id);
@@ -99,7 +121,7 @@ router.get('/customers/:id/payments', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/notes', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/notes', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const notes = await storage.getCustomerNotes(id);
@@ -110,7 +132,7 @@ router.get('/customers/:id/notes', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/service-reminders', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const reminders = await storage.getCustomerServiceReminders(customerId);
@@ -121,7 +143,7 @@ router.get('/customers/:customerId/service-reminders', isAuthenticated, async (r
   }
 });
 
-router.get('/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/reviews', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const reviews = await storage.getCustomerServiceReviews(customerId);
@@ -132,7 +154,7 @@ router.get('/customers/:customerId/reviews', isAuthenticated, async (req, res) =
   }
 });
 
-router.get('/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/signatures', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const signatures = await storage.getCustomerServiceSignatures(customerId);

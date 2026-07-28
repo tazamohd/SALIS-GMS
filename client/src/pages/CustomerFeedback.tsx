@@ -107,7 +107,7 @@ export default function CustomerFeedback() {
 
   const analyzeSentimentMutation = useMutation({
     mutationFn: async (feedbackId: string) => {
-      return await apiRequest('POST', `/api/feedback/${feedbackId}/analyze-sentiment`);
+      return await apiRequest('POST', `/api/feedback/${feedbackId}/analyze-sentiment`).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
@@ -128,7 +128,7 @@ export default function CustomerFeedback() {
 
   const analyzeAllMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('POST', '/api/feedback/analyze-all');
+      return await apiRequest('POST', '/api/feedback/analyze-all').then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
@@ -149,7 +149,7 @@ export default function CustomerFeedback() {
 
   const respondMutation = useMutation({
     mutationFn: async ({ id, response }: { id: string; response: string }) => {
-      return await apiRequest('POST', `/api/feedback/${id}/respond`, { response });
+      return await apiRequest('POST', `/api/feedback/${id}/respond`, { response }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
@@ -171,7 +171,7 @@ export default function CustomerFeedback() {
 
   const flagMutation = useMutation({
     mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
-      return await apiRequest('POST', `/api/feedback/${id}/flag`, { reason });
+      return await apiRequest('POST', `/api/feedback/${id}/flag`, { reason }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
@@ -194,7 +194,7 @@ export default function CustomerFeedback() {
 
   const unflagMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest('POST', `/api/feedback/${id}/unflag`);
+      return await apiRequest('POST', `/api/feedback/${id}/unflag`).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/feedback'] });
