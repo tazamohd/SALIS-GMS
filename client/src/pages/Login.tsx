@@ -230,7 +230,7 @@ function DemoQuickPick() {
       <div
         role="group"
         aria-label={t("auth.demoAccounts", "Demo accounts")}
-        className="flex flex-col gap-2"
+        className="grid grid-cols-3 gap-1.5"
       >
         {accounts.map((acc) => {
           const isActive = demoLogin.isPending && demoLogin.variables === acc.roleKey;
@@ -248,22 +248,12 @@ function DemoQuickPick() {
               })}
               onClick={() => demoLogin.mutate(acc.roleKey)}
               data-testid={`demo-login-${acc.roleKey.toLowerCase()}`}
-              className="flex flex-col items-start justify-center gap-0.5 h-auto py-2.5 px-3 text-left font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
-              title={acc.email}
+              className="flex h-full min-h-[2.75rem] w-full min-w-0 flex-col items-center justify-center gap-0 whitespace-normal break-words h-auto py-1.5 px-1.5 text-center font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
+              title={acc.description ? `${acc.email} — ${acc.description}` : acc.email}
             >
-              <span className="flex w-full items-center justify-between gap-2">
-                <span className="text-sm font-semibold">{label}</span>
-                {isActive && (
-                  <span className="text-[10px] font-normal text-[#64748B] dark:text-[#9BA4B0]">
-                    {t("auth.signingIn", "Signing in...")}
-                  </span>
-                )}
+              <span className="text-[11px] font-semibold leading-tight">
+                {isActive ? t("auth.signingIn", "Signing in...") : label}
               </span>
-              {acc.description && (
-                <span className="text-[11px] font-normal text-[#64748B] dark:text-[#9BA4B0] normal-case">
-                  {acc.description}
-                </span>
-              )}
             </Button>
           );
         })}
