@@ -164,7 +164,12 @@ export default function Login() {
         </Card>
 
         {/* Demo quick access (only renders when the server has demo mode on) */}
-        <DemoQuickPick />
+        <DemoQuickPick
+          onFillCredentials={(demoEmail, demoPassword) => {
+            setEmail(demoEmail);
+            setPassword(demoPassword);
+          }}
+        />
       </div>
     </div>
   );
@@ -181,10 +186,16 @@ type DemoAccount = {
 
 type DemoAccountsResponse = {
   enabled: boolean;
+  /** Shared demo password (demo mode only) so the form can be pre-filled. */
+  password?: string;
   accounts?: DemoAccount[];
 };
 
-function DemoQuickPick() {
+function DemoQuickPick({
+  onFillCredentials,
+}: {
+  onFillCredentials: (email: string, password: string) => void;
+}) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -246,9 +257,14 @@ function DemoQuickPick() {
                 role: label,
                 email: acc.email,
               })}
-              onClick={() => demoLogin.mutate(acc.roleKey)}
+              onClick={() => {
+                // Show the credentials in the form (so manual Sign In also
+                // works), then sign in with one click.
+                onFillCredentials(acc.email, data?.password ?? "");
+                demoLogin.mutate(acc.roleKey);
+              }}
               data-testid={`demo-login-${acc.roleKey.toLowerCase()}`}
-              className="flex h-full min-h-[2.75rem] w-full min-w-0 flex-col items-center justify-center gap-0 whitespace-normal break-words h-auto py-1.5 px-1.5 text-center font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
+              className="h-auto min-h-[2.75rem] w-full min-w-0 flex flex-col items-center justify-center gap-0 whitespace-normal break-words py-1.5 px-1.5 text-center font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
               title={acc.description ? `${acc.email} — ${acc.description}` : acc.email}
             >
               <span className="text-[11px] font-semibold leading-tight">
@@ -259,7 +275,7 @@ function DemoQuickPick() {
         })}
       </div>
       <p className="mt-3 text-[10px] font-poppins text-[#94A3B8] dark:text-[#6B7280] text-center">
-        {t("auth.demoOneClickNote", "Demo only · one-click sign-in, no password needed")}
+        {t("auth.demoOneClickNote", "Demo only · click a role to fill its credentials and sign in")}
       </p>
     </div>
   );

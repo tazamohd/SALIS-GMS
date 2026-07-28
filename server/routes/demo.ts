@@ -14,17 +14,28 @@ import { Router } from "express";
 import { db } from "../db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { DEMO_ROLES, getDemoRole, isDemoModeEnabled } from "../demo-config";
+import {
+  DEMO_ROLES,
+  getDemoPassword,
+  getDemoRole,
+  isDemoModeEnabled,
+} from "../demo-config";
 
 const router = Router();
 
-/** List the seeded demo accounts (never includes passwords). */
+/**
+ * List the demo accounts. The shared demo password is included so the login
+ * page can fill the credential fields on quick-pick — acceptable only because
+ * these endpoints are hard-gated to demo mode (never production traffic) and
+ * the password is a well-known non-secret by design (demo-config.ts).
+ */
 router.get("/demo/accounts", (_req, res) => {
   if (!isDemoModeEnabled()) {
     return res.json({ enabled: false, accounts: [] });
   }
   res.json({
     enabled: true,
+    password: getDemoPassword(),
     accounts: DEMO_ROLES.map((r) => ({
       roleKey: r.roleKey,
       roleName: r.roleName,
@@ -35,6 +46,22 @@ router.get("/demo/accounts", (_req, res) => {
     })),
   });
 });
+
+// Auto-provisioning guard: at most one concurrent seed run; a failed run may
+// be retried on the next request.
+let seedInFlight: Promise<void> | null = null;
+
+async function ensureDemoAccountsSeeded(): Promise<void> {
+  if (!seedInFlight) {
+    seedInFlight = import("../seed-demo")
+      .then(({ seedDemo }) => seedDemo())
+      .catch((err) => {
+        seedInFlight = null;
+        throw err;
+      });
+  }
+  return seedInFlight;
+}
 
 /** One-click demo login by role key — server-side, no password exposure. */
 router.post("/demo/login", async (req, res, next) => {
@@ -48,11 +75,23 @@ router.post("/demo/login", async (req, res, next) => {
   }
 
   try {
-    const [user] = await db
+    let [user] = await db
       .select()
       .from(users)
       .where(eq(users.email, spec.email))
       .limit(1);
+
+    // First use on a fresh database: provision the demo accounts on demand so
+    // the quick-pick never dead-ends. seedDemo() is idempotent and refuses to
+    // run in production without ALLOW_DEMO_SEED.
+    if (!user) {
+      await ensureDemoAccountsSeeded();
+      [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, spec.email))
+        .limit(1);
+    }
 
     if (!user) {
       return res.status(404).json({
