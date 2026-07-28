@@ -14410,9 +14410,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req, res) => {
+  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req: any, res) => {
     try {
       const { customerId } = req.params;
+      // Ownership: the customer must belong to the caller's garage, else any
+      // authenticated user could read another tenant's customer estimates.
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage) {
+        const customer = await storage.getCustomer(customerId);
+        if (!customer || ((customer as any).garageId && (customer as any).garageId !== sessionGarage)) {
+          return res.status(404).json({ message: "Customer not found" });
+        }
+      }
       const estimates = await phase4Service.getVideoEstimates(customerId);
       res.json(estimates);
     } catch (error) {
