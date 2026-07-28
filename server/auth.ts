@@ -74,6 +74,7 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax", // mitigates cross-site request forgery on the session cookie
       maxAge: sessionTtl,
     },
   });

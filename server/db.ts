@@ -25,7 +25,12 @@ if (isNeon) {
   const pg = await import('pg');
   const Pool = (pg as any).default?.Pool ?? (pg as any).Pool;
   const { drizzle } = await import('drizzle-orm/node-postgres');
-  pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: Number(process.env.PG_POOL_MAX) || 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+  });
   db = drizzle({ client: pool, schema });
 }
 

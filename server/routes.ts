@@ -745,25 +745,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Technician routes
-  app.post('/api/technicians', isAuthenticated, async (req, res) => {
+  app.post('/api/technicians', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
+      // Strip client-controlled privilege/tenant fields; a technician must not
+      // be able to mint an ADMIN or plant a user in another garage. Password is
+      // hashed here (never stored in cleartext).
+      const { garageId: _g, role: _r, password, id: _i, userType: _u, ...rest } = req.body;
+      const bcrypt = await import('bcrypt');
+      const hashed = typeof password === 'string' && password.length >= 8
+        ? await bcrypt.hash(password, 10)
+        : await bcrypt.hash(Math.random().toString(36).slice(-12), 10);
       const technicianData = {
-        ...req.body,
+        ...rest,
+        password: hashed,
+        garageId: req.user?.garageId,
         userType: 'technician',
+        role: 'TECHNICIAN',
         isActive: true,
       };
       const technician = await storage.createUser(technicianData);
-      res.status(201).json(technician);
+      const { password: _pw, ...safe } = technician as any;
+      res.status(201).json(safe);
     } catch (error) {
       console.error("Error creating technician:", error);
       res.status(500).json({ message: "Failed to create technician" });
     }
   });
 
-  app.delete('/api/technicians/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/technicians/:id', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteUser(id);
+      // Ownership: only delete a technician in the caller's garage. Soft-delete
+      // (deactivate) to preserve FK integrity (job cards reference createdBy).
+      const target = await storage.getUser(id);
+      const sessionGarage = req.user?.garageId;
+      if (!target || (sessionGarage && (target as any).garageId && (target as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      const { users } = await import("@shared/schema");
+      await db.update(users).set({ isActive: false }).where(eq(users.id, id));
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting technician:", error);
@@ -894,6 +914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // to plant a job card in another tenant by forging garageId in the body.
       const jobCardData = {
         ...req.body,
+        jobNumber: req.body.jobNumber?.trim() ? req.body.jobNumber.trim() : `JC-${Date.now()}`,
         garageId: req.user?.garageId || req.body.garageId,
         createdBy: userId,
       };
@@ -1707,7 +1728,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const vehicle = await storage.createVehicle(validationResult.data);
+      const vehicle = await storage.createVehicle({
+        ...validationResult.data,
+        garageId: (req as any).user?.garageId || validationResult.data.garageId,
+      } as any);
       res.status(201).json(vehicle);
     } catch (error) {
       console.error("Error creating vehicle:", error);
@@ -1728,7 +1752,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const updatedVehicle = await storage.updateVehicle(id, validationResult.data);
+      // Ownership: only update a vehicle in the caller's garage, and never let
+      // the body re-assign garageId (tenant hijack).
+      const existing = await storage.getVehicle(id);
+      const sessionGarage = (req as any).user?.garageId;
+      if (!existing || (sessionGarage && (existing as any).garageId && (existing as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+      const { garageId: _drop, ...vehicleUpdate } = validationResult.data as any;
+      const updatedVehicle = await storage.updateVehicle(id, vehicleUpdate);
       res.json(updatedVehicle);
     } catch (error) {
       console.error("Error updating vehicle:", error);
@@ -1739,6 +1771,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/vehicles/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
+      const existing = await storage.getVehicle(id);
+      const sessionGarage = (req as any).user?.garageId;
+      if (!existing || (sessionGarage && (existing as any).garageId && (existing as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
       await storage.deleteVehicle(id);
       res.json({ message: "Vehicle deleted successfully" });
     } catch (error) {
@@ -10002,7 +10039,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const media = await storage.getMediaAttachments(
         relatedType, 
         relatedId, 
-        category as string | undefined
+        category as string | undefined,
+        (req as any).user?.garageId,
       );
       res.json(media);
     } catch (error) {
@@ -10014,7 +10052,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/media-attachments/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteMediaAttachment(id);
+      await storage.deleteMediaAttachment(id, (req as any).user?.garageId);
       res.json({ message: "Media deleted successfully" });
     } catch (error) {
       console.error("Error deleting media attachment:", error);
@@ -10031,7 +10069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description,
         category,
         metadata,
-      });
+      }, (req as any).user?.garageId);
       
       res.json(media);
     } catch (error) {
@@ -20705,7 +20743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/service-reminders/generate', isAuthenticated, async (req: any, res) => {
     try {
-      const reminders = await storage.generateAutoServiceReminders();
+      const reminders = await storage.generateAutoServiceReminders(req.user?.garageId);
       res.json({ generated: reminders.length, reminders });
     } catch (error: any) {
       console.error("Error generating reminders:", error);

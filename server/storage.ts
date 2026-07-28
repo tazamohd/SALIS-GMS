@@ -2243,7 +2243,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(userData).returning();
+    // Defense-in-depth: never persist a cleartext password. bcrypt hashes start
+    // with $2a/$2b/$2y$ — if the caller passed something else, hash it here.
+    const data: any = { ...userData };
+    if (typeof data.password === 'string' && !/^\$2[aby]\$/.test(data.password)) {
+      const bcrypt = await import('bcrypt');
+      data.password = await bcrypt.hash(data.password, 10);
+    }
+    const [user] = await db.insert(users).values(data).returning();
     return user;
   }
 
@@ -7916,11 +7923,12 @@ export class DatabaseStorage implements IStorage {
     return media;
   }
 
-  async getMediaAttachments(relatedType: string, relatedId: string, category?: string): Promise<any[]> {
+  async getMediaAttachments(relatedType: string, relatedId: string, category?: string, garageId?: string): Promise<any[]> {
     const conditions = [
       eq(mediaAttachments.relatedType, relatedType),
       eq(mediaAttachments.relatedId, relatedId)
     ];
+    if (garageId) conditions.push(eq(mediaAttachments.garageId, garageId));
     
     if (category) {
       conditions.push(eq(mediaAttachments.category, category));
@@ -7939,15 +7947,19 @@ export class DatabaseStorage implements IStorage {
     return media;
   }
 
-  async deleteMediaAttachment(id: string): Promise<void> {
+  async deleteMediaAttachment(id: string, garageId?: string): Promise<void> {
     await db.delete(mediaAttachments)
-      .where(eq(mediaAttachments.id, id));
+      .where(garageId
+        ? and(eq(mediaAttachments.id, id), eq(mediaAttachments.garageId, garageId))
+        : eq(mediaAttachments.id, id));
   }
 
-  async updateMediaAttachment(id: string, data: any): Promise<any> {
+  async updateMediaAttachment(id: string, data: any, garageId?: string): Promise<any> {
     const [media] = await db.update(mediaAttachments)
       .set(data)
-      .where(eq(mediaAttachments.id, id))
+      .where(garageId
+        ? and(eq(mediaAttachments.id, id), eq(mediaAttachments.garageId, garageId))
+        : eq(mediaAttachments.id, id))
       .returning();
     return media;
   }
@@ -12206,9 +12218,11 @@ export class DatabaseStorage implements IStorage {
 
   // ==================== Auto Service Reminder Generation ====================
 
-  async generateAutoServiceReminders(): Promise<ServiceReminder[]> {
-    const templates = await this.getServiceReminderTemplates();
-    const vehicles = await this.getVehicles();
+  async generateAutoServiceReminders(garageId?: string): Promise<ServiceReminder[]> {
+    // Scope to a single garage — the unscoped version generated reminders for
+    // every tenant's vehicles from every tenant's templates (cross-tenant + N+1).
+    const templates = await this.getServiceReminderTemplates(garageId);
+    const vehicles = await this.getVehicles(garageId);
     const generatedReminders: ServiceReminder[] = [];
     
     for (const template of templates) {
