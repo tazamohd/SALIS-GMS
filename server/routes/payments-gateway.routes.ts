@@ -14,6 +14,9 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { db } from '../db';
+import { payments } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 import {
   enabledMethods,
   gatewayStatus,
@@ -201,6 +204,26 @@ async function recordCompletedPayment(opts: {
 
   const amount = opts.amount ?? Number((invoice as any).balanceAmount ?? (invoice as any).totalAmount ?? 0);
 
+  // Idempotency: gateways retry webhooks. If this transaction was already
+  // recorded as completed, do nothing; if we hold its pending row from
+  // /initiate, flip that row to completed instead of inserting a second one.
+  if (opts.transactionId) {
+    const existing = await db
+      .select()
+      .from(payments)
+      .where(eq(payments.gatewayTransactionId, opts.transactionId));
+    if (existing.some((p) => p.status === 'completed')) return;
+    const pending = existing.find((p) => p.status === 'pending');
+    if (pending) {
+      await db
+        .update(payments)
+        .set({ status: 'completed', paymentDate: new Date() })
+        .where(eq(payments.id, pending.id));
+      await settleInvoice(invoice, opts.invoiceId, amount);
+      return;
+    }
+  }
+
   await storage.createPayment({
     invoiceId: opts.invoiceId,
     amount: Number(amount).toFixed(2),
@@ -213,15 +236,20 @@ async function recordCompletedPayment(opts: {
     createdBy: opts.createdBy || (invoice as any).createdBy || null,
   } as any);
 
-  const prevPaid = parseFloat((invoice as any).paidAmount || '0');
-  const total = parseFloat((invoice as any).totalAmount || '0');
+  await settleInvoice(invoice, opts.invoiceId, amount);
+}
+
+/** Apply a received amount to the invoice's paid/balance/status fields. */
+async function settleInvoice(invoice: any, invoiceId: string, amount: number): Promise<void> {
+  const prevPaid = parseFloat(invoice.paidAmount || '0');
+  const total = parseFloat(invoice.totalAmount || '0');
   const newPaid = prevPaid + Number(amount);
   const balance = Math.max(total - newPaid, 0);
-  await storage.updateInvoice(opts.invoiceId, {
+  await storage.updateInvoice(invoiceId, {
     paidAmount: newPaid.toFixed(2),
     balanceAmount: balance.toFixed(2),
-    status: balance <= 0 ? 'paid' : (invoice as any).status,
-    paidAt: balance <= 0 ? new Date() : (invoice as any).paidAt,
+    status: balance <= 0 ? 'paid' : invoice.status,
+    paidAt: balance <= 0 ? new Date() : invoice.paidAt,
   } as any);
 }
 

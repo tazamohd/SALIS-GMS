@@ -1284,6 +1284,18 @@ export const payments = pgTable("payments", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
+  // Multi-gateway payment layer (migration 0006). These columns existed only
+  // in the migration; drizzle silently dropped them from every insert, losing
+  // gateway/status/transaction-id and breaking webhook idempotency.
+  gateway: varchar("gateway", { length: 30 }), // moyasar, hyperpay, tap, tabby, tamara, paypal, stripe, manual
+  methodType: varchar("method_type", { length: 30 }),
+  status: varchar("status", { length: 20 }).default("completed"), // pending, completed, failed, refunded
+  currency: varchar("currency", { length: 3 }).default("SAR"),
+  gatewayTransactionId: varchar("gateway_transaction_id", { length: 255 }),
+  gatewayReference: varchar("gateway_reference", { length: 255 }),
+  processingFee: decimal("processing_fee", { precision: 10, scale: 2 }),
+  failureReason: text("failure_reason"),
+  gatewayMetadata: jsonb("gateway_metadata"),
 });
 
 // Module 21: Notifications & Communication
