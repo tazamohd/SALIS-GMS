@@ -33,6 +33,12 @@ router.get('/job-cards/:id', isAuthenticated, async (req, res) => {
     if (!jobCard) {
       return res.status(404).json({ message: 'Job card not found' });
     }
+    // Ownership check: a caller with a garage may only read records of that
+    // garage (404, not 403, to avoid confirming the record exists).
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && jobCard.garageId && jobCard.garageId !== sessionGarage) {
+      return res.status(404).json({ message: 'Job card not found' });
+    }
     res.json(jobCard);
   } catch (error) {
     console.error('Error fetching job card:', error);
@@ -45,6 +51,12 @@ router.get('/job-cards/:id/details', isAuthenticated, async (req, res) => {
     const { id } = req.params;
     const jobCardDetails = await storage.getJobCardWithDetails(id);
     if (!jobCardDetails) {
+      return res.status(404).json({ message: 'Job card not found' });
+    }
+    // Ownership check: a caller with a garage may only read records of that
+    // garage (404, not 403, to avoid confirming the record exists).
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && jobCardDetails.garageId && jobCardDetails.garageId !== sessionGarage) {
       return res.status(404).json({ message: 'Job card not found' });
     }
     res.json(jobCardDetails);

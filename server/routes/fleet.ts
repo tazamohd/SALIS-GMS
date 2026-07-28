@@ -1,7 +1,11 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
 
 const router = Router();
+
+// All routes in this router require an authenticated session.
+router.use(isAuthenticated);
 
 // Helper: shape an account row + computed counts into the JSON the UI expects.
 function enrichAccount(account: any, vehicles: any[]) {

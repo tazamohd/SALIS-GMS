@@ -1,7 +1,11 @@
 import { Router, Request, Response } from 'express';
+import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
 
 const router = Router();
+
+// All routes in this router require an authenticated session.
+router.use(isAuthenticated);
 
 const CATEGORIES = [
   { id: 'invoices',      label: 'Invoices',           icon: 'receipt',         color: '#0A5ED7' },

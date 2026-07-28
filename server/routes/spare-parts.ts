@@ -9,7 +9,9 @@ router.get('/spare-parts', isAuthenticated, async (req, res) => {
   try {
     const { garageId } = req.query;
     const pagination = parsePagination(req);
-    const gid = (garageId as string) || (req.user as any)?.garageId;
+    // Session garage wins; honor ?garageId only for garage-less principals
+    // (platform admins). The reverse order allowed forged cross-tenant reads.
+    const gid = (req.user as any)?.garageId || (garageId as string);
     const [data, total] = await Promise.all([
       storage.getSparePartsPaginated(gid, pagination.limit, pagination.offset),
       storage.countSpareParts(gid),

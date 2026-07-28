@@ -3243,6 +3243,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
+      // Ownership check: a caller with a garage may only read records of that
+      // garage (404, not 403, to avoid confirming the record exists).
+      const sessionGarage = (req.user as any)?.garageId;
+      if (sessionGarage && invoice.garageId && invoice.garageId !== sessionGarage) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
       res.json(invoice);
     } catch (error) {
       console.error("Error fetching invoice:", error);
@@ -4897,15 +4903,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await run(await import("./paypal"));
   };
 
-  app.get("/paypal/setup", async (req, res) => {
+  app.get("/paypal/setup", isAuthenticated, async (req, res) => {
     await withPaypal(res, (paypal) => paypal.loadPaypalDefault(req, res));
   });
 
-  app.post("/paypal/order", async (req, res) => {
+  app.post("/paypal/order", isAuthenticated, async (req, res) => {
     await withPaypal(res, (paypal) => paypal.createPaypalOrder(req, res));
   });
 
-  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+  app.post("/paypal/order/:orderID/capture", isAuthenticated, async (req, res) => {
     await withPaypal(res, (paypal) => paypal.capturePaypalOrder(req, res));
   });
 
@@ -4974,7 +4980,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stock Alerts
   app.get('/api/stock-alerts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5022,7 +5030,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reorder Settings
   app.get('/api/reorder-settings', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, sparePartId } = req.query;
+      const { garageId: garageIdParam, sparePartId } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5094,7 +5104,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inventory Audit Trail
   app.get('/api/inventory-audit-trail', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, sparePartId, limit } = req.query;
+      const { garageId: garageIdParam, sparePartId, limit } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5123,7 +5135,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inventory Transfers
   app.get('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5287,7 +5301,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Refunds
   app.get('/api/refunds', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const refunds = await storage.getRefunds(garageId, status);
       res.json(refunds);
     } catch (error) {
@@ -5367,7 +5383,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Tax Configurations
   app.get('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5418,7 +5436,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Discounts & Promotions
   app.get('/api/discounts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5509,14 +5529,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Global Search
   app.get('/api/global-search', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, query, modules } = req.query;
-      
-      if (!garageId || !query) {
+      const { garageId: garageIdParam, query, modules } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
+      // Session garage wins — the query param let any tenant search another
+      // garage's data. Honored only for garage-less principals (platform admin).
+      const gid = req.user?.garageId || garageId;
+
+      if (!gid || !query) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
-      
+
       const modulesList = modules ? modules.split(',') : undefined;
-      const results = await storage.globalSearch(garageId, query, modulesList);
+      const results = await storage.globalSearch(gid, query, modulesList);
       res.json(results);
     } catch (error) {
       console.error("Error in global search:", error);
@@ -5527,7 +5552,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Saved Filter Presets
   app.get('/api/filter-presets', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, module } = req.query;
+      const { garageId: garageIdParam, module } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const userId = req.user?.id || 'default-user';
       const presets = await storage.getSavedFilterPresets(garageId, userId, module);
       res.json(presets);
@@ -5577,7 +5604,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export Jobs
   app.get('/api/export-jobs', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const userId = req.user?.id || 'default-user';
       const jobs = await storage.getExportJobs(garageId, userId);
       res.json(jobs);
@@ -5721,7 +5750,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 30: Business Intelligence & Analytics
   app.get('/api/bi/profitable-services', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5742,7 +5773,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/peak-hours', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5763,7 +5796,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/technician-utilization', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5784,7 +5819,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/customer-acquisition-cost', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5805,7 +5842,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/customer-lifetime-value', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -13626,7 +13665,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const cleanPhone = String(phone).replace(/\D/g, '');
-      const customers = await storage.getCustomers();
+      // Scope the lookup to the caller's garage — an unscoped getCustomers()
+      // matched phone numbers across every tenant's customer base.
+      const customers = await storage.getCustomers(req.user?.garageId);
       const customer = customers.find((c: any) => {
         const customerPhone = (c.phone || '').replace(/\D/g, '');
         return customerPhone.includes(cleanPhone) || cleanPhone.includes(customerPhone);
@@ -13643,7 +13684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
       
-      const allAppointments = await storage.getAppointments();
+      const allAppointments = await storage.getAppointments(req.user?.garageId);
       const todayAppointments = allAppointments.filter((apt: any) => {
         const aptDate = new Date(apt.appointmentDate);
         return apt.customerId === customer.id && 
@@ -19678,7 +19719,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const forecasts = await storage.getInventoryForecasts(garageId as string);
       res.json(forecasts);
@@ -19700,7 +19743,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const orders = await storage.getReplenishmentOrders(garageId as string, status as string);
       res.json(orders);
     } catch (error: any) {
@@ -19756,7 +19801,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const tiers = await storage.getLoyaltyTiers(garageId as string);
       res.json(tiers);
@@ -19798,7 +19845,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const accounts = await storage.getLoyaltyAccounts(garageId as string);
       res.json(accounts);
     } catch (error: any) {
@@ -19862,7 +19911,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-offers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const offers = await storage.getLoyaltyOffers(garageId as string, isActive === 'true');
       res.json(offers);
     } catch (error: any) {
@@ -19918,7 +19969,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const resources = await storage.getWorkshopResources(garageId as string);
       res.json(resources);
@@ -19960,7 +20013,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/calendar-appointments', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const appointments = await storage.getCalendarAppointments(
         garageId as string,
@@ -20037,7 +20092,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-instructions', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const instructions = await storage.getArWorkInstructions(garageId as string);
       res.json(instructions);
     } catch (error: any) {
@@ -20089,7 +20146,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-sessions', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, technicianId } = req.query;
+      const { garageId: garageIdParam, technicianId } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const sessions = await storage.getArSessionLogs(garageId as string, technicianId as string);
       res.json(sessions);
@@ -20121,7 +20180,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-devices', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const devices = await storage.getArDevicePairings(garageId as string);
       res.json(devices);

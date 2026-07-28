@@ -9,7 +9,9 @@ router.get('/suppliers', isAuthenticated, async (req, res) => {
   try {
     const { garage_id } = req.query;
     const pagination = parsePagination(req);
-    const gid = (garage_id as string) || (req.user as any)?.garageId;
+    // Session garage wins; honor ?garage_id only for garage-less principals
+    // (platform admins). The reverse order allowed forged cross-tenant reads.
+    const gid = (req.user as any)?.garageId || (garage_id as string);
     const [data, total] = await Promise.all([
       storage.getSuppliersPaginated(gid, pagination.limit, pagination.offset),
       storage.countSuppliers(gid),

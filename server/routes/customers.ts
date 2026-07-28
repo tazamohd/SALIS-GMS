@@ -42,6 +42,12 @@ router.get('/customers/:id', isAuthenticated, async (req, res) => {
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
+    // Ownership check: a caller with a garage may only read records of that
+    // garage (404, not 403, to avoid confirming the record exists).
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && customer.garageId && customer.garageId !== sessionGarage) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
     res.json(customer);
   } catch (error) {
     console.error('Error fetching customer:', error);

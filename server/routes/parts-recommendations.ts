@@ -1,12 +1,16 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 import { recommendParts } from '../services/parts-recommender';
 import { validate } from '../middleware/validate';
 import { partsRecommendationSchema } from '../schemas/validation';
 
 const router = Router();
 
+// All routes in this router require an authenticated session.
+router.use(isAuthenticated);
+
 router.get('/ai/parts-recommendations', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   const { vehicleMake, vehicleModel, vehicleYear, serviceType, description } = req.query;
   try {
     const recommendations = await recommendParts(garageId, {
@@ -21,7 +25,7 @@ router.get('/ai/parts-recommendations', async (req, res) => {
 });
 
 router.post('/ai/parts-recommendations', validate(partsRecommendationSchema), async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   try {
     const recommendations = await recommendParts(garageId, req.body);
     res.json({ recommendations, total: recommendations.length });

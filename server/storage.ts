@@ -2563,8 +2563,23 @@ export class DatabaseStorage implements IStorage {
 
   // Tool Management operations - Module 7
   async getTools(garageId?: string, isGlobal?: boolean): Promise<Tool[]> {
+    // tools has no garage_id column — a tool is visible when it is global or
+    // was created by someone in the caller's garage. Previously both params
+    // were ignored, listing every tenant's tools.
+    const conditions = [eq(tools.isActive, true)];
+    if (isGlobal !== undefined) {
+      conditions.push(eq(tools.isGlobal, isGlobal));
+    }
+    if (garageId) {
+      conditions.push(
+        or(
+          eq(tools.isGlobal, true),
+          sql`EXISTS (SELECT 1 FROM ${users} WHERE ${users.id} = ${tools.createdBy} AND ${users.garageId} = ${garageId})`,
+        )!,
+      );
+    }
     return await db.select().from(tools)
-      .where(eq(tools.isActive, true))
+      .where(and(...conditions))
       .orderBy(tools.name);
   }
 
@@ -7039,17 +7054,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOCRDocuments(garageId: string, status?: string): Promise<any[]> {
-    const conditions = [];
+    // ocr_documents has no garage_id column — scope through the uploader's
+    // garage. Without this every tenant saw every garage's scanned documents.
+    const conditions = [
+      sql`EXISTS (SELECT 1 FROM ${users} WHERE ${users.id} = ${ocrDocuments.uploadedBy} AND ${users.garageId} = ${garageId})`,
+    ];
     if (status) {
       conditions.push(eq(ocrDocuments.status, status));
     }
-    
-    const query = db.select().from(ocrDocuments).orderBy(desc(ocrDocuments.createdAt));
-    
-    if (conditions.length > 0) {
-      return await query.where(and(...conditions));
-    }
-    return await query;
+
+    return await db
+      .select()
+      .from(ocrDocuments)
+      .where(and(...conditions))
+      .orderBy(desc(ocrDocuments.createdAt));
   }
 
   async getOCRDocument(id: string): Promise<any | undefined> {
