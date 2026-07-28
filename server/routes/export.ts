@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
-import { requireAdmin } from '../middleware/requireRole';
+import { requireAdmin, requireRole } from '../middleware/requireRole';
 import { db } from '../db';
 import { users, vehicles, jobCards, invoices, appointments, spareParts, sparePartInventories } from '../../shared/schema';
 import { sql, count, eq } from 'drizzle-orm';
@@ -43,7 +43,7 @@ function toCsv(rows: Record<string, any>[]): string {
 }
 
 // GET /api/export/csv/:type — Export table data as CSV download
-router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) => {
+router.get('/export/csv/:type', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     // Exports are tenant data: even an admin only exports their own garage.
     const garageId = (req.user as any)?.garageId;
@@ -179,7 +179,7 @@ router.get('/export/csv/:type', isAuthenticated, requireAdmin, async (req, res) 
 });
 
 // GET /api/export/report/:type — Generate printer-friendly HTML report
-router.get('/export/report/:type', isAuthenticated, requireAdmin, async (req, res) => {
+router.get('/export/report/:type', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     // Same tenancy rule as the CSV export.
     const garageId = (req.user as any)?.garageId;

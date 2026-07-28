@@ -1611,7 +1611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer Management routes - Module 10
   app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
+      const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage, password } = req.body;
       
       if (!fullName || !email || !garageId) {
         return res.status(400).json({ message: "Name, email, and garage are required" });
@@ -1623,7 +1623,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const bcrypt = await import('bcrypt');
-      const tempPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+      // Optional portal password: when the caller supplies one (min 8 chars) the
+      // customer can log in immediately. Otherwise a random unusable hash is
+      // stored and the admin must set one later via /api/customers/:id/set-password.
+      const portalPasswordSet = typeof password === 'string' && password.length >= 8;
+      if (typeof password === 'string' && password.length > 0 && password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const hashedPassword = await bcrypt.hash(
+        portalPasswordSet ? password : Math.random().toString(36).slice(-12),
+        10,
+      );
 
       const customer = await storage.createUser({
         fullName,
@@ -1631,7 +1641,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: lastName || null,
         email,
         phone: phone || null,
-        password: tempPassword,
+        password: hashedPassword,
         garageId,
         nationalId: nationalId || null,
         userType: 'customer',
@@ -1651,10 +1661,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.status(201).json(customer);
+      res.status(201).json({ ...customer, portalPasswordSet });
     } catch (error) {
       console.error("Error creating customer:", error);
       res.status(500).json({ message: "Failed to create customer" });
+    }
+  });
+
+  // Set/reset a customer's portal password (staff-initiated). Gives customers a
+  // working credential — creation alone stores an unusable random hash.
+  app.post('/api/customers/:id/set-password', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { password } = req.body;
+      if (typeof password !== 'string' || password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const target = await storage.getUser(id);
+      if (!target || (target as any).userType !== 'customer') {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage && (target as any).garageId && (target as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      const bcrypt = await import('bcrypt');
+      const { users } = await import("@shared/schema");
+      const hashed = await bcrypt.hash(password, 10);
+      await db.update(users).set({ password: hashed }).where(eq(users.id, id));
+      res.json({ success: true, message: "Customer portal password updated" });
+    } catch (error) {
+      console.error("Error setting customer password:", error);
+      res.status(500).json({ message: "Failed to set customer password" });
     }
   });
 

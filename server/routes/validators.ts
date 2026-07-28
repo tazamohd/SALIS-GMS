@@ -79,11 +79,16 @@ export const updateTechnicianProfileSchema = z.object({
 export const updateJobCardSchema = z.object({
   title: z.string().max(200).optional(),
   description: z.string().max(5000).optional(),
-  status: z.enum(['open', 'in_progress', 'awaiting_parts', 'completed', 'cancelled', 'on_hold']).optional(),
-  priority: z.enum(['low', 'normal', 'high', 'urgent']).optional(),
+  // Enum aligned with the values create/seed actually produce (`pending`,
+  // `medium`) so the PUT path accepts real job cards, and the status-change
+  // timestamps the client sends are allowed instead of rejected by .strict().
+  status: z.enum(['pending', 'open', 'in_progress', 'awaiting_parts', 'completed', 'cancelled', 'on_hold']).optional(),
+  priority: z.enum(['low', 'normal', 'medium', 'high', 'urgent']).optional(),
   estimatedHours: z.number().positive().max(500).optional(),
   actualHours: z.number().nonnegative().max(500).optional(),
   notes: z.string().max(5000).optional(),
+  startedAt: z.coerce.date().optional(),
+  completedAt: z.coerce.date().optional(),
 }).strict();
 
 export const updateCustomerSchema = z.object({
