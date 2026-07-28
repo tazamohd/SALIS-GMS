@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState } from "react";
+import { asList } from "@/lib/asList";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,12 +11,13 @@ import type { SparePart } from "@shared/schema";
 export default function TechnicianMobileLookup() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: parts, isLoading } = useQuery<{ data: SparePart[] }>({
+  const { data: parts, isLoading } = useQuery<SparePart[]>({
     queryKey: ["/api/spare-parts"],
+    select: asList,
     enabled: searchQuery.length > 2,
   });
 
-  const filteredParts = parts?.data?.filter(part =>
+  const filteredParts = parts?.filter(part =>
     part.partName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     part.partNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     part.sku?.toLowerCase().includes(searchQuery.toLowerCase())

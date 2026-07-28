@@ -37,7 +37,7 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
-import { requireRole, requireAdmin } from "./middleware/requireRole";
+import { requireRole, requireAdmin, requireManagerOrAbove } from "./middleware/requireRole";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
@@ -890,8 +890,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/job-cards', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
+      // Pin garageId and createdBy to the session — a caller must not be able
+      // to plant a job card in another tenant by forging garageId in the body.
       const jobCardData = {
         ...req.body,
+        garageId: req.user?.garageId || req.body.garageId,
         createdBy: userId,
       };
       const jobCard = await storage.createJobCard(jobCardData);
@@ -3627,12 +3630,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payments', isAuthenticated, async (req, res) => {
+  app.get('/api/payments', isAuthenticated, async (req: any, res) => {
     try {
       const { invoice_id, status, method } = req.query;
       const { payments, invoices, users } = await import("@shared/schema");
-      
-      // Get payments with invoice and customer info
+      const sessionGarage = req.user?.garageId;
+
+      // Payments scoped to the caller's garage via the joined invoice — without
+      // this every tenant saw all garages' payments.
       let query = db.select({
         id: payments.id,
         invoiceId: payments.invoiceId,
@@ -3649,8 +3654,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .from(payments)
       .innerJoin(invoices, eq(payments.invoiceId, invoices.id))
       .innerJoin(users, eq(invoices.customerId, users.id))
+      .where(sessionGarage ? eq(invoices.garageId, sessionGarage) : undefined)
       .orderBy(desc(payments.paymentDate));
-      
+
       let results = await query;
       
       // Apply filters
@@ -3686,8 +3692,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdBy: userId,
       };
       
+      // Ownership: the target invoice must belong to the caller's garage,
+      // else a user could record a payment against another tenant's invoice.
+      const targetInvoice = await storage.getInvoice(validationResult.data.invoiceId);
+      if (!targetInvoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage && (targetInvoice as any).garageId && (targetInvoice as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
       const payment = await storage.createPayment(paymentData as any);
-      
+
       // Update invoice paid amount
       const invoice = await storage.getInvoice(payment.invoiceId);
       if (invoice) {
@@ -5377,6 +5394,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!refund) {
         return res.status(404).json({ message: "Refund not found" });
       }
+      // Ownership: refunds carry a garageId; a caller may only read their own.
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage && (refund as any).garageId && (refund as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: "Refund not found" });
+      }
       res.json(refund);
     } catch (error) {
       console.error("Error fetching refund:", error);
@@ -5384,7 +5406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
       const refund = await storage.createRefund({ ...req.body, requestedBy: userId });
@@ -5395,7 +5417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/refunds/:id', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const refund = await storage.updateRefund(id, req.body);
@@ -5406,7 +5428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds/:id/approve', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5422,7 +5444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds/:id/process', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds/:id/process', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -7876,6 +7898,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { action } = req.body;
+      if (!['opens', 'clicks', 'bounces', 'unsubscribes'].includes(String(action))) {
+        return res.status(400).json({ message: "Invalid engagement action" });
+      }
       const result = await phase3Service.trackEmailEngagement(id, action);
       res.json(result);
     } catch (error: any) {
@@ -14680,7 +14705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/calculate/:periodId', isAuthenticated, async (req, res) => {
+  app.post('/api/payroll/calculate/:periodId', isAuthenticated, requireManagerOrAbove, async (req, res) => {
     try {
       const { periodId } = req.params;
       const payrollEntries = await phase5Service.calculatePayroll(periodId);
@@ -17230,7 +17255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/employees', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/employees', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayrollEmployeeSchema.parse(req.body);
       const employee = await storage.createPayrollEmployee(validatedData);
@@ -17270,7 +17295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/periods', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayPeriodSchema.parse(req.body);
       const period = await storage.createPayPeriod(validatedData);
@@ -17292,7 +17317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/runs', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/runs', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayrollRunSchema.parse(req.body);
       const run = await storage.createPayrollRun(validatedData);

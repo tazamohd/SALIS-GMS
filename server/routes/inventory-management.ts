@@ -22,7 +22,7 @@ router.get('/inventory/overview', isAuthenticated, async (req, res) => {
     // Total inventory value (stockQuantity * costPrice)
     const totalValueResult = await db
       .select({
-        value: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        value: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
       })
       .from(sparePartInventories)
       .where(garageId ? eq(sparePartInventories.garageId, garageId) : undefined);
@@ -69,7 +69,7 @@ router.get('/inventory/overview', isAuthenticated, async (req, res) => {
         category: spareParts.category,
         count: sql<number>`count(*)`,
         totalQty: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
       })
       .from(sparePartInventories)
       .innerJoin(spareParts, eq(sparePartInventories.sparePartId, spareParts.id))
@@ -339,7 +339,7 @@ router.get('/inventory/turnover', isAuthenticated, async (req, res) => {
         category: spareParts.category,
         totalItems: sql<number>`count(*)`,
         totalStock: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
         avgCostPrice: sql<string>`coalesce(avg(${sparePartInventories.costPrice}), 0)`,
       })
       .from(sparePartInventories)
@@ -381,7 +381,7 @@ router.get('/inventory/valuation', isAuthenticated, async (req, res) => {
         category: spareParts.category,
         itemCount: sql<number>`count(*)`,
         totalQuantity: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalCostValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalCostValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
         totalSellingValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.sellingPrice}), 0)`,
       })
       .from(sparePartInventories)

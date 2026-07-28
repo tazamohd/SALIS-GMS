@@ -174,7 +174,7 @@ export function JobCards() {
       } else if (status === 'completed' && !jobCard.completedAt) {
         updates.completedAt = new Date().toISOString();
       }
-      return apiRequest("PUT", `/api/job-cards/${id}`, updates);
+      return apiRequest("PATCH", `/api/job-cards/${id}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ predicate: (query) => {

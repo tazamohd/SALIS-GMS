@@ -12333,7 +12333,7 @@ export class DatabaseStorage implements IStorage {
         and(
           eq(jobCards.garageId, garageId),
           or(
-            ilike(jobCards.id, pattern),
+            ilike(jobCards.jobNumber, pattern),
             ilike(jobCards.serviceType, pattern)
           )
         )

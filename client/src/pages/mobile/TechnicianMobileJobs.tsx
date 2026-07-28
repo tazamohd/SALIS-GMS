@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +9,9 @@ import { Link } from "wouter";
 import type { JobCard } from "@shared/schema";
 
 export default function TechnicianMobileJobs() {
-  const { data: jobCards, isLoading } = useQuery<{ data: JobCard[] }>({
+  const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: ["/api/job-cards"],
+    select: asList,
   });
 
   const statusConfig = {
@@ -29,8 +31,8 @@ export default function TechnicianMobileJobs() {
     );
   }
 
-  const activeJobs = jobCards?.data?.filter(j => j.status !== "completed" && j.status !== "cancelled") || [];
-  const completedJobs = jobCards?.data?.filter(j => j.status === "completed") || [];
+  const activeJobs = jobCards?.filter(j => j.status !== "completed" && j.status !== "cancelled") || [];
+  const completedJobs = jobCards?.filter(j => j.status === "completed") || [];
 
   return (
     <div className="p-4 space-y-4 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, Calendar, Wrench, Plus } from "lucide-react";
@@ -7,8 +8,9 @@ import { Link } from "wouter";
 import type { Vehicle } from "@shared/schema";
 
 export default function CustomerMobileVehicles() {
-  const { data: vehicles, isLoading } = useQuery<{ data: Vehicle[] }>({
+  const { data: vehicles, isLoading } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
+    select: asList,
   });
 
   if (isLoading) {
@@ -27,7 +29,7 @@ export default function CustomerMobileVehicles() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-[#0B1F3B] dark:text-white">My Vehicles</h2>
-          <p className="text-sm text-[#64748B]">{vehicles?.data?.length || 0} vehicle(s)</p>
+          <p className="text-sm text-[#64748B]">{vehicles?.length || 0} vehicle(s)</p>
         </div>
         <Link href="/vehicles">
           <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6]" data-testid="button-add-vehicle">
@@ -38,7 +40,7 @@ export default function CustomerMobileVehicles() {
       </div>
 
       <div className="space-y-3">
-        {vehicles?.data?.map((vehicle) => (
+        {vehicles?.map((vehicle) => (
           <Card 
             key={vehicle.id} 
             className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]"
@@ -102,7 +104,7 @@ export default function CustomerMobileVehicles() {
           </Card>
         ))}
 
-        {(!vehicles?.data || vehicles.data.length === 0) && (
+        {(!vehicles || vehicles.data.length === 0) && (
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-8 text-center">
               <Car className="h-16 w-16 mx-auto mb-4 text-[#E2E8F0] dark:text-[#232A36]" />

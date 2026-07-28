@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Car, Clock, DollarSign, Wrench, Bell, MessageSquare } from "lucide-react";
@@ -7,24 +8,27 @@ import { Link } from "wouter";
 import type { Appointment, Vehicle, Invoice } from "@shared/schema";
 
 export default function CustomerMobileHome() {
-  const { data: upcomingAppointments } = useQuery<{ data: Appointment[] }>({
+  const { data: upcomingAppointments } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments"],
+    select: asList,
   });
 
-  const { data: vehicles } = useQuery<{ data: Vehicle[] }>({
+  const { data: vehicles } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
+    select: asList,
   });
 
-  const { data: recentInvoices } = useQuery<{ data: Invoice[] }>({
+  const { data: recentInvoices } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices"],
+    select: asList,
   });
 
-  const nextAppointment = upcomingAppointments?.data?.find(
+  const nextAppointment = upcomingAppointments?.find(
     (apt) => apt.status === "scheduled" && new Date(apt.appointmentDate) > new Date()
   );
 
-  const totalVehicles = vehicles?.data?.length || 0;
-  const pendingInvoices = recentInvoices?.data?.filter(
+  const totalVehicles = vehicles?.length || 0;
+  const pendingInvoices = recentInvoices?.filter(
     (inv) => inv.status === "pending" || inv.status === "overdue"
   )?.length || 0;
 
@@ -79,7 +83,7 @@ export default function CustomerMobileHome() {
           <CardContent className="p-4 text-center">
             <Wrench className="h-6 w-6 mx-auto mb-2 text-emerald-600 dark:text-emerald-400" />
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
-              {upcomingAppointments?.data?.filter(a => a.status === "scheduled").length || 0}
+              {upcomingAppointments?.filter(a => a.status === "scheduled").length || 0}
             </div>
             <div className="text-xs text-[#64748B]">Appointments</div>
           </CardContent>
@@ -147,7 +151,7 @@ export default function CustomerMobileHome() {
           <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Recent Activity</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recentInvoices?.data?.slice(0, 3).map((invoice) => (
+          {recentInvoices?.slice(0, 3).map((invoice) => (
             <div 
               key={invoice.id} 
               className="flex justify-between items-center py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0"
@@ -173,7 +177,7 @@ export default function CustomerMobileHome() {
               </div>
             </div>
           ))}
-          {(!recentInvoices?.data || recentInvoices.data.length === 0) && (
+          {(!recentInvoices || recentInvoices.data.length === 0) && (
             <p className="text-sm text-[#64748B] text-center py-4">
               No recent activity
             </p>

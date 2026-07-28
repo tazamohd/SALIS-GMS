@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Receipt, Download, CreditCard, Clock, CheckCircle } from "lucide-react";
@@ -6,15 +7,16 @@ import { Link } from "wouter";
 import type { Invoice } from "@shared/schema";
 
 export default function CustomerMobilePayments() {
-  const { data: invoices, isLoading } = useQuery<{ data: Invoice[] }>({
+  const { data: invoices, isLoading } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices"],
+    select: asList,
   });
 
-  const pendingInvoices = invoices?.data?.filter(
+  const pendingInvoices = invoices?.filter(
     (inv) => inv.status === "pending" || inv.status === "overdue"
   ) || [];
   
-  const paidInvoices = invoices?.data?.filter(
+  const paidInvoices = invoices?.filter(
     (inv) => inv.status === "paid"
   ) || [];
 
