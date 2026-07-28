@@ -29,7 +29,7 @@ describe('Spare part read route extraction (Wave J)', () => {
   it('preserves spare part list pagination, garage scoping, and detail lookup', () => {
     expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-parts['"],\s*isAuthenticated/);
     expect(sparePartRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(sparePartRoutesSource).toMatch(/const gid = \(garageId as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    expect(sparePartRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garageId as string\)/);
     expect(sparePartRoutesSource).toMatch(/storage\.getSparePartsPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(sparePartRoutesSource).toMatch(/storage\.countSpareParts\(gid\)/);
     expect(sparePartRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

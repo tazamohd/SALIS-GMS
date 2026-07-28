@@ -420,11 +420,27 @@ function CustomerTab() {
 export default function AdvancedReports() {
   const { toast } = useToast();
 
-  const handleExport = () => {
-    toast({
-      title: "Export Coming Soon",
-      description: "Report export functionality will be available in a future update.",
-    });
+  // Streams the garage-scoped CSV from the real export endpoint.
+  const handleExport = async () => {
+    try {
+      const res = await fetch("/api/export/csv/financial-summary", { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `financial-summary-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      toast({
+        title: "Export failed",
+        description: err?.message?.includes("403")
+          ? "Exports require an admin account."
+          : "Could not generate the export. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

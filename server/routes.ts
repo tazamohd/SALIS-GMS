@@ -8100,37 +8100,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      const { customerId, vehicleId, estimatedCost } = req.body;
-      
-      const estimate = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        customerId,
-        vehicleId,
-        technicianId: userId,
-        estimatedCost,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(estimate);
-    } catch (error) {
-      console.error("Error creating video estimate:", error);
-      res.status(500).json({ message: "Failed to create video estimate" });
-    }
-  });
-
-  app.post('/api/video-estimates/:id/send', isAuthenticated, async (req: any, res) => {
-    try {
-      res.json({ success: true, message: "Video estimate sent to customer" });
-    } catch (error) {
-      console.error("Error sending video estimate:", error);
-      res.status(500).json({ message: "Failed to send video estimate" });
-    }
+  app.post('/api/video-estimates/:id/send', isAuthenticated, async (_req: any, res) => {
+    // No delivery channel (email/SMS) is integrated yet. Do not fake success.
+    res.status(501).json({ success: false, message: "Sending video estimates is not configured on this server yet." });
   });
 
   app.get('/api/vehicle-walkarounds', isAuthenticated, async (req: any, res) => {
@@ -8831,12 +8803,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Cannot restore incomplete backup" });
       }
       
-      // In production, this would trigger a restore process
-      // For now, return success message
-      res.json({ 
-        message: "Restore initiated successfully",
-        backupId: id,
-        estimatedTime: "5-10 minutes"
+      // No restore engine is integrated — do not fake success on a
+      // destructive-looking action.
+      res.status(501).json({
+        message: "Backup restore is not available on this server yet.",
       });
     } catch (error) {
       console.error("Error restoring backup:", error);
@@ -13253,16 +13223,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json([
       { id: "1", name: "Service Delivery Quality", category: "service_delivery", itemCount: 12, completionRate: 95 },
     ]);
-  });
-
-  app.get("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "NC-2024-001", title: "Incorrect torque on wheel nuts", severity: "major", status: "resolved" },
-    ]);
-  });
-
-  app.post("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "NC-NEW", ...req.body });
   });
 
   // Safety Incidents - Module 88

@@ -27,7 +27,7 @@ describe('Technician read route extraction (Wave J)', () => {
   it('preserves technician list authentication, garage scoping, and pagination', () => {
     expect(technicianRoutesSource).toMatch(/router\.get\(['"]\/technicians['"],\s*isAuthenticated/);
     expect(technicianRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(technicianRoutesSource).toMatch(/const gid = \(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    expect(technicianRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
     expect(technicianRoutesSource).toMatch(/storage\.getTechniciansPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(technicianRoutesSource).toMatch(/storage\.countTechnicians\(gid\)/);
     expect(technicianRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

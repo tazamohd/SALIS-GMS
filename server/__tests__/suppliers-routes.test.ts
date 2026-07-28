@@ -32,7 +32,7 @@ describe('Supplier read route extraction (Wave J)', () => {
   it('preserves supplier list pagination, garage scoping, detail lookup, and price-list reads', () => {
     expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/suppliers['"],\s*isAuthenticated/);
     expect(supplierRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(supplierRoutesSource).toMatch(/const gid = \(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    expect(supplierRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
     expect(supplierRoutesSource).toMatch(/storage\.getSuppliersPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(supplierRoutesSource).toMatch(/storage\.countSuppliers\(gid\)/);
     expect(supplierRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

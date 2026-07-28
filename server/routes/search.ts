@@ -58,7 +58,7 @@ router.get('/search', isAuthenticated, async (req: any, res) => {
         type: 'part',
         title: part.name || part.partNumber,
         subtitle: `${part.partNumber} - $${part.unitPrice || 0}`,
-        href: `/inventory?id=${part.id}`,
+        href: `/inventory-management?id=${part.id}`,
       });
     });
 

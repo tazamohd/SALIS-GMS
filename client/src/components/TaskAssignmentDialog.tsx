@@ -43,14 +43,17 @@ interface TaskAssignmentDialogProps {
 export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssignmentDialogProps) {
   const { toast } = useToast();
 
-  // For now, we'll use mock technicians since there's no users API endpoint yet
-  // In production, this would fetch from /api/users?userType=technician
-  const mockTechnicians = [
-    { id: "tech-1", fullName: "Ahmad Rasheed", userType: "technician" },
-    { id: "tech-2", fullName: "Sarah Johnson", userType: "technician" },
-    { id: "tech-3", fullName: "Mike Chen", userType: "assistant" },
-    { id: "tech-4", fullName: "Lisa Anderson", userType: "assistant" },
-  ];
+  // Garage-scoped user directory; assigning a real user id keeps the task's
+  // FK valid (the old hardcoded list persisted non-existent technician ids).
+  const { data: garageUsers = [] } = useQuery<
+    { id: string; fullName: string | null; userType: string | null; role: string | null }[]
+  >({
+    queryKey: ["/api/users"],
+    enabled: open,
+  });
+  const technicians = garageUsers.filter(
+    (u) => u.userType === "technician" || String(u.role || "").toUpperCase() === "TECHNICIAN",
+  );
 
   const form = useForm<TaskAssignmentFormData>({
     resolver: zodResolver(taskAssignmentFormSchema),
@@ -182,7 +185,7 @@ export function TaskAssignmentDialog({ jobCard, open, onOpenChange }: TaskAssign
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {mockTechnicians.map((tech) => (
+                        {technicians.map((tech) => (
                           <SelectItem key={tech.id} value={tech.id}>
                             {tech.fullName} ({tech.userType})
                           </SelectItem>

@@ -86,9 +86,12 @@ describe("POST /api/demo/login", () => {
     expect(res.status).toBe(400);
   });
 
-  it("reports an unseeded (but valid) role as 404", async () => {
-    // OWNER is a valid role key but is not inserted by this suite.
+  it("auto-provisions an unseeded (but valid) role and signs in", async () => {
+    // OWNER is a valid role key not inserted by this suite; the login route
+    // now seeds demo accounts on demand instead of dead-ending with 404.
     const res = await supertest(app).post("/api/demo/login").send({ roleKey: "OWNER" });
-    expect(res.status).toBe(404);
-  });
+    expect(res.status).toBe(200);
+    expect(res.body.email).toMatch(/^owner@/);
+    expect(res.body).not.toHaveProperty("password");
+  }, 60000);
 });

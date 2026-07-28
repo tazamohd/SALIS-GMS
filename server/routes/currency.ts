@@ -4,9 +4,6 @@ import { storage } from '../storage';
 
 const router = Router();
 
-// All routes in this router require an authenticated session.
-router.use(isAuthenticated);
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -148,7 +145,7 @@ function convert(amount: number, fromCode: string, toCode: string): { result: nu
 // ---------------------------------------------------------------------------
 // GET /api/currency/rates
 // ---------------------------------------------------------------------------
-router.get('/currency/rates', (_req, res) => {
+router.get('/currency/rates', isAuthenticated, (_req, res) => {
   res.json({ rates: exchangeRates });
 });
 
@@ -156,7 +153,7 @@ router.get('/currency/rates', (_req, res) => {
 // POST /api/currency/convert
 // Body: { amount: number, from: string, to: string }
 // ---------------------------------------------------------------------------
-router.post('/currency/convert', (req, res) => {
+router.post('/currency/convert', isAuthenticated, (req, res) => {
   const { amount, from, to } = req.body;
 
   if (typeof amount !== 'number' || amount <= 0) {
@@ -184,14 +181,14 @@ router.post('/currency/convert', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/currency/settings
 // ---------------------------------------------------------------------------
-router.get('/currency/settings', (_req, res) => {
+router.get('/currency/settings', isAuthenticated, (_req, res) => {
   res.json({ settings: currencySettings });
 });
 
 // ---------------------------------------------------------------------------
 // PUT /api/currency/settings
 // ---------------------------------------------------------------------------
-router.put('/currency/settings', (req, res) => {
+router.put('/currency/settings', isAuthenticated, (req, res) => {
   const { defaultCurrency, decimalPlaces, numberFormat, autoConversion } = req.body;
 
   if (defaultCurrency !== undefined) {
@@ -221,7 +218,7 @@ router.put('/currency/settings', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/currency/transactions
 // ---------------------------------------------------------------------------
-router.get('/currency/transactions', async (req, res) => {
+router.get('/currency/transactions', isAuthenticated, async (req, res) => {
   try {
     const { type, currency, limit: rawLimit } = req.query;
     const limit = rawLimit ? parseInt(rawLimit as string, 10) : 50;
@@ -268,7 +265,7 @@ router.get('/currency/transactions', async (req, res) => {
 // POST /api/currency/transactions
 // Body: { description, originalAmount, originalCurrency, type, reference?, customerName? }
 // ---------------------------------------------------------------------------
-router.post('/currency/transactions', async (req, res) => {
+router.post('/currency/transactions', isAuthenticated, async (req, res) => {
   const { description, originalAmount, originalCurrency, type, reference, customerName, date } = req.body;
 
   if (!description || typeof originalAmount !== 'number' || !originalCurrency || !type) {

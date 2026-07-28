@@ -20,6 +20,7 @@ import {
   CheckCircle, Clock, AlertCircle, Wrench, Plus, ChevronRight
 } from "lucide-react";
 import { TabsPageLayout } from "@/components/layouts/TabsPageLayout";
+import { PaymentMethodsDialog } from "@/components/customer/PaymentMethodsDialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Customer {
@@ -53,6 +54,7 @@ export default function CustomerPortal() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVehicleForHistory, setSelectedVehicleForHistory] = useState<string | null>(null);
+  const [payInvoice, setPayInvoice] = useState<{ id: string; amount: number } | null>(null);
 
   // Booking form state
   const [bookingVehicleId, setBookingVehicleId] = useState("");
@@ -721,12 +723,12 @@ export default function CustomerPortal() {
                     <Separator className="my-3" />
                     <Button
                       className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
-                      onClick={() => {
-                        toast({
-                          title: "Payment Gateway",
-                          description: "Online payment integration coming soon. Please contact us for payment options.",
-                        });
-                      }}
+                      onClick={() =>
+                        setPayInvoice({
+                          id: inv.id,
+                          amount: Number(inv.balanceAmount ?? inv.totalAmount ?? 0),
+                        })
+                      }
                       data-testid={`btn-pay-${inv.id}`}
                     >
                       <CreditCard className="w-4 h-4 mr-2" />
@@ -832,6 +834,7 @@ export default function CustomerPortal() {
   );
 
   return (
+    <>
     <TabsPageLayout
       title={`${t('customers.portal.welcomeUser', 'Welcome')}, ${customer?.fullName}`}
       description={customer?.email || t('customers.portal.title', 'Customer Portal')}
@@ -880,5 +883,18 @@ export default function CustomerPortal() {
       ]}
       defaultTab="vehicles"
     />
+    {payInvoice && (
+      <PaymentMethodsDialog
+        open={!!payInvoice}
+        onOpenChange={(v) => { if (!v) setPayInvoice(null); }}
+        invoiceId={payInvoice.id}
+        amount={payInvoice.amount}
+        onSuccess={() => {
+          setPayInvoice(null);
+          queryClient.invalidateQueries({ queryKey: ['portal-invoices', customer?.id] });
+        }}
+      />
+    )}
+    </>
   );
 }

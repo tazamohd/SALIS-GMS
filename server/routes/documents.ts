@@ -4,9 +4,6 @@ import { storage } from '../storage';
 
 const router = Router();
 
-// All routes in this router require an authenticated session.
-router.use(isAuthenticated);
-
 const CATEGORIES = [
   { id: 'invoices',      label: 'Invoices',           icon: 'receipt',         color: '#0A5ED7' },
   { id: 'contracts',     label: 'Contracts',          icon: 'file-signature',  color: '#7C3AED' },
@@ -39,7 +36,7 @@ function toView(doc: any) {
 }
 
 // GET /documents/categories — list document categories with counts
-router.get('/documents/categories', async (_req: Request, res: Response) => {
+router.get('/documents/categories', isAuthenticated, async (_req: Request, res: Response) => {
   try {
     const all = await storage.listDocumentLibraryItems();
     const result = CATEGORIES.map((cat) => {
@@ -65,7 +62,7 @@ router.get('/documents/categories', async (_req: Request, res: Response) => {
 });
 
 // GET /documents/stats — aggregate statistics
-router.get('/documents/stats', async (_req: Request, res: Response) => {
+router.get('/documents/stats', isAuthenticated, async (_req: Request, res: Response) => {
   try {
     const all = await storage.listDocumentLibraryItems();
     const totalStorage = all.reduce((sum: number, d: any) => sum + (d.size ?? 0), 0);
@@ -93,7 +90,7 @@ router.get('/documents/stats', async (_req: Request, res: Response) => {
 });
 
 // GET /documents — list documents (supports ?search, ?category, ?tag)
-router.get('/documents', async (req: Request, res: Response) => {
+router.get('/documents', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const { search, category, tag } = req.query;
     const rows = await storage.listDocumentLibraryItems({
@@ -109,7 +106,7 @@ router.get('/documents', async (req: Request, res: Response) => {
 });
 
 // GET /documents/:id — single document detail
-router.get('/documents/:id', async (req: Request, res: Response) => {
+router.get('/documents/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const doc = await storage.getDocumentLibraryItem(req.params.id);
     if (!doc) return res.status(404).json({ error: 'Document not found' });
@@ -121,7 +118,7 @@ router.get('/documents/:id', async (req: Request, res: Response) => {
 });
 
 // POST /documents — upload document metadata (file upload is stub)
-router.post('/documents', async (req: Request, res: Response) => {
+router.post('/documents', isAuthenticated, async (req: Request, res: Response) => {
   const { name, type, category, size, tags, description } = req.body;
 
   if (!name || !type || !category) {
@@ -151,7 +148,7 @@ router.post('/documents', async (req: Request, res: Response) => {
 });
 
 // DELETE /documents/:id — delete a document
-router.delete('/documents/:id', async (req: Request, res: Response) => {
+router.delete('/documents/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const deleted = await storage.deleteDocumentLibraryItem(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Document not found' });

@@ -4,10 +4,7 @@ import { predictMaintenance, getMaintenanceStats } from '../services/predictive-
 
 const router = Router();
 
-// All routes in this router require an authenticated session.
-router.use(isAuthenticated);
-
-router.get('/predictive-maintenance/predictions', async (req, res) => {
+router.get('/predictive-maintenance/predictions', isAuthenticated, async (req, res) => {
   const garageId = (req as any).user.garageId;
   try {
     const predictions = await predictMaintenance(garageId);
@@ -15,7 +12,7 @@ router.get('/predictive-maintenance/predictions', async (req, res) => {
   } catch (e) { res.json({ predictions: [] }); }
 });
 
-router.get('/predictive-maintenance/stats', async (req, res) => {
+router.get('/predictive-maintenance/stats', isAuthenticated, async (req, res) => {
   const garageId = (req as any).user.garageId;
   try {
     const stats = await getMaintenanceStats(garageId);

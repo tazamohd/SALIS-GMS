@@ -33,7 +33,7 @@ export default function Register() {
         title: t('common.success', 'Success'),
         description: t('auth.accountCreated', 'Account created successfully'),
       });
-      window.location.href = "/login-dashboard";
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       toast({
