@@ -44,17 +44,17 @@ export default function OEMSoftwareSubscriptions() {
   });
 
   const createCatalogMutation = useMutation({
-    mutationFn: (data: InsertVendorCatalog) => apiRequest("/api/vendor-catalogs", "POST", data),
+    mutationFn: (data: InsertVendorCatalog) => apiRequest("POST", "/api/vendor-catalogs", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/vendor-catalogs"] }); setShowCatalogDialog(false); toast({ title: t('oem.catalogCreated', 'Catalog created') }); },
   });
 
   const createProductMutation = useMutation({
-    mutationFn: (data: InsertOemProduct) => apiRequest("/api/oem-products", "POST", data),
+    mutationFn: (data: InsertOemProduct) => apiRequest("POST", "/api/oem-products", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/oem-products"] }); setShowProductDialog(false); toast({ title: t('oem.productCreated', 'Product created') }); },
   });
 
   const createLicenseMutation = useMutation({
-    mutationFn: (data: InsertSubscriptionLicense) => apiRequest("/api/subscription-licenses", "POST", data),
+    mutationFn: (data: InsertSubscriptionLicense) => apiRequest("POST", "/api/subscription-licenses", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/subscription-licenses"] }); setShowLicenseDialog(false); toast({ title: t('oem.licenseCreated', 'License created') }); },
   });
 

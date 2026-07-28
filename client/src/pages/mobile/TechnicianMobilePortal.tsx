@@ -94,7 +94,7 @@ export default function TechnicianMobilePortal() {
   const [, forceUpdate] = useState({});
 
   const { data: technicianProfile } = useQuery<TechnicianProfile>({
-    queryKey: ['/api/technician-profiles', currentUser?.id],
+    queryKey: [`/api/technician-profiles/${currentUser?.id}`],
     enabled: !!currentUser?.id,
   });
 

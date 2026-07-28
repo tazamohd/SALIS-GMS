@@ -89,9 +89,7 @@ export default function Integrations() {
 
   const obdScanMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/integrations/obd/scan', {
-        method: 'POST',
-      });
+      return await apiRequest('POST', '/api/integrations/obd/scan');
     },
     onSuccess: (result) => {
       if (result.success) {

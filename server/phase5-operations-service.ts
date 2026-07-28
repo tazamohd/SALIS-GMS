@@ -467,6 +467,15 @@ export async function clockOut(entryId: string, breakDuration: number = 0) {
   }
 }
 
+/** Time-clock entries for one employee, newest first. */
+export async function getTimeClockEntriesByEmployee(employeeId: string) {
+  return await db
+    .select()
+    .from(timeClockEntries)
+    .where(eq(timeClockEntries.employeeId, employeeId))
+    .orderBy(desc(timeClockEntries.clockInTime));
+}
+
 /** Clock-out for callers that only know who they are: resolves the
  *  employee's open entry (no clock-out time yet) and closes it. */
 export async function clockOutByEmployee(employeeId: string, breakDuration: number = 0) {

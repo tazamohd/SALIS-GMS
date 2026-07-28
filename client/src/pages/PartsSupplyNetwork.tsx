@@ -38,12 +38,12 @@ export default function PartsSupplyNetwork() {
   });
 
   const createPartnerMutation = useMutation({
-    mutationFn: (data: InsertNetworkPartner) => apiRequest("/api/network-partners", "POST", data),
+    mutationFn: (data: InsertNetworkPartner) => apiRequest("POST", "/api/network-partners", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/network-partners"] }); setShowPartnerDialog(false); toast({ title: t('inventory.partnerCreated', 'Partner created') }); },
   });
 
   const createOrderMutation = useMutation({
-    mutationFn: (data: InsertFulfillmentOrder) => apiRequest("/api/fulfillment-orders", "POST", data),
+    mutationFn: (data: InsertFulfillmentOrder) => apiRequest("POST", "/api/fulfillment-orders", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/fulfillment-orders"] }); setShowOrderDialog(false); toast({ title: t('inventory.orderCreated', 'Order created') }); },
   });
 

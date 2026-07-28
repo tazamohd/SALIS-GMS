@@ -18,7 +18,7 @@ export default function TechnicianProfile() {
   const { user } = useAuth();
 
   const { data: profile, isLoading } = useQuery<TechnicianProfile>({
-    queryKey: ["/api/technician-profiles", user?.id],
+    queryKey: [`/api/technician-profiles/${user?.id}`],
     enabled: !!user?.id,
   });
 

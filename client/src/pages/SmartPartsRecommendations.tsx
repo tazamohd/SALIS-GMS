@@ -119,7 +119,7 @@ export default function SmartPartsRecommendations() {
 
   const handleApplyToJobCard = async (recommendationId: string) => {
     try {
-      await apiRequest(`/api/ai/parts-recommendations/${recommendationId}`, "PATCH", {
+      await apiRequest("PATCH", `/api/ai/parts-recommendations/${recommendationId}`, {
         appliedToJobCard: true,
         status: "applied",
       });

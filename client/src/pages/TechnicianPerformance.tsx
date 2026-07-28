@@ -92,7 +92,7 @@ export default function TechnicianPerformance() {
 
   const handleMetricPreferenceChange = async (metricKey: string, isVisible: boolean) => {
     try {
-      await apiRequest('/api/technician-performance/metrics/preferences', 'POST', {
+      await apiRequest('POST', '/api/technician-performance/metrics/preferences', {
         userId,
         metricKey,
         isVisible,

@@ -17,7 +17,7 @@ export default function RoutingOptimizer() {
 
   const optimizeMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/routing/optimize", "POST", {
+      return apiRequest("POST", "/api/routing/optimize", {
         optimizationDate: new Date().toISOString(),
         stops: [],
         routeType: 'parts_transfer',

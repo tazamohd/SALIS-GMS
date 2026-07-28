@@ -25,7 +25,7 @@ export default function CustomerMobileBooking() {
 
   const bookingMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("/api/appointments", "POST", data);
+      return apiRequest("POST", "/api/appointments", data);
     },
     onSuccess: () => {
       toast({

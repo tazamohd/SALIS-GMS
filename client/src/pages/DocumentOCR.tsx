@@ -51,7 +51,7 @@ export default function DocumentOCR() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: { documentType: string; fileName: string }) => {
-      return await apiRequest("/api/ai/ocr-documents/upload", "POST", data);
+      return await apiRequest("POST", "/api/ai/ocr-documents/upload", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
@@ -72,7 +72,7 @@ export default function DocumentOCR() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return await apiRequest(`/api/ai/ocr-documents/${id}`, "PATCH", data);
+      return await apiRequest("PATCH", `/api/ai/ocr-documents/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });

@@ -136,7 +136,7 @@ export default function NextGenTechnologies() {
 
   const seedMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/nextgen/seed", "POST", {});
+      return apiRequest("POST", "/api/nextgen/seed", {});
     },
     onSuccess: () => {
       toast({

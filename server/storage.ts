@@ -6360,21 +6360,28 @@ export class DatabaseStorage implements IStorage {
       appointmentConditions.push(sql`${appointments.appointmentDate} <= ${endDate}`);
     }
 
-    const baseQuery = db.select({
+    // Two independent queries: selecting both hour and day from one shared
+    // builder made each grouped query select an ungrouped column (Postgres
+    // 42803), so this method failed on every call.
+    const hourlyData = await db.select({
       hour: sql<number>`EXTRACT(HOUR FROM ${appointments.appointmentDate})`,
+      count: sql<number>`COUNT(*)`,
+      revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
+    })
+    .from(appointments)
+    .leftJoin(invoices, eq(appointments.customerId, invoices.customerId))
+    .where(and(...appointmentConditions))
+    .groupBy(sql`EXTRACT(HOUR FROM ${appointments.appointmentDate})`);
+
+    const dailyData = await db.select({
       day: sql<string>`TO_CHAR(${appointments.appointmentDate}, 'Day')`,
       count: sql<number>`COUNT(*)`,
       revenue: sql<number>`COALESCE(SUM(CAST(${invoices.totalAmount} AS DECIMAL)), 0)`,
     })
     .from(appointments)
     .leftJoin(invoices, eq(appointments.customerId, invoices.customerId))
-    .where(and(...appointmentConditions));
-
-    const hourlyData = await baseQuery
-      .groupBy(sql`EXTRACT(HOUR FROM ${appointments.appointmentDate})`);
-
-    const dailyData = await baseQuery
-      .groupBy(sql`TO_CHAR(${appointments.appointmentDate}, 'Day')`);
+    .where(and(...appointmentConditions))
+    .groupBy(sql`TO_CHAR(${appointments.appointmentDate}, 'Day')`);
 
     const hourlyDistribution = hourlyData.map(h => ({
       hour: Number(h.hour) || 0,

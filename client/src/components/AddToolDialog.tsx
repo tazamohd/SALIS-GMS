@@ -48,7 +48,7 @@ export function AddToolDialog({ open, onOpenChange }: AddToolDialogProps) {
 
   const createToolMutation = useMutation({
     mutationFn: async (data: AddToolFormData) => {
-      return await apiRequest('/api/tools', 'POST', data);
+      return await apiRequest('POST', '/api/tools', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tools'] });

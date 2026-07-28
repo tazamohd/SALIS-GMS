@@ -69,7 +69,7 @@ export default function PayrollManagement() {
   });
 
   const { data: runs = [] } = useQuery<any[]>({
-    queryKey: ["/api/payroll/runs", selectedPeriod?.id],
+    queryKey: [`/api/payroll/runs/${selectedPeriod?.id}`],
     enabled: !!selectedPeriod,
   });
 

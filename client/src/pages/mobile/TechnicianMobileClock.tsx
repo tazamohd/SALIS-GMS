@@ -16,7 +16,7 @@ export default function TechnicianMobileClock() {
   }, []);
 
   const { data: timeEntries } = useQuery<{ data: any[] }>({
-    queryKey: ["/api/time-clock/entries"],
+    queryKey: ["/api/timeclock/entries"],
   });
 
   const todayEntry = timeEntries?.data?.find(entry => 
@@ -28,19 +28,19 @@ export default function TechnicianMobileClock() {
   const clockMutation = useMutation({
     mutationFn: async (type: "in" | "out") => {
       if (type === "in") {
-        return apiRequest("/api/time-clock/clock-in", "POST", {
+        return apiRequest("POST", "/api/timeclock/clock-in", {
           clockInTime: new Date().toISOString(),
           location: "Mobile App",
         });
       } else {
-        return apiRequest("/api/time-clock/clock-out", "POST", {
+        return apiRequest("POST", "/api/timeclock/clock-out", {
           entryId: todayEntry.id,
           clockOutTime: new Date().toISOString(),
         });
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/time-clock/entries"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/timeclock/entries"] });
       toast({
         title: isClockedIn ? "Clocked Out" : "Clocked In",
         description: `Successfully ${isClockedIn ? "ended" : "started"} your shift`,

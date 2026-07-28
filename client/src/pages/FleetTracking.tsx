@@ -48,7 +48,7 @@ export default function FleetTracking() {
 
   const createGeofenceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/fleet/geofences', 'POST', data);
+      return await apiRequest('POST', '/api/fleet/geofences', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });
@@ -78,7 +78,7 @@ export default function FleetTracking() {
 
   const deleteGeofenceMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/fleet/geofences/${id}`, 'DELETE', {});
+      return await apiRequest('DELETE', `/api/fleet/geofences/${id}`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });

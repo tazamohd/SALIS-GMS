@@ -90,7 +90,7 @@ export default function ServiceTemplates() {
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return await apiRequest("/api/service-templates", "POST", {
+      return await apiRequest("POST", "/api/service-templates", {
         ...data,
         taskSteps: data.taskSteps,
         requiredSkills: data.requiredSkills || [],
@@ -119,7 +119,7 @@ export default function ServiceTemplates() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/service-templates/${id}`, "DELETE");
+      return await apiRequest("DELETE", `/api/service-templates/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 

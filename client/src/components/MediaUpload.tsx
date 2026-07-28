@@ -84,8 +84,8 @@ export function MediaUpload({
 
         await apiRequest('POST', '/api/media-attachments', mediaData);
 
-        queryClient.invalidateQueries({ 
-          queryKey: ['/api/media-attachments', relatedType, relatedId] 
+        queryClient.invalidateQueries({
+          queryKey: [`/api/media-attachments/${relatedType}/${relatedId}`]
         });
 
         toast({

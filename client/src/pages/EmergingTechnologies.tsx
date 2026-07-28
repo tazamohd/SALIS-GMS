@@ -19,7 +19,7 @@ export default function EmergingTechnologies() {
   const { toast } = useToast();
 
   const seedMutation = useMutation({
-    mutationFn: () => apiRequest('/api/emerging-tech/seed', 'POST', {}),
+    mutationFn: () => apiRequest('POST', '/api/emerging-tech/seed', {}),
     onSuccess: (data: any) => {
       toast({
         title: t('emergingTech.sampleDataSeeded', 'Sample Data Seeded!'),

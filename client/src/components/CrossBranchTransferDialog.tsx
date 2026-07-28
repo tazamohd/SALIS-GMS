@@ -60,7 +60,7 @@ export function CrossBranchTransferDialog({ open, onOpenChange }: CrossBranchTra
   const transferMutation = useMutation({
     mutationFn: async (data: TransferFormData) => {
       // In production, this would call /api/tools/transfer
-      return await apiRequest('/api/tool-transfers', 'POST', data);
+      return await apiRequest('POST', '/api/tool-transfers', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tools'] });

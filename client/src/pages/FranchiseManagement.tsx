@@ -195,7 +195,7 @@ export default function FranchiseManagement() {
   });
 
   const createGroupMutation = useMutation({
-    mutationFn: (data: InsertFranchiseGroup) => apiRequest("/api/franchise-groups", "POST", data),
+    mutationFn: (data: InsertFranchiseGroup) => apiRequest("POST", "/api/franchise-groups", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
       toast({ title: t('franchise.groupCreatedSuccess', 'Franchise group created successfully') });
@@ -208,7 +208,7 @@ export default function FranchiseManagement() {
   });
 
   const updateGroupMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseGroup> }) => apiRequest(`/api/franchise-groups/${id}`, "PATCH", data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseGroup> }) => apiRequest("PATCH", `/api/franchise-groups/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
       toast({ title: t('franchise.groupUpdatedSuccess', 'Franchise group updated successfully') });
@@ -222,7 +222,7 @@ export default function FranchiseManagement() {
   });
 
   const deleteGroupMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/franchise-groups/${id}`, "DELETE"),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/franchise-groups/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-groups"] });
       toast({ title: t('franchise.groupDeletedSuccess', 'Franchise group deleted successfully') });
@@ -233,7 +233,7 @@ export default function FranchiseManagement() {
   });
 
   const createContractMutation = useMutation({
-    mutationFn: (data: InsertFranchiseContract) => apiRequest("/api/franchise-contracts", "POST", data),
+    mutationFn: (data: InsertFranchiseContract) => apiRequest("POST", "/api/franchise-contracts", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
       toast({ title: t('franchise.contractCreatedSuccess', 'Franchise contract created successfully') });
@@ -246,7 +246,7 @@ export default function FranchiseManagement() {
   });
 
   const updateContractMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseContract> }) => apiRequest(`/api/franchise-contracts/${id}`, "PATCH", data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<InsertFranchiseContract> }) => apiRequest("PATCH", `/api/franchise-contracts/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/franchise-contracts"] });
       toast({ title: t('franchise.contractUpdatedSuccess', 'Franchise contract updated successfully') });
@@ -260,7 +260,7 @@ export default function FranchiseManagement() {
   });
 
   const createKpiMutation = useMutation({
-    mutationFn: (data: InsertFranchiseKpi) => apiRequest("/api/franchise-kpis", "POST", data),
+    mutationFn: (data: InsertFranchiseKpi) => apiRequest("POST", "/api/franchise-kpis", data),
     onSuccess: () => {
       toast({ title: t('franchise.kpiCreatedSuccess', 'Franchise KPI created successfully') });
       setShowKpiDialog(false);
@@ -272,7 +272,7 @@ export default function FranchiseManagement() {
   });
 
   const createRuleMutation = useMutation({
-    mutationFn: (data: InsertRevenueSharingRule) => apiRequest("/api/revenue-sharing-rules", "POST", data),
+    mutationFn: (data: InsertRevenueSharingRule) => apiRequest("POST", "/api/revenue-sharing-rules", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/revenue-sharing-rules"] });
       toast({ title: t('franchise.ruleCreatedSuccess', 'Revenue sharing rule created successfully') });

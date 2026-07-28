@@ -771,6 +771,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Garage-scoped user directory (id/name/role only) — used by client screens
+  // to map user ids to names. Registered before the :userId profile route.
+  app.get('/api/users', isAuthenticated, async (req: any, res) => {
+    try {
+      const { users: usersTable } = await import("@shared/schema");
+      const gid = req.user?.garageId;
+      const rows = await db
+        .select({
+          id: usersTable.id,
+          fullName: usersTable.fullName,
+          firstName: usersTable.firstName,
+          lastName: usersTable.lastName,
+          email: usersTable.email,
+          role: usersTable.role,
+          userType: usersTable.userType,
+          garageId: usersTable.garageId,
+          isActive: usersTable.isActive,
+        })
+        .from(usersTable)
+        .where(gid ? eq(usersTable.garageId, gid) : undefined);
+      res.json(rows);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Technician profile list, scoped to the caller's garage via the owning user.
+  app.get('/api/technician-profiles', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianProfiles, users: usersTable } = await import("@shared/schema");
+      const gid = req.user?.garageId;
+      const rows = gid
+        ? await db
+            .select()
+            .from(technicianProfiles)
+            .where(sql`EXISTS (SELECT 1 FROM ${usersTable} WHERE ${usersTable.id} = ${technicianProfiles.userId} AND ${usersTable.garageId} = ${gid})`)
+        : await db.select().from(technicianProfiles);
+      res.json(rows);
+    } catch (error) {
+      console.error("Error fetching technician profiles:", error);
+      res.status(500).json({ message: "Failed to fetch technician profiles" });
+    }
+  });
+
   // Technician Profile routes
   app.get('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
     try {
@@ -3801,20 +3846,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const items = await storage.getEstimateItems(id);
       
-      // Create job card from estimate
+      // Create job card from estimate. job_cards requires jobNumber,
+      // vehicleInfo, serviceType and createdBy (all NOT NULL, no default) —
+      // omitting them made every conversion fail with a constraint violation.
       const jobCardData = {
+        jobNumber: `JC-${Date.now()}`,
         garageId: estimate.garageId,
         customerId: estimate.customerId,
         vehicleId: estimate.vehicleId,
-        title: estimate.title,
-        description: estimate.description || "",
+        vehicleInfo: (estimate as any).vehicleInfo ?? {},
+        serviceType: "repair",
+        description: [estimate.title, estimate.description].filter(Boolean).join(" — ") || "Converted from estimate",
         status: "pending" as const,
         priority: "medium" as const,
         estimatedCost: estimate.totalAmount,
         actualCost: "0.00",
+        createdBy: userId,
       };
       
-      const jobCard = await storage.createJobCard(jobCardData);
+      const jobCard = await storage.createJobCard(jobCardData as any);
       
       // Create task assignments from estimate items
       for (const item of items) {
@@ -8205,11 +8255,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
               results.imported++;
               break;
             case 'spareParts':
-              await storage.createSparePart({ ...item, garageId });
+              // spare_parts is a global catalogue (no garage_id column) and
+              // requires createdBy; without a stock row the imported part is
+              // invisible to garage-scoped listings, so create one.
+              {
+                const part = await storage.createSparePart({ ...item, createdBy: item.createdBy || userId });
+                await storage.createSparePartInventory({
+                  sparePartId: (part as any).id,
+                  garageId,
+                  stockQuantity: Number(item.stockQuantity ?? item.quantity ?? 0),
+                } as any);
+              }
               results.imported++;
               break;
             case 'jobCards':
-              await storage.createJobCard({ ...item, garageId });
+              // job_cards requires jobNumber/createdBy (NOT NULL, no default).
+              await storage.createJobCard({
+                jobNumber: item.jobNumber || `JC-${Date.now()}-${results.imported}`,
+                serviceType: item.serviceType || 'repair',
+                vehicleInfo: item.vehicleInfo ?? {},
+                createdBy: item.createdBy || userId,
+                ...item,
+                garageId,
+              });
               results.imported++;
               break;
             case 'invoices':
@@ -14597,6 +14665,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Time Clock & Payroll
+  app.get('/api/timeclock/entries', isAuthenticated, async (req: any, res) => {
+    try {
+      const entries = await phase5Service.getTimeClockEntriesByEmployee(req.user.id);
+      res.json({ data: entries });
+    } catch (error) {
+      console.error("Error fetching time clock entries:", error);
+      res.status(500).json({ message: "Failed to fetch time clock entries" });
+    }
+  });
+
   app.post('/api/timeclock/clock-in', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';

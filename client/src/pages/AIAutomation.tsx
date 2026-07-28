@@ -74,7 +74,7 @@ export default function AIAutomation() {
 
   const estimateJobMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/estimate-job', 'POST', data);
+      return await apiRequest('POST', '/api/ai/estimate-job', data);
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/job-estimations'] });
@@ -100,7 +100,7 @@ export default function AIAutomation() {
 
   const predictMaintenanceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/predict-maintenance', 'POST', data);
+      return await apiRequest('POST', '/api/ai/predict-maintenance', data);
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });
@@ -126,7 +126,7 @@ export default function AIAutomation() {
 
   const recommendPartsMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/recommend-parts', 'POST', data);
+      return await apiRequest('POST', '/api/ai/recommend-parts', data);
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/parts-recommendations'] });
@@ -152,7 +152,7 @@ export default function AIAutomation() {
 
   const optimizeScheduleMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/ai/optimize-schedule', 'POST', { appointments: [], technicians: [] });
+      return await apiRequest('POST', '/api/ai/optimize-schedule', { appointments: [], technicians: [] });
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/schedule-optimizations'] });
@@ -177,7 +177,7 @@ export default function AIAutomation() {
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; conversationId?: string }) => {
-      return await apiRequest('/api/ai/chat', 'POST', data);
+      return await apiRequest('POST', '/api/ai/chat', data);
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/chat-conversations'] });
@@ -201,7 +201,7 @@ export default function AIAutomation() {
 
   const acknowledgePredictionMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/ai/maintenance-predictions/${id}/acknowledge`, 'POST', {});
+      return await apiRequest('POST', `/api/ai/maintenance-predictions/${id}/acknowledge`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });

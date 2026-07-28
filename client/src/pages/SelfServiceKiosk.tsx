@@ -164,7 +164,7 @@ export default function SelfServiceKiosk() {
   });
 
   const statusQuery = useQuery<{ success: boolean; ticket: KioskTicket; message: string }>({
-    queryKey: ["/api/kiosk/status", statusTicketId],
+    queryKey: [`/api/kiosk/status/${statusTicketId}`],
     enabled: screen === "status-check" && statusTicketId.length > 0,
     refetchInterval: screen === "status-check" ? 10000 : false,
   });

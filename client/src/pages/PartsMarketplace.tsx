@@ -25,7 +25,7 @@ export default function PartsMarketplace() {
 
   const createOrder = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/marketplace/orders", "POST", data);
+      return await apiRequest("POST", "/api/marketplace/orders", data);
     },
     onSuccess: () => {
       toast({ title: t('inventory.orderPlaced', 'Order placed'), description: t('inventory.partsOrderSubmitted', 'Your parts order has been submitted.') });
