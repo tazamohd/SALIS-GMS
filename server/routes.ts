@@ -745,6 +745,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Technician routes
+  // Job cards assigned to a technician. A technician may only read their own;
+  // managers may read any technician in their garage.
+  app.get('/api/technicians/:id/job-cards', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const role = String(req.user?.role || '').toUpperCase();
+      const isSelf = req.user?.id === id;
+      const isManager = ['ADMIN', 'MANAGER', 'PLATFORM_ADMIN'].includes(role);
+      if (!isSelf && !isManager) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const jobCards = await storage.getJobCards(req.user?.garageId, id);
+      res.json(jobCards);
+    } catch (error) {
+      console.error("Error fetching technician job cards:", error);
+      res.status(500).json({ message: "Failed to fetch job cards" });
+    }
+  });
+
+  // Time-clock entries for a technician (own entries; managers any in garage).
+  app.get('/api/technicians/:id/time-clock', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const role = String(req.user?.role || '').toUpperCase();
+      const isSelf = req.user?.id === id;
+      const isManager = ['ADMIN', 'MANAGER', 'PLATFORM_ADMIN'].includes(role);
+      if (!isSelf && !isManager) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const entries = await phase5Service.getTimeClockEntriesByEmployee(id);
+      res.json(entries);
+    } catch (error) {
+      console.error("Error fetching technician time clock:", error);
+      res.status(500).json({ message: "Failed to fetch time clock" });
+    }
+  });
+
   app.post('/api/technicians', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       // Strip client-controlled privilege/tenant fields; a technician must not

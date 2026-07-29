@@ -35,6 +35,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
 
   const { data: results, isLoading } = useQuery<SearchResults>({
     queryKey: ['/api/global-search', { garageId, query }],
+    queryFn: () => fetch(`/api/global-search?query=${encodeURIComponent(query)}`, { credentials: 'include' }).then((r) => r.json()),
     enabled: open && query.length >= 2,
   });
 

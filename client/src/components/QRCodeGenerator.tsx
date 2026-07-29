@@ -31,13 +31,13 @@ export function QRCodeGenerator({
     setIsGenerating(true);
 
     try {
-      const qrCode = await apiRequest('POST', '/api/qr-codes/generate', {
+      const qrCode = await (await apiRequest('POST', '/api/qr-codes/generate', {
         appointmentId,
         customerId,
         vehicleId,
         tokenType,
         expiresInHours,
-      });
+      })).json();
 
       setGeneratedQR(qrCode);
       

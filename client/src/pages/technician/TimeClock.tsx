@@ -13,6 +13,7 @@ export default function TechnicianTimeClock() {
 
   const { data: timeEntries } = useQuery<any[]>({
     queryKey: ["/api/technicians", user?.id, "time-clock"],
+    queryFn: () => fetch(`/api/technicians/${user!.id}/time-clock`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!user?.id,
   });
 

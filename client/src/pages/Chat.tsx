@@ -155,11 +155,13 @@ export default function Chat() {
 
   const { data: messages = [] } = useQuery<ChatMessage[]>({
     queryKey: ['/api/chat/conversations', selectedConversationId, 'messages'],
+    queryFn: () => fetch(`/api/chat/conversations/${selectedConversationId}/messages`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!selectedConversationId,
   });
 
   const { data: participants = [] } = useQuery<ChatParticipant[]>({
     queryKey: ['/api/chat/conversations', selectedConversationId, 'participants'],
+    queryFn: () => fetch(`/api/chat/conversations/${selectedConversationId}/participants`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!selectedConversationId,
   });
 

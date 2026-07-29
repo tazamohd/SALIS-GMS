@@ -36,9 +36,9 @@ export function QRScanner({
     setScanResult(null);
 
     try {
-      const result: any = await apiRequest('POST', '/api/qr-codes/scan', {
+      const result: any = await (await apiRequest('POST', '/api/qr-codes/scan', {
         qrCodeData: qrCodeData.trim(),
-      });
+      })).json();
 
       setScanResult(result);
 

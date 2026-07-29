@@ -20,6 +20,7 @@ export default function TechnicianDashboard() {
 
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: ["/api/technicians", user?.id, "job-cards"],
+    queryFn: () => fetch(`/api/technicians/${user!.id}/job-cards`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!user?.id,
   });
 
