@@ -19,6 +19,9 @@ env:
   # Keep npm ci from fetching browser binaries (Puppeteer/Playwright) in CI.
   PUPPETEER_SKIP_DOWNLOAD: "true"
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+  # CI-only dummy secret so server/config.ts's env validation passes during
+  # migrate/build. NOT a real credential and never used against real data.
+  SESSION_SECRET: "ci-only-dummy-session-secret-not-a-real-value-0000"
 
 jobs:
   build-and-test:
