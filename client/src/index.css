@@ -689,14 +689,20 @@
   }
   
   @keyframes slideUp {
-    from { 
+    from {
       opacity: 0;
       transform: translateY(10px);
     }
-    to { 
+    to {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Language selection first-run entrance (design: LanguageSelection.dc.html) */
+  @keyframes fadeUp {
+    from { transform: translateY(12px); }
+    to   { transform: none; }
   }
   
   /* Mobile-First Responsive Breakpoints */

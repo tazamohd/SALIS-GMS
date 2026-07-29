@@ -47,6 +47,7 @@ import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
+import LanguageSelection from "@/pages/LanguageSelection";
 import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
@@ -296,11 +297,22 @@ function Router() {
   if (!isAuthenticated) {
     return (
       <Switch>
+        <Route path="/language" component={LanguageSelection} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/track/:token" component={PublicTracking} />
         <Route path="/customer-portal" component={CustomerPortal} />
-        <Route component={Login} />
+        {/* First-run: unrecognized paths show language selection until the
+            visitor has been through it once, then default to Login. */}
+        <Route>
+          {() =>
+            localStorage.getItem("salis-onboarding-done") ? (
+              <Login />
+            ) : (
+              <Redirect to="/language" />
+            )
+          }
+        </Route>
       </Switch>
     );
   }
