@@ -93,9 +93,8 @@ jobs:
         run: npm run db:migrate
 
   security-audit:
-    name: dependency CVE audit (advisory)
+    name: dependency CVE audit (blocking on critical)
     runs-on: ubuntu-latest
-    continue-on-error: true # advisory until `npm audit fix` clears the criticals
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -103,9 +102,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Report production CVEs. Once fixed, tighten --audit-level to `critical`
-      # and drop continue-on-error to make this a hard gate.
-      - name: npm audit (production)
+      # HARD GATE: fail the build on any production critical CVE. The critical
+      # backlog (jspdf/jspdf-autotable/basic-ftp) has been cleared, so this is
+      # now a real merge gate — a new critical prod dependency breaks CI.
+      - name: npm audit (production, blocking on critical)
+        run: npm audit --omit=dev --audit-level=critical
+      # Full production report + ruflo scans stay advisory (high/moderate
+      # backlog is still being worked down) — informational, never blocking.
+      - name: npm audit full report (advisory)
         run: npm audit --omit=dev || true
       - name: ruflo security scan (secrets + CVE + AIDefence)
         run: |
