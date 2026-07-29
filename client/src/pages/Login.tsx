@@ -149,6 +149,15 @@ export default function Login() {
               >
                 {loginMutation.isPending ? t('auth.signingIn', 'Signing in...') : t('auth.signIn', 'Sign In')}
               </Button>
+              <p className="text-center pt-1">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-poppins text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline"
+                  data-testid="link-forgot-password"
+                >
+                  {t('auth.forgotPassword', 'Forgot password?')}
+                </Link>
+              </p>
               <p className="text-center text-sm font-poppins text-[#64748B] dark:text-[#9BA4B0] pt-2">
                 {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
                 <Link 

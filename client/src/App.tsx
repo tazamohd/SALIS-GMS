@@ -48,6 +48,9 @@ import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
 import LanguageSelection from "@/pages/LanguageSelection";
+import RegionSelection from "@/pages/RegionSelection";
+import ForgotPassword from "@/pages/ForgotPassword";
+import OTPVerification from "@/pages/OTPVerification";
 import PublicTracking from "@/pages/PublicTracking";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
@@ -298,6 +301,9 @@ function Router() {
     return (
       <Switch>
         <Route path="/language" component={LanguageSelection} />
+        <Route path="/region" component={RegionSelection} />
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/otp" component={OTPVerification} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/track/:token" component={PublicTracking} />

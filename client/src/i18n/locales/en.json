@@ -2551,5 +2551,32 @@
     "stayDesc": "Turn on notifications to receive news, appointment reminders and job updates.",
     "enable": "Enable notifications",
     "later": "You can change this later in Settings."
+  },
+  "regionSelection": {
+    "selectRegion": "Select your region",
+    "continue": "Continue",
+    "cities": {
+      "Riyadh": "Riyadh",
+      "Jeddah": "Jeddah",
+      "Dammam": "Dammam",
+      "Makkah": "Makkah",
+      "Madinah": "Madinah"
+    }
+  },
+  "forgotPassword": {
+    "reset": "Reset Password",
+    "willSend": "We'll send a reset link to your email",
+    "email": "Email",
+    "sendLink": "Send Reset Link",
+    "backToSignIn": "Back to Sign In",
+    "checkEmail": "Check your email",
+    "sentDesc": "We sent a password reset link to your email address"
+  },
+  "otpVerification": {
+    "title": "OTP Verification",
+    "desc": "Enter the 6-digit code sent to",
+    "verify": "Verify",
+    "noCode": "Didn't receive a code?",
+    "resend": "Resend Code"
   }
 }

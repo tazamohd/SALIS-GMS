@@ -18,7 +18,6 @@ import { supportedLanguages } from "@/i18n/config";
 // (see i18n/config.ts and LanguageSwitcher.tsx); the others are local prefs.
 const LANG_KEY = "preferred-language";
 const NOTIF_KEY = "notifications-opt-in";
-const ONBOARDING_KEY = "salis-onboarding-done";
 
 export default function LanguageSelection() {
   const { t, i18n } = useTranslation();
@@ -46,8 +45,8 @@ export default function LanguageSelection() {
   };
 
   const handleContinue = () => {
-    localStorage.setItem(ONBOARDING_KEY, "1");
-    setLocation("/login");
+    // Next onboarding step is region selection, which finalizes onboarding.
+    setLocation("/region");
   };
 
   // Keep local selection in sync if the language changes elsewhere.
