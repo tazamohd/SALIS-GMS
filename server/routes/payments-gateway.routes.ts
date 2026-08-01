@@ -24,6 +24,7 @@ import {
   getProviderForMethod,
 } from '../services/payments/registry';
 import type { GatewayId, PaymentMethodType } from '../services/payments/types';
+import { verifyGatewayWebhook } from '../services/payments/webhook-verify';
 import { logger } from '../logger';
 
 const router = Router();
@@ -140,6 +141,17 @@ router.post('/payments/webhook/:gateway', async (req: any, res) => {
   const gateway = req.params.gateway as GatewayId;
   const provider = getProviderById(gateway);
   if (!provider) return res.status(404).json({ message: 'Unknown gateway' });
+
+  // SECURITY (deep-audit blocker B8): fail-closed signature verification. The
+  // webhook is public (server-to-server), so a forged 'completed' event must be
+  // rejected. Never settle an invoice from an unverified/unverifiable callback.
+  const rawForVerify = req.rawBody || JSON.stringify(req.body || {});
+  const verified = verifyGatewayWebhook(gateway, { headers: req.headers, rawBody: rawForVerify });
+  if (!verified.ok) {
+    logger.warn('payment webhook rejected (unverified signature)', { gateway, reason: verified.reason });
+    // 200 so the gateway stops retrying, but we do NOT settle anything.
+    return res.status(200).json({ received: true, verified: false });
+  }
 
   try {
     const result = await provider.handleWebhook({
