@@ -6,7 +6,7 @@ import fs from "fs";
 import { setupAuth } from "../auth";
 import { loadUserPermissions } from "../rbac-middleware";
 import { requireAuthByDefault } from "../middleware/defaultAuth";
-import { enforceGarageScopeOnQuery } from "../middleware/garageScope";
+import { enforceGarageScopeOnQuery, enforceTenantOnBody } from "../middleware/garageScope";
 import { generateCsrfToken, csrfTokenRoute } from "../middleware/csrf";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
@@ -167,6 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/csrf-token", csrfTokenRoute);
   app.use(requireAuthByDefault);
   app.use(enforceGarageScopeOnQuery);
+  app.use(enforceTenantOnBody);
   console.log("✅ Security floor mounted (default-deny auth + tenant scope + CSRF token)");
 
   // Wire RBAC: load user permissions on every authenticated request

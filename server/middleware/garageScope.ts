@@ -62,3 +62,50 @@ export function enforceGarageScopeOnQuery(req: Request, _res: Response, next: Ne
   }
   next();
 }
+
+const MUTATING = new Set(["POST", "PUT", "PATCH"]);
+
+/**
+ * Defense-in-depth against the systemic mass-assignment class (deep-audit
+ * blocker B12): ordinary staff must never set a write's tenant from the request
+ * body. Applied to every mutating /api request BEFORE any handler validates
+ * req.body, so a create handler that spreads the parsed body picks up the
+ * session garage automatically — no per-handler edits needed.
+ *
+ *  - POST (create): pin body.garageId / garage_id to the caller's session garage
+ *    so a new row always belongs to the creator's tenant (a forged victim id is
+ *    overwritten). Bodies for entities without a garageId column simply carry an
+ *    extra field that their insert schema strips.
+ *  - PUT/PATCH (update): STRIP body.garageId / garage_id entirely — a row's
+ *    tenant can never be reassigned via an update (which would otherwise let an
+ *    unscoped update "steal" a row into the caller's garage).
+ *
+ * Exemptions (left untouched): PLATFORM_ADMIN / SUPER_ADMIN (legitimately act
+ * across garages), CUSTOMER (their writes scope by customerId), and any caller
+ * with no session garageId (nothing to pin to). Non-object bodies are ignored.
+ */
+export function enforceTenantOnBody(req: Request, _res: Response, next: NextFunction): void {
+  const user = (req as any).user || {};
+  const role = String(user.role || "").toUpperCase();
+  const isCustomer = user.userType === "customer" || role === "CUSTOMER";
+  const body = req.body;
+
+  if (
+    MUTATING.has(req.method) &&
+    !CROSS_GARAGE_ROLES.has(role) &&
+    !isCustomer &&
+    user.garageId &&
+    body &&
+    typeof body === "object" &&
+    !Array.isArray(body)
+  ) {
+    if (req.method === "POST") {
+      body.garageId = user.garageId;
+      if ("garage_id" in body) body.garage_id = user.garageId;
+    } else {
+      delete body.garageId;
+      delete body.garage_id;
+    }
+  }
+  next();
+}
