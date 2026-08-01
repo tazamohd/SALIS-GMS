@@ -1296,7 +1296,15 @@ export const payments = pgTable("payments", {
   processingFee: decimal("processing_fee", { precision: 10, scale: 2 }),
   failureReason: text("failure_reason"),
   gatewayMetadata: jsonb("gateway_metadata"),
-});
+}, (table) => ({
+  // Exactly-once gateway settlement (deep-audit blocker B9): a duplicate
+  // (gateway, gateway_transaction_id) is impossible, so a retried webhook cannot
+  // double-credit an invoice. Partial so the many manual/pending rows that carry
+  // a NULL transaction id are unaffected. Mirrors migration 0011.
+  gatewayTxnUnique: uniqueIndex("payments_gateway_txn_unique")
+    .on(table.gateway, table.gatewayTransactionId)
+    .where(sql`${table.gatewayTransactionId} IS NOT NULL`),
+}));
 
 // Module 21: Notifications & Communication
 export const notifications = pgTable("notifications", {

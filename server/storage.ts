@@ -4194,6 +4194,89 @@ export class DatabaseStorage implements IStorage {
   }
 
   /**
+   * Exactly-once gateway settlement (deep-audit blocker B9). Runs in one
+   * transaction with the invoice locked FOR UPDATE, so concurrent webhook
+   * retries serialize: the first settles, the rest observe the completed payment
+   * and no-op. The partial unique index payments_gateway_txn_unique is the
+   * database-level backstop — a duplicate (gateway, gateway_transaction_id) that
+   * slips past the lock raises 23505 and is treated as already-processed. Used
+   * by both the webhook path and the manual settle (transactionId undefined).
+   */
+  async settleGatewayPayment(opts: {
+    invoiceId: string;
+    amount?: number;
+    currency?: string;
+    gateway: string;
+    methodType?: string;
+    transactionId?: string;
+    createdBy?: string;
+  }): Promise<{ settled: boolean; alreadyProcessed: boolean }> {
+    const { payments, invoices } = await import("@shared/schema");
+    return await db.transaction(async (tx) => {
+      const [invoice] = await tx.select().from(invoices).where(eq(invoices.id, opts.invoiceId)).for("update");
+      if (!invoice) return { settled: false, alreadyProcessed: false };
+
+      const amount = opts.amount ?? Number((invoice as any).balanceAmount ?? (invoice as any).totalAmount ?? 0);
+
+      const applySettle = async () => {
+        const prevPaid = parseFloat(invoice.paidAmount || "0");
+        const total = parseFloat(invoice.totalAmount || "0");
+        const newPaid = prevPaid + Number(amount);
+        const balance = Math.max(total - newPaid, 0);
+        await tx
+          .update(invoices)
+          .set({
+            paidAmount: newPaid.toFixed(2),
+            balanceAmount: balance.toFixed(2),
+            status: balance <= 0 ? "paid" : invoice.status,
+            paidAt: balance <= 0 ? new Date() : invoice.paidAt,
+            updatedAt: new Date(),
+          })
+          .where(eq(invoices.id, invoice.id));
+      };
+
+      if (opts.transactionId) {
+        const existing = await tx
+          .select()
+          .from(payments)
+          .where(and(eq(payments.gateway, opts.gateway as any), eq(payments.gatewayTransactionId, opts.transactionId)));
+        if (existing.some((p) => p.status === "completed")) {
+          return { settled: false, alreadyProcessed: true };
+        }
+        const pending = existing.find((p) => p.status === "pending");
+        if (pending) {
+          await tx.update(payments).set({ status: "completed", paymentDate: new Date() }).where(eq(payments.id, pending.id));
+          await applySettle();
+          return { settled: true, alreadyProcessed: false };
+        }
+      }
+
+      try {
+        // Savepoint so a unique-index violation doesn't poison the outer txn.
+        await tx.transaction(async (sp) => {
+          await sp.insert(payments).values({
+            invoiceId: opts.invoiceId,
+            amount: Number(amount).toFixed(2),
+            paymentMethod: opts.methodType || "card",
+            gateway: opts.gateway,
+            methodType: opts.methodType || null,
+            status: "completed",
+            currency: opts.currency || "SAR",
+            gatewayTransactionId: opts.transactionId || null,
+            createdBy: opts.createdBy || (invoice as any).createdBy || null,
+          } as any);
+        });
+      } catch (e: any) {
+        if (String(e?.code) === "23505") return { settled: false, alreadyProcessed: true };
+        throw e;
+      }
+
+      await applySettle();
+      return { settled: true, alreadyProcessed: false };
+    });
+  }
+
+  /**
    * Atomically reverse (delete) a payment and restore the invoice balance
    * (deep-audit blocker B7). Both the payment and its invoice are locked FOR
    * UPDATE. `garageId`, when provided, scopes the reversal to the caller's
