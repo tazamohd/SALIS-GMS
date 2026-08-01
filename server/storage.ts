@@ -3032,18 +3032,21 @@ export class DatabaseStorage implements IStorage {
     return supplier;
   }
 
-  async updateSupplier(id: string, data: Partial<Supplier>): Promise<Supplier> {
+  // `garageId`, when provided, scopes the write to the caller's tenant so an
+  // authenticated user cannot update/delete another garage's supplier by id
+  // (deep-audit blocker B4). Existing 2-arg callers are unaffected.
+  async updateSupplier(id: string, data: Partial<Supplier>, garageId?: string): Promise<Supplier> {
     const [supplier] = await db.update(suppliers)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(suppliers.id, id))
+      .where(and(eq(suppliers.id, id), garageId ? eq(suppliers.garageId, garageId) : undefined))
       .returning();
     return supplier;
   }
 
-  async deleteSupplier(id: string): Promise<void> {
+  async deleteSupplier(id: string, garageId?: string): Promise<void> {
     await db.update(suppliers)
       .set({ isActive: false })
-      .where(eq(suppliers.id, id));
+      .where(and(eq(suppliers.id, id), garageId ? eq(suppliers.garageId, garageId) : undefined));
   }
 
   async getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]> {
@@ -4075,18 +4078,20 @@ export class DatabaseStorage implements IStorage {
     return invoice;
   }
 
-  async updateInvoice(id: string, data: Partial<Invoice>): Promise<Invoice> {
+  // `garageId`, when provided, scopes the write to the caller's tenant (B4).
+  async updateInvoice(id: string, data: Partial<Invoice>, garageId?: string): Promise<Invoice> {
     const { invoices } = await import("@shared/schema");
     const [invoice] = await db.update(invoices)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(invoices.id, id))
+      .where(and(eq(invoices.id, id), garageId ? eq(invoices.garageId, garageId) : undefined))
       .returning();
     return invoice;
   }
 
-  async deleteInvoice(id: string): Promise<void> {
+  async deleteInvoice(id: string, garageId?: string): Promise<void> {
     const { invoices } = await import("@shared/schema");
-    await db.delete(invoices).where(eq(invoices.id, id));
+    await db.delete(invoices)
+      .where(and(eq(invoices.id, id), garageId ? eq(invoices.garageId, garageId) : undefined));
   }
 
   async getInvoiceItems(invoiceId: string): Promise<InvoiceItem[]> {
@@ -4182,16 +4187,18 @@ export class DatabaseStorage implements IStorage {
     return estimate;
   }
 
-  async updateEstimate(id: string, data: Partial<Estimate>): Promise<Estimate> {
+  // `garageId`, when provided, scopes the write to the caller's tenant (B4).
+  async updateEstimate(id: string, data: Partial<Estimate>, garageId?: string): Promise<Estimate> {
     const [estimate] = await db.update(estimates)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(estimates.id, id))
+      .where(and(eq(estimates.id, id), garageId ? eq(estimates.garageId, garageId) : undefined))
       .returning();
     return estimate;
   }
 
-  async deleteEstimate(id: string): Promise<void> {
-    await db.delete(estimates).where(eq(estimates.id, id));
+  async deleteEstimate(id: string, garageId?: string): Promise<void> {
+    await db.delete(estimates)
+      .where(and(eq(estimates.id, id), garageId ? eq(estimates.garageId, garageId) : undefined));
   }
 
   async getEstimateItems(estimateId: string): Promise<EstimateItem[]> {

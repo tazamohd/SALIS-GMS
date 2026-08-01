@@ -2022,7 +2022,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const supplier = await storage.createSupplier(validationResult.data);
+      // Pin the tenant to the session garage — never trust a body garageId
+      // (mass-assignment blocker B12). Falls back to the validated value only
+      // for garage-less platform admins.
+      const sessGarage = (req as any).user?.garageId;
+      const supplier = await storage.createSupplier({
+        ...validationResult.data,
+        garageId: sessGarage ?? (validationResult.data as any).garageId,
+      } as any);
       res.status(201).json(supplier);
     } catch (error) {
       console.error("Error creating supplier:", error);
@@ -2043,7 +2050,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const supplier = await storage.updateSupplier(id, validationResult.data);
+      const supplier = await storage.updateSupplier(id, validationResult.data, (req as any).user?.garageId);
+      if (!supplier) return res.status(404).json({ message: "Supplier not found" });
       res.json(supplier);
     } catch (error) {
       console.error("Error updating supplier:", error);
@@ -2054,7 +2062,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/suppliers/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplier(id);
+      await storage.deleteSupplier(id, (req as any).user?.garageId);
       res.json({ message: "Supplier deleted successfully" });
     } catch (error) {
       console.error("Error deleting supplier:", error);
@@ -3429,11 +3437,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Pin the tenant to the session garage — never trust a body garageId (B12).
       const invoiceData = {
         ...validationResult.data,
         createdBy: userId,
+        garageId: req.user?.garageId ?? (validationResult.data as any).garageId,
       };
-      
+
       const invoice = await storage.createInvoice(invoiceData as any);
       res.status(201).json(invoice);
     } catch (error) {
@@ -3704,7 +3714,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const invoice = await storage.updateInvoice(id, validationResult.data);
+      const invoice = await storage.updateInvoice(id, validationResult.data, (req as any).user?.garageId);
+      if (!invoice) return res.status(404).json({ message: "Invoice not found" });
       res.json(invoice);
     } catch (error) {
       console.error("Error updating invoice:", error);
@@ -3715,7 +3726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/invoices/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteInvoice(id);
+      await storage.deleteInvoice(id, (req as any).user?.garageId);
       res.json({ message: "Invoice deleted successfully" });
     } catch (error) {
       console.error("Error deleting invoice:", error);
@@ -3936,7 +3947,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const estimate = await storage.updateEstimate(id, validationResult.data);
+      const estimate = await storage.updateEstimate(id, validationResult.data, (req as any).user?.garageId);
+      if (!estimate) return res.status(404).json({ message: "Estimate not found" });
       res.json(estimate);
     } catch (error) {
       console.error("Error updating estimate:", error);
@@ -3947,7 +3959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/estimates/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteEstimate(id);
+      await storage.deleteEstimate(id, (req as any).user?.garageId);
       res.json({ message: "Estimate deleted successfully" });
     } catch (error) {
       console.error("Error deleting estimate:", error);
