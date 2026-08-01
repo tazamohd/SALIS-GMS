@@ -996,16 +996,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get all parts associated with this job card
             const jobParts = await tx.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, id));
             
-            // First pass: verify sufficient stock for all parts
+            // First pass: verify sufficient stock for all parts.
+            // FOR UPDATE locks each inventory row for the life of the transaction
+            // (deep-audit blocker B14): two concurrent completions can no longer
+            // both read the same stock, both pass, and both decrement into the
+            // negative — the second blocks here, then re-reads the decremented
+            // stock and fails the check.
             for (const part of jobParts) {
               if (!part.isDeducted && part.sparePartInventoryId) {
                 const [inventory] = await tx.select().from(sparePartInventories)
-                  .where(eq(sparePartInventories.id, part.sparePartInventoryId));
-                
+                  .where(eq(sparePartInventories.id, part.sparePartInventoryId))
+                  .for('update');
+
                 if (!inventory) {
                   throw new Error(`Inventory record not found for part ID: ${part.sparePartId}`);
                 }
-                
+
                 const currentStock = inventory.stockQuantity || 0;
                 if (currentStock < part.quantity) {
                   throw new Error(`Insufficient stock for part. Available: ${currentStock}, Required: ${part.quantity}`);

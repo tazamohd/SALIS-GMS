@@ -5716,98 +5716,118 @@ export class DatabaseStorage implements IStorage {
     return transfer;
   }
 
+  /**
+   * Complete an inventory transfer atomically and exactly once (deep-audit
+   * blocker B15). Previously this ran source-decrement, dest-increment and the
+   * status update as three separate statements with no transaction, no row
+   * locks and no idempotency guard — so a crash left inventory inconsistent and
+   * calling /complete twice deducted twice. Now everything runs in one
+   * transaction: the transfer row and both inventory rows are locked FOR UPDATE,
+   * an already-completed transfer short-circuits, and the audit entries are part
+   * of the same atomic unit.
+   */
   async completeInventoryTransfer(id: string, userId: string) {
-    const transfer = await this.getInventoryTransfer(id);
-    if (!transfer) throw new Error("Transfer not found");
+    return await db.transaction(async (tx) => {
+      const [transfer] = await tx
+        .select()
+        .from(inventoryTransfers)
+        .where(eq(inventoryTransfers.id, id))
+        .for("update");
+      if (!transfer) throw new Error("Transfer not found");
 
-    // Update source inventory
-    const [sourceInventory] = await db
-      .select()
-      .from(sparePartInventories)
-      .where(
-        and(
-          eq(sparePartInventories.sparePartId, transfer.sparePartId),
-          eq(sparePartInventories.garageId, transfer.fromGarageId)
+      // Idempotency: a second /complete (retry, double-click) is a no-op.
+      if (transfer.transferStatus === "completed") {
+        return transfer;
+      }
+
+      // Source: lock, then decrement with an atomic SQL expression.
+      const [sourceInventory] = await tx
+        .select()
+        .from(sparePartInventories)
+        .where(
+          and(
+            eq(sparePartInventories.sparePartId, transfer.sparePartId),
+            eq(sparePartInventories.garageId, transfer.fromGarageId)
+          )
         )
-      );
+        .for("update");
 
-    if (sourceInventory) {
-      const currentStock = sourceInventory.stockQuantity ?? 0;
-      await db
-        .update(sparePartInventories)
+      if (sourceInventory) {
+        const currentStock = sourceInventory.stockQuantity ?? 0;
+        await tx
+          .update(sparePartInventories)
+          .set({
+            stockQuantity: sql`${sparePartInventories.stockQuantity} - ${transfer.quantity}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(sparePartInventories.id, sourceInventory.id));
+
+        await tx.insert(inventoryAuditTrail).values({
+          sparePartId: transfer.sparePartId,
+          garageId: transfer.fromGarageId,
+          branchId: transfer.fromBranchId,
+          actionType: "transfer",
+          quantityBefore: currentStock,
+          quantityChange: -transfer.quantity,
+          quantityAfter: currentStock - transfer.quantity,
+          referenceType: "transfer",
+          referenceId: transfer.id,
+          reason: `Transfer to ${transfer.toGarageId}`,
+          performedBy: userId,
+        } as any);
+      }
+
+      // Destination: lock, then increment.
+      const [destInventory] = await tx
+        .select()
+        .from(sparePartInventories)
+        .where(
+          and(
+            eq(sparePartInventories.sparePartId, transfer.sparePartId),
+            eq(sparePartInventories.garageId, transfer.toGarageId)
+          )
+        )
+        .for("update");
+
+      if (destInventory) {
+        const currentStock = destInventory.stockQuantity ?? 0;
+        await tx
+          .update(sparePartInventories)
+          .set({
+            stockQuantity: sql`${sparePartInventories.stockQuantity} + ${transfer.quantity}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(sparePartInventories.id, destInventory.id));
+
+        await tx.insert(inventoryAuditTrail).values({
+          sparePartId: transfer.sparePartId,
+          garageId: transfer.toGarageId,
+          branchId: transfer.toBranchId,
+          actionType: "transfer",
+          quantityBefore: currentStock,
+          quantityChange: transfer.quantity,
+          quantityAfter: currentStock + transfer.quantity,
+          referenceType: "transfer",
+          referenceId: transfer.id,
+          reason: `Transfer from ${transfer.fromGarageId}`,
+          performedBy: userId,
+        } as any);
+      }
+
+      const [updatedTransfer] = await tx
+        .update(inventoryTransfers)
         .set({
-          stockQuantity: currentStock - transfer.quantity,
+          transferStatus: "completed",
+          completedBy: userId,
+          completedAt: new Date(),
+          actualDeliveryDate: new Date(),
           updatedAt: new Date(),
         })
-        .where(eq(sparePartInventories.id, sourceInventory.id));
+        .where(eq(inventoryTransfers.id, id))
+        .returning();
 
-      // Create audit trail for source
-      await this.createAuditTrailEntry({
-        sparePartId: transfer.sparePartId,
-        garageId: transfer.fromGarageId,
-        branchId: transfer.fromBranchId,
-        actionType: "transfer",
-        quantityBefore: currentStock,
-        quantityChange: -transfer.quantity,
-        quantityAfter: currentStock - transfer.quantity,
-        referenceType: "transfer",
-        referenceId: transfer.id,
-        reason: `Transfer to ${transfer.toGarageId}`,
-        performedBy: userId,
-      });
-    }
-
-    // Update destination inventory
-    const [destInventory] = await db
-      .select()
-      .from(sparePartInventories)
-      .where(
-        and(
-          eq(sparePartInventories.sparePartId, transfer.sparePartId),
-          eq(sparePartInventories.garageId, transfer.toGarageId)
-        )
-      );
-
-    if (destInventory) {
-      const currentStock = destInventory.stockQuantity ?? 0;
-      await db
-        .update(sparePartInventories)
-        .set({
-          stockQuantity: currentStock + transfer.quantity,
-          updatedAt: new Date(),
-        })
-        .where(eq(sparePartInventories.id, destInventory.id));
-
-      // Create audit trail for destination
-      await this.createAuditTrailEntry({
-        sparePartId: transfer.sparePartId,
-        garageId: transfer.toGarageId,
-        branchId: transfer.toBranchId,
-        actionType: "transfer",
-        quantityBefore: currentStock,
-        quantityChange: transfer.quantity,
-        quantityAfter: currentStock + transfer.quantity,
-        referenceType: "transfer",
-        referenceId: transfer.id,
-        reason: `Transfer from ${transfer.fromGarageId}`,
-        performedBy: userId,
-      });
-    }
-
-    // Update transfer status
-    const [updatedTransfer] = await db
-      .update(inventoryTransfers)
-      .set({
-        transferStatus: "completed",
-        completedBy: userId,
-        completedAt: new Date(),
-        actualDeliveryDate: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(inventoryTransfers.id, id))
-      .returning();
-
-    return updatedTransfer;
+      return updatedTransfer;
+    });
   }
 
   // TecDoc Integration
