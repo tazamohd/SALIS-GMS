@@ -3814,50 +3814,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validationResult.data,
         createdBy: userId,
       };
-      
-      // Ownership: the target invoice must belong to the caller's garage,
-      // else a user could record a payment against another tenant's invoice.
-      const targetInvoice = await storage.getInvoice(validationResult.data.invoiceId);
-      if (!targetInvoice) {
-        return res.status(404).json({ message: "Invoice not found" });
-      }
-      const sessionGarage = req.user?.garageId;
-      if (sessionGarage && (targetInvoice as any).garageId && (targetInvoice as any).garageId !== sessionGarage) {
+
+      // Atomic: locks the invoice FOR UPDATE, inserts the payment, and updates
+      // the balance in one transaction — scoped to the caller's garage so a
+      // payment cannot target another tenant's invoice (B6). undefined = the
+      // garage-scoped invoice does not exist.
+      const result = await storage.recordPayment(paymentData as any, req.user?.garageId);
+      if (!result) {
         return res.status(404).json({ message: "Invoice not found" });
       }
 
-      const payment = await storage.createPayment(paymentData as any);
-
-      // Update invoice paid amount
-      const invoice = await storage.getInvoice(payment.invoiceId);
-      if (invoice) {
-        const newPaidAmount = parseFloat(invoice.paidAmount) + parseFloat(payment.amount);
-        const balanceAmount = parseFloat(invoice.totalAmount) - newPaidAmount;
-        const newStatus = balanceAmount <= 0 ? 'paid' : invoice.status;
-        
-        await storage.updateInvoice(payment.invoiceId, {
-          paidAmount: newPaidAmount.toFixed(2),
-          balanceAmount: balanceAmount.toFixed(2),
-          status: newStatus,
-          paidAt: balanceAmount <= 0 ? new Date() : invoice.paidAt,
-        });
-      }
-      
-      res.status(201).json(payment);
+      res.status(201).json(result.payment);
     } catch (error) {
       console.error("Error creating payment:", error);
       res.status(500).json({ message: "Failed to create payment" });
     }
   });
 
-  app.delete('/api/payments/:id', isAuthenticated, async (req, res) => {
+  // Reversing a payment moves money — require manager/accountant, scope to the
+  // caller's garage, and restore the invoice balance atomically (B7).
+  app.delete('/api/payments/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePayment(id);
-      res.json({ message: "Payment deleted successfully" });
+      const ok = await storage.reversePayment(id, req.user?.garageId);
+      if (!ok) return res.status(404).json({ message: "Payment not found" });
+      res.json({ message: "Payment reversed successfully" });
     } catch (error) {
-      console.error("Error deleting payment:", error);
-      res.status(500).json({ message: "Failed to delete payment" });
+      console.error("Error reversing payment:", error);
+      res.status(500).json({ message: "Failed to reverse payment" });
     }
   });
 
@@ -8183,7 +8167,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/stripe/refund', isAuthenticated, async (req: any, res) => {
+  // Refunds move real money out — restrict to manager/accountant (B13).
+  app.post('/api/stripe/refund', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
     try {
       const validated = validatePatchBody(req, res, createRefundSchema);
       if (!validated.ok) return;

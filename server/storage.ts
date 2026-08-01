@@ -4153,6 +4153,85 @@ export class DatabaseStorage implements IStorage {
     await db.delete(payments).where(eq(payments.id, id));
   }
 
+  /**
+   * Atomically record a payment and update the invoice balance (deep-audit
+   * blocker B6). The invoice row is locked FOR UPDATE for the life of the
+   * transaction, so concurrent payments serialize and can no longer read a
+   * stale paidAmount and lose money. `garageId`, when provided, scopes the
+   * invoice lookup so a payment cannot be recorded against another tenant's
+   * invoice. Returns undefined when the (garage-scoped) invoice does not exist.
+   */
+  async recordPayment(
+    data: InsertPayment,
+    garageId?: string,
+  ): Promise<{ payment: Payment; invoice: Invoice } | undefined> {
+    const { payments, invoices } = await import("@shared/schema");
+    return await db.transaction(async (tx) => {
+      const [invoice] = await tx
+        .select()
+        .from(invoices)
+        .where(and(eq(invoices.id, data.invoiceId), garageId ? eq(invoices.garageId, garageId) : undefined))
+        .for("update");
+      if (!invoice) return undefined;
+
+      const [payment] = await tx.insert(payments).values(data).returning();
+
+      const newPaid = parseFloat(invoice.paidAmount) + parseFloat(payment.amount);
+      const balance = parseFloat(invoice.totalAmount) - newPaid;
+      const [updated] = await tx
+        .update(invoices)
+        .set({
+          paidAmount: newPaid.toFixed(2),
+          balanceAmount: balance.toFixed(2),
+          status: balance <= 0 ? "paid" : invoice.status,
+          paidAt: balance <= 0 ? new Date() : invoice.paidAt,
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, invoice.id))
+        .returning();
+      return { payment, invoice: updated };
+    });
+  }
+
+  /**
+   * Atomically reverse (delete) a payment and restore the invoice balance
+   * (deep-audit blocker B7). Both the payment and its invoice are locked FOR
+   * UPDATE. `garageId`, when provided, scopes the reversal to the caller's
+   * tenant. Returns false when the payment or its (garage-scoped) invoice is
+   * not found — the caller maps that to 404.
+   */
+  async reversePayment(id: string, garageId?: string): Promise<boolean> {
+    const { payments, invoices } = await import("@shared/schema");
+    return await db.transaction(async (tx) => {
+      const [payment] = await tx.select().from(payments).where(eq(payments.id, id)).for("update");
+      if (!payment) return false;
+
+      const [invoice] = await tx
+        .select()
+        .from(invoices)
+        .where(and(eq(invoices.id, payment.invoiceId), garageId ? eq(invoices.garageId, garageId) : undefined))
+        .for("update");
+      if (!invoice) return false; // cross-tenant or orphaned — refuse
+
+      await tx.delete(payments).where(eq(payments.id, id));
+
+      const newPaid = Math.max(0, parseFloat(invoice.paidAmount) - parseFloat(payment.amount));
+      const balance = parseFloat(invoice.totalAmount) - newPaid;
+      await tx
+        .update(invoices)
+        .set({
+          paidAmount: newPaid.toFixed(2),
+          balanceAmount: balance.toFixed(2),
+          // Reopening: a fully-paid invoice that is no longer covered reverts to 'sent'.
+          status: balance <= 0 ? invoice.status : invoice.status === "paid" ? "sent" : invoice.status,
+          paidAt: balance <= 0 ? invoice.paidAt : null,
+          updatedAt: new Date(),
+        })
+        .where(eq(invoices.id, invoice.id));
+      return true;
+    });
+  }
+
   // Estimates & Quotes - Module 23
   async getEstimates(garageId?: string, status?: string): Promise<Estimate[]> {
     const conditions = [];
