@@ -5,6 +5,9 @@ import path from "path";
 import fs from "fs";
 import { setupAuth } from "../auth";
 import { loadUserPermissions } from "../rbac-middleware";
+import { requireAuthByDefault } from "../middleware/defaultAuth";
+import { enforceGarageScopeOnQuery } from "../middleware/garageScope";
+import { generateCsrfToken, csrfTokenRoute } from "../middleware/csrf";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
@@ -148,6 +151,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // ── Security floor (mounted immediately after auth is available) ──────────
+  // Previously written but never wired in (deep-audit blocker B1). Order:
+  //  1. seed a per-session CSRF token + expose it at /api/csrf-token,
+  //  2. default-deny: any /api route not in the PUBLIC_ROUTES allowlist now
+  //     requires an authenticated session (401 otherwise),
+  //  3. force ?garage_id to the caller's session garage for ordinary staff
+  //     (closes the client-supplied cross-tenant class in one place).
+  // NOTE: CSRF *enforcement* (validateCsrfToken) is intentionally NOT mounted
+  // yet — the client does not send X-CSRF-Token, so enforcing now would 403
+  // every mutation. sameSite=lax remains the active CSRF defense; enforcement
+  // is a coordinated client+server follow-up.
+  app.use(generateCsrfToken);
+  app.get("/api/csrf-token", csrfTokenRoute);
+  app.use(requireAuthByDefault);
+  app.use(enforceGarageScopeOnQuery);
+  console.log("✅ Security floor mounted (default-deny auth + tenant scope + CSRF token)");
 
   // Wire RBAC: load user permissions on every authenticated request
   // This populates req.userPermissions for use by requirePermission() in handlers

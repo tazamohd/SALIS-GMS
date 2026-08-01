@@ -1,13 +1,55 @@
+// Load + validate environment FIRST (dotenv.config lives in ./config). Nothing
+// above this import may read process.env for required vars. This also fixes the
+// audit finding that config.ts (the only dotenv loader) was imported by no boot
+// file, so a .env-based deploy never loaded its variables.
+import "./config";
+
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
 }
 
 import express, { type Request, Response, NextFunction } from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes/index";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeChatWebSocket } from "./websocket";
 
 const app = express();
+
+// Behind a TLS-terminating proxy: trust the first hop so secure cookies work
+// and express-rate-limit reads the real client IP (not the proxy's).
+app.set("trust proxy", 1);
+
+// Security headers (HSTS, X-Frame-Options, noSniff, etc.). CSP is disabled here
+// because the SPA/Vite manage their own asset origins; enabling helmet's default
+// CSP would break the client. HSTS only takes effect over HTTPS.
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// Brute-force / credential-stuffing protection. Strict limiter on the session-
+// creating auth endpoints; generous global limiter as a backstop. Webhooks and
+// non-/api paths are exempt (gateway retries, static assets).
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { message: "Too many attempts, please try again later." },
+});
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !req.path.startsWith("/api") || req.path.includes("/webhook"),
+});
+app.use("/api/login", authLimiter);
+app.use("/api/register", authLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/customer-portal/login", authLimiter);
+app.use(globalLimiter);
 
 // Capture raw body for webhook signature verification (Stripe, etc.)
 // We use the `verify` hook to store the raw Buffer before JSON parsing.

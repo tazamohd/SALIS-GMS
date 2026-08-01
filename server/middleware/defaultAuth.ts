@@ -20,6 +20,14 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   // The walk-in queue, service catalog, and registration endpoints must be
   // reachable anonymously by design.
   /^\/api\/kiosk\/.*/,
+  // Payment/messaging webhooks are server-to-server callbacks with NO user
+  // session — they authenticate via provider signature, not our auth. They
+  // must remain reachable anonymously (default-deny would break settlement
+  // and WhatsApp verification). Each handler is responsible for verifying its
+  // own signature (see the payments/compliance audit).
+  "/api/stripe/webhook",
+  "/api/whatsapp/webhook",
+  /^\/api\/payments\/webhook\/[^/]+$/,
 ];
 
 function isPublicRoute(path: string): boolean {
