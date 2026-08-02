@@ -43,7 +43,7 @@ describe('Supplier read route extraction (Wave J)', () => {
     expect(supplierRoutesSource).toMatch(/const \{ supplierId,\s*sparePartId \} = req\.query/);
     expect(supplierRoutesSource).toMatch(/storage\.getSupplierPriceLists\(\s*supplierId as string \| undefined,\s*sparePartId as string \| undefined,\s*\)/);
     expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/supplier-price-lists\/:id['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/storage\.getSupplierPriceList\(id\)/);
+    expect(supplierRoutesSource).toMatch(/storage\.getSupplierPriceList\(id,/);
     expect(supplierRoutesSource).toMatch(/Price list not found/);
     expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/supplier-price-lists\/compare\/:sparePartId['"],\s*isAuthenticated/);
     expect(supplierRoutesSource).toMatch(/storage\.comparePrices\(sparePartId\)/);

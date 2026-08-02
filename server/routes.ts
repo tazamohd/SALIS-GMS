@@ -2143,7 +2143,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const priceList = await storage.updateSupplierPriceList(id, validationResult.data);
+      const priceList = await storage.updateSupplierPriceList(id, validationResult.data, (req as any).user?.garageId);
+      if (!priceList) return res.status(404).json({ message: "Price list not found" });
       res.json(priceList);
     } catch (error) {
       console.error("Error updating price list:", error);
@@ -2154,7 +2155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPriceList(id);
+      await storage.deleteSupplierPriceList(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Price list deleted successfully" });
     } catch (error) {
       console.error("Error deleting price list:", error);
@@ -2180,7 +2181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const performanceRecord = await storage.getSupplierPerformanceRecord(id);
+      const performanceRecord = await storage.getSupplierPerformanceRecord(id, (req as any).user?.garageId);
       if (!performanceRecord) {
         return res.status(404).json({ message: "Performance record not found" });
       }
@@ -2221,7 +2222,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const performanceRecord = await storage.updateSupplierPerformance(id, validationResult.data);
+      const performanceRecord = await storage.updateSupplierPerformance(id, validationResult.data, (req as any).user?.garageId);
+      if (!performanceRecord) return res.status(404).json({ message: "Performance record not found" });
       res.json(performanceRecord);
     } catch (error) {
       console.error("Error updating performance record:", error);
@@ -2232,7 +2234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPerformance(id);
+      await storage.deleteSupplierPerformance(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Performance record deleted successfully" });
     } catch (error) {
       console.error("Error deleting performance record:", error);

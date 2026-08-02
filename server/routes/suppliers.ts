@@ -59,7 +59,7 @@ router.get('/supplier-price-lists', isAuthenticated, async (req, res) => {
 router.get('/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
   try {
     const { id } = req.params;
-    const priceList = await storage.getSupplierPriceList(id);
+    const priceList = await storage.getSupplierPriceList(id, (req as any).user?.garageId);
     if (!priceList) {
       return res.status(404).json({ message: 'Price list not found' });
     }

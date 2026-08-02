@@ -949,18 +949,18 @@ export interface IStorage {
   
   // Supplier Price List methods - Module 43
   getSupplierPriceLists(supplierId?: string, sparePartId?: string): Promise<SupplierPriceList[]>;
-  getSupplierPriceList(id: string): Promise<SupplierPriceList | undefined>;
+  getSupplierPriceList(id: string, garageId?: string): Promise<SupplierPriceList | undefined>;
   createSupplierPriceList(data: InsertSupplierPriceList): Promise<SupplierPriceList>;
-  updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>): Promise<SupplierPriceList>;
-  deleteSupplierPriceList(id: string): Promise<void>;
+  updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>, garageId?: string): Promise<SupplierPriceList>;
+  deleteSupplierPriceList(id: string, garageId?: string): Promise<void>;
   comparePrices(sparePartId: string): Promise<SupplierPriceList[]>;
   
   // Supplier Performance methods - Module 43
   getSupplierPerformance(supplierId?: string, period?: string): Promise<SupplierPerformance[]>;
-  getSupplierPerformanceRecord(id: string): Promise<SupplierPerformance | undefined>;
+  getSupplierPerformanceRecord(id: string, garageId?: string): Promise<SupplierPerformance | undefined>;
   createSupplierPerformance(data: InsertSupplierPerformance): Promise<SupplierPerformance>;
-  updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>): Promise<SupplierPerformance>;
-  deleteSupplierPerformance(id: string): Promise<void>;
+  updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>, garageId?: string): Promise<SupplierPerformance>;
+  deleteSupplierPerformance(id: string, garageId?: string): Promise<void>;
   
   // Supplier Parts Availability - Feature #5
   getSupplierPartsAvailability(garageId: string, filters?: {sparePartId?: string, supplierId?: string, partName?: string}): Promise<SupplierPartsAvailability[]>;
@@ -3136,9 +3136,21 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(supplierPriceList.lastUpdated));
   }
 
-  async getSupplierPriceList(id: string): Promise<SupplierPriceList | undefined> {
+  // Restrict a supplier-owned child row (which has no garage_id of its own) to
+  // the caller's garage by requiring its supplierId to belong to a supplier in
+  // that garage. Returns undefined when no garageId is supplied so legacy
+  // callers stay unscoped (backward-compatible).
+  private supplierGarageScope(supplierIdColumn: any, garageId?: string) {
+    if (!garageId) return undefined;
+    return inArray(
+      supplierIdColumn,
+      db.select({ id: suppliers.id }).from(suppliers).where(eq(suppliers.garageId, garageId))
+    );
+  }
+
+  async getSupplierPriceList(id: string, garageId?: string): Promise<SupplierPriceList | undefined> {
     const [priceList] = await db.select().from(supplierPriceList)
-      .where(eq(supplierPriceList.id, id));
+      .where(and(eq(supplierPriceList.id, id), this.supplierGarageScope(supplierPriceList.supplierId, garageId)));
     return priceList;
   }
 
@@ -3149,17 +3161,20 @@ export class DatabaseStorage implements IStorage {
     return priceList;
   }
 
-  async updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>): Promise<SupplierPriceList> {
+  async updateSupplierPriceList(id: string, data: Partial<SupplierPriceList>, garageId?: string): Promise<SupplierPriceList> {
+    // Tenant scope (B16 breadth): supplier_price_list has no garage_id, so
+    // scope through the parent supplier's garage — a cross-tenant id matches
+    // no row (handler 404s).
     const [priceList] = await db.update(supplierPriceList)
       .set({ ...data, lastUpdated: new Date() })
-      .where(eq(supplierPriceList.id, id))
+      .where(and(eq(supplierPriceList.id, id), this.supplierGarageScope(supplierPriceList.supplierId, garageId)))
       .returning();
     return priceList;
   }
 
-  async deleteSupplierPriceList(id: string): Promise<void> {
+  async deleteSupplierPriceList(id: string, garageId?: string): Promise<void> {
     await db.delete(supplierPriceList)
-      .where(eq(supplierPriceList.id, id));
+      .where(and(eq(supplierPriceList.id, id), this.supplierGarageScope(supplierPriceList.supplierId, garageId)));
   }
 
   async comparePrices(sparePartId: string): Promise<SupplierPriceList[]> {
@@ -3192,9 +3207,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(supplierPerformance.period));
   }
 
-  async getSupplierPerformanceRecord(id: string): Promise<SupplierPerformance | undefined> {
+  async getSupplierPerformanceRecord(id: string, garageId?: string): Promise<SupplierPerformance | undefined> {
     const [performance] = await db.select().from(supplierPerformance)
-      .where(eq(supplierPerformance.id, id));
+      .where(and(eq(supplierPerformance.id, id), this.supplierGarageScope(supplierPerformance.supplierId, garageId)));
     return performance;
   }
 
@@ -3205,17 +3220,18 @@ export class DatabaseStorage implements IStorage {
     return performance;
   }
 
-  async updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>): Promise<SupplierPerformance> {
+  async updateSupplierPerformance(id: string, data: Partial<SupplierPerformance>, garageId?: string): Promise<SupplierPerformance> {
+    // Tenant scope (B16 breadth): scope through the parent supplier's garage.
     const [performance] = await db.update(supplierPerformance)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(supplierPerformance.id, id))
+      .where(and(eq(supplierPerformance.id, id), this.supplierGarageScope(supplierPerformance.supplierId, garageId)))
       .returning();
     return performance;
   }
 
-  async deleteSupplierPerformance(id: string): Promise<void> {
+  async deleteSupplierPerformance(id: string, garageId?: string): Promise<void> {
     await db.delete(supplierPerformance)
-      .where(eq(supplierPerformance.id, id));
+      .where(and(eq(supplierPerformance.id, id), this.supplierGarageScope(supplierPerformance.supplierId, garageId)));
   }
 
   // Supplier Parts Availability - Feature #5
