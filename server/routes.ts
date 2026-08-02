@@ -977,7 +977,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const validated = validatePatchBody(req, res, updateJobCardSchema);
       if (!validated.ok) return;
-      const updatedJobCard = await storage.updateJobCard(id, validated.data as any);
+      const updatedJobCard = await storage.updateJobCard(id, validated.data as any, (req as any).user?.garageId);
+      if (!updatedJobCard) return res.status(404).json({ message: "Job card not found" });
       res.json(updatedJobCard);
     } catch (error) {
       console.error("Error updating job card:", error);
@@ -995,6 +996,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get current job card to check existing status
         const currentJobCard = await storage.getJobCard(id);
         if (!currentJobCard) {
+          return res.status(404).json({ message: "Job card not found" });
+        }
+        // Tenant scope (B16): completing another garage's job card is a 404.
+        const cjcGarage = (req as any).user?.garageId;
+        if (cjcGarage && (currentJobCard as any).garageId && (currentJobCard as any).garageId !== cjcGarage) {
           return res.status(404).json({ message: "Job card not found" });
         }
         
@@ -1068,8 +1074,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // For non-completion status updates, use storage method
-      const updatedJobCard = await storage.updateJobCard(id, req.body);
+      // For non-completion status updates, use storage method (garage-scoped, B16)
+      const updatedJobCard = await storage.updateJobCard(id, req.body, (req as any).user?.garageId);
+      if (!updatedJobCard) return res.status(404).json({ message: "Job card not found" });
       res.json(updatedJobCard);
     } catch (error: any) {
       console.error("Error updating job card:", error);
@@ -1333,9 +1340,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { estimatedCompletionAt, manualOverride } = validationResult.data;
-      
+
       const jobCard = await storage.getJobCard(id);
       if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      // Tenant scope (B16): another garage's job card is a 404.
+      const etaGarage = (req as any).user?.garageId;
+      if (etaGarage && (jobCard as any).garageId && (jobCard as any).garageId !== etaGarage) {
         return res.status(404).json({ message: "Job card not found" });
       }
       
@@ -1420,7 +1432,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/service-templates/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const template = await storage.updateServiceTemplate(id, req.body);
+      const template = await storage.updateServiceTemplate(id, req.body, (req as any).user?.garageId);
+      if (!template) return res.status(404).json({ message: "Service template not found" });
       res.json(template);
     } catch (error) {
       console.error("Error updating service template:", error);
@@ -1431,7 +1444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/service-templates/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteServiceTemplate(id);
+      await storage.deleteServiceTemplate(id, (req as any).user?.garageId);
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting service template:", error);

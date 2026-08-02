@@ -2436,8 +2436,11 @@ export class DatabaseStorage implements IStorage {
     return jobCard;
   }
 
-  async updateJobCard(id: string, data: any): Promise<JobCard> {
-    const [jobCard] = await db.update(jobCards).set(data).where(eq(jobCards.id, id)).returning();
+  async updateJobCard(id: string, data: any, garageId?: string): Promise<JobCard> {
+    // Tenant scope (B16 breadth).
+    const [jobCard] = await db.update(jobCards).set(data)
+      .where(and(eq(jobCards.id, id), garageId ? eq(jobCards.garageId, garageId) : undefined))
+      .returning();
     return jobCard;
   }
 
@@ -2556,16 +2559,17 @@ export class DatabaseStorage implements IStorage {
     return template;
   }
 
-  async updateServiceTemplate(id: string, data: Partial<ServiceTemplate>): Promise<ServiceTemplate> {
+  async updateServiceTemplate(id: string, data: Partial<ServiceTemplate>, garageId?: string): Promise<ServiceTemplate> {
+    // Tenant scope (B16 breadth).
     const [template] = await db.update(serviceTemplates)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(serviceTemplates.id, id))
+      .where(and(eq(serviceTemplates.id, id), garageId ? eq(serviceTemplates.garageId, garageId) : undefined))
       .returning();
     return template;
   }
 
-  async deleteServiceTemplate(id: string): Promise<void> {
-    await db.delete(serviceTemplates).where(eq(serviceTemplates.id, id));
+  async deleteServiceTemplate(id: string, garageId?: string): Promise<void> {
+    await db.delete(serviceTemplates).where(and(eq(serviceTemplates.id, id), garageId ? eq(serviceTemplates.garageId, garageId) : undefined));
   }
 
   // Tool Management operations - Module 7
