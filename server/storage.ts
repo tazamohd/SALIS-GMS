@@ -1225,7 +1225,7 @@ export interface IStorage {
   // Stock Alerts
   getStockAlerts(garageId: string, status?: string): Promise<any[]>;
   createStockAlert(data: any): Promise<any>;
-  updateStockAlert(id: string, data: any): Promise<any>;
+  updateStockAlert(id: string, data: any, garageId?: string): Promise<any>;
   acknowledgeStockAlert(id: string, userId: string): Promise<any>;
   
   // Module 28: Advanced Financial Features
@@ -1251,8 +1251,8 @@ export interface IStorage {
   getTaxConfigurations(garageId: string, isActive?: boolean): Promise<TaxConfiguration[]>;
   getTaxConfiguration(id: string): Promise<TaxConfiguration | undefined>;
   createTaxConfiguration(data: InsertTaxConfiguration): Promise<TaxConfiguration>;
-  updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>): Promise<TaxConfiguration>;
-  deleteTaxConfiguration(id: string): Promise<void>;
+  updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>, garageId?: string): Promise<TaxConfiguration>;
+  deleteTaxConfiguration(id: string, garageId?: string): Promise<void>;
   
   // Discounts & Promotions
   getDiscounts(garageId: string, isActive?: boolean): Promise<DiscountPromotion[]>;
@@ -1273,7 +1273,7 @@ export interface IStorage {
   // Reorder Settings
   getReorderSettings(garageId: string, sparePartId?: string): Promise<any[]>;
   createReorderSetting(data: any): Promise<any>;
-  updateReorderSetting(id: string, data: any): Promise<any>;
+  updateReorderSetting(id: string, data: any, garageId?: string): Promise<any>;
   processAutoReorders(garageId: string): Promise<any[]>;
   
   // Pricing History
@@ -5659,11 +5659,12 @@ export class DatabaseStorage implements IStorage {
     return alert;
   }
 
-  async updateStockAlert(id: string, data: Partial<StockAlert>) {
+  async updateStockAlert(id: string, data: Partial<StockAlert>, garageId?: string) {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [alert] = await db
       .update(stockAlerts)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(stockAlerts.id, id))
+      .where(and(eq(stockAlerts.id, id), garageId ? eq(stockAlerts.garageId, garageId) : undefined))
       .returning();
     return alert;
   }
@@ -5707,11 +5708,12 @@ export class DatabaseStorage implements IStorage {
     return setting;
   }
 
-  async updateReorderSetting(id: string, data: Partial<ReorderSetting>) {
+  async updateReorderSetting(id: string, data: Partial<ReorderSetting>, garageId?: string) {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [setting] = await db
       .update(reorderSettings)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(reorderSettings.id, id))
+      .where(and(eq(reorderSettings.id, id), garageId ? eq(reorderSettings.garageId, garageId) : undefined))
       .returning();
     return setting;
   }
@@ -6188,16 +6190,18 @@ export class DatabaseStorage implements IStorage {
     return config;
   }
 
-  async updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>): Promise<TaxConfiguration> {
+  async updateTaxConfiguration(id: string, data: Partial<TaxConfiguration>, garageId?: string): Promise<TaxConfiguration> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [config] = await db.update(taxConfigurations)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(taxConfigurations.id, id))
+      .where(and(eq(taxConfigurations.id, id), garageId ? eq(taxConfigurations.garageId, garageId) : undefined))
       .returning();
     return config;
   }
 
-  async deleteTaxConfiguration(id: string): Promise<void> {
-    await db.delete(taxConfigurations).where(eq(taxConfigurations.id, id));
+  async deleteTaxConfiguration(id: string, garageId?: string): Promise<void> {
+    await db.delete(taxConfigurations)
+      .where(and(eq(taxConfigurations.id, id), garageId ? eq(taxConfigurations.garageId, garageId) : undefined));
   }
 
   // Discounts & Promotions

@@ -5247,7 +5247,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/stock-alerts/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const alert = await storage.updateStockAlert(id, req.body);
+      const alert = await storage.updateStockAlert(id, req.body, req.user?.garageId);
+      if (!alert) return res.status(404).json({ message: "Stock alert not found" });
       res.json(alert);
     } catch (error) {
       console.error("Error updating stock alert:", error);
@@ -5297,7 +5298,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/reorder-settings/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const setting = await storage.updateReorderSetting(id, req.body);
+      const setting = await storage.updateReorderSetting(id, req.body, req.user?.garageId);
+      if (!setting) return res.status(404).json({ message: "Reorder setting not found" });
       res.json(setting);
     } catch (error) {
       console.error("Error updating reorder setting:", error);
@@ -5659,7 +5661,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const config = await storage.updateTaxConfiguration(id, req.body);
+      const config = await storage.updateTaxConfiguration(id, req.body, req.user?.garageId);
+      if (!config) return res.status(404).json({ message: "Tax configuration not found" });
       res.json(config);
     } catch (error) {
       console.error("Error updating tax configuration:", error);
@@ -5670,7 +5673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteTaxConfiguration(id);
+      await storage.deleteTaxConfiguration(id, req.user?.garageId); // cross-tenant = scoped no-op
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting tax configuration:", error);
