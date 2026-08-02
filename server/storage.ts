@@ -12965,10 +12965,11 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
-  async deleteDocumentLibraryItem(id: string): Promise<boolean> {
+  async deleteDocumentLibraryItem(id: string, garageId?: string): Promise<boolean> {
+    // Tenant scope (verification audit): a cross-tenant delete deletes nothing.
     const rows = await db
       .delete(documentLibraryItems)
-      .where(eq(documentLibraryItems.id, id))
+      .where(and(eq(documentLibraryItems.id, id), garageId ? eq(documentLibraryItems.garageId, garageId) : undefined))
       .returning();
     return rows.length > 0;
   }

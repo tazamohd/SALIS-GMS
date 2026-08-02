@@ -966,6 +966,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/job-cards/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
+      // Completion runs inventory deduction under a FOR UPDATE row lock, and that
+      // logic lives only in the PATCH handler. Refuse to complete via PUT so a
+      // client cannot mark a job 'completed' while skipping the stock check /
+      // decrement (verification audit: PUT bypassed the B14 deduction guard).
+      if ((req.body as any)?.status === 'completed') {
+        return res.status(400).json({
+          message: "Use PATCH /api/job-cards/:id to complete a job (runs inventory deduction).",
+        });
+      }
       const validated = validatePatchBody(req, res, updateJobCardSchema);
       if (!validated.ok) return;
       const updatedJobCard = await storage.updateJobCard(id, validated.data as any);
@@ -3876,6 +3885,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!estimate) {
         return res.status(404).json({ message: "Estimate not found" });
       }
+      // Tenant ownership (verification audit): a cross-tenant estimate read
+      // must 404, matching the invoice/supplier GET guards.
+      const g = (req.user as any)?.garageId;
+      if (g && (estimate as any).garageId && (estimate as any).garageId !== g) {
+        return res.status(404).json({ message: "Estimate not found" });
+      }
       res.json(estimate);
     } catch (error) {
       console.error("Error fetching estimate:", error);
@@ -5147,13 +5162,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { invoiceId } = paymentIntent.metadata;
 
         if (invoiceId) {
-          // Update invoice as paid
+          // Settle atomically (verification audit): the old path OVERWROTE
+          // paidAmount with the intent amount and forced balance to 0 even on a
+          // partial payment, non-atomically and without a payment row. Route
+          // through settleGatewayPayment so the invoice is locked FOR UPDATE, the
+          // amount ACCUMULATES, a payment row is recorded, and the B9 unique index
+          // (gateway, gateway_transaction_id) makes a retried event idempotent.
           const paidAmount = Number(paymentIntent.amount) / 100;
-          await storage.updateInvoice(invoiceId, {
-            status: 'paid',
-            paidAmount: paidAmount.toString(),
-            balanceAmount: '0',
-            paidAt: new Date(),
+          await storage.settleGatewayPayment({
+            invoiceId,
+            amount: paidAmount,
+            currency: String(paymentIntent.currency || 'sar').toUpperCase(),
+            gateway: 'stripe',
+            methodType: 'card',
+            transactionId: paymentIntent.id,
           });
         }
       }

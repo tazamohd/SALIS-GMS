@@ -152,9 +152,9 @@ router.post('/documents', isAuthenticated, async (req: Request, res: Response) =
 // DELETE /documents/:id — delete a document
 router.delete('/documents/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const deleted = await storage.deleteDocumentLibraryItem(req.params.id);
+    const deleted = await storage.deleteDocumentLibraryItem(req.params.id, resolveGarageScope(req));
     if (!deleted) return res.status(404).json({ error: 'Document not found' });
-    res.json({ message: 'Document deleted', document: toView(deleted) });
+    res.json({ message: 'Document deleted' });
   } catch (err) {
     console.error('Documents delete error:', err);
     res.status(500).json({ error: 'Failed to delete document' });
