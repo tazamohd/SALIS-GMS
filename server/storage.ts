@@ -897,7 +897,7 @@ export interface IStorage {
   deleteSparePart(id: string): Promise<void>;
   getSparePartInventories(garageId: string, sparePartId?: string): Promise<SparePartInventory[]>;
   createSparePartInventory(data: InsertSparePartInventory): Promise<SparePartInventory>;
-  updateSparePartInventory(id: string, data: Partial<SparePartInventory>): Promise<SparePartInventory>;
+  updateSparePartInventory(id: string, data: Partial<SparePartInventory>, garageId?: string, opts?: { userId?: string; expectedStockQuantity?: number }): Promise<SparePartInventory>;
   
   // Tool Availability operations
   getToolAvailability(garageId: string, toolId?: string): Promise<ToolAvailability[]>;
@@ -2658,13 +2658,73 @@ export class DatabaseStorage implements IStorage {
     return inventory;
   }
 
-  async updateSparePartInventory(id: string, data: Partial<SparePartInventory>, garageId?: string): Promise<SparePartInventory> {
-    // Tenant scope (B16 breadth): a cross-tenant stock update matches no row.
-    const [inventory] = await db.update(sparePartInventories)
-      .set({ ...data, updatedAt: new Date() })
-      .where(and(eq(sparePartInventories.id, id), garageId ? eq(sparePartInventories.garageId, garageId) : undefined))
-      .returning();
-    return inventory;
+  async updateSparePartInventory(
+    id: string,
+    data: Partial<SparePartInventory>,
+    garageId?: string,
+    opts?: { userId?: string; expectedStockQuantity?: number }
+  ): Promise<SparePartInventory> {
+    // A blind absolute overwrite of stockQuantity is a lost-update race: two
+    // concurrent adjustments each read-modify-write and one clobbers the other
+    // (audit medium #7). Run under a row lock so writers serialize, support
+    // optional optimistic concurrency, and record an audit-trail entry whenever
+    // stock actually moves.
+    return await db.transaction(async (tx) => {
+      const [inventory] = await tx
+        .select()
+        .from(sparePartInventories)
+        .where(
+          and(
+            eq(sparePartInventories.id, id),
+            garageId ? eq(sparePartInventories.garageId, garageId) : undefined
+          )
+        )
+        .for("update");
+      // Cross-tenant / missing row: no match — handler turns this into a 404.
+      if (!inventory) return undefined as any;
+
+      const before = inventory.stockQuantity ?? 0;
+
+      // Optimistic concurrency: if the caller states the stock it expected to
+      // be updating, reject when the row has moved since they read it.
+      if (
+        typeof opts?.expectedStockQuantity === "number" &&
+        before !== opts.expectedStockQuantity
+      ) {
+        const conflict: any = new Error(
+          `Stock changed since read: expected ${opts.expectedStockQuantity}, found ${before}`
+        );
+        conflict.code = "STOCK_CONFLICT";
+        throw conflict;
+      }
+
+      const [updated] = await tx
+        .update(sparePartInventories)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(sparePartInventories.id, inventory.id))
+        .returning();
+
+      // Record the movement when the absolute stock value changed and we know
+      // who did it (performed_by is NOT NULL); skip silently for callers that
+      // only touch pricing/thresholds or don't pass a user.
+      const after = updated.stockQuantity ?? 0;
+      if (opts?.userId && after !== before) {
+        await tx.insert(inventoryAuditTrail).values({
+          sparePartId: updated.sparePartId,
+          garageId: updated.garageId,
+          branchId: updated.branchId,
+          actionType: "adjust",
+          quantityBefore: before,
+          quantityChange: after - before,
+          quantityAfter: after,
+          referenceType: "manual",
+          reason: "Manual inventory adjustment",
+          performedBy: opts.userId,
+        } as any);
+      }
+
+      return updated;
+    });
   }
 
   // Tool Availability operations

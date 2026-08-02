@@ -1609,10 +1609,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
-      const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data, (req as any).user?.garageId);
+      // Optional optimistic-concurrency guard: clients that read stock first can
+      // pass the value they expect so a concurrent adjustment is not clobbered.
+      const expectedStockQuantity =
+        typeof req.body?.expectedStockQuantity === "number" ? req.body.expectedStockQuantity : undefined;
+
+      const updatedInventory = await storage.updateSparePartInventory(
+        id,
+        validationResult.data,
+        (req as any).user?.garageId,
+        { userId: (req as any).user?.id, expectedStockQuantity }
+      );
       if (!updatedInventory) return res.status(404).json({ message: "Inventory not found" });
       res.json(updatedInventory);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === "STOCK_CONFLICT") {
+        return res.status(409).json({ message: "Inventory changed since it was read; retry with fresh data" });
+      }
       console.error("Error updating spare part inventory:", error);
       res.status(500).json({ message: "Failed to update spare part inventory" });
     }
