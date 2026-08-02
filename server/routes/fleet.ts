@@ -123,7 +123,12 @@ router.get('/fleet/vehicles', isAuthenticated, async (req, res) => {
       storage.listFleetAccountVehicles(accountId),
       storage.listFleetAccounts(resolveGarageScope(req)),
     ]);
-    const enriched = vehicles.map(v => viewVehicle(v, accounts.find(a => a.id === v.fleetAccountId)));
+    // Tenant scope (audit medium #5): fleet_account_vehicles has no garage_id, so
+    // restrict to vehicles whose fleet account belongs to the caller's garage.
+    const ownAccountIds = new Set(accounts.map(a => a.id));
+    const enriched = vehicles
+      .filter(v => ownAccountIds.has(v.fleetAccountId))
+      .map(v => viewVehicle(v, accounts.find(a => a.id === v.fleetAccountId)));
     res.json({ vehicles: enriched });
   } catch (err) {
     console.error('Fleet vehicles list error:', err);
@@ -140,7 +145,9 @@ router.get('/fleet/maintenance-schedule', isAuthenticated, async (req, res) => {
       storage.listFleetAccountVehicles(),
       storage.listFleetAccounts(resolveGarageScope(req)),
     ]);
-    const enriched = entries.map(entry => {
+    // Tenant scope (audit medium #5): only entries for the caller's garage accounts.
+    const ownAccountIds = new Set(accounts.map(a => a.id));
+    const enriched = entries.filter(e => ownAccountIds.has(e.fleetAccountId)).map(entry => {
       const vehicle = vehicles.find(v => v.id === entry.vehicleId);
       const account = accounts.find(a => a.id === entry.fleetAccountId);
       return {

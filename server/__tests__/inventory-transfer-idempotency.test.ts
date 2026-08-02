@@ -73,3 +73,62 @@ describe("completeInventoryTransfer — idempotent (B15)", () => {
     expect(await stockOf(dstInvId)).toBe(3); // still 3, NOT 6
   });
 });
+
+describe("completeInventoryTransfer — source sufficiency + missing destination (audit medium #6)", () => {
+  let garageA = "", garageB = "", garageC = "", userId = "";
+  let sparePartId = "", srcInvId = "";
+
+  beforeAll(async () => {
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+    try {
+      garageA = (await client.query(`INSERT INTO garages (name,country,city,is_active) VALUES ('M6-A','Saudi Arabia','Riyadh',true) RETURNING id`)).rows[0].id;
+      garageB = (await client.query(`INSERT INTO garages (name,country,city,is_active) VALUES ('M6-B','Saudi Arabia','Jeddah',true) RETURNING id`)).rows[0].id;
+      garageC = (await client.query(`INSERT INTO garages (name,country,city,is_active) VALUES ('M6-C','Saudi Arabia','Dammam',true) RETURNING id`)).rows[0].id;
+      userId = (await client.query(`INSERT INTO users (email,password,full_name,role) VALUES ($1,'x','M6 User','ADMIN') RETURNING id`, [`m6-${Date.now()}@t.sa`])).rows[0].id;
+    } finally {
+      await client.end();
+    }
+
+    const sp = await storage.createSparePart({ name: "M6 Widget", category: "test", sku: `SKU-M6-${Date.now()}`, createdBy: userId } as any);
+    sparePartId = sp.id;
+    srcInvId = (await storage.createSparePartInventory({ sparePartId, garageId: garageA, stockQuantity: 2 } as any)).id;
+  });
+
+  it("aborts (no negative stock) when the source has insufficient stock", async () => {
+    const t = await storage.createInventoryTransfer({
+      transferNumber: `TR-M6-INS-${Date.now()}`,
+      sparePartId, fromGarageId: garageA, toGarageId: garageB,
+      quantity: 5, transferStatus: "approved", requestedBy: userId,
+    } as any);
+
+    await expect(storage.completeInventoryTransfer(t.id, userId)).rejects.toThrow(/insufficient/i);
+    expect(await stockOf(srcInvId)).toBe(2); // unchanged — never went negative
+    const reloaded = await storage.getInventoryTransfer?.(t.id);
+    if (reloaded) expect(reloaded.transferStatus).not.toBe("completed"); // still retryable
+  });
+
+  it("creates the destination row when none exists so moved stock is not dropped", async () => {
+    const t = await storage.createInventoryTransfer({
+      transferNumber: `TR-M6-NEW-${Date.now()}`,
+      sparePartId, fromGarageId: garageA, toGarageId: garageC, // garageC has no inventory row
+      quantity: 2, transferStatus: "approved", requestedBy: userId,
+    } as any);
+
+    const done = await storage.completeInventoryTransfer(t.id, userId);
+    expect(done.transferStatus).toBe("completed");
+    expect(await stockOf(srcInvId)).toBe(0); // 2 - 2
+
+    const client = new Client({ connectionString: process.env.DATABASE_URL });
+    await client.connect();
+    try {
+      const r = await client.query(
+        `SELECT stock_quantity FROM spare_part_inventories WHERE spare_part_id = $1 AND garage_id = $2`,
+        [sparePartId, garageC]
+      );
+      expect(Number(r.rows[0]?.stock_quantity)).toBe(2); // new dest row holds the moved stock
+    } finally {
+      await client.end();
+    }
+  });
+});

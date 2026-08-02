@@ -5830,55 +5830,67 @@ export class DatabaseStorage implements IStorage {
         return transfer;
       }
 
-      // Source: lock, then decrement with an atomic SQL expression.
-      const [sourceInventory] = await tx
-        .select()
-        .from(sparePartInventories)
-        .where(
-          and(
-            eq(sparePartInventories.sparePartId, transfer.sparePartId),
-            eq(sparePartInventories.garageId, transfer.fromGarageId)
+      // Lock the source and destination inventory rows FOR UPDATE. To avoid
+      // deadlocks under concurrent opposite-direction transfers of the same
+      // part (A→B while B→A), acquire the two row locks in a deterministic
+      // order (sorted by garageId) rather than always source-then-destination.
+      const lockInventory = (garageId: string) =>
+        tx
+          .select()
+          .from(sparePartInventories)
+          .where(
+            and(
+              eq(sparePartInventories.sparePartId, transfer.sparePartId),
+              eq(sparePartInventories.garageId, garageId)
+            )
           )
-        )
-        .for("update");
+          .for("update");
 
-      if (sourceInventory) {
-        const currentStock = sourceInventory.stockQuantity ?? 0;
-        await tx
-          .update(sparePartInventories)
-          .set({
-            stockQuantity: sql`${sparePartInventories.stockQuantity} - ${transfer.quantity}`,
-            updatedAt: new Date(),
-          })
-          .where(eq(sparePartInventories.id, sourceInventory.id));
-
-        await tx.insert(inventoryAuditTrail).values({
-          sparePartId: transfer.sparePartId,
-          garageId: transfer.fromGarageId,
-          branchId: transfer.fromBranchId,
-          actionType: "transfer",
-          quantityBefore: currentStock,
-          quantityChange: -transfer.quantity,
-          quantityAfter: currentStock - transfer.quantity,
-          referenceType: "transfer",
-          referenceId: transfer.id,
-          reason: `Transfer to ${transfer.toGarageId}`,
-          performedBy: userId,
-        } as any);
+      let sourceInventory: any;
+      let destInventory: any;
+      if (transfer.fromGarageId <= transfer.toGarageId) {
+        [sourceInventory] = await lockInventory(transfer.fromGarageId);
+        [destInventory] = await lockInventory(transfer.toGarageId);
+      } else {
+        [destInventory] = await lockInventory(transfer.toGarageId);
+        [sourceInventory] = await lockInventory(transfer.fromGarageId);
       }
 
-      // Destination: lock, then increment.
-      const [destInventory] = await tx
-        .select()
-        .from(sparePartInventories)
-        .where(
-          and(
-            eq(sparePartInventories.sparePartId, transfer.sparePartId),
-            eq(sparePartInventories.garageId, transfer.toGarageId)
-          )
-        )
-        .for("update");
+      // Source sufficiency (audit medium #6): the source must exist and hold
+      // enough stock. Throwing aborts the transaction, so stock can never go
+      // negative and the transfer stays pending for the caller to retry.
+      const sourceStock = sourceInventory?.stockQuantity ?? 0;
+      if (!sourceInventory || sourceStock < transfer.quantity) {
+        throw new Error(
+          `Insufficient source stock for transfer ${transfer.id}: have ${sourceStock}, need ${transfer.quantity}`
+        );
+      }
 
+      // Source: decrement with an atomic SQL expression.
+      await tx
+        .update(sparePartInventories)
+        .set({
+          stockQuantity: sql`${sparePartInventories.stockQuantity} - ${transfer.quantity}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(sparePartInventories.id, sourceInventory.id));
+
+      await tx.insert(inventoryAuditTrail).values({
+        sparePartId: transfer.sparePartId,
+        garageId: transfer.fromGarageId,
+        branchId: transfer.fromBranchId,
+        actionType: "transfer",
+        quantityBefore: sourceStock,
+        quantityChange: -transfer.quantity,
+        quantityAfter: sourceStock - transfer.quantity,
+        referenceType: "transfer",
+        referenceId: transfer.id,
+        reason: `Transfer to ${transfer.toGarageId}`,
+        performedBy: userId,
+      } as any);
+
+      // Destination: increment the existing row, or create one so the moved
+      // stock is never silently dropped when the destination has no row yet.
       if (destInventory) {
         const currentStock = destInventory.stockQuantity ?? 0;
         await tx
@@ -5900,6 +5912,27 @@ export class DatabaseStorage implements IStorage {
           referenceType: "transfer",
           referenceId: transfer.id,
           reason: `Transfer from ${transfer.fromGarageId}`,
+          performedBy: userId,
+        } as any);
+      } else {
+        await tx.insert(sparePartInventories).values({
+          sparePartId: transfer.sparePartId,
+          garageId: transfer.toGarageId,
+          branchId: transfer.toBranchId,
+          stockQuantity: transfer.quantity,
+        } as any);
+
+        await tx.insert(inventoryAuditTrail).values({
+          sparePartId: transfer.sparePartId,
+          garageId: transfer.toGarageId,
+          branchId: transfer.toBranchId,
+          actionType: "transfer",
+          quantityBefore: 0,
+          quantityChange: transfer.quantity,
+          quantityAfter: transfer.quantity,
+          referenceType: "transfer",
+          referenceId: transfer.id,
+          reason: `Transfer from ${transfer.fromGarageId} (new destination stock)`,
           performedBy: userId,
         } as any);
       }

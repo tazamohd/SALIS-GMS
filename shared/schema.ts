@@ -11027,7 +11027,10 @@ export const currencyTransactions = pgTable("currency_transactions", {
   reference: varchar("reference", { length: 100 }),
   customerName: varchar("customer_name", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("currency_transactions_garage_idx").on(table.garageId),
+}));
 
 export const documentLibraryItems = pgTable("document_library_items", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -11041,7 +11044,10 @@ export const documentLibraryItems = pgTable("document_library_items", {
   tags: jsonb("tags").default([]).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("document_library_items_garage_idx").on(table.garageId),
+}));
 
 export const fleetAccounts = pgTable("fleet_accounts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -11061,7 +11067,10 @@ export const fleetAccounts = pgTable("fleet_accounts", {
   paymentTerms: varchar("payment_terms", { length: 50 }).default("Net 30"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("fleet_accounts_garage_idx").on(table.garageId),
+}));
 
 export const fleetAccountVehicles = pgTable("fleet_account_vehicles", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
