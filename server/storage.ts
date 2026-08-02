@@ -2654,10 +2654,11 @@ export class DatabaseStorage implements IStorage {
     return inventory;
   }
 
-  async updateSparePartInventory(id: string, data: Partial<SparePartInventory>): Promise<SparePartInventory> {
+  async updateSparePartInventory(id: string, data: Partial<SparePartInventory>, garageId?: string): Promise<SparePartInventory> {
+    // Tenant scope (B16 breadth): a cross-tenant stock update matches no row.
     const [inventory] = await db.update(sparePartInventories)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(sparePartInventories.id, id))
+      .where(and(eq(sparePartInventories.id, id), garageId ? eq(sparePartInventories.garageId, garageId) : undefined))
       .returning();
     return inventory;
   }
@@ -2739,16 +2740,17 @@ export class DatabaseStorage implements IStorage {
     return appointment;
   }
 
-  async updateAppointment(id: string, data: Partial<Appointment>): Promise<Appointment> {
+  async updateAppointment(id: string, data: Partial<Appointment>, garageId?: string): Promise<Appointment> {
+    // Tenant scope (B16 breadth).
     const [appointment] = await db.update(appointments).set({
       ...data,
       updatedAt: new Date()
-    }).where(eq(appointments.id, id)).returning();
+    }).where(and(eq(appointments.id, id), garageId ? eq(appointments.garageId, garageId) : undefined)).returning();
     return appointment;
   }
 
-  async deleteAppointment(id: string): Promise<void> {
-    await db.delete(appointments).where(eq(appointments.id, id));
+  async deleteAppointment(id: string, garageId?: string): Promise<void> {
+    await db.delete(appointments).where(and(eq(appointments.id, id), garageId ? eq(appointments.garageId, garageId) : undefined));
   }
 
   async updateAppointmentStatus(id: string, status: string, userId: string, reason?: string): Promise<Appointment> {
@@ -3742,16 +3744,17 @@ export class DatabaseStorage implements IStorage {
     return po;
   }
 
-  async updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder> {
+  async updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>, garageId?: string): Promise<PurchaseOrder> {
+    // Tenant scope (B16 breadth).
     const [po] = await db.update(purchaseOrders)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(purchaseOrders.id, id))
+      .where(and(eq(purchaseOrders.id, id), garageId ? eq(purchaseOrders.garageId, garageId) : undefined))
       .returning();
     return po;
   }
 
-  async deletePurchaseOrder(id: string): Promise<void> {
-    await db.delete(purchaseOrders).where(eq(purchaseOrders.id, id));
+  async deletePurchaseOrder(id: string, garageId?: string): Promise<void> {
+    await db.delete(purchaseOrders).where(and(eq(purchaseOrders.id, id), garageId ? eq(purchaseOrders.garageId, garageId) : undefined));
   }
 
   async getPurchaseOrderItems(purchaseOrderId: string): Promise<PurchaseOrderItem[]> {

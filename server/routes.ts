@@ -1596,7 +1596,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
-      const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data);
+      const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data, (req as any).user?.garageId);
+      if (!updatedInventory) return res.status(404).json({ message: "Inventory not found" });
       res.json(updatedInventory);
     } catch (error) {
       console.error("Error updating spare part inventory:", error);
@@ -1644,7 +1645,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const updatedAppointment = await storage.updateAppointment(id, validationResult.data);
+      const updatedAppointment = await storage.updateAppointment(id, validationResult.data, (req as any).user?.garageId);
+      if (!updatedAppointment) return res.status(404).json({ message: "Appointment not found" });
       res.json(updatedAppointment);
     } catch (error) {
       console.error("Error updating appointment:", error);
@@ -1655,7 +1657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/appointments/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteAppointment(id);
+      await storage.deleteAppointment(id, (req as any).user?.garageId);
       res.json({ message: "Appointment deleted successfully" });
     } catch (error) {
       console.error("Error deleting appointment:", error);
@@ -3142,7 +3144,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const order = await storage.updatePurchaseOrder(id, validationResult.data);
+      const order = await storage.updatePurchaseOrder(id, validationResult.data, (req as any).user?.garageId);
+      if (!order) return res.status(404).json({ message: "Purchase order not found" });
       res.json(order);
     } catch (error) {
       console.error("Error updating purchase order:", error);
@@ -3153,7 +3156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePurchaseOrder(id);
+      await storage.deletePurchaseOrder(id, (req as any).user?.garageId);
       res.json({ message: "Purchase order deleted successfully" });
     } catch (error) {
       console.error("Error deleting purchase order:", error);
