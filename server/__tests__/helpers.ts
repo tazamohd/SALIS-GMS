@@ -23,6 +23,17 @@ function getTestGarageId(): string {
 }
 
 /**
+ * A process-unique token for seed data. Date.now() alone collides when two
+ * parallel test workers seed within the same millisecond (observed as a
+ * users_email_unique 500 in CI), so combine the clock with the pid and a
+ * monotonic counter to guarantee uniqueness across concurrent seeds.
+ */
+let __seedSeq = 0;
+export function uniqueToken(): string {
+  return `${Date.now()}-${process.pid}-${++__seedSeq}`;
+}
+
+/**
  * The `/api/register` endpoint does not accept garageId, but most tenant-scoped
  * routes pull garageId off `req.user`. Wire the freshly registered user to the
  * seeded test garage by patching the row directly, then re-login so the new
@@ -98,9 +109,10 @@ export function unauthenticatedAgent(app: Express) {
 
 export async function seedCustomer(agent: supertest.Agent, garageId?: string) {
   const gId = garageId || getTestGarageId();
+  const token = uniqueToken();
   const res = await agent.post("/api/customers").send({
-    fullName: `Test Customer ${Date.now()}`,
-    email: `customer-${Date.now()}@test.sa`,
+    fullName: `Test Customer ${token}`,
+    email: `customer-${token}@test.sa`,
     phone: "+966500000003",
     address: "123 Test Street, Riyadh",
     garageId: gId,
@@ -113,14 +125,15 @@ export async function seedCustomer(agent: supertest.Agent, garageId?: string) {
 
 export async function seedVehicle(agent: supertest.Agent, customerId: string, garageId?: string) {
   const gId = garageId || getTestGarageId();
+  const token = uniqueToken();
   const res = await agent.post("/api/vehicles").send({
     customerId,
     garageId: gId,
     make: "Toyota",
     model: "Camry",
     year: 2024,
-    vin: `TESTVHCL${Date.now()}`,
-    licensePlate: `V-${Date.now().toString().slice(-4)}`,
+    vin: `TESTVHCL${token}`,
+    licensePlate: `V-${token.slice(-8)}`,
     color: "White",
   });
   if (res.status !== 200 && res.status !== 201) {
@@ -131,9 +144,8 @@ export async function seedVehicle(agent: supertest.Agent, customerId: string, ga
 
 export async function seedJobCard(agent: supertest.Agent, vehicleId: string, customerId: string, garageId?: string) {
   const gId = garageId || getTestGarageId();
-  const ts = Date.now();
   const res = await agent.post("/api/job-cards").send({
-    jobNumber: `JOB-TEST-${ts}`,
+    jobNumber: `JOB-TEST-${uniqueToken()}`,
     garageId: gId,
     customerId,
     vehicleInfo: { make: "Toyota", model: "Camry", year: 2024, licensePlate: "TEST-001" },
@@ -184,7 +196,7 @@ export async function createSecondGarageAdmin(app: Express): Promise<{
 
   const agent = supertest.agent(app);
   const adminB = {
-    email: `admin-garageB-${Date.now()}@slis.sa`,
+    email: `admin-garageB-${uniqueToken()}@slis.sa`,
     password: "TestPass123!",
     fullName: "Garage B Admin",
     phone: "+966500000099",
