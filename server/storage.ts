@@ -8630,17 +8630,18 @@ export class DatabaseStorage implements IStorage {
     return inspection;
   }
 
-  async updateVehicleInspection(id: string, data: Partial<InsertVehicleInspection>): Promise<VehicleInspection> {
+  async updateVehicleInspection(id: string, data: Partial<InsertVehicleInspection>, garageId?: string): Promise<VehicleInspection> {
+    // Tenant scope (B16 breadth).
     const [inspection] = await db.update(vehicleInspections)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(vehicleInspections.id, id))
+      .where(and(eq(vehicleInspections.id, id), garageId ? eq(vehicleInspections.garageId, garageId) : undefined))
       .returning();
     return inspection;
   }
 
-  async deleteVehicleInspection(id: string): Promise<void> {
+  async deleteVehicleInspection(id: string, garageId?: string): Promise<void> {
     await db.delete(vehicleInspections)
-      .where(eq(vehicleInspections.id, id));
+      .where(and(eq(vehicleInspections.id, id), garageId ? eq(vehicleInspections.garageId, garageId) : undefined));
   }
 
   // Module 46: Towing & Roadside Assistance
@@ -8781,17 +8782,18 @@ export class DatabaseStorage implements IStorage {
     return vehicle;
   }
 
-  async updateLoanerVehicle(id: string, data: Partial<InsertLoanerVehicle>): Promise<LoanerVehicle> {
+  async updateLoanerVehicle(id: string, data: Partial<InsertLoanerVehicle>, garageId?: string): Promise<LoanerVehicle> {
+    // Tenant scope (B16 breadth).
     const [vehicle] = await db.update(loanerVehicles)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(loanerVehicles.id, id))
+      .where(and(eq(loanerVehicles.id, id), garageId ? eq(loanerVehicles.garageId, garageId) : undefined))
       .returning();
     return vehicle;
   }
 
-  async deleteLoanerVehicle(id: string): Promise<void> {
+  async deleteLoanerVehicle(id: string, garageId?: string): Promise<void> {
     await db.delete(loanerVehicles)
-      .where(eq(loanerVehicles.id, id));
+      .where(and(eq(loanerVehicles.id, id), garageId ? eq(loanerVehicles.garageId, garageId) : undefined));
   }
 
   async createLoanerReservation(data: InsertLoanerReservation): Promise<LoanerReservation> {

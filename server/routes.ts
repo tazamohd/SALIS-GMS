@@ -11283,7 +11283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const data = insertVehicleInspectionSchema.partial().parse(req.body);
-      const updated = await storage.updateVehicleInspection(id, data);
+      const updated = await storage.updateVehicleInspection(id, data, (req as any).user?.garageId);
+      if (!updated) return res.status(404).json({ error: "Vehicle inspection not found" });
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating vehicle inspection:", error);
@@ -11294,7 +11295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteVehicleInspection(id);
+      await storage.deleteVehicleInspection(id, (req as any).user?.garageId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting vehicle inspection:", error);
@@ -11515,7 +11516,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const data = insertLoanerVehicleSchema.partial().parse(req.body);
-      const updated = await storage.updateLoanerVehicle(id, data);
+      const updated = await storage.updateLoanerVehicle(id, data, (req as any).user?.garageId);
+      if (!updated) return res.status(404).json({ error: "Loaner vehicle not found" });
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating loaner vehicle:", error);
@@ -11526,7 +11528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteLoanerVehicle(id);
+      await storage.deleteLoanerVehicle(id, (req as any).user?.garageId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting loaner vehicle:", error);
