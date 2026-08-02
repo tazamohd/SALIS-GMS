@@ -1033,8 +1033,8 @@ export interface IStorage {
   getPurchaseTasks(garageId?: string, status?: string, priority?: string): Promise<PurchaseTask[]>;
   getPurchaseTask(id: string): Promise<PurchaseTask | undefined>;
   createPurchaseTask(data: InsertPurchaseTask): Promise<PurchaseTask>;
-  updatePurchaseTask(id: string, data: Partial<PurchaseTask>): Promise<PurchaseTask>;
-  deletePurchaseTask(id: string): Promise<void>;
+  updatePurchaseTask(id: string, data: Partial<PurchaseTask>, garageId?: string): Promise<PurchaseTask>;
+  deletePurchaseTask(id: string, garageId?: string): Promise<void>;
   getPurchaseTaskParts(taskId: string): Promise<PurchaseTaskPart[]>;
   createPurchaseTaskPart(data: InsertPurchaseTaskPart): Promise<PurchaseTaskPart>;
   deletePurchaseTaskPart(id: string): Promise<void>;
@@ -1043,8 +1043,8 @@ export interface IStorage {
   getQuotationRequests(garageId?: string, status?: string): Promise<QuotationRequest[]>;
   getQuotationRequest(id: string): Promise<QuotationRequest | undefined>;
   createQuotationRequest(data: InsertQuotationRequest): Promise<QuotationRequest>;
-  updateQuotationRequest(id: string, data: Partial<QuotationRequest>): Promise<QuotationRequest>;
-  deleteQuotationRequest(id: string): Promise<void>;
+  updateQuotationRequest(id: string, data: Partial<QuotationRequest>, garageId?: string): Promise<QuotationRequest>;
+  deleteQuotationRequest(id: string, garageId?: string): Promise<void>;
   getSupplierQuotations(quotationRequestId: string): Promise<SupplierQuotation[]>;
   createSupplierQuotation(data: InsertSupplierQuotation): Promise<SupplierQuotation>;
   updateSupplierQuotation(id: string, data: Partial<SupplierQuotation>): Promise<SupplierQuotation>;
@@ -1057,15 +1057,15 @@ export interface IStorage {
   getSupplierPayments(garageId?: string, status?: string): Promise<SupplierPayment[]>;
   getSupplierPayment(id: string): Promise<SupplierPayment | undefined>;
   createSupplierPayment(data: InsertSupplierPayment): Promise<SupplierPayment>;
-  updateSupplierPayment(id: string, data: Partial<SupplierPayment>): Promise<SupplierPayment>;
-  deleteSupplierPayment(id: string): Promise<void>;
+  updateSupplierPayment(id: string, data: Partial<SupplierPayment>, garageId?: string): Promise<SupplierPayment>;
+  deleteSupplierPayment(id: string, garageId?: string): Promise<void>;
   
   // Purchase Agent - Delivery Tracking
   getDeliveries(garageId?: string, status?: string): Promise<Delivery[]>;
   getDelivery(id: string): Promise<Delivery | undefined>;
   createDelivery(data: InsertDelivery): Promise<Delivery>;
-  updateDelivery(id: string, data: Partial<Delivery>): Promise<Delivery>;
-  deleteDelivery(id: string): Promise<void>;
+  updateDelivery(id: string, data: Partial<Delivery>, garageId?: string): Promise<Delivery>;
+  deleteDelivery(id: string, garageId?: string): Promise<void>;
   getDeliveryItems(deliveryId: string): Promise<DeliveryItem[]>;
   createDeliveryItem(data: InsertDeliveryItem): Promise<DeliveryItem>;
   deleteDeliveryItem(id: string): Promise<void>;
@@ -3906,16 +3906,18 @@ export class DatabaseStorage implements IStorage {
     return task;
   }
 
-  async updatePurchaseTask(id: string, data: Partial<PurchaseTask>): Promise<PurchaseTask> {
+  async updatePurchaseTask(id: string, data: Partial<PurchaseTask>, garageId?: string): Promise<PurchaseTask> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [task] = await db.update(purchaseTasks)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(purchaseTasks.id, id))
+      .where(and(eq(purchaseTasks.id, id), garageId ? eq(purchaseTasks.garageId, garageId) : undefined))
       .returning();
     return task;
   }
 
-  async deletePurchaseTask(id: string): Promise<void> {
-    await db.delete(purchaseTasks).where(eq(purchaseTasks.id, id));
+  async deletePurchaseTask(id: string, garageId?: string): Promise<void> {
+    await db.delete(purchaseTasks)
+      .where(and(eq(purchaseTasks.id, id), garageId ? eq(purchaseTasks.garageId, garageId) : undefined));
   }
 
   async getPurchaseTaskParts(taskId: string): Promise<PurchaseTaskPart[]> {
@@ -3959,16 +3961,18 @@ export class DatabaseStorage implements IStorage {
     return req;
   }
 
-  async updateQuotationRequest(id: string, data: Partial<QuotationRequest>): Promise<QuotationRequest> {
+  async updateQuotationRequest(id: string, data: Partial<QuotationRequest>, garageId?: string): Promise<QuotationRequest> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [req] = await db.update(quotationRequests)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(quotationRequests.id, id))
+      .where(and(eq(quotationRequests.id, id), garageId ? eq(quotationRequests.garageId, garageId) : undefined))
       .returning();
     return req;
   }
 
-  async deleteQuotationRequest(id: string): Promise<void> {
-    await db.delete(quotationRequests).where(eq(quotationRequests.id, id));
+  async deleteQuotationRequest(id: string, garageId?: string): Promise<void> {
+    await db.delete(quotationRequests)
+      .where(and(eq(quotationRequests.id, id), garageId ? eq(quotationRequests.garageId, garageId) : undefined));
   }
 
   async getSupplierQuotations(quotationRequestId: string): Promise<SupplierQuotation[]> {
@@ -4032,16 +4036,18 @@ export class DatabaseStorage implements IStorage {
     return payment;
   }
 
-  async updateSupplierPayment(id: string, data: Partial<SupplierPayment>): Promise<SupplierPayment> {
+  async updateSupplierPayment(id: string, data: Partial<SupplierPayment>, garageId?: string): Promise<SupplierPayment> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [payment] = await db.update(supplierPayments)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(supplierPayments.id, id))
+      .where(and(eq(supplierPayments.id, id), garageId ? eq(supplierPayments.garageId, garageId) : undefined))
       .returning();
     return payment;
   }
 
-  async deleteSupplierPayment(id: string): Promise<void> {
-    await db.delete(supplierPayments).where(eq(supplierPayments.id, id));
+  async deleteSupplierPayment(id: string, garageId?: string): Promise<void> {
+    await db.delete(supplierPayments)
+      .where(and(eq(supplierPayments.id, id), garageId ? eq(supplierPayments.garageId, garageId) : undefined));
   }
 
   // Purchase Agent - Delivery Tracking
@@ -4067,16 +4073,18 @@ export class DatabaseStorage implements IStorage {
     return delivery;
   }
 
-  async updateDelivery(id: string, data: Partial<Delivery>): Promise<Delivery> {
+  async updateDelivery(id: string, data: Partial<Delivery>, garageId?: string): Promise<Delivery> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [delivery] = await db.update(deliveries)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(deliveries.id, id))
+      .where(and(eq(deliveries.id, id), garageId ? eq(deliveries.garageId, garageId) : undefined))
       .returning();
     return delivery;
   }
 
-  async deleteDelivery(id: string): Promise<void> {
-    await db.delete(deliveries).where(eq(deliveries.id, id));
+  async deleteDelivery(id: string, garageId?: string): Promise<void> {
+    await db.delete(deliveries)
+      .where(and(eq(deliveries.id, id), garageId ? eq(deliveries.garageId, garageId) : undefined));
   }
 
   async getDeliveryItems(deliveryId: string): Promise<DeliveryItem[]> {

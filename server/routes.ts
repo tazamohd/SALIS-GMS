@@ -3243,7 +3243,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const task = await storage.updatePurchaseTask(id, req.body);
+      const task = await storage.updatePurchaseTask(id, req.body, (req as any).user?.garageId);
+      if (!task) return res.status(404).json({ message: "Purchase task not found" });
       res.json(task);
     } catch (error) {
       console.error("Error updating purchase task:", error);
@@ -3254,7 +3255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePurchaseTask(id);
+      await storage.deletePurchaseTask(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Task deleted successfully" });
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -3277,7 +3278,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const request = await storage.updateQuotationRequest(id, req.body);
+      const request = await storage.updateQuotationRequest(id, req.body, (req as any).user?.garageId);
+      if (!request) return res.status(404).json({ message: "Quotation request not found" });
       res.json(request);
     } catch (error) {
       console.error("Error updating quotation request:", error);
@@ -3288,7 +3290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteQuotationRequest(id);
+      await storage.deleteQuotationRequest(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Quotation request deleted successfully" });
     } catch (error) {
       console.error("Error deleting quotation request:", error);
@@ -3338,7 +3340,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const payment = await storage.updateSupplierPayment(id, req.body);
+      const payment = await storage.updateSupplierPayment(id, req.body, (req as any).user?.garageId);
+      if (!payment) return res.status(404).json({ message: "Supplier payment not found" });
       res.json(payment);
     } catch (error) {
       console.error("Error updating supplier payment:", error);
@@ -3349,7 +3352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPayment(id);
+      await storage.deleteSupplierPayment(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Payment deleted successfully" });
     } catch (error) {
       console.error("Error deleting payment:", error);
@@ -3386,7 +3389,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/deliveries/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const delivery = await storage.updateDelivery(id, req.body);
+      const delivery = await storage.updateDelivery(id, req.body, (req as any).user?.garageId);
+      if (!delivery) return res.status(404).json({ message: "Delivery not found" });
       res.json(delivery);
     } catch (error) {
       console.error("Error updating delivery:", error);
@@ -3397,7 +3401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/deliveries/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteDelivery(id);
+      await storage.deleteDelivery(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Delivery deleted successfully" });
     } catch (error) {
       console.error("Error deleting delivery:", error);
