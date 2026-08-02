@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { resolveGarageScope } from '../middleware/garageScope';
 
 const router = Router();
 
@@ -227,7 +228,7 @@ router.get('/currency/transactions', isAuthenticated, async (req, res) => {
       type: type ? String(type) : undefined,
       currency: currency ? String(currency) : undefined,
       limit,
-    });
+    }, resolveGarageScope(req));
 
     const view = rows.map((t: any) => ({
       id: t.id,
@@ -282,6 +283,7 @@ router.post('/currency/transactions', isAuthenticated, async (req, res) => {
 
   try {
     const row = await storage.createCurrencyTransaction({
+      garageId: resolveGarageScope(req),
       txDate: date ? new Date(date) : new Date(),
       description,
       originalAmount: String(originalAmount),

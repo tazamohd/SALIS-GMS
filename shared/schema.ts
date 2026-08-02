@@ -11013,6 +11013,10 @@ export const backupHistory = pgTable("backup_history", {
 
 export const currencyTransactions = pgTable("currency_transactions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5): this table was structurally tenant-less,
+  // so any list over it returned every garage's rows. Nullable for legacy rows;
+  // new rows are pinned to the session garage by enforceTenantOnBody + the routes.
+  garageId: uuid("garage_id"),
   txDate: timestamp("tx_date").defaultNow().notNull(),
   description: text("description").notNull(),
   originalAmount: decimal("original_amount", { precision: 18, scale: 4 }).notNull(),
@@ -11027,6 +11031,8 @@ export const currencyTransactions = pgTable("currency_transactions", {
 
 export const documentLibraryItems = pgTable("document_library_items", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5) — see currency_transactions above.
+  garageId: uuid("garage_id"),
   name: varchar("name", { length: 500 }).notNull(),
   type: varchar("type", { length: 50 }).notNull(),
   category: varchar("category", { length: 100 }).notNull(),
@@ -11039,6 +11045,8 @@ export const documentLibraryItems = pgTable("document_library_items", {
 
 export const fleetAccounts = pgTable("fleet_accounts", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5) — see currency_transactions above.
+  garageId: uuid("garage_id"),
   externalRef: varchar("external_ref", { length: 50 }).unique(),
   companyName: varchar("company_name", { length: 255 }).notNull(),
   contactPerson: varchar("contact_person", { length: 255 }),

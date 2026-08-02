@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { resolveGarageScope } from '../middleware/garageScope';
 
 const router = Router();
 
@@ -50,10 +51,10 @@ function viewVehicle(v: any, account?: any) {
 }
 
 // GET /api/fleet/accounts — List all fleet accounts
-router.get('/fleet/accounts', isAuthenticated, async (_req, res) => {
+router.get('/fleet/accounts', isAuthenticated, async (req, res) => {
   try {
     const [accounts, vehicles] = await Promise.all([
-      storage.listFleetAccounts(),
+      storage.listFleetAccounts(resolveGarageScope(req)),
       storage.listFleetAccountVehicles(),
     ]);
     res.json({ accounts: accounts.map(a => enrichAccount(a, vehicles)) });
@@ -66,7 +67,7 @@ router.get('/fleet/accounts', isAuthenticated, async (_req, res) => {
 // GET /api/fleet/accounts/:id — Fleet account detail with vehicles
 router.get('/fleet/accounts/:id', isAuthenticated, async (req, res) => {
   try {
-    const account = await storage.getFleetAccount(req.params.id);
+    const account = await storage.getFleetAccount(req.params.id, resolveGarageScope(req));
     if (!account) {
       return res.status(404).json({ message: 'Fleet account not found' });
     }
@@ -93,6 +94,7 @@ router.post('/fleet/accounts', isAuthenticated, async (req, res) => {
   }
   try {
     const created = await storage.createFleetAccount({
+      garageId: resolveGarageScope(req),
       companyName,
       contactPerson: contactPerson || '',
       contactEmail: contactEmail || '',
@@ -119,7 +121,7 @@ router.get('/fleet/vehicles', isAuthenticated, async (req, res) => {
     const accountId = req.query.accountId as string | undefined;
     const [vehicles, accounts] = await Promise.all([
       storage.listFleetAccountVehicles(accountId),
-      storage.listFleetAccounts(),
+      storage.listFleetAccounts(resolveGarageScope(req)),
     ]);
     const enriched = vehicles.map(v => viewVehicle(v, accounts.find(a => a.id === v.fleetAccountId)));
     res.json({ vehicles: enriched });
@@ -136,7 +138,7 @@ router.get('/fleet/maintenance-schedule', isAuthenticated, async (req, res) => {
     const [entries, vehicles, accounts] = await Promise.all([
       storage.listFleetMaintenanceEntries(accountId),
       storage.listFleetAccountVehicles(),
-      storage.listFleetAccounts(),
+      storage.listFleetAccounts(resolveGarageScope(req)),
     ]);
     const enriched = entries.map(entry => {
       const vehicle = vehicles.find(v => v.id === entry.vehicleId);
@@ -163,10 +165,10 @@ router.get('/fleet/maintenance-schedule', isAuthenticated, async (req, res) => {
 });
 
 // GET /api/fleet/analytics — Fleet analytics
-router.get('/fleet/analytics', isAuthenticated, async (_req, res) => {
+router.get('/fleet/analytics', isAuthenticated, async (req, res) => {
   try {
     const [accounts, vehicles, entries] = await Promise.all([
-      storage.listFleetAccounts(),
+      storage.listFleetAccounts(resolveGarageScope(req)),
       storage.listFleetAccountVehicles(),
       storage.listFleetMaintenanceEntries(),
     ]);

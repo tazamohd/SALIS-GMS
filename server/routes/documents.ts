@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { resolveGarageScope } from '../middleware/garageScope';
 
 const router = Router();
 
@@ -36,9 +37,9 @@ function toView(doc: any) {
 }
 
 // GET /documents/categories — list document categories with counts
-router.get('/documents/categories', isAuthenticated, async (_req: Request, res: Response) => {
+router.get('/documents/categories', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const all = await storage.listDocumentLibraryItems();
+    const all = await storage.listDocumentLibraryItems(undefined, resolveGarageScope(req));
     const result = CATEGORIES.map((cat) => {
       const docs = all.filter((d: any) => d.category === cat.id);
       const total = docs.reduce((sum: number, d: any) => sum + (d.size ?? 0), 0);
@@ -62,9 +63,9 @@ router.get('/documents/categories', isAuthenticated, async (_req: Request, res: 
 });
 
 // GET /documents/stats — aggregate statistics
-router.get('/documents/stats', isAuthenticated, async (_req: Request, res: Response) => {
+router.get('/documents/stats', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const all = await storage.listDocumentLibraryItems();
+    const all = await storage.listDocumentLibraryItems(undefined, resolveGarageScope(req));
     const totalStorage = all.reduce((sum: number, d: any) => sum + (d.size ?? 0), 0);
     const byCategory = CATEGORIES.map((cat) => {
       const docs = all.filter((d: any) => d.category === cat.id);
@@ -97,7 +98,7 @@ router.get('/documents', isAuthenticated, async (req: Request, res: Response) =>
       category: category ? String(category) : undefined,
       tag: tag ? String(tag) : undefined,
       search: search ? String(search) : undefined,
-    });
+    }, resolveGarageScope(req));
     res.json(rows.map(toView));
   } catch (err) {
     console.error('Documents list error:', err);
@@ -108,7 +109,7 @@ router.get('/documents', isAuthenticated, async (req: Request, res: Response) =>
 // GET /documents/:id — single document detail
 router.get('/documents/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const doc = await storage.getDocumentLibraryItem(req.params.id);
+    const doc = await storage.getDocumentLibraryItem(req.params.id, resolveGarageScope(req));
     if (!doc) return res.status(404).json({ error: 'Document not found' });
     res.json(toView(doc));
   } catch (err) {
@@ -132,6 +133,7 @@ router.post('/documents', isAuthenticated, async (req: Request, res: Response) =
 
   try {
     const doc = await storage.createDocumentLibraryItem({
+      garageId: resolveGarageScope(req),
       name,
       type: type || 'pdf',
       category,

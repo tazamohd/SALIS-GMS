@@ -12896,8 +12896,10 @@ export class DatabaseStorage implements IStorage {
     type?: string;
     currency?: string;
     limit?: number;
-  }): Promise<CurrencyTransaction[]> {
+  }, garageId?: string): Promise<CurrencyTransaction[]> {
     const conditions: any[] = [];
+    // Tenant scope (B5): only the caller's garage when provided.
+    if (garageId) conditions.push(eq(currencyTransactions.garageId, garageId));
     if (filter?.type) conditions.push(eq(currencyTransactions.type, filter.type));
     if (filter?.currency)
       conditions.push(eq(currencyTransactions.originalCurrency, filter.currency));
@@ -12928,8 +12930,10 @@ export class DatabaseStorage implements IStorage {
     category?: string;
     tag?: string;
     search?: string;
-  }): Promise<DocumentLibraryItem[]> {
+  }, garageId?: string): Promise<DocumentLibraryItem[]> {
     const conditions: any[] = [];
+    // Tenant scope (B5): only the caller's garage when provided.
+    if (garageId) conditions.push(eq(documentLibraryItems.garageId, garageId));
     if (filter?.category) conditions.push(eq(documentLibraryItems.category, filter.category));
     if (filter?.search) conditions.push(ilike(documentLibraryItems.name, `%${filter.search}%`));
     // tags is jsonb; containment keeps the match inside Postgres.
@@ -12946,11 +12950,11 @@ export class DatabaseStorage implements IStorage {
       : await query;
   }
 
-  async getDocumentLibraryItem(id: string): Promise<DocumentLibraryItem | undefined> {
+  async getDocumentLibraryItem(id: string, garageId?: string): Promise<DocumentLibraryItem | undefined> {
     const [row] = await db
       .select()
       .from(documentLibraryItems)
-      .where(eq(documentLibraryItems.id, id));
+      .where(and(eq(documentLibraryItems.id, id), garageId ? eq(documentLibraryItems.garageId, garageId) : undefined));
     return row;
   }
 
@@ -13029,12 +13033,15 @@ export class DatabaseStorage implements IStorage {
   // Fleet accounts
   // ==========================================================================
 
-  async listFleetAccounts(): Promise<FleetAccount[]> {
-    return await db.select().from(fleetAccounts).orderBy(desc(fleetAccounts.createdAt));
+  async listFleetAccounts(garageId?: string): Promise<FleetAccount[]> {
+    // Tenant scope (B5): only the caller's garage when provided.
+    const q = db.select().from(fleetAccounts).orderBy(desc(fleetAccounts.createdAt));
+    return garageId ? await q.where(eq(fleetAccounts.garageId, garageId)) : await q;
   }
 
-  async getFleetAccount(id: string): Promise<FleetAccount | undefined> {
-    const [row] = await db.select().from(fleetAccounts).where(eq(fleetAccounts.id, id));
+  async getFleetAccount(id: string, garageId?: string): Promise<FleetAccount | undefined> {
+    const [row] = await db.select().from(fleetAccounts)
+      .where(and(eq(fleetAccounts.id, id), garageId ? eq(fleetAccounts.garageId, garageId) : undefined));
     return row;
   }
 
