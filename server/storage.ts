@@ -13360,8 +13360,8 @@ export class DatabaseStorage implements IStorage {
    */
   async approveGarageApplication(
     id: string,
-    reviewerId: string,
-    hashedPassword: string,
+    reviewerId: string | null,
+    opts?: { hashedPassword?: string; autoApproved?: boolean },
   ): Promise<{ application: GarageApplication; garageId: string; ownerUserId: string }> {
     return await db.transaction(async (tx) => {
       const [app] = await tx
@@ -13376,6 +13376,13 @@ export class DatabaseStorage implements IStorage {
       }
       if (app.status === "rejected") {
         throw new Error("Application already rejected");
+      }
+
+      // Prefer the applicant's own password (hashed at submit); fall back to a
+      // reviewer-provided temp hash. One of the two must be present.
+      const password = app.ownerPasswordHash ?? opts?.hashedPassword;
+      if (!password) {
+        throw new Error("No password available to provision the owner account");
       }
 
       const [garage] = await tx
@@ -13393,7 +13400,7 @@ export class DatabaseStorage implements IStorage {
         .insert(users)
         .values({
           email: app.email,
-          password: hashedPassword,
+          password,
           fullName: app.ownerName,
           phone: app.phone,
           role: "ADMIN",
@@ -13412,6 +13419,7 @@ export class DatabaseStorage implements IStorage {
         .update(garageApplications)
         .set({
           status: "approved",
+          autoApproved: opts?.autoApproved ?? false,
           reviewedBy: reviewerId,
           reviewedAt: new Date(),
           provisionedGarageId: garage.id,

@@ -38,6 +38,7 @@ import {
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import { randomBytes } from "crypto";
+import { verifyBusiness } from "./services/verification/businessVerification";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
 import passport from "passport";
 import { emailService } from "./services/emailService";
@@ -21250,8 +21251,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Platform SuperAdmin — garage onboarding applications
   // ==========================================================================
 
-  // Public: a prospective garage submits an onboarding application. Creates a
-  // PENDING record for a PLATFORM_ADMIN to review; provisions nothing yet.
+  // Public: a prospective service provider submits an onboarding application.
+  // Runs automated government-identifier verification (ZATCA VAT + commercial
+  // registration). Verified applications are AUTO-APPROVED and provisioned on
+  // the spot; well-formed-but-unconfirmed ones go to a PLATFORM_ADMIN review
+  // queue; bad-format submissions are rejected immediately.
   app.post('/api/garage-applications', async (req, res) => {
     try {
       const { insertGarageApplicationSchema } = await import("@shared/schema");
@@ -21259,6 +21263,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!parsed.success) {
         return res.status(400).json(sanitizeZodError(parsed.error));
       }
+      const password = typeof req.body?.password === "string" ? req.body.password : "";
+      if (password.length < 8) {
+        return res.status(400).json({ message: "A password of at least 8 characters is required" });
+      }
+      const isDemo = req.body?.isDemo === true;
+      if (!parsed.data.taxNumber || !parsed.data.commercialRegistration) {
+        return res.status(400).json({ message: "Tax number and commercial registration are required" });
+      }
+
       // Reject if the email is already a user or already has a pending application.
       const existingUser = await storage.getUserByEmail(parsed.data.email);
       if (existingUser) {
@@ -21269,8 +21282,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (pending) {
         return res.status(409).json({ message: "An application with this email is already pending review" });
       }
-      const application = await storage.createGarageApplication(parsed.data as any);
-      res.status(201).json({ id: application.id, status: application.status });
+
+      // Automated verification of the official government identifiers.
+      const verification = verifyBusiness({
+        taxNumber: parsed.data.taxNumber,
+        commercialRegistration: parsed.data.commercialRegistration,
+        country: parsed.data.country,
+        isDemo,
+      });
+      if (verification.status === "failed") {
+        return res.status(400).json({
+          message: "Business identifiers are invalid",
+          verification,
+        });
+      }
+
+      const ownerPasswordHash = await hashPassword(password);
+      const application = await storage.createGarageApplication({
+        ...parsed.data,
+        isDemo,
+        ownerPasswordHash,
+        verificationStatus: verification.status,
+        verificationDetails: verification as any,
+      } as any);
+
+      // Verified -> auto-approve + provision immediately (no manual step).
+      if (verification.status === "verified") {
+        const result = await storage.approveGarageApplication(application.id, null, { autoApproved: true });
+        return res.status(201).json({
+          id: application.id,
+          status: "approved",
+          autoApproved: true,
+          garageId: result.garageId,
+          verification,
+        });
+      }
+
+      // Well-formed but unconfirmed -> manual review queue.
+      res.status(201).json({ id: application.id, status: "pending", verification });
     } catch (error) {
       console.error("Error submitting garage application:", error);
       res.status(500).json({ message: "Failed to submit application" });
@@ -21293,16 +21342,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!app_) return res.status(404).json({ message: "Application not found" });
       if (app_.status === "rejected") return res.status(409).json({ message: "Application already rejected" });
 
-      // Provision with a one-time temporary password: hash for storage, return
-      // the plaintext ONCE to the super admin to relay (never persisted/logged).
-      const tempPassword = randomBytes(9).toString("base64url");
-      const hashed = await hashPassword(tempPassword);
-      const result = await storage.approveGarageApplication(req.params.id, req.user.id, hashed);
+      // If the applicant set their own password at signup, provision with it
+      // (they can log in immediately). Otherwise mint a one-time temp password,
+      // hash it for storage, and return the plaintext ONCE for the super admin
+      // to relay (never persisted/logged).
+      let tempPassword: string | undefined;
+      let hashed: string | undefined;
+      if (!app_.ownerPasswordHash) {
+        tempPassword = randomBytes(9).toString("base64url");
+        hashed = await hashPassword(tempPassword);
+      }
+      const result = await storage.approveGarageApplication(req.params.id, req.user.id, { hashedPassword: hashed });
       res.json({
         application: result.application,
         garageId: result.garageId,
         ownerEmail: app_.email,
-        tempPassword,
+        ...(tempPassword ? { tempPassword } : {}),
       });
     } catch (error: any) {
       console.error("Error approving garage application:", error);

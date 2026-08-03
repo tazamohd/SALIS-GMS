@@ -11215,6 +11215,8 @@ export const subscriptions = pgTable("subscriptions", {
 // provisions the garage + owner user + trial subscription) or rejects it.
 export const garageApplications = pgTable("garage_applications", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Provider kind — this table backs onboarding for all business types.
+  providerType: varchar("provider_type", { length: 30 }).default("garage").notNull(), // garage | parts_store | insurance
   businessName: varchar("business_name", { length: 255 }).notNull(),
   ownerName: varchar("owner_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
@@ -11223,7 +11225,17 @@ export const garageApplications = pgTable("garage_applications", {
   country: varchar("country", { length: 100 }),
   requestedPlan: varchar("requested_plan", { length: 20 }).default("STARTER").notNull(),
   notes: text("notes"),
+  // Official government identifiers, verified before activation.
+  taxNumber: varchar("tax_number", { length: 20 }), // ZATCA VAT: 15 digits, starts with 3
+  commercialRegistration: varchar("commercial_registration", { length: 20 }), // Sejel/CR: 10 digits
+  isDemo: boolean("is_demo").default(false).notNull(), // trial account, verification bypassed
   status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  // Automated verification outcome (format + registry check).
+  verificationStatus: varchar("verification_status", { length: 20 }).default("unverified").notNull(), // unverified | verified | failed | manual_review
+  verificationDetails: jsonb("verification_details"),
+  autoApproved: boolean("auto_approved").default(false).notNull(),
+  // Applicant-set password, hashed at submit, used to provision the owner login.
+  ownerPasswordHash: varchar("owner_password_hash", { length: 255 }),
   reviewedBy: varchar("reviewed_by").references(() => users.id),
   reviewedAt: timestamp("reviewed_at"),
   rejectionReason: text("rejection_reason"),
@@ -11349,6 +11361,11 @@ export type InsertGarageApplication = typeof garageApplications.$inferInsert;
 export const insertGarageApplicationSchema = createInsertSchema(garageApplications).omit({
   id: true,
   status: true,
+  verificationStatus: true,
+  verificationDetails: true,
+  autoApproved: true,
+  ownerPasswordHash: true,
+  isDemo: true,
   reviewedBy: true,
   reviewedAt: true,
   rejectionReason: true,
