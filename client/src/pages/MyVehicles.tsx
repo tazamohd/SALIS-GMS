@@ -60,15 +60,37 @@ export default function MyVehicles() {
   });
 
   const scan = useMutation({
-    mutationFn: async (docType: "license" | "insurance") => (await apiRequest("POST", "/api/my/vehicles/scan", { docType })).json(),
+    mutationFn: async ({ docType, rawText }: { docType: "license" | "insurance"; rawText: string }) =>
+      (await apiRequest("POST", "/api/my/vehicles/scan", { docType, rawText })).json(),
     onSuccess: (r) => {
-      if (r.ocrAvailable === false) {
-        toast({ title: "Scanning not available", description: r.message ?? "Please enter the details manually." });
-      } else {
-        toast({ title: "Scanned", description: "Fields extracted." });
+      const f = r.fields ?? {};
+      if (r.ocrAvailable === false || Object.keys(f).length === 0) {
+        toast({ title: "Nothing extracted", description: r.message ?? "Please enter the details manually." });
+        return;
       }
+      const matchedMake = f.make ? vehicleMakes.find((m) => m.name.toLowerCase() === String(f.make).toLowerCase()) : undefined;
+      setForm((cur) => ({
+        ...cur,
+        make: matchedMake?.name ?? cur.make,
+        year: f.year ? String(f.year) : cur.year,
+        vin: f.vin ?? cur.vin,
+        licensePlate: f.licensePlate ?? cur.licensePlate,
+        insuranceProvider: f.insuranceProvider ?? cur.insuranceProvider,
+        insurancePolicyNumber: f.insurancePolicyNumber ?? cur.insurancePolicyNumber,
+        insuranceExpiry: f.insuranceExpiry ?? cur.insuranceExpiry,
+      }));
+      toast({ title: "Scanned", description: "Fields extracted and filled in." });
     },
   });
+
+  // Capture the document text (client-side OCR can feed this later; for now the
+  // user pastes the text from their registration/insurance card) and extract.
+  const handleScan = (docType: "license" | "insurance") => {
+    const rawText = window.prompt(
+      `Paste the text from your ${docType === "license" ? "vehicle registration / license" : "insurance"} document:`,
+    );
+    if (rawText && rawText.trim()) scan.mutate({ docType, rawText });
+  };
 
   const save = useMutation({
     mutationFn: async () => {
@@ -122,8 +144,8 @@ export default function MyVehicles() {
                   <Button type="button" variant="outline" onClick={() => decodeVin.mutate()} disabled={form.vin.trim().length !== 17 || decodeVin.isPending} data-testid="button-decode-vin">
                     <Search className="h-4 w-4 mr-1" />{decodeVin.isPending ? "Decoding…" : "Decode VIN"}
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => scan.mutate("license")} data-testid="button-scan-license"><ScanLine className="h-4 w-4 mr-1" />Scan license</Button>
-                  <Button type="button" variant="outline" onClick={() => scan.mutate("insurance")} data-testid="button-scan-insurance"><ShieldCheck className="h-4 w-4 mr-1" />Scan insurance</Button>
+                  <Button type="button" variant="outline" onClick={() => handleScan("license")} data-testid="button-scan-license"><ScanLine className="h-4 w-4 mr-1" />Scan license</Button>
+                  <Button type="button" variant="outline" onClick={() => handleScan("insurance")} data-testid="button-scan-insurance"><ShieldCheck className="h-4 w-4 mr-1" />Scan insurance</Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

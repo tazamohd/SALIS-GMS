@@ -86,6 +86,18 @@ describe("customer vehicles", () => {
     expect((await custA.post("/api/my/vehicles/scan").send({ docType: "nope" })).status).toBe(400);
   });
 
+  it("scan extracts structured fields from supplied OCR text", async () => {
+    const res = await custA.post("/api/my/vehicles/scan").send({
+      docType: "license",
+      rawText: "Make: Toyota Model Year 2022 Chassis 4T1BF1FK5GU123456 Plate ABC-1234",
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.ocrAvailable).toBe(true);
+    expect(res.body.fields.make).toBe("Toyota");
+    expect(res.body.fields.vin).toBe("4T1BF1FK5GU123456");
+    expect(res.body.fields.year).toBe(2022);
+  });
+
   it("requires authentication", async () => {
     const anon = supertestLib.agent(app);
     expect((await anon.get("/api/my/vehicles")).status).toBe(401);

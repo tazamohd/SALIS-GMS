@@ -21590,15 +21590,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (docType !== "license" && docType !== "insurance") {
         return res.status(400).json({ message: "docType must be 'license' or 'insurance'" });
       }
+      const { extractVehicleFields } = await import("./services/ocr/vehicleDocOcr");
+
+      // Preferred path: the caller supplies OCR text (from client-side OCR such
+      // as Tesseract.js, or a cloud provider) and we extract structured fields.
+      const rawText = typeof req.body?.rawText === "string" ? req.body.rawText : "";
+      if (rawText.trim()) {
+        return res.json({ ocrAvailable: true, source: "text", fields: extractVehicleFields(rawText, docType) });
+      }
+
+      // Otherwise, a server-side image->text provider must be configured. The
+      // provider adapter is the remaining integration point; until it is set we
+      // report unavailable so the UI falls back to manual entry (no fabrication).
       const provider = process.env.VEHICLE_OCR_PROVIDER;
       if (!provider) {
-        return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually." });
+        return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually or paste the document text." });
       }
-      // Seam: a configured provider (Google Vision / AWS Textract / etc.) would
-      // extract text from req.body.imageBase64 and map it to vehicle/insurance
-      // fields here. Kept out of the default build so the platform stays
-      // self-contained.
-      res.json({ ocrAvailable: true, provider, fields: {} });
+      return res.json({ ocrAvailable: true, provider, source: "image", fields: {}, message: "Send the recognized text as rawText to extract fields." });
     } catch (error) {
       console.error("Error scanning document:", error);
       res.status(500).json({ message: "Failed to scan document" });
