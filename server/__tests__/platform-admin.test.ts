@@ -2,12 +2,14 @@
  * Wave A — Platform admin route security tests (SA-005)
  *
  * These tests are read-only documentation/contract tests. They verify that
- * the route definitions in `server/routes.ts` use `requireAdmin` middleware
- * instead of `isAuthenticated` for all `/api/platform-admin/*` endpoints.
+ * the route definitions in `server/routes.ts` use `requirePlatformAdmin`
+ * middleware for all `/api/platform-admin/*` endpoints. requireAdmin is NOT
+ * sufficient: it short-circuits for any garage-level ADMIN, so it would let
+ * every garage owner control the cross-tenant platform control plane.
  *
  * Acceptance criteria (SA-005):
- *  - Every platform-admin endpoint declares `requireAdmin` as middleware
- *  - No platform-admin endpoint uses only `isAuthenticated`
+ *  - Every platform-admin endpoint declares `requirePlatformAdmin` as middleware
+ *  - No platform-admin endpoint uses only `isAuthenticated` or `requireAdmin`
  *
  * Note: full integration tests would require a running server, DB, and
  * authenticated sessions. These are contract tests that verify the source
@@ -34,7 +36,7 @@ describe('Platform admin route security (SA-005)', () => {
   ];
 
   for (const routePath of platformAdminRoutes) {
-    it(`${routePath} uses requireAdmin middleware`, () => {
+    it(`${routePath} uses requirePlatformAdmin middleware`, () => {
       const escaped = routePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const routeRegex = new RegExp(
         `app\\.(get|post|patch|put|delete)\\(['"]${escaped}['"]\\s*,\\s*([^,]+)`
@@ -44,8 +46,8 @@ describe('Platform admin route security (SA-005)', () => {
       const middleware = match![2].trim();
       expect(
         middleware,
-        `${routePath} must use requireAdmin, found: ${middleware}`
-      ).toBe('requireAdmin');
+        `${routePath} must use requirePlatformAdmin, found: ${middleware}`
+      ).toBe('requirePlatformAdmin');
     });
   }
 });

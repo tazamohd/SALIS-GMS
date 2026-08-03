@@ -37,7 +37,7 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
-import { requireRole, requireAdmin, requireManagerOrAbove } from "./middleware/requireRole";
+import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
@@ -21093,7 +21093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PLATFORM ADMIN ROUTES
   // ============================================================
 
-  app.get('/api/platform-admin/stats', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/stats', requirePlatformAdmin, async (req: any, res) => {
     try {
       const totalGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages`);
       const activeGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`);
@@ -21113,7 +21113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/platform-admin/garages', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/garages', requirePlatformAdmin, async (req: any, res) => {
     try {
       const result = await db.execute(sql`
         SELECT g.*, COUNT(u.id) as user_count
@@ -21129,7 +21129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/platform-admin/garages', requireAdmin, auditLog, async (req: any, res) => {
+  app.post('/api/platform-admin/garages', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { name, ownerName, email, phone, address, city, country, subscriptionPlan, vatNumber, maxBranches } = req.body;
 
@@ -21154,7 +21154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/platform-admin/garages/:id/status', requireAdmin, auditLog, async (req: any, res) => {
+  app.patch('/api/platform-admin/garages/:id/status', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { status } = req.body;
       const isActive = status === 'active';
@@ -21165,7 +21165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/platform-admin/suppliers', requireAdmin, auditLog, async (req: any, res) => {
+  app.post('/api/platform-admin/suppliers', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { name, contactPerson, email, phone, address, country, category, paymentTerms, website, notes } = req.body;
 
@@ -21187,7 +21187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/platform-admin/stores', requireAdmin, auditLog, async (req: any, res) => {
+  app.post('/api/platform-admin/stores', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { name, ownerEmail, description, category, country, city, commissionRate, currency } = req.body;
       const fallback = {
@@ -21201,7 +21201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/platform-admin/support-tickets', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/support-tickets', requirePlatformAdmin, async (req: any, res) => {
     try {
       const tickets = [
         { id: "T-001", garageId: "g1", garage: "Al-Rashid Auto Center", user: "Mohammed Al-Rashid", subject: "Invoice ZATCA sync issue", priority: "HIGH", status: "open", created: "2026-03-08", type: "Technical" },
@@ -21213,7 +21213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/platform-admin/support-tickets/:id', requireAdmin, auditLog, async (req: any, res) => {
+  app.patch('/api/platform-admin/support-tickets/:id', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       res.json({ success: true, id: req.params.id, ...req.body });
     } catch (error: any) {
@@ -21221,7 +21221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/platform-admin/system-health', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/system-health', requirePlatformAdmin, async (req: any, res) => {
     try {
       res.json({
         apiLatency: 87,

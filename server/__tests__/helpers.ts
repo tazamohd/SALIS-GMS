@@ -107,6 +107,49 @@ export function unauthenticatedAgent(app: Express) {
   return supertest.agent(app);
 }
 
+/**
+ * Register + log in a PLATFORM_ADMIN (super admin): garageless, role
+ * PLATFORM_ADMIN, userType platform_admin. Used to exercise the
+ * /api/platform-admin/* control plane and the approval workflows.
+ */
+export async function loginAsPlatformAdmin(app: Express): Promise<{
+  agent: supertest.Agent;
+  user: any;
+}> {
+  const agent = supertest.agent(app);
+  const admin = {
+    email: `platform-admin-${uniqueToken()}@salisauto.com`,
+    password: "TestPass123!",
+    fullName: "Platform Admin",
+    phone: "+966500000100",
+  };
+  await agent.post("/api/register").send(admin).expect((res) => {
+    if (res.status !== 200 && res.status !== 400 && res.status !== 500) {
+      throw new Error(`Register (platform admin) failed: ${res.status} ${JSON.stringify(res.body)}`);
+    }
+  });
+
+  const url = process.env.DATABASE_URL;
+  if (url) {
+    const client = new Client({ connectionString: url });
+    await client.connect();
+    try {
+      await client.query(
+        `UPDATE users SET role = 'PLATFORM_ADMIN', user_type = 'platform_admin', garage_id = NULL WHERE email = $1`,
+        [admin.email],
+      );
+    } finally {
+      await client.end();
+    }
+  }
+
+  const loginRes = await agent.post("/api/login").send({ email: admin.email, password: admin.password });
+  if (loginRes.status !== 200) {
+    throw new Error(`Login (platform admin) failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
+  }
+  return { agent, user: loginRes.body };
+}
+
 export async function seedCustomer(agent: supertest.Agent, garageId?: string) {
   const gId = garageId || getTestGarageId();
   const token = uniqueToken();
