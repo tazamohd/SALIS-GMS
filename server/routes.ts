@@ -21312,7 +21312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Automated verification of the official government identifiers.
-      const verification = verifyBusiness({
+      const verification = await verifyBusiness({
         taxNumber: parsed.data.taxNumber,
         commercialRegistration: parsed.data.commercialRegistration,
         country: parsed.data.country,
@@ -21895,21 +21895,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const { extractVehicleFields } = await import("./services/ocr/vehicleDocOcr");
 
-      // Preferred path: the caller supplies OCR text (from client-side OCR such
-      // as Tesseract.js, or a cloud provider) and we extract structured fields.
+      // Path 1: the caller supplies OCR text (client-side OCR / paste) and we
+      // extract structured fields from it.
       const rawText = typeof req.body?.rawText === "string" ? req.body.rawText : "";
       if (rawText.trim()) {
         return res.json({ ocrAvailable: true, source: "text", fields: extractVehicleFields(rawText, docType) });
       }
 
-      // Otherwise, a server-side image->text provider must be configured. The
-      // provider adapter is the remaining integration point; until it is set we
-      // report unavailable so the UI falls back to manual entry (no fabrication).
-      const provider = process.env.VEHICLE_OCR_PROVIDER;
-      if (!provider) {
-        return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually or paste the document text." });
+      // Path 2: the caller supplies an image and a server-side OCR provider is
+      // configured (GOOGLE_VISION_API_KEY) — image -> text -> same extractor.
+      const imageBase64 = typeof req.body?.imageBase64 === "string" ? req.body.imageBase64 : "";
+      const { imageToText, imageOcrConfigured } = await import("./services/ocr/imageOcr");
+      if (imageBase64 && imageOcrConfigured()) {
+        const text = await imageToText(imageBase64);
+        if (text) {
+          return res.json({ ocrAvailable: true, source: "image", fields: extractVehicleFields(text, docType) });
+        }
+        return res.json({ ocrAvailable: true, source: "image", fields: {}, message: "Could not read the image — try a clearer photo or enter details manually." });
       }
-      return res.json({ ocrAvailable: true, provider, source: "image", fields: {}, message: "Send the recognized text as rawText to extract fields." });
+
+      // No text, no configured image provider → honest fallback to manual entry.
+      return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually or paste the document text." });
     } catch (error) {
       console.error("Error scanning document:", error);
       res.status(500).json({ message: "Failed to scan document" });

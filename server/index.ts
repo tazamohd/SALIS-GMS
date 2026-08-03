@@ -3,6 +3,9 @@
 // audit finding that config.ts (the only dotenv loader) was imported by no boot
 // file, so a .env-based deploy never loaded its variables.
 import "./config";
+// Sentry (no-op without SENTRY_DSN) — must load before the rest of the app so
+// platform-wide errors are captured.
+import { sentryEnabled, Sentry } from "./instrument";
 
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
@@ -106,7 +109,10 @@ app.use((req, res, next) => {
     // Log the error but do NOT re-throw: throwing after the response is sent, in
     // the terminal handler, produced an uncaughtException that could crash the
     // process on ordinary 4xx/5xx.
-    if (status >= 500) console.error("Unhandled error:", err);
+    if (status >= 500) {
+      console.error("Unhandled error:", err);
+      if (sentryEnabled) Sentry.captureException(err);
+    }
     res.status(status).json({ message });
   });
 

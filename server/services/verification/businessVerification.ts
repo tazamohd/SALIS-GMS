@@ -64,11 +64,40 @@ function checkFormats(input: VerifyInput): VerificationCheck[] {
 }
 
 /**
- * Registry existence check. The stub treats correctly-formatted numbers as
- * "found" unless they are on a small blocklist, and demo numbers as found.
- * Replace this with a real government API client when available.
+ * Real registry client: Wathq (وثّق) commercial-registration lookup, active
+ * when WATHQ_API_KEY is set. Any API failure degrades to "not found" so a
+ * possibly-valid business routes to MANUAL REVIEW — never auto-approved on an
+ * outage, never auto-rejected on one either.
  */
-function registryLookup(input: VerifyInput): { provider: string; found: boolean; detail: string } {
+async function wathqLookup(cr: string): Promise<{ found: boolean; detail: string }> {
+  const key = process.env.WATHQ_API_KEY!;
+  const base = process.env.WATHQ_API_BASE || "https://api.wathq.sa/v5/commercialregistration";
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(`${base}/fullinfo/${encodeURIComponent(cr)}`, {
+      headers: { apiKey: key, Accept: "application/json" },
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+    if (res.status === 200) {
+      const body: any = await res.json().catch(() => ({}));
+      const active = body?.status?.id === undefined || String(body?.status?.name ?? "").length >= 0;
+      return { found: active, detail: `CR found in Wathq registry (${body?.crName ?? "name unavailable"})` };
+    }
+    if (res.status === 404) return { found: false, detail: "CR not found in Wathq registry" };
+    return { found: false, detail: `Wathq lookup inconclusive (HTTP ${res.status})` };
+  } catch (err: any) {
+    return { found: false, detail: `Wathq lookup failed (${err?.name === "AbortError" ? "timeout" : "network error"})` };
+  }
+}
+
+/**
+ * Registry existence check. Uses Wathq when WATHQ_API_KEY is configured;
+ * otherwise a deterministic stub (well-formed, non-blocklisted → found) so the
+ * platform is self-contained and testable. Demo identifiers always pass.
+ */
+async function registryLookup(input: VerifyInput): Promise<{ provider: string; found: boolean; detail: string }> {
   const tax = (input.taxNumber ?? "").trim();
   const cr = (input.commercialRegistration ?? "").trim();
 
@@ -76,9 +105,12 @@ function registryLookup(input: VerifyInput): { provider: string; found: boolean;
     return { provider: "demo", found: true, detail: "Demo account — registry lookup bypassed" };
   }
 
+  if (process.env.WATHQ_API_KEY) {
+    const r = await wathqLookup(cr);
+    return { provider: "wathq", ...r };
+  }
+
   const provider = process.env.BUSINESS_VERIFICATION_PROVIDER || "stub";
-  // Seam: a real client would call the government registry here and return its
-  // result. The stub confirms existence for well-formed, non-blocklisted ids.
   const blocklisted = tax.endsWith("0000") && cr.endsWith("0000");
   const found = SAUDI_VAT_RE.test(tax) && SAUDI_CR_RE.test(cr) && !blocklisted;
   return {
@@ -88,7 +120,7 @@ function registryLookup(input: VerifyInput): { provider: string; found: boolean;
   };
 }
 
-export function verifyBusiness(input: VerifyInput): VerificationResult {
+export async function verifyBusiness(input: VerifyInput): Promise<VerificationResult> {
   const formatChecks = checkFormats(input);
   const formatsOk = formatChecks.every((c) => c.passed);
 
@@ -97,7 +129,7 @@ export function verifyBusiness(input: VerifyInput): VerificationResult {
     return { status: "failed", provider: "format", checks: formatChecks };
   }
 
-  const lookup = registryLookup(input);
+  const lookup = await registryLookup(input);
   const checks: VerificationCheck[] = [
     ...formatChecks,
     { name: "registry_lookup", passed: lookup.found, detail: lookup.detail },
