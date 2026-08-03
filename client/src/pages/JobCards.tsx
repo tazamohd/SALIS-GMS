@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
+import { vehicleMakes } from "@shared/vehicleCatalogs";
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -463,13 +464,17 @@ export function JobCards() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="make" className="text-[#0B1F3B] dark:text-white">{t('jobCards.make', 'Make')} *</Label>
-                  <Input
+                  <select
                     id="make"
                     {...createForm.register("vehicleInfo.make")}
-                    placeholder="Toyota"
-                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-make"
-                  />
+                    className="w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                  >
+                    <option value="">{t('jobCards.selectMake', 'Select make')}</option>
+                    {vehicleMakes.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="model" className="text-[#0B1F3B] dark:text-white">{t('jobCards.model', 'Model')} *</Label>
