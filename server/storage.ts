@@ -2811,7 +2811,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAppointment(data: Omit<InsertAppointment, 'appointmentNumber' | 'id'>): Promise<Appointment> {
-    const appointmentNumber = `APT-${Date.now()}`;
+    const appointmentNumber = `APT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [appointment] = await db.insert(appointments).values({
       ...data,
       appointmentNumber,
@@ -3861,7 +3861,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder> {
-    const poNumber = `PO-${Date.now()}`;
+    const poNumber = `PO-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [po] = await db.insert(purchaseOrders)
       .values({ ...data, poNumber })
       .returning();
@@ -3909,7 +3909,7 @@ export class DatabaseStorage implements IStorage {
     items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]
   ): Promise<PurchaseOrder> {
     return await db.transaction(async (tx) => {
-      const poNumber = `PO-${Date.now()}`;
+      const poNumber = `PO-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [po] = await tx.insert(purchaseOrders)
         .values({ ...poData, poNumber })
         .returning();
@@ -3943,7 +3943,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPurchaseTask(data: InsertPurchaseTask): Promise<PurchaseTask> {
-    const taskNumber = `PT-${Date.now()}`;
+    const taskNumber = `PT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [task] = await db.insert(purchaseTasks)
       .values({ ...data, taskNumber })
       .returning();
@@ -3998,7 +3998,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createQuotationRequest(data: InsertQuotationRequest): Promise<QuotationRequest> {
-    const requestNumber = `QR-${Date.now()}`;
+    const requestNumber = `QR-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [req] = await db.insert(quotationRequests)
       .values({ ...data, requestNumber })
       .returning();
@@ -4482,7 +4482,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEstimate(data: InsertEstimate): Promise<Estimate> {
-    const estimateNumber = `EST-${Date.now()}`;
+    const estimateNumber = `EST-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [estimate] = await db.insert(estimates)
       .values({ ...data, estimateNumber })
       .returning();
@@ -4523,7 +4523,7 @@ export class DatabaseStorage implements IStorage {
     items: Omit<InsertEstimateItem, 'estimateId'>[]
   ): Promise<Estimate> {
     return await db.transaction(async (tx) => {
-      const estimateNumber = `EST-${Date.now()}`;
+      const estimateNumber = `EST-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [estimate] = await tx.insert(estimates)
         .values({ ...estimateData, estimateNumber })
         .returning();
@@ -8772,7 +8772,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVehicleInspection(data: InsertVehicleInspection): Promise<VehicleInspection> {
-    const inspectionNumber = `INS-${Date.now()}`;
+    const inspectionNumber = `INS-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [inspection] = await db.insert(vehicleInspections)
       .values({ ...data, inspectionNumber })
       .returning();
@@ -8824,7 +8824,7 @@ export class DatabaseStorage implements IStorage {
 
   // Module 46: Towing & Roadside Assistance
   async createTowingRequest(data: InsertTowingRequest): Promise<TowingRequest> {
-    const requestNumber = `TOW-${Date.now()}`;
+    const requestNumber = `TOW-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [request] = await db.insert(towingRequests)
       .values({ ...data, requestNumber })
       .returning();
@@ -8927,7 +8927,7 @@ export class DatabaseStorage implements IStorage {
 
   // Module 48: Loaner Vehicle Management
   async createLoanerVehicle(data: InsertLoanerVehicle): Promise<LoanerVehicle> {
-    const loanerNumber = `LOAN-${Date.now()}`;
+    const loanerNumber = `LOAN-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [vehicle] = await db.insert(loanerVehicles)
       .values({ ...data, loanerNumber })
       .returning();
@@ -8975,7 +8975,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLoanerReservation(data: InsertLoanerReservation): Promise<LoanerReservation> {
-    const reservationNumber = `RES-${Date.now()}`;
+    const reservationNumber = `RES-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [reservation] = await db.insert(loanerReservations)
       .values({ ...data, reservationNumber })
       .returning();

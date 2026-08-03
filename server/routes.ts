@@ -953,7 +953,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // to plant a job card in another tenant by forging garageId in the body.
       const jobCardData = {
         ...req.body,
-        jobNumber: req.body.jobNumber?.trim() ? req.body.jobNumber.trim() : `JC-${Date.now()}`,
+        jobNumber: req.body.jobNumber?.trim() ? req.body.jobNumber.trim() : `JC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         garageId: req.user?.garageId || req.body.garageId,
         createdBy: userId,
       };
@@ -4042,7 +4042,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // vehicleInfo, serviceType and createdBy (all NOT NULL, no default) —
       // omitting them made every conversion fail with a constraint violation.
       const jobCardData = {
-        jobNumber: `JC-${Date.now()}`,
+        jobNumber: `JC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         garageId: estimate.garageId,
         customerId: estimate.customerId,
         vehicleId: estimate.vehicleId,
@@ -17164,7 +17164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId,
         droneName: 'SkyInspect-Alpha',
         droneModel: 'DJI Matrice 300 RTK',
-        serialNumber: `DRONE-${Date.now()}`,
+        serialNumber: `DRONE-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         maxFlightTime: 55,
         maxRange: '15.00',
         sensors: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
