@@ -65,6 +65,9 @@ export const garages = pgTable("garages", {
   createdAt: timestamp("created_at").defaultNow(),
   // Subscription plan for feature gating: STARTER, PRO, ENTERPRISE
   subscriptionPlan: varchar("subscription_plan", { length: 50 }).default("STARTER"),
+  // Marketplace provider kind — this "business account" backs every provider
+  // type, not only auto-repair garages.
+  businessType: varchar("business_type", { length: 30 }).default("garage").notNull(), // garage | parts_store | insurance
 });
 
 // Branches

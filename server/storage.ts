@@ -13393,6 +13393,7 @@ export class DatabaseStorage implements IStorage {
           country: app.country,
           isActive: true,
           subscriptionPlan: app.requestedPlan,
+          businessType: app.providerType ?? "garage",
         } as any)
         .returning();
 
@@ -13459,8 +13460,8 @@ export class DatabaseStorage implements IStorage {
   /** List active, approved providers customers can browse. Today providers are
    *  garages; parts_store / insurance types return empty until provisioned. */
   async listMarketplaceProviders(opts?: { type?: string; q?: string; city?: string }): Promise<any[]> {
-    if (opts?.type && opts.type !== "garage") return [];
     const conditions: any[] = [eq(garages.isActive, true)];
+    if (opts?.type) conditions.push(eq(garages.businessType, opts.type));
     if (opts?.q) conditions.push(ilike(garages.name, `%${opts.q}%`));
     if (opts?.city) conditions.push(ilike(garages.city, `%${opts.city}%`));
     const rows = await db
@@ -13469,13 +13470,14 @@ export class DatabaseStorage implements IStorage {
         name: garages.name,
         city: garages.city,
         country: garages.country,
+        providerType: garages.businessType,
         createdAt: garages.createdAt,
       })
       .from(garages)
       .where(and(...conditions))
       .orderBy(desc(garages.createdAt))
       .limit(100);
-    return rows.map((r) => ({ ...r, providerType: "garage" }));
+    return rows;
   }
 
   async getMarketplaceProvider(id: string): Promise<any | undefined> {
@@ -13485,6 +13487,7 @@ export class DatabaseStorage implements IStorage {
         name: garages.name,
         city: garages.city,
         country: garages.country,
+        providerType: garages.businessType,
         createdAt: garages.createdAt,
       })
       .from(garages)
@@ -13502,7 +13505,7 @@ export class DatabaseStorage implements IStorage {
       .from(serviceTemplates)
       .where(and(eq(serviceTemplates.garageId, id), eq(serviceTemplates.isActive, true)))
       .orderBy(asc(serviceTemplates.name));
-    return { ...g, providerType: "garage", services };
+    return { ...g, services };
   }
 
   /** Smart search across providers and the services they offer. Returns both a
@@ -13512,7 +13515,7 @@ export class DatabaseStorage implements IStorage {
   async searchMarketplace(query: string): Promise<{ providers: any[]; services: any[] }> {
     const q = `%${query}%`;
     const providers = await db
-      .select({ id: garages.id, name: garages.name, city: garages.city, country: garages.country })
+      .select({ id: garages.id, name: garages.name, city: garages.city, country: garages.country, providerType: garages.businessType })
       .from(garages)
       .where(and(eq(garages.isActive, true), ilike(garages.name, q)))
       .limit(25);
@@ -13538,10 +13541,7 @@ export class DatabaseStorage implements IStorage {
       )
       .limit(50);
 
-    return {
-      providers: providers.map((p) => ({ ...p, providerType: "garage" })),
-      services,
-    };
+    return { providers, services };
   }
 
   // ==========================================================================
