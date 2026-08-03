@@ -218,6 +218,7 @@ import Marketplace from "@/pages/Marketplace";
 import MyVehicles from "@/pages/MyVehicles";
 import MyBookings from "@/pages/MyBookings";
 import ProviderBookings from "@/pages/ProviderBookings";
+import MyOfferings from "@/pages/MyOfferings";
 import PlatformAdmin from "@/pages/PlatformAdmin";
 import AdvancedReports from "@/pages/AdvancedReports";
 import SupplierPortal from "@/pages/SupplierPortal";
@@ -352,6 +353,11 @@ function Router() {
       <Route path="/provider-bookings">
         <Layout>
           <ProviderBookings />
+        </Layout>
+      </Route>
+      <Route path="/my-offerings">
+        <Layout>
+          <MyOfferings />
         </Layout>
       </Route>
 

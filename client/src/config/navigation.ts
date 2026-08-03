@@ -132,6 +132,7 @@ export const navigationConfig: NavGroup[] = [
       { title: "Job Cards", href: "/job-cards", icon: Wrench },
       { title: "Appointments", href: "/appointments", icon: Calendar },
       { title: "Marketplace Bookings", href: "/provider-bookings", icon: Calendar },
+      { title: "My Offerings", href: "/my-offerings", icon: Receipt },
       { title: "Estimates", href: "/estimates", icon: Receipt },
     ],
   },

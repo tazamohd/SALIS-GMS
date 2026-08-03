@@ -31,6 +31,7 @@ interface ServiceHit {
 }
 interface ProviderDetail extends Provider {
   services: { id: string; name: string; category: string | null; description: string | null; standardCost: string | null }[];
+  offerings: { id: string; kind: string; name: string; category: string | null; description: string | null; price: string | null; currency: string | null }[];
 }
 
 const TYPES = [
@@ -178,19 +179,37 @@ export default function Marketplace() {
                   </span>
                 )}
               </div>
-              <div>
-                <h3 className="text-sm font-semibold mb-2">Services</h3>
-                {detail.data.services.length === 0 ? <p className="text-sm text-[#64748B]">No services listed yet.</p> : (
+              {(detail.data.services.length > 0 || detail.data.offerings.length === 0) && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Services</h3>
+                  {detail.data.services.length === 0 ? <p className="text-sm text-[#64748B]">No services listed yet.</p> : (
+                    <ul className="space-y-2">
+                      {detail.data.services.map((s) => (
+                        <li key={s.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36]">
+                          <div className="font-medium text-sm">{s.name}</div>
+                          <div className="text-xs text-[#64748B]">{s.category}{s.standardCost ? ` · from ${s.standardCost}` : ""}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+              {detail.data.offerings.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Products &amp; plans</h3>
                   <ul className="space-y-2">
-                    {detail.data.services.map((s) => (
-                      <li key={s.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36]">
-                        <div className="font-medium text-sm">{s.name}</div>
-                        <div className="text-xs text-[#64748B]">{s.category}{s.standardCost ? ` · from ${s.standardCost}` : ""}</div>
+                    {detail.data.offerings.map((o) => (
+                      <li key={o.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-sm">{o.name}</div>
+                          <div className="text-xs text-[#64748B]">{o.category}{o.price ? ` · ${o.price} ${o.currency ?? "SAR"}` : ""}</div>
+                        </div>
+                        <Badge variant="outline" className="text-xs">{o.kind === "insurance_plan" ? "plan" : o.kind}</Badge>
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
+                </div>
+              )}
               {user ? (
                 <BookingForm providerId={detail.data.id} services={detail.data.services} onDone={() => setSelected(null)} />
               ) : (
