@@ -6364,7 +6364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Cannot change garage" });
       }
       
-      const template = await storage.updateShiftTemplate(req.params.id, validated.data);
+      const template = await storage.updateShiftTemplate(req.params.id, validated.data, userGarageId);
       res.json(template);
     } catch (error) {
       console.error("Error updating shift template:", error);
@@ -6385,7 +6385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      await storage.deleteShiftTemplate(req.params.id);
+      await storage.deleteShiftTemplate(req.params.id, userGarageId);
       res.json({ message: "Shift template deleted successfully" });
     } catch (error) {
       console.error("Error deleting shift template:", error);
@@ -6455,7 +6455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Cannot change garage" });
       }
       
-      const assignment = await storage.updateShiftAssignment(req.params.id, validated.data);
+      const assignment = await storage.updateShiftAssignment(req.params.id, validated.data, userGarageId);
       res.json(assignment);
     } catch (error) {
       console.error("Error updating shift assignment:", error);
@@ -6476,7 +6476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      await storage.deleteShiftAssignment(req.params.id);
+      await storage.deleteShiftAssignment(req.params.id, userGarageId);
       res.json({ message: "Shift assignment deleted successfully" });
     } catch (error) {
       console.error("Error deleting shift assignment:", error);

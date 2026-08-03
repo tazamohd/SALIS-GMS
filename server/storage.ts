@@ -6999,16 +6999,18 @@ export class DatabaseStorage implements IStorage {
     return template;
   }
 
-  async updateShiftTemplate(id: string, data: Partial<ShiftTemplate>): Promise<ShiftTemplate> {
+  async updateShiftTemplate(id: string, data: Partial<ShiftTemplate>, garageId?: string): Promise<ShiftTemplate> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [template] = await db.update(shiftTemplates)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(shiftTemplates.id, id))
+      .where(and(eq(shiftTemplates.id, id), garageId ? eq(shiftTemplates.garageId, garageId) : undefined))
       .returning();
     return template;
   }
 
-  async deleteShiftTemplate(id: string): Promise<void> {
-    await db.delete(shiftTemplates).where(eq(shiftTemplates.id, id));
+  async deleteShiftTemplate(id: string, garageId?: string): Promise<void> {
+    await db.delete(shiftTemplates)
+      .where(and(eq(shiftTemplates.id, id), garageId ? eq(shiftTemplates.garageId, garageId) : undefined));
   }
 
   async getShiftAssignments(garageId: string, employeeId?: string, startDate?: Date, endDate?: Date): Promise<ShiftAssignment[]> {
@@ -7039,16 +7041,18 @@ export class DatabaseStorage implements IStorage {
     return assignment;
   }
 
-  async updateShiftAssignment(id: string, data: Partial<ShiftAssignment>): Promise<ShiftAssignment> {
+  async updateShiftAssignment(id: string, data: Partial<ShiftAssignment>, garageId?: string): Promise<ShiftAssignment> {
+    // Tenant scope (B16 breadth): a cross-tenant update matches no row.
     const [assignment] = await db.update(shiftAssignments)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(shiftAssignments.id, id))
+      .where(and(eq(shiftAssignments.id, id), garageId ? eq(shiftAssignments.garageId, garageId) : undefined))
       .returning();
     return assignment;
   }
 
-  async deleteShiftAssignment(id: string): Promise<void> {
-    await db.delete(shiftAssignments).where(eq(shiftAssignments.id, id));
+  async deleteShiftAssignment(id: string, garageId?: string): Promise<void> {
+    await db.delete(shiftAssignments)
+      .where(and(eq(shiftAssignments.id, id), garageId ? eq(shiftAssignments.garageId, garageId) : undefined));
   }
 
   // Commission Management
