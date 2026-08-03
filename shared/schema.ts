@@ -11312,6 +11312,58 @@ export const providerOfferings = pgTable("provider_offerings", {
   providerIdx: index("provider_offerings_provider_idx").on(table.providerId),
 }));
 
+// Customer marketplace — a product order a customer places with a parts store.
+// Prices/names are snapshotted per line so the order stands if the offering
+// changes later.
+export const providerOrders = pgTable("provider_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | confirmed | fulfilled | declined | cancelled
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).default("0").notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  notes: text("notes"),
+  providerNotes: text("provider_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("provider_orders_customer_idx").on(table.customerId),
+  providerIdx: index("provider_orders_provider_idx").on(table.providerId),
+}));
+
+export const providerOrderItems = pgTable("provider_order_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: uuid("order_id").notNull().references(() => providerOrders.id, { onDelete: "cascade" }),
+  offeringId: uuid("offering_id").references(() => providerOfferings.id),
+  name: varchar("name", { length: 255 }).notNull(), // snapshot
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).default("0").notNull(), // snapshot
+  quantity: integer("quantity").default(1).notNull(),
+});
+
+// Customer marketplace — an insurance-quote request against an insurer's plan,
+// tied to one of the customer's vehicles (snapshotted).
+export const insuranceQuotes = pgTable("insurance_quotes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  offeringId: uuid("offering_id").references(() => providerOfferings.id),
+  planName: varchar("plan_name", { length: 255 }), // snapshot
+  customerVehicleId: uuid("customer_vehicle_id").references(() => customerVehicles.id),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYear: integer("vehicle_year"),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | quoted | accepted | declined | cancelled
+  quotedPremium: decimal("quoted_premium", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  quoteNotes: text("quote_notes"),
+  validUntil: timestamp("valid_until"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("insurance_quotes_customer_idx").on(table.customerId),
+  providerIdx: index("insurance_quotes_provider_idx").on(table.providerId),
+}));
+
 // Customer marketplace — a booking a customer makes with a provider for a
 // service, optionally tied to one of their saved vehicles. Vehicle/service
 // details are snapshotted so the record stands even if the source changes.
@@ -11474,6 +11526,13 @@ export type InsertMarketplaceBooking = typeof marketplaceBookings.$inferInsert;
 
 export type ProviderOffering = typeof providerOfferings.$inferSelect;
 export type InsertProviderOffering = typeof providerOfferings.$inferInsert;
+
+export type ProviderOrder = typeof providerOrders.$inferSelect;
+export type InsertProviderOrder = typeof providerOrders.$inferInsert;
+export type ProviderOrderItem = typeof providerOrderItems.$inferSelect;
+export type InsertProviderOrderItem = typeof providerOrderItems.$inferInsert;
+export type InsuranceQuote = typeof insuranceQuotes.$inferSelect;
+export type InsertInsuranceQuote = typeof insuranceQuotes.$inferInsert;
 export const insertProviderOfferingSchema = createInsertSchema(providerOfferings).omit({
   id: true,
   providerId: true,

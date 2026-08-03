@@ -39,6 +39,26 @@ export default function MyBookings() {
     onError: (e: Error) => toast({ title: "Could not cancel", description: e.message, variant: "destructive" }),
   });
 
+  const orders = useQuery<any[]>({
+    queryKey: ["/api/my/orders"],
+    queryFn: async () => (await apiRequest("GET", "/api/my/orders")).json(),
+  });
+  const cancelOrder = useMutation({
+    mutationFn: async (id: string) => (await apiRequest("POST", `/api/my/orders/${id}/cancel`, {})).json(),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["/api/my/orders"] }); toast({ title: "Order cancelled" }); },
+  });
+
+  const quotes = useQuery<any[]>({
+    queryKey: ["/api/my/quotes"],
+    queryFn: async () => (await apiRequest("GET", "/api/my/quotes")).json(),
+  });
+  const decideQuote = useMutation({
+    mutationFn: async ({ id, d }: { id: string; d: "accept" | "cancel" }) =>
+      (await apiRequest("POST", `/api/my/quotes/${id}/${d}`, {})).json(),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["/api/my/quotes"] }); toast({ title: "Updated" }); },
+    onError: (e: Error) => toast({ title: "Could not update", description: e.message, variant: "destructive" }),
+  });
+
   const notifications = useQuery<MyNotification[]>({
     queryKey: ["/api/my/notifications"],
     queryFn: async () => (await apiRequest("GET", "/api/my/notifications")).json(),
@@ -95,6 +115,64 @@ export default function MyBookings() {
                   {(b.status === "requested" || b.status === "accepted") && (
                     <Button size="sm" variant="outline" onClick={() => cancel.mutate(b.id)} data-testid={`cancel-${b.id}`}>Cancel</Button>
                   )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Product orders */}
+        {(orders.data?.length ?? 0) > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-[#64748B] uppercase tracking-wide">My Orders</h2>
+            {orders.data!.map((o: any) => (
+              <Card key={o.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`order-${o.id}`}>
+                <CardContent className="p-4 flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white">{o.totalAmount} {o.currency}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${STATUS_STYLE[o.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{o.status}</span>
+                    </div>
+                    <div className="text-xs text-[#64748B]">
+                      {(o.items ?? []).map((i: any) => `${i.quantity}× ${i.name}`).join(", ")}
+                    </div>
+                    {o.providerNotes && <div className="text-xs text-[#0A5ED7] dark:text-[#0BB3FF]">Store: {o.providerNotes}</div>}
+                  </div>
+                  {(o.status === "pending" || o.status === "confirmed") && (
+                    <Button size="sm" variant="outline" onClick={() => cancelOrder.mutate(o.id)} data-testid={`cancel-order-${o.id}`}>Cancel</Button>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Insurance quotes */}
+        {(quotes.data?.length ?? 0) > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-[#64748B] uppercase tracking-wide">My Insurance Quotes</h2>
+            {quotes.data!.map((qt: any) => (
+              <Card key={qt.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`quote-${qt.id}`}>
+                <CardContent className="p-4 flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white">{qt.planName ?? "Insurance quote"}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${STATUS_STYLE[qt.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{qt.status}</span>
+                    </div>
+                    {(qt.vehicleMake || qt.vehicleModel) && (
+                      <div className="text-xs text-[#64748B]">{[qt.vehicleYear, qt.vehicleMake, qt.vehicleModel].filter(Boolean).join(" ")}</div>
+                    )}
+                    {qt.quotedPremium && <div className="text-xs text-emerald-600 font-medium">Premium: {qt.quotedPremium} {qt.currency}</div>}
+                    {qt.quoteNotes && <div className="text-xs text-[#0A5ED7] dark:text-[#0BB3FF]">{qt.quoteNotes}</div>}
+                  </div>
+                  <div className="flex gap-1">
+                    {qt.status === "quoted" && (
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => decideQuote.mutate({ id: qt.id, d: "accept" })} data-testid={`accept-quote-${qt.id}`}>Accept</Button>
+                    )}
+                    {(qt.status === "pending" || qt.status === "quoted") && (
+                      <Button size="sm" variant="outline" onClick={() => decideQuote.mutate({ id: qt.id, d: "cancel" })} data-testid={`cancel-quote-${qt.id}`}>Cancel</Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}

@@ -211,7 +211,17 @@ export default function Marketplace() {
                 </div>
               )}
               {user ? (
-                <BookingForm providerId={detail.data.id} services={detail.data.services} onDone={() => setSelected(null)} />
+                <>
+                  {detail.data.offerings.some((o) => o.kind === "product") && (
+                    <OrderForm providerId={detail.data.id} products={detail.data.offerings.filter((o) => o.kind === "product")} onDone={() => setSelected(null)} />
+                  )}
+                  {detail.data.offerings.some((o) => o.kind === "insurance_plan") && (
+                    <QuoteForm providerId={detail.data.id} plans={detail.data.offerings.filter((o) => o.kind === "insurance_plan")} onDone={() => setSelected(null)} />
+                  )}
+                  {detail.data.providerType === "garage" && (
+                    <BookingForm providerId={detail.data.id} services={detail.data.services} onDone={() => setSelected(null)} />
+                  )}
+                </>
               ) : (
                 <Link href="/customer-signup">
                   <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up to book</Button>
@@ -284,6 +294,78 @@ function BookingForm({ providerId, services, onDone }: { providerId: string; ser
       </div>
       <Button onClick={() => book.mutate()} disabled={book.isPending} data-testid="booking-submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
         {book.isPending ? "Requesting…" : "Request booking"}
+      </Button>
+    </div>
+  );
+}
+
+function OrderForm({ providerId, products, onDone }: { providerId: string; products: { id: string; name: string; price: string | null; currency: string | null }[]; onDone: () => void }) {
+  const { toast } = useToast();
+  const [qty, setQty] = useState<Record<string, number>>({});
+  const items = Object.entries(qty).filter(([, q]) => q > 0).map(([offeringId, quantity]) => ({ offeringId, quantity }));
+  const total = items.reduce((s, i) => {
+    const p = products.find((x) => x.id === i.offeringId);
+    return s + Number(p?.price ?? 0) * i.quantity;
+  }, 0);
+
+  const order = useMutation({
+    mutationFn: async () => (await apiRequest("POST", "/api/my/orders", { providerId, items })).json(),
+    onSuccess: () => { toast({ title: "Order placed", description: "The store will confirm your order." }); onDone(); },
+    onError: (e: Error) => toast({ title: "Could not order", description: e.message, variant: "destructive" }),
+  });
+
+  return (
+    <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-2">
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Order parts</p>
+      {products.map((p) => (
+        <div key={p.id} className="flex items-center justify-between gap-2 text-sm">
+          <span>{p.name}{p.price ? ` · ${p.price} ${p.currency ?? "SAR"}` : ""}</span>
+          <input
+            type="number" min={0} max={999} value={qty[p.id] ?? 0}
+            onChange={(e) => setQty((q) => ({ ...q, [p.id]: Math.max(0, parseInt(e.target.value || "0", 10)) }))}
+            data-testid={`order-qty-${p.id}`}
+            className="w-16 h-8 rounded-md px-2 text-right bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]"
+          />
+        </div>
+      ))}
+      <Button onClick={() => order.mutate()} disabled={items.length === 0 || order.isPending} data-testid="order-submit"
+        className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+        {order.isPending ? "Placing…" : `Place order${total > 0 ? ` (${total.toFixed(2)} SAR)` : ""}`}
+      </Button>
+    </div>
+  );
+}
+
+function QuoteForm({ providerId, plans, onDone }: { providerId: string; plans: { id: string; name: string }[]; onDone: () => void }) {
+  const { toast } = useToast();
+  const [offeringId, setOfferingId] = useState("");
+  const [customerVehicleId, setCustomerVehicleId] = useState("");
+  const vehicles = useQuery<MyVehicle[]>({
+    queryKey: ["/api/my/vehicles"],
+    queryFn: async () => (await apiRequest("GET", "/api/my/vehicles")).json(),
+  });
+  const quote = useMutation({
+    mutationFn: async () => (await apiRequest("POST", "/api/my/quotes", {
+      providerId, offeringId: offeringId || undefined, customerVehicleId: customerVehicleId || undefined,
+    })).json(),
+    onSuccess: () => { toast({ title: "Quote requested", description: "The insurer will send you a premium." }); onDone(); },
+    onError: (e: Error) => toast({ title: "Could not request quote", description: e.message, variant: "destructive" }),
+  });
+  const sel = "w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white";
+  return (
+    <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-2">
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Request an insurance quote</p>
+      <select className={sel} value={offeringId} onChange={(e) => setOfferingId(e.target.value)} data-testid="quote-plan">
+        <option value="">Any plan</option>
+        {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+      <select className={sel} value={customerVehicleId} onChange={(e) => setCustomerVehicleId(e.target.value)} data-testid="quote-vehicle">
+        <option value="">{(vehicles.data?.length ?? 0) === 0 ? "No saved vehicles" : "Select a vehicle"}</option>
+        {(vehicles.data ?? []).map((v) => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(" ")}</option>)}
+      </select>
+      <Button onClick={() => quote.mutate()} disabled={quote.isPending} data-testid="quote-submit"
+        className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+        {quote.isPending ? "Requesting…" : "Request quote"}
       </Button>
     </div>
   );

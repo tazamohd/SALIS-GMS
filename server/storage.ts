@@ -807,6 +807,14 @@ import {
   providerOfferings,
   type ProviderOffering,
   type InsertProviderOffering,
+  providerOrders,
+  providerOrderItems,
+  type ProviderOrder,
+  type InsertProviderOrder,
+  type ProviderOrderItem,
+  insuranceQuotes,
+  type InsuranceQuote,
+  type InsertInsuranceQuote,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13664,6 +13672,133 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(providerOfferings)
       .where(and(eq(providerOfferings.id, id), eq(providerOfferings.providerId, providerId)));
+  }
+
+  // ==========================================================================
+  // Customer marketplace — product orders (parts stores)
+  // ==========================================================================
+
+  /** Create an order with snapshotted line items, atomically with its total. */
+  async createProviderOrder(
+    order: InsertProviderOrder,
+    items: Array<{ offeringId: string | null; name: string; unitPrice: string; quantity: number }>,
+  ): Promise<ProviderOrder & { items: ProviderOrderItem[] }> {
+    return await db.transaction(async (tx) => {
+      const total = items.reduce((s, i) => s + Number(i.unitPrice) * i.quantity, 0);
+      const [row] = await tx
+        .insert(providerOrders)
+        .values({ ...order, totalAmount: total.toFixed(2) } as any)
+        .returning();
+      const inserted = items.length
+        ? await tx.insert(providerOrderItems).values(items.map((i) => ({ ...i, orderId: row.id })) as any).returning()
+        : [];
+      return { ...row, items: inserted };
+    });
+  }
+
+  async listCustomerOrders(customerId: string): Promise<Array<ProviderOrder & { items: ProviderOrderItem[] }>> {
+    const orders = await db.select().from(providerOrders)
+      .where(eq(providerOrders.customerId, customerId))
+      .orderBy(desc(providerOrders.createdAt));
+    return await this.attachOrderItems(orders);
+  }
+
+  async listProviderOrders(providerId: string): Promise<Array<ProviderOrder & { items: ProviderOrderItem[] }>> {
+    const orders = await db.select().from(providerOrders)
+      .where(eq(providerOrders.providerId, providerId))
+      .orderBy(desc(providerOrders.createdAt));
+    return await this.attachOrderItems(orders);
+  }
+
+  private async attachOrderItems(orders: ProviderOrder[]): Promise<Array<ProviderOrder & { items: ProviderOrderItem[] }>> {
+    if (orders.length === 0) return [];
+    const items = await db.select().from(providerOrderItems)
+      .where(inArray(providerOrderItems.orderId, orders.map((o) => o.id)));
+    const byOrder = new Map<string, ProviderOrderItem[]>();
+    for (const i of items) {
+      const list = byOrder.get(i.orderId) ?? [];
+      list.push(i);
+      byOrder.set(i.orderId, list);
+    }
+    return orders.map((o) => ({ ...o, items: byOrder.get(o.id) ?? [] }));
+  }
+
+  /** Customer cancels their own still-open order. */
+  async cancelCustomerOrder(id: string, customerId: string): Promise<ProviderOrder | undefined> {
+    const [row] = await db.update(providerOrders)
+      .set({ status: "cancelled", updatedAt: new Date() })
+      .where(and(
+        eq(providerOrders.id, id),
+        eq(providerOrders.customerId, customerId),
+        inArray(providerOrders.status, ["pending", "confirmed"]),
+      ))
+      .returning();
+    return row;
+  }
+
+  /** Provider updates an order made TO them (scoped to providerId). */
+  async updateProviderOrder(
+    id: string,
+    providerId: string,
+    data: { status?: string; providerNotes?: string },
+  ): Promise<ProviderOrder | undefined> {
+    const [row] = await db.update(providerOrders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(providerOrders.id, id), eq(providerOrders.providerId, providerId)))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Customer marketplace — insurance-quote requests
+  // ==========================================================================
+
+  async createInsuranceQuote(data: InsertInsuranceQuote): Promise<InsuranceQuote> {
+    const [row] = await db.insert(insuranceQuotes).values(data).returning();
+    return row;
+  }
+
+  async listCustomerQuotes(customerId: string): Promise<InsuranceQuote[]> {
+    return await db.select().from(insuranceQuotes)
+      .where(eq(insuranceQuotes.customerId, customerId))
+      .orderBy(desc(insuranceQuotes.createdAt));
+  }
+
+  async listProviderQuotes(providerId: string): Promise<InsuranceQuote[]> {
+    return await db.select().from(insuranceQuotes)
+      .where(eq(insuranceQuotes.providerId, providerId))
+      .orderBy(desc(insuranceQuotes.createdAt));
+  }
+
+  /** Insurer answers a quote request (scoped to providerId). */
+  async respondInsuranceQuote(
+    id: string,
+    providerId: string,
+    data: { status: "quoted" | "declined"; quotedPremium?: string; quoteNotes?: string; validUntil?: Date },
+  ): Promise<InsuranceQuote | undefined> {
+    const [row] = await db.update(insuranceQuotes)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(insuranceQuotes.id, id), eq(insuranceQuotes.providerId, providerId)))
+      .returning();
+    return row;
+  }
+
+  /** Customer accepts a quoted premium or cancels their own open request. */
+  async decideInsuranceQuote(
+    id: string,
+    customerId: string,
+    decision: "accepted" | "cancelled",
+  ): Promise<InsuranceQuote | undefined> {
+    const allowedFrom = decision === "accepted" ? ["quoted"] : ["pending", "quoted"];
+    const [row] = await db.update(insuranceQuotes)
+      .set({ status: decision, updatedAt: new Date() })
+      .where(and(
+        eq(insuranceQuotes.id, id),
+        eq(insuranceQuotes.customerId, customerId),
+        inArray(insuranceQuotes.status, allowedFrom),
+      ))
+      .returning();
+    return row;
   }
 
   // ==========================================================================

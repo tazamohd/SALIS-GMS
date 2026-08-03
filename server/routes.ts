@@ -21883,6 +21883,238 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Marketplace C2 — product orders (customer -> parts store)
+  // ==========================================================================
+
+  // Best-effort notify of the provider's active admins/managers.
+  const notifyProviderAdmins = async (providerId: string, title: string, message: string, metadata: any) => {
+    try {
+      const admins = await db.execute(sql`
+        SELECT id FROM users
+        WHERE garage_id = ${providerId} AND role IN ('ADMIN', 'MANAGER') AND is_active = true
+        LIMIT 5`);
+      for (const row of admins.rows as any[]) {
+        await storage.createNotification({
+          type: "in-app", category: "general", recipientId: row.id, garageId: providerId,
+          title, message, metadata,
+        } as any);
+      }
+    } catch (e) {
+      console.error("Provider notification failed:", e);
+    }
+  };
+  const notifyCustomer = async (customerId: string, providerId: string, title: string, message: string, metadata: any) => {
+    try {
+      await storage.createNotification({
+        type: "in-app", category: "general", recipientId: customerId, garageId: providerId,
+        title, message, metadata,
+      } as any);
+    } catch (e) {
+      console.error("Customer notification failed:", e);
+    }
+  };
+
+  app.post('/api/my/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, items, notes } = req.body ?? {};
+      if (!providerId || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "providerId and at least one item are required" });
+      }
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      // Every line must reference one of the provider's ACTIVE offerings; name
+      // and unit price are snapshotted from the offering, never from the body.
+      const offerings = new Map((provider.offerings ?? []).map((o: any) => [o.id, o]));
+      const lines: Array<{ offeringId: string; name: string; unitPrice: string; quantity: number }> = [];
+      for (const item of items) {
+        const off: any = offerings.get(item?.offeringId);
+        if (!off) return res.status(400).json({ message: "An item references an offering this provider does not sell" });
+        const qty = Number(item?.quantity ?? 1);
+        if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
+          return res.status(400).json({ message: "Item quantity must be a whole number between 1 and 999" });
+        }
+        lines.push({ offeringId: off.id, name: off.name, unitPrice: String(off.price ?? "0"), quantity: qty });
+      }
+
+      const order = await storage.createProviderOrder(
+        { customerId: req.user.id, providerId, notes: notes ?? null } as any,
+        lines,
+      );
+      await notifyProviderAdmins(providerId, "New product order",
+        `${lines.length} item(s), total ${order.totalAmount} ${order.currency}`, { orderId: order.id });
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ message: "Failed to create order" });
+    }
+  });
+
+  app.get('/api/my/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerOrders(req.user.id));
+    } catch (error) {
+      console.error("Error listing orders:", error);
+      res.status(500).json({ message: "Failed to load orders" });
+    }
+  });
+
+  app.post('/api/my/orders/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const cancelled = await storage.cancelCustomerOrder(req.params.id, req.user.id);
+      if (!cancelled) return res.status(404).json({ message: "Order not found or not cancellable" });
+      res.json(cancelled);
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      res.status(500).json({ message: "Failed to cancel order" });
+    }
+  });
+
+  app.get('/api/provider/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderOrders(providerId));
+    } catch (error) {
+      console.error("Error listing provider orders:", error);
+      res.status(500).json({ message: "Failed to load orders" });
+    }
+  });
+
+  app.patch('/api/provider/orders/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = req.body?.status;
+      if (status && !["confirmed", "fulfilled", "declined"].includes(status)) {
+        return res.status(400).json({ message: "status must be confirmed, fulfilled or declined" });
+      }
+      const updated = await storage.updateProviderOrder(req.params.id, providerId, {
+        status,
+        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Order not found" });
+      if (status) {
+        await notifyCustomer(updated.customerId, providerId, `Order ${status}`,
+          `Your order (${updated.totalAmount} ${updated.currency}) is now ${status}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
+          { orderId: updated.id, status });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider order:", error);
+      res.status(500).json({ message: "Failed to update order" });
+    }
+  });
+
+  // ==========================================================================
+  // Marketplace C2 — insurance-quote requests (customer -> insurer)
+  // ==========================================================================
+
+  app.post('/api/my/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, offeringId, customerVehicleId } = req.body ?? {};
+      if (!providerId) return res.status(400).json({ message: "providerId is required" });
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      let planName: string | undefined;
+      if (offeringId) {
+        const off = (provider.offerings ?? []).find((o: any) => o.id === offeringId && o.kind === "insurance_plan");
+        if (!off) return res.status(400).json({ message: "Selected plan is not offered by this insurer" });
+        planName = off.name;
+      }
+      let veh: any;
+      if (customerVehicleId) {
+        veh = await storage.getCustomerVehicle(customerVehicleId, req.user.id);
+        if (!veh) return res.status(400).json({ message: "Vehicle not found" });
+      }
+
+      const quote = await storage.createInsuranceQuote({
+        customerId: req.user.id,
+        providerId,
+        offeringId: offeringId || null,
+        planName: planName ?? null,
+        customerVehicleId: customerVehicleId || null,
+        vehicleMake: veh?.make ?? null,
+        vehicleModel: veh?.model ?? null,
+        vehicleYear: veh?.year ?? null,
+      } as any);
+      await notifyProviderAdmins(providerId, "New insurance quote request",
+        `${planName ?? "General"}${veh ? ` — ${veh.make} ${veh.model ?? ""}`.trim() : ""}`, { quoteId: quote.id });
+      res.status(201).json(quote);
+    } catch (error) {
+      console.error("Error creating quote request:", error);
+      res.status(500).json({ message: "Failed to request quote" });
+    }
+  });
+
+  app.get('/api/my/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerQuotes(req.user.id));
+    } catch (error) {
+      console.error("Error listing quotes:", error);
+      res.status(500).json({ message: "Failed to load quotes" });
+    }
+  });
+
+  app.post('/api/my/quotes/:id/:decision(accept|cancel)', isAuthenticated, async (req: any, res) => {
+    try {
+      const decision = req.params.decision === "accept" ? "accepted" : "cancelled";
+      const updated = await storage.decideInsuranceQuote(req.params.id, req.user.id, decision as any);
+      if (!updated) return res.status(404).json({ message: "Quote not found or not in a decidable state" });
+      await notifyProviderAdmins(updated.providerId, `Quote ${decision}`,
+        `The customer ${decision} the quote${updated.planName ? ` for ${updated.planName}` : ""}.`,
+        { quoteId: updated.id, status: decision });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error deciding quote:", error);
+      res.status(500).json({ message: "Failed to update quote" });
+    }
+  });
+
+  app.get('/api/provider/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderQuotes(providerId));
+    } catch (error) {
+      console.error("Error listing provider quotes:", error);
+      res.status(500).json({ message: "Failed to load quotes" });
+    }
+  });
+
+  app.post('/api/provider/quotes/:id/respond', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { status, quotedPremium, quoteNotes, validUntil } = req.body ?? {};
+      if (!["quoted", "declined"].includes(status)) {
+        return res.status(400).json({ message: "status must be quoted or declined" });
+      }
+      if (status === "quoted" && !(Number(quotedPremium) > 0)) {
+        return res.status(400).json({ message: "quotedPremium is required to quote" });
+      }
+      const updated = await storage.respondInsuranceQuote(req.params.id, providerId, {
+        status,
+        quotedPremium: status === "quoted" ? String(quotedPremium) : undefined,
+        quoteNotes: typeof quoteNotes === "string" ? quoteNotes : undefined,
+        validUntil: validUntil ? new Date(validUntil) : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Quote not found" });
+      await notifyCustomer(updated.customerId, providerId,
+        status === "quoted" ? "Your insurance quote is ready" : "Quote request declined",
+        status === "quoted"
+          ? `Premium: ${updated.quotedPremium} ${updated.currency}${updated.quoteNotes ? ` — ${updated.quoteNotes}` : ""}`
+          : `The insurer declined${updated.quoteNotes ? `: ${updated.quoteNotes}` : "."}`,
+        { quoteId: updated.id, status });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error responding to quote:", error);
+      res.status(500).json({ message: "Failed to respond to quote" });
+    }
+  });
+
   // Scan a vehicle registration/license or insurance card and extract fields.
   // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
   // runs; otherwise we report ocrAvailable:false so the UI falls back to manual
