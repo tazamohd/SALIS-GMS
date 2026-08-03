@@ -216,6 +216,7 @@ import ProviderSignup from "@/pages/ProviderSignup";
 import CustomerSignup from "@/pages/CustomerSignup";
 import Marketplace from "@/pages/Marketplace";
 import MyVehicles from "@/pages/MyVehicles";
+import MyBookings from "@/pages/MyBookings";
 import PlatformAdmin from "@/pages/PlatformAdmin";
 import AdvancedReports from "@/pages/AdvancedReports";
 import SupplierPortal from "@/pages/SupplierPortal";
@@ -346,6 +347,7 @@ function Router() {
       {/* Marketplace is browsable while signed in too (customers + providers) */}
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/my-vehicles" component={MyVehicles} />
+      <Route path="/my-bookings" component={MyBookings} />
 
       {/* Customer Portal Routes */}
       <Route path="/portal/dashboard">

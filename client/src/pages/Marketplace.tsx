@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -38,6 +41,7 @@ const TYPES = [
 ];
 
 export default function Marketplace() {
+  const { user } = useAuth();
   const [type, setType] = useState("");
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -71,6 +75,7 @@ export default function Marketplace() {
           <h1 className="text-xl font-extrabold text-[#0B1F3B] dark:text-white">SALIS Marketplace</h1>
           <div className="flex items-center gap-3">
             <Link href="/my-vehicles" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">My vehicles</Link>
+            <Link href="/my-bookings" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">My bookings</Link>
             <Link href="/customer-signup"><Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up</Button></Link>
             <Link href="/login" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Sign in</Link>
             <ThemeToggle />
@@ -186,13 +191,81 @@ export default function Marketplace() {
                   </ul>
                 )}
               </div>
-              <Link href="/customer-signup">
-                <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up to book</Button>
-              </Link>
+              {user ? (
+                <BookingForm providerId={detail.data.id} services={detail.data.services} onDone={() => setSelected(null)} />
+              ) : (
+                <Link href="/customer-signup">
+                  <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up to book</Button>
+                </Link>
+              )}
             </div>
           )}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+interface MyVehicle { id: string; make: string; model: string | null; year: number | null; licensePlate: string | null; }
+
+function BookingForm({ providerId, services, onDone }: { providerId: string; services: { id: string; name: string }[]; onDone: () => void }) {
+  const { toast } = useToast();
+  const [serviceTemplateId, setServiceTemplateId] = useState("");
+  const [customerVehicleId, setCustomerVehicleId] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const vehicles = useQuery<MyVehicle[]>({
+    queryKey: ["/api/my/vehicles"],
+    queryFn: async () => (await apiRequest("GET", "/api/my/vehicles")).json(),
+  });
+
+  const book = useMutation({
+    mutationFn: async () =>
+      (await apiRequest("POST", "/api/my/bookings", {
+        providerId,
+        serviceTemplateId: serviceTemplateId || undefined,
+        customerVehicleId: customerVehicleId || undefined,
+        preferredDate: preferredDate ? new Date(preferredDate).toISOString() : undefined,
+        notes: notes || undefined,
+      })).json(),
+    onSuccess: () => { toast({ title: "Booking requested", description: "The provider will confirm your request." }); onDone(); },
+    onError: (e: Error) => {
+      let msg = e.message; const m = e.message.match(/\{.*\}/);
+      if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep */ } }
+      toast({ title: "Could not book", description: msg, variant: "destructive" });
+    },
+  });
+
+  const sel = "w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white";
+
+  return (
+    <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-3">
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Book this provider</p>
+      {services.length > 0 && (
+        <div className="space-y-1">
+          <Label className="text-xs">Service</Label>
+          <select className={sel} value={serviceTemplateId} onChange={(e) => setServiceTemplateId(e.target.value)} data-testid="booking-service">
+            <option value="">Any / general</option>
+            {services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </div>
+      )}
+      <div className="space-y-1">
+        <Label className="text-xs">Vehicle</Label>
+        <select className={sel} value={customerVehicleId} onChange={(e) => setCustomerVehicleId(e.target.value)} data-testid="booking-vehicle">
+          <option value="">{(vehicles.data?.length ?? 0) === 0 ? "No saved vehicles — add one first" : "Select a vehicle"}</option>
+          {(vehicles.data ?? []).map((v) => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(" ")}{v.licensePlate ? ` (${v.licensePlate})` : ""}</option>)}
+        </select>
+        {(vehicles.data?.length ?? 0) === 0 && <Link href="/my-vehicles" className="text-xs text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Add a vehicle</Link>}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="space-y-1"><Label className="text-xs">Preferred date</Label><Input type="datetime-local" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} data-testid="booking-date" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
+        <div className="space-y-1"><Label className="text-xs">Notes</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} data-testid="booking-notes" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
+      </div>
+      <Button onClick={() => book.mutate()} disabled={book.isPending} data-testid="booking-submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+        {book.isPending ? "Requesting…" : "Request booking"}
+      </Button>
     </div>
   );
 }
