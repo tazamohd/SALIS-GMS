@@ -160,14 +160,21 @@ export default function Login() {
               </p>
               <p className="text-center text-sm font-poppins text-[#64748B] dark:text-[#9BA4B0] pt-2">
                 {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
-                <Link 
-                  href="/register" 
-                  className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold" 
+                <Link
+                  href="/register"
+                  className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold"
                   data-testid="link-register"
                 >
                   {t('auth.register', 'Register')}
                 </Link>
               </p>
+              <div className="flex items-center justify-center gap-3 text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0]">
+                <Link href="/marketplace" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-marketplace">Browse marketplace</Link>
+                <span>·</span>
+                <Link href="/customer-signup" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-customer-signup">Customer sign up</Link>
+                <span>·</span>
+                <Link href="/provider-signup" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-provider-signup">List your business</Link>
+              </div>
             </form>
           </CardContent>
         </Card>
