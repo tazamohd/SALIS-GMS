@@ -15,6 +15,7 @@ import {
   insertMaintenanceScheduleSchema,
   insertServiceReminderSchema
 } from "@shared/schema";
+import { vehicleMakes } from "@shared/vehicleCatalogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -339,7 +340,20 @@ export default function VehiclesEnhanced() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Toyota" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
+                        <select
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                          data-testid="input-make"
+                          className="w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                        >
+                          <option value="">{t('vehicles.selectMake', 'Select make')}</option>
+                          {vehicleMakes.map((m) => (
+                            <option key={m.id} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
