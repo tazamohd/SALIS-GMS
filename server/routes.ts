@@ -21620,6 +21620,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         preferredDate: preferredDate ? new Date(preferredDate) : null,
         notes: notes ?? null,
       } as any);
+
+      // Notify the provider's admins/managers about the new request. Best-effort:
+      // a notification failure must never fail the booking itself.
+      try {
+        const admins = await db.execute(sql`
+          SELECT id FROM users
+          WHERE garage_id = ${providerId} AND role IN ('ADMIN', 'MANAGER') AND is_active = true
+          LIMIT 5`);
+        const label = [serviceName ?? "General service", veh ? `${veh.make} ${veh.model ?? ""}`.trim() : null]
+          .filter(Boolean).join(" — ");
+        for (const row of admins.rows as any[]) {
+          await storage.createNotification({
+            type: "in-app",
+            category: "appointment",
+            recipientId: row.id,
+            garageId: providerId,
+            title: "New marketplace booking request",
+            message: `A customer requested: ${label}`,
+            metadata: { bookingId: booking.id },
+          } as any);
+        }
+      } catch (notifyErr) {
+        console.error("Booking notification (provider) failed:", notifyErr);
+      }
+
       res.status(201).json(booking);
     } catch (error) {
       console.error("Error creating booking:", error);
@@ -21673,10 +21698,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
       });
       if (!updated) return res.status(404).json({ message: "Booking not found" });
+
+      // Tell the customer their booking changed state. Best-effort.
+      if (status) {
+        try {
+          const verb = status === "accepted" ? "accepted" : status === "declined" ? "declined" : "marked complete";
+          await storage.createNotification({
+            type: "in-app",
+            category: "appointment",
+            recipientId: updated.customerId,
+            garageId: providerId,
+            title: `Booking ${verb}`,
+            message: `Your booking${updated.serviceName ? ` for ${updated.serviceName}` : ""} was ${verb}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
+            metadata: { bookingId: updated.id, status },
+          } as any);
+        } catch (notifyErr) {
+          console.error("Booking notification (customer) failed:", notifyErr);
+        }
+      }
+
       res.json(updated);
     } catch (error) {
       console.error("Error updating provider booking:", error);
       res.status(500).json({ message: "Failed to update booking" });
+    }
+  });
+
+  // A user's own in-app notifications (customers have no garage, so this is
+  // recipient-scoped, unlike the garage-wide /api/notifications).
+  app.get('/api/my/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const rows = await storage.getNotifications(req.user.id);
+      res.json(rows.slice(0, 50));
+    } catch (error) {
+      console.error("Error listing my notifications:", error);
+      res.status(500).json({ message: "Failed to load notifications" });
+    }
+  });
+
+  app.post('/api/my/notifications/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const n = await storage.getNotification(req.params.id);
+      if (!n || n.recipientId !== req.user.id) return res.status(404).json({ message: "Notification not found" });
+      res.json(await storage.updateNotification(req.params.id, { status: "read", readAt: new Date() } as any));
+    } catch (error) {
+      console.error("Error marking notification read:", error);
+      res.status(500).json({ message: "Failed to update notification" });
     }
   });
 

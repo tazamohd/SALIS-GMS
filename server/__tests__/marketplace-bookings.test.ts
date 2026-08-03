@@ -96,6 +96,26 @@ describe("marketplace bookings", () => {
     expect((await custB.post(`/api/my/bookings/${bookingId}/cancel`)).status).toBe(404);
   });
 
+  it("notified the provider admin on request and the customer on acceptance (C1)", async () => {
+    // Provider owner got an in-app notification for the new request.
+    const provNotifs = await providerAgent.get("/api/my/notifications");
+    expect(provNotifs.status).toBe(200);
+    const provHit = provNotifs.body.find((n: any) => n.metadata?.bookingId === bookingId);
+    expect(provHit).toBeTruthy();
+    expect(provHit.title).toMatch(/booking request/i);
+
+    // Customer got one when the provider accepted.
+    const custNotifs = await custA.get("/api/my/notifications");
+    const custHit = custNotifs.body.find((n: any) => n.metadata?.bookingId === bookingId && n.metadata?.status === "accepted");
+    expect(custHit).toBeTruthy();
+
+    // Mark-read works and is owner-scoped.
+    const read = await custA.post(`/api/my/notifications/${custHit.id}/read`);
+    expect(read.status).toBe(200);
+    expect(read.body.status).toBe("read");
+    expect((await custB.post(`/api/my/notifications/${provHit.id}/read`)).status).toBe(404);
+  });
+
   it("lets the owning customer cancel their booking", async () => {
     const cancel = await custA.post(`/api/my/bookings/${bookingId}/cancel`);
     expect(cancel.status).toBe(200);

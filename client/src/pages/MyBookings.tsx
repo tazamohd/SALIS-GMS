@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { CalendarClock, Car } from "lucide-react";
 
+interface MyNotification {
+  id: string; title: string; message: string; status: string; createdAt: string;
+}
+
 interface Booking {
   id: string; providerId: string; serviceName: string | null; status: string;
   vehicleMake: string | null; vehicleModel: string | null; vehicleYear: number | null; vehiclePlate: string | null;
@@ -35,6 +39,16 @@ export default function MyBookings() {
     onError: (e: Error) => toast({ title: "Could not cancel", description: e.message, variant: "destructive" }),
   });
 
+  const notifications = useQuery<MyNotification[]>({
+    queryKey: ["/api/my/notifications"],
+    queryFn: async () => (await apiRequest("GET", "/api/my/notifications")).json(),
+  });
+  const markRead = useMutation({
+    mutationFn: async (id: string) => apiRequest("POST", `/api/my/notifications/${id}/read`, {}),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/my/notifications"] }),
+  });
+  const unread = (notifications.data ?? []).filter((n) => n.status !== "read");
+
   return (
     <div className="min-h-screen p-6 bg-[#F8FAFC] dark:bg-[#0E1117]">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -42,6 +56,22 @@ export default function MyBookings() {
           <h1 className="text-2xl font-bold text-[#0B1F3B] dark:text-white flex items-center gap-2"><CalendarClock className="h-6 w-6 text-[#0A5ED7]" /> My Bookings</h1>
           <Link href="/marketplace"><Button variant="outline">Find a provider</Button></Link>
         </div>
+
+        {unread.length > 0 && (
+          <Card className="border-[#0A5ED7]/30 bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10">
+            <CardContent className="p-4 space-y-2">
+              {unread.slice(0, 5).map((n) => (
+                <div key={n.id} className="flex items-start justify-between gap-3" data-testid={`notif-${n.id}`}>
+                  <div>
+                    <div className="text-sm font-medium text-[#0B1F3B] dark:text-white">{n.title}</div>
+                    <div className="text-xs text-[#64748B]">{n.message}</div>
+                  </div>
+                  <Button size="sm" variant="ghost" className="text-xs" onClick={() => markRead.mutate(n.id)} data-testid={`notif-read-${n.id}`}>Dismiss</Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {bookings.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
         : (bookings.data?.length ?? 0) === 0 ? (
