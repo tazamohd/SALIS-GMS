@@ -13453,6 +13453,98 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ==========================================================================
+  // Customer marketplace — public provider directory
+  // ==========================================================================
+
+  /** List active, approved providers customers can browse. Today providers are
+   *  garages; parts_store / insurance types return empty until provisioned. */
+  async listMarketplaceProviders(opts?: { type?: string; q?: string; city?: string }): Promise<any[]> {
+    if (opts?.type && opts.type !== "garage") return [];
+    const conditions: any[] = [eq(garages.isActive, true)];
+    if (opts?.q) conditions.push(ilike(garages.name, `%${opts.q}%`));
+    if (opts?.city) conditions.push(ilike(garages.city, `%${opts.city}%`));
+    const rows = await db
+      .select({
+        id: garages.id,
+        name: garages.name,
+        city: garages.city,
+        country: garages.country,
+        createdAt: garages.createdAt,
+      })
+      .from(garages)
+      .where(and(...conditions))
+      .orderBy(desc(garages.createdAt))
+      .limit(100);
+    return rows.map((r) => ({ ...r, providerType: "garage" }));
+  }
+
+  async getMarketplaceProvider(id: string): Promise<any | undefined> {
+    const [g] = await db
+      .select({
+        id: garages.id,
+        name: garages.name,
+        city: garages.city,
+        country: garages.country,
+        createdAt: garages.createdAt,
+      })
+      .from(garages)
+      .where(and(eq(garages.id, id), eq(garages.isActive, true)));
+    if (!g) return undefined;
+    const services = await db
+      .select({
+        id: serviceTemplates.id,
+        name: serviceTemplates.name,
+        category: serviceTemplates.category,
+        description: serviceTemplates.description,
+        estimatedHours: serviceTemplates.estimatedHours,
+        standardCost: serviceTemplates.standardCost,
+      })
+      .from(serviceTemplates)
+      .where(and(eq(serviceTemplates.garageId, id), eq(serviceTemplates.isActive, true)))
+      .orderBy(asc(serviceTemplates.name));
+    return { ...g, providerType: "garage", services };
+  }
+
+  /** Smart search across providers and the services they offer. Returns both a
+   *  provider hit list (name match) and service hits (name/category match)
+   *  annotated with their provider, so a customer can search a service and find
+   *  who offers it. */
+  async searchMarketplace(query: string): Promise<{ providers: any[]; services: any[] }> {
+    const q = `%${query}%`;
+    const providers = await db
+      .select({ id: garages.id, name: garages.name, city: garages.city, country: garages.country })
+      .from(garages)
+      .where(and(eq(garages.isActive, true), ilike(garages.name, q)))
+      .limit(25);
+
+    const services = await db
+      .select({
+        id: serviceTemplates.id,
+        name: serviceTemplates.name,
+        category: serviceTemplates.category,
+        standardCost: serviceTemplates.standardCost,
+        providerId: garages.id,
+        providerName: garages.name,
+        providerCity: garages.city,
+      })
+      .from(serviceTemplates)
+      .innerJoin(garages, eq(serviceTemplates.garageId, garages.id))
+      .where(
+        and(
+          eq(garages.isActive, true),
+          eq(serviceTemplates.isActive, true),
+          or(ilike(serviceTemplates.name, q), ilike(serviceTemplates.category, q)),
+        ),
+      )
+      .limit(50);
+
+    return {
+      providers: providers.map((p) => ({ ...p, providerType: "garage" })),
+      services,
+    };
+  }
+
+  // ==========================================================================
   // Knowledge base
   // ==========================================================================
 

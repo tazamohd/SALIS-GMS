@@ -21376,6 +21376,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Customer marketplace — platform-wide customer accounts + provider directory
+  // ==========================================================================
+
+  // Public: a customer signs up on the PLATFORM (not tied to any one garage) to
+  // browse and use every provider. userType 'customer', no garageId.
+  app.post('/api/customer/register', async (req, res) => {
+    try {
+      const { email, password, fullName, phone } = req.body ?? {};
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      if (String(password).length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const existing = await storage.getUserByEmail(email);
+      if (existing) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        email,
+        password: hashedPassword,
+        fullName,
+        phone,
+        role: "CUSTOMER",
+        userType: "customer",
+        isActive: true,
+      } as any);
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Login error after customer registration:", err);
+          return res.status(500).json({ message: "Registered but login failed" });
+        }
+        const { password: _pw, ...safe } = user as any;
+        res.status(201).json(safe);
+      });
+    } catch (error) {
+      console.error("Error registering customer:", error);
+      res.status(500).json({ message: "Failed to register" });
+    }
+  });
+
+  // Public: browse approved providers (garages today; parts_store/insurance next).
+  app.get('/api/marketplace/providers', async (req, res) => {
+    try {
+      const type = typeof req.query.type === "string" ? req.query.type : undefined;
+      const q = typeof req.query.q === "string" ? req.query.q : undefined;
+      const city = typeof req.query.city === "string" ? req.query.city : undefined;
+      res.json(await storage.listMarketplaceProviders({ type, q, city }));
+    } catch (error) {
+      console.error("Error listing marketplace providers:", error);
+      res.status(500).json({ message: "Failed to load providers" });
+    }
+  });
+
+  // Public: a single provider and the services it presents.
+  app.get('/api/marketplace/providers/:id', async (req, res) => {
+    try {
+      const provider = await storage.getMarketplaceProvider(req.params.id);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      res.json(provider);
+    } catch (error) {
+      console.error("Error loading marketplace provider:", error);
+      res.status(500).json({ message: "Failed to load provider" });
+    }
+  });
+
+  // Public: smart search across providers and the services they offer.
+  // Named /find to avoid the pre-existing authenticated parts-marketplace
+  // /api/marketplace/search (a different feature) registered earlier.
+  app.get('/api/marketplace/find', async (req, res) => {
+    try {
+      const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+      if (q.length < 2) {
+        return res.status(400).json({ message: "Search query must be at least 2 characters" });
+      }
+      res.json(await storage.searchMarketplace(q));
+    } catch (error) {
+      console.error("Error searching marketplace:", error);
+      res.status(500).json({ message: "Failed to search" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize WebSocket server for chat

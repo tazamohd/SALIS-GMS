@@ -10,6 +10,11 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   // PLATFORM_ADMIN to review. No session exists yet (the garage isn't
   // provisioned until approval), so it must be anonymous.
   "/api/garage-applications",
+  // Public customer signup for the marketplace (creates the session itself).
+  "/api/customer/register",
+  // Public marketplace browsing (provider directory + smart search) — a
+  // customer can look before creating an account.
+  /^\/api\/marketplace\/.*/,
   "/api/csrf-token",
   "/api/health",
   "/api/health/live",
