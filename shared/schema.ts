@@ -11250,6 +11250,25 @@ export const garageApplications = pgTable("garage_applications", {
   statusIdx: index("garage_applications_status_idx").on(table.status),
 }));
 
+// Platform SuperAdmin — subscription change requests. A garage requests a plan
+// change; a PLATFORM_ADMIN reviews and approves (applies the plan) or rejects.
+export const subscriptionRequests = pgTable("subscription_requests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  currentPlan: varchar("current_plan", { length: 20 }),
+  requestedPlan: varchar("requested_plan", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  requestedBy: varchar("requested_by").references(() => users.id),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("subscription_requests_status_idx").on(table.status),
+  garageIdx: index("subscription_requests_garage_idx").on(table.garageId),
+}));
+
 export const vatConfig = pgTable("vat_config", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   countryCode: varchar("country_code", { length: 2 }).default("SA").notNull(),
@@ -11356,6 +11375,9 @@ export const insertSchedulingOptimizationRunSchema = createInsertSchema(scheduli
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type SubscriptionRequest = typeof subscriptionRequests.$inferSelect;
+export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert;
 
 export type GarageApplication = typeof garageApplications.$inferSelect;
 export type InsertGarageApplication = typeof garageApplications.$inferInsert;

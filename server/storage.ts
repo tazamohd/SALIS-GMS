@@ -795,6 +795,9 @@ import {
   garageApplications,
   type GarageApplication,
   type InsertGarageApplication,
+  subscriptionRequests,
+  type SubscriptionRequest,
+  type InsertSubscriptionRequest,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13449,6 +13452,89 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       })
       .where(and(eq(garageApplications.id, id), eq(garageApplications.status, "pending")))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Platform SuperAdmin — subscription change requests
+  // ==========================================================================
+
+  async createSubscriptionRequest(data: InsertSubscriptionRequest): Promise<SubscriptionRequest> {
+    const [row] = await db.insert(subscriptionRequests).values(data).returning();
+    return row;
+  }
+
+  async listSubscriptionRequests(status?: string): Promise<SubscriptionRequest[]> {
+    const query = db.select().from(subscriptionRequests).orderBy(desc(subscriptionRequests.createdAt));
+    return status ? await query.where(eq(subscriptionRequests.status, status)) : await query;
+  }
+
+  /** A garage's own most-recent pending request (used to prevent duplicates). */
+  async getPendingSubscriptionRequest(garageId: string): Promise<SubscriptionRequest | undefined> {
+    const [row] = await db
+      .select()
+      .from(subscriptionRequests)
+      .where(and(eq(subscriptionRequests.garageId, garageId), eq(subscriptionRequests.status, "pending")))
+      .orderBy(desc(subscriptionRequests.createdAt))
+      .limit(1);
+    return row;
+  }
+
+  /** Approve a pending request: atomically apply the plan to both the
+   *  subscription row and the garage's cached plan, then mark it approved. */
+  async approveSubscriptionRequest(
+    id: string,
+    reviewerId: string,
+  ): Promise<SubscriptionRequest | undefined> {
+    return await db.transaction(async (tx) => {
+      const [reqRow] = await tx
+        .select()
+        .from(subscriptionRequests)
+        .where(eq(subscriptionRequests.id, id))
+        .for("update");
+      if (!reqRow) return undefined;
+      if (reqRow.status !== "pending") {
+        throw new Error(`Request is already ${reqRow.status}`);
+      }
+
+      await tx
+        .insert(subscriptions)
+        .values({ garageId: reqRow.garageId, plan: reqRow.requestedPlan, status: "active" } as any)
+        .onConflictDoUpdate({
+          target: subscriptions.garageId,
+          set: { plan: reqRow.requestedPlan, updatedAt: new Date() },
+        });
+
+      await tx
+        .update(garages)
+        .set({ subscriptionPlan: reqRow.requestedPlan })
+        .where(eq(garages.id, reqRow.garageId));
+
+      const [updated] = await tx
+        .update(subscriptionRequests)
+        .set({ status: "approved", reviewedBy: reviewerId, reviewedAt: new Date(), updatedAt: new Date() })
+        .where(eq(subscriptionRequests.id, id))
+        .returning();
+      return updated;
+    });
+  }
+
+  async rejectSubscriptionRequest(
+    id: string,
+    reviewerId: string,
+    reason?: string,
+  ): Promise<SubscriptionRequest | undefined> {
+    const [row] = await db
+      .update(subscriptionRequests)
+      .set({
+        status: "rejected",
+        reviewedBy: reviewerId,
+        reviewedAt: new Date(),
+        rejectionReason: reason ?? null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(subscriptionRequests.id, id), eq(subscriptionRequests.status, "pending")))
       .returning();
     return row;
   }

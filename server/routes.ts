@@ -21377,6 +21377,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ==========================================================================
+  // Platform SuperAdmin — subscription change requests
+  // ==========================================================================
+
+  // A garage requests a plan change; a PLATFORM_ADMIN reviews and approves.
+  app.post('/api/subscription-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: "No garage associated" });
+      const requestedPlan = String(req.body?.requestedPlan || "").toUpperCase();
+      if (!["STARTER", "PRO", "ENTERPRISE"].includes(requestedPlan)) {
+        return res.status(400).json({ message: "Invalid plan. Use STARTER, PRO or ENTERPRISE." });
+      }
+      const existing = await storage.getPendingSubscriptionRequest(garageId);
+      if (existing) {
+        return res.status(409).json({ message: "You already have a pending subscription request" });
+      }
+      const sub = await storage.ensureSubscription(garageId);
+      const request = await storage.createSubscriptionRequest({
+        garageId,
+        currentPlan: sub.plan,
+        requestedPlan,
+        requestedBy: req.user.id,
+      } as any);
+      res.status(201).json(request);
+    } catch (error) {
+      console.error("Error creating subscription request:", error);
+      res.status(500).json({ message: "Failed to create request" });
+    }
+  });
+
+  app.get('/api/platform-admin/subscription-requests', requirePlatformAdmin, async (req: any, res) => {
+    try {
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listSubscriptionRequests(status));
+    } catch (error) {
+      console.error("Error listing subscription requests:", error);
+      res.status(500).json({ message: "Failed to list requests" });
+    }
+  });
+
+  app.post('/api/platform-admin/subscription-requests/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const approved = await storage.approveSubscriptionRequest(req.params.id, req.user.id);
+      if (!approved) return res.status(404).json({ message: "Request not found" });
+      res.json(approved);
+    } catch (error: any) {
+      if (/already/.test(error?.message || "")) return res.status(409).json({ message: error.message });
+      console.error("Error approving subscription request:", error);
+      res.status(500).json({ message: "Failed to approve request" });
+    }
+  });
+
+  app.post('/api/platform-admin/subscription-requests/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const rejected = await storage.rejectSubscriptionRequest(req.params.id, req.user.id, req.body?.reason);
+      if (!rejected) return res.status(404).json({ message: "Pending request not found" });
+      res.json(rejected);
+    } catch (error) {
+      console.error("Error rejecting subscription request:", error);
+      res.status(500).json({ message: "Failed to reject request" });
+    }
+  });
+
+  // ==========================================================================
   // Customer marketplace — platform-wide customer accounts + provider directory
   // ==========================================================================
 
