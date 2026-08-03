@@ -792,6 +792,9 @@ import {
   subscriptions,
   type Subscription,
   type InsertSubscription,
+  garageApplications,
+  type GarageApplication,
+  type InsertGarageApplication,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13325,6 +13328,118 @@ export class DatabaseStorage implements IStorage {
       .update(subscriptions)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(subscriptions.garageId, garageId))
+      .returning();
+    return row;
+  }
+
+  // ==========================================================================
+  // Platform SuperAdmin — garage onboarding applications
+  // ==========================================================================
+
+  async createGarageApplication(data: InsertGarageApplication): Promise<GarageApplication> {
+    const [row] = await db.insert(garageApplications).values(data).returning();
+    return row;
+  }
+
+  async listGarageApplications(status?: string): Promise<GarageApplication[]> {
+    const query = db.select().from(garageApplications).orderBy(desc(garageApplications.createdAt));
+    return status ? await query.where(eq(garageApplications.status, status)) : await query;
+  }
+
+  async getGarageApplication(id: string): Promise<GarageApplication | undefined> {
+    const [row] = await db.select().from(garageApplications).where(eq(garageApplications.id, id));
+    return row;
+  }
+
+  /**
+   * Approve a pending garage application: atomically provision the garage, its
+   * owner user (role ADMIN), and a trial subscription, then mark the
+   * application approved. `hashedPassword` is prepared by the caller (the route
+   * has the hashing util); the plaintext is never stored here. Idempotent: a
+   * second approve returns the already-provisioned result without duplicating.
+   */
+  async approveGarageApplication(
+    id: string,
+    reviewerId: string,
+    hashedPassword: string,
+  ): Promise<{ application: GarageApplication; garageId: string; ownerUserId: string }> {
+    return await db.transaction(async (tx) => {
+      const [app] = await tx
+        .select()
+        .from(garageApplications)
+        .where(eq(garageApplications.id, id))
+        .for("update");
+      if (!app) throw new Error("Application not found");
+
+      if (app.status === "approved" && app.provisionedGarageId && app.provisionedUserId) {
+        return { application: app, garageId: app.provisionedGarageId, ownerUserId: app.provisionedUserId };
+      }
+      if (app.status === "rejected") {
+        throw new Error("Application already rejected");
+      }
+
+      const [garage] = await tx
+        .insert(garages)
+        .values({
+          name: app.businessName,
+          city: app.city,
+          country: app.country,
+          isActive: true,
+          subscriptionPlan: app.requestedPlan,
+        } as any)
+        .returning();
+
+      const [owner] = await tx
+        .insert(users)
+        .values({
+          email: app.email,
+          password: hashedPassword,
+          fullName: app.ownerName,
+          phone: app.phone,
+          role: "ADMIN",
+          userType: "admin",
+          garageId: garage.id,
+          isActive: true,
+        } as any)
+        .returning();
+
+      await tx
+        .insert(subscriptions)
+        .values({ garageId: garage.id, plan: app.requestedPlan, status: "trialing" } as any)
+        .onConflictDoNothing({ target: subscriptions.garageId });
+
+      const [updated] = await tx
+        .update(garageApplications)
+        .set({
+          status: "approved",
+          reviewedBy: reviewerId,
+          reviewedAt: new Date(),
+          provisionedGarageId: garage.id,
+          provisionedUserId: owner.id,
+          updatedAt: new Date(),
+        })
+        .where(eq(garageApplications.id, id))
+        .returning();
+
+      return { application: updated, garageId: garage.id, ownerUserId: owner.id };
+    });
+  }
+
+  async rejectGarageApplication(
+    id: string,
+    reviewerId: string,
+    reason?: string,
+  ): Promise<GarageApplication | undefined> {
+    const [row] = await db
+      .update(garageApplications)
+      .set({
+        status: "rejected",
+        reviewedBy: reviewerId,
+        reviewedAt: new Date(),
+        rejectionReason: reason ?? null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(garageApplications.id, id), eq(garageApplications.status, "pending")))
       .returning();
     return row;
   }

@@ -37,6 +37,7 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
+import { randomBytes } from "crypto";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
 import passport from "passport";
 import { emailService } from "./services/emailService";
@@ -21245,10 +21246,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Platform SuperAdmin — garage onboarding applications
+  // ==========================================================================
+
+  // Public: a prospective garage submits an onboarding application. Creates a
+  // PENDING record for a PLATFORM_ADMIN to review; provisions nothing yet.
+  app.post('/api/garage-applications', async (req, res) => {
+    try {
+      const { insertGarageApplicationSchema } = await import("@shared/schema");
+      const parsed = insertGarageApplicationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      // Reject if the email is already a user or already has a pending application.
+      const existingUser = await storage.getUserByEmail(parsed.data.email);
+      if (existingUser) {
+        return res.status(409).json({ message: "An account with this email already exists" });
+      }
+      const pending = (await storage.listGarageApplications("pending"))
+        .find((a) => a.email.toLowerCase() === parsed.data.email.toLowerCase());
+      if (pending) {
+        return res.status(409).json({ message: "An application with this email is already pending review" });
+      }
+      const application = await storage.createGarageApplication(parsed.data as any);
+      res.status(201).json({ id: application.id, status: application.status });
+    } catch (error) {
+      console.error("Error submitting garage application:", error);
+      res.status(500).json({ message: "Failed to submit application" });
+    }
+  });
+
+  app.get('/api/platform-admin/garage-applications', requirePlatformAdmin, async (req: any, res) => {
+    try {
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listGarageApplications(status));
+    } catch (error: any) {
+      console.error("Error listing garage applications:", error);
+      res.status(500).json({ message: "Failed to list applications" });
+    }
+  });
+
+  app.post('/api/platform-admin/garage-applications/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const app_ = await storage.getGarageApplication(req.params.id);
+      if (!app_) return res.status(404).json({ message: "Application not found" });
+      if (app_.status === "rejected") return res.status(409).json({ message: "Application already rejected" });
+
+      // Provision with a one-time temporary password: hash for storage, return
+      // the plaintext ONCE to the super admin to relay (never persisted/logged).
+      const tempPassword = randomBytes(9).toString("base64url");
+      const hashed = await hashPassword(tempPassword);
+      const result = await storage.approveGarageApplication(req.params.id, req.user.id, hashed);
+      res.json({
+        application: result.application,
+        garageId: result.garageId,
+        ownerEmail: app_.email,
+        tempPassword,
+      });
+    } catch (error: any) {
+      console.error("Error approving garage application:", error);
+      res.status(500).json({ message: error.message || "Failed to approve application" });
+    }
+  });
+
+  app.post('/api/platform-admin/garage-applications/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const rejected = await storage.rejectGarageApplication(req.params.id, req.user.id, req.body?.reason);
+      if (!rejected) return res.status(404).json({ message: "Pending application not found" });
+      res.json(rejected);
+    } catch (error: any) {
+      console.error("Error rejecting garage application:", error);
+      res.status(500).json({ message: "Failed to reject application" });
+    }
+  });
+
   const httpServer = createServer(app);
-  
+
   // Initialize WebSocket server for chat
   initializeChatWebSocket(httpServer);
-  
+
   return httpServer;
 }

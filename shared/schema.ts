@@ -11210,6 +11210,31 @@ export const subscriptions = pgTable("subscriptions", {
 // supplier_parts_availability was already declared earlier in this file, so it
 // is deliberately not repeated here despite also originating in migration 0003.
 
+// Platform SuperAdmin — garage onboarding applications. A public garage signup
+// creates a PENDING application; a PLATFORM_ADMIN reviews and approves (which
+// provisions the garage + owner user + trial subscription) or rejects it.
+export const garageApplications = pgTable("garage_applications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  businessName: varchar("business_name", { length: 255 }).notNull(),
+  ownerName: varchar("owner_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  requestedPlan: varchar("requested_plan", { length: 20 }).default("STARTER").notNull(),
+  notes: text("notes"),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  provisionedGarageId: uuid("provisioned_garage_id").references(() => garages.id),
+  provisionedUserId: varchar("provisioned_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("garage_applications_status_idx").on(table.status),
+}));
+
 export const vatConfig = pgTable("vat_config", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   countryCode: varchar("country_code", { length: 2 }).default("SA").notNull(),
@@ -11316,6 +11341,22 @@ export const insertSchedulingOptimizationRunSchema = createInsertSchema(scheduli
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GarageApplication = typeof garageApplications.$inferSelect;
+export type InsertGarageApplication = typeof garageApplications.$inferInsert;
+// Public garage signup — only the applicant-supplied fields; review/provisioning
+// columns are set server-side, never by the untrusted request body.
+export const insertGarageApplicationSchema = createInsertSchema(garageApplications).omit({
+  id: true,
+  status: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  rejectionReason: true,
+  provisionedGarageId: true,
+  provisionedUserId: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 export type VatConfig = typeof vatConfig.$inferSelect;
 export type InsertVatConfig = typeof vatConfig.$inferInsert;

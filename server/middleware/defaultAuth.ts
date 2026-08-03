@@ -6,6 +6,10 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   "/api/login",
   "/api/register",
   "/api/customer-portal/login",
+  // Public garage onboarding signup — creates a PENDING application for a
+  // PLATFORM_ADMIN to review. No session exists yet (the garage isn't
+  // provisioned until approval), so it must be anonymous.
+  "/api/garage-applications",
   "/api/csrf-token",
   "/api/health",
   "/api/health/live",
