@@ -217,6 +217,7 @@ import CustomerSignup from "@/pages/CustomerSignup";
 import Marketplace from "@/pages/Marketplace";
 import MyVehicles from "@/pages/MyVehicles";
 import MyBookings from "@/pages/MyBookings";
+import ProviderBookings from "@/pages/ProviderBookings";
 import PlatformAdmin from "@/pages/PlatformAdmin";
 import AdvancedReports from "@/pages/AdvancedReports";
 import SupplierPortal from "@/pages/SupplierPortal";
@@ -348,6 +349,11 @@ function Router() {
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/my-vehicles" component={MyVehicles} />
       <Route path="/my-bookings" component={MyBookings} />
+      <Route path="/provider-bookings">
+        <Layout>
+          <ProviderBookings />
+        </Layout>
+      </Route>
 
       {/* Customer Portal Routes */}
       <Route path="/portal/dashboard">
