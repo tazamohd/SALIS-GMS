@@ -103,6 +103,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
+  phoneVerifiedAt: timestamp("phone_verified_at"),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   nationalId: varchar("national_id", { length: 50 }),
   isActive: boolean("is_active").default(true),

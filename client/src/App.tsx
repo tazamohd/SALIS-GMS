@@ -350,6 +350,8 @@ function Router() {
       <Route path="/marketplace" component={Marketplace} />
       <Route path="/my-vehicles" component={MyVehicles} />
       <Route path="/my-bookings" component={MyBookings} />
+      {/* Phone verification is reachable while signed in (post-signup). */}
+      <Route path="/otp" component={OTPVerification} />
       <Route path="/provider-bookings">
         <Layout>
           <ProviderBookings />

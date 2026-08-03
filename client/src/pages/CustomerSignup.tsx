@@ -21,7 +21,8 @@ export default function CustomerSignup() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/auth/user"] });
       toast({ title: "Welcome!", description: "Your account is ready." });
-      window.location.href = "/";
+      // With a phone on file, verify it next (OTP); otherwise straight in.
+      window.location.href = form.phone ? `/otp?phone=${encodeURIComponent(form.phone)}` : "/";
     },
     onError: (error: Error) => {
       let msg = error.message;

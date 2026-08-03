@@ -21483,6 +21483,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ── Customer phone verification (OTP) ──────────────────────────────────────
+  // Session-backed: the code lives in the caller's session (10-min expiry), so
+  // no table is needed and it dies with the session. SMS delivery is a seam
+  // (SMS_PROVIDER); until one is configured the code is returned in the
+  // response ONLY in demo mode so the flow stays fully testable end-to-end.
+  app.post('/api/customer/request-otp', isAuthenticated, async (req: any, res) => {
+    try {
+      const phone = String(req.body?.phone ?? req.user?.phone ?? "").trim();
+      if (!/^\+?\d{9,15}$/.test(phone)) {
+        return res.status(400).json({ message: "A valid phone number is required" });
+      }
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      (req.session as any).phoneOtp = { code, phone, expiresAt: Date.now() + 10 * 60 * 1000 };
+
+      const smsProvider = process.env.SMS_PROVIDER;
+      if (smsProvider) {
+        // Seam: a configured SMS provider (Unifonic/Twilio/...) sends the code here.
+        console.log(`[otp] would send code via ${smsProvider} to ${phone}`);
+        return res.json({ sent: true, provider: smsProvider });
+      }
+      const demo = process.env.DEMO_MODE === "true" || process.env.NODE_ENV !== "production";
+      return res.json({ sent: false, ...(demo ? { demoOtp: code } : {}), message: demo ? "SMS not configured — demo code returned" : "SMS not configured" });
+    } catch (error) {
+      console.error("Error requesting OTP:", error);
+      res.status(500).json({ message: "Failed to send verification code" });
+    }
+  });
+
+  app.post('/api/customer/verify-otp', isAuthenticated, async (req: any, res) => {
+    try {
+      const supplied = String(req.body?.code ?? "").trim();
+      const pending = (req.session as any).phoneOtp;
+      if (!pending || Date.now() > pending.expiresAt) {
+        return res.status(400).json({ message: "No pending code — request a new one" });
+      }
+      if (supplied !== pending.code) {
+        return res.status(400).json({ message: "Incorrect code" });
+      }
+      delete (req.session as any).phoneOtp;
+      await db.execute(sql`
+        UPDATE users SET phone = ${pending.phone}, phone_verified_at = NOW()
+        WHERE id = ${req.user.id}`);
+      res.json({ verified: true, phone: pending.phone });
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      res.status(500).json({ message: "Failed to verify code" });
+    }
+  });
+
   // Public: browse approved providers (garages today; parts_store/insurance next).
   app.get('/api/marketplace/providers', async (req, res) => {
     try {

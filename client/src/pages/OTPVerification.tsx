@@ -1,21 +1,47 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { MessageSquareText } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 /**
- * OTP verification screen (design: OTPVerification.dc.html).
- *
- * NOTE: there is no OTP backend yet, so verification is UI-only — "Verify"
- * routes to /login. When an SMS/OTP endpoint exists, wire `verify` to it.
+ * OTP verification screen (design: OTPVerification.dc.html), wired to
+ * /api/customer/request-otp + /api/customer/verify-otp. The phone comes from
+ * the ?phone= query param (set by customer signup). When no SMS provider is
+ * configured the server returns a demo code, which we surface so the flow is
+ * usable end-to-end in demo mode.
  */
 export default function OTPVerification() {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const isRTL = (i18n.language || "en").split("-")[0] === "ar";
 
+  const phone = new URLSearchParams(window.location.search).get("phone") ?? "";
   const [codes, setCodes] = useState<string[]>(["", "", "", "", "", ""]);
+  const [demoCode, setDemoCode] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
+  const requested = useRef(false);
+
+  const requestCode = async () => {
+    try {
+      const res = await (await apiRequest("POST", "/api/customer/request-otp", { phone })).json();
+      if (res.demoOtp) setDemoCode(res.demoOtp);
+      toast({ title: t("otpVerification.sentTitle", "Code sent"), description: res.message ?? "" });
+    } catch (e: any) {
+      toast({ title: t("otpVerification.sendFailed", "Could not send code"), description: e.message, variant: "destructive" });
+    }
+  };
+
+  useEffect(() => {
+    if (!requested.current && phone) {
+      requested.current = true;
+      requestCode();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const setDigit = (i: number, value: string) => {
     const c = [...codes];
@@ -28,7 +54,21 @@ export default function OTPVerification() {
     if (e.key === "Backspace" && !codes[i] && i > 0) inputs.current[i - 1]?.focus();
   };
 
-  const verify = () => setLocation("/login");
+  const verify = async () => {
+    setBusy(true);
+    try {
+      await (await apiRequest("POST", "/api/customer/verify-otp", { code: codes.join("") })).json();
+      toast({ title: t("otpVerification.verified", "Phone verified!") });
+      setLocation("/marketplace");
+    } catch (e: any) {
+      let msg = e.message;
+      const m = e.message.match(/\{.*\}/);
+      if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep */ } }
+      toast({ title: t("otpVerification.failed", "Verification failed"), description: msg, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div
@@ -50,13 +90,16 @@ export default function OTPVerification() {
           </h2>
           <p className="mx-0 mb-5 mt-2 font-poppins text-[13px] text-[#64748B] dark:text-gray-400">
             {t("otpVerification.desc", "Enter the 6-digit code sent to")}{" "}
-            <span
-              dir="ltr"
-              className="font-semibold text-[#0B1F3B] dark:text-white"
-            >
-              +966 55 •••• 471
+            <span dir="ltr" className="font-semibold text-[#0B1F3B] dark:text-white">
+              {phone || t("otpVerification.yourPhone", "your phone")}
             </span>
           </p>
+
+          {demoCode && (
+            <p className="mb-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-[13px] text-amber-700 dark:text-amber-400" data-testid="demo-otp">
+              {t("otpVerification.demoCode", "Demo mode — your code is")} <b dir="ltr">{demoCode}</b>
+            </p>
+          )}
 
           <div dir="ltr" className="mb-5 flex justify-center gap-2">
             {codes.map((val, i) => (
@@ -77,17 +120,18 @@ export default function OTPVerification() {
           <button
             type="button"
             onClick={verify}
+            disabled={busy || codes.join("").length !== 6}
             data-testid="button-verify"
-            className="box-border h-12 w-full whitespace-nowrap rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-poppins text-[15px] font-semibold text-white shadow-[0_4px_12px_rgba(10,94,215,0.25)]"
+            className="box-border h-12 w-full whitespace-nowrap rounded-lg bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-poppins text-[15px] font-semibold text-white shadow-[0_4px_12px_rgba(10,94,215,0.25)] disabled:opacity-60"
           >
-            {t("otpVerification.verify", "Verify")}
+            {busy ? t("otpVerification.verifying", "Verifying…") : t("otpVerification.verify", "Verify")}
           </button>
 
           <p className="mt-4 text-[13px] text-[#64748B] dark:text-gray-400">
             {t("otpVerification.noCode", "Didn't receive a code?")}{" "}
             <button
               type="button"
-              onClick={() => setCodes(["", "", "", "", "", ""])}
+              onClick={() => { setCodes(["", "", "", "", "", ""]); requestCode(); }}
               data-testid="button-resend"
               className="font-semibold text-[#0A5ED7]"
             >
