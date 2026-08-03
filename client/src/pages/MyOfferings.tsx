@@ -89,6 +89,8 @@ export default function MyOfferings() {
         </Dialog>
       </div>
 
+      <ProfileCard />
+
       <Card className="border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader><CardTitle className="text-base">Your offerings</CardTitle></CardHeader>
         <CardContent>
@@ -114,5 +116,56 @@ export default function MyOfferings() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function ProfileCard() {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const profile = useQuery<any>({
+    queryKey: ["/api/provider/profile"],
+    queryFn: async () => (await apiRequest("GET", "/api/provider/profile")).json(),
+  });
+  const [form, setForm] = useState({ description: "", phone: "", email: "", address: "", workingHours: "" });
+  const [loaded, setLoaded] = useState(false);
+  if (profile.data && !loaded) {
+    setForm({
+      description: profile.data.description ?? "",
+      phone: profile.data.phone ?? "",
+      email: profile.data.email ?? "",
+      address: profile.data.address ?? "",
+      workingHours: profile.data.workingHours ?? "",
+    });
+    setLoaded(true);
+  }
+  const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const save = useMutation({
+    mutationFn: async () => (await apiRequest("PATCH", "/api/provider/profile", form)).json(),
+    onSuccess: () => { toast({ title: "Profile saved", description: "Customers now see the updated details." }); qc.invalidateQueries({ queryKey: ["/api/provider/profile"] }); },
+    onError: (e: Error) => toast({ title: "Could not save", description: e.message, variant: "destructive" }),
+  });
+
+  const inputCls = "h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]";
+
+  return (
+    <Card className="border-[#E2E8F0] dark:border-[#232A36]">
+      <CardHeader>
+        <CardTitle className="text-base">Public profile</CardTitle>
+        <p className="text-xs text-[#64748B]">What customers see on your marketplace page.</p>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="md:col-span-2 space-y-1"><Label>Description</Label><Input className={inputCls} value={form.description} onChange={(e) => set("description", e.target.value)} data-testid="profile-description" /></div>
+        <div className="space-y-1"><Label>Phone</Label><Input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} data-testid="profile-phone" /></div>
+        <div className="space-y-1"><Label>Email</Label><Input className={inputCls} value={form.email} onChange={(e) => set("email", e.target.value)} data-testid="profile-email" /></div>
+        <div className="space-y-1"><Label>Working hours</Label><Input className={inputCls} placeholder="Sat–Thu 8:00–20:00" value={form.workingHours} onChange={(e) => set("workingHours", e.target.value)} data-testid="profile-hours" /></div>
+        <div className="space-y-1"><Label>Address</Label><Input className={inputCls} value={form.address} onChange={(e) => set("address", e.target.value)} data-testid="profile-address" /></div>
+        <div className="md:col-span-2">
+          <Button onClick={() => save.mutate()} disabled={save.isPending} data-testid="profile-save" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
+            {save.isPending ? "Saving…" : "Save profile"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

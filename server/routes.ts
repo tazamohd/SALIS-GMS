@@ -21884,6 +21884,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ==========================================================================
+  // Marketplace C3 — provider profile + customer reviews
+  // ==========================================================================
+
+  app.get('/api/provider/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      res.json(provider);
+    } catch (error) {
+      console.error("Error loading provider profile:", error);
+      res.status(500).json({ message: "Failed to load profile" });
+    }
+  });
+
+  app.patch('/api/provider/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const allowed: any = {};
+      for (const k of ["description", "phone", "email", "address", "photoUrl", "workingHours"]) {
+        if (typeof req.body?.[k] === "string") allowed[k] = req.body[k];
+      }
+      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
+      const updated = await storage.updateProviderProfile(providerId, allowed);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Public: a provider's reviews.
+  app.get('/api/marketplace/providers/:id/reviews', async (req, res) => {
+    try {
+      res.json(await storage.listProviderReviews(req.params.id, 50));
+    } catch (error) {
+      console.error("Error listing reviews:", error);
+      res.status(500).json({ message: "Failed to load reviews" });
+    }
+  });
+
+  // A customer reviews a provider they have actually transacted with
+  // (completed booking, fulfilled order, or accepted quote). One review per
+  // provider per customer — resubmitting updates it.
+  app.post('/api/my/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, rating, comment } = req.body ?? {};
+      const r = Number(rating);
+      if (!providerId || !Number.isInteger(r) || r < 1 || r > 5) {
+        return res.status(400).json({ message: "providerId and a whole-number rating 1–5 are required" });
+      }
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      if (!(await storage.hasTransactedWith(req.user.id, providerId))) {
+        return res.status(403).json({ message: "You can review a provider after completing a booking, order or quote with them" });
+      }
+      const review = await storage.upsertProviderReview(
+        providerId, req.user.id, r,
+        typeof comment === "string" && comment.trim() ? comment.trim().slice(0, 2000) : undefined,
+      );
+      res.status(201).json(review);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      res.status(500).json({ message: "Failed to submit review" });
+    }
+  });
+
+  // ==========================================================================
   // Marketplace C2 — product orders (customer -> parts store)
   // ==========================================================================
 

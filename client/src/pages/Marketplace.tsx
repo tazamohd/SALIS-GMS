@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,9 @@ interface Provider {
   city: string | null;
   country: string | null;
   providerType: string;
+  description?: string | null;
+  avgRating?: number | null;
+  reviewCount?: number;
 }
 interface ServiceHit {
   id: string;
@@ -30,8 +33,20 @@ interface ServiceHit {
   providerCity: string | null;
 }
 interface ProviderDetail extends Provider {
+  phone?: string | null;
+  address?: string | null;
+  workingHours?: string | null;
   services: { id: string; name: string; category: string | null; description: string | null; standardCost: string | null }[];
   offerings: { id: string; kind: string; name: string; category: string | null; description: string | null; price: string | null; currency: string | null }[];
+  reviews: { id: string; rating: number; comment: string | null; customerName: string | null; createdAt: string }[];
+}
+
+function Stars({ value }: { value: number }) {
+  return (
+    <span className="text-amber-500" aria-label={`${value} stars`}>
+      {"★".repeat(Math.round(value))}{"☆".repeat(5 - Math.round(value))}
+    </span>
+  );
 }
 
 const TYPES = [
@@ -151,6 +166,12 @@ export default function Marketplace() {
                     <CardContent className="p-5">
                       <Badge variant="outline" className="mb-2">{p.providerType}</Badge>
                       <div className="font-semibold text-[#0B1F3B] dark:text-white">{p.name}</div>
+                      {p.avgRating != null && (
+                        <div className="text-xs mt-0.5" data-testid={`rating-${p.id}`}>
+                          <Stars value={Number(p.avgRating)} />{" "}
+                          <span className="text-[#64748B]">{Number(p.avgRating).toFixed(1)} ({p.reviewCount})</span>
+                        </div>
+                      )}
                       {(p.city || p.country) && (
                         <div className="text-xs text-[#64748B] flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />{[p.city, p.country].filter(Boolean).join(", ")}
@@ -171,14 +192,25 @@ export default function Marketplace() {
           <DialogHeader><DialogTitle>{detail.data?.name ?? "Provider"}</DialogTitle></DialogHeader>
           {detail.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p> : detail.data && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline">{detail.data.providerType}</Badge>
+                {detail.data.avgRating != null && (
+                  <span className="text-xs"><Stars value={Number(detail.data.avgRating)} /> <span className="text-[#64748B]">{Number(detail.data.avgRating).toFixed(1)} ({detail.data.reviewCount})</span></span>
+                )}
                 {(detail.data.city || detail.data.country) && (
                   <span className="text-xs text-[#64748B] flex items-center gap-1">
                     <MapPin className="h-3 w-3" />{[detail.data.city, detail.data.country].filter(Boolean).join(", ")}
                   </span>
                 )}
               </div>
+              {(detail.data.description || detail.data.phone || detail.data.workingHours || detail.data.address) && (
+                <div className="text-xs text-[#64748B] space-y-0.5">
+                  {detail.data.description && <p className="text-sm text-[#0B1F3B] dark:text-[#E6EAF0]">{detail.data.description}</p>}
+                  {detail.data.phone && <div>☎ {detail.data.phone}</div>}
+                  {detail.data.workingHours && <div>🕒 {detail.data.workingHours}</div>}
+                  {detail.data.address && <div>📍 {detail.data.address}</div>}
+                </div>
+              )}
               {(detail.data.services.length > 0 || detail.data.offerings.length === 0) && (
                 <div>
                   <h3 className="text-sm font-semibold mb-2">Services</h3>
@@ -210,6 +242,20 @@ export default function Marketplace() {
                   </ul>
                 </div>
               )}
+              {(detail.data.reviews?.length ?? 0) > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Reviews</h3>
+                  <ul className="space-y-2 max-h-40 overflow-y-auto">
+                    {detail.data.reviews.map((r) => (
+                      <li key={r.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36] text-xs">
+                        <Stars value={r.rating} /> <span className="font-medium">{r.customerName ?? "Customer"}</span>
+                        {r.comment && <p className="mt-0.5 text-[#64748B]">{r.comment}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {user && <ReviewForm providerId={detail.data.id} />}
               {user ? (
                 <>
                   {detail.data.offerings.some((o) => o.kind === "product") && (
@@ -367,6 +413,46 @@ function QuoteForm({ providerId, plans, onDone }: { providerId: string; plans: {
         className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
         {quote.isPending ? "Requesting…" : "Request quote"}
       </Button>
+    </div>
+  );
+}
+
+function ReviewForm({ providerId }: { providerId: string }) {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const submit = useMutation({
+    mutationFn: async () => (await apiRequest("POST", "/api/my/reviews", { providerId, rating, comment: comment || undefined })).json(),
+    onSuccess: () => {
+      toast({ title: "Review submitted", description: "Thanks for the feedback!" });
+      qc.invalidateQueries({ queryKey: ["/api/marketplace/providers", providerId] });
+      setRating(0); setComment("");
+    },
+    onError: (e: Error) => {
+      let msg = e.message; const m = e.message.match(/\{.*\}/);
+      if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep */ } }
+      toast({ title: "Could not submit review", description: msg, variant: "destructive" });
+    },
+  });
+
+  return (
+    <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-3 space-y-2">
+      <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Rate this provider</p>
+      <div className="flex items-center gap-2">
+        <div className="flex" data-testid="review-stars">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" onClick={() => setRating(n)} data-testid={`star-${n}`}
+              className={`text-xl leading-none ${n <= rating ? "text-amber-500" : "text-[#CBD5E1] dark:text-[#334155]"}`}>★</button>
+          ))}
+        </div>
+        <Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Optional comment"
+          data-testid="review-comment" className="h-8 text-xs bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
+        <Button size="sm" className="h-8" disabled={rating === 0 || submit.isPending} onClick={() => submit.mutate()} data-testid="review-submit">
+          {submit.isPending ? "…" : "Send"}
+        </Button>
+      </div>
     </div>
   );
 }

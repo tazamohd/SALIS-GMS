@@ -815,6 +815,8 @@ import {
   insuranceQuotes,
   type InsuranceQuote,
   type InsertInsuranceQuote,
+  providerReviews,
+  type ProviderReview,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13675,6 +13677,95 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ==========================================================================
+  // Customer marketplace — provider profiles + reviews (C3)
+  // ==========================================================================
+
+  /** A provider edits its own public profile. */
+  async updateProviderProfile(
+    providerId: string,
+    data: Partial<Pick<any, "description" | "phone" | "email" | "address" | "photoUrl" | "workingHours">>,
+  ): Promise<any | undefined> {
+    const [row] = await db.update(garages)
+      .set(data as any)
+      .where(eq(garages.id, providerId))
+      .returning({
+        id: garages.id, name: garages.name, description: garages.description,
+        phone: garages.phone, email: garages.email, address: garages.address,
+        photoUrl: garages.photoUrl, workingHours: garages.workingHours,
+      });
+    return row;
+  }
+
+  /** Has this customer completed a transaction with this provider? (review gate) */
+  async hasTransactedWith(customerId: string, providerId: string): Promise<boolean> {
+    const [booking] = await db.select({ id: marketplaceBookings.id }).from(marketplaceBookings)
+      .where(and(
+        eq(marketplaceBookings.customerId, customerId),
+        eq(marketplaceBookings.providerId, providerId),
+        eq(marketplaceBookings.status, "completed"),
+      )).limit(1);
+    if (booking) return true;
+    const [order] = await db.select({ id: providerOrders.id }).from(providerOrders)
+      .where(and(
+        eq(providerOrders.customerId, customerId),
+        eq(providerOrders.providerId, providerId),
+        eq(providerOrders.status, "fulfilled"),
+      )).limit(1);
+    if (order) return true;
+    const [quote] = await db.select({ id: insuranceQuotes.id }).from(insuranceQuotes)
+      .where(and(
+        eq(insuranceQuotes.customerId, customerId),
+        eq(insuranceQuotes.providerId, providerId),
+        eq(insuranceQuotes.status, "accepted"),
+      )).limit(1);
+    return !!quote;
+  }
+
+  /** One review per customer per provider — upsert on the unique pair. */
+  async upsertProviderReview(
+    providerId: string,
+    customerId: string,
+    rating: number,
+    comment?: string,
+  ): Promise<ProviderReview> {
+    const [row] = await db.insert(providerReviews)
+      .values({ providerId, customerId, rating, comment: comment ?? null })
+      .onConflictDoUpdate({
+        target: [providerReviews.providerId, providerReviews.customerId],
+        set: { rating, comment: comment ?? null, updatedAt: new Date() },
+      })
+      .returning();
+    return row;
+  }
+
+  async listProviderReviews(providerId: string, limit = 20): Promise<any[]> {
+    return await db
+      .select({
+        id: providerReviews.id,
+        rating: providerReviews.rating,
+        comment: providerReviews.comment,
+        createdAt: providerReviews.createdAt,
+        customerName: users.fullName,
+      })
+      .from(providerReviews)
+      .innerJoin(users, eq(providerReviews.customerId, users.id))
+      .where(eq(providerReviews.providerId, providerId))
+      .orderBy(desc(providerReviews.createdAt))
+      .limit(limit);
+  }
+
+  async getProviderRating(providerId: string): Promise<{ avgRating: number | null; reviewCount: number }> {
+    const [row] = await db
+      .select({
+        avg: sql<number>`avg(${providerReviews.rating})::numeric(3,2)`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(providerReviews)
+      .where(eq(providerReviews.providerId, providerId));
+    return { avgRating: row?.avg == null ? null : Number(row.avg), reviewCount: Number(row?.count ?? 0) };
+  }
+
+  // ==========================================================================
   // Customer marketplace — product orders (parts stores)
   // ==========================================================================
 
@@ -13877,13 +13968,31 @@ export class DatabaseStorage implements IStorage {
         city: garages.city,
         country: garages.country,
         providerType: garages.businessType,
+        description: garages.description,
+        photoUrl: garages.photoUrl,
         createdAt: garages.createdAt,
       })
       .from(garages)
       .where(and(...conditions))
       .orderBy(desc(garages.createdAt))
       .limit(100);
-    return rows;
+    if (rows.length === 0) return rows;
+
+    // Merge review aggregates (single grouped query, joined in JS).
+    const ratings = await db
+      .select({
+        providerId: providerReviews.providerId,
+        avg: sql<number>`avg(${providerReviews.rating})::numeric(3,2)`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(providerReviews)
+      .where(inArray(providerReviews.providerId, rows.map((r) => r.id)))
+      .groupBy(providerReviews.providerId);
+    const byId = new Map(ratings.map((r) => [r.providerId, r]));
+    return rows.map((r) => {
+      const agg = byId.get(r.id);
+      return { ...r, avgRating: agg ? Number(agg.avg) : null, reviewCount: agg ? Number(agg.count) : 0 };
+    });
   }
 
   async getMarketplaceProvider(id: string): Promise<any | undefined> {
@@ -13894,6 +14003,12 @@ export class DatabaseStorage implements IStorage {
         city: garages.city,
         country: garages.country,
         providerType: garages.businessType,
+        description: garages.description,
+        phone: garages.phone,
+        email: garages.email,
+        address: garages.address,
+        photoUrl: garages.photoUrl,
+        workingHours: garages.workingHours,
         createdAt: garages.createdAt,
       })
       .from(garages)
@@ -13912,7 +14027,11 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(serviceTemplates.garageId, id), eq(serviceTemplates.isActive, true)))
       .orderBy(asc(serviceTemplates.name));
     const offerings = await this.listProviderOfferings(id, true);
-    return { ...g, services, offerings };
+    const [rating, reviews] = await Promise.all([
+      this.getProviderRating(id),
+      this.listProviderReviews(id, 10),
+    ]);
+    return { ...g, services, offerings, ...rating, reviews };
   }
 
   /** Smart search across providers and the services they offer. Returns both a

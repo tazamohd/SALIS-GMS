@@ -70,7 +70,29 @@ export const garages = pgTable("garages", {
   // Marketplace provider kind — this "business account" backs every provider
   // type, not only auto-repair garages.
   businessType: varchar("business_type", { length: 30 }).default("garage").notNull(), // garage | parts_store | insurance
+  // Public marketplace profile (C3).
+  description: text("description"),
+  phone: varchar("phone", { length: 50 }),
+  email: varchar("email", { length: 255 }),
+  address: text("address"),
+  photoUrl: text("photo_url"),
 });
+
+// Customer reviews of marketplace providers (C3). One review per customer per
+// provider (upsert semantics); only customers with a completed transaction may
+// review — enforced in the route.
+export const providerReviews = pgTable("provider_reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  rating: integer("rating").notNull(), // 1..5
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  onePerCustomer: uniqueIndex("provider_reviews_provider_customer_unique").on(table.providerId, table.customerId),
+  providerIdx: index("provider_reviews_provider_idx").on(table.providerId),
+}));
 
 // Branches
 export const branches = pgTable("branches", {
@@ -11526,6 +11548,9 @@ export type InsertMarketplaceBooking = typeof marketplaceBookings.$inferInsert;
 
 export type ProviderOffering = typeof providerOfferings.$inferSelect;
 export type InsertProviderOffering = typeof providerOfferings.$inferInsert;
+
+export type ProviderReview = typeof providerReviews.$inferSelect;
+export type InsertProviderReview = typeof providerReviews.$inferInsert;
 
 export type ProviderOrder = typeof providerOrders.$inferSelect;
 export type InsertProviderOrder = typeof providerOrders.$inferInsert;
