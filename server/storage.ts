@@ -804,6 +804,9 @@ import {
   marketplaceBookings,
   type MarketplaceBooking,
   type InsertMarketplaceBooking,
+  providerOfferings,
+  type ProviderOffering,
+  type InsertProviderOffering,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13595,6 +13598,44 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ==========================================================================
+  // Customer marketplace — provider offerings (products / plans / services)
+  // ==========================================================================
+
+  async listProviderOfferings(providerId: string, activeOnly = false): Promise<ProviderOffering[]> {
+    const conditions = [eq(providerOfferings.providerId, providerId)];
+    if (activeOnly) conditions.push(eq(providerOfferings.isActive, true));
+    return await db
+      .select()
+      .from(providerOfferings)
+      .where(and(...conditions))
+      .orderBy(asc(providerOfferings.name));
+  }
+
+  async createProviderOffering(data: InsertProviderOffering & { providerId: string }): Promise<ProviderOffering> {
+    const [row] = await db.insert(providerOfferings).values(data).returning();
+    return row;
+  }
+
+  async updateProviderOffering(
+    id: string,
+    providerId: string,
+    data: Partial<InsertProviderOffering>,
+  ): Promise<ProviderOffering | undefined> {
+    const [row] = await db
+      .update(providerOfferings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(providerOfferings.id, id), eq(providerOfferings.providerId, providerId)))
+      .returning();
+    return row;
+  }
+
+  async deleteProviderOffering(id: string, providerId: string): Promise<void> {
+    await db
+      .delete(providerOfferings)
+      .where(and(eq(providerOfferings.id, id), eq(providerOfferings.providerId, providerId)));
+  }
+
+  // ==========================================================================
   // Customer marketplace — bookings (customer <-> provider)
   // ==========================================================================
 
@@ -13704,14 +13745,15 @@ export class DatabaseStorage implements IStorage {
       .from(serviceTemplates)
       .where(and(eq(serviceTemplates.garageId, id), eq(serviceTemplates.isActive, true)))
       .orderBy(asc(serviceTemplates.name));
-    return { ...g, services };
+    const offerings = await this.listProviderOfferings(id, true);
+    return { ...g, services, offerings };
   }
 
   /** Smart search across providers and the services they offer. Returns both a
    *  provider hit list (name match) and service hits (name/category match)
    *  annotated with their provider, so a customer can search a service and find
    *  who offers it. */
-  async searchMarketplace(query: string): Promise<{ providers: any[]; services: any[] }> {
+  async searchMarketplace(query: string): Promise<{ providers: any[]; services: any[]; offerings: any[] }> {
     const q = `%${query}%`;
     const providers = await db
       .select({ id: garages.id, name: garages.name, city: garages.city, country: garages.country, providerType: garages.businessType })
@@ -13740,7 +13782,30 @@ export class DatabaseStorage implements IStorage {
       )
       .limit(50);
 
-    return { providers, services };
+    // Provider offerings (products / plans) are searchable the same way.
+    const offerings = await db
+      .select({
+        id: providerOfferings.id,
+        name: providerOfferings.name,
+        kind: providerOfferings.kind,
+        category: providerOfferings.category,
+        price: providerOfferings.price,
+        providerId: garages.id,
+        providerName: garages.name,
+        providerCity: garages.city,
+      })
+      .from(providerOfferings)
+      .innerJoin(garages, eq(providerOfferings.providerId, garages.id))
+      .where(
+        and(
+          eq(garages.isActive, true),
+          eq(providerOfferings.isActive, true),
+          or(ilike(providerOfferings.name, q), ilike(providerOfferings.category, q)),
+        ),
+      )
+      .limit(50);
+
+    return { providers, services, offerings };
   }
 
   // ==========================================================================

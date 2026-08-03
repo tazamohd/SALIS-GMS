@@ -21680,6 +21680,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Provider offerings — a provider manages the products/plans/services it
+  // presents in the marketplace (scoped to the caller's garage).
+  // ==========================================================================
+
+  app.get('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderOfferings(providerId));
+    } catch (error) {
+      console.error("Error listing provider offerings:", error);
+      res.status(500).json({ message: "Failed to load offerings" });
+    }
+  });
+
+  app.post('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { insertProviderOfferingSchema } = await import("@shared/schema");
+      const parsed = insertProviderOfferingSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
+      const offering = await storage.createProviderOffering({ ...parsed.data, providerId } as any);
+      res.status(201).json(offering);
+    } catch (error) {
+      console.error("Error creating provider offering:", error);
+      res.status(500).json({ message: "Failed to create offering" });
+    }
+  });
+
+  app.patch('/api/provider/offerings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { insertProviderOfferingSchema } = await import("@shared/schema");
+      const parsed = insertProviderOfferingSchema.partial().safeParse(req.body);
+      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
+      const updated = await storage.updateProviderOffering(req.params.id, providerId, parsed.data as any);
+      if (!updated) return res.status(404).json({ message: "Offering not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider offering:", error);
+      res.status(500).json({ message: "Failed to update offering" });
+    }
+  });
+
+  app.delete('/api/provider/offerings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      await storage.deleteProviderOffering(req.params.id, providerId); // scoped
+      res.json({ message: "Offering removed" });
+    } catch (error) {
+      console.error("Error deleting provider offering:", error);
+      res.status(500).json({ message: "Failed to remove offering" });
+    }
+  });
+
   // Scan a vehicle registration/license or insurance card and extract fields.
   // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
   // runs; otherwise we report ocrAvailable:false so the UI falls back to manual

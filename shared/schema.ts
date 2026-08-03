@@ -11279,6 +11279,26 @@ export const customerVehicles = pgTable("customer_vehicles", {
   customerIdx: index("customer_vehicles_customer_idx").on(table.customerId),
 }));
 
+// Customer marketplace — the offerings a provider presents (products for parts
+// stores, plans for insurers, extra services for garages). Garages also keep
+// their service_templates; the directory surfaces both.
+export const providerOfferings = pgTable("provider_offerings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  kind: varchar("kind", { length: 20 }).default("service").notNull(), // service | product | insurance_plan
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  attributes: jsonb("attributes"), // type-specific extras (sku, coverage, etc.)
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  providerIdx: index("provider_offerings_provider_idx").on(table.providerId),
+}));
+
 // Customer marketplace — a booking a customer makes with a provider for a
 // service, optionally tied to one of their saved vehicles. Vehicle/service
 // details are snapshotted so the record stands even if the source changes.
@@ -11438,6 +11458,15 @@ export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert
 
 export type MarketplaceBooking = typeof marketplaceBookings.$inferSelect;
 export type InsertMarketplaceBooking = typeof marketplaceBookings.$inferInsert;
+
+export type ProviderOffering = typeof providerOfferings.$inferSelect;
+export type InsertProviderOffering = typeof providerOfferings.$inferInsert;
+export const insertProviderOfferingSchema = createInsertSchema(providerOfferings).omit({
+  id: true,
+  providerId: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 export type CustomerVehicle = typeof customerVehicles.$inferSelect;
 export type InsertCustomerVehicle = typeof customerVehicles.$inferInsert;
