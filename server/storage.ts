@@ -801,6 +801,9 @@ import {
   customerVehicles,
   type CustomerVehicle,
   type InsertCustomerVehicle,
+  marketplaceBookings,
+  type MarketplaceBooking,
+  type InsertMarketplaceBooking,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13589,6 +13592,64 @@ export class DatabaseStorage implements IStorage {
       .update(customerVehicles)
       .set({ isActive: false, updatedAt: new Date() })
       .where(and(eq(customerVehicles.id, id), eq(customerVehicles.customerId, customerId)));
+  }
+
+  // ==========================================================================
+  // Customer marketplace — bookings (customer <-> provider)
+  // ==========================================================================
+
+  async createMarketplaceBooking(data: InsertMarketplaceBooking): Promise<MarketplaceBooking> {
+    const [row] = await db.insert(marketplaceBookings).values(data).returning();
+    return row;
+  }
+
+  async listCustomerBookings(customerId: string): Promise<MarketplaceBooking[]> {
+    return await db
+      .select()
+      .from(marketplaceBookings)
+      .where(eq(marketplaceBookings.customerId, customerId))
+      .orderBy(desc(marketplaceBookings.createdAt));
+  }
+
+  /** Cancel a customer's own still-open booking (scoped to customerId). */
+  async cancelCustomerBooking(id: string, customerId: string): Promise<MarketplaceBooking | undefined> {
+    const [row] = await db
+      .update(marketplaceBookings)
+      .set({ status: "cancelled", updatedAt: new Date() })
+      .where(
+        and(
+          eq(marketplaceBookings.id, id),
+          eq(marketplaceBookings.customerId, customerId),
+          inArray(marketplaceBookings.status, ["requested", "accepted"]),
+        ),
+      )
+      .returning();
+    return row;
+  }
+
+  async listProviderBookings(providerId: string, status?: string): Promise<MarketplaceBooking[]> {
+    const conditions = [eq(marketplaceBookings.providerId, providerId)];
+    if (status) conditions.push(eq(marketplaceBookings.status, status));
+    return await db
+      .select()
+      .from(marketplaceBookings)
+      .where(and(...conditions))
+      .orderBy(desc(marketplaceBookings.createdAt));
+  }
+
+  /** A provider updates the status/notes of a booking made TO them (scoped to
+   *  providerId so a garage can only touch its own bookings). */
+  async updateProviderBooking(
+    id: string,
+    providerId: string,
+    data: { status?: string; providerNotes?: string },
+  ): Promise<MarketplaceBooking | undefined> {
+    const [row] = await db
+      .update(marketplaceBookings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(marketplaceBookings.id, id), eq(marketplaceBookings.providerId, providerId)))
+      .returning();
+    return row;
   }
 
   // ==========================================================================

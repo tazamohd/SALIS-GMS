@@ -11279,6 +11279,34 @@ export const customerVehicles = pgTable("customer_vehicles", {
   customerIdx: index("customer_vehicles_customer_idx").on(table.customerId),
 }));
 
+// Customer marketplace — a booking a customer makes with a provider for a
+// service, optionally tied to one of their saved vehicles. Vehicle/service
+// details are snapshotted so the record stands even if the source changes.
+export const marketplaceBookings = pgTable("marketplace_bookings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  serviceTemplateId: uuid("service_template_id").references(() => serviceTemplates.id),
+  customerVehicleId: uuid("customer_vehicle_id").references(() => customerVehicles.id),
+  // Snapshots at booking time.
+  serviceName: varchar("service_name", { length: 255 }),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYear: integer("vehicle_year"),
+  vehiclePlate: varchar("vehicle_plate", { length: 50 }),
+  preferredDate: timestamp("preferred_date"),
+  notes: text("notes"),
+  // requested | accepted | declined | completed | cancelled
+  status: varchar("status", { length: 20 }).default("requested").notNull(),
+  providerNotes: text("provider_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("marketplace_bookings_customer_idx").on(table.customerId),
+  providerIdx: index("marketplace_bookings_provider_idx").on(table.providerId),
+  statusIdx: index("marketplace_bookings_status_idx").on(table.status),
+}));
+
 // Platform SuperAdmin — subscription change requests. A garage requests a plan
 // change; a PLATFORM_ADMIN reviews and approves (applies the plan) or rejects.
 export const subscriptionRequests = pgTable("subscription_requests", {
@@ -11407,6 +11435,9 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 
 export type SubscriptionRequest = typeof subscriptionRequests.$inferSelect;
 export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert;
+
+export type MarketplaceBooking = typeof marketplaceBookings.$inferSelect;
+export type InsertMarketplaceBooking = typeof marketplaceBookings.$inferInsert;
 
 export type CustomerVehicle = typeof customerVehicles.$inferSelect;
 export type InsertCustomerVehicle = typeof customerVehicles.$inferInsert;

@@ -21580,6 +21580,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Marketplace bookings — a customer books a provider for a service.
+  // ==========================================================================
+
+  app.post('/api/my/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, serviceTemplateId, customerVehicleId, preferredDate, notes } = req.body ?? {};
+      if (!providerId) return res.status(400).json({ message: "providerId is required" });
+
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      // Snapshot the chosen service (must belong to the provider).
+      let serviceName: string | undefined;
+      if (serviceTemplateId) {
+        const svc = (provider.services ?? []).find((s: any) => s.id === serviceTemplateId);
+        if (!svc) return res.status(400).json({ message: "Selected service is not offered by this provider" });
+        serviceName = svc.name;
+      }
+
+      // Snapshot the chosen vehicle (must belong to the caller).
+      let veh: any;
+      if (customerVehicleId) {
+        veh = await storage.getCustomerVehicle(customerVehicleId, req.user.id);
+        if (!veh) return res.status(400).json({ message: "Vehicle not found" });
+      }
+
+      const booking = await storage.createMarketplaceBooking({
+        customerId: req.user.id,
+        providerId,
+        serviceTemplateId: serviceTemplateId || null,
+        customerVehicleId: customerVehicleId || null,
+        serviceName: serviceName ?? null,
+        vehicleMake: veh?.make ?? null,
+        vehicleModel: veh?.model ?? null,
+        vehicleYear: veh?.year ?? null,
+        vehiclePlate: veh?.licensePlate ?? null,
+        preferredDate: preferredDate ? new Date(preferredDate) : null,
+        notes: notes ?? null,
+      } as any);
+      res.status(201).json(booking);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      res.status(500).json({ message: "Failed to create booking" });
+    }
+  });
+
+  app.get('/api/my/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerBookings(req.user.id));
+    } catch (error) {
+      console.error("Error listing bookings:", error);
+      res.status(500).json({ message: "Failed to load bookings" });
+    }
+  });
+
+  app.post('/api/my/bookings/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const cancelled = await storage.cancelCustomerBooking(req.params.id, req.user.id);
+      if (!cancelled) return res.status(404).json({ message: "Booking not found or not cancellable" });
+      res.json(cancelled);
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      res.status(500).json({ message: "Failed to cancel booking" });
+    }
+  });
+
+  // Provider side: bookings made TO the caller's garage.
+  app.get('/api/provider/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listProviderBookings(providerId, status));
+    } catch (error) {
+      console.error("Error listing provider bookings:", error);
+      res.status(500).json({ message: "Failed to load bookings" });
+    }
+  });
+
+  app.patch('/api/provider/bookings/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = req.body?.status;
+      if (status && !["accepted", "declined", "completed"].includes(status)) {
+        return res.status(400).json({ message: "status must be accepted, declined or completed" });
+      }
+      const updated = await storage.updateProviderBooking(req.params.id, providerId, {
+        status,
+        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Booking not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider booking:", error);
+      res.status(500).json({ message: "Failed to update booking" });
+    }
+  });
+
   // Scan a vehicle registration/license or insurance card and extract fields.
   // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
   // runs; otherwise we report ocrAvailable:false so the UI falls back to manual
