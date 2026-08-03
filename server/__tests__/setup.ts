@@ -25,8 +25,13 @@ export async function createTestApp(): Promise<{ app: Express; server: Server }>
   const { registerRoutes } = await import("../routes/index");
 
   const app = express();
-  app.use(express.json({ limit: "10mb" }));
-  app.use(express.urlencoded({ extended: false }));
+  // Mirror production (server/index.ts): capture the raw body on webhook paths
+  // so webhook signature verification (WhatsApp, payments) can be exercised.
+  const captureRaw = (req: any, _res: any, buf: Buffer) => {
+    if (req.path?.includes("/webhook")) req.rawBody = buf.toString("utf8");
+  };
+  app.use(express.json({ limit: "10mb", verify: captureRaw }));
+  app.use(express.urlencoded({ extended: false, verify: captureRaw }));
 
   const server = await registerRoutes(app);
 

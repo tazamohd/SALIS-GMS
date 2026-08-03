@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { isAuthenticated } from '../auth';
 
 const router = Router();
@@ -296,11 +297,45 @@ router.get('/whatsapp/conversations', isAuthenticated, (_req, res) => {
   res.json({ conversations: sorted });
 });
 
-// Webhook receiver for incoming messages (stub)
-router.post('/whatsapp/webhook', isAuthenticated, (req, res) => {
+// WhatsApp Business API webhook — a server-to-server callback from Meta with NO
+// user session, so it must be PUBLIC (it is allowlisted at the auth floor).
+// Gating it with isAuthenticated was the bug: Meta's calls got 401 and the
+// webhook could never receive events (audit medium #13).
+
+// GET: subscription verification handshake. Meta calls this with hub.* query
+// params; echo hub.challenge only when the verify token matches.
+router.get('/whatsapp/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  const expected = process.env.WHATSAPP_VERIFY_TOKEN;
+  if (mode === 'subscribe' && expected && token === expected) {
+    return res.status(200).send(String(challenge ?? ''));
+  }
+  return res.sendStatus(403);
+});
+
+// POST: incoming events. Public; when WHATSAPP_APP_SECRET is configured we
+// fail-closed on a missing/invalid X-Hub-Signature-256 HMAC (a real request is
+// always signed). Without a secret (dev/stub) we accept and just log.
+router.post('/whatsapp/webhook', (req, res) => {
+  const appSecret = process.env.WHATSAPP_APP_SECRET;
+  if (appSecret) {
+    const signature = String(req.get('x-hub-signature-256') || '');
+    const raw = (req as any).rawBody as Buffer | string | undefined;
+    let ok = false;
+    if (signature.startsWith('sha256=') && raw !== undefined) {
+      try {
+        const expected =
+          'sha256=' + createHmac('sha256', appSecret).update(raw).digest('hex');
+        const a = Buffer.from(signature);
+        const b = Buffer.from(expected);
+        ok = a.length === b.length && timingSafeEqual(a, b);
+      } catch { ok = false; }
+    }
+    if (!ok) return res.sendStatus(401); // fail closed
+  }
   const { entry } = req.body || {};
-  // In production, this would process incoming WhatsApp Business API webhook events
-  // For now, log and acknowledge
   console.log('[WhatsApp Webhook] Received payload:', JSON.stringify(entry || req.body).slice(0, 200));
   res.status(200).json({ success: true, message: 'Webhook received' });
 });
