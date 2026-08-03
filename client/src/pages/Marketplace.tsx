@@ -70,6 +70,7 @@ export default function Marketplace() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-extrabold text-[#0B1F3B] dark:text-white">SALIS Marketplace</h1>
           <div className="flex items-center gap-3">
+            <Link href="/my-vehicles" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">My vehicles</Link>
             <Link href="/customer-signup"><Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up</Button></Link>
             <Link href="/login" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Sign in</Link>
             <ThemeToggle />
