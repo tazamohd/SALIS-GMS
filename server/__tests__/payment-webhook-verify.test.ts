@@ -45,6 +45,47 @@ describe("verifyGatewayWebhook — fail-closed (B8)", () => {
   });
 });
 
+describe("verifyGatewayWebhook — Stripe timestamped scheme (medium #11)", () => {
+  const SECRET = "whsec_test";
+  const stripeSig = (t: number, body: string, secret = SECRET) =>
+    `t=${t},v1=${crypto.createHmac("sha256", secret).update(`${t}.${body}`).digest("hex")}`;
+
+  it("accepts a correct t=/v1= signature", () => {
+    process.env.STRIPE_WEBHOOK_SECRET = SECRET;
+    const t = Math.floor(Date.now() / 1000);
+    const r = verifyGatewayWebhook("stripe", { headers: { "stripe-signature": stripeSig(t, RAW) }, rawBody: RAW });
+    expect(r.ok).toBe(true);
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+  });
+
+  it("rejects a plain HMAC (Stripe is NOT a bare body HMAC)", () => {
+    process.env.STRIPE_WEBHOOK_SECRET = SECRET;
+    const bare = crypto.createHmac("sha256", SECRET).update(RAW).digest("hex");
+    expect(verifyGatewayWebhook("stripe", { headers: { "stripe-signature": bare }, rawBody: RAW }).ok).toBe(false);
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+  });
+
+  it("rejects a tampered body and an out-of-tolerance timestamp", () => {
+    process.env.STRIPE_WEBHOOK_SECRET = SECRET;
+    const t = Math.floor(Date.now() / 1000);
+    // Signature computed for RAW, but a different body is delivered.
+    const sig = stripeSig(t, RAW);
+    expect(verifyGatewayWebhook("stripe", { headers: { "stripe-signature": sig }, rawBody: RAW + "x" }).ok).toBe(false);
+    // Correct signature but a stale timestamp (> 5 min) -> replay rejected.
+    const old = t - 10 * 60;
+    expect(verifyGatewayWebhook("stripe", { headers: { "stripe-signature": stripeSig(old, RAW) }, rawBody: RAW }).ok).toBe(false);
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+  });
+
+  it("fails closed with no secret and on a malformed header", () => {
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+    expect(verifyGatewayWebhook("stripe", { headers: { "stripe-signature": "t=1,v1=abc" }, rawBody: RAW }).ok).toBe(false);
+    process.env.STRIPE_WEBHOOK_SECRET = SECRET;
+    expect(verifyGatewayWebhook("stripe", { headers: { "stripe-signature": "garbage" }, rawBody: RAW }).ok).toBe(false);
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+  });
+});
+
 describe("webhook route — forged event does not settle the invoice (B8)", () => {
   let app: Express;
   let admin: supertest.Agent;

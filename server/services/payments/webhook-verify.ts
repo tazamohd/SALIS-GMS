@@ -64,6 +64,37 @@ function safeEqual(a: string, b: string): boolean {
   return crypto.timingSafeEqual(da, db);
 }
 
+// Stripe's tolerance for the signed timestamp (replay protection), in seconds.
+const STRIPE_TIMESTAMP_TOLERANCE = 5 * 60;
+
+/**
+ * Stripe's signature scheme (what stripe.webhooks.constructEvent verifies):
+ * the `stripe-signature` header is `t=<unixTs>,v1=<hex>` where
+ * v1 = HMAC-SHA256(secret, `${t}.${rawBody}`). This is NOT a plain HMAC over the
+ * body, so Stripe needs its own path — implemented here so the unified verifier
+ * matches the SDK-based /api/stripe/webhook route.
+ */
+function verifyStripe(secret: string, header: string, raw: string, nowSec: number): WebhookVerifyResult {
+  const parts = Object.fromEntries(
+    header.split(",").map((kv) => {
+      const i = kv.indexOf("=");
+      return [kv.slice(0, i).trim(), kv.slice(i + 1).trim()];
+    }),
+  );
+  const t = parts["t"];
+  const v1 = parts["v1"];
+  if (!t || !v1) {
+    return { ok: false, reason: "malformed stripe-signature header (need t and v1)" };
+  }
+  const age = Math.abs(nowSec - Number(t));
+  if (!Number.isFinite(age) || age > STRIPE_TIMESTAMP_TOLERANCE) {
+    return { ok: false, reason: "stripe signature timestamp outside tolerance" };
+  }
+  const expected = crypto.createHmac("sha256", secret).update(`${t}.${raw}`).digest("hex");
+  const ok = safeEqual(v1, expected);
+  return { ok, reason: ok ? "verified" : "signature mismatch" };
+}
+
 export function verifyGatewayWebhook(
   gateway: GatewayId,
   input: WebhookVerifyInput,
@@ -86,6 +117,12 @@ export function verifyGatewayWebhook(
 
   const raw =
     typeof input.rawBody === "string" ? input.rawBody : input.rawBody?.toString("utf8") || "";
+
+  // Stripe uses a timestamped scheme distinct from the generic HMAC below.
+  if (gateway === "stripe") {
+    return verifyStripe(secret, provided, raw, Math.floor(Date.now() / 1000));
+  }
+
   const expected = crypto.createHmac("sha256", secret).update(raw).digest("hex");
 
   // Some providers prefix the scheme (e.g. "sha256="); compare against the tail token.
