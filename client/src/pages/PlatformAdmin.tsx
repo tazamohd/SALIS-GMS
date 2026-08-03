@@ -1250,6 +1250,7 @@ export default function PlatformAdmin() {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "approvals", label: "Approvals", icon: CheckCircle },
     { id: "garages", label: "Garages", icon: Building2 },
     { id: "billing", label: "Billing", icon: CreditCard },
     { id: "suppliers", label: "Suppliers", icon: Truck },
@@ -1295,6 +1296,7 @@ export default function PlatformAdmin() {
         </TabsList>
 
         <TabsContent value="overview" className="mt-6"><OverviewTab /></TabsContent>
+        <TabsContent value="approvals" className="mt-6"><ApprovalsTab /></TabsContent>
         <TabsContent value="garages" className="mt-6"><GaragesTab /></TabsContent>
         <TabsContent value="billing" className="mt-6"><PlatformBillingTab /></TabsContent>
         <TabsContent value="suppliers" className="mt-6"><SuppliersTab /></TabsContent>
@@ -1304,6 +1306,153 @@ export default function PlatformAdmin() {
         <TabsContent value="rbac" className="mt-6"><RBACTab /></TabsContent>
         <TabsContent value="system" className="mt-6"><SystemHealthTab /></TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Approvals tab — real onboarding + subscription-request review queues.
+// ═══════════════════════════════════════════════════════════════════════
+
+interface GarageApplicationRow {
+  id: string;
+  providerType: string;
+  businessName: string;
+  ownerName: string;
+  email: string;
+  city: string | null;
+  requestedPlan: string;
+  taxNumber: string | null;
+  commercialRegistration: string | null;
+  verificationStatus: string;
+  status: string;
+  createdAt: string;
+}
+
+interface SubscriptionRequestRow {
+  id: string;
+  garageId: string;
+  currentPlan: string | null;
+  requestedPlan: string;
+  status: string;
+  createdAt: string;
+}
+
+function ApprovalsTab() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+
+  const apps = useQuery<GarageApplicationRow[]>({
+    queryKey: ["/api/platform-admin/garage-applications", "pending"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/garage-applications?status=pending")).json(),
+  });
+  const subs = useQuery<SubscriptionRequestRow[]>({
+    queryKey: ["/api/platform-admin/subscription-requests", "pending"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/subscription-requests?status=pending")).json(),
+  });
+
+  const act = useMutation({
+    mutationFn: async ({ url, invalidate }: { url: string; invalidate: any[] }) => {
+      await apiRequest("POST", url, {});
+      return invalidate;
+    },
+    onSuccess: (invalidate) => {
+      qc.invalidateQueries({ queryKey: invalidate });
+      toast({ title: "Done", description: "Request processed." });
+    },
+    onError: (e: Error) => toast({ title: "Action failed", description: e.message, variant: "destructive" }),
+  });
+
+  const badge = (s: string) =>
+    s === "verified" ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20"
+    : s === "manual_review" ? "text-amber-600 bg-amber-50 dark:bg-amber-900/20"
+    : "text-slate-600 bg-slate-50 dark:bg-slate-800/40";
+
+  return (
+    <div className="space-y-6">
+      {/* Provider onboarding applications */}
+      <Card className="border-[#E2E8F0] dark:border-[#232A36]">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-[#0A5ED7]" /> Provider applications
+            <Badge variant="outline" className="ml-2">{apps.data?.length ?? 0} pending</Badge>
+          </CardTitle>
+          <CardDescription>Garages, parts stores and insurers awaiting review (verified ones auto-approve).</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {apps.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
+          : (apps.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-apps">No pending applications.</p>
+          : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Business</TableHead><TableHead>Type</TableHead><TableHead>Tax / CR</TableHead>
+                  <TableHead>Verification</TableHead><TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {apps.data!.map((a) => (
+                  <TableRow key={a.id} data-testid={`app-row-${a.id}`}>
+                    <TableCell>
+                      <div className="font-medium">{a.businessName}</div>
+                      <div className="text-xs text-[#64748B]">{a.ownerName} · {a.email}</div>
+                    </TableCell>
+                    <TableCell><Badge variant="outline">{a.providerType}</Badge></TableCell>
+                    <TableCell className="text-xs">{a.taxNumber}<br />{a.commercialRegistration}</TableCell>
+                    <TableCell><span className={`text-xs px-2 py-1 rounded ${badge(a.verificationStatus)}`}>{a.verificationStatus}</span></TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="sm" data-testid={`approve-app-${a.id}`}
+                        onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/approve`, invalidate: ["/api/platform-admin/garage-applications"] })}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />Approve</Button>
+                      <Button size="sm" variant="outline" data-testid={`reject-app-${a.id}`}
+                        onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/reject`, invalidate: ["/api/platform-admin/garage-applications"] })}
+                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />Reject</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Subscription change requests */}
+      <Card className="border-[#E2E8F0] dark:border-[#232A36]">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-[#0A5ED7]" /> Subscription requests
+            <Badge variant="outline" className="ml-2">{subs.data?.length ?? 0} pending</Badge>
+          </CardTitle>
+          <CardDescription>Garages requesting a plan change.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {subs.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
+          : (subs.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-subs">No pending requests.</p>
+          : (
+            <Table>
+              <TableHeader>
+                <TableRow><TableHead>Garage</TableHead><TableHead>Change</TableHead><TableHead className="text-right">Action</TableHead></TableRow>
+              </TableHeader>
+              <TableBody>
+                {subs.data!.map((s) => (
+                  <TableRow key={s.id} data-testid={`sub-row-${s.id}`}>
+                    <TableCell className="text-xs font-mono">{s.garageId.slice(0, 8)}…</TableCell>
+                    <TableCell>{s.currentPlan ?? "—"} → <span className="font-semibold">{s.requestedPlan}</span></TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="sm" data-testid={`approve-sub-${s.id}`}
+                        onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/approve`, invalidate: ["/api/platform-admin/subscription-requests"] })}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />Approve</Button>
+                      <Button size="sm" variant="outline" data-testid={`reject-sub-${s.id}`}
+                        onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/reject`, invalidate: ["/api/platform-admin/subscription-requests"] })}
+                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />Reject</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
