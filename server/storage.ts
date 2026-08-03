@@ -4200,7 +4200,9 @@ export class DatabaseStorage implements IStorage {
 
   async createInvoice(data: InsertInvoice): Promise<Invoice> {
     const { invoices } = await import("@shared/schema");
-    const invoiceNumber = `INV-${Date.now()}`;
+    // A bare INV-<timestamp> collides on the unique invoice_number when two
+    // invoices are created within the same millisecond. Add a random suffix.
+    const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const [invoice] = await db.insert(invoices)
       .values({ ...data, invoiceNumber })
       .returning();
@@ -4247,7 +4249,7 @@ export class DatabaseStorage implements IStorage {
   ): Promise<Invoice> {
     const { invoices, invoiceItems } = await import("@shared/schema");
     return await db.transaction(async (tx) => {
-      const invoiceNumber = `INV-${Date.now()}`;
+      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [invoice] = await tx.insert(invoices)
         .values({ ...invoiceData, invoiceNumber })
         .returning();
