@@ -342,6 +342,9 @@ function Router() {
         </Layout>
       </Route>
 
+      {/* Marketplace is browsable while signed in too (customers + providers) */}
+      <Route path="/marketplace" component={Marketplace} />
+
       {/* Customer Portal Routes */}
       <Route path="/portal/dashboard">
         <CustomerPortalLayout>
