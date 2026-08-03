@@ -21097,18 +21097,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/platform-admin/stats', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const totalGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages`);
-      const activeGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`);
-      const totalUsers = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
+      const [totalGarages, activeGarages, totalUsers, plans, tickets, pendingApps, pendingSubs] = await Promise.all([
+        db.execute(sql`SELECT COUNT(*) as count FROM garages`),
+        db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`),
+        db.execute(sql`SELECT COUNT(*) as count FROM users`),
+        db.execute(sql`SELECT plan, COUNT(*) as count FROM subscriptions WHERE status IN ('active','trialing') GROUP BY plan`),
+        db.execute(sql`SELECT COUNT(*) as count FROM support_tickets WHERE status NOT IN ('resolved','closed')`),
+        db.execute(sql`SELECT COUNT(*) as count FROM garage_applications WHERE status = 'pending'`),
+        db.execute(sql`SELECT COUNT(*) as count FROM subscription_requests WHERE status = 'pending'`),
+      ]);
+
+      // Real MRR from the subscription plan mix (display prices from the
+      // shared plan catalog — Stripe is the billing source of truth).
+      const { PLANS } = await import("@shared/plans");
+      const priceByPlan = new Map(Object.values(PLANS).map((p: any) => [p.id, p.priceMonthly ?? 0]));
+      let monthlyRevenue = 0;
+      for (const row of plans.rows as any[]) {
+        monthlyRevenue += (priceByPlan.get(row.plan) ?? 0) * Number(row.count);
+      }
 
       res.json({
         totalGarages: Number(totalGarages.rows[0]?.count ?? 0),
         activeGarages: Number(activeGarages.rows[0]?.count ?? 0),
         totalUsers: Number(totalUsers.rows[0]?.count ?? 0),
-        monthlyRevenue: 485200,
-        revenueGrowth: 14.2,
-        supportTickets: 18,
-        systemUptime: 99.97,
+        monthlyRevenue,
+        supportTickets: Number(tickets.rows[0]?.count ?? 0),
+        pendingApplications: Number(pendingApps.rows[0]?.count ?? 0),
+        pendingSubscriptionRequests: Number(pendingSubs.rows[0]?.count ?? 0),
+        // Honest process uptime (seconds), not an invented SLA percentage.
+        uptimeSeconds: Math.round(process.uptime()),
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -21205,11 +21222,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/platform-admin/support-tickets', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const tickets = [
-        { id: "T-001", garageId: "g1", garage: "Al-Rashid Auto Center", user: "Mohammed Al-Rashid", subject: "Invoice ZATCA sync issue", priority: "HIGH", status: "open", created: "2026-03-08", type: "Technical" },
-        { id: "T-002", garageId: "g2", garage: "Gulf Motors Workshop", user: "Ahmed Al-Farsi", subject: "Cannot add technician accounts", priority: "MEDIUM", status: "in_progress", created: "2026-03-09", type: "Account" },
-      ];
-      res.json(tickets);
+      // Cross-garage view for the platform team (real data, garage name joined).
+      const result = await db.execute(sql`
+        SELECT t.id, t.garage_id, g.name AS garage, t.subject, t.priority, t.status,
+               t.category, t.created_at
+        FROM support_tickets t
+        LEFT JOIN garages g ON g.id = t.garage_id
+        ORDER BY t.created_at DESC
+        LIMIT 100`);
+      res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -21217,7 +21238,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/platform-admin/support-tickets/:id', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
-      res.json({ success: true, id: req.params.id, ...req.body });
+      const allowed: any = {};
+      if (typeof req.body?.status === "string") allowed.status = req.body.status;
+      if (typeof req.body?.priority === "string") allowed.priority = req.body.priority;
+      if (typeof req.body?.assignedTo === "string") allowed.assignedTo = req.body.assignedTo;
+      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
+      const updated = await storage.updateSupportTicket(req.params.id, allowed);
+      if (!updated) return res.status(404).json({ message: "Ticket not found" });
+      res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
