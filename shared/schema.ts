@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
+  bigint,
   boolean,
   date,
   decimal,
@@ -9,6 +10,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -11278,6 +11280,16 @@ export const customerVehicles = pgTable("customer_vehicles", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
   customerIdx: index("customer_vehicles_customer_idx").on(table.customerId),
+}));
+
+// Per-garage sequential document counters (ZATCA prefers gapless sequences per
+// seller). One row per (garage, docType); incremented atomically via upsert.
+export const docSequences = pgTable("doc_sequences", {
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  docType: varchar("doc_type", { length: 30 }).notNull(),
+  nextValue: bigint("next_value", { mode: "number" }).default(0).notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.garageId, table.docType] }),
 }));
 
 // Customer marketplace — the offerings a provider presents (products for parts

@@ -3861,7 +3861,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder> {
-    const poNumber = `PO-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const poNumber = await this.generateDocNumber("PO", "purchase_order", (data as any).garageId);
     const [po] = await db.insert(purchaseOrders)
       .values({ ...data, poNumber })
       .returning();
@@ -3908,8 +3908,8 @@ export class DatabaseStorage implements IStorage {
     poData: InsertPurchaseOrder,
     items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]
   ): Promise<PurchaseOrder> {
+    const poNumber = await this.generateDocNumber("PO", "purchase_order", (poData as any).garageId);
     return await db.transaction(async (tx) => {
-      const poNumber = `PO-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [po] = await tx.insert(purchaseOrders)
         .values({ ...poData, poNumber })
         .returning();
@@ -4207,11 +4207,38 @@ export class DatabaseStorage implements IStorage {
     return invoice;
   }
 
+  /**
+   * Atomically claim the next per-garage number for a document type. Upsert on
+   * (garage_id, doc_type) is race-safe: concurrent claimants serialize on the
+   * row and each RETURNING sees a distinct value. ZATCA prefers sequential
+   * per-seller numbering, which this provides.
+   */
+  async nextDocNumber(garageId: string, docType: string): Promise<number> {
+    const { docSequences } = await import("@shared/schema");
+    const [row] = await db
+      .insert(docSequences)
+      .values({ garageId, docType, nextValue: 1 })
+      .onConflictDoUpdate({
+        target: [docSequences.garageId, docSequences.docType],
+        set: { nextValue: sql`${docSequences.nextValue} + 1` },
+      })
+      .returning({ nextValue: docSequences.nextValue });
+    return Number(row.nextValue);
+  }
+
+  /** Sequential (per garage) when a garageId is known; random-suffixed otherwise. */
+  private async generateDocNumber(prefix: string, docType: string, garageId?: string | null): Promise<string> {
+    if (garageId) {
+      const seq = await this.nextDocNumber(garageId, docType);
+      // Garage discriminator keeps globally-unique columns unique across tenants.
+      return `${prefix}-${garageId.slice(0, 8).toUpperCase()}-${String(seq).padStart(6, "0")}`;
+    }
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  }
+
   async createInvoice(data: InsertInvoice): Promise<Invoice> {
     const { invoices } = await import("@shared/schema");
-    // A bare INV-<timestamp> collides on the unique invoice_number when two
-    // invoices are created within the same millisecond. Add a random suffix.
-    const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const invoiceNumber = await this.generateDocNumber("INV", "invoice", (data as any).garageId);
     const [invoice] = await db.insert(invoices)
       .values({ ...data, invoiceNumber })
       .returning();
@@ -4257,8 +4284,8 @@ export class DatabaseStorage implements IStorage {
     items: Omit<InsertInvoiceItem, 'invoiceId'>[]
   ): Promise<Invoice> {
     const { invoices, invoiceItems } = await import("@shared/schema");
+    const invoiceNumber = await this.generateDocNumber("INV", "invoice", (invoiceData as any).garageId);
     return await db.transaction(async (tx) => {
-      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [invoice] = await tx.insert(invoices)
         .values({ ...invoiceData, invoiceNumber })
         .returning();
@@ -4482,7 +4509,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createEstimate(data: InsertEstimate): Promise<Estimate> {
-    const estimateNumber = `EST-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const estimateNumber = await this.generateDocNumber("EST", "estimate", (data as any).garageId);
     const [estimate] = await db.insert(estimates)
       .values({ ...data, estimateNumber })
       .returning();
@@ -4522,8 +4549,8 @@ export class DatabaseStorage implements IStorage {
     estimateData: InsertEstimate,
     items: Omit<InsertEstimateItem, 'estimateId'>[]
   ): Promise<Estimate> {
+    const estimateNumber = await this.generateDocNumber("EST", "estimate", (estimateData as any).garageId);
     return await db.transaction(async (tx) => {
-      const estimateNumber = `EST-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const [estimate] = await tx.insert(estimates)
         .values({ ...estimateData, estimateNumber })
         .returning();
