@@ -11250,6 +11250,35 @@ export const garageApplications = pgTable("garage_applications", {
   statusIdx: index("garage_applications_status_idx").on(table.status),
 }));
 
+// Customer marketplace — a platform customer's own vehicles (garage-agnostic).
+// Kept separate from the garage-scoped `vehicles` table so a marketplace
+// customer can manage their fleet before/without belonging to any one garage.
+export const customerVehicles = pgTable("customer_vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }),
+  year: integer("year"),
+  vin: varchar("vin", { length: 100 }),
+  licensePlate: varchar("license_plate", { length: 50 }),
+  color: varchar("color", { length: 50 }),
+  mileage: integer("mileage"),
+  engineType: varchar("engine_type", { length: 100 }),
+  transmissionType: varchar("transmission_type", { length: 50 }),
+  // Insurance (optional — captured from a scanned card or entered manually).
+  insuranceProvider: varchar("insurance_provider", { length: 255 }),
+  insurancePolicyNumber: varchar("insurance_policy_number", { length: 100 }),
+  insuranceExpiry: timestamp("insurance_expiry"),
+  // Scanned document references (registration/license + insurance).
+  licenseDocUrl: text("license_doc_url"),
+  insuranceDocUrl: text("insurance_doc_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("customer_vehicles_customer_idx").on(table.customerId),
+}));
+
 // Platform SuperAdmin — subscription change requests. A garage requests a plan
 // change; a PLATFORM_ADMIN reviews and approves (applies the plan) or rejects.
 export const subscriptionRequests = pgTable("subscription_requests", {
@@ -11378,6 +11407,17 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
 
 export type SubscriptionRequest = typeof subscriptionRequests.$inferSelect;
 export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert;
+
+export type CustomerVehicle = typeof customerVehicles.$inferSelect;
+export type InsertCustomerVehicle = typeof customerVehicles.$inferInsert;
+// Applicant-supplied fields only; ownership + timestamps are server-set.
+export const insertCustomerVehicleSchema = createInsertSchema(customerVehicles).omit({
+  id: true,
+  customerId: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 export type GarageApplication = typeof garageApplications.$inferSelect;
 export type InsertGarageApplication = typeof garageApplications.$inferInsert;

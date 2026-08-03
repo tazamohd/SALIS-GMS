@@ -21524,6 +21524,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==========================================================================
+  // Customer vehicles — a signed-in customer manages their own vehicles.
+  // Every route is scoped to req.user.id, so a customer only ever sees/edits
+  // their own vehicles.
+  // ==========================================================================
+
+  app.get('/api/my/vehicles', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerVehicles(req.user.id));
+    } catch (error) {
+      console.error("Error listing customer vehicles:", error);
+      res.status(500).json({ message: "Failed to load vehicles" });
+    }
+  });
+
+  app.post('/api/my/vehicles', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCustomerVehicleSchema } = await import("@shared/schema");
+      const parsed = insertCustomerVehicleSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const vehicle = await storage.createCustomerVehicle({ ...parsed.data, customerId: req.user.id } as any);
+      res.status(201).json(vehicle);
+    } catch (error) {
+      console.error("Error adding customer vehicle:", error);
+      res.status(500).json({ message: "Failed to add vehicle" });
+    }
+  });
+
+  app.patch('/api/my/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCustomerVehicleSchema } = await import("@shared/schema");
+      const parsed = insertCustomerVehicleSchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const updated = await storage.updateCustomerVehicle(req.params.id, parsed.data as any, req.user.id);
+      if (!updated) return res.status(404).json({ message: "Vehicle not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating customer vehicle:", error);
+      res.status(500).json({ message: "Failed to update vehicle" });
+    }
+  });
+
+  app.delete('/api/my/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteCustomerVehicle(req.params.id, req.user.id); // scoped soft-delete
+      res.json({ message: "Vehicle removed" });
+    } catch (error) {
+      console.error("Error deleting customer vehicle:", error);
+      res.status(500).json({ message: "Failed to remove vehicle" });
+    }
+  });
+
+  // Scan a vehicle registration/license or insurance card and extract fields.
+  // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
+  // runs; otherwise we report ocrAvailable:false so the UI falls back to manual
+  // entry (no fabricated data). VIN decoding uses the existing /api/vin-decode.
+  app.post('/api/my/vehicles/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const docType = req.body?.docType;
+      if (docType !== "license" && docType !== "insurance") {
+        return res.status(400).json({ message: "docType must be 'license' or 'insurance'" });
+      }
+      const provider = process.env.VEHICLE_OCR_PROVIDER;
+      if (!provider) {
+        return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually." });
+      }
+      // Seam: a configured provider (Google Vision / AWS Textract / etc.) would
+      // extract text from req.body.imageBase64 and map it to vehicle/insurance
+      // fields here. Kept out of the default build so the platform stays
+      // self-contained.
+      res.json({ ocrAvailable: true, provider, fields: {} });
+    } catch (error) {
+      console.error("Error scanning document:", error);
+      res.status(500).json({ message: "Failed to scan document" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Initialize WebSocket server for chat

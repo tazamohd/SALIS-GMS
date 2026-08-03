@@ -798,6 +798,9 @@ import {
   subscriptionRequests,
   type SubscriptionRequest,
   type InsertSubscriptionRequest,
+  customerVehicles,
+  type CustomerVehicle,
+  type InsertCustomerVehicle,
   schedulingOptimizationRuns,
   type SchedulingOptimizationRun,
   type InsertSchedulingOptimizationRun,
@@ -13539,6 +13542,53 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(subscriptionRequests.id, id), eq(subscriptionRequests.status, "pending")))
       .returning();
     return row;
+  }
+
+  // ==========================================================================
+  // Customer marketplace — a customer's own vehicles (all scoped to customerId)
+  // ==========================================================================
+
+  async listCustomerVehicles(customerId: string): Promise<CustomerVehicle[]> {
+    return await db
+      .select()
+      .from(customerVehicles)
+      .where(and(eq(customerVehicles.customerId, customerId), eq(customerVehicles.isActive, true)))
+      .orderBy(desc(customerVehicles.createdAt));
+  }
+
+  async getCustomerVehicle(id: string, customerId: string): Promise<CustomerVehicle | undefined> {
+    const [row] = await db
+      .select()
+      .from(customerVehicles)
+      .where(and(eq(customerVehicles.id, id), eq(customerVehicles.customerId, customerId)));
+    return row;
+  }
+
+  async createCustomerVehicle(data: InsertCustomerVehicle & { customerId: string }): Promise<CustomerVehicle> {
+    const [row] = await db.insert(customerVehicles).values(data).returning();
+    return row;
+  }
+
+  async updateCustomerVehicle(
+    id: string,
+    data: Partial<InsertCustomerVehicle>,
+    customerId: string,
+  ): Promise<CustomerVehicle | undefined> {
+    // Ownership is enforced in the WHERE — another customer's id matches nothing.
+    const [row] = await db
+      .update(customerVehicles)
+      .set({ ...data, updatedAt: new Date() })
+      .where(and(eq(customerVehicles.id, id), eq(customerVehicles.customerId, customerId)))
+      .returning();
+    return row;
+  }
+
+  async deleteCustomerVehicle(id: string, customerId: string): Promise<void> {
+    // Soft-delete so history/bookings that referenced it stay intact.
+    await db
+      .update(customerVehicles)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(and(eq(customerVehicles.id, id), eq(customerVehicles.customerId, customerId)));
   }
 
   // ==========================================================================
