@@ -212,6 +212,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import type { User } from "@shared/schema";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ProviderSignup from "@/pages/ProviderSignup";
 import PlatformAdmin from "@/pages/PlatformAdmin";
 import AdvancedReports from "@/pages/AdvancedReports";
 import SupplierPortal from "@/pages/SupplierPortal";
@@ -306,6 +307,8 @@ function Router() {
         <Route path="/otp" component={OTPVerification} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/provider-signup" component={ProviderSignup} />
+        <Route path="/join" component={ProviderSignup} />
         <Route path="/track/:token" component={PublicTracking} />
         <Route path="/customer-portal" component={CustomerPortal} />
         {/* First-run: unrecognized paths show language selection until the
