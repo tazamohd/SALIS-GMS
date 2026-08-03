@@ -35,7 +35,38 @@ const CSRF_EXEMPT_PATHS = new Set([
   "/api/customer-portal/login",
   // Demo one-click login creates a session (like /api/login) and is demo-gated.
   "/api/demo/login",
+  // Public no-session entry points: nothing to forge — there is no session yet.
+  "/api/garage-applications",
+  "/api/customer/register",
 ]);
+
+// Server-to-server callbacks and sessionless kiosks authenticate by provider
+// signature / their own gating, not cookies, so CSRF does not apply.
+const CSRF_EXEMPT_PATTERNS: RegExp[] = [
+  /^\/api\/stripe\/webhook$/,
+  /^\/api\/whatsapp\/webhook$/,
+  /^\/api\/payments\/webhook\/[^/]+$/,
+  /^\/api\/kiosk\//,
+  /^\/api\/demo\//,
+  /^\/api\/public\//,
+];
+
+/**
+ * Whether mutating requests must carry X-CSRF-Token. Read at REQUEST time (not
+ * mount time) so tests can toggle it: explicitly via CSRF_ENFORCE=true|false,
+ * defaulting to ON in production and OFF in dev/test.
+ */
+export function csrfEnforcementEnabled(): boolean {
+  const v = process.env.CSRF_ENFORCE;
+  if (v !== undefined) return v === "true";
+  return process.env.NODE_ENV === "production";
+}
+
+/** Request-time gate around validateCsrfToken (mount this). */
+export function enforceCsrf(req: Request, res: Response, next: NextFunction): void {
+  if (!csrfEnforcementEnabled()) return next();
+  return validateCsrfToken(req, res, next);
+}
 
 export function validateCsrfToken(req: Request, res: Response, next: NextFunction): void {
   if (SKIP_METHODS.has(req.method)) {
@@ -43,7 +74,11 @@ export function validateCsrfToken(req: Request, res: Response, next: NextFunctio
   }
 
   // Use originalUrl so path matching works regardless of Express mount prefix
-  if (CSRF_EXEMPT_PATHS.has(req.originalUrl.split("?")[0])) {
+  const path = req.originalUrl.split("?")[0];
+  if (CSRF_EXEMPT_PATHS.has(path)) {
+    return next();
+  }
+  if (CSRF_EXEMPT_PATTERNS.some((re) => re.test(path))) {
     return next();
   }
 
