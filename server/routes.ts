@@ -3317,7 +3317,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/supplier-quotations/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
-      const quotation = await storage.updateSupplierQuotation(id, req.body);
+      const quotation = await storage.updateSupplierQuotation(id, req.body, (req as any).user?.garageId);
+      if (!quotation) return res.status(404).json({ message: "Supplier quotation not found" });
       res.json(quotation);
     } catch (error) {
       console.error("Error updating supplier quotation:", error);
@@ -5487,7 +5488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const plan = await storage.getPaymentPlan(id);
+      const plan = await storage.getPaymentPlan(id, req.user?.garageId);
       if (!plan) {
         return res.status(404).json({ message: "Payment plan not found" });
       }
@@ -5512,7 +5513,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const plan = await storage.updatePaymentPlan(id, req.body);
+      const plan = await storage.updatePaymentPlan(id, req.body, req.user?.garageId);
+      if (!plan) return res.status(404).json({ message: "Payment plan not found" });
       res.json(plan);
     } catch (error) {
       console.error("Error updating payment plan:", error);
@@ -5538,7 +5540,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/installments/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const installment = await storage.updateInstallment(id, req.body);
+      const installment = await storage.updateInstallment(id, req.body, req.user?.garageId);
+      if (!installment) return res.status(404).json({ message: "Installment not found" });
       res.json(installment);
     } catch (error) {
       console.error("Error updating installment:", error);

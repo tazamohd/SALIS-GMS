@@ -1047,8 +1047,8 @@ export interface IStorage {
   deleteQuotationRequest(id: string, garageId?: string): Promise<void>;
   getSupplierQuotations(quotationRequestId: string): Promise<SupplierQuotation[]>;
   createSupplierQuotation(data: InsertSupplierQuotation): Promise<SupplierQuotation>;
-  updateSupplierQuotation(id: string, data: Partial<SupplierQuotation>): Promise<SupplierQuotation>;
-  deleteSupplierQuotation(id: string): Promise<void>;
+  updateSupplierQuotation(id: string, data: Partial<SupplierQuotation>, garageId?: string): Promise<SupplierQuotation>;
+  deleteSupplierQuotation(id: string, garageId?: string): Promise<void>;
   getQuotationItems(quotationId: string): Promise<QuotationItem[]>;
   createQuotationItem(data: InsertQuotationItem): Promise<QuotationItem>;
   deleteQuotationItem(id: string): Promise<void>;
@@ -1231,15 +1231,15 @@ export interface IStorage {
   // Module 28: Advanced Financial Features
   // Payment Plans
   getPaymentPlans(invoiceId?: string): Promise<PaymentPlan[]>;
-  getPaymentPlan(id: string): Promise<PaymentPlan | undefined>;
+  getPaymentPlan(id: string, garageId?: string): Promise<PaymentPlan | undefined>;
   createPaymentPlan(data: InsertPaymentPlan): Promise<PaymentPlan>;
-  updatePaymentPlan(id: string, data: Partial<PaymentPlan>): Promise<PaymentPlan>;
-  
+  updatePaymentPlan(id: string, data: Partial<PaymentPlan>, garageId?: string): Promise<PaymentPlan>;
+
   // Installments
   getInstallments(paymentPlanId: string): Promise<Installment[]>;
-  getInstallment(id: string): Promise<Installment | undefined>;
+  getInstallment(id: string, garageId?: string): Promise<Installment | undefined>;
   createInstallment(data: InsertInstallment): Promise<Installment>;
-  updateInstallment(id: string, data: Partial<Installment>): Promise<Installment>;
+  updateInstallment(id: string, data: Partial<Installment>, garageId?: string): Promise<Installment>;
   
   // Refunds
   getRefunds(garageId?: string, status?: string): Promise<Refund[]>;
@@ -3148,6 +3148,35 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
+  // Same idea for other parentless child rows: constrain a foreign key to
+  // parents in the caller's garage. Undefined when no garageId (unscoped).
+  private quotationRequestGarageScope(requestIdColumn: any, garageId?: string) {
+    if (!garageId) return undefined;
+    return inArray(
+      requestIdColumn,
+      db.select({ id: quotationRequests.id }).from(quotationRequests).where(eq(quotationRequests.garageId, garageId))
+    );
+  }
+
+  private invoiceGarageScope(invoiceIdColumn: any, garageId?: string) {
+    if (!garageId) return undefined;
+    return inArray(
+      invoiceIdColumn,
+      db.select({ id: invoices.id }).from(invoices).where(eq(invoices.garageId, garageId))
+    );
+  }
+
+  // Two hops: installment -> paymentPlan -> invoice -> garage.
+  private paymentPlanGarageScope(planIdColumn: any, garageId?: string) {
+    if (!garageId) return undefined;
+    return inArray(
+      planIdColumn,
+      db.select({ id: paymentPlans.id }).from(paymentPlans).where(
+        inArray(paymentPlans.invoiceId, db.select({ id: invoices.id }).from(invoices).where(eq(invoices.garageId, garageId)))
+      )
+    );
+  }
+
   async getSupplierPriceList(id: string, garageId?: string): Promise<SupplierPriceList | undefined> {
     const [priceList] = await db.select().from(supplierPriceList)
       .where(and(eq(supplierPriceList.id, id), this.supplierGarageScope(supplierPriceList.supplierId, garageId)));
@@ -3986,16 +4015,19 @@ export class DatabaseStorage implements IStorage {
     return q;
   }
 
-  async updateSupplierQuotation(id: string, data: Partial<SupplierQuotation>): Promise<SupplierQuotation> {
+  async updateSupplierQuotation(id: string, data: Partial<SupplierQuotation>, garageId?: string): Promise<SupplierQuotation> {
+    // Tenant scope (B16 breadth): supplier_quotations has no garage_id; scope
+    // through the parent quotation request's garage.
     const [q] = await db.update(supplierQuotations)
       .set(data)
-      .where(eq(supplierQuotations.id, id))
+      .where(and(eq(supplierQuotations.id, id), this.quotationRequestGarageScope(supplierQuotations.quotationRequestId, garageId)))
       .returning();
     return q;
   }
 
-  async deleteSupplierQuotation(id: string): Promise<void> {
-    await db.delete(supplierQuotations).where(eq(supplierQuotations.id, id));
+  async deleteSupplierQuotation(id: string, garageId?: string): Promise<void> {
+    await db.delete(supplierQuotations)
+      .where(and(eq(supplierQuotations.id, id), this.quotationRequestGarageScope(supplierQuotations.quotationRequestId, garageId)));
   }
 
   async getQuotationItems(quotationId: string): Promise<QuotationItem[]> {
@@ -6119,8 +6151,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(paymentPlans).orderBy(desc(paymentPlans.createdAt));
   }
 
-  async getPaymentPlan(id: string): Promise<PaymentPlan | undefined> {
-    const [plan] = await db.select().from(paymentPlans).where(eq(paymentPlans.id, id));
+  async getPaymentPlan(id: string, garageId?: string): Promise<PaymentPlan | undefined> {
+    const [plan] = await db.select().from(paymentPlans)
+      .where(and(eq(paymentPlans.id, id), this.invoiceGarageScope(paymentPlans.invoiceId, garageId)));
     return plan;
   }
 
@@ -6129,10 +6162,11 @@ export class DatabaseStorage implements IStorage {
     return plan;
   }
 
-  async updatePaymentPlan(id: string, data: Partial<PaymentPlan>): Promise<PaymentPlan> {
+  async updatePaymentPlan(id: string, data: Partial<PaymentPlan>, garageId?: string): Promise<PaymentPlan> {
+    // Tenant scope (B16 breadth): scope through the parent invoice's garage.
     const [plan] = await db.update(paymentPlans)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(paymentPlans.id, id))
+      .where(and(eq(paymentPlans.id, id), this.invoiceGarageScope(paymentPlans.invoiceId, garageId)))
       .returning();
     return plan;
   }
@@ -6144,8 +6178,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(installments.installmentNumber);
   }
 
-  async getInstallment(id: string): Promise<Installment | undefined> {
-    const [installment] = await db.select().from(installments).where(eq(installments.id, id));
+  async getInstallment(id: string, garageId?: string): Promise<Installment | undefined> {
+    const [installment] = await db.select().from(installments)
+      .where(and(eq(installments.id, id), this.paymentPlanGarageScope(installments.paymentPlanId, garageId)));
     return installment;
   }
 
@@ -6154,10 +6189,11 @@ export class DatabaseStorage implements IStorage {
     return installment;
   }
 
-  async updateInstallment(id: string, data: Partial<Installment>): Promise<Installment> {
+  async updateInstallment(id: string, data: Partial<Installment>, garageId?: string): Promise<Installment> {
+    // Tenant scope (B16 breadth): two hops — installment -> paymentPlan -> invoice.
     const [installment] = await db.update(installments)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(installments.id, id))
+      .where(and(eq(installments.id, id), this.paymentPlanGarageScope(installments.paymentPlanId, garageId)))
       .returning();
     return installment;
   }
