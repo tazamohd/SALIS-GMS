@@ -73,7 +73,12 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      // Secure (HTTPS-only) by default in production. SESSION_COOKIE_SECURE
+      // explicitly overrides it so a plain-HTTP demo (e.g. local docker) can log
+      // in; leave it unset for real HTTPS deployments.
+      secure: process.env.SESSION_COOKIE_SECURE !== undefined
+        ? process.env.SESSION_COOKIE_SECURE === "true"
+        : process.env.NODE_ENV === "production",
       sameSite: "lax", // mitigates cross-site request forgery on the session cookie
       maxAge: sessionTtl,
     },
