@@ -388,14 +388,22 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, async (req: Reque
       paymentMethod: 'cash',
     };
 
-    // ICV: per-garage monotonic counter; PIH: hash of this garage's previous
-    // e-invoice (spec-defined constant for the first link in the chain).
+    // ICV: per-garage monotonic counter; PIH: hash of this garage's most
+    // recently ACCEPTED e-invoice (spec-defined constant for the first link).
+    // Ordered by clearance time — updatedAt is bumped by unrelated invoice
+    // mutations (payments etc.) and would corrupt the chain order. Note: a
+    // rejected submission still consumes an ICV; ZATCA tolerates counter
+    // gaps but not chain divergence.
     const icv = await storage.nextDocNumber(user.garageId, 'zatca_icv');
     const [prev] = await db
       .select({ hash: invoices.zatcaInvoiceHash })
       .from(invoices)
-      .where(and(eq(invoices.garageId, user.garageId), isNotNull(invoices.zatcaInvoiceHash)))
-      .orderBy(desc(invoices.updatedAt))
+      .where(and(
+        eq(invoices.garageId, user.garageId),
+        isNotNull(invoices.zatcaInvoiceHash),
+        isNotNull(invoices.zatcaClearedAt),
+      ))
+      .orderBy(desc(invoices.zatcaClearedAt))
       .limit(1);
     const pih = prev?.hash ?? ZATCA_INITIAL_PIH;
 
@@ -415,8 +423,10 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, async (req: Reque
       .set({
         zatcaClearanceStatus: clearance.status,
         zatcaClearanceId: clearance.clearanceId ?? null,
-        zatcaInvoiceHash: clearance.invoiceHash ?? ubl.hash,
-        zatcaQrCode: clearance.qrCode ?? (localQr.qrCode || null),
+        // A rejected/failed submission must NOT enter the hash chain: the
+        // next invoice's PIH may only reference an invoice ZATCA accepted.
+        zatcaInvoiceHash: cleared ? (clearance.invoiceHash ?? ubl.hash) : null,
+        zatcaQrCode: cleared ? (clearance.qrCode ?? (localQr.qrCode || null)) : null,
         zatcaClearedAt: cleared ? new Date() : null,
         updatedAt: new Date(),
       })

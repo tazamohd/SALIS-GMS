@@ -290,6 +290,8 @@ export async function submitToClearance(
           'Accept-Version': 'V2',
           'Accept-Language': 'en',
           'Authorization': `Basic ${Buffer.from(`${authToken}:${secret}`).toString('base64')}`,
+          // Required by the FATOORA clearance API; harmless on reporting.
+          ...(invoiceType !== 'simplified' ? { 'Clearance-Status': '1' } : {}),
         },
         body: JSON.stringify(requestBody),
       });
@@ -327,7 +329,8 @@ export async function submitToClearance(
       status: 'CLEARED',
       clearanceId: `CLR-STUB-${ublInvoice.hash.substring(0, 8)}`,
       invoiceHash: ublInvoice.hash,
-      qrCode: ublInvoice.encodedInvoice.substring(0, 100),
+      // No qrCode: the caller's locally-generated TLV QR is the real
+      // artifact; fabricating one here would overwrite it with garbage.
       warnings: ['ZATCA_CSID not configured — this is a development stub, not a real clearance.'],
       errors: [],
       timestamp: new Date().toISOString(),

@@ -101,7 +101,7 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
         SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
         FROM invoice_items ii
         JOIN invoices i ON i.id = ii.invoice_id
-        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
         GROUP BY i.job_card_id
       )
       SELECT
@@ -132,7 +132,7 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
         SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
         FROM invoice_items ii
         JOIN invoices i ON i.id = ii.invoice_id
-        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
         GROUP BY i.job_card_id
       )
       SELECT
@@ -163,7 +163,7 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
         SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
         FROM invoice_items ii
         JOIN invoices i ON i.id = ii.invoice_id
-        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
         GROUP BY i.job_card_id
       )
       SELECT

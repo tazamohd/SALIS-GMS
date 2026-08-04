@@ -35,9 +35,13 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // Both limits are env-tunable: a busy garage office shares one NAT IP (so a
 // deployment may need RATE_LIMIT_MAX raised), and load tests need it lifted
 // without a code change.
+const envInt = (name: string, fallback: number): number => {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && v > 0 ? v : fallback;
+};
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 10),
+  max: envInt("AUTH_RATE_LIMIT_MAX", 10),
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
@@ -45,7 +49,7 @@ const authLimiter = rateLimit({
 });
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_MAX ?? 2000),
+  max: envInt("RATE_LIMIT_MAX", 2000),
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => !req.path.startsWith("/api") || req.path.includes("/webhook"),
