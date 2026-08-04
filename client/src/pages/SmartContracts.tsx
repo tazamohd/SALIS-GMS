@@ -108,7 +108,7 @@ export default function SmartContracts() {
       partyA: newContract.partyA || t('smartContracts.garage', 'Garage'),
       partyB: newContract.partyB || t('smartContracts.customer', 'Customer'),
       contractValue: newContract.contractValue,
-      currency: "USD",
+      currency: "SAR",
       terms: newContract.terms,
       status: "draft",
     });
@@ -416,7 +416,7 @@ export default function SmartContracts() {
                   </div>
                   <div>
                     <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.contractValue', 'Contract Value')}</p>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${contract.contractValue} {contract.currency}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {contract.contractValue} {contract.currency}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.blockchain', 'Blockchain')}</p>

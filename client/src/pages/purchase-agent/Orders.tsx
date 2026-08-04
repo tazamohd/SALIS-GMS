@@ -236,7 +236,7 @@ export default function PurchaseAgentOrders() {
                         ? new Date(order.orderDate).toLocaleDateString()
                         : "N/A"}
                     </TableCell>
-                    <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">${order.totalAmount}</TableCell>
+                    <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">SAR {order.totalAmount}</TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
@@ -317,11 +317,11 @@ export default function PurchaseAgentOrders() {
                 </div>
                 <div>
                   <p className="text-sm text-[#64748B]">Subtotal</p>
-                  <p className="font-medium text-[#0B1F3B] dark:text-white">${selectedOrder.subtotal}</p>
+                  <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {selectedOrder.subtotal}</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#64748B]">Total</p>
-                  <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">${selectedOrder.totalAmount}</p>
+                  <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">SAR {selectedOrder.totalAmount}</p>
                 </div>
               </div>
               {selectedOrder.notes && (

@@ -221,7 +221,7 @@ export default function VehicleStorage() {
                     <TableCell className="text-[#64748B]" data-testid={`text-end-${assignment.id}`}>
                       {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : t('vehicles.ongoing', 'Ongoing')}
                     </TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-monthly-rate-${assignment.id}`}>${assignment.monthlyRate.toFixed(2)}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-monthly-rate-${assignment.id}`}>SAR {assignment.monthlyRate.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge className={assignment.status === "active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"} data-testid={`badge-status-${assignment.id}`}>
                         {assignment.status}

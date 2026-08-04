@@ -106,7 +106,7 @@ export default function TechnicianLeaderboards() {
                             </div>
                             <div>
                               <p className="text-[#64748B]">{t('leaderboards.revenue', 'Revenue')}</p>
-                              <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>${tech.revenue.toLocaleString()}</p>
+                              <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>SAR {tech.revenue.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>

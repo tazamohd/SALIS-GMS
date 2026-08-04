@@ -162,6 +162,13 @@
       "when": 1785000012000,
       "tag": "0023_provider_profiles_reviews",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1785000013000,
+      "tag": "0024_sar_currency_defaults",
+      "breakpoints": true
     }
   ]
 }

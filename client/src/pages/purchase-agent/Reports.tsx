@@ -148,7 +148,7 @@ export default function PurchaseAgentReports() {
                 <DollarSign className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${totalSpend.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalSpend.toLocaleString()}</div>
                 <p className="text-sm text-[#64748B]">Total Spend</p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function PurchaseAgentReports() {
                 <TrendingUp className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${avgOrderValue.toFixed(0)}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {avgOrderValue.toFixed(0)}</div>
                 <p className="text-sm text-[#64748B]">Avg Order Value</p>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function PurchaseAgentReports() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-[#0B1F3B] dark:text-white">${supplier.totalSpend.toLocaleString()}</p>
+                          <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {supplier.totalSpend.toLocaleString()}</p>
                           {supplier.rating && (
                             <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
                               ★ {supplier.rating}

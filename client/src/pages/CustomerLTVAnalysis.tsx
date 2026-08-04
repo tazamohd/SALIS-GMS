@@ -168,7 +168,7 @@ export default function CustomerLTVAnalysis() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">$51,600</h3>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">SAR 51,600</h3>
               <p className="text-sm text-[#0A5ED7] mt-1">+8.5% vs last year</p>
             </div>
             <DollarSign className="h-12 w-12 text-[#0A5ED7]" />

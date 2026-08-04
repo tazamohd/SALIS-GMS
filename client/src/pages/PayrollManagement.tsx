@@ -22,7 +22,7 @@ const employeeSchema = z.object({
   employeeNumber: z.string().min(1, "Employee number is required"),
   payType: z.enum(["hourly", "salary", "commission"]),
   baseRate: z.number().min(0),
-  currency: z.string().default("USD"),
+  currency: z.string().default("SAR"),
   payFrequency: z.enum(["weekly", "biweekly", "monthly"]),
   taxId: z.string().optional(),
   bankAccount: z.string().optional(),
@@ -80,7 +80,7 @@ export default function PayrollManagement() {
       employeeNumber: "",
       payType: "hourly",
       baseRate: 0,
-      currency: "USD",
+      currency: "SAR",
       payFrequency: "biweekly",
       isActive: true,
     }
@@ -188,7 +188,7 @@ export default function PayrollManagement() {
                   <TableRow key={emp.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-employee-${emp.id}`}>
                     <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-empnum-${emp.id}`}>{emp.employeeNumber}</TableCell>
                     <TableCell className="text-[#0B1F3B] dark:text-white capitalize" data-testid={`text-paytype-${emp.id}`}>{emp.payType}</TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-rate-${emp.id}`}>${emp.baseRate.toFixed(2)}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-rate-${emp.id}`}>SAR {emp.baseRate.toFixed(2)}</TableCell>
                     <TableCell className="text-[#0B1F3B] dark:text-white capitalize" data-testid={`text-frequency-${emp.id}`}>{emp.payFrequency}</TableCell>
                     <TableCell>
                       <Badge className={emp.isActive ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0" : "bg-[#F8FAFC] dark:bg-[#232A36] text-[#64748B] border-0"} data-testid={`badge-status-${emp.id}`}>
@@ -309,9 +309,9 @@ export default function PayrollManagement() {
                   <TableRow key={run.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-run-${run.id}`}>
                     <TableCell className="font-medium text-[#0B1F3B] dark:text-white" data-testid={`text-employee-${run.id}`}>{run.employeeId}</TableCell>
                     <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-hours-${run.id}`}>{run.hoursWorked || t('common.na', 'N/A')}</TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-gross-${run.id}`}>${run.grossPay.toFixed(2)}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-gross-${run.id}`}>SAR {run.grossPay.toFixed(2)}</TableCell>
                     <TableCell className="text-[#F97316]" data-testid={`text-deductions-${run.id}`}>-${run.deductions.toFixed(2)}</TableCell>
-                    <TableCell className="font-semibold text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid={`text-net-${run.id}`}>${run.netPay.toFixed(2)}</TableCell>
+                    <TableCell className="font-semibold text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid={`text-net-${run.id}`}>SAR {run.netPay.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

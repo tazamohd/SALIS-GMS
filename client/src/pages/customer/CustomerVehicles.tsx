@@ -137,7 +137,7 @@ export function CustomerVehicles() {
                                   {job.completedAt ? format(new Date(job.completedAt), 'PPP') : 'N/A'}
                                 </p>
                                 {job.totalCost && (
-                                  <p className="font-medium text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {Number(job.totalCost).toFixed(2)}</p>
                                 )}
                               </div>
                             </div>

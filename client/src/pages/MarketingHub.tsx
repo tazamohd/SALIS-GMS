@@ -135,7 +135,7 @@ export default function MarketingHub() {
               <DollarSign className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm text-[#64748B]">{t('marketing.totalSpend', 'Total Spend')}</p>
-                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${totalSpend.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalSpend.toLocaleString()}</p>
                 <p className="text-xs text-[#64748B]">{t('marketing.ofBudget', 'of ${{budget}} budget', { budget: totalBudget.toLocaleString() })}</p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function MarketingHub() {
               <div>
                 <p className="text-sm text-[#64748B]">{t('marketing.conversions', 'Conversions')}</p>
                 <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{totalConversions}</p>
-                <p className="text-xs text-[#64748B]">${(totalSpend / Math.max(totalConversions, 1)).toFixed(2)} {t('marketing.cpa', 'CPA')}</p>
+                <p className="text-xs text-[#64748B]">SAR {(totalSpend / Math.max(totalConversions, 1)).toFixed(2)} {t('marketing.cpa', 'CPA')}</p>
               </div>
             </div>
           </CardContent>
@@ -213,7 +213,7 @@ export default function MarketingHub() {
                     <div className="flex items-center gap-3">
                       {account.status === "connected" && (
                         <div className="text-right">
-                          <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">${account.spend.toLocaleString()}</p>
+                          <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">SAR {account.spend.toLocaleString()}</p>
                           <Progress value={spendPercent} className="w-20 h-1" />
                         </div>
                       )}
@@ -303,7 +303,7 @@ export default function MarketingHub() {
                   <div className="grid grid-cols-4 gap-6 text-center text-sm">
                     <div>
                       <p className="text-[#64748B]">{t('marketing.spent', 'Spent')}</p>
-                      <p className="font-medium text-[#0B1F3B] dark:text-white">${campaign.spent.toLocaleString()}</p>
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {campaign.spent.toLocaleString()}</p>
                     </div>
                     <div>
                       <p className="text-[#64748B]">{t('marketing.impressions', 'Impressions')}</p>
@@ -404,7 +404,7 @@ export default function MarketingHub() {
                           <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{account.name}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="text-sm text-[#0B1F3B] dark:text-white">${account.spend.toLocaleString()} / ${account.budget.toLocaleString()}</span>
+                          <span className="text-sm text-[#0B1F3B] dark:text-white">SAR {account.spend.toLocaleString()} / ${account.budget.toLocaleString()}</span>
                           {getStatusBadge(account.status)}
                         </div>
                       </div>
@@ -483,7 +483,7 @@ export default function MarketingHub() {
                   <div className="grid grid-cols-5 gap-6 text-center text-sm">
                     <div>
                       <p className="text-[#64748B]">{t('marketing.budget', 'Budget')}</p>
-                      <p className="font-medium text-[#0B1F3B] dark:text-white">${campaign.budget}</p>
+                      <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {campaign.budget}</p>
                       <Progress value={budgetPercent} className="w-16 h-1 mt-1" />
                     </div>
                     <div>

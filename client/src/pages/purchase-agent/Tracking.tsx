@@ -248,7 +248,7 @@ export default function PurchaseAgentTracking() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">${order.totalAmount}</p>
+                        <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">SAR {order.totalAmount}</p>
                         {order.expectedDeliveryDate && (
                           <p className="text-sm text-[#64748B] flex items-center justify-end gap-1">
                             <MapPin className="h-3 w-3" />

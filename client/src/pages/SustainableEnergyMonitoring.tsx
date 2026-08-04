@@ -219,7 +219,7 @@ export default function SustainableEnergyMonitoring() {
             </div>
             <div>
               <p className="text-sm text-[#64748B] mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
-              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">$2,450</p>
+              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">SAR 2,450</p>
               <Progress value={82} className="h-2" />
             </div>
           </div>

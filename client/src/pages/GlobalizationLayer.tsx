@@ -359,7 +359,7 @@ export default function GlobalizationLayer() {
               <FormField control={currencyForm.control} name="fromCurrency" render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('globalization.fromCurrency', 'From Currency')}</FormLabel>
-                  <FormControl><Input {...field} placeholder="USD" /></FormControl>
+                  <FormControl><Input {...field} placeholder="SAR" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={currencyForm.control} name="toCurrency" render={({ field }) => (

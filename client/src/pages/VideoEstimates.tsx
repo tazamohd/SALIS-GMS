@@ -62,7 +62,7 @@ export default function VideoEstimates() {
     {
       header: t('videoEstimates.estimatedCost', 'Estimated Cost'),
       accessorKey: "estimatedCost",
-      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">${row.estimatedCost || 0}</span>,
+      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">SAR {row.estimatedCost || 0}</span>,
     },
     {
       header: t('common.status', 'Status'),

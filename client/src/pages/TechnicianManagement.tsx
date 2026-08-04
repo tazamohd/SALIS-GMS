@@ -310,7 +310,7 @@ export default function TechnicianManagement() {
                       <DollarSign className="h-4 w-4 mt-0.5 text-[#0BB3FF]" />
                       <div className="text-sm">
                         <div className="font-medium text-[#0B1F3B] dark:text-white">{t('technician.hourlyRate', 'Hourly Rate')}</div>
-                        <div className="text-[#64748B]">${profile.hourlyRate}/{t('technician.hr', 'hr')}</div>
+                        <div className="text-[#64748B]">SAR {profile.hourlyRate}/{t('technician.hr', 'hr')}</div>
                       </div>
                     </div>
                   )}

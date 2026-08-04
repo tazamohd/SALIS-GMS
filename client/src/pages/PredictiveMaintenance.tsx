@@ -224,7 +224,7 @@ export default function PredictiveMaintenance() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#0A5ED7]">
-                {statsLoading ? <Skeleton className="h-8 w-16" /> : `$${(stats?.estimatedRevenue || 0).toLocaleString()}`}
+                {statsLoading ? <Skeleton className="h-8 w-16" /> : `SAR ${(stats?.estimatedRevenue || 0).toLocaleString()}`}
               </div>
             </CardContent>
           </Card>

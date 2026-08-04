@@ -369,7 +369,7 @@ export default function DocumentOCR() {
                     <div>
                       <Label className="text-[#64748B]">{t('documentOCR.totalAmount', 'Total Amount')}</Label>
                       <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
-                        {editedData.total ? `$${editedData.total}` : t('common.notAvailable', 'N/A')}
+                        {editedData.total ? `SAR ${editedData.total}` : t('common.notAvailable', 'N/A')}
                       </p>
                     </div>
                   </div>

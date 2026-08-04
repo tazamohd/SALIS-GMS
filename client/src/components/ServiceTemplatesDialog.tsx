@@ -87,7 +87,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
                     {template.standardCost && (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <DollarSign className="w-4 h-4" />
-                        <span>${template.standardCost}</span>
+                        <span>SAR {template.standardCost}</span>
                       </div>
                     )}
                   </div>

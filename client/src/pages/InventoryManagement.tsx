@@ -59,7 +59,7 @@ import {
 const CHART_COLORS = ["#0A5ED7", "#0BB3FF", "#F97316", "#10B981", "#8B5CF6", "#EC4899", "#F59E0B", "#6366F1"];
 
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "SAR" }).format(value);
 }
 
 function StatusBadge({ status }: { status: string }) {

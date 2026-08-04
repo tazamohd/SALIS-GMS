@@ -95,7 +95,7 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
     if (paymentAmount > maxPaymentAmount) {
       toast({
         title: "Invalid Amount",
-        description: `Payment amount cannot exceed balance due of $${maxPaymentAmount.toFixed(2)}`,
+        description: `Payment amount cannot exceed balance due of SAR ${maxPaymentAmount.toFixed(2)}`,
         variant: "destructive",
       });
       return;
@@ -126,15 +126,15 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
         <div className="mb-4 p-3 bg-blue-50 rounded">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Invoice Total:</span>
-            <span className="font-medium">${parseFloat(invoice.totalAmount).toFixed(2)}</span>
+            <span className="font-medium">SAR {parseFloat(invoice.totalAmount).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Paid Amount:</span>
-            <span className="font-medium text-green-600">${parseFloat(invoice.paidAmount).toFixed(2)}</span>
+            <span className="font-medium text-green-600">SAR {parseFloat(invoice.paidAmount).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm font-bold border-t mt-2 pt-2">
             <span>Balance Due:</span>
-            <span className="text-orange-600">${maxPaymentAmount.toFixed(2)}</span>
+            <span className="text-orange-600">SAR {maxPaymentAmount.toFixed(2)}</span>
           </div>
         </div>
 

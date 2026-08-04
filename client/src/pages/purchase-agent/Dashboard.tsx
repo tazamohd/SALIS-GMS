@@ -76,7 +76,7 @@ export default function PurchaseAgentDashboard() {
     },
     {
       title: "Total Order Value",
-      value: `$${totalOrderValue.toLocaleString()}`,
+      value: `SAR ${totalOrderValue.toLocaleString()}`,
       icon: DollarSign,
       color: "text-green-500",
       bgColor: "bg-green-50 dark:bg-green-900/20",
@@ -172,7 +172,7 @@ export default function PurchaseAgentDashboard() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold text-[#0B1F3B] dark:text-white">${order.totalAmount}</span>
+                      <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR {order.totalAmount}</span>
                       {getStatusBadge(order.status)}
                     </div>
                   </div>

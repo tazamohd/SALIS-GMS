@@ -202,7 +202,7 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                         <td className="p-3">{item.partName}</td>
                         <td className="p-3 text-gray-600">{item.partNumber || "-"}</td>
                         <td className="p-3 text-right">{item.quantity}</td>
-                        <td className="p-3 text-right">${parseFloat(item.unitPrice).toFixed(2)}</td>
+                        <td className="p-3 text-right">SAR {parseFloat(item.unitPrice).toFixed(2)}</td>
                         <td className="p-3 text-right font-medium">
                           ${parseFloat(item.lineTotal).toFixed(2)}
                         </td>
@@ -219,15 +219,15 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                 <div className="space-y-2 min-w-[300px]">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-medium">${parseFloat(purchaseOrder.subtotal).toFixed(2)}</span>
+                    <span className="font-medium">SAR {parseFloat(purchaseOrder.subtotal).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax:</span>
-                    <span className="font-medium">${parseFloat(purchaseOrder.taxAmount).toFixed(2)}</span>
+                    <span className="font-medium">SAR {parseFloat(purchaseOrder.taxAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
                     <span>Total:</span>
-                    <span>${parseFloat(purchaseOrder.totalAmount).toFixed(2)}</span>
+                    <span>SAR {parseFloat(purchaseOrder.totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -647,7 +647,7 @@ export default function FinancialSettings() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-discount-value-${discount.id}`}>
-                        {discount.discountType === "percentage" ? `${discount.discountValue}%` : `$${discount.discountValue}`}
+                        {discount.discountType === "percentage" ? `${discount.discountValue}%` : `SAR ${discount.discountValue}`}
                       </TableCell>
                       <TableCell className="text-sm text-[#64748B]" data-testid={`text-discount-period-${discount.id}`}>
                         {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}

@@ -117,8 +117,8 @@ export default function AppointmentReminders() {
         ...recentNoShows.map((ns: any) => {
           const markedDate = ns.markedNoShowAt ? new Date(ns.markedNoShowAt).toLocaleDateString() : 'N/A';
           const scheduledTime = ns.scheduledTime ? new Date(ns.scheduledTime).toLocaleString() : 'N/A';
-          const revenueLoss = `$${Number(ns.estimatedRevenueLoss || 0).toFixed(2)}`;
-          const feeCharged = ns.noShowFeeCharged ? `$${Number(ns.feeAmount || 0).toFixed(2)}` : t('common.none', 'None');
+          const revenueLoss = `SAR ${Number(ns.estimatedRevenueLoss || 0).toFixed(2)}`;
+          const feeCharged = ns.noShowFeeCharged ? `SAR ${Number(ns.feeAmount || 0).toFixed(2)}` : t('common.none', 'None');
           const status = ns.feePaid ? t('reminders.paid', 'Paid') : ns.feeWaived ? t('reminders.waived', 'Waived') : t('reminders.unpaid', 'Unpaid');
           
           return [
@@ -205,7 +205,7 @@ export default function AppointmentReminders() {
             <DollarSign className="w-5 h-5 text-[#F97316]" />
             <span className="text-sm font-medium text-[#64748B]">{t('reminders.revenueLoss', 'Revenue Loss')}</span>
           </div>
-          <p className="text-3xl font-bold text-[#F97316]">${totalRevenueLoss.toFixed(0)}</p>
+          <p className="text-3xl font-bold text-[#F97316]">SAR {totalRevenueLoss.toFixed(0)}</p>
         </div>
       </div>
 
@@ -414,7 +414,7 @@ export default function AppointmentReminders() {
                       <div>
                         <p className="text-gray-600 dark:text-gray-400">{t('reminders.feeCharged', 'Fee Charged')}</p>
                         <p className="font-semibold text-gray-900 dark:text-white">
-                          {noShow.noShowFeeCharged ? `$${Number(noShow.feeAmount || 0).toFixed(2)}` : t('common.none', 'None')}
+                          {noShow.noShowFeeCharged ? `SAR ${Number(noShow.feeAmount || 0).toFixed(2)}` : t('common.none', 'None')}
                         </p>
                       </div>
                       <div>

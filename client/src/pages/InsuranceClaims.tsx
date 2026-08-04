@@ -92,7 +92,7 @@ export default function InsuranceClaims() {
     },
     {
       label: t('payments.insurance.totalValue', 'Total Value'),
-      value: `$${Math.round(stats.totalValue).toLocaleString()}`,
+      value: `SAR ${Math.round(stats.totalValue).toLocaleString()}`,
       icon: DollarSign,
       color: "text-[#0A5ED7]",
     },
@@ -163,7 +163,7 @@ export default function InsuranceClaims() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${Number(claim.claimAmount || 0).toLocaleString()}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {Number(claim.claimAmount || 0).toLocaleString()}</p>
                     {claim.approvedAmount && (
                       <p className="text-sm text-[#0BB3FF]">{t('payments.insurance.approved', 'Approved')}: ${Number(claim.approvedAmount).toLocaleString()}</p>
                     )}

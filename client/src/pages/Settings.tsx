@@ -265,7 +265,7 @@ function CurrencySettingsTab({ settings, onUpdate }: { settings: UserSettings; o
         <div className="space-y-2">
           <Label className="text-[#0B1F3B] dark:text-white">{t('settings.currency', 'Currency')}</Label>
           <Select 
-            value={settings.currency || "USD"} 
+            value={settings.currency || "SAR"} 
             onValueChange={(value) => onUpdate({ currency: value })}
           >
             <SelectTrigger data-testid="select-currency" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">

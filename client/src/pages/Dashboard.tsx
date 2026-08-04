@@ -458,9 +458,9 @@ export function Dashboard() {
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
+                      <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `SAR ${v/1000}k`} />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        formatter={(value: number) => [`SAR ${value.toLocaleString()}`, 'Revenue']}
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                         labelStyle={{ color: '#0B1F3B' }}
                       />
@@ -791,7 +791,7 @@ export function Dashboard() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
                 {[
-                  { label: "Today's Revenue", value: `$${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
+                  { label: "Today's Revenue", value: `SAR ${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
                   { label: 'Jobs In Progress', value: summary.jobsInProgress, color: 'text-[#0A5ED7] dark:text-[#0BB3FF]' },
                   { label: 'Appointments', value: summary.appointmentsToday, color: 'text-[#0BB3FF]' },
                   { label: 'Pending Invoices', value: summary.pendingInvoices, color: 'text-[#F97316]' },

@@ -741,7 +741,7 @@ export default function VehiclesEnhanced() {
                                 )}
                               </div>
                               {service.cost && (
-                                <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7]">${service.cost}</Badge>
+                                <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7]">SAR {service.cost}</Badge>
                               )}
                             </div>
                           </div>

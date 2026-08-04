@@ -306,7 +306,7 @@ export default function AIAutomation() {
                         </div>
                         <div>
                           <span className="text-[#64748B]">{t('aiAutomation.estimatedCost', 'Estimated Cost')}:</span>
-                          <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">${est.estimatedCost || t('common.notAvailable', 'N/A')}</span>
+                          <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">SAR {est.estimatedCost || t('common.notAvailable', 'N/A')}</span>
                         </div>
                       </div>
                       {est.reasoning && (

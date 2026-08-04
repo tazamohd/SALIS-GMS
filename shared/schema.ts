@@ -601,7 +601,7 @@ export const sparePartInventories = pgTable("spare_part_inventories", {
   purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 }),
   sellingPrice: decimal("selling_price", { precision: 10, scale: 2 }),
   costPrice: decimal("cost_price", { precision: 10, scale: 2 }),
-  currency: varchar("currency").default("USD"),
+  currency: varchar("currency").default("SAR"),
   purchaseTaxRate: decimal("purchase_tax_rate", {
     precision: 5,
     scale: 2,
@@ -1747,7 +1747,7 @@ export const pricingHistory = pgTable("pricing_history", {
   priceType: varchar("price_type", { length: 50 }).notNull(), // "purchase", "selling", "cost"
   oldPrice: decimal("old_price", { precision: 10, scale: 2 }),
   newPrice: decimal("new_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency").default("USD"),
+  currency: varchar("currency").default("SAR"),
   changeReason: varchar("change_reason", { length: 255 }), // "market_adjustment", "supplier_change", "promotion", "manual"
   notes: text("notes"),
   effectiveDate: timestamp("effective_date").defaultNow(),
@@ -2584,7 +2584,7 @@ export const accountingTransactions = pgTable("accounting_transactions", {
   externalId: varchar("external_id", { length: 255 }),
   transactionType: varchar("transaction_type", { length: 100 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   description: text("description"),
   transactionDate: timestamp("transaction_date").notNull(),
   syncStatus: varchar("sync_status", { length: 50 }).default("pending"),
@@ -2783,7 +2783,7 @@ export const userSettings = pgTable("user_settings", {
     .notNull()
     .unique(),
   language: varchar("language", { length: 10 }).default("en").notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  currency: varchar("currency", { length: 3 }).default("SAR").notNull(),
   timezone: varchar("timezone", { length: 50 }).default("UTC"),
   dateFormat: varchar("date_format", { length: 20 }).default("MM/DD/YYYY"),
   timeFormat: varchar("time_format", { length: 10 }).default("12h"),
@@ -3647,7 +3647,7 @@ export const supplierPriceList = pgTable("supplier_price_list", {
   partName: varchar("part_name", { length: 255 }).notNull(),
   partNumber: varchar("part_number", { length: 100 }),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   minimumOrderQuantity: integer("minimum_order_quantity").default(1),
   leadTimeDays: integer("lead_time_days"),
   availability: varchar("availability", { length: 50 }).default("in_stock"), // "in_stock", "limited", "out_of_stock", "discontinued"
@@ -5335,7 +5335,7 @@ export const marketplaceOrders = pgTable("marketplace_orders", {
   quantity: integer("quantity").notNull(),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   sellerId: varchar("seller_id"),
   sellerName: varchar("seller_name"),
   sellerRating: decimal("seller_rating", { precision: 3, scale: 2 }),
@@ -7224,7 +7224,7 @@ export const smartContracts = pgTable("smart_contracts", {
   partyB: varchar("party_b", { length: 255 }).notNull(),
   terms: jsonb("terms").notNull(),
   contractValue: decimal("contract_value", { precision: 15, scale: 2 }),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   status: varchar("status", { length: 50 }).default("draft"),
   deployedAt: timestamp("deployed_at"),
   executedAt: timestamp("executed_at"),
@@ -9540,7 +9540,7 @@ export const marketingAccounts = pgTable("marketing_accounts", {
   syncStatus: varchar("sync_status", { length: 50 }).default("never"), // "never", "syncing", "success", "failed"
   totalSpend: decimal("total_spend", { precision: 12, scale: 2 }).default("0.00"),
   monthlyBudget: decimal("monthly_budget", { precision: 12, scale: 2 }),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   notes: text("notes"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),

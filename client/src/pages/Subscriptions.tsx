@@ -314,7 +314,7 @@ function PlanCard({
         <CardDescription className="text-[#64748B]">{plan.tagline}</CardDescription>
         <div className="mt-4 flex items-baseline gap-2">
           <span className="text-3xl font-bold text-[#0B1F3B] dark:text-white">
-            {plan.priceMonthly === 0 ? "Free" : `$${plan.priceMonthly}`}
+            {plan.priceMonthly === 0 ? "Free" : `SAR ${plan.priceMonthly}`}
           </span>
           {plan.priceMonthly > 0 && (
             <span className="text-sm text-[#64748B]">/ month / garage</span>

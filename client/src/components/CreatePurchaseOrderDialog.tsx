@@ -311,7 +311,7 @@ export function CreatePurchaseOrderDialog() {
                       <div className="flex items-center gap-4">
                         <span className="text-sm">Qty: {item.quantity}</span>
                         <span className="text-sm">@ ${item.unitPrice.toFixed(2)}</span>
-                        <span className="font-medium">${(item.quantity * item.unitPrice).toFixed(2)}</span>
+                        <span className="font-medium">SAR {(item.quantity * item.unitPrice).toFixed(2)}</span>
                         <Button
                           type="button"
                           variant="ghost"
@@ -330,15 +330,15 @@ export function CreatePurchaseOrderDialog() {
                       <div className="space-y-1">
                         <div className="flex justify-between gap-4">
                           <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">${subtotal.toFixed(2)}</span>
+                          <span className="font-medium">SAR {subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4">
                           <span className="text-gray-600">Tax (10%):</span>
-                          <span className="font-medium">${tax.toFixed(2)}</span>
+                          <span className="font-medium">SAR {tax.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4 text-base font-bold">
                           <span>Total:</span>
-                          <span>${total.toFixed(2)}</span>
+                          <span>SAR {total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

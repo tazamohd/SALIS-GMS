@@ -470,7 +470,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Service Cap</p>
-              <p className="text-2xl font-bold">${serviceCap.toLocaleString()}</p>
+              <p className="text-2xl font-bold">SAR {serviceCap.toLocaleString()}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Remaining Budget</p>
@@ -532,7 +532,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${parseFloat(u.totalCost || "0").toLocaleString()}</p>
+                    <p className="font-medium">SAR {parseFloat(u.totalCost || "0").toLocaleString()}</p>
                     {u.isCoveredByContract && (
                       <Badge variant="outline" className="text-xs">Covered</Badge>
                     )}

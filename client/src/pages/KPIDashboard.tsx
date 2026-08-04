@@ -218,7 +218,7 @@ export default function KPIDashboard() {
   const metrics = [
     {
       label: t('analytics.totalRevenue', 'Total Revenue'),
-      value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `SAR ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: "text-[#0A5ED7]",
       trend: { 
@@ -238,14 +238,14 @@ export default function KPIDashboard() {
     },
     {
       label: t('analytics.avgJobValue', 'Avg Job Value'),
-      value: `$${avgJobValue.toFixed(2)}`,
+      value: `SAR ${avgJobValue.toFixed(2)}`,
       icon: Target,
       color: "text-[#0BB3FF]",
       trend: { value: `${completionRate.toFixed(1)}% ${t('analytics.rate', 'rate')}`, isPositive: true },
     },
     {
       label: t('analytics.totalLaborCost', 'Total Labor Cost'),
-      value: `$${totalLabor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `SAR ${totalLabor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: Users,
       color: "text-[#6366F1]",
       trend: { value: `${completionRate.toFixed(1)}% ${t('common.completed', 'complete')}`, isPositive: true },
@@ -564,7 +564,7 @@ export default function KPIDashboard() {
                 <div className="p-4 bg-[#0A5ED7]/10 dark:bg-[#0A5ED7]/20 rounded-lg border border-[#0A5ED7]/30">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-[#0B1F3B] dark:text-gray-300">{t('analytics.laborCost', 'Labor Cost')}</span>
-                    <span className="text-lg font-bold text-[#0A5ED7]">${totalLabor.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-[#0A5ED7]">SAR {totalLabor.toLocaleString()}</span>
                   </div>
                   <p className="text-xs text-[#64748B] dark:text-gray-400">{t('analytics.totalLaborRevenueInPeriod', 'Total labor revenue in period')}</p>
                 </div>
@@ -595,7 +595,7 @@ export default function KPIDashboard() {
                 <div className="p-4 bg-[#6366F1]/10 dark:bg-[#6366F1]/20 rounded-lg border border-[#6366F1]/30">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-[#0B1F3B] dark:text-gray-300">{t('analytics.partsRevenue', 'Parts Revenue')}</span>
-                    <span className="text-lg font-bold text-[#6366F1]">${totalParts.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-[#6366F1]">SAR {totalParts.toLocaleString()}</span>
                   </div>
                   <p className="text-xs text-[#64748B] dark:text-gray-400">{t('analytics.totalPartsSoldInPeriod', 'Total parts sold in period')}</p>
                 </div>

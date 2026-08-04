@@ -408,8 +408,8 @@ export default function LoanerVehicles() {
                   <TableCell>
                     {getLoanerStatusBadge(loaner.status ?? "available", loaner.id)}
                   </TableCell>
-                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.dailyRate ?? "0.00"}</TableCell>
-                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.depositAmount ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">SAR {loaner.dailyRate ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">SAR {loaner.depositAmount ?? "0.00"}</TableCell>
                   <TableCell className="text-[#0B1F3B] dark:text-white">
                     {loaner.lastServiceDate
                       ? format(new Date(loaner.lastServiceDate), "MMM dd, yyyy")
@@ -516,8 +516,8 @@ export default function LoanerVehicles() {
                     <TableCell>
                       {getReservationStatusBadge(reservation.status ?? "reserved", reservation.id)}
                     </TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.depositPaid ?? "0.00"}</TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.totalCost ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {reservation.depositPaid ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {reservation.totalCost ?? "0.00"}</TableCell>
                     <TableCell>
                       {reservation.damageReported ? (
                         <Badge className="bg-[#F97316] text-white">{t('common.yes', 'Yes')}</Badge>

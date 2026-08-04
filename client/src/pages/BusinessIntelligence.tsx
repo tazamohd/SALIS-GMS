@@ -92,13 +92,13 @@ export default function BusinessIntelligence() {
   const metrics = [
     {
       label: t('analytics.avgCustomerLifetimeValue', 'Avg. Customer Lifetime Value'),
-      value: `$${avgLifetimeValue.toFixed(2)}`,
+      value: `SAR ${avgLifetimeValue.toFixed(2)}`,
       icon: DollarSign,
       color: "text-[#0B1F3B] dark:text-white",
     },
     {
       label: t('analytics.customerAcquisitionCost', 'Customer Acquisition Cost'),
-      value: `$${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
+      value: `SAR ${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
       icon: Users,
       color: "text-[#0B1F3B] dark:text-white",
     },

@@ -47,7 +47,7 @@ export default function CustomerMobilePayments() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm opacity-90 mb-1">Total Pending</p>
-              <p className="text-3xl font-bold">${totalPending.toFixed(2)}</p>
+              <p className="text-3xl font-bold">SAR {totalPending.toFixed(2)}</p>
               <p className="text-xs opacity-75 mt-1">{pendingInvoices.length} invoice(s)</p>
             </div>
             <CreditCard className="h-16 w-16 opacity-20" />

@@ -344,19 +344,19 @@ export default function ProfitAnalysis() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
                   <span className="text-[#64748B]">{t('analytics.laborCosts', 'Labor Costs')}</span>
-                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$96,300 (45%)</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR 96,300 (45%)</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
                   <span className="text-[#64748B]">{t('analytics.partsCosts', 'Parts Costs')}</span>
-                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$74,900 (35%)</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR 74,900 (35%)</span>
                 </div>
                 <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0] dark:border-[#232A36]">
                   <span className="text-[#64748B]">{t('analytics.overhead', 'Overhead')}</span>
-                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$32,100 (15%)</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR 32,100 (15%)</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[#64748B]">{t('analytics.otherExpenses', 'Other Expenses')}</span>
-                  <span className="font-semibold text-[#0B1F3B] dark:text-white">$10,700 (5%)</span>
+                  <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR 10,700 (5%)</span>
                 </div>
               </div>
             </CardContent>

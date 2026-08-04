@@ -169,7 +169,7 @@ export default function PartsMarketplace() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.totalSpent', 'Total Spent')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.totalSpent.toLocaleString()}</h3>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">SAR {stats.totalSpent.toLocaleString()}</h3>
             </div>
             <DollarSign className="h-12 w-12 text-purple-600" />
           </div>
@@ -330,7 +330,7 @@ export default function PartsMarketplace() {
                     </div>
                   </div>
                   <div className="text-right ml-4">
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">${result.price}</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">SAR {result.price}</p>
                     <Button size="sm" className="mt-2" onClick={() => {
                       createOrder.mutate({
                         marketplace: result.marketplace,

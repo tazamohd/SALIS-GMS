@@ -191,7 +191,7 @@ export function CustomerInvoices() {
                         data-testid={`button-pay-invoice-${inv.id}`}
                       >
                         <CreditCard className="h-4 w-4 mr-2" />
-                        {`Pay $${Number(inv.balanceAmount).toFixed(2)}`}
+                        {`Pay SAR ${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
                     )}
 

@@ -157,7 +157,7 @@ export default function SmartPartsRecommendations() {
     { label: t('smartParts.totalRecommendations', 'Total Recommendations'), value: stats.total.toString(), icon: Package },
     { label: t('smartParts.pendingReview', 'Pending Review'), value: stats.pending.toString(), icon: Brain },
     { label: t('smartParts.appliedToJobs', 'Applied to Jobs'), value: stats.applied.toString(), icon: CheckCircle },
-    { label: t('smartParts.totalValue', 'Total Value'), value: `$${stats.totalValue.toFixed(2)}`, icon: DollarSign },
+    { label: t('smartParts.totalValue', 'Total Value'), value: `SAR ${stats.totalValue.toFixed(2)}`, icon: DollarSign },
   ];
 
   const categoryColors: Record<string, string> = {

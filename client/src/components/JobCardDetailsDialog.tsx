@@ -316,7 +316,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                                     {inv.items.slice(0, 3).map((item: any, idx: number) => (
                                       <div key={idx} className="flex justify-between text-sm">
                                         <span className="text-[#64748B]">{item.description}</span>
-                                        <span className="text-[#0B1F3B] dark:text-white">${Number(item.total || item.amount || 0).toFixed(2)}</span>
+                                        <span className="text-[#0B1F3B] dark:text-white">SAR {Number(item.total || item.amount || 0).toFixed(2)}</span>
                                       </div>
                                     ))}
                                     {inv.items.length > 3 && (
@@ -327,7 +327,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                               )}
 
                               <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
-                                <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">${Number(inv.totalAmount || 0).toFixed(2)}</span>
+                                <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">SAR {Number(inv.totalAmount || 0).toFixed(2)}</span>
                                 <div className="flex gap-2">
                                   <InvoiceDetailsDialog invoiceId={inv.id}>
                                     <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-invoice-${inv.id}`}>
@@ -345,7 +345,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                                     {inv.payments.map((payment: any) => (
                                       <div key={payment.id} className="flex items-center justify-between text-sm bg-[#F8FAFC] dark:bg-[#0E1117] p-2 rounded">
                                         <div>
-                                          <span className="text-[#0B1F3B] dark:text-white">${Number(payment.amount).toFixed(2)}</span>
+                                          <span className="text-[#0B1F3B] dark:text-white">SAR {Number(payment.amount).toFixed(2)}</span>
                                           <span className="text-[#64748B] ml-2">({payment.paymentMethod})</span>
                                         </div>
                                         <div className="flex items-center gap-2">

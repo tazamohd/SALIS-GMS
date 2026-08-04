@@ -25,7 +25,7 @@ const CustomCurrencyTooltip = ({ active, payload, label }: any) => {
         <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: <span className="font-bold">${parseFloat(entry.value).toFixed(2)}</span>
+            {entry.name}: <span className="font-bold">SAR {parseFloat(entry.value).toFixed(2)}</span>
           </p>
         ))}
       </div>
@@ -190,7 +190,7 @@ export function Reports() {
               <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${overview?.totalRevenue || "0"}</div>
+              <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {overview?.totalRevenue || "0"}</div>
               <p className="text-xs text-[#64748B] mt-1">{t('analytics.allTime', 'All time')}</p>
             </CardContent>
           </Card>
@@ -241,7 +241,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.totalRevenue', 'Total Revenue')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.totalRevenue || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {revenueReport?.totalRevenue || "0"}</div>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -249,7 +249,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.paidAmount', 'Paid Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.paidAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {revenueReport?.paidAmount || "0"}</div>
               </CardContent>
             </Card>
             <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -257,7 +257,7 @@ export function Reports() {
                 <CardTitle className="text-sm font-medium text-[#64748B]">{t('analytics.pendingAmount', 'Pending Amount')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${revenueReport?.pendingAmount || "0"}</div>
+                <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {revenueReport?.pendingAmount || "0"}</div>
               </CardContent>
             </Card>
           </div>
@@ -272,7 +272,7 @@ export function Reports() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#64748B]">{t('analytics.previousMonth', 'Previous Month')}</span>
-                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">SAR {revenueReport.comparison.previousMonth.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousMonth.change >= 0 ? (
@@ -299,7 +299,7 @@ export function Reports() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-[#64748B]">{t('analytics.samePeriodLastYear', 'Same Period Last Year')}</span>
-                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">${revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
+                      <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">SAR {revenueReport.comparison.previousYear.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       {revenueReport.comparison.previousYear.change >= 0 ? (
@@ -330,7 +330,7 @@ export function Reports() {
                   <LineChart data={revenueReport.revenueByMonth}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `$${value}`} />
+                    <YAxis tickFormatter={(value) => `SAR ${value}`} />
                     <Tooltip content={<CustomCurrencyTooltip />} />
                     <Legend />
                     <Line type="monotone" dataKey="revenue" stroke="#0A5ED7" strokeWidth={2} name={t('analytics.revenue', 'Revenue')} />
@@ -379,7 +379,7 @@ export function Reports() {
                       <BarChart data={revenueReport.paymentsByMethod}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="method" />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Bar dataKey="total" fill="#0A5ED7" name={t('analytics.totalAmount', 'Total Amount')} />
                       </BarChart>
@@ -572,7 +572,7 @@ export function Reports() {
                       <BarChart data={technicianPerformance.technicians}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="revenueGenerated" fill="#404040" name={t('analytics.revenue', 'Revenue')} />
@@ -712,7 +712,7 @@ export function Reports() {
                       <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="lifetimeValue" fill="#404040" name={t('analytics.lifetimeValue', 'Lifetime Value')} />
@@ -748,7 +748,7 @@ export function Reports() {
                       <BarChart data={customerAnalytics.customers.slice(0, 10)}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                        <YAxis tickFormatter={(value) => `$${value}`} />
+                        <YAxis tickFormatter={(value) => `SAR ${value}`} />
                         <Tooltip content={<CustomCurrencyTooltip />} />
                         <Legend />
                         <Bar dataKey="avgInvoiceValue" fill="#f59e0b" name={t('analytics.avgInvoice', 'Avg. Invoice')} />

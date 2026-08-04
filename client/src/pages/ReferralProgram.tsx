@@ -97,7 +97,7 @@ export default function ReferralProgram() {
     {
       header: t('referral.reward', 'Reward'),
       accessorKey: "rewardAmount",
-      cell: (row) => row.rewardAmount ? `$${row.rewardAmount}` : "-",
+      cell: (row) => row.rewardAmount ? `SAR ${row.rewardAmount}` : "-",
     },
   ];
 

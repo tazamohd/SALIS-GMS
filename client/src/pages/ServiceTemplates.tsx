@@ -439,7 +439,7 @@ export default function ServiceTemplates() {
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4 text-[#0A5ED7]" />
-                      <span>${template.standardCost || 0}</span>
+                      <span>SAR {template.standardCost || 0}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -501,7 +501,7 @@ export default function ServiceTemplates() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('serviceTemplates.standardCost', 'Standard Cost')}</h4>
-                  <p className="text-sm text-[#64748B]">${selectedTemplate.standardCost || 0}</p>
+                  <p className="text-sm text-[#64748B]">SAR {selectedTemplate.standardCost || 0}</p>
                 </div>
               </div>
               <div>

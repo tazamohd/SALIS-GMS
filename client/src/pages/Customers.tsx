@@ -617,7 +617,7 @@ export function Customers() {
                                     <span>{t('customers.service', 'Service')}: {job.serviceType}</span>
                                     <span>{t('customers.vehicle', 'Vehicle')}: {job.vehicleInfo?.make} {job.vehicleInfo?.model}</span>
                                     {job.completedAt && <span>{t('common.completed', 'Completed')}: {new Date(job.completedAt).toLocaleDateString()}</span>}
-                                    {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</span>}
+                                    {job.totalCost && <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR {Number(job.totalCost).toFixed(2)}</span>}
                                   </div>
                                   <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
                                     <JobCardDetailsDialog jobCardId={job.id}>

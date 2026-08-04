@@ -225,7 +225,7 @@ export default function AIServiceAdvisor() {
                                 <div className="flex items-center gap-4 mt-3 text-xs text-[#64748B]">
                                   <div className="flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" />
-                                    <span data-testid={`text-cost-${recIdx}`}>${rec.cost}</span>
+                                    <span data-testid={`text-cost-${recIdx}`}>SAR {rec.cost}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" />

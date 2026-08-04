@@ -93,7 +93,7 @@ function PaymentForm({ invoiceId, amount, onSuccess, onCancel }: PaymentFormProp
           data-testid="button-submit-payment"
         >
           {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isProcessing ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
+          {isProcessing ? 'Processing...' : `Pay SAR ${amount.toFixed(2)}`}
         </Button>
       </div>
     </form>
