@@ -13463,12 +13463,31 @@ export class DatabaseStorage implements IStorage {
 
   /** Every garage is treated as having a subscription; absent rows default to
    *  the STARTER plan rather than forcing callers to handle undefined. */
+  // D1 — expired trials flip to past_due lazily on access. Stripe-managed
+  // subscriptions are exempt: their status is owned by webhook events.
+  private async enforceTrialExpiry(sub: Subscription): Promise<Subscription> {
+    if (
+      sub.status === "trialing" &&
+      sub.currentPeriodEnd &&
+      new Date(sub.currentPeriodEnd) < new Date() &&
+      !sub.stripeSubscriptionId
+    ) {
+      const [row] = await db
+        .update(subscriptions)
+        .set({ status: "past_due", updatedAt: new Date() })
+        .where(and(eq(subscriptions.id, sub.id), eq(subscriptions.status, "trialing")))
+        .returning();
+      return row ?? sub;
+    }
+    return sub;
+  }
+
   async ensureSubscription(garageId: string): Promise<Subscription> {
     const [existing] = await db
       .select()
       .from(subscriptions)
       .where(eq(subscriptions.garageId, garageId));
-    if (existing) return existing;
+    if (existing) return this.enforceTrialExpiry(existing);
 
     const [created] = await db
       .insert(subscriptions)
@@ -13577,9 +13596,18 @@ export class DatabaseStorage implements IStorage {
         } as any)
         .returning();
 
+      // Trials end: after TRIAL_DAYS (default 14) the subscription lazily
+      // flips to past_due and plan-gated features lock until a plan is chosen.
+      const trialDays = Number(process.env.TRIAL_DAYS ?? 14);
       await tx
         .insert(subscriptions)
-        .values({ garageId: garage.id, plan: app.requestedPlan, status: "trialing" } as any)
+        .values({
+          garageId: garage.id,
+          plan: app.requestedPlan,
+          status: "trialing",
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000),
+        } as any)
         .onConflictDoNothing({ target: subscriptions.garageId });
 
       const [updated] = await tx
