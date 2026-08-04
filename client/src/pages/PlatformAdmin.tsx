@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -958,7 +958,19 @@ export default function PlatformAdmin() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const params = useParams<{ tab?: string }>();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState(TAB_ALIASES[params.tab ?? ""] ?? "overview");
+
+  // Sidebar links change the :tab param without remounting this component
+  // (same route matches), so state must follow the URL — and tab clicks
+  // update the URL so refresh/back keep the selected tab.
+  useEffect(() => {
+    setActiveTab(TAB_ALIASES[params.tab ?? ""] ?? "overview");
+  }, [params.tab]);
+  const selectTab = (tab: string) => {
+    setActiveTab(tab);
+    navigate(tab === "overview" ? "/platform-admin" : `/platform-admin/${tab}`, { replace: true });
+  };
 
   const tabs = [
     { id: "overview", label: t("platformAdmin.tabOverview", "Overview"), icon: LayoutDashboard },
@@ -996,7 +1008,7 @@ export default function PlatformAdmin() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={selectTab}>
         <TabsList className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36] h-auto flex-wrap gap-1 p-1">
           {tabs.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 text-xs font-medium data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">

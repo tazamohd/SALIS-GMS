@@ -443,7 +443,7 @@ export default function KPIDashboard() {
                     <div className="text-center p-3 bg-[#0BB3FF]/10 dark:bg-[#0BB3FF]/20 rounded-lg border border-[#0BB3FF]/20" data-testid="card-labor-total">
                       <p className="text-xs text-[#0B1F3B] dark:text-gray-300 mb-1">{t('analytics.thisMonthLabor', 'This Month Labor')}</p>
                       <p className="text-lg font-bold text-[#0B1F3B] dark:text-white" data-testid="text-labor-total">
-                        ${(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                        SAR {(monthlyComparison[1]?.labor || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
                       </p>
                     </div>
                   </div>
@@ -501,7 +501,7 @@ export default function KPIDashboard() {
                           {service.name}
                         </span>
                         <span className="text-sm font-bold text-[#0B1F3B] dark:text-white">
-                          ${(service.value * 150).toLocaleString()}
+                          SAR {(service.value * 150).toLocaleString()}
                         </span>
                       </div>
                       <div className="w-full bg-[#E2E8F0] dark:bg-[#232A36] rounded-full h-2">

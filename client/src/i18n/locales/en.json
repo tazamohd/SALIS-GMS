@@ -1597,7 +1597,7 @@
     "startAR": "Start AR",
     "stopAR": "Stop AR",
     "oilFilter": "Oil Filter",
-    "stepOf": "Step Of",
+    "stepOf": "Step {{current}} of {{total}}",
     "clickStartAR": "Click Start AR",
     "previousStep": "Previous Step",
     "nextStep": "Next Step",

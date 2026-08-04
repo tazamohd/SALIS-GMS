@@ -21178,10 +21178,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const result = await db.execute(sql`
-        INSERT INTO garages (id, name, address, phone, email, subscription_plan, is_active, created_at, updated_at)
+        INSERT INTO garages (id, name, address, phone, email, subscription_plan, is_active, created_at)
         VALUES (
           gen_random_uuid(), ${name}, ${`${address}, ${city}, ${country}`}, ${phone}, ${email},
-          ${subscriptionPlan ?? 'STARTER'}, true, NOW(), NOW()
+          ${subscriptionPlan ?? 'STARTER'}, true, NOW()
         )
         RETURNING *
       `);
@@ -21197,7 +21197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { status } = req.body;
       const isActive = status === 'active';
-      await db.execute(sql`UPDATE garages SET is_active = ${isActive}, updated_at = NOW() WHERE id = ${req.params.id}`);
+      await db.execute(sql`UPDATE garages SET is_active = ${isActive} WHERE id = ${req.params.id}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

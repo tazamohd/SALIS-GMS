@@ -294,21 +294,21 @@ export default function IntelligentPriceOptimizer() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[#64748B]">{t('priceOptimizer.marketAdjustment', 'Market Adjustment')}</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">+$10</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">+SAR 10</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[#64748B]">{t('priceOptimizer.demandMultiplier', 'Demand Multiplier')}</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">+$8</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">+SAR 8</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[#64748B]">{t('priceOptimizer.competitiveEdge', 'Competitive Edge')}</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">+$2</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">+SAR 2</span>
               </div>
               <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-2 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-[#0B1F3B] dark:text-white">{t('priceOptimizer.optimizedPrice', 'Optimized Price')}</span>
                   <span className="text-xl font-bold text-[#0A5ED7]">
-                    ${optimizedPrice}
+                    SAR {optimizedPrice}
                   </span>
                 </div>
               </div>

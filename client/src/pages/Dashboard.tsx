@@ -287,7 +287,7 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
-                      ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      SAR {totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </h3>
                     <div className="flex items-center gap-2">
                       <TrendIndicator change={trends?.revenue?.change ?? 0} />

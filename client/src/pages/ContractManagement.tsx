@@ -179,10 +179,10 @@ export default function ContractManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid="text-contract-value">
-              ${dashboardMetrics.totalValue.toLocaleString()}
+              SAR {dashboardMetrics.totalValue.toLocaleString()}
             </div>
             <p className="text-xs text-[#64748B]">
-              ${dashboardMetrics.totalUtilized.toLocaleString()} {t('payments.contracts.utilized', 'utilized')}
+              SAR {dashboardMetrics.totalUtilized.toLocaleString()} {t('payments.contracts.utilized', 'utilized')}
             </p>
           </CardContent>
         </Card>
@@ -360,7 +360,7 @@ export default function ContractManagement() {
                           </div>
                           <Progress value={utilizationPercentage} className="w-24" />
                           <div className="text-xs text-[#64748B]">
-                            ${totalUtilized.toLocaleString()} / ${serviceCap.toLocaleString()}
+                            SAR {totalUtilized.toLocaleString()} / SAR {serviceCap.toLocaleString()}
                           </div>
                         </div>
                       </div>
@@ -465,7 +465,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
             <div>
               <p className="text-sm text-muted-foreground">Total Utilized</p>
               <p className="text-2xl font-bold" data-testid="text-total-utilized">
-                ${totalUtilized.toLocaleString()}
+                SAR {totalUtilized.toLocaleString()}
               </p>
             </div>
             <div>
@@ -475,7 +475,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
             <div>
               <p className="text-sm text-muted-foreground">Remaining Budget</p>
               <p className={`text-2xl font-bold ${remaining < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                ${remaining.toLocaleString()}
+                SAR {remaining.toLocaleString()}
               </p>
             </div>
           </div>
@@ -582,7 +582,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
             <div>
               <p className="text-sm text-muted-foreground">Total Penalties</p>
               <p className="text-2xl font-bold text-orange-500">
-                ${totalPenalties.toLocaleString()}
+                SAR {totalPenalties.toLocaleString()}
               </p>
             </div>
           </div>
@@ -743,7 +743,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                       {renewal.proposedMonthlyFee && (
                         <div>
                           <span className="text-muted-foreground">New Monthly Fee:</span>{" "}
-                          ${parseFloat(renewal.proposedMonthlyFee).toLocaleString()}
+                          SAR {parseFloat(renewal.proposedMonthlyFee).toLocaleString()}
                         </div>
                       )}
                     </div>

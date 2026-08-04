@@ -394,7 +394,7 @@ function CustomerTab() {
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.totalVisits}</TableCell>
                   <TableCell>
-                    ${parseFloat(customer.totalSpent).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    SAR {parseFloat(customer.totalSpent).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
                     {customer.lastVisit

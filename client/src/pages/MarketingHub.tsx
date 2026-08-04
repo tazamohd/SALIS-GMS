@@ -136,7 +136,7 @@ export default function MarketingHub() {
               <div>
                 <p className="text-sm text-[#64748B]">{t('marketing.totalSpend', 'Total Spend')}</p>
                 <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalSpend.toLocaleString()}</p>
-                <p className="text-xs text-[#64748B]">{t('marketing.ofBudget', 'of ${{budget}} budget', { budget: totalBudget.toLocaleString() })}</p>
+                <p className="text-xs text-[#64748B]">{t('marketing.ofBudget', 'of SAR {{budget}} budget', { budget: totalBudget.toLocaleString() })}</p>
               </div>
             </div>
           </CardContent>
@@ -404,7 +404,7 @@ export default function MarketingHub() {
                           <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{account.name}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="text-sm text-[#0B1F3B] dark:text-white">SAR {account.spend.toLocaleString()} / ${account.budget.toLocaleString()}</span>
+                          <span className="text-sm text-[#0B1F3B] dark:text-white">SAR {account.spend.toLocaleString()} / SAR {account.budget.toLocaleString()}</span>
                           {getStatusBadge(account.status)}
                         </div>
                       </div>
