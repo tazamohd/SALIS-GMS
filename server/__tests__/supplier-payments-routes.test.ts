@@ -25,10 +25,10 @@ describe('Supplier payment read route extraction (Wave J)', () => {
 
   it('preserves supplier payment list and detail behavior', () => {
     expect(supplierPaymentRoutesSource).toMatch(/router\.get\(['"]\/supplier-payments['"],\s*isAuthenticated/);
-    expect(supplierPaymentRoutesSource).toMatch(/const \{ garage_id,\s*status \} = req\.query/);
-    expect(supplierPaymentRoutesSource).toMatch(/storage\.getSupplierPayments\(garage_id as string,\s*status as string\)/);
+    expect(supplierPaymentRoutesSource).toMatch(/storage\.getSupplierPayments\(req\.user\.garageId,\s*status as string\)/);
+    expect(supplierPaymentRoutesSource).not.toMatch(/getSupplierPayments\(garage_id/);
     expect(supplierPaymentRoutesSource).toMatch(/router\.get\(['"]\/supplier-payments\/:id['"],\s*isAuthenticated/);
-    expect(supplierPaymentRoutesSource).toMatch(/storage\.getSupplierPayment\(id\)/);
+    expect(supplierPaymentRoutesSource).toMatch(/storage\.getSupplierPayment\(id,\s*req\.user\.garageId\)/);
     expect(supplierPaymentRoutesSource).toMatch(/Payment not found/);
   });
 });

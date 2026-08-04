@@ -30,16 +30,16 @@ describe('Delivery read route extraction (Wave J)', () => {
 
   it('preserves delivery list, detail, items, timeline, and live status reads', () => {
     expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveries\(garage_id as string,\s*status as string\)/);
+    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveries\(req\.user\.garageId,\s*status as string\)/);
     expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDelivery\(id\)/);
+    expect(deliveryRoutesSource).toMatch(/storage\.getDelivery\(req\.params\.id,\s*req\.user\.garageId\)/);
     expect(deliveryRoutesSource).toMatch(/Delivery not found/);
     expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/items['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryItems\(id\)/);
+    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryItems\(req\.params\.id\)/);
     expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/timeline['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryTimeline\(id\)/);
+    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryTimeline\(req\.params\.id\)/);
     expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/live['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getLiveDeliveryStatus\(id\)/);
+    expect(deliveryRoutesSource).toMatch(/storage\.getLiveDeliveryStatus\(req\.params\.id\)/);
     expect(deliveryRoutesSource).toMatch(/Live status not found/);
   });
 });

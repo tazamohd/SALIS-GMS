@@ -3865,8 +3865,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
   }
 
-  async getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined> {
-    const [po] = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, id));
+  async getPurchaseOrder(id: string, garageId?: string): Promise<PurchaseOrder | undefined> {
+    const [po] = await db.select().from(purchaseOrders)
+      .where(and(eq(purchaseOrders.id, id), garageId ? eq(purchaseOrders.garageId, garageId) : undefined));
     return po;
   }
 
@@ -3947,8 +3948,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(purchaseTasks).orderBy(desc(purchaseTasks.createdAt));
   }
 
-  async getPurchaseTask(id: string): Promise<PurchaseTask | undefined> {
-    const [task] = await db.select().from(purchaseTasks).where(eq(purchaseTasks.id, id));
+  async getPurchaseTask(id: string, garageId?: string): Promise<PurchaseTask | undefined> {
+    const [task] = await db.select().from(purchaseTasks)
+      .where(and(eq(purchaseTasks.id, id), garageId ? eq(purchaseTasks.garageId, garageId) : undefined));
     return task;
   }
 
@@ -4002,8 +4004,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(quotationRequests).orderBy(desc(quotationRequests.createdAt));
   }
 
-  async getQuotationRequest(id: string): Promise<QuotationRequest | undefined> {
-    const [req] = await db.select().from(quotationRequests).where(eq(quotationRequests.id, id));
+  async getQuotationRequest(id: string, garageId?: string): Promise<QuotationRequest | undefined> {
+    const [req] = await db.select().from(quotationRequests)
+      .where(and(eq(quotationRequests.id, id), garageId ? eq(quotationRequests.garageId, garageId) : undefined));
     return req;
   }
 
@@ -4033,6 +4036,13 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(supplierQuotations)
       .where(eq(supplierQuotations.quotationRequestId, quotationRequestId))
       .orderBy(desc(supplierQuotations.createdAt));
+  }
+
+  // Single supplier quotation, scoped through the parent request's garage (B11).
+  async getSupplierQuotation(id: string, garageId?: string): Promise<SupplierQuotation | undefined> {
+    const [q] = await db.select().from(supplierQuotations)
+      .where(and(eq(supplierQuotations.id, id), this.quotationRequestGarageScope(supplierQuotations.quotationRequestId, garageId)));
+    return q;
   }
 
   async createSupplierQuotation(data: InsertSupplierQuotation): Promise<SupplierQuotation> {
@@ -4083,8 +4093,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(supplierPayments).orderBy(desc(supplierPayments.createdAt));
   }
 
-  async getSupplierPayment(id: string): Promise<SupplierPayment | undefined> {
-    const [payment] = await db.select().from(supplierPayments).where(eq(supplierPayments.id, id));
+  async getSupplierPayment(id: string, garageId?: string): Promise<SupplierPayment | undefined> {
+    const [payment] = await db.select().from(supplierPayments)
+      .where(and(eq(supplierPayments.id, id), garageId ? eq(supplierPayments.garageId, garageId) : undefined));
     return payment;
   }
 
@@ -4120,8 +4131,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(deliveries).orderBy(desc(deliveries.createdAt));
   }
 
-  async getDelivery(id: string): Promise<Delivery | undefined> {
-    const [delivery] = await db.select().from(deliveries).where(eq(deliveries.id, id));
+  async getDelivery(id: string, garageId?: string): Promise<Delivery | undefined> {
+    const [delivery] = await db.select().from(deliveries)
+      .where(and(eq(deliveries.id, id), garageId ? eq(deliveries.garageId, garageId) : undefined));
     return delivery;
   }
 
@@ -8105,8 +8117,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(supportTickets.createdAt));
   }
 
-  async getSupportTicket(id: string): Promise<SupportTicket | undefined> {
-    const [ticket] = await db.select().from(supportTickets).where(eq(supportTickets.id, id));
+  async getSupportTicket(id: string, garageId?: string): Promise<SupportTicket | undefined> {
+    const [ticket] = await db.select().from(supportTickets)
+      .where(and(eq(supportTickets.id, id), garageId ? eq(supportTickets.garageId, garageId) : undefined));
     return ticket;
   }
 

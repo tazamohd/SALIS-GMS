@@ -29,14 +29,15 @@ describe('Quotation read route extraction (Wave J)', () => {
 
   it('preserves quotation request and supplier quotation read behavior', () => {
     expect(quotationRoutesSource).toMatch(/router\.get\(['"]\/quotation-requests['"],\s*isAuthenticated/);
-    expect(quotationRoutesSource).toMatch(/const \{ garage_id,\s*status \} = req\.query/);
-    expect(quotationRoutesSource).toMatch(/storage\.getQuotationRequests\(garage_id as string,\s*status as string\)/);
+    // B11: list scopes to the session garage, not a client-supplied query param.
+    expect(quotationRoutesSource).not.toMatch(/getQuotationRequests\(garage_id/);
+    expect(quotationRoutesSource).toMatch(/storage\.getQuotationRequests\(req\.user\.garageId,\s*status as string\)/);
     expect(quotationRoutesSource).toMatch(/router\.get\(['"]\/quotation-requests\/:id['"],\s*isAuthenticated/);
-    expect(quotationRoutesSource).toMatch(/storage\.getQuotationRequest\(id\)/);
+    expect(quotationRoutesSource).toMatch(/storage\.getQuotationRequest\(req\.params\.id,\s*req\.user\.garageId\)/);
     expect(quotationRoutesSource).toMatch(/Quotation request not found/);
     expect(quotationRoutesSource).toMatch(/router\.get\(['"]\/quotation-requests\/:id\/quotations['"],\s*isAuthenticated/);
-    expect(quotationRoutesSource).toMatch(/storage\.getSupplierQuotations\(id\)/);
+    expect(quotationRoutesSource).toMatch(/storage\.getSupplierQuotations\(req\.params\.id\)/);
     expect(quotationRoutesSource).toMatch(/router\.get\(['"]\/supplier-quotations\/:id\/items['"],\s*isAuthenticated/);
-    expect(quotationRoutesSource).toMatch(/storage\.getQuotationItems\(id\)/);
+    expect(quotationRoutesSource).toMatch(/storage\.getQuotationItems\(req\.params\.id\)/);
   });
 });

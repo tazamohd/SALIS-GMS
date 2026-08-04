@@ -4,10 +4,13 @@ import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/deliveries', isAuthenticated, async (req, res) => {
+// All reads scoped to the caller's garage (B11). Child collections (items,
+// timeline, live status) are gated by verifying the parent delivery first.
+
+router.get('/deliveries', isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, status } = req.query;
-    const deliveriesList = await storage.getDeliveries(garage_id as string, status as string);
+    const { status } = req.query;
+    const deliveriesList = await storage.getDeliveries(req.user.garageId, status as string);
     res.json(deliveriesList);
   } catch (error) {
     console.error('Error fetching deliveries:', error);
@@ -15,10 +18,9 @@ router.get('/deliveries', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/deliveries/:id', isAuthenticated, async (req, res) => {
+router.get('/deliveries/:id', isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const delivery = await storage.getDelivery(id);
+    const delivery = await storage.getDelivery(req.params.id, req.user.garageId);
     if (!delivery) {
       return res.status(404).json({ message: 'Delivery not found' });
     }
@@ -29,10 +31,13 @@ router.get('/deliveries/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/deliveries/:id/items', isAuthenticated, async (req, res) => {
+router.get('/deliveries/:id/items', isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const items = await storage.getDeliveryItems(id);
+    const delivery = await storage.getDelivery(req.params.id, req.user.garageId);
+    if (!delivery) {
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+    const items = await storage.getDeliveryItems(req.params.id);
     res.json(items);
   } catch (error) {
     console.error('Error fetching delivery items:', error);
@@ -40,10 +45,13 @@ router.get('/deliveries/:id/items', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/deliveries/:id/timeline', isAuthenticated, async (req, res) => {
+router.get('/deliveries/:id/timeline', isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const timeline = await storage.getDeliveryTimeline(id);
+    const delivery = await storage.getDelivery(req.params.id, req.user.garageId);
+    if (!delivery) {
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+    const timeline = await storage.getDeliveryTimeline(req.params.id);
     res.json(timeline);
   } catch (error) {
     console.error('Error fetching delivery timeline:', error);
@@ -51,10 +59,13 @@ router.get('/deliveries/:id/timeline', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/deliveries/:id/live', isAuthenticated, async (req, res) => {
+router.get('/deliveries/:id/live', isAuthenticated, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const liveStatus = await storage.getLiveDeliveryStatus(id);
+    const delivery = await storage.getDelivery(req.params.id, req.user.garageId);
+    if (!delivery) {
+      return res.status(404).json({ message: 'Delivery not found' });
+    }
+    const liveStatus = await storage.getLiveDeliveryStatus(req.params.id);
     if (!liveStatus) {
       return res.status(404).json({ message: 'Live status not found' });
     }
