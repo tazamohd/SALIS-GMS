@@ -32,9 +32,12 @@ app.use(helmet({ contentSecurityPolicy: false }));
 // Brute-force / credential-stuffing protection. Strict limiter on the session-
 // creating auth endpoints; generous global limiter as a backstop. Webhooks and
 // non-/api paths are exempt (gateway retries, static assets).
+// Both limits are env-tunable: a busy garage office shares one NAT IP (so a
+// deployment may need RATE_LIMIT_MAX raised), and load tests need it lifted
+// without a code change.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 10),
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
@@ -42,7 +45,7 @@ const authLimiter = rateLimit({
 });
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: Number(process.env.RATE_LIMIT_MAX ?? 2000),
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => !req.path.startsWith("/api") || req.path.includes("/webhook"),
