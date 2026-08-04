@@ -4246,6 +4246,117 @@ export class DatabaseStorage implements IStorage {
     return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
   }
 
+  // ── F2: financial reconciliation ─────────────────────────────────────
+  // Cross-checks invoices against payments, refunds and line items for one
+  // garage and reports every inconsistency. Money comparisons use a 1-halala
+  // tolerance so decimal rounding never produces false positives.
+  async reconcileFinancials(garageId: string): Promise<{
+    summary: {
+      invoiceCount: number;
+      totalInvoiced: number;
+      totalPaid: number;
+      totalOutstanding: number;
+      discrepancyCount: number;
+      cleanInvoices: number;
+    };
+    discrepancies: {
+      invoiceId: string;
+      invoiceNumber: string;
+      status: string;
+      type: string;
+      detail: string;
+      expected: number;
+      actual: number;
+    }[];
+  }> {
+    const TOL = 0.01;
+    const result = await db.execute(sql`
+      SELECT i.id, i.invoice_number, i.status,
+             i.subtotal, i.tax_amount, i.discount_amount,
+             i.total_amount, i.paid_amount, i.balance_amount,
+             COALESCE(p.paid, 0) AS payments_sum,
+             COALESCE(r.refunded, 0) AS refunds_sum,
+             COALESCE(it.items_sum, 0) AS items_sum,
+             COALESCE(it.item_count, 0) AS item_count
+      FROM invoices i
+      LEFT JOIN (
+        SELECT invoice_id, SUM(amount) AS paid
+        FROM payments
+        WHERE COALESCE(status, 'completed') = 'completed'
+        GROUP BY invoice_id
+      ) p ON p.invoice_id = i.id
+      LEFT JOIN (
+        SELECT invoice_id, SUM(amount) AS refunded
+        FROM refunds
+        WHERE status = 'processed'
+        GROUP BY invoice_id
+      ) r ON r.invoice_id = i.id
+      LEFT JOIN (
+        SELECT invoice_id, SUM(line_total) AS items_sum, COUNT(*) AS item_count
+        FROM invoice_items
+        GROUP BY invoice_id
+      ) it ON it.invoice_id = i.id
+      WHERE i.garage_id = ${garageId} AND i.status != 'cancelled'
+      ORDER BY i.created_at DESC
+    `);
+
+    const discrepancies: {
+      invoiceId: string; invoiceNumber: string; status: string;
+      type: string; detail: string; expected: number; actual: number;
+    }[] = [];
+    let totalInvoiced = 0, totalPaid = 0, totalOutstanding = 0;
+
+    for (const row of result.rows as any[]) {
+      const n = (v: any) => Number(v ?? 0);
+      const total = n(row.total_amount);
+      const paid = n(row.paid_amount);
+      const balance = n(row.balance_amount);
+      const netPayments = n(row.payments_sum) - n(row.refunds_sum);
+      const computedTotal = n(row.subtotal) + n(row.tax_amount) - n(row.discount_amount);
+      totalInvoiced += total;
+      totalPaid += paid;
+      totalOutstanding += balance;
+
+      const flag = (type: string, detail: string, expected: number, actual: number) =>
+        discrepancies.push({
+          invoiceId: row.id, invoiceNumber: row.invoice_number, status: row.status,
+          type, detail, expected: Math.round(expected * 100) / 100, actual: Math.round(actual * 100) / 100,
+        });
+
+      if (Math.abs(paid - netPayments) > TOL) {
+        flag("payment_mismatch", "invoice paid_amount disagrees with completed payments minus processed refunds", netPayments, paid);
+      }
+      if (Math.abs(balance - (total - paid)) > TOL) {
+        flag("balance_mismatch", "balance_amount is not total_amount - paid_amount", total - paid, balance);
+      }
+      if (Math.abs(total - computedTotal) > TOL) {
+        flag("total_mismatch", "total_amount is not subtotal + tax - discount", computedTotal, total);
+      }
+      if (Number(row.item_count) > 0 && Math.abs(n(row.subtotal) - n(row.items_sum)) > TOL) {
+        flag("items_mismatch", "subtotal disagrees with the sum of invoice line items", n(row.items_sum), n(row.subtotal));
+      }
+      if (row.status === "paid" && balance > TOL) {
+        flag("status_paid_with_balance", "invoice is marked paid but still carries a balance", 0, balance);
+      }
+      if (paid - total > TOL) {
+        flag("overpaid", "paid_amount exceeds total_amount", total, paid);
+      }
+    }
+
+    const flaggedInvoices = new Set(discrepancies.map((d) => d.invoiceId)).size;
+    return {
+      summary: {
+        invoiceCount: result.rows.length,
+        totalInvoiced: Math.round(totalInvoiced * 100) / 100,
+        totalPaid: Math.round(totalPaid * 100) / 100,
+        totalOutstanding: Math.round(totalOutstanding * 100) / 100,
+        discrepancyCount: discrepancies.length,
+        cleanInvoices: result.rows.length - flaggedInvoices,
+      },
+      discrepancies,
+    };
+  }
+
   async createInvoice(data: InsertInvoice): Promise<Invoice> {
     const { invoices } = await import("@shared/schema");
     const invoiceNumber = await this.generateDocNumber("INV", "invoice", (data as any).garageId);

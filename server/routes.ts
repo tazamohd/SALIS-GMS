@@ -3787,6 +3787,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // F2 — financial reconciliation: cross-check this garage's invoices
+  // against payments, refunds and line items, reporting every mismatch.
+  app.get('/api/reconciliation/financial', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(400).json({ message: "No garage on session" });
+      res.json(await storage.reconcileFinancials(garageId));
+    } catch (error) {
+      console.error("Error reconciling financials:", error);
+      res.status(500).json({ message: "Failed to reconcile financials" });
+    }
+  });
+
   app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
