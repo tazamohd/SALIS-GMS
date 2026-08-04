@@ -109,7 +109,6 @@ export const navigationConfig: NavGroup[] = [
       { title: "Platform Overview", href: "/platform-admin", icon: LayoutDashboard, roles: ['PLATFORM_ADMIN'] },
       { title: "Garage Management", href: "/platform-admin/garages", icon: Building2, roles: ['PLATFORM_ADMIN'] },
       { title: "Supplier Management", href: "/platform-admin/suppliers", icon: Truck, roles: ['PLATFORM_ADMIN'] },
-      { title: "E-Commerce Stores", href: "/platform-admin/stores", icon: Store, roles: ['PLATFORM_ADMIN'] },
       { title: "User Management", href: "/platform-admin/users", icon: Users, roles: ['PLATFORM_ADMIN'] },
       { title: "Help & Support", href: "/platform-admin/support", icon: MessageSquare, roles: ['PLATFORM_ADMIN'] },
       { title: "Platform Analytics", href: "/platform-admin/analytics", icon: BarChart3, roles: ['PLATFORM_ADMIN'] },

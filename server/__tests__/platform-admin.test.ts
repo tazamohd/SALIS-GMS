@@ -29,7 +29,6 @@ describe('Platform admin route security (SA-005)', () => {
     "/api/platform-admin/garages",
     "/api/platform-admin/garages/:id/status",
     "/api/platform-admin/suppliers",
-    "/api/platform-admin/stores",
     "/api/platform-admin/support-tickets",
     "/api/platform-admin/support-tickets/:id",
     "/api/platform-admin/system-health",

@@ -21097,7 +21097,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/platform-admin/stats', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const [totalGarages, activeGarages, totalUsers, plans, tickets, pendingApps, pendingSubs] = await Promise.all([
+      const [totalGarages, activeGarages, totalUsers, plans, tickets, pendingApps, pendingSubs, totalSuppliers, roleRows] = await Promise.all([
         db.execute(sql`SELECT COUNT(*) as count FROM garages`),
         db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`),
         db.execute(sql`SELECT COUNT(*) as count FROM users`),
@@ -21105,6 +21105,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         db.execute(sql`SELECT COUNT(*) as count FROM support_tickets WHERE status NOT IN ('resolved','closed')`),
         db.execute(sql`SELECT COUNT(*) as count FROM garage_applications WHERE status = 'pending'`),
         db.execute(sql`SELECT COUNT(*) as count FROM subscription_requests WHERE status = 'pending'`),
+        db.execute(sql`SELECT COUNT(*) as count FROM suppliers`),
+        db.execute(sql`SELECT role, COUNT(*) as count FROM users GROUP BY role ORDER BY count DESC`),
       ]);
 
       // Real MRR from the subscription plan mix (display prices from the
@@ -21120,10 +21122,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalGarages: Number(totalGarages.rows[0]?.count ?? 0),
         activeGarages: Number(activeGarages.rows[0]?.count ?? 0),
         totalUsers: Number(totalUsers.rows[0]?.count ?? 0),
+        totalSuppliers: Number(totalSuppliers.rows[0]?.count ?? 0),
         monthlyRevenue,
         supportTickets: Number(tickets.rows[0]?.count ?? 0),
         pendingApplications: Number(pendingApps.rows[0]?.count ?? 0),
         pendingSubscriptionRequests: Number(pendingSubs.rows[0]?.count ?? 0),
+        // Live subscription plan mix — feeds the overview distribution chart.
+        planMix: (plans.rows as any[]).map((r) => ({ plan: r.plan, count: Number(r.count) })),
+        // Real user counts per role — feeds the RBAC tab.
+        roleCounts: (roleRows.rows as any[]).map((r) => ({ role: r.role, count: Number(r.count) })),
         // Honest process uptime (seconds), not an invented SLA percentage.
         uptimeSeconds: Math.round(process.uptime()),
       });
@@ -21184,37 +21191,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/platform-admin/suppliers', requirePlatformAdmin, auditLog, async (req: any, res) => {
+  // Cross-tenant oversight view: every garage's suppliers with the owning
+  // garage joined. Read-only — suppliers are created by each garage in its
+  // own procurement module; platform-level parts vendors live in the
+  // marketplace as parts_store providers.
+  app.get('/api/platform-admin/suppliers', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const { name, contactPerson, email, phone, address, country, category, paymentTerms, website, notes } = req.body;
-
       const result = await db.execute(sql`
-        INSERT INTO suppliers (id, name, contact_person, email, phone, address, country, category, payment_terms, website, notes, is_active, created_at, updated_at)
-        VALUES (
-          gen_random_uuid(), ${name}, ${contactPerson}, ${email}, ${phone},
-          ${address}, ${country}, ${category}, ${paymentTerms},
-          ${website ?? null}, ${notes ?? null}, true, NOW(), NOW()
-        )
-        RETURNING *
+        SELECT s.id, s.name, s.contact_person, s.email, s.phone, s.country,
+               s.payment_terms, s.is_active, s.created_at, g.name AS garage
+        FROM suppliers s
+        LEFT JOIN garages g ON g.id = s.garage_id
+        ORDER BY s.created_at DESC
+        LIMIT 100
       `);
-
-      res.status(201).json(result.rows[0]);
-    } catch (error: any) {
-      console.error('Error creating supplier:', error);
-      const fallback = { id: Math.random().toString(36).substring(2), ...req.body, status: 'active', createdAt: new Date().toISOString() };
-      res.status(201).json(fallback);
-    }
-  });
-
-  app.post('/api/platform-admin/stores', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const { name, ownerEmail, description, category, country, city, commissionRate, currency } = req.body;
-      const fallback = {
-        id: Math.random().toString(36).substring(2),
-        name, ownerEmail, description, category, country, city,
-        commissionRate, currency, status: 'pending', createdAt: new Date().toISOString()
-      };
-      res.status(201).json(fallback);
+      res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -21252,23 +21243,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/platform-admin/system-health', requirePlatformAdmin, async (req: any, res) => {
+    // Honest, measured metrics only — no invented SLA numbers. Integrations
+    // report "configured" from their env keys; only the DB is actively pinged.
     try {
+      const dbStart = Date.now();
+      let dbOk = true;
+      let dbConnections = 0;
+      try {
+        const conns = await db.execute(sql`SELECT COUNT(*) as count FROM pg_stat_activity WHERE datname = current_database()`);
+        dbConnections = Number(conns.rows[0]?.count ?? 0);
+      } catch {
+        dbOk = false;
+      }
+      const dbLatencyMs = Date.now() - dbStart;
+      const mem = process.memoryUsage();
+
       res.json({
-        apiLatency: 87,
-        dbConnections: 124,
-        uptime: 99.97,
-        cpuUsage: 38,
-        memoryUsage: 62,
-        diskUsage: 44,
-        activeWebSockets: 312,
-        cacheHitRate: 94.2,
-        services: [
-          { name: "API Server", status: "operational", latency: "87ms" },
-          { name: "PostgreSQL Database", status: "operational", latency: "12ms" },
-          { name: "WebSocket Server", status: "operational" },
-          { name: "Email Service", status: "operational" },
-          { name: "SMS Service", status: "operational" },
-        ]
+        uptimeSeconds: Math.round(process.uptime()),
+        dbOk,
+        dbLatencyMs,
+        dbConnections,
+        memoryRssMb: Math.round(mem.rss / 1024 / 1024),
+        memoryHeapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        nodeVersion: process.version,
+        integrations: [
+          { name: "PostgreSQL Database", configured: true, operational: dbOk },
+          { name: "Stripe Billing", configured: !!process.env.STRIPE_SECRET_KEY },
+          { name: "Stripe Webhook Signing", configured: !!process.env.STRIPE_WEBHOOK_SECRET },
+          { name: "Wathq CR Registry", configured: !!process.env.WATHQ_API_KEY },
+          { name: "Google Vision OCR", configured: !!process.env.GOOGLE_VISION_API_KEY },
+          { name: "Sentry Error Tracking", configured: !!process.env.SENTRY_DSN },
+          { name: "SMS Provider", configured: !!process.env.SMS_PROVIDER },
+          { name: "WhatsApp Webhook", configured: !!process.env.WHATSAPP_VERIFY_TOKEN },
+        ],
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

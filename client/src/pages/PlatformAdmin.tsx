@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -16,21 +17,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import {
-  Building2, Store, Truck, Users, Shield, BarChart3, Activity,
+  Building2, Truck, Users, Shield, Activity,
   CreditCard, Plus, Search, CheckCircle, XCircle, AlertTriangle,
-  Globe, Phone, Mail, MapPin, Eye, Edit, Trash2, RefreshCw,
-  TrendingUp, TrendingDown, Wrench, Package, MessageSquare,
-  Star, Clock, LayoutDashboard, Crown, ChevronRight, Settings,
-  Server, Database, Cpu, HardDrive, Wifi, Lock, BookOpen
+  Phone, Eye, RefreshCw, TrendingUp, MessageSquare,
+  Clock, LayoutDashboard, Crown,
+  Server, Database, Cpu, HardDrive, Wifi
 } from "lucide-react";
-import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
-} from "recharts";
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const BRAND_BLUE = "#0A5ED7";
 const BRAND_CYAN = "#0BB3FF";
@@ -50,33 +44,7 @@ const garageSchema = z.object({
   maxBranches: z.coerce.number().min(1).max(500),
 });
 
-const supplierSchema = z.object({
-  name: z.string().min(2, "Name required"),
-  contactPerson: z.string().min(2, "Contact person required"),
-  email: z.string().email("Valid email required"),
-  phone: z.string().min(7, "Valid phone required"),
-  address: z.string().min(5, "Address required"),
-  country: z.string().min(2, "Country required"),
-  category: z.enum(["SPARE_PARTS", "TOOLS", "CONSUMABLES", "TYRES", "ELECTRONICS", "LUBRICANTS", "OTHER"]),
-  paymentTerms: z.string().min(2, "Payment terms required"),
-  website: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-const storeSchema = z.object({
-  name: z.string().min(2, "Store name required"),
-  ownerEmail: z.string().email("Valid email required"),
-  description: z.string().min(10, "Description required"),
-  category: z.enum(["SPARE_PARTS", "TOOLS", "ACCESSORIES", "TYRES", "LUBRICANTS", "FULL_SERVICE"]),
-  country: z.string().min(2, "Country required"),
-  city: z.string().min(2, "City required"),
-  commissionRate: z.coerce.number().min(0).max(50),
-  currency: z.string().min(3, "Currency required"),
-});
-
 type GarageFormData = z.infer<typeof garageSchema>;
-type SupplierFormData = z.infer<typeof supplierSchema>;
-type StoreFormData = z.infer<typeof storeSchema>;
 
 const PLAN_COLORS: Record<string, string> = {
   STARTER: "text-gray-500 bg-gray-100 dark:bg-gray-800",
@@ -84,83 +52,102 @@ const PLAN_COLORS: Record<string, string> = {
   ENTERPRISE: "text-purple-500 bg-purple-50 dark:bg-purple-900/30",
 };
 
-const mockPlatformStats = {
-  totalGarages: 284,
-  activeGarages: 261,
-  totalSuppliers: 147,
-  activeSuppliers: 139,
-  totalStores: 52,
-  activeStores: 49,
-  totalUsers: 4820,
-  supportTickets: 18,
-  monthlyRevenue: 485200,
-  revenueGrowth: 14.2,
+// ── Real platform data (no mocks) ──────────────────────────────────────
+
+interface PlatformStats {
+  totalGarages: number;
+  activeGarages: number;
+  totalUsers: number;
+  totalSuppliers: number;
+  monthlyRevenue: number;
+  supportTickets: number;
+  pendingApplications: number;
+  pendingSubscriptionRequests: number;
+  planMix: { plan: string; count: number }[];
+  roleCounts: { role: string; count: number }[];
+  uptimeSeconds: number;
+}
+
+interface PlatformGarageRow {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  business_type: string | null;
+  subscription_plan: string | null;
+  is_active: boolean;
+  user_count: string | number;
+  created_at: string;
+}
+
+interface PlatformSupplierRow {
+  id: string;
+  name: string;
+  contact_person: string | null;
+  email: string | null;
+  phone: string | null;
+  country: string | null;
+  payment_terms: string | null;
+  is_active: boolean;
+  created_at: string;
+  garage: string | null;
+}
+
+interface SupportTicketRow {
+  id: string;
+  garage_id: string | null;
+  garage: string | null;
+  subject: string;
+  priority: string | null;
+  status: string;
+  category: string | null;
+  created_at: string;
+}
+
+function usePlatformStats() {
+  return useQuery<PlatformStats>({
+    queryKey: ["/api/platform-admin/stats"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/stats")).json(),
+  });
+}
+
+function usePlatformGarages() {
+  return useQuery<PlatformGarageRow[]>({
+    queryKey: ["/api/platform-admin/garages"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/garages")).json(),
+  });
+}
+
+const PLAN_CHART_COLORS: Record<string, string> = {
+  STARTER: "#94a3b8",
+  PRO: BRAND_BLUE,
+  ENTERPRISE: "#7c3aed",
 };
 
-const revenueData = [
-  { month: "Oct", revenue: 380000 },
-  { month: "Nov", revenue: 420000 },
-  { month: "Dec", revenue: 395000 },
-  { month: "Jan", revenue: 451000 },
-  { month: "Feb", revenue: 467000 },
-  { month: "Mar", revenue: 485200 },
-];
-
-const planDistribution = [
-  { name: "Starter", value: 142, color: "#94a3b8" },
-  { name: "Pro", value: 98, color: BRAND_BLUE },
-  { name: "Enterprise", value: 44, color: "#7c3aed" },
-];
-
-const mockGarages = [
-  { id: "1", name: "Al-Rashid Auto Center", owner: "Mohammed Al-Rashid", city: "Riyadh", country: "Saudi Arabia", plan: "ENTERPRISE", status: "active", users: 45, branches: 8, revenue: 125000, joinedAt: "2023-06-12" },
-  { id: "2", name: "Gulf Motors Workshop", owner: "Ahmed Al-Farsi", city: "Dubai", country: "UAE", plan: "PRO", status: "active", users: 18, branches: 3, revenue: 48000, joinedAt: "2024-01-08" },
-  { id: "3", name: "Salam Car Care", owner: "Khalid Ibrahim", city: "Jeddah", country: "Saudi Arabia", plan: "STARTER", status: "active", users: 6, branches: 1, revenue: 12000, joinedAt: "2024-03-15" },
-  { id: "4", name: "Platinum Auto Works", owner: "Omar Hassan", city: "Abu Dhabi", country: "UAE", plan: "ENTERPRISE", status: "active", users: 67, branches: 12, revenue: 230000, joinedAt: "2023-02-20" },
-  { id: "5", name: "Desert Drive Service", owner: "Faisal Al-Mutairi", city: "Dammam", country: "Saudi Arabia", plan: "PRO", status: "suspended", users: 12, branches: 2, revenue: 31000, joinedAt: "2023-11-05" },
-];
-
-const mockSuppliers = [
-  { id: "1", name: "Gulf Auto Parts Co.", contact: "Ali Hassan", category: "SPARE_PARTS", country: "Saudi Arabia", status: "active", orders: 284, rating: 4.8 },
-  { id: "2", name: "TechDrive Automotive", contact: "Karim Mansour", category: "ELECTRONICS", country: "UAE", status: "active", orders: 156, rating: 4.6 },
-  { id: "3", name: "ProTyre International", contact: "Sara Al-Ahmad", category: "TYRES", country: "Jordan", status: "active", orders: 93, rating: 4.9 },
-  { id: "4", name: "MasterLube Solutions", contact: "Rami Khalil", category: "LUBRICANTS", country: "Bahrain", status: "inactive", orders: 44, rating: 4.2 },
-];
-
-const mockStores = [
-  { id: "1", name: "AutoParts Express", owner: "Nader Saleh", category: "SPARE_PARTS", country: "Saudi Arabia", status: "active", products: 1284, sales: 84200, commission: 8 },
-  { id: "2", name: "TireZone Online", owner: "Basim Al-Khatib", category: "TYRES", country: "UAE", status: "active", products: 312, sales: 48900, commission: 6 },
-  { id: "3", name: "Garage Tools Hub", owner: "Yasser Mahmoud", category: "TOOLS", country: "Saudi Arabia", status: "pending", products: 748, sales: 0, commission: 7 },
-];
-
-const mockSupportTickets = [
-  { id: "T-001", garage: "Al-Rashid Auto Center", user: "Mohammed Al-Rashid", subject: "Invoice ZATCA sync issue", priority: "HIGH", status: "open", created: "2026-03-08", type: "Technical" },
-  { id: "T-002", garage: "Gulf Motors Workshop", user: "Ahmed Al-Farsi", subject: "Cannot add technician accounts", priority: "MEDIUM", status: "in_progress", created: "2026-03-09", type: "Account" },
-  { id: "T-003", garage: "Salam Car Care", user: "Khalid Ibrahim", subject: "Upgrade to PRO plan", priority: "LOW", status: "open", created: "2026-03-10", type: "Billing" },
-  { id: "T-004", garage: "Desert Drive Service", user: "Faisal Al-Mutairi", subject: "Suspension appeal - billing issue resolved", priority: "HIGH", status: "open", created: "2026-03-10", type: "Billing" },
-  { id: "T-005", garage: "Platinum Auto Works", user: "Omar Hassan", subject: "Custom report builder feature request", priority: "LOW", status: "resolved", created: "2026-03-07", type: "Feature" },
-];
-
-const systemHealth = {
-  apiLatency: 87,
-  dbConnections: 124,
-  uptime: 99.97,
-  cpuUsage: 38,
-  memoryUsage: 62,
-  diskUsage: 44,
-  activeWebSockets: 312,
-  cacheHitRate: 94.2,
-};
+function formatUptime(seconds: number) {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
 
 function OverviewTab() {
+  const stats = usePlatformStats();
+  const s = stats.data;
+  const pendingTotal = (s?.pendingApplications ?? 0) + (s?.pendingSubscriptionRequests ?? 0);
+  const planDistribution = (s?.planMix ?? []).map((p) => ({
+    name: p.plan, value: p.count, color: PLAN_CHART_COLORS[p.plan] ?? "#64748b",
+  }));
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Garages", value: mockPlatformStats.totalGarages, active: mockPlatformStats.activeGarages, icon: Building2, color: BRAND_BLUE },
-          { label: "Suppliers", value: mockPlatformStats.totalSuppliers, active: mockPlatformStats.activeSuppliers, icon: Truck, color: "#7c3aed" },
-          { label: "E-Commerce Stores", value: mockPlatformStats.totalStores, active: mockPlatformStats.activeStores, icon: Store, color: "#059669" },
-          { label: "Platform Users", value: mockPlatformStats.totalUsers.toLocaleString(), active: null, icon: Users, color: "#d97706" },
+          { label: "Total Garages", value: s?.totalGarages ?? "…", active: s?.activeGarages ?? null, icon: Building2, color: BRAND_BLUE },
+          { label: "Suppliers", value: s?.totalSuppliers ?? "…", active: null, icon: Truck, color: "#7c3aed" },
+          { label: "Pending Approvals", value: pendingTotal, active: null, icon: Clock, color: BRAND_ORANGE },
+          { label: "Platform Users", value: s?.totalUsers?.toLocaleString() ?? "…", active: null, icon: Users, color: "#d97706" },
         ].map((stat) => (
           <Card key={stat.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-4 pb-4">
@@ -188,8 +175,8 @@ function OverviewTab() {
               <p className="text-sm font-medium opacity-90">Monthly Revenue</p>
               <TrendingUp className="h-4 w-4 opacity-80" />
             </div>
-            <p className="text-3xl font-bold">SAR {(mockPlatformStats.monthlyRevenue / 1000).toFixed(0)}K</p>
-            <p className="text-xs mt-1 opacity-80">+{mockPlatformStats.revenueGrowth}% vs last month</p>
+            <p className="text-3xl font-bold">SAR {(s?.monthlyRevenue ?? 0).toLocaleString()}</p>
+            <p className="text-xs mt-1 opacity-80">MRR from active subscription plans</p>
           </CardContent>
         </Card>
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
@@ -198,18 +185,18 @@ function OverviewTab() {
               <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">Open Support Tickets</p>
               <MessageSquare className="h-4 w-4 text-[#F97316]" />
             </div>
-            <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{mockPlatformStats.supportTickets}</p>
-            <p className="text-xs text-[#F97316] mt-1">4 high priority</p>
+            <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{s?.supportTickets ?? "…"}</p>
+            <p className="text-xs text-[#64748B] mt-1">unresolved across all garages</p>
           </CardContent>
         </Card>
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">System Uptime</p>
+              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">Server Uptime</p>
               <Activity className="h-4 w-4 text-green-500" />
             </div>
-            <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{systemHealth.uptime}%</p>
-            <p className="text-xs text-green-500 mt-1">All systems operational</p>
+            <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{s ? formatUptime(s.uptimeSeconds) : "…"}</p>
+            <p className="text-xs text-[#64748B] mt-1">since last restart</p>
           </CardContent>
         </Card>
       </div>
@@ -217,89 +204,86 @@ function OverviewTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Platform Revenue (6 months)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={180}>
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={BRAND_BLUE} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={BRAND_BLUE} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" className="dark:opacity-20" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
-                <Tooltip formatter={(v: any) => [`SAR ${v.toLocaleString()}`, "Revenue"]} />
-                <Area type="monotone" dataKey="revenue" stroke={BRAND_BLUE} fill="url(#revGrad)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
-          <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Subscription Plan Distribution</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-6">
-            <ResponsiveContainer width="60%" height={160}>
-              <PieChart>
-                <Pie data={planDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value">
-                  {planDistribution.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
+            {planDistribution.length === 0 ? (
+              <p className="text-sm text-[#64748B] py-8">No active subscriptions yet.</p>
+            ) : (
+              <>
+                <ResponsiveContainer width="60%" height={160}>
+                  <PieChart>
+                    <Pie data={planDistribution} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value">
+                      {planDistribution.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {planDistribution.map((plan) => (
+                    <div key={plan.name} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ background: plan.color }} />
+                      <div>
+                        <p className="text-xs font-medium text-[#0F172A] dark:text-white">{plan.name}</p>
+                        <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{plan.value} garages</p>
+                      </div>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="space-y-3">
-              {planDistribution.map((plan) => (
-                <div key={plan.name} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ background: plan.color }} />
-                  <div>
-                    <p className="text-xs font-medium text-[#0F172A] dark:text-white">{plan.name}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{plan.value} garages</p>
-                  </div>
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
+        <RecentGaragesCard />
       </div>
+    </div>
+  );
+}
 
-      <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { icon: Building2, color: BRAND_BLUE, text: "New garage registered: Al-Safa Motors — Riyadh", time: "2 min ago" },
-              { icon: CreditCard, color: "#7c3aed", text: "Gulf Motors Workshop upgraded to ENTERPRISE plan", time: "18 min ago" },
-              { icon: MessageSquare, color: BRAND_ORANGE, text: "High priority ticket T-001 opened by Al-Rashid Auto", time: "1 hr ago" },
-              { icon: Store, color: "#059669", text: "New e-commerce store approved: AutoParts Express", time: "3 hrs ago" },
-              { icon: Shield, color: "#ef4444", text: "Suspicious login attempt blocked — Desert Drive Service", time: "5 hrs ago" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0">
-                <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${item.color}15` }}>
-                  <item.icon className="h-4 w-4" style={{ color: item.color }} />
+function RecentGaragesCard() {
+  const garages = usePlatformGarages();
+  const recent = (garages.data ?? []).slice(0, 6);
+  return (
+    <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Recently Onboarded Providers</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {garages.isLoading ? (
+          <p className="text-sm text-[#64748B]">Loading…</p>
+        ) : recent.length === 0 ? (
+          <p className="text-sm text-[#64748B]">No providers yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {recent.map((g) => (
+              <div key={g.id} className="flex items-center gap-3 py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0">
+                <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${BRAND_BLUE}15` }}>
+                  <Building2 className="h-4 w-4" style={{ color: BRAND_BLUE }} />
                 </div>
-                <p className="flex-1 text-sm text-[#0F172A] dark:text-[#E6EAF0]">{item.text}</p>
-                <span className="text-xs text-[#64748B] dark:text-[#9BA4B0] whitespace-nowrap">{item.time}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0] truncate">{g.name}</p>
+                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{g.business_type ?? "garage"} · {Number(g.user_count)} users</p>
+                </div>
+                <Badge variant="outline" className={`text-xs ${PLAN_COLORS[g.subscription_plan ?? ""] ?? ""}`}>{g.subscription_plan ?? "—"}</Badge>
+                <span className="text-xs text-[#64748B] dark:text-[#9BA4B0] whitespace-nowrap">{new Date(g.created_at).toLocaleDateString()}</span>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
 function GaragesTab() {
   const { toast } = useToast();
+  const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [planFilter, setPlanFilter] = useState("ALL");
+  const garages = usePlatformGarages();
 
   const form = useForm<GarageFormData>({
     resolver: zodResolver(garageSchema),
@@ -314,17 +298,29 @@ function GaragesTab() {
     mutationFn: (data: GarageFormData) => apiRequest("POST", "/api/platform-admin/garages", data),
     onSuccess: () => {
       toast({ title: "Garage created successfully", description: "The garage account is now active." });
+      qc.invalidateQueries({ queryKey: ["/api/platform-admin/garages"] });
       setDialogOpen(false);
       form.reset();
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
-  const filtered = mockGarages.filter(g => {
-    const matchSearch = g.name.toLowerCase().includes(search.toLowerCase()) ||
-      g.owner.toLowerCase().includes(search.toLowerCase()) ||
-      g.city.toLowerCase().includes(search.toLowerCase());
-    const matchPlan = planFilter === "ALL" || g.plan === planFilter;
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: "active" | "suspended" }) =>
+      apiRequest("PATCH", `/api/platform-admin/garages/${id}/status`, { status }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/platform-admin/garages"] });
+      toast({ title: "Status updated" });
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+  });
+
+  const filtered = (garages.data ?? []).filter(g => {
+    const q = search.toLowerCase();
+    const matchSearch = g.name.toLowerCase().includes(q) ||
+      (g.email ?? "").toLowerCase().includes(q) ||
+      (g.address ?? "").toLowerCase().includes(q);
+    const matchPlan = planFilter === "ALL" || g.subscription_plan === planFilter;
     return matchSearch && matchPlan;
   });
 
@@ -355,60 +351,65 @@ function GaragesTab() {
       </div>
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
+        {garages.isLoading ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+        ) : filtered.length === 0 ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-garages">No garages match.</p></CardContent>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
               <TableHead>Garage</TableHead>
-              <TableHead>Location</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>Users</TableHead>
-              <TableHead>Branches</TableHead>
-              <TableHead>Revenue/mo</TableHead>
+              <TableHead>Joined</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((garage) => (
-              <TableRow key={garage.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+              <TableRow key={garage.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`garage-row-${garage.id}`}>
                 <TableCell>
                   <div>
                     <p className="font-semibold text-sm text-[#0F172A] dark:text-white">{garage.name}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{garage.owner}</p>
+                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{garage.email ?? garage.phone ?? "—"}</p>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-1 text-sm text-[#64748B] dark:text-[#9BA4B0]">
-                    <MapPin className="h-3 w-3" />
-                    {garage.city}, {garage.country}
-                  </div>
+                  <Badge variant="outline" className="text-xs">{garage.business_type ?? "garage"}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={PLAN_COLORS[garage.plan]}>
-                    {garage.plan}
+                  <Badge variant="outline" className={PLAN_COLORS[garage.subscription_plan ?? ""] ?? ""}>
+                    {garage.subscription_plan ?? "—"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm">{garage.users}</TableCell>
-                <TableCell className="text-sm">{garage.branches}</TableCell>
-                <TableCell className="text-sm font-medium">SAR {garage.revenue.toLocaleString()}</TableCell>
+                <TableCell className="text-sm">{Number(garage.user_count)}</TableCell>
+                <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{new Date(garage.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={garage.status === "active" ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20"}>
-                    {garage.status}
+                  <Badge variant="outline" className={garage.is_active ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20"}>
+                    {garage.is_active ? "active" : "suspended"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-[#F97316] hover:text-[#F97316]">
-                      {garage.status === "active" ? <XCircle className="h-3.5 w-3.5" /> : <CheckCircle className="h-3.5 w-3.5" />}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost" size="sm"
+                    className="h-7 px-2 text-xs text-[#F97316] hover:text-[#F97316]"
+                    disabled={statusMutation.isPending}
+                    data-testid={`toggle-garage-${garage.id}`}
+                    onClick={() => statusMutation.mutate({ id: garage.id, status: garage.is_active ? "suspended" : "active" })}
+                  >
+                    {garage.is_active
+                      ? <><XCircle className="h-3.5 w-3.5 mr-1" /> Suspend</>
+                      : <><CheckCircle className="h-3.5 w-3.5 mr-1" /> Activate</>}
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        )}
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -517,443 +518,104 @@ function GaragesTab() {
 }
 
 function SuppliersTab() {
-  const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const form = useForm<SupplierFormData>({
-    resolver: zodResolver(supplierSchema),
-    defaultValues: {
-      name: "", contactPerson: "", email: "", phone: "", address: "",
-      country: "Saudi Arabia", category: "SPARE_PARTS",
-      paymentTerms: "NET30", website: "", notes: "",
-    },
+  const suppliers = useQuery<PlatformSupplierRow[]>({
+    queryKey: ["/api/platform-admin/suppliers"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/suppliers")).json(),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data: SupplierFormData) => apiRequest("POST", "/api/platform-admin/suppliers", data),
-    onSuccess: () => {
-      toast({ title: "Supplier added", description: "The supplier has been registered on the platform." });
-      setDialogOpen(false);
-      form.reset();
-    },
-    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
-  });
-
-  const filtered = mockSuppliers.filter(s =>
+  const filtered = (suppliers.data ?? []).filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.contact.toLowerCase().includes(search.toLowerCase())
+    (s.contact_person ?? "").toLowerCase().includes(search.toLowerCase()) ||
+    (s.garage ?? "").toLowerCase().includes(search.toLowerCase())
   );
-
-  const categoryLabels: Record<string, string> = {
-    SPARE_PARTS: "Spare Parts", TOOLS: "Tools", CONSUMABLES: "Consumables",
-    TYRES: "Tyres", ELECTRONICS: "Electronics", LUBRICANTS: "Lubricants", OTHER: "Other",
-  };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-3 items-center justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-          <Input placeholder="Search suppliers..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
+          <Input placeholder="Search suppliers or garages..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-72 h-9" />
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="h-9 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Supplier
-        </Button>
+        <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
+          Read-only oversight of every garage's procurement suppliers. Platform-level parts vendors onboard via the marketplace.
+        </p>
       </div>
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
+        {suppliers.isLoading ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+        ) : filtered.length === 0 ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-suppliers">No suppliers registered by any garage yet.</p></CardContent>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
               <TableHead>Supplier</TableHead>
-              <TableHead>Category</TableHead>
+              <TableHead>Garage</TableHead>
               <TableHead>Country</TableHead>
-              <TableHead>Orders</TableHead>
-              <TableHead>Rating</TableHead>
+              <TableHead>Payment Terms</TableHead>
+              <TableHead>Added</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((supplier) => (
-              <TableRow key={supplier.id} className="border-[#E2E8F0] dark:border-[#232A36]">
+              <TableRow key={supplier.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`supplier-row-${supplier.id}`}>
                 <TableCell>
                   <div>
                     <p className="font-semibold text-sm text-[#0F172A] dark:text-white">{supplier.name}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{supplier.contact}</p>
+                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{supplier.contact_person ?? supplier.email ?? "—"}</p>
                   </div>
                 </TableCell>
+                <TableCell className="text-sm text-[#64748B] dark:text-[#9BA4B0]">{supplier.garage ?? "—"}</TableCell>
+                <TableCell className="text-sm text-[#64748B] dark:text-[#9BA4B0]">{supplier.country ?? "—"}</TableCell>
+                <TableCell className="text-sm">{supplier.payment_terms ?? "—"}</TableCell>
+                <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{new Date(supplier.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="text-[#0A5ED7] border-blue-200 bg-blue-50 dark:bg-blue-900/20 text-xs">
-                    {categoryLabels[supplier.category] || supplier.category}
+                  <Badge variant="outline" className={supplier.is_active ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-gray-500 border-gray-200"}>
+                    {supplier.is_active ? "active" : "inactive"}
                   </Badge>
-                </TableCell>
-                <TableCell className="text-sm text-[#64748B] dark:text-[#9BA4B0]">{supplier.country}</TableCell>
-                <TableCell className="text-sm">{supplier.orders}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-medium">{supplier.rating}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={supplier.status === "active" ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-gray-500 border-gray-200"}>
-                    {supplier.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit className="h-3.5 w-3.5" /></Button>
-                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        )}
       </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-[#0B1F3B] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-[#0F172A] dark:text-white flex items-center gap-2">
-              <Truck className="h-5 w-5 text-[#0A5ED7]" />
-              Add New Supplier
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit((d) => createMutation.mutate(d))} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Supplier Name</FormLabel>
-                    <FormControl><Input placeholder="Gulf Auto Parts Co." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="contactPerson" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Person</FormLabel>
-                    <FormControl><Input placeholder="Ali Hassan" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="email" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl><Input type="email" placeholder="contact@supplier.com" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="phone" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl><Input placeholder="+966 50 000 0000" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="category" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {Object.entries(categoryLabels).map(([v, l]) => (
-                          <SelectItem key={v} value={v}>{l}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="address" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Address</FormLabel>
-                    <FormControl><Input placeholder="Street, city..." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="country" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl><Input placeholder="Saudi Arabia" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="paymentTerms" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment Terms</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="IMMEDIATE">Immediate</SelectItem>
-                        <SelectItem value="NET15">Net 15</SelectItem>
-                        <SelectItem value="NET30">Net 30</SelectItem>
-                        <SelectItem value="NET60">Net 60</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="website" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Website (optional)</FormLabel>
-                    <FormControl><Input placeholder="https://supplier.com" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="notes" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Notes (optional)</FormLabel>
-                    <FormControl><Textarea placeholder="Additional notes..." rows={3} {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-                  {createMutation.isPending ? "Adding..." : "Add Supplier"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function StoresTab() {
-  const { toast } = useToast();
-  const [search, setSearch] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const form = useForm<StoreFormData>({
-    resolver: zodResolver(storeSchema),
-    defaultValues: {
-      name: "", ownerEmail: "", description: "", category: "SPARE_PARTS",
-      country: "Saudi Arabia", city: "", commissionRate: 7, currency: "SAR",
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: StoreFormData) => apiRequest("POST", "/api/platform-admin/stores", data),
-    onSuccess: () => {
-      toast({ title: "Store created", description: "The e-commerce store is now live on the platform." });
-      setDialogOpen(false);
-      form.reset();
-    },
-    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
-  });
-
-  const statusColors: Record<string, string> = {
-    active: "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20",
-    pending: "text-yellow-600 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20",
-    suspended: "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20",
-  };
-
-  const catLabels: Record<string, string> = {
-    SPARE_PARTS: "Spare Parts", TOOLS: "Tools", ACCESSORIES: "Accessories",
-    TYRES: "Tyres", LUBRICANTS: "Lubricants", FULL_SERVICE: "Full Service",
-  };
-
-  const filtered = mockStores.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.owner.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-3 items-center justify-between">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-          <Input placeholder="Search stores..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
-        </div>
-        <Button onClick={() => setDialogOpen(true)} className="h-9 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Store
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-        {[
-          { label: "Total Stores", value: "52", icon: Store, color: BRAND_BLUE },
-          { label: "Total Products Listed", value: "12,840", icon: Package, color: "#7c3aed" },
-          { label: "Monthly Store Sales", value: "SAR 284K", icon: TrendingUp, color: "#059669" },
-        ].map((s) => (
-          <Card key={s.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
-            <CardContent className="pt-4 pb-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${s.color}15` }}>
-                <s.icon className="h-5 w-5" style={{ color: s.color }} />
-              </div>
-              <div>
-                <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{s.label}</p>
-                <p className="text-xl font-bold text-[#0F172A] dark:text-white">{s.value}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead>Store</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Products</TableHead>
-              <TableHead>Monthly Sales</TableHead>
-              <TableHead>Commission</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((store) => (
-              <TableRow key={store.id} className="border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell>
-                  <div>
-                    <p className="font-semibold text-sm text-[#0F172A] dark:text-white">{store.name}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{store.owner}</p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-xs text-[#0A5ED7] border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                    {catLabels[store.category] || store.category}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-sm">{store.products.toLocaleString()}</TableCell>
-                <TableCell className="text-sm font-medium">SAR {store.sales.toLocaleString()}</TableCell>
-                <TableCell className="text-sm">{store.commission}%</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusColors[store.status] || ""}>
-                    {store.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Edit className="h-3.5 w-3.5" /></Button>
-                    {store.status === "pending" && (
-                      <Button variant="ghost" size="sm" className="h-7 px-2 text-green-500 hover:text-green-500 text-xs">
-                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Approve
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white dark:bg-[#0B1F3B] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-[#0F172A] dark:text-white flex items-center gap-2">
-              <Store className="h-5 w-5 text-[#0A5ED7]" />
-              Add New E-Commerce Store
-            </DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit((d) => createMutation.mutate(d))} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Store Name</FormLabel>
-                    <FormControl><Input placeholder="AutoParts Express" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="ownerEmail" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner Email</FormLabel>
-                    <FormControl><Input type="email" placeholder="owner@store.com" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="category" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {Object.entries(catLabels).map(([v, l]) => (
-                          <SelectItem key={v} value={v}>{l}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="commissionRate" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Commission Rate (%)</FormLabel>
-                    <FormControl><Input type="number" min={0} max={50} step={0.5} {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="city" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl><Input placeholder="Riyadh" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="country" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl><Input placeholder="Saudi Arabia" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="currency" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="SAR">SAR - Saudi Riyal</SelectItem>
-                        <SelectItem value="AED">AED - UAE Dirham</SelectItem>
-                        <SelectItem value="USD">USD - US Dollar</SelectItem>
-                        <SelectItem value="EUR">EUR - Euro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Store Description</FormLabel>
-                    <FormControl><Textarea placeholder="Describe what this store sells..." rows={3} {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-                  {createMutation.isPending ? "Creating..." : "Create Store"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
 
 function SupportTab() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [selectedTicket, setSelectedTicket] = useState<typeof mockSupportTickets[0] | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicketRow | null>(null);
+  const [newStatus, setNewStatus] = useState<string>("open");
+
+  const tickets = useQuery<SupportTicketRow[]>({
+    queryKey: ["/api/platform-admin/support-tickets"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/support-tickets")).json(),
+  });
+
+  const updateTicket = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      apiRequest("PATCH", `/api/platform-admin/support-tickets/${id}`, { status }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/platform-admin/support-tickets"] });
+      qc.invalidateQueries({ queryKey: ["/api/platform-admin/stats"] });
+      toast({ title: "Ticket updated" });
+      setSelectedTicket(null);
+    },
+    onError: (e: Error) => toast({ title: "Update failed", description: e.message, variant: "destructive" }),
+  });
 
   const priorityColors: Record<string, string> = {
     HIGH: "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20",
+    URGENT: "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20",
     MEDIUM: "text-yellow-600 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20",
     LOW: "text-blue-500 border-blue-200 bg-blue-50 dark:bg-blue-900/20",
   };
@@ -962,11 +624,13 @@ function SupportTab() {
     open: "text-[#F97316] border-orange-200 bg-orange-50 dark:bg-orange-900/20",
     in_progress: "text-blue-500 border-blue-200 bg-blue-50 dark:bg-blue-900/20",
     resolved: "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20",
+    closed: "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20",
   };
 
-  const filtered = mockSupportTickets.filter(t => {
+  const all = tickets.data ?? [];
+  const filtered = all.filter(t => {
     const matchSearch = t.subject.toLowerCase().includes(search.toLowerCase()) ||
-      t.garage.toLowerCase().includes(search.toLowerCase());
+      (t.garage ?? "").toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "ALL" || t.status === statusFilter;
     return matchSearch && matchStatus;
   });
@@ -975,10 +639,10 @@ function SupportTab() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-2">
         {[
-          { label: "Total Open", value: mockSupportTickets.filter(t => t.status === "open").length, color: BRAND_ORANGE },
-          { label: "In Progress", value: mockSupportTickets.filter(t => t.status === "in_progress").length, color: BRAND_BLUE },
-          { label: "Resolved Today", value: 3, color: "#059669" },
-          { label: "Avg. Response", value: "2.4h", color: "#7c3aed" },
+          { label: "Open", value: all.filter(t => t.status === "open").length, color: BRAND_ORANGE },
+          { label: "In Progress", value: all.filter(t => t.status === "in_progress").length, color: BRAND_BLUE },
+          { label: "Resolved", value: all.filter(t => t.status === "resolved" || t.status === "closed").length, color: "#059669" },
+          { label: "Total", value: all.length, color: "#7c3aed" },
         ].map((s) => (
           <Card key={s.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-3 pb-3">
@@ -1010,13 +674,18 @@ function SupportTab() {
       </div>
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
+        {tickets.isLoading ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+        ) : filtered.length === 0 ? (
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-tickets">No support tickets.</p></CardContent>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead>Ticket ID</TableHead>
+              <TableHead>Ticket</TableHead>
               <TableHead>Garage</TableHead>
               <TableHead>Subject</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
@@ -1025,34 +694,31 @@ function SupportTab() {
           </TableHeader>
           <TableBody>
             {filtered.map((ticket) => (
-              <TableRow key={ticket.id} className="border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell className="font-mono text-xs font-bold text-[#0A5ED7]">{ticket.id}</TableCell>
+              <TableRow key={ticket.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`ticket-row-${ticket.id}`}>
+                <TableCell className="font-mono text-xs font-bold text-[#0A5ED7]">{ticket.id.slice(0, 8)}…</TableCell>
                 <TableCell>
-                  <div>
-                    <p className="text-sm font-medium text-[#0F172A] dark:text-white">{ticket.garage}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{ticket.user}</p>
-                  </div>
+                  <p className="text-sm font-medium text-[#0F172A] dark:text-white">{ticket.garage ?? "—"}</p>
                 </TableCell>
                 <TableCell className="max-w-[200px]">
                   <p className="text-sm truncate">{ticket.subject}</p>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="text-xs">{ticket.type}</Badge>
+                  <Badge variant="outline" className="text-xs">{ticket.category ?? "—"}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={`text-xs ${priorityColors[ticket.priority]}`}>
-                    {ticket.priority}
+                  <Badge variant="outline" className={`text-xs ${priorityColors[(ticket.priority ?? "").toUpperCase()] ?? ""}`}>
+                    {ticket.priority ?? "—"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className={`text-xs ${statusColors[ticket.status]}`}>
+                  <Badge variant="outline" className={`text-xs ${statusColors[ticket.status] ?? ""}`}>
                     {ticket.status.replace("_", " ")}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{ticket.created}</TableCell>
+                <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{new Date(ticket.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#0A5ED7]"
-                    onClick={() => setSelectedTicket(ticket)}>
+                    onClick={() => { setSelectedTicket(ticket); setNewStatus(ticket.status); }}>
                     <Eye className="h-3.5 w-3.5 mr-1" /> View
                   </Button>
                 </TableCell>
@@ -1060,6 +726,7 @@ function SupportTab() {
             ))}
           </TableBody>
         </Table>
+        )}
       </Card>
 
       <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
@@ -1068,31 +735,27 @@ function SupportTab() {
             <DialogHeader>
               <DialogTitle className="text-[#0F172A] dark:text-white flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
-                Ticket {selectedTicket.id}
+                Ticket {selectedTicket.id.slice(0, 8)}…
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
                   <p className="text-xs text-[#64748B] mb-1">Garage</p>
-                  <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.garage}</p>
+                  <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.garage ?? "—"}</p>
                 </div>
                 <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
-                  <p className="text-xs text-[#64748B] mb-1">Submitted by</p>
-                  <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.user}</p>
+                  <p className="text-xs text-[#64748B] mb-1">Opened</p>
+                  <p className="text-sm font-medium text-[#0F172A] dark:text-white">{new Date(selectedTicket.created_at).toLocaleString()}</p>
                 </div>
               </div>
               <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
                 <p className="text-xs text-[#64748B] mb-1">Subject</p>
                 <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.subject}</p>
               </div>
-              <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
-                <p className="text-xs text-[#64748B] mb-2">Admin Response</p>
-                <Textarea placeholder="Type your response to this ticket..." rows={4} className="bg-white dark:bg-[#0B1F3B]" />
-              </div>
               <div className="flex gap-3 justify-end">
-                <Select defaultValue={selectedTicket.status}>
-                  <SelectTrigger className="w-36">
+                <Select value={newStatus} onValueChange={setNewStatus}>
+                  <SelectTrigger className="w-36" data-testid="ticket-status-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1101,8 +764,13 @@ function SupportTab() {
                     <SelectItem value="resolved">Resolved</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-                  Send Response
+                <Button
+                  className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0"
+                  disabled={updateTicket.isPending || newStatus === selectedTicket.status}
+                  data-testid="ticket-save"
+                  onClick={() => updateTicket.mutate({ id: selectedTicket.id, status: newStatus })}
+                >
+                  {updateTicket.isPending ? "Saving…" : "Update Status"}
                 </Button>
               </div>
             </div>
@@ -1113,31 +781,55 @@ function SupportTab() {
   );
 }
 
+interface SystemHealth {
+  uptimeSeconds: number;
+  dbOk: boolean;
+  dbLatencyMs: number;
+  dbConnections: number;
+  memoryRssMb: number;
+  memoryHeapUsedMb: number;
+  nodeVersion: string;
+  integrations: { name: string; configured: boolean; operational?: boolean }[];
+}
+
 function SystemHealthTab() {
-  const metrics = [
-    { label: "API Latency", value: `${systemHealth.apiLatency}ms`, good: systemHealth.apiLatency < 200, icon: Wifi },
-    { label: "DB Connections", value: systemHealth.dbConnections, good: systemHealth.dbConnections < 300, icon: Database },
-    { label: "CPU Usage", value: `${systemHealth.cpuUsage}%`, good: systemHealth.cpuUsage < 80, icon: Cpu },
-    { label: "Memory Usage", value: `${systemHealth.memoryUsage}%`, good: systemHealth.memoryUsage < 85, icon: HardDrive },
-    { label: "Disk Usage", value: `${systemHealth.diskUsage}%`, good: systemHealth.diskUsage < 85, icon: HardDrive },
-    { label: "Cache Hit Rate", value: `${systemHealth.cacheHitRate}%`, good: systemHealth.cacheHitRate > 90, icon: RefreshCw },
-    { label: "Active WebSockets", value: systemHealth.activeWebSockets, good: true, icon: Activity },
-    { label: "System Uptime", value: `${systemHealth.uptime}%`, good: systemHealth.uptime > 99, icon: Server },
-  ];
+  const health = useQuery<SystemHealth>({
+    queryKey: ["/api/platform-admin/system-health"],
+    queryFn: async () => (await apiRequest("GET", "/api/platform-admin/system-health")).json(),
+    refetchInterval: 30_000,
+  });
+  const h = health.data;
+
+  const metrics = h ? [
+    { label: "DB Latency", value: `${h.dbLatencyMs}ms`, good: h.dbLatencyMs < 200, icon: Wifi },
+    { label: "DB Connections", value: h.dbConnections, good: h.dbConnections < 300, icon: Database },
+    { label: "Memory (RSS)", value: `${h.memoryRssMb} MB`, good: true, icon: HardDrive },
+    { label: "Heap Used", value: `${h.memoryHeapUsedMb} MB`, good: true, icon: HardDrive },
+    { label: "Server Uptime", value: formatUptime(h.uptimeSeconds), good: true, icon: Server },
+    { label: "Node.js", value: h.nodeVersion, good: true, icon: Cpu },
+  ] : [];
 
   return (
     <div className="space-y-4">
-      <Card className="bg-gradient-to-r from-green-500/10 to-green-400/5 border border-green-200 dark:border-green-900/40">
+      <Card className={h && !h.dbOk
+        ? "bg-gradient-to-r from-red-500/10 to-red-400/5 border border-red-200 dark:border-red-900/40"
+        : "bg-gradient-to-r from-green-500/10 to-green-400/5 border border-green-200 dark:border-green-900/40"}>
         <CardContent className="pt-4 pb-4 flex items-center gap-3">
-          <CheckCircle className="h-6 w-6 text-green-500" />
+          {h && !h.dbOk
+            ? <AlertTriangle className="h-6 w-6 text-red-500" />
+            : <CheckCircle className="h-6 w-6 text-green-500" />}
           <div>
-            <p className="font-bold text-[#0F172A] dark:text-white">All Systems Operational</p>
-            <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">Last checked: {new Date().toLocaleTimeString()}</p>
+            <p className="font-bold text-[#0F172A] dark:text-white">
+              {health.isLoading ? "Checking…" : h && !h.dbOk ? "Database Unreachable" : "Core Systems Operational"}
+            </p>
+            <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
+              Live metrics measured from the running server{h ? ` · refreshed every 30s` : ""}
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {metrics.map((m) => (
           <Card key={m.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-4 pb-4">
@@ -1154,31 +846,26 @@ function SystemHealthTab() {
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Service Status</CardTitle>
+          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Integrations</CardTitle>
+          <CardDescription className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
+            Configured from environment keys — unconfigured integrations run in stub/dev mode.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {[
-              { service: "API Server", status: "operational", latency: "87ms" },
-              { service: "PostgreSQL Database", status: "operational", latency: "12ms" },
-              { service: "WebSocket Server", status: "operational", latency: "—" },
-              { service: "File Storage (S3)", status: "operational", latency: "156ms" },
-              { service: "Email Service (Gmail)", status: "operational", latency: "—" },
-              { service: "SMS Service (Twilio)", status: "operational", latency: "—" },
-              { service: "AI Services (OpenAI)", status: "operational", latency: "342ms" },
-              { service: "ZATCA E-Invoice API", status: "operational", latency: "289ms" },
-            ].map((svc) => (
-              <div key={svc.service} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0">
+            {(h?.integrations ?? []).map((svc) => (
+              <div key={svc.name} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-400" />
-                  <span className="text-sm text-[#0F172A] dark:text-[#E6EAF0]">{svc.service}</span>
+                  <div className={`h-2 w-2 rounded-full ${svc.operational === false ? "bg-red-400" : svc.configured ? "bg-green-400" : "bg-slate-300 dark:bg-slate-600"}`} />
+                  <span className="text-sm text-[#0F172A] dark:text-[#E6EAF0]">{svc.name}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  {svc.latency !== "—" && <span className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{svc.latency}</span>}
-                  <Badge variant="outline" className="text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20 text-xs">
-                    {svc.status}
-                  </Badge>
-                </div>
+                <Badge variant="outline" className={svc.operational === false
+                  ? "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20 text-xs"
+                  : svc.configured
+                    ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20 text-xs"
+                    : "text-slate-500 border-slate-200 text-xs"}>
+                  {svc.operational === false ? "down" : svc.configured ? "configured" : "not configured"}
+                </Badge>
               </div>
             ))}
           </div>
@@ -1188,18 +875,25 @@ function SystemHealthTab() {
   );
 }
 
+const ROLE_CATALOG: Record<string, { name: string; color: string; description: string }> = {
+  PLATFORM_ADMIN: { name: "Platform Admin", color: "#7c3aed", description: "Full platform control, all tenants, system settings" },
+  SUPER_ADMIN: { name: "Super Admin", color: "#7c3aed", description: "Full platform control, all tenants, system settings" },
+  ADMIN: { name: "System Administrator", color: BRAND_BLUE, description: "Full access within their garage/tenant" },
+  MANAGER: { name: "Service Manager", color: "#059669", description: "Service operations, HR, limited finance" },
+  ADVISOR: { name: "Service Advisor", color: "#d97706", description: "Customer intake, job cards, estimates" },
+  TECHNICIAN: { name: "Technician", color: "#64748b", description: "Assigned jobs, time clock, parts lookup" },
+  ACCOUNTANT: { name: "Accountant", color: "#0891b2", description: "Finance, invoices, reports, accounting" },
+  PURCHASE_AGENT: { name: "Purchase Agent", color: "#7c3aed", description: "Purchase orders, suppliers, inventory" },
+  HR_MANAGER: { name: "HR Manager", color: "#be185d", description: "Staff, payroll, leave, performance" },
+  CUSTOMER: { name: "Customer", color: "#84cc16", description: "Customer portal, booking, vehicle history" },
+};
+
 function RBACTab() {
-  const roles = [
-    { name: "Platform Admin", code: "PLATFORM_ADMIN", users: 3, color: "#7c3aed", description: "Full platform control, all tenants, system settings" },
-    { name: "System Administrator", code: "ADMIN", users: 142, color: BRAND_BLUE, description: "Full access within their garage/tenant" },
-    { name: "Service Manager", code: "MANAGER", users: 384, color: "#059669", description: "Service operations, HR, limited finance" },
-    { name: "Service Advisor", code: "ADVISOR", users: 612, color: "#d97706", description: "Customer intake, job cards, estimates" },
-    { name: "Technician", code: "TECHNICIAN", users: 1840, color: "#64748b", description: "Assigned jobs, time clock, parts lookup" },
-    { name: "Accountant", code: "ACCOUNTANT", users: 298, color: "#0891b2", description: "Finance, invoices, reports, accounting" },
-    { name: "Purchase Agent", code: "PURCHASE_AGENT", users: 184, color: "#7c3aed", description: "Purchase orders, suppliers, inventory" },
-    { name: "HR Manager", code: "HR_MANAGER", users: 97, color: "#be185d", description: "Staff, payroll, leave, performance" },
-    { name: "Customer", code: "CUSTOMER", users: 1260, color: "#84cc16", description: "Customer portal, booking, vehicle history" },
-  ];
+  const stats = usePlatformStats();
+  const roles = (stats.data?.roleCounts ?? []).map((r) => {
+    const meta = ROLE_CATALOG[r.role] ?? { name: r.role, color: "#64748b", description: "Custom role" };
+    return { code: r.role, users: r.count, ...meta };
+  });
 
   return (
     <div className="space-y-4">
@@ -1207,10 +901,15 @@ function RBACTab() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Platform Roles & Permissions Matrix</CardTitle>
           <CardDescription className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
-            All roles across the platform. PLATFORM_ADMIN has unrestricted access to all tenants and settings.
+            Live user counts per role across the platform. PLATFORM_ADMIN has unrestricted access to all tenants and settings.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {stats.isLoading ? (
+            <p className="text-sm text-[#64748B]">Loading…</p>
+          ) : roles.length === 0 ? (
+            <p className="text-sm text-[#64748B]">No users yet.</p>
+          ) : (
           <div className="space-y-3">
             {roles.map((role) => (
               <div key={role.code} className="flex items-center justify-between p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/30 transition-colors">
@@ -1226,27 +925,31 @@ function RBACTab() {
                     <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{role.description}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-[#0F172A] dark:text-white">{role.users.toLocaleString()}</p>
-                    <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">users</p>
-                  </div>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                    <Settings className="h-3.5 w-3.5" />
-                  </Button>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-[#0F172A] dark:text-white">{role.users.toLocaleString()}</p>
+                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">users</p>
                 </div>
               </div>
             ))}
           </div>
+          )}
         </CardContent>
       </Card>
     </div>
   );
 }
 
+// Sidebar deep-links (/platform-admin/<segment>) → tab ids.
+const TAB_ALIASES: Record<string, string> = {
+  garages: "garages", suppliers: "suppliers", support: "support",
+  billing: "billing", system: "system", approvals: "approvals",
+  roles: "rbac", rbac: "rbac", users: "rbac", analytics: "overview",
+};
+
 export default function PlatformAdmin() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("overview");
+  const params = useParams<{ tab?: string }>();
+  const [activeTab, setActiveTab] = useState(TAB_ALIASES[params.tab ?? ""] ?? "overview");
 
   const tabs = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -1254,7 +957,6 @@ export default function PlatformAdmin() {
     { id: "garages", label: "Garages", icon: Building2 },
     { id: "billing", label: "Billing", icon: CreditCard },
     { id: "suppliers", label: "Suppliers", icon: Truck },
-    { id: "stores", label: "E-Commerce", icon: Store },
     { id: "support", label: "Help & Support", icon: MessageSquare },
     { id: "rbac", label: "Roles & RBAC", icon: Shield },
     { id: "system", label: "System Health", icon: Activity },
@@ -1300,8 +1002,6 @@ export default function PlatformAdmin() {
         <TabsContent value="garages" className="mt-6"><GaragesTab /></TabsContent>
         <TabsContent value="billing" className="mt-6"><PlatformBillingTab /></TabsContent>
         <TabsContent value="suppliers" className="mt-6"><SuppliersTab /></TabsContent>
-        {/* PlatformBillingTab is defined inline below */}
-        <TabsContent value="stores" className="mt-6"><StoresTab /></TabsContent>
         <TabsContent value="support" className="mt-6"><SupportTab /></TabsContent>
         <TabsContent value="rbac" className="mt-6"><RBACTab /></TabsContent>
         <TabsContent value="system" className="mt-6"><SystemHealthTab /></TabsContent>

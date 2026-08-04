@@ -26,9 +26,14 @@ describe('Audit logging for platform-admin (SA-008)', () => {
   });
 
   it('all platform-admin POST routes use auditLog middleware', () => {
+    // Suppliers and stores POSTs were removed: suppliers are per-garage
+    // (platform view is read-only oversight) and e-commerce stores are
+    // superseded by marketplace parts_store providers.
     expect(routes).toMatch(/app\.post\('\/api\/platform-admin\/garages',\s*requirePlatformAdmin,\s*auditLog/);
-    expect(routes).toMatch(/app\.post\('\/api\/platform-admin\/suppliers',\s*requirePlatformAdmin,\s*auditLog/);
-    expect(routes).toMatch(/app\.post\('\/api\/platform-admin\/stores',\s*requirePlatformAdmin,\s*auditLog/);
+    const platformPosts = routes.match(/app\.post\('\/api\/platform-admin[^']*',[^\n]*/g) || [];
+    platformPosts.forEach(r => {
+      expect(r, `platform-admin POST must audit-log: ${r}`).toMatch(/auditLog/);
+    });
   });
 
   it('all platform-admin PATCH routes use auditLog middleware', () => {
