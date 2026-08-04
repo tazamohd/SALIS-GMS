@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -133,6 +134,7 @@ function formatUptime(seconds: number) {
 }
 
 function OverviewTab() {
+  const { t } = useTranslation();
   const stats = usePlatformStats();
   const s = stats.data;
   const pendingTotal = (s?.pendingApplications ?? 0) + (s?.pendingSubscriptionRequests ?? 0);
@@ -144,10 +146,10 @@ function OverviewTab() {
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Garages", value: s?.totalGarages ?? "…", active: s?.activeGarages ?? null, icon: Building2, color: BRAND_BLUE },
-          { label: "Suppliers", value: s?.totalSuppliers ?? "…", active: null, icon: Truck, color: "#7c3aed" },
-          { label: "Pending Approvals", value: pendingTotal, active: null, icon: Clock, color: BRAND_ORANGE },
-          { label: "Platform Users", value: s?.totalUsers?.toLocaleString() ?? "…", active: null, icon: Users, color: "#d97706" },
+          { label: t("platformAdmin.totalGarages", "Total Garages"), value: s?.totalGarages ?? "…", active: s?.activeGarages ?? null, icon: Building2, color: BRAND_BLUE },
+          { label: t("platformAdmin.suppliers", "Suppliers"), value: s?.totalSuppliers ?? "…", active: null, icon: Truck, color: "#7c3aed" },
+          { label: t("platformAdmin.pendingApprovals", "Pending Approvals"), value: pendingTotal, active: null, icon: Clock, color: BRAND_ORANGE },
+          { label: t("platformAdmin.platformUsers", "Platform Users"), value: s?.totalUsers?.toLocaleString() ?? "…", active: null, icon: Users, color: "#d97706" },
         ].map((stat) => (
           <Card key={stat.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-4 pb-4">
@@ -156,7 +158,7 @@ function OverviewTab() {
                   <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">{stat.label}</p>
                   <p className="text-2xl font-bold text-[#0F172A] dark:text-white mt-1">{stat.value}</p>
                   {stat.active !== null && (
-                    <p className="text-xs text-green-500 mt-1">{stat.active} active</p>
+                    <p className="text-xs text-green-500 mt-1">{stat.active} {t("platformAdmin.active", "active")}</p>
                   )}
                 </div>
                 <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: `${stat.color}20` }}>
@@ -172,31 +174,31 @@ function OverviewTab() {
         <Card className="bg-gradient-to-br from-[#0A5ED7] to-[#0BB3FF] border-0 text-white">
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium opacity-90">Monthly Revenue</p>
+              <p className="text-sm font-medium opacity-90">{t("platformAdmin.monthlyRevenue", "Monthly Revenue")}</p>
               <TrendingUp className="h-4 w-4 opacity-80" />
             </div>
             <p className="text-3xl font-bold">SAR {(s?.monthlyRevenue ?? 0).toLocaleString()}</p>
-            <p className="text-xs mt-1 opacity-80">MRR from active subscription plans</p>
+            <p className="text-xs mt-1 opacity-80">{t("platformAdmin.mrrNote", "MRR from active subscription plans")}</p>
           </CardContent>
         </Card>
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">Open Support Tickets</p>
+              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">{t("platformAdmin.openSupportTickets", "Open Support Tickets")}</p>
               <MessageSquare className="h-4 w-4 text-[#F97316]" />
             </div>
             <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{s?.supportTickets ?? "…"}</p>
-            <p className="text-xs text-[#64748B] mt-1">unresolved across all garages</p>
+            <p className="text-xs text-[#64748B] mt-1">{t("platformAdmin.unresolvedNote", "unresolved across all garages")}</p>
           </CardContent>
         </Card>
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">Server Uptime</p>
+              <p className="text-xs text-[#64748B] dark:text-[#9BA4B0] font-medium">{t("platformAdmin.serverUptime", "Server Uptime")}</p>
               <Activity className="h-4 w-4 text-green-500" />
             </div>
             <p className="text-3xl font-bold text-[#0F172A] dark:text-white">{s ? formatUptime(s.uptimeSeconds) : "…"}</p>
-            <p className="text-xs text-[#64748B] mt-1">since last restart</p>
+            <p className="text-xs text-[#64748B] mt-1">{t("platformAdmin.sinceRestart", "since last restart")}</p>
           </CardContent>
         </Card>
       </div>
@@ -204,11 +206,11 @@ function OverviewTab() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Subscription Plan Distribution</CardTitle>
+            <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">{t("platformAdmin.planDistribution", "Subscription Plan Distribution")}</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-6">
             {planDistribution.length === 0 ? (
-              <p className="text-sm text-[#64748B] py-8">No active subscriptions yet.</p>
+              <p className="text-sm text-[#64748B] py-8">{t("platformAdmin.noActiveSubs", "No active subscriptions yet.")}</p>
             ) : (
               <>
                 <ResponsiveContainer width="60%" height={160}>
@@ -227,7 +229,7 @@ function OverviewTab() {
                       <div className="w-3 h-3 rounded-full" style={{ background: plan.color }} />
                       <div>
                         <p className="text-xs font-medium text-[#0F172A] dark:text-white">{plan.name}</p>
-                        <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{plan.value} garages</p>
+                        <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{plan.value} {t("platformAdmin.garagesLower", "garages")}</p>
                       </div>
                     </div>
                   ))}
@@ -243,18 +245,19 @@ function OverviewTab() {
 }
 
 function RecentGaragesCard() {
+  const { t } = useTranslation();
   const garages = usePlatformGarages();
   const recent = (garages.data ?? []).slice(0, 6);
   return (
     <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Recently Onboarded Providers</CardTitle>
+        <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">{t("platformAdmin.recentProviders", "Recently Onboarded Providers")}</CardTitle>
       </CardHeader>
       <CardContent>
         {garages.isLoading ? (
-          <p className="text-sm text-[#64748B]">Loading…</p>
+          <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p>
         ) : recent.length === 0 ? (
-          <p className="text-sm text-[#64748B]">No providers yet.</p>
+          <p className="text-sm text-[#64748B]">{t("platformAdmin.noProviders", "No providers yet.")}</p>
         ) : (
           <div className="space-y-2">
             {recent.map((g) => (
@@ -264,7 +267,7 @@ function RecentGaragesCard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0F172A] dark:text-[#E6EAF0] truncate">{g.name}</p>
-                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{g.business_type ?? "garage"} · {Number(g.user_count)} users</p>
+                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{g.business_type ?? "garage"} · {Number(g.user_count)} {t("platformAdmin.users", "users")}</p>
                 </div>
                 <Badge variant="outline" className={`text-xs ${PLAN_COLORS[g.subscription_plan ?? ""] ?? ""}`}>{g.subscription_plan ?? "—"}</Badge>
                 <span className="text-xs text-[#64748B] dark:text-[#9BA4B0] whitespace-nowrap">{new Date(g.created_at).toLocaleDateString()}</span>
@@ -278,6 +281,7 @@ function RecentGaragesCard() {
 }
 
 function GaragesTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
@@ -297,7 +301,7 @@ function GaragesTab() {
   const createGarageMutation = useMutation({
     mutationFn: (data: GarageFormData) => apiRequest("POST", "/api/platform-admin/garages", data),
     onSuccess: () => {
-      toast({ title: "Garage created successfully", description: "The garage account is now active." });
+      toast({ title: t("platformAdmin.garageCreated", "Garage created successfully"), description: t("platformAdmin.garageCreatedDesc", "The garage account is now active.") });
       qc.invalidateQueries({ queryKey: ["/api/platform-admin/garages"] });
       setDialogOpen(false);
       form.reset();
@@ -310,7 +314,7 @@ function GaragesTab() {
       apiRequest("PATCH", `/api/platform-admin/garages/${id}/status`, { status }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/platform-admin/garages"] });
-      toast({ title: "Status updated" });
+      toast({ title: t("platformAdmin.statusUpdated", "Status updated") });
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
@@ -330,14 +334,14 @@ function GaragesTab() {
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-            <Input placeholder="Search garages..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
+            <Input placeholder={t("platformAdmin.searchGarages", "Search garages...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
           </div>
           <Select value={planFilter} onValueChange={setPlanFilter}>
             <SelectTrigger className="w-36 h-9">
-              <SelectValue placeholder="All Plans" />
+              <SelectValue placeholder={t("platformAdmin.allPlans", "All Plans")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Plans</SelectItem>
+              <SelectItem value="ALL">{t("platformAdmin.allPlans", "All Plans")}</SelectItem>
               <SelectItem value="STARTER">Starter</SelectItem>
               <SelectItem value="PRO">Pro</SelectItem>
               <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
@@ -346,26 +350,26 @@ function GaragesTab() {
         </div>
         <Button onClick={() => setDialogOpen(true)} className="h-9 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90">
           <Plus className="h-4 w-4 mr-2" />
-          New Garage
+          {t("platformAdmin.newGarage", "New Garage")}
         </Button>
       </div>
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         {garages.isLoading ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p></CardContent>
         ) : filtered.length === 0 ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-garages">No garages match.</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-garages">{t("platformAdmin.noGaragesMatch", "No garages match.")}</p></CardContent>
         ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead>Garage</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead>Users</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t("platformAdmin.garage", "Garage")}</TableHead>
+              <TableHead>{t("myOfferings.type", "Type")}</TableHead>
+              <TableHead>{t("providerSignup.plan", "Plan")}</TableHead>
+              <TableHead>{t("platformAdmin.users", "Users")}</TableHead>
+              <TableHead>{t("platformAdmin.joined", "Joined")}</TableHead>
+              <TableHead>{t("common.status", "Status")}</TableHead>
+              <TableHead>{t("platformAdmin.actions", "Actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -389,7 +393,7 @@ function GaragesTab() {
                 <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{new Date(garage.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={garage.is_active ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-red-500 border-red-200 bg-red-50 dark:bg-red-900/20"}>
-                    {garage.is_active ? "active" : "suspended"}
+                    {garage.is_active ? t("platformAdmin.active", "active") : t("platformAdmin.suspended", "suspended")}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -401,8 +405,8 @@ function GaragesTab() {
                     onClick={() => statusMutation.mutate({ id: garage.id, status: garage.is_active ? "suspended" : "active" })}
                   >
                     {garage.is_active
-                      ? <><XCircle className="h-3.5 w-3.5 mr-1" /> Suspend</>
-                      : <><CheckCircle className="h-3.5 w-3.5 mr-1" /> Activate</>}
+                      ? <><XCircle className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.suspend", "Suspend")}</>
+                      : <><CheckCircle className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.activate", "Activate")}</>}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -417,7 +421,7 @@ function GaragesTab() {
           <DialogHeader>
             <DialogTitle className="text-[#0F172A] dark:text-white flex items-center gap-2">
               <Building2 className="h-5 w-5 text-[#0A5ED7]" />
-              Register New Garage
+              {t("platformAdmin.registerNewGarage", "Register New Garage")}
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -425,63 +429,63 @@ function GaragesTab() {
               <div className="grid grid-cols-2 gap-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel>Garage Name</FormLabel>
+                    <FormLabel>{t("platformAdmin.garageName", "Garage Name")}</FormLabel>
                     <FormControl><Input placeholder="Al-Rashid Auto Center" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="ownerName" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Owner Name</FormLabel>
+                    <FormLabel>{t("providerSignup.ownerName", "Owner name")}</FormLabel>
                     <FormControl><Input placeholder="Mohammed Al-Rashid" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("common.email", "Email")}</FormLabel>
                     <FormControl><Input type="email" placeholder="owner@garage.com" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="phone" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>{t("common.phone", "Phone")}</FormLabel>
                     <FormControl><Input placeholder="+966 50 000 0000" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="vatNumber" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>VAT/TRN Number</FormLabel>
+                    <FormLabel>{t("platformAdmin.vatNumber", "VAT/TRN Number")}</FormLabel>
                     <FormControl><Input placeholder="310XXXXXXXXXX" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="address" render={({ field }) => (
                   <FormItem className="col-span-2">
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel>{t("myOfferings.address", "Address")}</FormLabel>
                     <FormControl><Input placeholder="Street, district..." {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="city" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>{t("common.city", "City")}</FormLabel>
                     <FormControl><Input placeholder="Riyadh" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="country" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country</FormLabel>
+                    <FormLabel>{t("common.country", "Country")}</FormLabel>
                     <FormControl><Input placeholder="Saudi Arabia" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="subscriptionPlan" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subscription Plan</FormLabel>
+                    <FormLabel>{t("platformAdmin.subscriptionPlan", "Subscription Plan")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger><SelectValue /></SelectTrigger>
@@ -497,16 +501,16 @@ function GaragesTab() {
                 )} />
                 <FormField control={form.control} name="maxBranches" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Max Branches</FormLabel>
+                    <FormLabel>{t("platformAdmin.maxBranches", "Max Branches")}</FormLabel>
                     <FormControl><Input type="number" min={1} max={500} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>{t("common.cancel", "Cancel")}</Button>
                 <Button type="submit" disabled={createGarageMutation.isPending} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0">
-                  {createGarageMutation.isPending ? "Creating..." : "Create Garage"}
+                  {createGarageMutation.isPending ? t("platformAdmin.creating", "Creating...") : t("platformAdmin.createGarage", "Create Garage")}
                 </Button>
               </div>
             </form>
@@ -518,6 +522,7 @@ function GaragesTab() {
 }
 
 function SuppliersTab() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   const suppliers = useQuery<PlatformSupplierRow[]>({
@@ -536,28 +541,28 @@ function SuppliersTab() {
       <div className="flex gap-3 items-center justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-          <Input placeholder="Search suppliers or garages..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-72 h-9" />
+          <Input placeholder={t("platformAdmin.searchSuppliers", "Search suppliers or garages...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-72 h-9" />
         </div>
         <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
-          Read-only oversight of every garage's procurement suppliers. Platform-level parts vendors onboard via the marketplace.
+          {t("platformAdmin.suppliersNote", "Read-only oversight of every garage's procurement suppliers. Platform-level parts vendors onboard via the marketplace.")}
         </p>
       </div>
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         {suppliers.isLoading ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p></CardContent>
         ) : filtered.length === 0 ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-suppliers">No suppliers registered by any garage yet.</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-suppliers">{t("platformAdmin.noSuppliers", "No suppliers registered by any garage yet.")}</p></CardContent>
         ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead>Supplier</TableHead>
-              <TableHead>Garage</TableHead>
-              <TableHead>Country</TableHead>
-              <TableHead>Payment Terms</TableHead>
-              <TableHead>Added</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t("platformAdmin.supplier", "Supplier")}</TableHead>
+              <TableHead>{t("platformAdmin.garage", "Garage")}</TableHead>
+              <TableHead>{t("common.country", "Country")}</TableHead>
+              <TableHead>{t("platformAdmin.paymentTerms", "Payment Terms")}</TableHead>
+              <TableHead>{t("platformAdmin.added", "Added")}</TableHead>
+              <TableHead>{t("common.status", "Status")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -575,7 +580,7 @@ function SuppliersTab() {
                 <TableCell className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{new Date(supplier.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={supplier.is_active ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20" : "text-gray-500 border-gray-200"}>
-                    {supplier.is_active ? "active" : "inactive"}
+                    {supplier.is_active ? t("platformAdmin.active", "active") : t("platformAdmin.inactive", "inactive")}
                   </Badge>
                 </TableCell>
               </TableRow>
@@ -589,6 +594,7 @@ function SuppliersTab() {
 }
 
 function SupportTab() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [search, setSearch] = useState("");
@@ -607,10 +613,10 @@ function SupportTab() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/platform-admin/support-tickets"] });
       qc.invalidateQueries({ queryKey: ["/api/platform-admin/stats"] });
-      toast({ title: "Ticket updated" });
+      toast({ title: t("platformAdmin.ticketUpdated", "Ticket updated") });
       setSelectedTicket(null);
     },
-    onError: (e: Error) => toast({ title: "Update failed", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: t("providerBookings.updateFailed", "Update failed"), description: e.message, variant: "destructive" }),
   });
 
   const priorityColors: Record<string, string> = {
@@ -639,10 +645,10 @@ function SupportTab() {
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-2">
         {[
-          { label: "Open", value: all.filter(t => t.status === "open").length, color: BRAND_ORANGE },
-          { label: "In Progress", value: all.filter(t => t.status === "in_progress").length, color: BRAND_BLUE },
-          { label: "Resolved", value: all.filter(t => t.status === "resolved" || t.status === "closed").length, color: "#059669" },
-          { label: "Total", value: all.length, color: "#7c3aed" },
+          { label: t("platformAdmin.open", "Open"), value: all.filter(t => t.status === "open").length, color: BRAND_ORANGE },
+          { label: t("platformAdmin.inProgress", "In Progress"), value: all.filter(t => t.status === "in_progress").length, color: BRAND_BLUE },
+          { label: t("platformAdmin.resolved", "Resolved"), value: all.filter(t => t.status === "resolved" || t.status === "closed").length, color: "#059669" },
+          { label: t("platformAdmin.total", "Total"), value: all.length, color: "#7c3aed" },
         ].map((s) => (
           <Card key={s.label} className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-3 pb-3">
@@ -657,17 +663,17 @@ function SupportTab() {
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-            <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
+            <Input placeholder={t("platformAdmin.searchTickets", "Search tickets...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-36 h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="ALL">{t("platformAdmin.allStatus", "All Status")}</SelectItem>
+              <SelectItem value="open">{t("platformAdmin.open", "Open")}</SelectItem>
+              <SelectItem value="in_progress">{t("platformAdmin.inProgress", "In Progress")}</SelectItem>
+              <SelectItem value="resolved">{t("platformAdmin.resolved", "Resolved")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -675,21 +681,21 @@ function SupportTab() {
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         {tickets.isLoading ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]">Loading…</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p></CardContent>
         ) : filtered.length === 0 ? (
-          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-tickets">No support tickets.</p></CardContent>
+          <CardContent className="py-8"><p className="text-sm text-[#64748B]" data-testid="no-tickets">{t("platformAdmin.noTickets", "No support tickets.")}</p></CardContent>
         ) : (
         <Table>
           <TableHeader>
             <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
-              <TableHead>Ticket</TableHead>
-              <TableHead>Garage</TableHead>
-              <TableHead>Subject</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t("platformAdmin.ticket", "Ticket")}</TableHead>
+              <TableHead>{t("platformAdmin.garage", "Garage")}</TableHead>
+              <TableHead>{t("platformAdmin.subject", "Subject")}</TableHead>
+              <TableHead>{t("myOfferings.category", "Category")}</TableHead>
+              <TableHead>{t("platformAdmin.priority", "Priority")}</TableHead>
+              <TableHead>{t("common.status", "Status")}</TableHead>
+              <TableHead>{t("platformAdmin.date", "Date")}</TableHead>
+              <TableHead>{t("platformAdmin.actions", "Actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -719,7 +725,7 @@ function SupportTab() {
                 <TableCell>
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#0A5ED7]"
                     onClick={() => { setSelectedTicket(ticket); setNewStatus(ticket.status); }}>
-                    <Eye className="h-3.5 w-3.5 mr-1" /> View
+                    <Eye className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.view", "View")}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -735,22 +741,22 @@ function SupportTab() {
             <DialogHeader>
               <DialogTitle className="text-[#0F172A] dark:text-white flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
-                Ticket {selectedTicket.id.slice(0, 8)}…
+                {t("platformAdmin.ticket", "Ticket")} {selectedTicket.id.slice(0, 8)}…
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
-                  <p className="text-xs text-[#64748B] mb-1">Garage</p>
+                  <p className="text-xs text-[#64748B] mb-1">{t("platformAdmin.garage", "Garage")}</p>
                   <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.garage ?? "—"}</p>
                 </div>
                 <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
-                  <p className="text-xs text-[#64748B] mb-1">Opened</p>
+                  <p className="text-xs text-[#64748B] mb-1">{t("platformAdmin.opened", "Opened")}</p>
                   <p className="text-sm font-medium text-[#0F172A] dark:text-white">{new Date(selectedTicket.created_at).toLocaleString()}</p>
                 </div>
               </div>
               <div className="bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-3">
-                <p className="text-xs text-[#64748B] mb-1">Subject</p>
+                <p className="text-xs text-[#64748B] mb-1">{t("platformAdmin.subject", "Subject")}</p>
                 <p className="text-sm font-medium text-[#0F172A] dark:text-white">{selectedTicket.subject}</p>
               </div>
               <div className="flex gap-3 justify-end">
@@ -759,9 +765,9 @@ function SupportTab() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
+                    <SelectItem value="open">{t("platformAdmin.open", "Open")}</SelectItem>
+                    <SelectItem value="in_progress">{t("platformAdmin.inProgress", "In Progress")}</SelectItem>
+                    <SelectItem value="resolved">{t("platformAdmin.resolved", "Resolved")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button
@@ -770,7 +776,7 @@ function SupportTab() {
                   data-testid="ticket-save"
                   onClick={() => updateTicket.mutate({ id: selectedTicket.id, status: newStatus })}
                 >
-                  {updateTicket.isPending ? "Saving…" : "Update Status"}
+                  {updateTicket.isPending ? t("common.saving", "Saving…") : t("platformAdmin.updateStatus", "Update Status")}
                 </Button>
               </div>
             </div>
@@ -793,6 +799,7 @@ interface SystemHealth {
 }
 
 function SystemHealthTab() {
+  const { t } = useTranslation();
   const health = useQuery<SystemHealth>({
     queryKey: ["/api/platform-admin/system-health"],
     queryFn: async () => (await apiRequest("GET", "/api/platform-admin/system-health")).json(),
@@ -801,11 +808,11 @@ function SystemHealthTab() {
   const h = health.data;
 
   const metrics = h ? [
-    { label: "DB Latency", value: `${h.dbLatencyMs}ms`, good: h.dbLatencyMs < 200, icon: Wifi },
-    { label: "DB Connections", value: h.dbConnections, good: h.dbConnections < 300, icon: Database },
-    { label: "Memory (RSS)", value: `${h.memoryRssMb} MB`, good: true, icon: HardDrive },
-    { label: "Heap Used", value: `${h.memoryHeapUsedMb} MB`, good: true, icon: HardDrive },
-    { label: "Server Uptime", value: formatUptime(h.uptimeSeconds), good: true, icon: Server },
+    { label: t("platformAdmin.dbLatency", "DB Latency"), value: `${h.dbLatencyMs}ms`, good: h.dbLatencyMs < 200, icon: Wifi },
+    { label: t("platformAdmin.dbConnections", "DB Connections"), value: h.dbConnections, good: h.dbConnections < 300, icon: Database },
+    { label: t("platformAdmin.memoryRss", "Memory (RSS)"), value: `${h.memoryRssMb} MB`, good: true, icon: HardDrive },
+    { label: t("platformAdmin.heapUsed", "Heap Used"), value: `${h.memoryHeapUsedMb} MB`, good: true, icon: HardDrive },
+    { label: t("platformAdmin.serverUptime", "Server Uptime"), value: formatUptime(h.uptimeSeconds), good: true, icon: Server },
     { label: "Node.js", value: h.nodeVersion, good: true, icon: Cpu },
   ] : [];
 
@@ -820,10 +827,10 @@ function SystemHealthTab() {
             : <CheckCircle className="h-6 w-6 text-green-500" />}
           <div>
             <p className="font-bold text-[#0F172A] dark:text-white">
-              {health.isLoading ? "Checking…" : h && !h.dbOk ? "Database Unreachable" : "Core Systems Operational"}
+              {health.isLoading ? t("platformAdmin.checking", "Checking…") : h && !h.dbOk ? t("platformAdmin.dbUnreachable", "Database Unreachable") : t("platformAdmin.coreOperational", "Core Systems Operational")}
             </p>
             <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
-              Live metrics measured from the running server{h ? ` · refreshed every 30s` : ""}
+              {t("platformAdmin.liveMetricsNote", "Live metrics measured from the running server")}{h ? ` · ${t("platformAdmin.refreshedEvery", "refreshed every 30s")}` : ""}
             </p>
           </div>
         </CardContent>
@@ -846,9 +853,9 @@ function SystemHealthTab() {
 
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Integrations</CardTitle>
+          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">{t("platformAdmin.integrations", "Integrations")}</CardTitle>
           <CardDescription className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
-            Configured from environment keys — unconfigured integrations run in stub/dev mode.
+            {t("platformAdmin.integrationsNote", "Configured from environment keys — unconfigured integrations run in stub/dev mode.")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -864,7 +871,7 @@ function SystemHealthTab() {
                   : svc.configured
                     ? "text-green-500 border-green-200 bg-green-50 dark:bg-green-900/20 text-xs"
                     : "text-slate-500 border-slate-200 text-xs"}>
-                  {svc.operational === false ? "down" : svc.configured ? "configured" : "not configured"}
+                  {svc.operational === false ? t("platformAdmin.down", "down") : svc.configured ? t("platformAdmin.configured", "configured") : t("platformAdmin.notConfigured", "not configured")}
                 </Badge>
               </div>
             ))}
@@ -889,6 +896,7 @@ const ROLE_CATALOG: Record<string, { name: string; color: string; description: s
 };
 
 function RBACTab() {
+  const { t } = useTranslation();
   const stats = usePlatformStats();
   const roles = (stats.data?.roleCounts ?? []).map((r) => {
     const meta = ROLE_CATALOG[r.role] ?? { name: r.role, color: "#64748b", description: "Custom role" };
@@ -899,16 +907,16 @@ function RBACTab() {
     <div className="space-y-4">
       <Card className="bg-white dark:bg-[#0B1F3B] border border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">Platform Roles & Permissions Matrix</CardTitle>
+          <CardTitle className="text-sm font-bold text-[#0F172A] dark:text-white">{t("platformAdmin.rolesMatrix", "Platform Roles & Permissions Matrix")}</CardTitle>
           <CardDescription className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
-            Live user counts per role across the platform. PLATFORM_ADMIN has unrestricted access to all tenants and settings.
+            {t("platformAdmin.rolesMatrixNote", "Live user counts per role across the platform. PLATFORM_ADMIN has unrestricted access to all tenants and settings.")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {stats.isLoading ? (
-            <p className="text-sm text-[#64748B]">Loading…</p>
+            <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p>
           ) : roles.length === 0 ? (
-            <p className="text-sm text-[#64748B]">No users yet.</p>
+            <p className="text-sm text-[#64748B]">{t("platformAdmin.noUsers", "No users yet.")}</p>
           ) : (
           <div className="space-y-3">
             {roles.map((role) => (
@@ -927,7 +935,7 @@ function RBACTab() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-bold text-[#0F172A] dark:text-white">{role.users.toLocaleString()}</p>
-                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">users</p>
+                  <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{t("platformAdmin.users", "users")}</p>
                 </div>
               </div>
             ))}
@@ -947,19 +955,20 @@ const TAB_ALIASES: Record<string, string> = {
 };
 
 export default function PlatformAdmin() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const params = useParams<{ tab?: string }>();
   const [activeTab, setActiveTab] = useState(TAB_ALIASES[params.tab ?? ""] ?? "overview");
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "approvals", label: "Approvals", icon: CheckCircle },
-    { id: "garages", label: "Garages", icon: Building2 },
-    { id: "billing", label: "Billing", icon: CreditCard },
-    { id: "suppliers", label: "Suppliers", icon: Truck },
-    { id: "support", label: "Help & Support", icon: MessageSquare },
-    { id: "rbac", label: "Roles & RBAC", icon: Shield },
-    { id: "system", label: "System Health", icon: Activity },
+    { id: "overview", label: t("platformAdmin.tabOverview", "Overview"), icon: LayoutDashboard },
+    { id: "approvals", label: t("platformAdmin.tabApprovals", "Approvals"), icon: CheckCircle },
+    { id: "garages", label: t("platformAdmin.tabGarages", "Garages"), icon: Building2 },
+    { id: "billing", label: t("platformAdmin.tabBilling", "Billing"), icon: CreditCard },
+    { id: "suppliers", label: t("platformAdmin.tabSuppliers", "Suppliers"), icon: Truck },
+    { id: "support", label: t("platformAdmin.tabSupport", "Help & Support"), icon: MessageSquare },
+    { id: "rbac", label: t("platformAdmin.tabRbac", "Roles & RBAC"), icon: Shield },
+    { id: "system", label: t("platformAdmin.tabSystem", "System Health"), icon: Activity },
   ];
 
   return (
@@ -970,19 +979,19 @@ export default function PlatformAdmin() {
             <Crown className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-[#0B1F3B] dark:text-white">Platform Administration</h1>
+            <h1 className="text-2xl font-extrabold text-[#0B1F3B] dark:text-white">{t("platformAdmin.title", "Platform Administration")}</h1>
             <p className="text-sm text-[#64748B] dark:text-[#9BA4B0]">
-              SALIS AUTO · Super Admin Control Center
+              {t("platformAdmin.subtitle", "SALIS AUTO · Super Admin Control Center")}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 px-3 py-1 text-xs font-semibold">
-            PLATFORM ADMIN
+            {t("platformAdmin.badge", "PLATFORM ADMIN")}
           </Badge>
           <Button variant="outline" size="sm" className="h-9 gap-2 border-[#E2E8F0] dark:border-[#232A36]">
             <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
+            {t("platformAdmin.refresh", "Refresh")}
           </Button>
         </div>
       </div>
@@ -1039,6 +1048,7 @@ interface SubscriptionRequestRow {
 }
 
 function ApprovalsTab() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { toast } = useToast();
 
@@ -1058,9 +1068,9 @@ function ApprovalsTab() {
     },
     onSuccess: (invalidate) => {
       qc.invalidateQueries({ queryKey: invalidate });
-      toast({ title: "Done", description: "Request processed." });
+      toast({ title: t("platformAdmin.done", "Done"), description: t("platformAdmin.requestProcessed", "Request processed.") });
     },
-    onError: (e: Error) => toast({ title: "Action failed", description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ title: t("platformAdmin.actionFailed", "Action failed"), description: e.message, variant: "destructive" }),
   });
 
   const badge = (s: string) =>
@@ -1074,20 +1084,20 @@ function ApprovalsTab() {
       <Card className="border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-[#0A5ED7]" /> Provider applications
-            <Badge variant="outline" className="ml-2">{apps.data?.length ?? 0} pending</Badge>
+            <Building2 className="h-5 w-5 text-[#0A5ED7]" /> {t("platformAdmin.providerApplications", "Provider applications")}
+            <Badge variant="outline" className="ml-2">{apps.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
           </CardTitle>
-          <CardDescription>Garages, parts stores and insurers awaiting review (verified ones auto-approve).</CardDescription>
+          <CardDescription>{t("platformAdmin.applicationsNote", "Garages, parts stores and insurers awaiting review (verified ones auto-approve).")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {apps.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
-          : (apps.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-apps">No pending applications.</p>
+          {apps.isLoading ? <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p>
+          : (apps.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-apps">{t("platformAdmin.noPendingApps", "No pending applications.")}</p>
           : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Business</TableHead><TableHead>Type</TableHead><TableHead>Tax / CR</TableHead>
-                  <TableHead>Verification</TableHead><TableHead className="text-right">Action</TableHead>
+                  <TableHead>{t("platformAdmin.business", "Business")}</TableHead><TableHead>{t("myOfferings.type", "Type")}</TableHead><TableHead>{t("platformAdmin.taxCr", "Tax / CR")}</TableHead>
+                  <TableHead>{t("platformAdmin.verification", "Verification")}</TableHead><TableHead className="text-right">{t("providerBookings.action", "Action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1103,10 +1113,10 @@ function ApprovalsTab() {
                     <TableCell className="text-right space-x-2">
                       <Button size="sm" data-testid={`approve-app-${a.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/approve`, invalidate: ["/api/platform-admin/garage-applications"] })}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />Approve</Button>
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.approve", "Approve")}</Button>
                       <Button size="sm" variant="outline" data-testid={`reject-app-${a.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/reject`, invalidate: ["/api/platform-admin/garage-applications"] })}
-                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />Reject</Button>
+                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.reject", "Reject")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1120,18 +1130,18 @@ function ApprovalsTab() {
       <Card className="border-[#E2E8F0] dark:border-[#232A36]">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-[#0A5ED7]" /> Subscription requests
-            <Badge variant="outline" className="ml-2">{subs.data?.length ?? 0} pending</Badge>
+            <CreditCard className="h-5 w-5 text-[#0A5ED7]" /> {t("platformAdmin.subscriptionRequests", "Subscription requests")}
+            <Badge variant="outline" className="ml-2">{subs.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
           </CardTitle>
-          <CardDescription>Garages requesting a plan change.</CardDescription>
+          <CardDescription>{t("platformAdmin.subRequestsNote", "Garages requesting a plan change.")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {subs.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
-          : (subs.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-subs">No pending requests.</p>
+          {subs.isLoading ? <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p>
+          : (subs.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-pending-subs">{t("platformAdmin.noPendingSubs", "No pending requests.")}</p>
           : (
             <Table>
               <TableHeader>
-                <TableRow><TableHead>Garage</TableHead><TableHead>Change</TableHead><TableHead className="text-right">Action</TableHead></TableRow>
+                <TableRow><TableHead>{t("platformAdmin.garage", "Garage")}</TableHead><TableHead>{t("platformAdmin.change", "Change")}</TableHead><TableHead className="text-right">{t("providerBookings.action", "Action")}</TableHead></TableRow>
               </TableHeader>
               <TableBody>
                 {subs.data!.map((s) => (
@@ -1141,10 +1151,10 @@ function ApprovalsTab() {
                     <TableCell className="text-right space-x-2">
                       <Button size="sm" data-testid={`approve-sub-${s.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/approve`, invalidate: ["/api/platform-admin/subscription-requests"] })}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />Approve</Button>
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.approve", "Approve")}</Button>
                       <Button size="sm" variant="outline" data-testid={`reject-sub-${s.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/reject`, invalidate: ["/api/platform-admin/subscription-requests"] })}
-                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />Reject</Button>
+                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.reject", "Reject")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1178,6 +1188,7 @@ interface GarageSubscriptionRow {
 }
 
 function PlatformBillingTab() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { toast } = useToast();
   const { data = [], isLoading } = useQuery<GarageSubscriptionRow[]>({
@@ -1191,10 +1202,10 @@ function PlatformBillingTab() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/subscriptions/all"] });
-      toast({ title: "Plan updated" });
+      toast({ title: t("platformAdmin.planUpdated", "Plan updated") });
     },
     onError: (err: Error) =>
-      toast({ title: "Update failed", description: err.message, variant: "destructive" }),
+      toast({ title: t("providerBookings.updateFailed", "Update failed"), description: err.message, variant: "destructive" }),
   });
 
   const totals = data.reduce(
@@ -1226,7 +1237,7 @@ function PlatformBillingTab() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs text-[#64748B] uppercase tracking-wide">{p} garages</div>
+                  <div className="text-xs text-[#64748B] uppercase tracking-wide">{p} {t("platformAdmin.garagesLower", "garages")}</div>
                   <div className="text-3xl font-extrabold text-[#0B1F3B] dark:text-white mt-1" data-testid={`count-${p}`}>
                     {totals[p]}
                   </div>
@@ -1240,29 +1251,29 @@ function PlatformBillingTab() {
 
       <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
         <CardHeader>
-          <CardTitle className="text-[#0B1F3B] dark:text-white">All garage subscriptions</CardTitle>
+          <CardTitle className="text-[#0B1F3B] dark:text-white">{t("platformAdmin.allGarageSubs", "All garage subscriptions")}</CardTitle>
           <CardDescription className="text-[#64748B]">
-            Override a garage's plan directly. In production this should require a refund flow when downgrading mid-cycle.
+            {t("platformAdmin.billingNote", "Override a garage's plan directly. In production this should require a refund flow when downgrading mid-cycle.")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-[#64748B]">Loading…</p>
+            <p className="text-[#64748B]">{t("common.loading", "Loading…")}</p>
           ) : data.length === 0 ? (
             <p className="text-[#64748B] text-sm">
-              No subscriptions yet. Garages will appear here once they log in.
+              {t("platformAdmin.noSubsYet", "No subscriptions yet. Garages will appear here once they log in.")}
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] text-left text-[#64748B]">
-                    <th className="py-2 px-2 font-medium">Garage</th>
-                    <th className="py-2 px-2 font-medium">Plan</th>
-                    <th className="py-2 px-2 font-medium">Status</th>
-                    <th className="py-2 px-2 font-medium">Renews</th>
+                    <th className="py-2 px-2 font-medium">{t("platformAdmin.garage", "Garage")}</th>
+                    <th className="py-2 px-2 font-medium">{t("providerSignup.plan", "Plan")}</th>
+                    <th className="py-2 px-2 font-medium">{t("common.status", "Status")}</th>
+                    <th className="py-2 px-2 font-medium">{t("platformAdmin.renews", "Renews")}</th>
                     <th className="py-2 px-2 font-medium">Stripe</th>
-                    <th className="py-2 px-2 font-medium">Override</th>
+                    <th className="py-2 px-2 font-medium">{t("platformAdmin.override", "Override")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1274,7 +1285,7 @@ function PlatformBillingTab() {
                     >
                       <td className="py-2 px-2">
                         <div className="font-semibold text-[#0B1F3B] dark:text-white">
-                          {row.garageName ?? "Unnamed garage"}
+                          {row.garageName ?? t("platformAdmin.unnamedGarage", "Unnamed garage")}
                         </div>
                         <div className="text-xs text-[#64748B] font-mono">{row.garageId.slice(0, 8)}…</div>
                       </td>
@@ -1296,7 +1307,7 @@ function PlatformBillingTab() {
                         {row.currentPeriodEnd ? new Date(row.currentPeriodEnd).toLocaleDateString() : "—"}
                         {row.cancelAt && (
                           <div className="text-xs text-red-500">
-                            cancels {new Date(row.cancelAt).toLocaleDateString()}
+                            {t("platformAdmin.cancels", "cancels")} {new Date(row.cancelAt).toLocaleDateString()}
                           </div>
                         )}
                       </td>
