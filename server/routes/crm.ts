@@ -112,9 +112,9 @@ router.get('/crm/customers/:id', isAuthenticated, async (req, res) => {
     const appointmentsResult = await db.execute(sql`
       SELECT a.id, a.appointment_number AS "appointmentNumber",
         a.service_type AS "serviceType", a.status,
-        a.scheduled_date AS "scheduledDate"
+        a.appointment_date AS "scheduledDate"
       FROM appointments a WHERE a.customer_id = ${id} AND a.garage_id = ${garageId}::uuid
-      ORDER BY a.scheduled_date DESC LIMIT 50
+      ORDER BY a.appointment_date DESC LIMIT 50
     `);
 
     const jobs = jobsResult.rows || [];
