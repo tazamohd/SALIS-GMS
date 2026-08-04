@@ -107,6 +107,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.use("/public", express.static(publicPath));
   }
   
+  // Liveness/readiness probe for compose healthchecks and load balancers:
+  // 200 with a live DB ping, 503 when the database is unreachable.
+  app.get("/api/health", async (_req, res) => {
+    try {
+      const { db } = await import("../db");
+      const { sql } = await import("drizzle-orm");
+      await db.execute(sql`SELECT 1`);
+      res.json({ ok: true });
+    } catch {
+      res.status(503).json({ ok: false });
+    }
+  });
+
   // Public API routes (no auth required) - mounted at /api/public
   app.use("/api/public", publicRoutes);
   // Public system routes and AI discovery/CORS middleware
