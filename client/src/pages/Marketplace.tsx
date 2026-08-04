@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,13 +51,14 @@ function Stars({ value }: { value: number }) {
 }
 
 const TYPES = [
-  { id: "", label: "All", icon: Search },
-  { id: "garage", label: "Garages", icon: Wrench },
-  { id: "parts_store", label: "Parts Stores", icon: Store },
-  { id: "insurance", label: "Insurance", icon: Shield },
+  { id: "", key: "marketplace.typeAll", label: "All", icon: Search },
+  { id: "garage", key: "marketplace.typeGarages", label: "Garages", icon: Wrench },
+  { id: "parts_store", key: "marketplace.typePartsStores", label: "Parts Stores", icon: Store },
+  { id: "insurance", key: "marketplace.typeInsurance", label: "Insurance", icon: Shield },
 ];
 
 export default function Marketplace() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [type, setType] = useState("");
   const [q, setQ] = useState("");
@@ -88,12 +90,12 @@ export default function Marketplace() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0E1117]">
       <header className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-white/70 dark:bg-[#151A23]/70 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-extrabold text-[#0B1F3B] dark:text-white">SALIS Marketplace</h1>
+          <h1 className="text-xl font-extrabold text-[#0B1F3B] dark:text-white">{t("marketplace.title", "SALIS Marketplace")}</h1>
           <div className="flex items-center gap-3">
-            <Link href="/my-vehicles" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">My vehicles</Link>
-            <Link href="/my-bookings" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">My bookings</Link>
-            <Link href="/customer-signup"><Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up</Button></Link>
-            <Link href="/login" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Sign in</Link>
+            <Link href="/my-vehicles" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">{t("marketplace.myVehicles", "My vehicles")}</Link>
+            <Link href="/my-bookings" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">{t("marketplace.myBookings", "My bookings")}</Link>
+            <Link href="/customer-signup"><Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t("auth.signUp", "Sign up")}</Button></Link>
+            <Link href="/login" className="text-sm text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">{t("auth.signIn", "Sign in")}</Link>
             <ThemeToggle />
           </div>
         </div>
@@ -106,22 +108,22 @@ export default function Marketplace() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search a service (e.g. brakes) or a business name…"
+              placeholder={t("marketplace.searchPlaceholder", "Search a service (e.g. brakes) or a business name…")}
               data-testid="input-search"
               className="pl-9 h-11 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             />
           </div>
           <div className="flex gap-1 flex-wrap">
-            {TYPES.map((t) => (
+            {TYPES.map((ty) => (
               <Button
-                key={t.id}
+                key={ty.id}
                 size="sm"
-                variant={type === t.id ? "default" : "outline"}
-                onClick={() => setType(t.id)}
-                data-testid={`filter-${t.id || "all"}`}
-                className={type === t.id ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""}
+                variant={type === ty.id ? "default" : "outline"}
+                onClick={() => setType(ty.id)}
+                data-testid={`filter-${ty.id || "all"}`}
+                className={type === ty.id ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""}
               >
-                <t.icon className="h-3.5 w-3.5 mr-1" />{t.label}
+                <ty.icon className="h-3.5 w-3.5 mr-1" />{t(ty.key, ty.label)}
               </Button>
             ))}
           </div>
@@ -130,7 +132,7 @@ export default function Marketplace() {
         {/* Smart-search service matches */}
         {q.trim().length >= 2 && (search.data?.services?.length ?? 0) > 0 && (
           <Card className="border-[#E2E8F0] dark:border-[#232A36]">
-            <CardHeader><CardTitle className="text-base">Services matching “{q}”</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{t("marketplace.servicesMatching", "Services matching “{{q}}”", { q })}</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {search.data!.services.map((s) => (
                 <button
@@ -140,8 +142,8 @@ export default function Marketplace() {
                   className="text-left p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition"
                 >
                   <div className="font-medium text-[#0B1F3B] dark:text-white">{s.name}</div>
-                  <div className="text-xs text-[#64748B]">{s.category} · offered by {s.providerName}{s.providerCity ? ` · ${s.providerCity}` : ""}</div>
-                  {s.standardCost && <div className="text-xs text-emerald-600 mt-1">from {s.standardCost}</div>}
+                  <div className="text-xs text-[#64748B]">{s.category} · {t("marketplace.offeredBy", "offered by")} {s.providerName}{s.providerCity ? ` · ${s.providerCity}` : ""}</div>
+                  {s.standardCost && <div className="text-xs text-emerald-600 mt-1">{t("marketplace.from", "from")} {s.standardCost}</div>}
                 </button>
               ))}
             </CardContent>
@@ -150,9 +152,9 @@ export default function Marketplace() {
 
         {/* Provider directory */}
         <div>
-          <h2 className="text-sm font-semibold text-[#64748B] dark:text-[#9BA4B0] mb-3 uppercase tracking-wide">Providers</h2>
-          {providers.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p>
-          : (providers.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-providers">No providers found.</p>
+          <h2 className="text-sm font-semibold text-[#64748B] dark:text-[#9BA4B0] mb-3 uppercase tracking-wide">{t("marketplace.providers", "Providers")}</h2>
+          {providers.isLoading ? <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p>
+          : (providers.data?.length ?? 0) === 0 ? <p className="text-sm text-[#64748B]" data-testid="no-providers">{t("marketplace.noProviders", "No providers found.")}</p>
           : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {providers.data!.map((p) => (
@@ -189,8 +191,8 @@ export default function Marketplace() {
       {/* Provider detail */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>{detail.data?.name ?? "Provider"}</DialogTitle></DialogHeader>
-          {detail.isLoading ? <p className="text-sm text-[#64748B]">Loading…</p> : detail.data && (
+          <DialogHeader><DialogTitle>{detail.data?.name ?? t("marketplace.provider", "Provider")}</DialogTitle></DialogHeader>
+          {detail.isLoading ? <p className="text-sm text-[#64748B]">{t("common.loading", "Loading…")}</p> : detail.data && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline">{detail.data.providerType}</Badge>
@@ -213,13 +215,13 @@ export default function Marketplace() {
               )}
               {(detail.data.services.length > 0 || detail.data.offerings.length === 0) && (
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Services</h3>
-                  {detail.data.services.length === 0 ? <p className="text-sm text-[#64748B]">No services listed yet.</p> : (
+                  <h3 className="text-sm font-semibold mb-2">{t("marketplace.services", "Services")}</h3>
+                  {detail.data.services.length === 0 ? <p className="text-sm text-[#64748B]">{t("marketplace.noServices", "No services listed yet.")}</p> : (
                     <ul className="space-y-2">
                       {detail.data.services.map((s) => (
                         <li key={s.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36]">
                           <div className="font-medium text-sm">{s.name}</div>
-                          <div className="text-xs text-[#64748B]">{s.category}{s.standardCost ? ` · from ${s.standardCost}` : ""}</div>
+                          <div className="text-xs text-[#64748B]">{s.category}{s.standardCost ? ` · ${t("marketplace.from", "from")} ${s.standardCost}` : ""}</div>
                         </li>
                       ))}
                     </ul>
@@ -228,7 +230,7 @@ export default function Marketplace() {
               )}
               {detail.data.offerings.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Products &amp; plans</h3>
+                  <h3 className="text-sm font-semibold mb-2">{t("marketplace.productsPlans", "Products & plans")}</h3>
                   <ul className="space-y-2">
                     {detail.data.offerings.map((o) => (
                       <li key={o.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36] flex items-center justify-between">
@@ -244,11 +246,11 @@ export default function Marketplace() {
               )}
               {(detail.data.reviews?.length ?? 0) > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Reviews</h3>
+                  <h3 className="text-sm font-semibold mb-2">{t("marketplace.reviews", "Reviews")}</h3>
                   <ul className="space-y-2 max-h-40 overflow-y-auto">
                     {detail.data.reviews.map((r) => (
                       <li key={r.id} className="p-2 rounded border border-[#E2E8F0] dark:border-[#232A36] text-xs">
-                        <Stars value={r.rating} /> <span className="font-medium">{r.customerName ?? "Customer"}</span>
+                        <Stars value={r.rating} /> <span className="font-medium">{r.customerName ?? t("marketplace.customer", "Customer")}</span>
                         {r.comment && <p className="mt-0.5 text-[#64748B]">{r.comment}</p>}
                       </li>
                     ))}
@@ -270,7 +272,7 @@ export default function Marketplace() {
                 </>
               ) : (
                 <Link href="/customer-signup">
-                  <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Sign up to book</Button>
+                  <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t("marketplace.signUpToBook", "Sign up to book")}</Button>
                 </Link>
               )}
             </div>
@@ -284,6 +286,7 @@ export default function Marketplace() {
 interface MyVehicle { id: string; make: string; model: string | null; year: number | null; licensePlate: string | null; }
 
 function BookingForm({ providerId, services, onDone }: { providerId: string; services: { id: string; name: string }[]; onDone: () => void }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [serviceTemplateId, setServiceTemplateId] = useState("");
   const [customerVehicleId, setCustomerVehicleId] = useState("");
@@ -304,11 +307,11 @@ function BookingForm({ providerId, services, onDone }: { providerId: string; ser
         preferredDate: preferredDate ? new Date(preferredDate).toISOString() : undefined,
         notes: notes || undefined,
       })).json(),
-    onSuccess: () => { toast({ title: "Booking requested", description: "The provider will confirm your request." }); onDone(); },
+    onSuccess: () => { toast({ title: t("marketplace.bookingRequested", "Booking requested"), description: t("marketplace.bookingRequestedDesc", "The provider will confirm your request.") }); onDone(); },
     onError: (e: Error) => {
       let msg = e.message; const m = e.message.match(/\{.*\}/);
       if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep */ } }
-      toast({ title: "Could not book", description: msg, variant: "destructive" });
+      toast({ title: t("marketplace.couldNotBook", "Could not book"), description: msg, variant: "destructive" });
     },
   });
 
@@ -316,30 +319,30 @@ function BookingForm({ providerId, services, onDone }: { providerId: string; ser
 
   return (
     <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-3">
-      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Book this provider</p>
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{t("marketplace.bookThisProvider", "Book this provider")}</p>
       {services.length > 0 && (
         <div className="space-y-1">
-          <Label className="text-xs">Service</Label>
+          <Label className="text-xs">{t("marketplace.service", "Service")}</Label>
           <select className={sel} value={serviceTemplateId} onChange={(e) => setServiceTemplateId(e.target.value)} data-testid="booking-service">
-            <option value="">Any / general</option>
+            <option value="">{t("marketplace.anyGeneral", "Any / general")}</option>
             {services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
       )}
       <div className="space-y-1">
-        <Label className="text-xs">Vehicle</Label>
+        <Label className="text-xs">{t("marketplace.vehicle", "Vehicle")}</Label>
         <select className={sel} value={customerVehicleId} onChange={(e) => setCustomerVehicleId(e.target.value)} data-testid="booking-vehicle">
-          <option value="">{(vehicles.data?.length ?? 0) === 0 ? "No saved vehicles — add one first" : "Select a vehicle"}</option>
+          <option value="">{(vehicles.data?.length ?? 0) === 0 ? t("marketplace.noSavedVehiclesAdd", "No saved vehicles — add one first") : t("marketplace.selectVehicle", "Select a vehicle")}</option>
           {(vehicles.data ?? []).map((v) => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(" ")}{v.licensePlate ? ` (${v.licensePlate})` : ""}</option>)}
         </select>
-        {(vehicles.data?.length ?? 0) === 0 && <Link href="/my-vehicles" className="text-xs text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Add a vehicle</Link>}
+        {(vehicles.data?.length ?? 0) === 0 && <Link href="/my-vehicles" className="text-xs text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">{t("marketplace.addVehicle", "Add a vehicle")}</Link>}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <div className="space-y-1"><Label className="text-xs">Preferred date</Label><Input type="datetime-local" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} data-testid="booking-date" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
-        <div className="space-y-1"><Label className="text-xs">Notes</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} data-testid="booking-notes" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
+        <div className="space-y-1"><Label className="text-xs">{t("marketplace.preferredDate", "Preferred date")}</Label><Input type="datetime-local" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} data-testid="booking-date" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
+        <div className="space-y-1"><Label className="text-xs">{t("marketplace.notes", "Notes")}</Label><Input value={notes} onChange={(e) => setNotes(e.target.value)} data-testid="booking-notes" className="h-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" /></div>
       </div>
       <Button onClick={() => book.mutate()} disabled={book.isPending} data-testid="booking-submit" className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
-        {book.isPending ? "Requesting…" : "Request booking"}
+        {book.isPending ? t("marketplace.requesting", "Requesting…") : t("marketplace.requestBooking", "Request booking")}
       </Button>
     </div>
   );
@@ -348,6 +351,7 @@ function BookingForm({ providerId, services, onDone }: { providerId: string; ser
 function OrderForm({ providerId, products, onDone }: { providerId: string; products: { id: string; name: string; price: string | null; currency: string | null }[]; onDone: () => void }) {
   const { toast } = useToast();
   const [qty, setQty] = useState<Record<string, number>>({});
+  const { t } = useTranslation();
   const items = Object.entries(qty).filter(([, q]) => q > 0).map(([offeringId, quantity]) => ({ offeringId, quantity }));
   const total = items.reduce((s, i) => {
     const p = products.find((x) => x.id === i.offeringId);
@@ -356,13 +360,13 @@ function OrderForm({ providerId, products, onDone }: { providerId: string; produ
 
   const order = useMutation({
     mutationFn: async () => (await apiRequest("POST", "/api/my/orders", { providerId, items })).json(),
-    onSuccess: () => { toast({ title: "Order placed", description: "The store will confirm your order." }); onDone(); },
-    onError: (e: Error) => toast({ title: "Could not order", description: e.message, variant: "destructive" }),
+    onSuccess: () => { toast({ title: t("marketplace.orderPlaced", "Order placed"), description: t("marketplace.orderPlacedDesc", "The store will confirm your order.") }); onDone(); },
+    onError: (e: Error) => toast({ title: t("marketplace.couldNotOrder", "Could not order"), description: e.message, variant: "destructive" }),
   });
 
   return (
     <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-2">
-      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Order parts</p>
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{t("marketplace.orderParts", "Order parts")}</p>
       {products.map((p) => (
         <div key={p.id} className="flex items-center justify-between gap-2 text-sm">
           <span>{p.name}{p.price ? ` · ${p.price} ${p.currency ?? "SAR"}` : ""}</span>
@@ -376,13 +380,14 @@ function OrderForm({ providerId, products, onDone }: { providerId: string; produ
       ))}
       <Button onClick={() => order.mutate()} disabled={items.length === 0 || order.isPending} data-testid="order-submit"
         className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
-        {order.isPending ? "Placing…" : `Place order${total > 0 ? ` (${total.toFixed(2)} SAR)` : ""}`}
+        {order.isPending ? t("marketplace.placing", "Placing…") : `${t("marketplace.placeOrder", "Place order")}${total > 0 ? ` (${total.toFixed(2)} SAR)` : ""}`}
       </Button>
     </div>
   );
 }
 
 function QuoteForm({ providerId, plans, onDone }: { providerId: string; plans: { id: string; name: string }[]; onDone: () => void }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [offeringId, setOfferingId] = useState("");
   const [customerVehicleId, setCustomerVehicleId] = useState("");
@@ -394,30 +399,31 @@ function QuoteForm({ providerId, plans, onDone }: { providerId: string; plans: {
     mutationFn: async () => (await apiRequest("POST", "/api/my/quotes", {
       providerId, offeringId: offeringId || undefined, customerVehicleId: customerVehicleId || undefined,
     })).json(),
-    onSuccess: () => { toast({ title: "Quote requested", description: "The insurer will send you a premium." }); onDone(); },
-    onError: (e: Error) => toast({ title: "Could not request quote", description: e.message, variant: "destructive" }),
+    onSuccess: () => { toast({ title: t("marketplace.quoteRequested", "Quote requested"), description: t("marketplace.quoteRequestedDesc", "The insurer will send you a premium.") }); onDone(); },
+    onError: (e: Error) => toast({ title: t("marketplace.couldNotQuote", "Could not request quote"), description: e.message, variant: "destructive" }),
   });
   const sel = "w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white";
   return (
     <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-4 space-y-2">
-      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">Request an insurance quote</p>
+      <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{t("marketplace.requestInsuranceQuote", "Request an insurance quote")}</p>
       <select className={sel} value={offeringId} onChange={(e) => setOfferingId(e.target.value)} data-testid="quote-plan">
-        <option value="">Any plan</option>
+        <option value="">{t("marketplace.anyPlan", "Any plan")}</option>
         {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
       </select>
       <select className={sel} value={customerVehicleId} onChange={(e) => setCustomerVehicleId(e.target.value)} data-testid="quote-vehicle">
-        <option value="">{(vehicles.data?.length ?? 0) === 0 ? "No saved vehicles" : "Select a vehicle"}</option>
+        <option value="">{(vehicles.data?.length ?? 0) === 0 ? t("marketplace.noSavedVehicles", "No saved vehicles") : t("marketplace.selectVehicle", "Select a vehicle")}</option>
         {(vehicles.data ?? []).map((v) => <option key={v.id} value={v.id}>{[v.year, v.make, v.model].filter(Boolean).join(" ")}</option>)}
       </select>
       <Button onClick={() => quote.mutate()} disabled={quote.isPending} data-testid="quote-submit"
         className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
-        {quote.isPending ? "Requesting…" : "Request quote"}
+        {quote.isPending ? t("marketplace.requesting", "Requesting…") : t("marketplace.requestQuote", "Request quote")}
       </Button>
     </div>
   );
 }
 
 function ReviewForm({ providerId }: { providerId: string }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [rating, setRating] = useState(0);
@@ -426,20 +432,20 @@ function ReviewForm({ providerId }: { providerId: string }) {
   const submit = useMutation({
     mutationFn: async () => (await apiRequest("POST", "/api/my/reviews", { providerId, rating, comment: comment || undefined })).json(),
     onSuccess: () => {
-      toast({ title: "Review submitted", description: "Thanks for the feedback!" });
+      toast({ title: t("marketplace.reviewSubmitted", "Review submitted"), description: t("marketplace.reviewThanks", "Thanks for the feedback!") });
       qc.invalidateQueries({ queryKey: ["/api/marketplace/providers", providerId] });
       setRating(0); setComment("");
     },
     onError: (e: Error) => {
       let msg = e.message; const m = e.message.match(/\{.*\}/);
       if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep */ } }
-      toast({ title: "Could not submit review", description: msg, variant: "destructive" });
+      toast({ title: t("marketplace.couldNotReview", "Could not submit review"), description: msg, variant: "destructive" });
     },
   });
 
   return (
     <div className="border-t border-[#E2E8F0] dark:border-[#232A36] pt-3 space-y-2">
-      <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Rate this provider</p>
+      <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">{t("marketplace.rateProvider", "Rate this provider")}</p>
       <div className="flex items-center gap-2">
         <div className="flex" data-testid="review-stars">
           {[1, 2, 3, 4, 5].map((n) => (
@@ -447,10 +453,10 @@ function ReviewForm({ providerId }: { providerId: string }) {
               className={`text-xl leading-none ${n <= rating ? "text-amber-500" : "text-[#CBD5E1] dark:text-[#334155]"}`}>★</button>
           ))}
         </div>
-        <Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Optional comment"
+        <Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder={t("marketplace.optionalComment", "Optional comment")}
           data-testid="review-comment" className="h-8 text-xs bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" />
         <Button size="sm" className="h-8" disabled={rating === 0 || submit.isPending} onClick={() => submit.mutate()} data-testid="review-submit">
-          {submit.isPending ? "…" : "Send"}
+          {submit.isPending ? "…" : t("marketplace.send", "Send")}
         </Button>
       </div>
     </div>

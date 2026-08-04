@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,13 +20,14 @@ interface SubmitResult {
   verification?: { status: string };
 }
 
-const PROVIDER_LABELS: Record<ProviderType, string> = {
-  garage: "Auto Repair Garage",
-  parts_store: "Spare Parts Store",
-  insurance: "Insurance Company",
-};
+const PROVIDER_TYPES: { id: ProviderType; key: string; label: string }[] = [
+  { id: "garage", key: "providerSignup.typeGarage", label: "Auto Repair Garage" },
+  { id: "parts_store", key: "providerSignup.typePartsStore", label: "Spare Parts Store" },
+  { id: "insurance", key: "providerSignup.typeInsurance", label: "Insurance Company" },
+];
 
 export default function ProviderSignup() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [form, setForm] = useState({
     providerType: "garage" as ProviderType,
@@ -58,7 +60,7 @@ export default function ProviderSignup() {
       if (m) {
         try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep raw */ }
       }
-      toast({ title: "Could not submit", description: msg, variant: "destructive" });
+      toast({ title: t("providerSignup.couldNotSubmit", "Could not submit"), description: msg, variant: "destructive" });
     },
   });
 
@@ -80,9 +82,9 @@ export default function ProviderSignup() {
             <div className="flex items-center gap-3">
               <Building2 className="h-7 w-7 text-[#0A5ED7] dark:text-[#0BB3FF]" />
               <div>
-                <CardTitle className="text-2xl font-bold text-[#0B1F3B] dark:text-white">Join the platform</CardTitle>
+                <CardTitle className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{t("providerSignup.title", "Join the platform")}</CardTitle>
                 <CardDescription className="text-[#64748B] dark:text-[#9BA4B0]">
-                  Register your business. We verify your official tax &amp; commercial registration and activate you automatically.
+                  {t("providerSignup.subtitle", "Register your business. We verify your official tax & commercial registration and activate you automatically.")}
                 </CardDescription>
               </div>
             </div>
@@ -94,22 +96,22 @@ export default function ProviderSignup() {
                 {result.status === "approved" ? (
                   <>
                     <CheckCircle2 className="h-14 w-14 text-emerald-500 mx-auto" />
-                    <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">Verified &amp; activated!</h3>
+                    <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t("providerSignup.verifiedActivated", "Verified & activated!")}</h3>
                     <p className="text-[#64748B] dark:text-[#9BA4B0]">
-                      Your identifiers were verified automatically. You can sign in now with your email and password.
+                      {t("providerSignup.verifiedDesc", "Your identifiers were verified automatically. You can sign in now with your email and password.")}
                     </p>
                     <Link href="/login" className="inline-block">
-                      <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">Go to sign in</Button>
+                      <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{t("providerSignup.goToSignIn", "Go to sign in")}</Button>
                     </Link>
                   </>
                 ) : (
                   <>
                     <Clock className="h-14 w-14 text-amber-500 mx-auto" />
-                    <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">Submitted for review</h3>
+                    <h3 className="text-xl font-semibold text-[#0B1F3B] dark:text-white">{t("providerSignup.submittedForReview", "Submitted for review")}</h3>
                     <p className="text-[#64748B] dark:text-[#9BA4B0]">
-                      Your details are well-formed but need a quick manual check. We'll activate your account shortly.
+                      {t("providerSignup.reviewDesc", "Your details are well-formed but need a quick manual check. We'll activate your account shortly.")}
                     </p>
-                    <Link href="/login" className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">Back to sign in</Link>
+                    <Link href="/login" className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline">{t("providerSignup.backToSignIn", "Back to sign in")}</Link>
                   </>
                 )}
               </div>
@@ -119,35 +121,35 @@ export default function ProviderSignup() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
                 <div className="md:col-span-2 space-y-2">
-                  <Label className="text-[#0B1F3B] dark:text-[#E6EAF0]">Business type *</Label>
+                  <Label className="text-[#0B1F3B] dark:text-[#E6EAF0]">{t("providerSignup.businessType", "Business type")} *</Label>
                   <select
                     value={form.providerType}
                     onChange={(e) => set("providerType", e.target.value as ProviderType)}
                     data-testid="select-provider-type"
                     className={`w-full rounded-md px-3 ${inputCls}`}
                   >
-                    {(Object.keys(PROVIDER_LABELS) as ProviderType[]).map((k) => (
-                      <option key={k} value={k}>{PROVIDER_LABELS[k]}</option>
+                    {PROVIDER_TYPES.map((pt) => (
+                      <option key={pt.id} value={pt.id}>{t(pt.key, pt.label)}</option>
                     ))}
                   </select>
                 </div>
 
-                <Field label="Business name *"><Input className={inputCls} value={form.businessName} onChange={(e) => set("businessName", e.target.value)} data-testid="input-business-name" /></Field>
-                <Field label="Owner name *"><Input className={inputCls} value={form.ownerName} onChange={(e) => set("ownerName", e.target.value)} data-testid="input-owner-name" /></Field>
-                <Field label="Email *"><Input type="email" className={inputCls} value={form.email} onChange={(e) => set("email", e.target.value)} data-testid="input-email" /></Field>
-                <Field label="Phone"><Input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} data-testid="input-phone" /></Field>
-                <Field label="City"><Input className={inputCls} value={form.city} onChange={(e) => set("city", e.target.value)} data-testid="input-city" /></Field>
-                <Field label="Country"><Input className={inputCls} value={form.country} onChange={(e) => set("country", e.target.value)} data-testid="input-country" /></Field>
+                <Field label={`${t("providerSignup.businessName", "Business name")} *`}><Input className={inputCls} value={form.businessName} onChange={(e) => set("businessName", e.target.value)} data-testid="input-business-name" /></Field>
+                <Field label={`${t("providerSignup.ownerName", "Owner name")} *`}><Input className={inputCls} value={form.ownerName} onChange={(e) => set("ownerName", e.target.value)} data-testid="input-owner-name" /></Field>
+                <Field label={`${t("common.email", "Email")} *`}><Input type="email" className={inputCls} value={form.email} onChange={(e) => set("email", e.target.value)} data-testid="input-email" /></Field>
+                <Field label={t("common.phone", "Phone")}><Input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} data-testid="input-phone" /></Field>
+                <Field label={t("common.city", "City")}><Input className={inputCls} value={form.city} onChange={(e) => set("city", e.target.value)} data-testid="input-city" /></Field>
+                <Field label={t("common.country", "Country")}><Input className={inputCls} value={form.country} onChange={(e) => set("country", e.target.value)} data-testid="input-country" /></Field>
 
-                <Field label="Tax number (VAT) *" hint="15 digits, starts with 3">
+                <Field label={`${t("providerSignup.taxNumber", "Tax number (VAT)")} *`} hint={t("providerSignup.taxHint", "15 digits, starts with 3")}>
                   <Input className={inputCls} value={form.taxNumber} onChange={(e) => set("taxNumber", e.target.value)} data-testid="input-tax-number" />
                 </Field>
-                <Field label="Commercial registration (Sejel) *" hint="10 digits">
+                <Field label={`${t("providerSignup.commercialRegistration", "Commercial registration (Sejel)")} *`} hint={t("providerSignup.crHint", "10 digits")}>
                   <Input className={inputCls} value={form.commercialRegistration} onChange={(e) => set("commercialRegistration", e.target.value)} data-testid="input-cr" />
                 </Field>
 
                 <div className="space-y-2">
-                  <Label className="text-[#0B1F3B] dark:text-[#E6EAF0]">Plan</Label>
+                  <Label className="text-[#0B1F3B] dark:text-[#E6EAF0]">{t("providerSignup.plan", "Plan")}</Label>
                   <select
                     value={form.requestedPlan}
                     onChange={(e) => set("requestedPlan", e.target.value)}
@@ -159,13 +161,13 @@ export default function ProviderSignup() {
                     <option value="ENTERPRISE">Enterprise</option>
                   </select>
                 </div>
-                <Field label="Password *" hint="min 8 characters">
+                <Field label={`${t("common.password", "Password")} *`} hint={t("providerSignup.passwordHint", "min 8 characters")}>
                   <Input type="password" className={inputCls} value={form.password} onChange={(e) => set("password", e.target.value)} data-testid="input-password" />
                 </Field>
 
                 <label className="md:col-span-2 flex items-center gap-2 text-sm text-[#64748B] dark:text-[#9BA4B0]">
                   <input type="checkbox" checked={form.isDemo} onChange={(e) => set("isDemo", e.target.checked)} data-testid="checkbox-demo" />
-                  This is a demo account (try the platform with demo identifiers)
+                  {t("providerSignup.demoAccount", "This is a demo account (try the platform with demo identifiers)")}
                 </label>
 
                 <div className="md:col-span-2">
@@ -175,11 +177,11 @@ export default function ProviderSignup() {
                     data-testid="button-submit"
                     className="w-full h-12 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white font-semibold"
                   >
-                    {submit.isPending ? "Submitting..." : "Submit application"}
+                    {submit.isPending ? t("providerSignup.submitting", "Submitting...") : t("providerSignup.submitApplication", "Submit application")}
                   </Button>
                   <p className="text-center text-sm text-[#64748B] dark:text-[#9BA4B0] pt-3">
-                    Already registered?{" "}
-                    <Link href="/login" className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold">Sign in</Link>
+                    {t("providerSignup.alreadyRegistered", "Already registered?")}{" "}
+                    <Link href="/login" className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold">{t("auth.signIn", "Sign in")}</Link>
                   </p>
                 </div>
               </form>
