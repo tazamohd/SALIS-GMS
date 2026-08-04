@@ -2,11 +2,18 @@
 // Saudi Arabia's Zakat, Tax and Customs Authority
 // Phase 2 requires real-time invoice clearance through ZATCA's Fatoora platform
 
+import crypto from 'crypto';
 import {
   ZATCAInvoiceData,
   generateZATCAQRCode,
   validateZATCACompliance,
 } from '../../shared/zatcaUtils';
+import {
+  getZatcaSigningConfig,
+  signInvoiceHash,
+  getPublicKeyDer,
+  getCertificateSignature,
+} from './zatca-signing';
 
 // ─── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -89,6 +96,32 @@ export interface UBLInvoiceXML {
   encodedInvoice: string;
 }
 
+// ─── Chain + endpoint constants ────────────────────────────────────────────────
+
+/**
+ * PIH for the very first invoice in a chain: base64 of the sha256 hex digest
+ * of "0", per the ZATCA XML implementation standard.
+ */
+export const ZATCA_INITIAL_PIH = Buffer.from(
+  crypto.createHash('sha256').update('0', 'utf-8').digest('hex'),
+  'utf-8',
+).toString('base64');
+
+/**
+ * FATOORA endpoint for an invoice type. Standard (B2B) invoices go through
+ * real-time CLEARANCE; simplified (B2C) invoices are REPORTED within 24h.
+ * ZATCA_API_BASE selects the environment:
+ *   developer-portal (sandbox, default) · simulation · core (production)
+ */
+export function zatcaEndpointFor(invoiceType: ZATCAPhase2Invoice['invoiceType']): string {
+  const base =
+    process.env.ZATCA_API_BASE ||
+    'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal';
+  return invoiceType === 'simplified'
+    ? `${base}/invoices/reporting/single`
+    : `${base}/invoices/clearance/single`;
+}
+
 // ─── E-Invoice XML Generation ──────────────────────────────────────────────────
 
 /**
@@ -108,7 +141,7 @@ export interface UBLInvoiceXML {
 export function generateEInvoice(
   invoice: ZATCAPhase2Invoice,
   icv: number = 1,
-  previousInvoiceHash: string = ''
+  previousInvoiceHash: string = ZATCA_INITIAL_PIH
 ): UBLInvoiceXML {
   const uuid = generateUUID();
 
@@ -225,22 +258,17 @@ ${lineItemsXml}
  */
 export async function submitToClearance(
   ublInvoice: UBLInvoiceXML,
-  csid: string = ''
+  csid: string = '',
+  invoiceType: ZATCAPhase2Invoice['invoiceType'] = 'standard',
 ): Promise<ClearanceResponse> {
-  // TODO: Replace with actual ZATCA Fatoora API endpoint
-  // Production: https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/clearance/single
-  // Sandbox:    https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single
-  const ZATCA_CLEARANCE_URL =
-    process.env.ZATCA_API_URL ||
-    'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single';
+  // Standard invoices → clearance, simplified → reporting. ZATCA_API_URL
+  // overrides the full URL; otherwise ZATCA_API_BASE selects the environment.
+  const ZATCA_CLEARANCE_URL = process.env.ZATCA_API_URL || zatcaEndpointFor(invoiceType);
 
-  // TODO: Obtain real CSID through ZATCA onboarding process
-  // The CSID is generated via:
-  // 1. Generate CSR (Certificate Signing Request)
-  // 2. Submit to ZATCA compliance API
-  // 3. Complete compliance checks
-  // 4. Receive production CSID
+  // The CSID (binary security token) comes from ZATCA onboarding —
+  // run server/scripts/zatca-onboard.ts once credentials are issued.
   const authToken = csid || process.env.ZATCA_CSID || '';
+  const secret = process.env.ZATCA_SECRET || '';
 
   const requestBody = {
     invoiceHash: ublInvoice.hash,
@@ -261,7 +289,7 @@ export async function submitToClearance(
           'Accept': 'application/json',
           'Accept-Version': 'V2',
           'Accept-Language': 'en',
-          'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+          'Authorization': `Basic ${Buffer.from(`${authToken}:${secret}`).toString('base64')}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -275,7 +303,12 @@ export async function submitToClearance(
         };
       }
       return {
-        status: data?.clearanceStatus === 'CLEARED' || data?.clearanceStatus === 'CLEARED_WITH_WARNINGS' ? 'CLEARED' : 'ERROR',
+        status:
+          data?.clearanceStatus === 'CLEARED' || data?.clearanceStatus === 'CLEARED_WITH_WARNINGS'
+            ? 'CLEARED'
+            : data?.reportingStatus === 'REPORTED' || data?.reportingStatus === 'REPORTED_WITH_WARNINGS'
+              ? 'REPORTED'
+              : 'ERROR',
         clearanceId: data?.clearanceId || data?.invoiceHash,
         invoiceHash: data?.invoiceHash || ublInvoice.hash,
         qrCode: data?.qrCode,
@@ -326,8 +359,9 @@ export async function submitToClearance(
  * @returns Base64-encoded TLV QR string, or null if validation fails
  */
 export function generateComplianceQR(
-  invoice: ZATCAPhase2Invoice
-): { qrCode: string; validationErrors: string[] } {
+  invoice: ZATCAPhase2Invoice,
+  ubl?: UBLInvoiceXML,
+): { qrCode: string; validationErrors: string[]; signed: boolean } {
   const invoiceData: ZATCAInvoiceData = {
     sellerName: invoice.seller.name,
     vatRegistrationNumber: invoice.seller.vatNumber,
@@ -339,11 +373,78 @@ export function generateComplianceQR(
   const validation = validateZATCACompliance(invoiceData);
 
   if (!validation.valid) {
-    return { qrCode: '', validationErrors: validation.errors };
+    return { qrCode: '', validationErrors: validation.errors, signed: false };
+  }
+
+  // With a signing key configured and a generated UBL invoice on hand,
+  // produce the full phase-2 stamp QR (tags 1–9); otherwise fall back to
+  // the phase-1 QR (tags 1–5).
+  const signing = getZatcaSigningConfig();
+  if (signing && ubl) {
+    try {
+      const qrCode = generatePhase2QR(invoiceData, ubl.hash, signing.privateKeyPem, signing.certificatePem);
+      return { qrCode, validationErrors: [], signed: true };
+    } catch (err) {
+      console.error('[ZATCA] phase-2 QR signing failed, falling back to phase-1 QR:', err);
+    }
   }
 
   const qrCode = generateZATCAQRCode(invoiceData);
-  return { qrCode, validationErrors: [] };
+  return { qrCode, validationErrors: [], signed: false };
+}
+
+// ─── Phase-2 (signed) QR — TLV tags 1–9 ───────────────────────────────────────
+
+/** One TLV entry with a binary-capable value. Length is a single byte per spec. */
+export function tlvEntry(tag: number, value: string | Buffer): Buffer {
+  const bytes = typeof value === 'string' ? Buffer.from(value, 'utf-8') : value;
+  if (bytes.length > 255) throw new Error(`TLV tag ${tag} value exceeds 255 bytes`);
+  return Buffer.concat([Buffer.from([tag, bytes.length]), bytes]);
+}
+
+/** Decode a TLV buffer into a tag → bytes map (QR readers + tests). */
+export function decodeTlv(base64: string): Map<number, Buffer> {
+  const buf = Buffer.from(base64, 'base64');
+  const out = new Map<number, Buffer>();
+  let i = 0;
+  while (i + 2 <= buf.length) {
+    const tag = buf[i];
+    const len = buf[i + 1];
+    out.set(tag, buf.subarray(i + 2, i + 2 + len));
+    i += 2 + len;
+  }
+  return out;
+}
+
+/**
+ * Build the signed phase-2 QR:
+ *   1 seller name · 2 VAT number · 3 timestamp · 4 total · 5 VAT amount
+ *   6 invoice hash · 7 ECDSA signature · 8 public key (DER SPKI)
+ *   9 certificate signature (simplified invoices, when the CSID cert is set)
+ */
+export function generatePhase2QR(
+  data: ZATCAInvoiceData,
+  invoiceHashBase64: string,
+  privateKeyPem: string,
+  certificatePem?: string,
+): string {
+  const signature = signInvoiceHash(invoiceHashBase64, privateKeyPem);
+  const publicKeyDer = getPublicKeyDer(privateKeyPem);
+
+  const entries = [
+    tlvEntry(1, data.sellerName),
+    tlvEntry(2, data.vatRegistrationNumber),
+    tlvEntry(3, data.timestamp),
+    tlvEntry(4, data.totalWithVAT.toFixed(2)),
+    tlvEntry(5, data.vatAmount.toFixed(2)),
+    tlvEntry(6, invoiceHashBase64),
+    tlvEntry(7, Buffer.from(signature, 'base64')),
+    tlvEntry(8, publicKeyDer),
+  ];
+  if (certificatePem) {
+    entries.push(tlvEntry(9, getCertificateSignature(certificatePem)));
+  }
+  return Buffer.concat(entries).toString('base64');
 }
 
 // ─── Internal Helpers ──────────────────────────────────────────────────────────
@@ -409,17 +510,10 @@ function escapeXml(str: string): string {
 }
 
 function generateUUID(): string {
-  // Simple UUID v4 generator
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  return crypto.randomUUID();
 }
 
 function computeInvoiceHash(xml: string): string {
-  // Use Node.js crypto for SHA-256 hashing
-  const crypto = require('crypto');
   return crypto.createHash('sha256').update(xml, 'utf-8').digest('base64');
 }
 

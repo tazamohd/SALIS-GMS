@@ -14,9 +14,13 @@ import { isAuthenticated } from '../auth';
 import {
   generateEInvoice,
   submitToClearance,
+  generateComplianceQR,
+  ZATCA_INITIAL_PIH,
   type ZATCAPhase2Invoice,
   type ZATCALineItem,
 } from '../services/zatca-phase2';
+import { storage } from '../storage';
+import { isNotNull, desc } from 'drizzle-orm';
 
 const router = Router();
 
@@ -384,9 +388,24 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, async (req: Reque
       paymentMethod: 'cash',
     };
 
-    // Generate the UBL e-invoice and submit for clearance (stub or real).
-    const ubl = generateEInvoice(zatcaInvoice);
-    const clearance = await submitToClearance(ubl);
+    // ICV: per-garage monotonic counter; PIH: hash of this garage's previous
+    // e-invoice (spec-defined constant for the first link in the chain).
+    const icv = await storage.nextDocNumber(user.garageId, 'zatca_icv');
+    const [prev] = await db
+      .select({ hash: invoices.zatcaInvoiceHash })
+      .from(invoices)
+      .where(and(eq(invoices.garageId, user.garageId), isNotNull(invoices.zatcaInvoiceHash)))
+      .orderBy(desc(invoices.updatedAt))
+      .limit(1);
+    const pih = prev?.hash ?? ZATCA_INITIAL_PIH;
+
+    // Generate the UBL e-invoice and submit (clearance for standard,
+    // reporting for simplified — stub until ZATCA_CSID is configured).
+    const ubl = generateEInvoice(zatcaInvoice, icv, pih);
+    const clearance = await submitToClearance(ubl, '', zatcaInvoice.invoiceType);
+    // Local stamp QR: phase-2 signed (9 tags) when a signing key is
+    // configured, phase-1 otherwise. ZATCA-returned QR wins when present.
+    const localQr = generateComplianceQR(zatcaInvoice, ubl);
 
     const cleared = clearance.status === 'CLEARED' || clearance.status === 'REPORTED';
 
@@ -397,7 +416,7 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, async (req: Reque
         zatcaClearanceStatus: clearance.status,
         zatcaClearanceId: clearance.clearanceId ?? null,
         zatcaInvoiceHash: clearance.invoiceHash ?? ubl.hash,
-        zatcaQrCode: clearance.qrCode ?? null,
+        zatcaQrCode: clearance.qrCode ?? (localQr.qrCode || null),
         zatcaClearedAt: cleared ? new Date() : null,
         updatedAt: new Date(),
       })
