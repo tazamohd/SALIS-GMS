@@ -1,5 +1,8 @@
-/* SALIS AUTO Typography - Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* SALIS AUTO Typography — Google Fonts load asynchronously from
+   index.html. A blocking @import here stalls the whole app on networks
+   where fonts.googleapis.com hangs: the stylesheet never finishes, so
+   the browser defers module-script execution indefinitely and the page
+   stays blank. */
 
 /* RTL / Arabic layout support */
 @import './styles/rtl.css';
