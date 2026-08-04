@@ -11,6 +11,7 @@ user_credentials.csv
 .env.*
 # ...but env TEMPLATES are documentation, not secrets — keep them versioned
 !.env.production.example
+!.env.example
 *.pem
 *.key
 # Production DB dumps written by scripts/backup-db.sh / the backup sidecar
