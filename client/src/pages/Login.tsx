@@ -149,15 +149,11 @@ export default function Login() {
               >
                 {loginMutation.isPending ? t('auth.signingIn', 'Signing in...') : t('auth.signIn', 'Sign In')}
               </Button>
-              <p className="text-center pt-1">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm font-poppins text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline"
-                  data-testid="link-forgot-password"
-                >
-                  {t('auth.forgotPassword', 'Forgot password?')}
-                </Link>
-              </p>
+              {/* Forgot-password entry point is hidden until a real reset
+                  backend exists: there is no /api/auth/forgot-password route and
+                  the OTP step accepts any code, so shipping the link would be a
+                  fake, misleading flow (audit 3.5/3.8). Re-enable once the
+                  email-token reset backend is implemented. */}
               <p className="text-center text-sm font-poppins text-[#64748B] dark:text-[#9BA4B0] pt-2">
                 {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
                 <Link

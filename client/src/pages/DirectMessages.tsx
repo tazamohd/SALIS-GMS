@@ -89,6 +89,16 @@ export default function DirectMessages() {
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery<ChatMessage[]>({
     queryKey: ["/api/chat/conversations", selectedConversationId, "messages"],
+    // Explicit queryFn: the default one fetches only queryKey[0]
+    // (/api/chat/conversations — the LIST), so without this the message pane
+    // showed conversations instead of the selected thread's messages.
+    queryFn: async () => {
+      const res = await fetch(`/api/chat/conversations/${selectedConversationId}/messages`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+      return res.json();
+    },
     enabled: !!selectedConversationId,
   });
 
@@ -104,6 +114,14 @@ export default function DirectMessages() {
 
   const { data: unreadCount = 0 } = useQuery<number>({
     queryKey: ["/api/chat/unread-count"],
+    // The endpoint returns { count }; extract it so the badge shows a number
+    // rather than rendering "[object Object]".
+    queryFn: async () => {
+      const res = await fetch("/api/chat/unread-count", { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+      return typeof data === "number" ? data : (data?.count ?? 0);
+    },
     enabled: !!user?.id,
   });
 

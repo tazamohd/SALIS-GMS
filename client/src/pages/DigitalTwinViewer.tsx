@@ -63,9 +63,16 @@ export default function DigitalTwinViewer() {
     queryKey: ['/api/vehicles'],
   });
 
-  // Fetch selected vehicle details
+  // Fetch selected vehicle details. Explicit queryFn: the default fetches only
+  // queryKey[0] (/api/vehicles — the LIST), so the detail pane never loaded the
+  // selected vehicle.
   const { data: vehicleDetail } = useQuery<VehicleDetail>({
     queryKey: ['/api/vehicles', selectedVehicleId],
+    queryFn: async () => {
+      const res = await fetch(`/api/vehicles/${selectedVehicleId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`${res.status}`);
+      return res.json();
+    },
     enabled: !!selectedVehicleId,
   });
 
