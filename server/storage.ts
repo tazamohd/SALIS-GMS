@@ -1268,9 +1268,9 @@ export interface IStorage {
   
   // Refunds
   getRefunds(garageId?: string, status?: string): Promise<Refund[]>;
-  getRefund(id: string): Promise<Refund | undefined>;
+  getRefund(id: string, garageId?: string): Promise<Refund | undefined>;
   createRefund(data: InsertRefund): Promise<Refund>;
-  updateRefund(id: string, data: Partial<Refund>): Promise<Refund>;
+  updateRefund(id: string, data: Partial<Refund>, garageId?: string): Promise<Refund | undefined>;
   
   // Tax Configurations
   getTaxConfigurations(garageId: string, isActive?: boolean): Promise<TaxConfiguration[]>;
@@ -1534,21 +1534,21 @@ export interface IStorage {
   // Module 41: Warranty Tracking
   createWarranty(data: any): Promise<any>;
   getWarrantiesByGarage(garageId: string): Promise<any[]>;
-  getWarrantyById(id: string): Promise<any | undefined>;
-  getWarrantiesByVehicle(vehicleId: string): Promise<any[]>;
-  getWarrantiesByCustomer(customerId: string): Promise<any[]>;
+  getWarrantyById(id: string, garageId?: string): Promise<any | undefined>;
+  getWarrantiesByVehicle(vehicleId: string, garageId?: string): Promise<any[]>;
+  getWarrantiesByCustomer(customerId: string, garageId?: string): Promise<any[]>;
   getActiveWarranties(garageId: string): Promise<any[]>;
   getExpiredWarranties(garageId: string): Promise<any[]>;
   getExpiringWarranties(garageId: string, daysThreshold: number): Promise<any[]>;
-  updateWarranty(id: string, data: any): Promise<any>;
-  deleteWarranty(id: string): Promise<void>;
+  updateWarranty(id: string, data: any, garageId?: string): Promise<any | undefined>;
+  deleteWarranty(id: string, garageId?: string): Promise<boolean>;
 
   createWarrantyClaim(data: any): Promise<any>;
   getWarrantyClaimsByGarage(garageId: string): Promise<any[]>;
-  getWarrantyClaimById(id: string): Promise<any | undefined>;
-  getWarrantyClaimsByWarranty(warrantyId: string): Promise<any[]>;
-  updateWarrantyClaim(id: string, data: any): Promise<any>;
-  deleteWarrantyClaim(id: string): Promise<void>;
+  getWarrantyClaimById(id: string, garageId?: string): Promise<any | undefined>;
+  getWarrantyClaimsByWarranty(warrantyId: string, garageId?: string): Promise<any[]>;
+  updateWarrantyClaim(id: string, data: any, garageId?: string): Promise<any | undefined>;
+  deleteWarrantyClaim(id: string, garageId?: string): Promise<boolean>;
 
   // Module 45: Vehicle Inspection Checklists
   createInspectionTemplate(data: InsertInspectionTemplate): Promise<InspectionTemplate>;
@@ -6387,8 +6387,9 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(refunds).orderBy(desc(refunds.requestedAt));
   }
 
-  async getRefund(id: string): Promise<Refund | undefined> {
-    const [refund] = await db.select().from(refunds).where(eq(refunds.id, id));
+  async getRefund(id: string, garageId?: string): Promise<Refund | undefined> {
+    const [refund] = await db.select().from(refunds)
+      .where(and(eq(refunds.id, id), garageId ? eq(refunds.garageId, garageId) : undefined));
     return refund;
   }
 
@@ -6398,10 +6399,12 @@ export class DatabaseStorage implements IStorage {
     return refund;
   }
 
-  async updateRefund(id: string, data: Partial<Refund>): Promise<Refund> {
+  // garageId, when provided, scopes the write to the caller's tenant (B11/H-1):
+  // a cross-tenant update matches no row and returns undefined.
+  async updateRefund(id: string, data: Partial<Refund>, garageId?: string): Promise<Refund | undefined> {
     const [refund] = await db.update(refunds)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(refunds.id, id))
+      .where(and(eq(refunds.id, id), garageId ? eq(refunds.garageId, garageId) : undefined))
       .returning();
     return refund;
   }
@@ -8781,24 +8784,24 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(warranties.createdAt));
   }
 
-  async getWarrantyById(id: string): Promise<any | undefined> {
+  async getWarrantyById(id: string, garageId?: string): Promise<any | undefined> {
     const [warranty] = await db.select()
       .from(warranties)
-      .where(eq(warranties.id, id));
+      .where(and(eq(warranties.id, id), garageId ? eq(warranties.garageId, garageId) : undefined));
     return warranty;
   }
 
-  async getWarrantiesByVehicle(vehicleId: string): Promise<any[]> {
+  async getWarrantiesByVehicle(vehicleId: string, garageId?: string): Promise<any[]> {
     return await db.select()
       .from(warranties)
-      .where(eq(warranties.vehicleId, vehicleId))
+      .where(and(eq(warranties.vehicleId, vehicleId), garageId ? eq(warranties.garageId, garageId) : undefined))
       .orderBy(desc(warranties.createdAt));
   }
 
-  async getWarrantiesByCustomer(customerId: string): Promise<any[]> {
+  async getWarrantiesByCustomer(customerId: string, garageId?: string): Promise<any[]> {
     return await db.select()
       .from(warranties)
-      .where(eq(warranties.customerId, customerId))
+      .where(and(eq(warranties.customerId, customerId), garageId ? eq(warranties.garageId, garageId) : undefined))
       .orderBy(desc(warranties.createdAt));
   }
 
@@ -8841,17 +8844,19 @@ export class DatabaseStorage implements IStorage {
       .orderBy(warranties.endDate);
   }
 
-  async updateWarranty(id: string, data: any): Promise<any> {
+  async updateWarranty(id: string, data: any, garageId?: string): Promise<any | undefined> {
     const [warranty] = await db.update(warranties)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(warranties.id, id))
+      .where(and(eq(warranties.id, id), garageId ? eq(warranties.garageId, garageId) : undefined))
       .returning();
     return warranty;
   }
 
-  async deleteWarranty(id: string): Promise<void> {
-    await db.delete(warranties)
-      .where(eq(warranties.id, id));
+  async deleteWarranty(id: string, garageId?: string): Promise<boolean> {
+    const rows = await db.delete(warranties)
+      .where(and(eq(warranties.id, id), garageId ? eq(warranties.garageId, garageId) : undefined))
+      .returning({ id: warranties.id });
+    return rows.length > 0;
   }
 
   async createWarrantyClaim(data: any): Promise<any> {
@@ -8872,31 +8877,40 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(warrantyClaims.createdAt));
   }
 
-  async getWarrantyClaimById(id: string): Promise<any | undefined> {
+  // warranty_claims has no garage_id; scope through the parent warranty (H-1).
+  private warrantyClaimGarageScope(garageId?: string) {
+    return garageId
+      ? inArray(warrantyClaims.warrantyId, db.select({ id: warranties.id }).from(warranties).where(eq(warranties.garageId, garageId)))
+      : undefined;
+  }
+
+  async getWarrantyClaimById(id: string, garageId?: string): Promise<any | undefined> {
     const [claim] = await db.select()
       .from(warrantyClaims)
-      .where(eq(warrantyClaims.id, id));
+      .where(and(eq(warrantyClaims.id, id), this.warrantyClaimGarageScope(garageId)));
     return claim;
   }
 
-  async getWarrantyClaimsByWarranty(warrantyId: string): Promise<any[]> {
+  async getWarrantyClaimsByWarranty(warrantyId: string, garageId?: string): Promise<any[]> {
     return await db.select()
       .from(warrantyClaims)
-      .where(eq(warrantyClaims.warrantyId, warrantyId))
+      .where(and(eq(warrantyClaims.warrantyId, warrantyId), this.warrantyClaimGarageScope(garageId)))
       .orderBy(desc(warrantyClaims.createdAt));
   }
 
-  async updateWarrantyClaim(id: string, data: any): Promise<any> {
+  async updateWarrantyClaim(id: string, data: any, garageId?: string): Promise<any | undefined> {
     const [claim] = await db.update(warrantyClaims)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(warrantyClaims.id, id))
+      .where(and(eq(warrantyClaims.id, id), this.warrantyClaimGarageScope(garageId)))
       .returning();
     return claim;
   }
 
-  async deleteWarrantyClaim(id: string): Promise<void> {
-    await db.delete(warrantyClaims)
-      .where(eq(warrantyClaims.id, id));
+  async deleteWarrantyClaim(id: string, garageId?: string): Promise<boolean> {
+    const rows = await db.delete(warrantyClaims)
+      .where(and(eq(warrantyClaims.id, id), this.warrantyClaimGarageScope(garageId)))
+      .returning({ id: warrantyClaims.id });
+    return rows.length > 0;
   }
 
   // Module 45: Vehicle Inspection Checklists

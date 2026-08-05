@@ -5581,13 +5581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const refund = await storage.getRefund(id);
+      const refund = await storage.getRefund(id, req.user?.garageId);
       if (!refund) {
-        return res.status(404).json({ message: "Refund not found" });
-      }
-      // Ownership: refunds carry a garageId; a caller may only read their own.
-      const sessionGarage = req.user?.garageId;
-      if (sessionGarage && (refund as any).garageId && (refund as any).garageId !== sessionGarage) {
         return res.status(404).json({ message: "Refund not found" });
       }
       res.json(refund);
@@ -5611,7 +5606,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/refunds/:id', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const refund = await storage.updateRefund(id, req.body);
+      const refund = await storage.updateRefund(id, req.body, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error updating refund:", error);
@@ -5627,7 +5623,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         approvedBy: userId,
         approvedAt: new Date(),
-      });
+      }, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error approving refund:", error);
@@ -5643,7 +5640,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'processed',
         processedBy: userId,
         processedAt: new Date(),
-      });
+      }, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error processing refund:", error);
@@ -11092,7 +11090,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/vehicle/:vehicleId", isAuthenticated, async (req, res) => {
     try {
-      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId);
+      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId, (req as any).user?.garageId);
       res.json(warranties);
     } catch (error) {
       console.error("Error fetching warranties by vehicle:", error);
@@ -11102,7 +11100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/customer/:customerId", isAuthenticated, async (req, res) => {
     try {
-      const warranties = await storage.getWarrantiesByCustomer(req.params.customerId);
+      const warranties = await storage.getWarrantiesByCustomer(req.params.customerId, (req as any).user?.garageId);
       res.json(warranties);
     } catch (error) {
       console.error("Error fetching warranties by customer:", error);
@@ -11112,7 +11110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
-      const warranty = await storage.getWarrantyById(req.params.id);
+      const warranty = await storage.getWarrantyById(req.params.id, (req as any).user?.garageId);
       if (!warranty) {
         return res.status(404).json({ error: "Warranty not found" });
       }
@@ -11126,7 +11124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
       const data = insertWarrantySchema.partial().parse(req.body);
-      const warranty = await storage.updateWarranty(req.params.id, data);
+      const warranty = await storage.updateWarranty(req.params.id, data, (req as any).user?.garageId);
+      if (!warranty) return res.status(404).json({ error: "Warranty not found" });
       res.json(warranty);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -11135,7 +11134,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteWarranty(req.params.id);
+      const ok = await storage.deleteWarranty(req.params.id, (req as any).user?.garageId);
+      if (!ok) return res.status(404).json({ error: "Warranty not found" });
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting warranty:", error);
@@ -11171,7 +11171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranty-claims/warranty/:warrantyId", isAuthenticated, async (req, res) => {
     try {
-      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId);
+      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId, (req as any).user?.garageId);
       res.json(claims);
     } catch (error) {
       console.error("Error fetching warranty claims by warranty:", error);
@@ -11181,7 +11181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
     try {
-      const claim = await storage.getWarrantyClaimById(req.params.id);
+      const claim = await storage.getWarrantyClaimById(req.params.id, (req as any).user?.garageId);
       if (!claim) {
         return res.status(404).json({ error: "Warranty claim not found" });
       }
@@ -11202,7 +11202,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.reviewedBy = user.id;
       }
       
-      const claim = await storage.updateWarrantyClaim(req.params.id, data);
+      const claim = await storage.updateWarrantyClaim(req.params.id, data, user?.garageId);
+      if (!claim) return res.status(404).json({ error: "Warranty claim not found" });
       res.json(claim);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -11211,7 +11212,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteWarrantyClaim(req.params.id);
+      const ok = await storage.deleteWarrantyClaim(req.params.id, (req as any).user?.garageId);
+      if (!ok) return res.status(404).json({ error: "Warranty claim not found" });
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting warranty claim:", error);
