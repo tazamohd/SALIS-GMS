@@ -37,14 +37,18 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
-import { requireRole, requireAdmin } from "./middleware/requireRole";
+import { randomBytes } from "crypto";
+import { verifyBusiness } from "./services/verification/businessVerification";
+import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
+import { requireResourceOwnership } from "./middleware/resourceOwnership";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
 import { initializeChatWebSocket, getChatWebSocketServer } from "./websocket";
 import { z } from "zod";
 import { 
-  insertNotificationSchema, 
+  insertNotificationSchema,
+  type InsertNotification,
   insertSavedFilterPresetSchema, 
   insertExportJobSchema,
   insertEmployeeAttendanceSchema,
@@ -153,10 +157,20 @@ import {
   insertIoTSensorSchema,
   insertIoTSensorReadingSchema,
   insertIoTAlertSchema,
-  insertJobTrackingEventSchema
+  insertJobTrackingEventSchema,
+  insertServiceFeedbackSchema,
+  fleetContracts,
+  fleetGroups,
+  contractUtilization,
+  contractRenewals,
+  // Declared in schema.ts as contractSLAMetrics; aliased to match call sites.
+  contractSLAMetrics as contractSlaMetrics
 } from "@shared/schema";
 import Stripe from "stripe";
-import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+// server/paypal.ts throws at import time when PAYPAL_CLIENT_ID/SECRET are
+// absent (and its banner forbids editing it), so it is loaded lazily inside
+// the PayPal routes — the server boots without credentials and those three
+// endpoints report 503 instead.
 import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 import { analyzePredictiveMaintenance, generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
@@ -394,9 +408,10 @@ const videoEstimateSchema = z.object({
 });
 
 const digitalWalkaroundSchema = z.object({
-  jobCardId: z.string().optional(),
+  // digital_walkarounds.job_card_id is NOT NULL — a walkaround only exists
+  // in the context of a job.
+  jobCardId: z.string(),
   vehicleId: z.string(),
-  customerId: z.string(),
   technicianId: z.string(),
   inspectionType: z.enum(['pre-service', 'post-service', 'damage-assessment']),
   photos: z.array(z.object({
@@ -422,6 +437,11 @@ const reviewResponseSchema = z.object({
 
 const generateReferralCodeSchema = z.object({
   customerId: z.string(),
+  // customer_referrals requires the program and the referee's email
+  // (program_id and referee_email are NOT NULL).
+  programId: z.string(),
+  refereeEmail: z.string().email(),
+  refereeName: z.string().optional(),
 });
 
 const applyReferralCodeSchema = z.object({
@@ -728,25 +748,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Technician routes
-  app.post('/api/technicians', isAuthenticated, async (req, res) => {
+  // Job cards assigned to a technician. A technician may only read their own;
+  // managers may read any technician in their garage.
+  app.get('/api/technicians/:id/job-cards', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
     try {
+      const { id } = req.params;
+      const role = String(req.user?.role || '').toUpperCase();
+      const isSelf = req.user?.id === id;
+      const isManager = ['ADMIN', 'MANAGER', 'PLATFORM_ADMIN'].includes(role);
+      if (!isSelf && !isManager) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const jobCards = await storage.getJobCards(req.user?.garageId, id);
+      res.json(jobCards);
+    } catch (error) {
+      console.error("Error fetching technician job cards:", error);
+      res.status(500).json({ message: "Failed to fetch job cards" });
+    }
+  });
+
+  // Time-clock entries for a technician (own entries; managers any in garage).
+  app.get('/api/technicians/:id/time-clock', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const role = String(req.user?.role || '').toUpperCase();
+      const isSelf = req.user?.id === id;
+      const isManager = ['ADMIN', 'MANAGER', 'PLATFORM_ADMIN'].includes(role);
+      if (!isSelf && !isManager) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const entries = await phase5Service.getTimeClockEntriesByEmployee(id);
+      res.json(entries);
+    } catch (error) {
+      console.error("Error fetching technician time clock:", error);
+      res.status(500).json({ message: "Failed to fetch time clock" });
+    }
+  });
+
+  app.post('/api/technicians', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
+    try {
+      // Strip client-controlled privilege/tenant fields; a technician must not
+      // be able to mint an ADMIN or plant a user in another garage. Password is
+      // hashed here (never stored in cleartext).
+      const { garageId: _g, role: _r, password, id: _i, userType: _u, ...rest } = req.body;
+      const bcrypt = await import('bcrypt');
+      const hashed = typeof password === 'string' && password.length >= 8
+        ? await bcrypt.hash(password, 10)
+        : await bcrypt.hash(Math.random().toString(36).slice(-12), 10);
       const technicianData = {
-        ...req.body,
+        ...rest,
+        password: hashed,
+        garageId: req.user?.garageId,
         userType: 'technician',
+        role: 'TECHNICIAN',
         isActive: true,
       };
       const technician = await storage.createUser(technicianData);
-      res.status(201).json(technician);
+      const { password: _pw, ...safe } = technician as any;
+      res.status(201).json(safe);
     } catch (error) {
       console.error("Error creating technician:", error);
       res.status(500).json({ message: "Failed to create technician" });
     }
   });
 
-  app.delete('/api/technicians/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/technicians/:id', isAuthenticated, requireResourceOwnership({ table: 'users' }), requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteUser(id);
+      // Ownership: only delete a technician in the caller's garage. Soft-delete
+      // (deactivate) to preserve FK integrity (job cards reference createdBy).
+      const target = await storage.getUser(id);
+      const sessionGarage = req.user?.garageId;
+      if (!target || (sessionGarage && (target as any).garageId && (target as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      const { users } = await import("@shared/schema");
+      await db.update(users).set({ isActive: false }).where(eq(users.id, id));
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting technician:", error);
@@ -754,8 +831,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Garage-scoped user directory (id/name/role only) — used by client screens
+  // to map user ids to names. Registered before the :userId profile route.
+  app.get('/api/users', isAuthenticated, async (req: any, res) => {
+    try {
+      const { users: usersTable } = await import("@shared/schema");
+      const gid = req.user?.garageId;
+      const rows = await db
+        .select({
+          id: usersTable.id,
+          fullName: usersTable.fullName,
+          firstName: usersTable.firstName,
+          lastName: usersTable.lastName,
+          email: usersTable.email,
+          role: usersTable.role,
+          userType: usersTable.userType,
+          garageId: usersTable.garageId,
+          isActive: usersTable.isActive,
+        })
+        .from(usersTable)
+        .where(gid ? eq(usersTable.garageId, gid) : undefined);
+      res.json(rows);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Technician profile list, scoped to the caller's garage via the owning user.
+  app.get('/api/technician-profiles', isAuthenticated, async (req: any, res) => {
+    try {
+      const { technicianProfiles, users: usersTable } = await import("@shared/schema");
+      const gid = req.user?.garageId;
+      const rows = gid
+        ? await db
+            .select()
+            .from(technicianProfiles)
+            .where(sql`EXISTS (SELECT 1 FROM ${usersTable} WHERE ${usersTable.id} = ${technicianProfiles.userId} AND ${usersTable.garageId} = ${gid})`)
+        : await db.select().from(technicianProfiles);
+      res.json(rows);
+    } catch (error) {
+      console.error("Error fetching technician profiles:", error);
+      res.status(500).json({ message: "Failed to fetch technician profiles" });
+    }
+  });
+
   // Technician Profile routes
-  app.get('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+  app.get('/api/technician-profiles/:userId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'userId' }), async (req, res) => {
     try {
       const { userId } = req.params;
       const currentUser = (req as any).user;
@@ -795,7 +917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+  app.patch('/api/technician-profiles/:userId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'userId' }), async (req, res) => {
     try {
       const { userId } = req.params;
       const currentUser = (req as any).user;
@@ -828,8 +950,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/job-cards', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
+      // Pin garageId and createdBy to the session — a caller must not be able
+      // to plant a job card in another tenant by forging garageId in the body.
       const jobCardData = {
         ...req.body,
+        jobNumber: req.body.jobNumber?.trim() ? req.body.jobNumber.trim() : `JC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+        garageId: req.user?.garageId || req.body.garageId,
         createdBy: userId,
       };
       const jobCard = await storage.createJobCard(jobCardData);
@@ -840,12 +966,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/job-cards/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/job-cards/:id', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req, res) => {
     try {
       const { id } = req.params;
+      // Completion runs inventory deduction under a FOR UPDATE row lock, and that
+      // logic lives only in the PATCH handler. Refuse to complete via PUT so a
+      // client cannot mark a job 'completed' while skipping the stock check /
+      // decrement (verification audit: PUT bypassed the B14 deduction guard).
+      if ((req.body as any)?.status === 'completed') {
+        return res.status(400).json({
+          message: "Use PATCH /api/job-cards/:id to complete a job (runs inventory deduction).",
+        });
+      }
       const validated = validatePatchBody(req, res, updateJobCardSchema);
       if (!validated.ok) return;
-      const updatedJobCard = await storage.updateJobCard(id, validated.data as any);
+      const updatedJobCard = await storage.updateJobCard(id, validated.data as any, (req as any).user?.garageId);
+      if (!updatedJobCard) return res.status(404).json({ message: "Job card not found" });
       res.json(updatedJobCard);
     } catch (error) {
       console.error("Error updating job card:", error);
@@ -853,7 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/job-cards/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/job-cards/:id', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req, res) => {
     try {
       const { id } = req.params;
       const newStatus = req.body.status;
@@ -865,6 +1001,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!currentJobCard) {
           return res.status(404).json({ message: "Job card not found" });
         }
+        // Tenant scope (B16): completing another garage's job card is a 404.
+        const cjcGarage = (req as any).user?.garageId;
+        if (cjcGarage && (currentJobCard as any).garageId && (currentJobCard as any).garageId !== cjcGarage) {
+          return res.status(404).json({ message: "Job card not found" });
+        }
         
         // Only deduct inventory if transitioning TO completed (not already completed)
         if (currentJobCard.status !== 'completed') {
@@ -873,16 +1014,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Get all parts associated with this job card
             const jobParts = await tx.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, id));
             
-            // First pass: verify sufficient stock for all parts
+            // First pass: verify sufficient stock for all parts.
+            // FOR UPDATE locks each inventory row for the life of the transaction
+            // (deep-audit blocker B14): two concurrent completions can no longer
+            // both read the same stock, both pass, and both decrement into the
+            // negative — the second blocks here, then re-reads the decremented
+            // stock and fails the check.
             for (const part of jobParts) {
               if (!part.isDeducted && part.sparePartInventoryId) {
                 const [inventory] = await tx.select().from(sparePartInventories)
-                  .where(eq(sparePartInventories.id, part.sparePartInventoryId));
-                
+                  .where(eq(sparePartInventories.id, part.sparePartInventoryId))
+                  .for('update');
+
                 if (!inventory) {
                   throw new Error(`Inventory record not found for part ID: ${part.sparePartId}`);
                 }
-                
+
                 const currentStock = inventory.stockQuantity || 0;
                 if (currentStock < part.quantity) {
                   throw new Error(`Insufficient stock for part. Available: ${currentStock}, Required: ${part.quantity}`);
@@ -930,8 +1077,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // For non-completion status updates, use storage method
-      const updatedJobCard = await storage.updateJobCard(id, req.body);
+      // For non-completion status updates, use storage method (garage-scoped, B16)
+      const updatedJobCard = await storage.updateJobCard(id, req.body, (req as any).user?.garageId);
+      if (!updatedJobCard) return res.status(404).json({ message: "Job card not found" });
       res.json(updatedJobCard);
     } catch (error: any) {
       console.error("Error updating job card:", error);
@@ -943,7 +1091,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Job Card Parts routes - Track parts used in a job
-  app.post('/api/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
+  app.post('/api/job-cards/:jobCardId/parts', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
       
@@ -984,7 +1132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/job-cards/:jobCardId/parts/:partId', isAuthenticated, async (req, res) => {
+  app.delete('/api/job-cards/:jobCardId/parts/:partId', isAuthenticated, requireResourceOwnership({ table: 'job_card_parts', idParam: 'partId', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { partId } = req.params;
       
@@ -1003,7 +1151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Task Assignment routes
-  app.post('/api/job-cards/:jobCardId/tasks', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:jobCardId/tasks', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { jobCardId } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -1020,7 +1168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tasks/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'task_assignments', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedTask = await storage.updateTaskAssignment(id, req.body);
@@ -1033,7 +1181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Dynamic Service Tracking routes - Feature #3
   // Generate public tracking token for a job card
-  app.post('/api/job-cards/:id/tracking/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:id/tracking/generate', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1110,7 +1258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create job tracking event
-  app.post('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:id/tracking/events', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1148,7 +1296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get job tracking events
-  app.get('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+  app.get('/api/job-cards/:id/tracking/events', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { visibleToCustomer } = req.query;
@@ -1178,7 +1326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update job ETA
-  app.patch('/api/job-cards/:id/eta', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/job-cards/:id/eta', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1195,9 +1343,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { estimatedCompletionAt, manualOverride } = validationResult.data;
-      
+
       const jobCard = await storage.getJobCard(id);
       if (!jobCard) {
+        return res.status(404).json({ message: "Job card not found" });
+      }
+      // Tenant scope (B16): another garage's job card is a 404.
+      const etaGarage = (req as any).user?.garageId;
+      if (etaGarage && (jobCard as any).garageId && (jobCard as any).garageId !== etaGarage) {
         return res.status(404).json({ message: "Job card not found" });
       }
       
@@ -1253,7 +1406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // POST clock in/out
-  app.post('/api/technicians/:technicianId/time-clock', isAuthenticated, authorizeTechnician, async (req, res) => {
+  app.post('/api/technicians/:technicianId/time-clock', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), authorizeTechnician, async (req, res) => {
     try {
       const { technicianId } = req.params;
       const entryData = {
@@ -1279,10 +1432,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/service-templates/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/service-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const template = await storage.updateServiceTemplate(id, req.body);
+      const template = await storage.updateServiceTemplate(id, req.body, (req as any).user?.garageId);
+      if (!template) return res.status(404).json({ message: "Service template not found" });
       res.json(template);
     } catch (error) {
       console.error("Error updating service template:", error);
@@ -1290,10 +1444,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-templates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteServiceTemplate(id);
+      await storage.deleteServiceTemplate(id, (req as any).user?.garageId);
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting service template:", error);
@@ -1339,7 +1493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tool-availability/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tool-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'tool_availability' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedAvailability = await storage.updateToolAvailability(id, req.body);
@@ -1366,7 +1520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tool-usage/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tool-usage/:id', isAuthenticated, requireResourceOwnership({ table: 'tool_usage_logs', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedUsageLog = await storage.updateToolUsageLog(id, req.body);
@@ -1448,7 +1602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/spare-part-inventories/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/spare-part-inventories/:id', isAuthenticated, requireResourceOwnership({ table: 'spare_part_inventories' }), async (req, res) => {
     try {
       const { insertSparePartInventorySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1458,9 +1612,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json(sanitizeZodError(validationResult.error));
       }
 
-      const updatedInventory = await storage.updateSparePartInventory(id, validationResult.data);
+      // Optional optimistic-concurrency guard: clients that read stock first can
+      // pass the value they expect so a concurrent adjustment is not clobbered.
+      const expectedStockQuantity =
+        typeof req.body?.expectedStockQuantity === "number" ? req.body.expectedStockQuantity : undefined;
+
+      const updatedInventory = await storage.updateSparePartInventory(
+        id,
+        validationResult.data,
+        (req as any).user?.garageId,
+        { userId: (req as any).user?.id, expectedStockQuantity }
+      );
+      if (!updatedInventory) return res.status(404).json({ message: "Inventory not found" });
       res.json(updatedInventory);
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === "STOCK_CONFLICT") {
+        return res.status(409).json({ message: "Inventory changed since it was read; retry with fresh data" });
+      }
       console.error("Error updating spare part inventory:", error);
       res.status(500).json({ message: "Failed to update spare part inventory" });
     }
@@ -1476,7 +1644,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1494,7 +1661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/appointments/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req, res) => {
     try {
       const { insertAppointmentSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1503,12 +1670,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const updatedAppointment = await storage.updateAppointment(id, validationResult.data);
+      const updatedAppointment = await storage.updateAppointment(id, validationResult.data, (req as any).user?.garageId);
+      if (!updatedAppointment) return res.status(404).json({ message: "Appointment not found" });
       res.json(updatedAppointment);
     } catch (error) {
       console.error("Error updating appointment:", error);
@@ -1516,10 +1683,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/appointments/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteAppointment(id);
+      await storage.deleteAppointment(id, (req as any).user?.garageId);
       res.json({ message: "Appointment deleted successfully" });
     } catch (error) {
       console.error("Error deleting appointment:", error);
@@ -1527,7 +1694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/appointments/:id/status', isAuthenticated, async (req: any, res) => {
+  app.post('/api/appointments/:id/status', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status, reason } = req.body;
@@ -1548,7 +1715,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer Management routes - Module 10
   app.post('/api/customers', isAuthenticated, async (req: any, res) => {
     try {
-      const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
+      const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage, password } = req.body;
       
       if (!fullName || !email || !garageId) {
         return res.status(400).json({ message: "Name, email, and garage are required" });
@@ -1560,7 +1727,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const bcrypt = await import('bcrypt');
-      const tempPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+      // Optional portal password: when the caller supplies one (min 8 chars) the
+      // customer can log in immediately. Otherwise a random unusable hash is
+      // stored and the admin must set one later via /api/customers/:id/set-password.
+      const portalPasswordSet = typeof password === 'string' && password.length >= 8;
+      if (typeof password === 'string' && password.length > 0 && password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const hashedPassword = await bcrypt.hash(
+        portalPasswordSet ? password : Math.random().toString(36).slice(-12),
+        10,
+      );
 
       const customer = await storage.createUser({
         fullName,
@@ -1568,7 +1745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: lastName || null,
         email,
         phone: phone || null,
-        password: tempPassword,
+        password: hashedPassword,
         garageId,
         nationalId: nationalId || null,
         userType: 'customer',
@@ -1588,10 +1765,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.status(201).json(customer);
+      res.status(201).json({ ...customer, portalPasswordSet });
     } catch (error) {
       console.error("Error creating customer:", error);
       res.status(500).json({ message: "Failed to create customer" });
+    }
+  });
+
+  // Set/reset a customer's portal password (staff-initiated). Gives customers a
+  // working credential — creation alone stores an unusable random hash.
+  app.post('/api/customers/:id/set-password', isAuthenticated, requireResourceOwnership({ table: 'users' }), requireManagerOrAbove, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { password } = req.body;
+      if (typeof password !== 'string' || password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const target = await storage.getUser(id);
+      if (!target || (target as any).userType !== 'customer') {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage && (target as any).garageId && (target as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+      const bcrypt = await import('bcrypt');
+      const { users } = await import("@shared/schema");
+      const hashed = await bcrypt.hash(password, 10);
+      await db.update(users).set({ password: hashed }).where(eq(users.id, id));
+      res.json({ success: true, message: "Customer portal password updated" });
+    } catch (error) {
+      console.error("Error setting customer password:", error);
+      res.status(500).json({ message: "Failed to set customer password" });
     }
   });
 
@@ -1602,12 +1807,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const vehicle = await storage.createVehicle(validationResult.data);
+      const vehicle = await storage.createVehicle({
+        ...validationResult.data,
+        garageId: (req as any).user?.garageId || validationResult.data.garageId,
+      } as any);
       res.status(201).json(vehicle);
     } catch (error) {
       console.error("Error creating vehicle:", error);
@@ -1615,7 +1822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertVehicleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1624,12 +1831,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const updatedVehicle = await storage.updateVehicle(id, validationResult.data);
+      // Ownership: only update a vehicle in the caller's garage, and never let
+      // the body re-assign garageId (tenant hijack).
+      const existing = await storage.getVehicle(id);
+      const sessionGarage = (req as any).user?.garageId;
+      if (!existing || (sessionGarage && (existing as any).garageId && (existing as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
+      const { garageId: _drop, ...vehicleUpdate } = validationResult.data as any;
+      const updatedVehicle = await storage.updateVehicle(id, vehicleUpdate);
       res.json(updatedVehicle);
     } catch (error) {
       console.error("Error updating vehicle:", error);
@@ -1637,9 +1851,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { id } = req.params;
+      const existing = await storage.getVehicle(id);
+      const sessionGarage = (req as any).user?.garageId;
+      if (!existing || (sessionGarage && (existing as any).garageId && (existing as any).garageId !== sessionGarage)) {
+        return res.status(404).json({ message: "Vehicle not found" });
+      }
       await storage.deleteVehicle(id);
       res.json({ message: "Vehicle deleted successfully" });
     } catch (error) {
@@ -1649,7 +1868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Vehicle Service History Routes - Module 22 Enhancements
-  app.post('/api/vehicles/:id/service-history', isAuthenticated, async (req: any, res) => {
+  app.post('/api/vehicles/:id/service-history', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req: any, res) => {
     try {
       const { insertVehicleServiceHistorySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1663,7 +1882,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1676,7 +1894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-history/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-history/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_service_history', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteServiceHistory(id);
@@ -1688,7 +1906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Maintenance Schedules Routes - Module 22 Enhancements
-  app.post('/api/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, res) => {
+  app.post('/api/vehicles/:id/maintenance-schedules', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1700,7 +1918,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1713,7 +1930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'maintenance_schedules', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1722,7 +1939,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1735,7 +1951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'maintenance_schedules', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteMaintenanceSchedule(id);
@@ -1746,7 +1962,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/vehicles/:id/service-reminders', isAuthenticated, async (req, res) => {
+  app.post('/api/vehicles/:id/service-reminders', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertServiceReminderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1758,7 +1974,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1771,7 +1986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminders/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { insertServiceReminderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1780,7 +1995,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!validationResult.success) {
         return res.status(400).json({
-          message: "Validation error",
           ...sanitizeZodError(validationResult.error)
         });
       }
@@ -1793,7 +2007,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-reminders/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteServiceReminder(id);
@@ -1804,7 +2018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/customers/:id/notes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/customers/:id/notes', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
     try {
       const { insertCustomerNoteSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1814,7 +2028,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1833,7 +2046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/customer-notes/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/customer-notes/:id', isAuthenticated, requireResourceOwnership({ table: 'customer_notes', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteCustomerNote(id);
@@ -1851,12 +2064,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const supplier = await storage.createSupplier(validationResult.data);
+      // Pin the tenant to the session garage — never trust a body garageId
+      // (mass-assignment blocker B12). Falls back to the validated value only
+      // for garage-less platform admins.
+      const sessGarage = (req as any).user?.garageId;
+      const supplier = await storage.createSupplier({
+        ...validationResult.data,
+        garageId: sessGarage ?? (validationResult.data as any).garageId,
+      } as any);
       res.status(201).json(supplier);
     } catch (error) {
       console.error("Error creating supplier:", error);
@@ -1864,7 +2083,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/suppliers/:id', isAuthenticated, requireResourceOwnership({ table: 'suppliers' }), async (req, res) => {
     try {
       const { insertSupplierSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1873,12 +2092,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const supplier = await storage.updateSupplier(id, validationResult.data);
+      const supplier = await storage.updateSupplier(id, validationResult.data, (req as any).user?.garageId);
+      if (!supplier) return res.status(404).json({ message: "Supplier not found" });
       res.json(supplier);
     } catch (error) {
       console.error("Error updating supplier:", error);
@@ -1886,10 +2105,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/suppliers/:id', isAuthenticated, requireResourceOwnership({ table: 'suppliers' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplier(id);
+      await storage.deleteSupplier(id, (req as any).user?.garageId);
       res.json({ message: "Supplier deleted successfully" });
     } catch (error) {
       console.error("Error deleting supplier:", error);
@@ -1903,7 +2122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1916,7 +2134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-price-lists/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_price_list', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -1924,12 +2142,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const priceList = await storage.updateSupplierPriceList(id, validationResult.data);
+      const priceList = await storage.updateSupplierPriceList(id, validationResult.data, (req as any).user?.garageId);
+      if (!priceList) return res.status(404).json({ message: "Price list not found" });
       res.json(priceList);
     } catch (error) {
       console.error("Error updating price list:", error);
@@ -1937,10 +2155,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-price-lists/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_price_list', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPriceList(id);
+      await storage.deleteSupplierPriceList(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Price list deleted successfully" });
     } catch (error) {
       console.error("Error deleting price list:", error);
@@ -1963,10 +2181,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
-      const performanceRecord = await storage.getSupplierPerformanceRecord(id);
+      const performanceRecord = await storage.getSupplierPerformanceRecord(id, (req as any).user?.garageId);
       if (!performanceRecord) {
         return res.status(404).json({ message: "Performance record not found" });
       }
@@ -1983,7 +2201,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -1996,7 +2213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -2004,12 +2221,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const performanceRecord = await storage.updateSupplierPerformance(id, validationResult.data);
+      const performanceRecord = await storage.updateSupplierPerformance(id, validationResult.data, (req as any).user?.garageId);
+      if (!performanceRecord) return res.status(404).json({ message: "Performance record not found" });
       res.json(performanceRecord);
     } catch (error) {
       console.error("Error updating performance record:", error);
@@ -2017,10 +2234,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPerformance(id);
+      await storage.deleteSupplierPerformance(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Performance record deleted successfully" });
     } catch (error) {
       console.error("Error deleting performance record:", error);
@@ -2091,7 +2308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2133,7 +2350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { insertSupplierPartsAvailabilitySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2160,7 +2377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2181,7 +2398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Smart Job Assignment Routes - Feature #6
-  app.post('/api/assignments/recommend/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/assignments/recommend/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { getAIAssignmentRecommendations } = await import("./services/assignmentAI");
       const { jobCardId } = req.params;
@@ -2258,7 +2475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/assignments/rules/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/assignments/rules/:id', isAuthenticated, requireResourceOwnership({ table: 'assignment_rules' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2342,7 +2559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2362,7 +2579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2391,7 +2608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2411,7 +2628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:id/with-members', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:id/with-members', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2432,7 +2649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Queue Members
-  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members', idParam: 'queueId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallQueueMemberSchema } = await import("@shared/schema");
       const { queueId } = req.params;
@@ -2460,7 +2677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:queueId/members', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:queueId/members', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members', idParam: 'queueId' }), async (req: any, res) => {
     try {
       const { queueId } = req.params;
       const { active } = req.query;
@@ -2482,7 +2699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/queue-members/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2504,7 +2721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/queue-members/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2580,7 +2797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2600,7 +2817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/sessions/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2629,7 +2846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2665,7 +2882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Notes
-  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallNoteSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2689,7 +2906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:sessionId/notes', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:sessionId/notes', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), async (req: any, res) => {
     try {
       const { sessionId } = req.params;
       const notes = await storage.listCallNotes(sessionId);
@@ -2701,7 +2918,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Recordings
-  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallRecordingSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2723,7 +2940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), async (req: any, res) => {
     try {
       const { sessionId } = req.params;
       const recordings = await storage.listCallRecordings(sessionId);
@@ -2780,7 +2997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, requireResourceOwnership({ table: 'call_disposition_codes' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2802,7 +3019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, requireResourceOwnership({ table: 'call_disposition_codes' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2887,7 +3104,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2946,7 +3162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/purchase-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_orders' }), async (req, res) => {
     try {
       const { insertPurchaseOrderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2955,12 +3171,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const order = await storage.updatePurchaseOrder(id, validationResult.data);
+      const order = await storage.updatePurchaseOrder(id, validationResult.data, (req as any).user?.garageId);
+      if (!order) return res.status(404).json({ message: "Purchase order not found" });
       res.json(order);
     } catch (error) {
       console.error("Error updating purchase order:", error);
@@ -2968,10 +3184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_orders' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePurchaseOrder(id);
+      await storage.deletePurchaseOrder(id, (req as any).user?.garageId);
       res.json({ message: "Purchase order deleted successfully" });
     } catch (error) {
       console.error("Error deleting purchase order:", error);
@@ -2986,7 +3202,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -2999,7 +3214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-order-items/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-order-items/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_order_items', parent: { table: 'purchase_orders', fk: 'purchase_order_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deletePurchaseOrderItem(id);
@@ -3028,10 +3243,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/purchase-tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_tasks' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const task = await storage.updatePurchaseTask(id, req.body);
+      const task = await storage.updatePurchaseTask(id, req.body, (req as any).user?.garageId);
+      if (!task) return res.status(404).json({ message: "Purchase task not found" });
       res.json(task);
     } catch (error) {
       console.error("Error updating purchase task:", error);
@@ -3039,10 +3255,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_tasks' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePurchaseTask(id);
+      await storage.deletePurchaseTask(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Task deleted successfully" });
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -3062,10 +3278,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/quotation-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'quotation_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const request = await storage.updateQuotationRequest(id, req.body);
+      const request = await storage.updateQuotationRequest(id, req.body, (req as any).user?.garageId);
+      if (!request) return res.status(404).json({ message: "Quotation request not found" });
       res.json(request);
     } catch (error) {
       console.error("Error updating quotation request:", error);
@@ -3073,10 +3290,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/quotation-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'quotation_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteQuotationRequest(id);
+      await storage.deleteQuotationRequest(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Quotation request deleted successfully" });
     } catch (error) {
       console.error("Error deleting quotation request:", error);
@@ -3100,10 +3317,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-quotations/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-quotations/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_quotations', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
-      const quotation = await storage.updateSupplierQuotation(id, req.body);
+      const quotation = await storage.updateSupplierQuotation(id, req.body, (req as any).user?.garageId);
+      if (!quotation) return res.status(404).json({ message: "Supplier quotation not found" });
       res.json(quotation);
     } catch (error) {
       console.error("Error updating supplier quotation:", error);
@@ -3123,10 +3341,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-payments/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_payments' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const payment = await storage.updateSupplierPayment(id, req.body);
+      const payment = await storage.updateSupplierPayment(id, req.body, (req as any).user?.garageId);
+      if (!payment) return res.status(404).json({ message: "Supplier payment not found" });
       res.json(payment);
     } catch (error) {
       console.error("Error updating supplier payment:", error);
@@ -3134,10 +3353,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-payments/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_payments' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteSupplierPayment(id);
+      await storage.deleteSupplierPayment(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Payment deleted successfully" });
     } catch (error) {
       console.error("Error deleting payment:", error);
@@ -3171,10 +3390,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/deliveries/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/deliveries/:id', isAuthenticated, requireResourceOwnership({ table: 'deliveries' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const delivery = await storage.updateDelivery(id, req.body);
+      const delivery = await storage.updateDelivery(id, req.body, (req as any).user?.garageId);
+      if (!delivery) return res.status(404).json({ message: "Delivery not found" });
       res.json(delivery);
     } catch (error) {
       console.error("Error updating delivery:", error);
@@ -3182,10 +3402,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/deliveries/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/deliveries/:id', isAuthenticated, requireResourceOwnership({ table: 'deliveries' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteDelivery(id);
+      await storage.deleteDelivery(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
       res.json({ message: "Delivery deleted successfully" });
     } catch (error) {
       console.error("Error deleting delivery:", error);
@@ -3193,7 +3413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/deliveries/:id/timeline', isAuthenticated, async (req, res) => {
+  app.post('/api/deliveries/:id/timeline', isAuthenticated, requireResourceOwnership({ table: 'deliveries' }), async (req, res) => {
     try {
       const { id } = req.params;
       const event = await storage.createDeliveryTimelineEvent({ ...req.body, deliveryId: id });
@@ -3204,7 +3424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/deliveries/:id/live', isAuthenticated, async (req, res) => {
+  app.patch('/api/deliveries/:id/live', isAuthenticated, requireResourceOwnership({ table: 'deliveries' }), async (req, res) => {
     try {
       const { id } = req.params;
       const existing = await storage.getLiveDeliveryStatus(id);
@@ -3238,12 +3458,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/invoices/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { id } = req.params;
       const invoice = await storage.getInvoice(id);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
+      }
+      // Ownership check: a caller with a garage may only read records of that
+      // garage (404, not 403, to avoid confirming the record exists).
+      const sessionGarage = (req.user as any)?.garageId;
+      if (sessionGarage && invoice.garageId && invoice.garageId !== sessionGarage) {
+        return res.status(404).json({ message: 'Invoice not found' });
       }
       res.json(invoice);
     } catch (error) {
@@ -3261,16 +3487,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
+      // Pin the tenant to the session garage — never trust a body garageId (B12).
       const invoiceData = {
         ...validationResult.data,
         createdBy: userId,
+        garageId: req.user?.garageId ?? (validationResult.data as any).garageId,
       };
-      
+
       const invoice = await storage.createInvoice(invoiceData as any);
       res.status(201).json(invoice);
     } catch (error) {
@@ -3321,7 +3548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Secure invoice creation from job card - server-side calculation only
-  app.post('/api/invoices/from-job/:jobId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/invoices/from-job/:jobId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobId' }), async (req: any, res) => {
     try {
       const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems, saudiTaxCompliance, technicianProfiles } = await import("@shared/schema");
       const { eq, sql } = await import("drizzle-orm");
@@ -3505,7 +3732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/invoices/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { insertInvoiceSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -3514,7 +3741,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3542,7 +3768,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const invoice = await storage.updateInvoice(id, validationResult.data);
+      const invoice = await storage.updateInvoice(id, validationResult.data, (req as any).user?.garageId);
+      if (!invoice) return res.status(404).json({ message: "Invoice not found" });
       res.json(invoice);
     } catch (error) {
       console.error("Error updating invoice:", error);
@@ -3550,10 +3777,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/invoices/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
+  app.delete('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteInvoice(id);
+      await storage.deleteInvoice(id, (req as any).user?.garageId);
       res.json({ message: "Invoice deleted successfully" });
     } catch (error) {
       console.error("Error deleting invoice:", error);
@@ -3561,9 +3788,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
+  // F2 — financial reconciliation: cross-check this garage's invoices
+  // against payments, refunds and line items, reporting every mismatch.
+  app.get('/api/reconciliation/financial', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(400).json({ message: "No garage on session" });
+      res.json(await storage.reconcileFinancials(garageId));
+    } catch (error) {
+      console.error("Error reconciling financials:", error);
+      res.status(500).json({ message: "Failed to reconcile financials" });
+    }
+  });
+
+  app.get('/api/invoices/:id/items', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { id } = req.params;
+      // Parent ownership: items inherit the invoice's garage scope.
+      const sessionGarage = (req.user as any)?.garageId;
+      if (sessionGarage) {
+        const invoice = await storage.getInvoice(id);
+        if (!invoice || ((invoice as any).garageId && (invoice as any).garageId !== sessionGarage)) {
+          return res.status(404).json({ message: "Invoice not found" });
+        }
+      }
       const items = await storage.getInvoiceItems(id);
       res.json(items);
     } catch (error) {
@@ -3572,12 +3820,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payments', isAuthenticated, async (req, res) => {
+  app.get('/api/payments', isAuthenticated, async (req: any, res) => {
     try {
       const { invoice_id, status, method } = req.query;
       const { payments, invoices, users } = await import("@shared/schema");
-      
-      // Get payments with invoice and customer info
+      const sessionGarage = req.user?.garageId;
+
+      // Payments scoped to the caller's garage via the joined invoice — without
+      // this every tenant saw all garages' payments.
       let query = db.select({
         id: payments.id,
         invoiceId: payments.invoiceId,
@@ -3594,8 +3844,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .from(payments)
       .innerJoin(invoices, eq(payments.invoiceId, invoices.id))
       .innerJoin(users, eq(invoices.customerId, users.id))
+      .where(sessionGarage ? eq(invoices.garageId, sessionGarage) : undefined)
       .orderBy(desc(payments.paymentDate));
-      
+
       let results = await query;
       
       // Apply filters
@@ -3622,7 +3873,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -3631,39 +3881,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...validationResult.data,
         createdBy: userId,
       };
-      
-      const payment = await storage.createPayment(paymentData as any);
-      
-      // Update invoice paid amount
-      const invoice = await storage.getInvoice(payment.invoiceId);
-      if (invoice) {
-        const newPaidAmount = parseFloat(invoice.paidAmount) + parseFloat(payment.amount);
-        const balanceAmount = parseFloat(invoice.totalAmount) - newPaidAmount;
-        const newStatus = balanceAmount <= 0 ? 'paid' : invoice.status;
-        
-        await storage.updateInvoice(payment.invoiceId, {
-          paidAmount: newPaidAmount.toFixed(2),
-          balanceAmount: balanceAmount.toFixed(2),
-          status: newStatus,
-          paidAt: balanceAmount <= 0 ? new Date() : invoice.paidAt,
-        });
+
+      // Atomic: locks the invoice FOR UPDATE, inserts the payment, and updates
+      // the balance in one transaction — scoped to the caller's garage so a
+      // payment cannot target another tenant's invoice (B6). undefined = the
+      // garage-scoped invoice does not exist.
+      const result = await storage.recordPayment(paymentData as any, req.user?.garageId);
+      if (!result) {
+        return res.status(404).json({ message: "Invoice not found" });
       }
-      
-      res.status(201).json(payment);
+
+      res.status(201).json(result.payment);
     } catch (error) {
       console.error("Error creating payment:", error);
       res.status(500).json({ message: "Failed to create payment" });
     }
   });
 
-  app.delete('/api/payments/:id', isAuthenticated, async (req, res) => {
+  // Reversing a payment moves money — require manager/accountant, scope to the
+  // caller's garage, and restore the invoice balance atomically (B7).
+  app.delete('/api/payments/:id', isAuthenticated, requireResourceOwnership({ table: 'payments', parent: { table: 'invoices', fk: 'invoice_id' } }), requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deletePayment(id);
-      res.json({ message: "Payment deleted successfully" });
+      const ok = await storage.reversePayment(id, req.user?.garageId);
+      if (!ok) return res.status(404).json({ message: "Payment not found" });
+      res.json({ message: "Payment reversed successfully" });
     } catch (error) {
-      console.error("Error deleting payment:", error);
-      res.status(500).json({ message: "Failed to delete payment" });
+      console.error("Error reversing payment:", error);
+      res.status(500).json({ message: "Failed to reverse payment" });
     }
   });
 
@@ -3685,11 +3930,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const estimate = await storage.getEstimate(id);
       if (!estimate) {
+        return res.status(404).json({ message: "Estimate not found" });
+      }
+      // Tenant ownership (verification audit): a cross-tenant estimate read
+      // must 404, matching the invoice/supplier GET guards.
+      const g = (req.user as any)?.garageId;
+      if (g && (estimate as any).garageId && (estimate as any).garageId !== g) {
         return res.status(404).json({ message: "Estimate not found" });
       }
       res.json(estimate);
@@ -3740,7 +3991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { insertEstimateSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -3749,12 +4000,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
       
-      const estimate = await storage.updateEstimate(id, validationResult.data);
+      const estimate = await storage.updateEstimate(id, validationResult.data, (req as any).user?.garageId);
+      if (!estimate) return res.status(404).json({ message: "Estimate not found" });
       res.json(estimate);
     } catch (error) {
       console.error("Error updating estimate:", error);
@@ -3762,10 +4013,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteEstimate(id);
+      await storage.deleteEstimate(id, (req as any).user?.garageId);
       res.json({ message: "Estimate deleted successfully" });
     } catch (error) {
       console.error("Error deleting estimate:", error);
@@ -3773,7 +4024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/estimates/:id/items', isAuthenticated, async (req, res) => {
+  app.get('/api/estimates/:id/items', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const items = await storage.getEstimateItems(id);
@@ -3785,7 +4036,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Convert estimate to job card
-  app.post('/api/estimates/:id/convert-to-job-card', isAuthenticated, async (req: any, res) => {
+  app.post('/api/estimates/:id/convert-to-job-card', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -3801,20 +4052,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const items = await storage.getEstimateItems(id);
       
-      // Create job card from estimate
+      // Create job card from estimate. job_cards requires jobNumber,
+      // vehicleInfo, serviceType and createdBy (all NOT NULL, no default) —
+      // omitting them made every conversion fail with a constraint violation.
       const jobCardData = {
+        jobNumber: `JC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
         garageId: estimate.garageId,
         customerId: estimate.customerId,
         vehicleId: estimate.vehicleId,
-        title: estimate.title,
-        description: estimate.description || "",
+        vehicleInfo: (estimate as any).vehicleInfo ?? {},
+        serviceType: "repair",
+        description: [estimate.title, estimate.description].filter(Boolean).join(" — ") || "Converted from estimate",
         status: "pending" as const,
         priority: "medium" as const,
         estimatedCost: estimate.totalAmount,
         actualCost: "0.00",
+        createdBy: userId,
       };
       
-      const jobCard = await storage.createJobCard(jobCardData);
+      const jobCard = await storage.createJobCard(jobCardData as any);
       
       // Create task assignments from estimate items
       for (const item of items) {
@@ -3846,7 +4102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Convert estimate to invoice
-  app.post('/api/estimates/:id/convert-to-invoice', isAuthenticated, async (req: any, res) => {
+  app.post('/api/estimates/:id/convert-to-invoice', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -3878,11 +4134,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         notes: estimate.notes,
       };
       
-      const invoiceNumber = `INV-${Date.now()}`;
-      const invoice = await storage.createInvoice({ 
-        ...invoiceData, 
-        invoiceNumber, 
-        createdBy: userId 
+      // Crypto-random suffix so two invoices created in the same millisecond
+      // (even across tenants, against the global unique) cannot collide (B17).
+      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const invoice = await storage.createInvoice({
+        ...invoiceData,
+        invoiceNumber,
+        createdBy: userId
       });
       
       // Create invoice items from estimate items
@@ -4072,14 +4330,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Notification routes - Module 21
   app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
     try {
-      const { recipient_id, garage_id, status, type } = req.query;
-      const userId = req.user?.id || 'default-user';
-      
-      // If no recipient_id specified, use current user
-      const recipientId = recipient_id || userId;
-      
+      const { garage_id, status, type } = req.query;
+      const userId = req.user?.id;
+
+      // Always the session user's own notifications — a client-supplied
+      // recipient_id previously let anyone read another user's notifications
+      // (which carry customer/appointment/invoice PII) across garages.
       const notifications = await storage.getNotifications(
-        recipientId as string,
+        userId as string,
         garage_id as string | undefined,
         status as string | undefined,
         type as string | undefined
@@ -4104,7 +4362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.getNotification(id);
@@ -4136,7 +4394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.updateNotification(id, req.body);
@@ -4147,7 +4405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/notifications/:id/read', isAuthenticated, async (req, res) => {
+  app.patch('/api/notifications/:id/read', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.markNotificationAsRead(id);
@@ -4158,7 +4416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteNotification(id);
@@ -4538,7 +4796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.id || 'default-user';
       const { eventMap } = req.body;
-      const preferences = await storage.upsertNotificationPreferences(userId, eventMap);
+      const preferences = await storage.upsertNotificationPreferences({ userId, eventMap });
       res.json(preferences);
     } catch (error) {
       console.error("Error saving notification preferences:", error);
@@ -4665,7 +4923,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/availability/:id', isAuthenticated, requireResourceOwnership({ table: 'technician_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateTechnicianAvailability(id, req.body);
@@ -4676,7 +4934,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/availability/:id', isAuthenticated, requireResourceOwnership({ table: 'technician_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTechnicianAvailability(id);
@@ -4705,7 +4963,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/recurring-appointments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/recurring-appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'recurring_appointments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateRecurringAppointment(id, req.body);
@@ -4716,7 +4974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/recurring-appointments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/recurring-appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'recurring_appointments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteRecurringAppointment(id);
@@ -4727,7 +4985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/recurring-appointments/:id/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/recurring-appointments/:id/generate', isAuthenticated, requireResourceOwnership({ table: 'recurring_appointments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { startDate, endDate } = req.body;
@@ -4766,7 +5024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/calendar-events/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_events' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateCalendarEvent(id, req.body);
@@ -4777,7 +5035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/calendar-events/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_events' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteCalendarEvent(id);
@@ -4804,7 +5062,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/time-slots/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/time-slots/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), async (req: any, res) => {
     try {
       const { technicianId } = req.params;
       const { date, duration } = req.query;
@@ -4825,7 +5083,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/technician-workload/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/technician-workload/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), async (req: any, res) => {
     try {
       const { technicianId } = req.params;
       const { startDate, endDate } = req.query;
@@ -4893,16 +5151,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PayPal Routes (PayPal integration blueprint - Module 28)
-  app.get("/paypal/setup", async (req, res) => {
-    await loadPaypalDefault(req, res);
+  const withPaypal = async (
+    res: any,
+    run: (mod: typeof import("./paypal")) => Promise<unknown>,
+  ) => {
+    if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
+      return res.status(503).json({ message: "PayPal is not configured on this server" });
+    }
+    await run(await import("./paypal"));
+  };
+
+  app.get("/paypal/setup", isAuthenticated, async (req, res) => {
+    await withPaypal(res, (paypal) => paypal.loadPaypalDefault(req, res));
   });
 
-  app.post("/paypal/order", async (req, res) => {
-    await createPaypalOrder(req, res);
+  app.post("/paypal/order", isAuthenticated, async (req, res) => {
+    await withPaypal(res, (paypal) => paypal.createPaypalOrder(req, res));
   });
 
-  app.post("/paypal/order/:orderID/capture", async (req, res) => {
-    await capturePaypalOrder(req, res);
+  app.post("/paypal/order/:orderID/capture", isAuthenticated, async (req, res) => {
+    await withPaypal(res, (paypal) => paypal.capturePaypalOrder(req, res));
   });
 
   // Webhook to handle Stripe events
@@ -4948,13 +5216,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { invoiceId } = paymentIntent.metadata;
 
         if (invoiceId) {
-          // Update invoice as paid
+          // Settle atomically (verification audit): the old path OVERWROTE
+          // paidAmount with the intent amount and forced balance to 0 even on a
+          // partial payment, non-atomically and without a payment row. Route
+          // through settleGatewayPayment so the invoice is locked FOR UPDATE, the
+          // amount ACCUMULATES, a payment row is recorded, and the B9 unique index
+          // (gateway, gateway_transaction_id) makes a retried event idempotent.
           const paidAmount = Number(paymentIntent.amount) / 100;
-          await storage.updateInvoice(invoiceId, {
-            status: 'paid',
-            paidAmount: paidAmount.toString(),
-            balanceAmount: '0',
-            paidAt: new Date(),
+          await storage.settleGatewayPayment({
+            invoiceId,
+            amount: paidAmount,
+            currency: String(paymentIntent.currency || 'sar').toUpperCase(),
+            gateway: 'stripe',
+            methodType: 'card',
+            transactionId: paymentIntent.id,
           });
         }
       }
@@ -4970,7 +5245,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stock Alerts
   app.get('/api/stock-alerts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -4992,10 +5269,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/stock-alerts/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/stock-alerts/:id', isAuthenticated, requireResourceOwnership({ table: 'stock_alerts' }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const alert = await storage.updateStockAlert(id, req.body);
+      const alert = await storage.updateStockAlert(id, req.body, req.user?.garageId);
+      if (!alert) return res.status(404).json({ message: "Stock alert not found" });
       res.json(alert);
     } catch (error) {
       console.error("Error updating stock alert:", error);
@@ -5003,7 +5281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/stock-alerts/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/stock-alerts/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'stock_alerts' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5018,7 +5296,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reorder Settings
   app.get('/api/reorder-settings', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, sparePartId } = req.query;
+      const { garageId: garageIdParam, sparePartId } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5040,10 +5320,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/reorder-settings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/reorder-settings/:id', isAuthenticated, requireResourceOwnership({ table: 'reorder_settings' }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const setting = await storage.updateReorderSetting(id, req.body);
+      const setting = await storage.updateReorderSetting(id, req.body, req.user?.garageId);
+      if (!setting) return res.status(404).json({ message: "Reorder setting not found" });
       res.json(setting);
     } catch (error) {
       console.error("Error updating reorder setting:", error);
@@ -5090,7 +5371,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inventory Audit Trail
   app.get('/api/inventory-audit-trail', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, sparePartId, limit } = req.query;
+      const { garageId: garageIdParam, sparePartId, limit } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5119,7 +5402,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Inventory Transfers
   app.get('/api/inventory-transfers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5131,7 +5416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/inventory-transfers/:id', isAuthenticated, requireResourceOwnership({ table: 'inventory_transfers', tenantColumns: ['from_garage_id', 'to_garage_id'] }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const transfer = await storage.getInventoryTransfer(id);
@@ -5155,7 +5440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/inventory-transfers/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/inventory-transfers/:id', isAuthenticated, requireResourceOwnership({ table: 'inventory_transfers', tenantColumns: ['from_garage_id', 'to_garage_id'] }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const transfer = await storage.updateInventoryTransfer(id, req.body);
@@ -5166,7 +5451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/inventory-transfers/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/inventory-transfers/:id/approve', isAuthenticated, requireResourceOwnership({ table: 'inventory_transfers', tenantColumns: ['from_garage_id', 'to_garage_id'] }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5178,7 +5463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/inventory-transfers/:id/complete', isAuthenticated, async (req: any, res) => {
+  app.post('/api/inventory-transfers/:id/complete', isAuthenticated, requireResourceOwnership({ table: 'inventory_transfers', tenantColumns: ['from_garage_id', 'to_garage_id'] }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5218,10 +5503,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/payment-plans/:id', isAuthenticated, requireResourceOwnership({ table: 'payment_plans', parent: { table: 'invoices', fk: 'invoice_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const plan = await storage.getPaymentPlan(id);
+      const plan = await storage.getPaymentPlan(id, req.user?.garageId);
       if (!plan) {
         return res.status(404).json({ message: "Payment plan not found" });
       }
@@ -5243,10 +5528,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/payment-plans/:id', isAuthenticated, requireResourceOwnership({ table: 'payment_plans', parent: { table: 'invoices', fk: 'invoice_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const plan = await storage.updatePaymentPlan(id, req.body);
+      const plan = await storage.updatePaymentPlan(id, req.body, req.user?.garageId);
+      if (!plan) return res.status(404).json({ message: "Payment plan not found" });
       res.json(plan);
     } catch (error) {
       console.error("Error updating payment plan:", error);
@@ -5269,10 +5555,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/installments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/installments/:id', isAuthenticated, requireResourceOwnership({ table: 'installments', parent: { table: 'payment_plans', fk: 'payment_plan_id', parent: { table: 'invoices', fk: 'invoice_id' } } }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const installment = await storage.updateInstallment(id, req.body);
+      const installment = await storage.updateInstallment(id, req.body, req.user?.garageId);
+      if (!installment) return res.status(404).json({ message: "Installment not found" });
       res.json(installment);
     } catch (error) {
       console.error("Error updating installment:", error);
@@ -5283,7 +5570,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Refunds
   app.get('/api/refunds', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const refunds = await storage.getRefunds(garageId, status);
       res.json(refunds);
     } catch (error) {
@@ -5295,7 +5584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const refund = await storage.getRefund(id);
+      const refund = await storage.getRefund(id, req.user?.garageId);
       if (!refund) {
         return res.status(404).json({ message: "Refund not found" });
       }
@@ -5306,10 +5595,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const refund = await storage.createRefund({ ...req.body, requestedBy: userId });
+      const refund = await storage.createRefund({ ...req.body, garageId: req.user?.garageId || req.body.garageId, status: 'pending', requestedBy: userId });
       res.status(201).json(refund);
     } catch (error) {
       console.error("Error creating refund:", error);
@@ -5317,10 +5606,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/refunds/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/refunds/:id', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
-      const refund = await storage.updateRefund(id, req.body);
+      const refund = await storage.updateRefund(id, req.body, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error updating refund:", error);
@@ -5328,7 +5618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds/:id/approve', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5336,7 +5626,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         approvedBy: userId,
         approvedAt: new Date(),
-      });
+      }, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error approving refund:", error);
@@ -5344,7 +5635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/refunds/:id/process', isAuthenticated, async (req: any, res) => {
+  app.post('/api/refunds/:id/process', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5352,7 +5643,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'processed',
         processedBy: userId,
         processedAt: new Date(),
-      });
+      }, req.user?.garageId);
+      if (!refund) return res.status(404).json({ message: "Refund not found" });
       res.json(refund);
     } catch (error) {
       console.error("Error processing refund:", error);
@@ -5363,7 +5655,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Tax Configurations
   app.get('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5381,7 +5675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/tax-configurations', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const config = await storage.createTaxConfiguration({ ...req.body, createdBy: userId });
+      const config = await storage.createTaxConfiguration({ ...req.body, garageId: req.user?.garageId || req.body.garageId, createdBy: userId });
       res.status(201).json(config);
     } catch (error) {
       console.error("Error creating tax configuration:", error);
@@ -5389,10 +5683,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/tax-configurations/:id', isAuthenticated, requireResourceOwnership({ table: 'tax_configurations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      const config = await storage.updateTaxConfiguration(id, req.body);
+      const config = await storage.updateTaxConfiguration(id, req.body, req.user?.garageId);
+      if (!config) return res.status(404).json({ message: "Tax configuration not found" });
       res.json(config);
     } catch (error) {
       console.error("Error updating tax configuration:", error);
@@ -5400,10 +5695,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/tax-configurations/:id', isAuthenticated, requireResourceOwnership({ table: 'tax_configurations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteTaxConfiguration(id);
+      await storage.deleteTaxConfiguration(id, req.user?.garageId); // cross-tenant = scoped no-op
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting tax configuration:", error);
@@ -5414,7 +5709,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Discounts & Promotions
   app.get('/api/discounts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) {
         return res.status(400).json({ message: "garageId is required" });
       }
@@ -5429,7 +5726,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/discounts/:id', isAuthenticated, requireResourceOwnership({ table: 'discounts_promotions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const discount = await storage.getDiscount(id);
@@ -5454,7 +5751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/discounts/:id', isAuthenticated, requireResourceOwnership({ table: 'discounts_promotions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const discount = await storage.updateDiscount(id, req.body);
@@ -5465,7 +5762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/discounts/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/discounts/:id', isAuthenticated, requireResourceOwnership({ table: 'discounts_promotions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteDiscount(id);
@@ -5505,14 +5802,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Global Search
   app.get('/api/global-search', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, query, modules } = req.query;
-      
-      if (!garageId || !query) {
+      const { garageId: garageIdParam, query, modules } = req.query;
+      // Session garage wins — the query param let any tenant search another
+      // garage's data. Honored only for garage-less principals (platform admin).
+      const gid = req.user?.garageId || garageIdParam;
+
+      if (!gid || !query) {
         return res.status(400).json({ message: "Missing required parameters" });
       }
-      
+
       const modulesList = modules ? modules.split(',') : undefined;
-      const results = await storage.globalSearch(garageId, query, modulesList);
+      const results = await storage.globalSearch(gid, query, modulesList);
       res.json(results);
     } catch (error) {
       console.error("Error in global search:", error);
@@ -5523,7 +5823,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Saved Filter Presets
   app.get('/api/filter-presets', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, module } = req.query;
+      const { garageId: garageIdParam, module } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const userId = req.user?.id || 'default-user';
       const presets = await storage.getSavedFilterPresets(garageId, userId, module);
       res.json(presets);
@@ -5548,7 +5850,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/filter-presets/:id', isAuthenticated, requireResourceOwnership({ table: 'saved_filter_presets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const preset = await storage.updateSavedFilterPreset(id, req.body);
@@ -5559,7 +5861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/filter-presets/:id', isAuthenticated, requireResourceOwnership({ table: 'saved_filter_presets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSavedFilterPreset(id);
@@ -5573,7 +5875,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Export Jobs
   app.get('/api/export-jobs', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const userId = req.user?.id || 'default-user';
       const jobs = await storage.getExportJobs(garageId, userId);
       res.json(jobs);
@@ -5665,7 +5969,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/export-jobs/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/export-jobs/:id', isAuthenticated, requireResourceOwnership({ table: 'export_jobs' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const job = await storage.getExportJob(id);
@@ -5717,7 +6021,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 30: Business Intelligence & Analytics
   app.get('/api/bi/profitable-services', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5738,7 +6044,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/peak-hours', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5759,7 +6067,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/technician-utilization', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5780,7 +6090,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/customer-acquisition-cost', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5801,7 +6113,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/bi/customer-lifetime-value', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       
       if (!garageId) {
         return res.status(400).json({ message: "Garage ID is required" });
@@ -5842,7 +6156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/attendance/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const record = await storage.getAttendance(req.params.id);
@@ -5882,7 +6196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/attendance/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -5925,7 +6239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/clock-out/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/clock-out/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -5946,7 +6260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/break-start/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/break-start/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -5967,7 +6281,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/break-end/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/break-end/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -6001,7 +6315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const template = await storage.getShiftTemplate(req.params.id);
@@ -6041,7 +6355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftTemplate(req.params.id);
@@ -6064,7 +6378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Cannot change garage" });
       }
       
-      const template = await storage.updateShiftTemplate(req.params.id, validated.data);
+      const template = await storage.updateShiftTemplate(req.params.id, validated.data, userGarageId);
       res.json(template);
     } catch (error) {
       console.error("Error updating shift template:", error);
@@ -6072,7 +6386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftTemplate(req.params.id);
@@ -6085,7 +6399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      await storage.deleteShiftTemplate(req.params.id);
+      await storage.deleteShiftTemplate(req.params.id, userGarageId);
       res.json({ message: "Shift template deleted successfully" });
     } catch (error) {
       console.error("Error deleting shift template:", error);
@@ -6132,7 +6446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/shift-assignments/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_assignments' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftAssignment(req.params.id);
@@ -6155,7 +6469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Cannot change garage" });
       }
       
-      const assignment = await storage.updateShiftAssignment(req.params.id, validated.data);
+      const assignment = await storage.updateShiftAssignment(req.params.id, validated.data, userGarageId);
       res.json(assignment);
     } catch (error) {
       console.error("Error updating shift assignment:", error);
@@ -6163,7 +6477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/shift-assignments/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_assignments' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftAssignment(req.params.id);
@@ -6176,7 +6490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      await storage.deleteShiftAssignment(req.params.id);
+      await storage.deleteShiftAssignment(req.params.id, userGarageId);
       res.json({ message: "Shift assignment deleted successfully" });
     } catch (error) {
       console.error("Error deleting shift assignment:", error);
@@ -6217,7 +6531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/commission-rules/:id', isAuthenticated, requireResourceOwnership({ table: 'commission_rules' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommissionRule(req.params.id);
@@ -6248,7 +6562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/commission-rules/:id', isAuthenticated, requireResourceOwnership({ table: 'commission_rules' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommissionRule(req.params.id);
@@ -6308,7 +6622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/commissions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/commissions/:id', isAuthenticated, requireResourceOwnership({ table: 'commissions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommission(req.params.id);
@@ -6339,7 +6653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       
@@ -6378,7 +6692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const review = await storage.getPerformanceReview(req.params.id);
@@ -6418,7 +6732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getPerformanceReview(req.params.id);
@@ -6449,7 +6763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getPerformanceReview(req.params.id);
@@ -6503,7 +6817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getTraining(req.params.id);
@@ -6534,7 +6848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getTraining(req.params.id);
@@ -6593,7 +6907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/employee-trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getEmployeeTraining(req.params.id);
@@ -6624,7 +6938,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/employee-trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getEmployeeTraining(req.params.id);
@@ -6693,7 +7007,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const estimation = await storage.getAIJobEstimation(req.params.id);
@@ -6713,7 +7027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIJobEstimation(req.params.id);
@@ -6876,7 +7190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/maintenance-predictions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/maintenance-predictions/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const prediction = await storage.getAIMaintenancePrediction(req.params.id);
@@ -6896,7 +7210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIMaintenancePrediction(req.params.id);
@@ -6939,10 +7253,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (jobCards.length > 0) {
           // Use GPT-5 AI to analyze service patterns and predict maintenance needs
+          // job_cards has no mileage column; the closest reading is the
+          // vehicle's own odometer.
           const serviceHistory = jobCards.map(jc => ({
             date: jc.createdAt,
             description: jc.description || 'Service performed',
-            mileage: jc.mileage || vehicle.mileage,
+            mileage: vehicle.mileage ?? 0,
             cost: jc.totalCost || 0
           }));
 
@@ -6963,7 +7279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               predictedIssue: aiPred.issue || `Maintenance needed for ${vehicle.make} ${vehicle.model}`,
               severity: aiPred.severity || 'medium',
               recommendedAction: aiPred.recommendation || 'Schedule inspection',
-              estimatedTimeframe: `Around ${aiPred.estimatedMiles || vehicle.mileage + 1000} miles`,
+              estimatedTimeframe: `Around ${aiPred.estimatedMiles || (vehicle.mileage ?? 0) + 1000} miles`,
               confidence: Math.round((aiPred.probability || 0.75) * 100),
               basedOnData: {
                 serviceHistory: serviceHistory.slice(-3),
@@ -7042,7 +7358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const recommendation = await storage.getAIPartsRecommendation(req.params.id);
@@ -7062,7 +7378,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIPartsRecommendation(req.params.id);
@@ -7137,7 +7453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const optimization = await storage.getAIScheduleOptimization(req.params.id);
@@ -7157,7 +7473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIScheduleOptimization(req.params.id);
@@ -7272,7 +7588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/chat-conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/chat-conversations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const conversation = await storage.getAIChatConversation(req.params.id);
@@ -7292,7 +7608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIChatConversation(req.params.id);
@@ -7463,7 +7779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/ocr-documents/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const document = await storage.getOCRDocument(req.params.id);
       if (!document) {
@@ -7476,7 +7792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/ocr-documents/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const { extractedData, status } = req.body;
       const document = await storage.updateOCRDocument(req.params.id, {
@@ -7760,7 +8076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/email/campaigns/:id/send', isAuthenticated, async (req: any, res) => {
+  app.post('/api/email/campaigns/:id/send', isAuthenticated, requireResourceOwnership({ table: 'email_campaigns' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const result = await phase3Service.sendEmailCampaign(id);
@@ -7771,10 +8087,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/email/campaigns/:id/track', isAuthenticated, async (req: any, res) => {
+  app.post('/api/email/campaigns/:id/track', isAuthenticated, requireResourceOwnership({ table: 'email_campaigns' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { action } = req.body;
+      if (!['opens', 'clicks', 'bounces', 'unsubscribes'].includes(String(action))) {
+        return res.status(400).json({ message: "Invalid engagement action" });
+      }
       const result = await phase3Service.trackEmailEngagement(id, action);
       res.json(result);
     } catch (error: any) {
@@ -7842,7 +8161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video/consultations/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/video/consultations/:id/start', isAuthenticated, requireResourceOwnership({ table: 'video_consultations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const result = await phase3Service.startVideoConsultation(id);
@@ -7853,7 +8172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video/consultations/:id/end', isAuthenticated, async (req: any, res) => {
+  app.post('/api/video/consultations/:id/end', isAuthenticated, requireResourceOwnership({ table: 'video_consultations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { notes, recordingUrl } = req.body;
@@ -7933,7 +8252,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/stripe/refund', isAuthenticated, async (req: any, res) => {
+  // Refunds move real money out — restrict to manager/accountant (B13).
+  app.post('/api/stripe/refund', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
     try {
       const validated = validatePatchBody(req, res, createRefundSchema);
       if (!validated.ok) return;
@@ -8005,37 +8325,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video-estimates', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const userId = req.user?.id || 'default-user';
-      const { customerId, vehicleId, estimatedCost } = req.body;
-      
-      const estimate = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        customerId,
-        vehicleId,
-        technicianId: userId,
-        estimatedCost,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-      };
-      
-      res.json(estimate);
-    } catch (error) {
-      console.error("Error creating video estimate:", error);
-      res.status(500).json({ message: "Failed to create video estimate" });
-    }
-  });
-
-  app.post('/api/video-estimates/:id/send', isAuthenticated, async (req: any, res) => {
-    try {
-      res.json({ success: true, message: "Video estimate sent to customer" });
-    } catch (error) {
-      console.error("Error sending video estimate:", error);
-      res.status(500).json({ message: "Failed to send video estimate" });
-    }
+  app.post('/api/video-estimates/:id/send', isAuthenticated, requireResourceOwnership({ table: 'video_estimates' }), async (_req: any, res) => {
+    // No delivery channel (email/SMS) is integrated yet. Do not fake success.
+    res.status(501).json({ success: false, message: "Sending video estimates is not configured on this server yet." });
   });
 
   app.get('/api/vehicle-walkarounds', isAuthenticated, async (req: any, res) => {
@@ -8133,26 +8425,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Data Import
-  app.post('/api/import', isAuthenticated, async (req: any, res) => {
+  app.post('/api/import', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
-      const { garageId, module, data, conflictResolution = 'skip' } = req.body;
+      const { module, data, conflictResolution = 'skip' } = req.body;
       const userId = req.user?.id || 'default-user';
-      
+      // Tenant comes from the session, never the request body — a staff user
+      // cannot import into another garage.
+      const garageId = req.user?.garageId;
+
       if (!garageId) {
-        return res.status(400).json({ message: "Garage ID is required" });
+        return res.status(400).json({ message: "No garage associated with your account" });
       }
-      
+
       if (!module || !data || !Array.isArray(data)) {
         return res.status(400).json({ message: "Invalid import data" });
       }
-      
+      // Bound the batch so a huge array can't block the event loop / hammer the DB.
+      if (data.length > 1000) {
+        return res.status(400).json({ message: "Import batch too large (max 1000 rows)" });
+      }
+
       const results = { imported: 0, skipped: 0, errors: [] as any[] };
-      
+
       for (const item of data) {
         try {
           switch (module) {
             case 'customers':
-              await storage.createUser({ ...item, garageId, createdBy: userId });
+              // Force customer identity — never let an import body set role/
+              // userType/isActive and mint an ADMIN (privilege escalation).
+              await storage.createUser({
+                ...item,
+                role: 'CUSTOMER',
+                userType: 'customer',
+                isActive: true,
+                garageId,
+                createdBy: userId,
+              });
               results.imported++;
               break;
             case 'vehicles':
@@ -8160,11 +8468,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
               results.imported++;
               break;
             case 'spareParts':
-              await storage.createSparePart({ ...item, garageId });
+              // spare_parts is a global catalogue (no garage_id column) and
+              // requires createdBy; without a stock row the imported part is
+              // invisible to garage-scoped listings, so create one.
+              {
+                const part = await storage.createSparePart({ ...item, createdBy: item.createdBy || userId });
+                await storage.createSparePartInventory({
+                  sparePartId: (part as any).id,
+                  garageId,
+                  stockQuantity: Number(item.stockQuantity ?? item.quantity ?? 0),
+                } as any);
+              }
               results.imported++;
               break;
             case 'jobCards':
-              await storage.createJobCard({ ...item, garageId });
+              // job_cards requires jobNumber/createdBy (NOT NULL, no default).
+              await storage.createJobCard({
+                jobNumber: item.jobNumber || `JC-${Date.now()}-${results.imported}`,
+                serviceType: item.serviceType || 'repair',
+                vehicleInfo: item.vehicleInfo ?? {},
+                createdBy: item.createdBy || userId,
+                ...item,
+                garageId,
+              });
               results.imported++;
               break;
             case 'invoices':
@@ -8223,7 +8549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/integrations/connections/:id', isAuthenticated, requireResourceOwnership({ table: 'integration_connections' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getIntegrationConnection(req.params.id);
@@ -8240,7 +8566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/integrations/connections/:id', isAuthenticated, requireResourceOwnership({ table: 'integration_connections' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getIntegrationConnection(req.params.id);
@@ -8705,7 +9031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post('/api/security/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+  app.post('/api/security/backups/:id/restore', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const backup = await storage.getBackupJob(id);
@@ -8718,12 +9044,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Cannot restore incomplete backup" });
       }
       
-      // In production, this would trigger a restore process
-      // For now, return success message
-      res.json({ 
-        message: "Restore initiated successfully",
-        backupId: id,
-        estimatedTime: "5-10 minutes"
+      // No restore engine is integrated — do not fake success on a
+      // destructive-looking action.
+      res.status(501).json({
+        message: "Backup restore is not available on this server yet.",
       });
     } catch (error) {
       console.error("Error restoring backup:", error);
@@ -8770,7 +9094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.patch('/api/security/gdpr/requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/security/gdpr/requests/:id', isAuthenticated, requireResourceOwnership({ table: 'gdpr_data_requests' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status, processedBy, completedAt, exportUrl } = req.body;
@@ -8825,7 +9149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.patch('/api/security/consents/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/security/consents/:id', isAuthenticated, requireResourceOwnership({ table: 'user_consents', parent: { table: 'users', fk: 'user_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { granted } = req.body;
@@ -8880,7 +9204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete('/api/security/permissions/overrides/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/security/permissions/overrides/:id', isAuthenticated, requireResourceOwnership({ table: 'permission_overrides' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deletePermissionOverride(id);
@@ -8962,7 +9286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/history/undo/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/history/undo/:id', isAuthenticated, requireResourceOwnership({ table: 'action_history' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const history = await storage.undoAction(id);
@@ -8973,7 +9297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/history/redo/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/history/redo/:id', isAuthenticated, requireResourceOwnership({ table: 'action_history' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const history = await storage.redoAction(id);
@@ -9005,7 +9329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const conversation = await storage.getChatConversation(id);
@@ -9062,7 +9386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Messages
-  app.get('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id/messages', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { limit } = req.query;
@@ -9079,7 +9403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9110,7 +9434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/chat/messages/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { content } = req.body;
@@ -9123,7 +9447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/messages/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteChatMessage(id);
@@ -9135,7 +9459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Participants
-  app.get('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id/participants', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const participants = await storage.getChatParticipants(id);
@@ -9146,7 +9470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/participants', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { userId, role } = req.body;
@@ -9164,7 +9488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/read', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/read', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9290,7 +9614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/support/tickets/:id/status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/support/tickets/:id/status', isAuthenticated, requireResourceOwnership({ table: 'support_tickets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9326,7 +9650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/support/tickets/:id/assign', isAuthenticated, async (req: any, res) => {
+  app.post('/api/support/tickets/:id/assign', isAuthenticated, requireResourceOwnership({ table: 'support_tickets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9355,7 +9679,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Attachments
-  app.post('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/messages/:id/attachments', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9406,7 +9730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/messages/:id/attachments', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const attachments = await storage.getChatAttachments(id);
@@ -9417,7 +9741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/attachments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/attachments/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_attachments', parent: { table: 'chat_messages', fk: 'message_id', parent: { table: 'chat_conversations', fk: 'conversation_id' } } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteChatAttachment(id);
@@ -9429,7 +9753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Reactions
-  app.post('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9468,7 +9792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9497,7 +9821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const reactions = await storage.getMessageReactions(id);
@@ -9850,7 +10174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const media = await storage.getMediaAttachments(
         relatedType, 
         relatedId, 
-        category as string | undefined
+        category as string | undefined,
+        (req as any).user?.garageId,
       );
       res.json(media);
     } catch (error) {
@@ -9859,10 +10184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/media-attachments/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/media-attachments/:id', isAuthenticated, requireResourceOwnership({ table: 'media_attachments' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteMediaAttachment(id);
+      await storage.deleteMediaAttachment(id, (req as any).user?.garageId);
       res.json({ message: "Media deleted successfully" });
     } catch (error) {
       console.error("Error deleting media attachment:", error);
@@ -9870,7 +10195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/media-attachments/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/media-attachments/:id', isAuthenticated, requireResourceOwnership({ table: 'media_attachments' }), async (req, res) => {
     try {
       const { id } = req.params;
       const { description, category, metadata } = req.body;
@@ -9879,7 +10204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description,
         category,
         metadata,
-      });
+      }, (req as any).user?.garageId);
       
       res.json(media);
     } catch (error) {
@@ -10092,7 +10417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/customer/:customerId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/customer/:customerId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const tokens = await storage.getQRCodeTokensByCustomer(customerId);
@@ -10103,7 +10428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/appointment/:appointmentId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/appointment/:appointmentId', isAuthenticated, requireResourceOwnership({ table: 'appointments', idParam: 'appointmentId' }), async (req, res) => {
     try {
       const { appointmentId } = req.params;
       const tokens = await storage.getQRCodeTokensByAppointment(appointmentId);
@@ -10114,7 +10439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/scan-logs/:qrCodeId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/scan-logs/:qrCodeId', isAuthenticated, requireResourceOwnership({ table: 'qr_code_tokens', idParam: 'qrCodeId' }), async (req, res) => {
     try {
       const { qrCodeId } = req.params;
       const logs = await storage.getQRScanLogsByToken(qrCodeId);
@@ -10125,7 +10450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/scan-logs/garage/:garageId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/scan-logs/garage/:garageId', isAuthenticated, requireResourceOwnership({ table: 'qr_scan_logs', idParam: 'garageId', parent: { table: 'qr_code_tokens', fk: 'qr_code_id' } }), async (req, res) => {
     try {
       const { garageId } = req.params;
       const { limit } = req.query;
@@ -10166,7 +10491,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       const fleetGroup = await storage.getFleetGroup(req.params.id);
       if (!fleetGroup) {
@@ -10179,7 +10504,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       const fleetGroup = await storage.updateFleetGroup(req.params.id, req.body);
       res.json(fleetGroup);
@@ -10189,7 +10514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       await storage.deleteFleetGroup(req.params.id);
       res.status(204).send();
@@ -10210,7 +10535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/vehicles/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/vehicles/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const fleetVehicles = await storage.getFleetVehiclesByGroup(req.params.fleetGroupId);
       res.json(fleetVehicles);
@@ -10220,7 +10545,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const fleetVehicle = await storage.getFleetVehicle(req.params.id);
       if (!fleetVehicle) {
@@ -10233,7 +10558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const fleetVehicle = await storage.updateFleetVehicle(req.params.id, req.body);
       res.json(fleetVehicle);
@@ -10243,7 +10568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetVehicle(req.params.id);
       res.status(204).send();
@@ -10267,7 +10592,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/contracts/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/contracts/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const contracts = await storage.getFleetContractsByGroup(req.params.fleetGroupId);
       res.json(contracts);
@@ -10277,7 +10602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const contract = await storage.getFleetContract(req.params.id);
       if (!contract) {
@@ -10290,7 +10615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const contract = await storage.updateFleetContract(req.params.id, req.body);
       res.json(contract);
@@ -10300,7 +10625,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetContract(req.params.id);
       res.status(204).send();
@@ -10316,7 +10641,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user?.garageId;
       
       // Fetch all contracts for the garage
-      const contracts = await db.select().from(fleetContracts).where(eq(fleetContracts.garageId, garageId));
+      // fleet_contracts has no garage_id — it belongs to a fleet_group, and
+      // that is what carries the garage. Scope through the group.
+      const contracts = await db
+        .select()
+        .from(fleetContracts)
+        .where(sql`EXISTS (SELECT 1 FROM ${fleetGroups} WHERE ${fleetGroups.id} = ${fleetContracts.fleetGroupId} AND ${fleetGroups.garageId} = ${garageId})`);
       
       // Fetch related data for each contract
       const enhancedContracts = await Promise.all(contracts.map(async (contract) => {
@@ -10356,14 +10686,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newEndDate = new Date(contract.endDate);
       newEndDate.setFullYear(newEndDate.getFullYear() + 1);
 
+      // Column names follow contract_renewals: status (not renewalStatus),
+      // proposedMonthlyFee (not proposedValue), notes (not proposedTerms).
+      // The date columns are timestamps, so they take Date, not ISO strings.
+      // renewalType is NOT NULL and had no value at all here.
       const [renewal] = await db.insert(contractRenewals).values({
         contractId,
-        renewalStatus: 'pending',
+        renewalType: 'standard',
+        status: 'pending',
         proposedStartDate: contract.endDate,
-        proposedEndDate: newEndDate.toISOString(),
-        proposedValue: contract.monthlyValue ? contract.monthlyValue * 12 : contract.totalValue,
-        proposedTerms: contract.terms,
-        notificationSentAt: new Date().toISOString(),
+        proposedEndDate: newEndDate,
+        proposedMonthlyFee: contract.monthlyFee ?? contract.contractValue,
+        notes: contract.terms,
+        notificationSentAt: new Date(),
       }).returning();
 
       res.status(201).json(renewal);
@@ -10385,8 +10720,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update renewal status
       await db.update(contractRenewals)
         .set({
-          renewalStatus: 'accepted',
-          acceptedAt: new Date().toISOString(),
+          // contract_renewals records the customer's answer in
+          // customerResponse/customerResponseDate; there is no acceptedAt,
+          // and the state column is `status`, not `renewalStatus`.
+          status: 'accepted',
+          customerResponse: 'accepted',
+          customerResponseDate: new Date(),
         })
         .where(eq(contractRenewals.id, renewalId));
 
@@ -10402,8 +10741,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({
           startDate: renewal.proposedStartDate,
           endDate: renewal.proposedEndDate,
-          totalValue: renewal.proposedValue,
-          terms: renewal.proposedTerms,
+          // fleet_contracts carries monthlyFee/contractValue; the renewal
+          // proposes a monthly fee, and its free text lives in notes.
+          monthlyFee: renewal.proposedMonthlyFee,
+          terms: renewal.notes,
           status: 'active',
         })
         .where(eq(fleetContracts.id, contractId))
@@ -10443,7 +10784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       const tier = await storage.getFleetPricingTier(req.params.id);
       if (!tier) {
@@ -10456,7 +10797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       const tier = await storage.updateFleetPricingTier(req.params.id, req.body);
       res.json(tier);
@@ -10466,7 +10807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       await storage.deleteFleetPricingTier(req.params.id);
       res.status(204).send();
@@ -10487,7 +10828,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/maintenance-schedules/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/maintenance-schedules/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const schedules = await storage.getFleetMaintenanceSchedulesByGroup(req.params.fleetGroupId);
       res.json(schedules);
@@ -10497,7 +10838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const schedule = await storage.getFleetMaintenanceSchedule(req.params.id);
       if (!schedule) {
@@ -10510,7 +10851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const schedule = await storage.updateFleetMaintenanceSchedule(req.params.id, req.body);
       res.json(schedule);
@@ -10520,7 +10861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetMaintenanceSchedule(req.params.id);
       res.status(204).send();
@@ -10534,7 +10875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all contracts with enhanced data (utilization, SLA metrics, renewals)
   app.get('/api/contracts/enhanced', isAuthenticated, async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, fleetGroups, contractUtilization, contractSLAMetrics, contractRenewals } = await import('@shared/schema');
       const { eq, desc } = await import('drizzle-orm');
 
@@ -10586,7 +10927,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trigger renewal workflow for a contract
   app.post('/api/contracts/:contractId/trigger-renewal', isAuthenticated, async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, contractRenewals } = await import('@shared/schema');
       const { eq } = await import('drizzle-orm');
       const { addMonths, addDays } = await import('date-fns');
@@ -10631,9 +10972,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Accept a renewal
-  app.post('/api/contracts/:contractId/renewals/:renewalId/accept', isAuthenticated, async (req: any, res) => {
+  app.post('/api/contracts/:contractId/renewals/:renewalId/accept', isAuthenticated, requireResourceOwnership({ table: 'contract_renewals', idParam: 'renewalId', parent: { table: 'fleet_contracts', fk: 'contract_id', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } } }), async (req: any, res) => {
     try {
-      const { db } = await import('./storage');
+      const { db } = await import('./db'); // db lives in ./db, not ./storage
       const { fleetContracts, contractRenewals } = await import('@shared/schema');
       const { eq } = await import('drizzle-orm');
 
@@ -10752,7 +11093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/vehicle/:vehicleId", isAuthenticated, async (req, res) => {
     try {
-      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId);
+      const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId, (req as any).user?.garageId);
       res.json(warranties);
     } catch (error) {
       console.error("Error fetching warranties by vehicle:", error);
@@ -10762,7 +11103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/customer/:customerId", isAuthenticated, async (req, res) => {
     try {
-      const warranties = await storage.getWarrantiesByCustomer(req.params.customerId);
+      const warranties = await storage.getWarrantiesByCustomer(req.params.customerId, (req as any).user?.garageId);
       res.json(warranties);
     } catch (error) {
       console.error("Error fetching warranties by customer:", error);
@@ -10772,7 +11113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
-      const warranty = await storage.getWarrantyById(req.params.id);
+      const warranty = await storage.getWarrantyById(req.params.id, (req as any).user?.garageId);
       if (!warranty) {
         return res.status(404).json({ error: "Warranty not found" });
       }
@@ -10786,7 +11127,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
       const data = insertWarrantySchema.partial().parse(req.body);
-      const warranty = await storage.updateWarranty(req.params.id, data);
+      const warranty = await storage.updateWarranty(req.params.id, data, (req as any).user?.garageId);
+      if (!warranty) return res.status(404).json({ error: "Warranty not found" });
       res.json(warranty);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -10795,7 +11137,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/warranties/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteWarranty(req.params.id);
+      const ok = await storage.deleteWarranty(req.params.id, (req as any).user?.garageId);
+      if (!ok) return res.status(404).json({ error: "Warranty not found" });
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting warranty:", error);
@@ -10831,7 +11174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranty-claims/warranty/:warrantyId", isAuthenticated, async (req, res) => {
     try {
-      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId);
+      const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId, (req as any).user?.garageId);
       res.json(claims);
     } catch (error) {
       console.error("Error fetching warranty claims by warranty:", error);
@@ -10841,7 +11184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
     try {
-      const claim = await storage.getWarrantyClaimById(req.params.id);
+      const claim = await storage.getWarrantyClaimById(req.params.id, (req as any).user?.garageId);
       if (!claim) {
         return res.status(404).json({ error: "Warranty claim not found" });
       }
@@ -10862,7 +11205,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data.reviewedBy = user.id;
       }
       
-      const claim = await storage.updateWarrantyClaim(req.params.id, data);
+      const claim = await storage.updateWarrantyClaim(req.params.id, data, user?.garageId);
+      if (!claim) return res.status(404).json({ error: "Warranty claim not found" });
       res.json(claim);
     } catch (error: any) {
       res.status(400).json({ error: error.message });
@@ -10871,7 +11215,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/warranty-claims/:id", isAuthenticated, async (req, res) => {
     try {
-      await storage.deleteWarrantyClaim(req.params.id);
+      const ok = await storage.deleteWarrantyClaim(req.params.id, (req as any).user?.garageId);
+      if (!ok) return res.status(404).json({ error: "Warranty claim not found" });
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting warranty claim:", error);
@@ -10911,7 +11256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const template = await storage.getInspectionTemplateById(id);
@@ -10925,7 +11270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertInspectionTemplateSchema.partial().parse(req.body);
@@ -10937,7 +11282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteInspectionTemplate(id);
@@ -10981,7 +11326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
       const inspection = await storage.getVehicleInspectionById(id);
@@ -10995,11 +11340,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertVehicleInspectionSchema.partial().parse(req.body);
-      const updated = await storage.updateVehicleInspection(id, data);
+      const updated = await storage.updateVehicleInspection(id, data, (req as any).user?.garageId);
+      if (!updated) return res.status(404).json({ error: "Vehicle inspection not found" });
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating vehicle inspection:", error);
@@ -11007,10 +11353,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteVehicleInspection(id);
+      await storage.deleteVehicleInspection(id, (req as any).user?.garageId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting vehicle inspection:", error);
@@ -11053,7 +11399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       const request = await storage.getTowingRequestById(id);
@@ -11067,7 +11413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertTowingRequestSchema.partial().parse(req.body);
@@ -11079,7 +11425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTowingRequest(id);
@@ -11120,7 +11466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const truck = await storage.getTowTruckById(id);
@@ -11134,7 +11480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertTowTruckSchema.partial().parse(req.body);
@@ -11146,7 +11492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTowTruck(id);
@@ -11157,7 +11503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tow-trucks/:id/location", isAuthenticated, async (req, res) => {
+  app.patch("/api/tow-trucks/:id/location", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const { latitude, longitude } = req.body;
@@ -11213,7 +11559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loaner-vehicles/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_vehicles' }), async (req, res) => {
     try {
       const { id } = req.params;
       const vehicle = await storage.getLoanerVehicleById(id);
@@ -11227,11 +11573,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loaner-vehicles/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_vehicles' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertLoanerVehicleSchema.partial().parse(req.body);
-      const updated = await storage.updateLoanerVehicle(id, data);
+      const updated = await storage.updateLoanerVehicle(id, data, (req as any).user?.garageId);
+      if (!updated) return res.status(404).json({ error: "Loaner vehicle not found" });
       res.json(updated);
     } catch (error: any) {
       console.error("Error updating loaner vehicle:", error);
@@ -11239,10 +11586,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loaner-vehicles/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loaner-vehicles/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_vehicles' }), async (req, res) => {
     try {
       const { id } = req.params;
-      await storage.deleteLoanerVehicle(id);
+      await storage.deleteLoanerVehicle(id, (req as any).user?.garageId);
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting loaner vehicle:", error);
@@ -11281,7 +11628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const reservation = await storage.getLoanerReservationById(id);
@@ -11295,7 +11642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertLoanerReservationSchema.partial().parse(req.body);
@@ -11307,7 +11654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoanerReservation(id);
@@ -11350,7 +11697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       const campaign = await storage.getMarketingCampaignById(id);
@@ -11364,7 +11711,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateMarketingCampaign(id, req.body);
@@ -11375,7 +11722,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteMarketingCampaign(id);
@@ -11408,7 +11755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/campaign-recipients/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/campaign-recipients/:id", isAuthenticated, requireResourceOwnership({ table: 'campaign_recipients', parent: { table: 'marketing_campaigns', fk: 'campaign_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateCampaignRecipient(id, req.body);
@@ -11459,7 +11806,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       const program = await storage.getLoyaltyProgramById(id);
@@ -11473,7 +11820,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyProgram(id, req.body);
@@ -11484,7 +11831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoyaltyProgram(id);
@@ -11498,7 +11845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loyalty Accounts
   app.post("/api/loyalty-accounts", isAuthenticated, async (req, res) => {
     try {
-      const account = await storage.createLoyaltyAccount(req.body);
+      const account = await storage.createLoyaltyAccount({ ...req.body, garageId: req.user?.garageId || req.body.garageId });
       res.status(201).json(account);
     } catch (error: any) {
       console.error("Error creating loyalty account:", error);
@@ -11520,7 +11867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-accounts/:id", isAuthenticated, requireResourceOwnership({ table: 'customer_loyalty_accounts', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const account = await storage.getLoyaltyAccountById(id);
@@ -11534,7 +11881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const account = await storage.getLoyaltyAccountByCustomer(customerId);
@@ -11545,7 +11892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-accounts/:id", isAuthenticated, requireResourceOwnership({ table: 'customer_loyalty_accounts', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyAccount(id, req.body);
@@ -11578,7 +11925,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-transactions/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-transactions/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_transactions', parent: { table: 'customer_loyalty_accounts', fk: 'account_id', parent: { table: 'users', fk: 'customer_id' } } }), async (req, res) => {
     try {
       const { id } = req.params;
       const transaction = await storage.getLoyaltyTransactionById(id);
@@ -11603,7 +11950,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-programs/:programId/rewards", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-programs/:programId/rewards", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program', idParam: 'programId' }), async (req, res) => {
     try {
       const { programId } = req.params;
       const { isActive } = req.query;
@@ -11617,7 +11964,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const reward = await storage.getLoyaltyRewardById(id);
@@ -11631,7 +11978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyReward(id, req.body);
@@ -11642,7 +11989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoyaltyReward(id);
@@ -11678,7 +12025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-redemptions/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-redemptions/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_redemptions', parent: { table: 'customer_loyalty_accounts', fk: 'account_id', parent: { table: 'users', fk: 'customer_id' } } }), async (req, res) => {
     try {
       const { id } = req.params;
       const redemption = await storage.getLoyaltyRedemptionById(id);
@@ -11692,7 +12039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-redemptions/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-redemptions/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_redemptions', parent: { table: 'customer_loyalty_accounts', fk: 'account_id', parent: { table: 'users', fk: 'customer_id' } } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyRedemption(id, req.body);
@@ -11731,7 +12078,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/document-categories/:id", isAuthenticated, requireResourceOwnership({ table: 'document_categories' }), async (req, res) => {
     try {
       const { id } = req.params;
       const category = await storage.getDocumentCategoryById(id);
@@ -11745,7 +12092,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/document-categories/:id", isAuthenticated, requireResourceOwnership({ table: 'document_categories' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateDocumentCategory(id, req.body);
@@ -11756,7 +12103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/document-categories/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/document-categories/:id", isAuthenticated, requireResourceOwnership({ table: 'document_categories' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteDocumentCategory(id);
@@ -11815,7 +12162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       const document = await storage.getDocumentById(id);
@@ -11829,7 +12176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateDocument(id, req.body);
@@ -11840,7 +12187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteDocument(id);
@@ -11864,7 +12211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/documents/:documentId/access-logs", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:documentId/access-logs", isAuthenticated, requireResourceOwnership({ table: 'documents', idParam: 'documentId' }), async (req, res) => {
     try {
       const { documentId } = req.params;
       const logs = await storage.getDocumentAccessLogs(documentId);
@@ -11884,7 +12231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================================================
 
   // Franchise Groups
-  app.post("/api/franchise-groups", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-groups", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseGroupSchema.parse(req.body);
       const group = await storage.createFranchiseGroup(validatedData);
@@ -11895,7 +12242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-groups", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-groups", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const groups = await storage.getFranchiseGroups();
       res.json(groups);
@@ -11905,7 +12252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const group = await storage.getFranchiseGroupById(id);
@@ -11919,7 +12266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseGroup(id, req.body);
@@ -11930,7 +12277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFranchiseGroup(id);
@@ -11942,7 +12289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Franchise Contracts
-  app.post("/api/franchise-contracts", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-contracts", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseContractSchema.parse(req.body);
       const contract = await storage.createFranchiseContract(validatedData);
@@ -11953,7 +12300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-contracts", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-contracts", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { franchiseGroupId } = req.query;
       const contracts = await storage.getFranchiseContracts(franchiseGroupId as string | undefined);
@@ -11964,7 +12311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const contract = await storage.getFranchiseContractById(id);
@@ -11978,7 +12325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseContract(id, req.body);
@@ -11989,7 +12336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFranchiseContract(id);
@@ -12001,7 +12348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Franchise KPIs
-  app.post("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-kpis", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseKpiSchema.parse(req.body);
       const kpi = await storage.createFranchiseKpi(validatedData);
@@ -12012,7 +12359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+  app.get("/api/franchise-kpis", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const { branchId, month } = req.query;
       if (!branchId) {
@@ -12028,7 +12375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-kpis/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const kpi = await storage.getFranchiseKpiById(id);
@@ -12042,7 +12389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-kpis/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseKpi(id, req.body);
@@ -12054,7 +12401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Revenue Sharing Rules
-  app.post("/api/revenue-sharing-rules", isAuthenticated, async (req: any, res) => {
+  app.post("/api/revenue-sharing-rules", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertRevenueSharingRuleSchema.parse(req.body);
       const rule = await storage.createRevenueSharingRule(validatedData);
@@ -12065,7 +12412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/revenue-sharing-rules", isAuthenticated, async (req, res) => {
+  app.get("/api/revenue-sharing-rules", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { franchiseGroupId } = req.query;
       if (!franchiseGroupId) {
@@ -12079,7 +12426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const rule = await storage.getRevenueSharingRuleById(id);
@@ -12093,7 +12440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateRevenueSharingRule(id, req.body);
@@ -12104,7 +12451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteRevenueSharingRule(id);
@@ -12363,7 +12710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/timezone-rules/:id", isAuthenticated, requireResourceOwnership({ table: 'timezone_rules', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const rule = await storage.getTimezoneRuleById(id);
@@ -12377,7 +12724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/timezone-rules/:id", isAuthenticated, requireResourceOwnership({ table: 'timezone_rules', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateTimezoneRule(id, req.body);
@@ -12481,7 +12828,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const order = await storage.getFulfillmentOrderById(id);
@@ -12495,7 +12842,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFulfillmentOrder(id, req.body);
@@ -12506,7 +12853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFulfillmentOrder(id);
@@ -12529,7 +12876,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/fulfillment-orders/:fulfillmentOrderId/shipment-events", isAuthenticated, async (req, res) => {
+  app.get("/api/fulfillment-orders/:fulfillmentOrderId/shipment-events", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', idParam: 'fulfillmentOrderId', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { fulfillmentOrderId } = req.params;
       const events = await storage.getShipmentEvents(fulfillmentOrderId);
@@ -12626,7 +12973,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const device = await storage.getObdDeviceById(id);
@@ -12640,7 +12987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateObdDevice(id, req.body);
@@ -12651,7 +12998,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteObdDevice(id);
@@ -12688,7 +13035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/device-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'device_assignments', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const assignment = await storage.getDeviceAssignmentById(id);
@@ -12702,7 +13049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/device-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'device_assignments', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateDeviceAssignment(id, req.body);
@@ -12740,7 +13087,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/obd-sessions/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_sessions', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const session = await storage.getObdSessionById(id);
@@ -12754,7 +13101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/obd-sessions/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_sessions', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateObdSession(id, req.body);
@@ -12777,7 +13124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/obd-sessions/:sessionId/diagnostic-reports", isAuthenticated, async (req, res) => {
+  app.get("/api/obd-sessions/:sessionId/diagnostic-reports", isAuthenticated, requireResourceOwnership({ table: 'obd_sessions', idParam: 'sessionId', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { sessionId } = req.params;
       const reports = await storage.getDiagnosticReports(sessionId);
@@ -12788,7 +13135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/diagnostic-reports/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/diagnostic-reports/:id", isAuthenticated, requireResourceOwnership({ table: 'diagnostic_reports', parent: { table: 'obd_sessions', fk: 'session_id', parent: { table: 'vehicles', fk: 'vehicle_id' } } }), async (req, res) => {
     try {
       const { id } = req.params;
       const report = await storage.getDiagnosticReportById(id);
@@ -12949,7 +13296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const license = await storage.getSubscriptionLicenseById(id);
@@ -12963,7 +13310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateSubscriptionLicense(id, req.body);
@@ -12974,7 +13321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSubscriptionLicense(id);
@@ -12998,7 +13345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/subscription-licenses/:licenseId/audit-logs", isAuthenticated, async (req, res) => {
+  app.get("/api/subscription-licenses/:licenseId/audit-logs", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', idParam: 'licenseId', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { licenseId } = req.params;
       const logs = await storage.getLicenseAuditLogs(licenseId);
@@ -13035,7 +13382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/entitlement-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'entitlement_assignments', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const assignment = await storage.getEntitlementAssignmentById(id);
@@ -13049,7 +13396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/entitlement-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'entitlement_assignments', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateEntitlementAssignment(id, req.body);
@@ -13065,42 +13412,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // AI Scheduling Optimizer - Module 81
-  app.post("/api/scheduling/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Optimization started", optimizationId: "opt-123" });
-  });
-
-  // Parts Auto-Reordering - Module 82
-  app.get("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", partNumber: "OF-123", currentStock: 15, reorderPoint: 20, reorderQuantity: 50, status: "triggered" },
-    ]);
-  });
-
-  app.post("/api/auto-reorder/rules", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "new", ...req.body });
-  });
-
-  app.get("/api/auto-reorder/history", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", partName: "Oil Filter", quantity: 50, supplier: "AutoParts Plus", status: "ordered" },
-    ]);
-  });
-
-  // Time Clock & Payroll - Module 84
-  app.post("/api/timeclock/clock-in", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked in successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.post("/api/timeclock/clock-out", isAuthenticated, async (req, res) => {
-    res.json({ message: "Clocked out successfully", timestamp: new Date().toISOString() });
-  });
-
-  app.get("/api/payroll/periods", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", periodStart: "2024-10-14", periodEnd: "2024-10-27", status: "draft" },
-    ]);
-  });
-
   app.post("/api/payroll/calculate", isAuthenticated, async (req, res) => {
     res.json({ totalGrossPay: 18500, totalDeductions: 3200, totalNetPay: 15300 });
   });
@@ -13120,17 +13431,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json([
       { id: "1", toolName: "Diagnostic Scanner", dueDate: "2024-10-15" },
     ]);
-  });
-
-  // Multi-Location Routing - Module 83
-  app.get("/api/routing/routes", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "1", type: "parts_transfer", stops: 4, distance: 12.5, duration: 45, driver: "Mike Davis", status: "planned" },
-    ]);
-  });
-
-  app.post("/api/routing/optimize", isAuthenticated, async (req, res) => {
-    res.json({ message: "Route optimized", routeId: "route-123" });
   });
 
   // ========================================
@@ -13171,16 +13471,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json([
       { id: "1", name: "Service Delivery Quality", category: "service_delivery", itemCount: 12, completionRate: 95 },
     ]);
-  });
-
-  app.get("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.json([
-      { id: "NC-2024-001", title: "Incorrect torque on wheel nuts", severity: "major", status: "resolved" },
-    ]);
-  });
-
-  app.post("/api/quality/non-conformances", isAuthenticated, async (req, res) => {
-    res.status(201).json({ id: "NC-NEW", ...req.body });
   });
 
   // Safety Incidents - Module 88
@@ -13651,7 +13941,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const cleanPhone = String(phone).replace(/\D/g, '');
-      const customers = await storage.getCustomers();
+      // Scope the lookup to the caller's garage — an unscoped getCustomers()
+      // matched phone numbers across every tenant's customer base.
+      const customers = await storage.getCustomers(req.user?.garageId);
       const customer = customers.find((c: any) => {
         const customerPhone = (c.phone || '').replace(/\D/g, '');
         return customerPhone.includes(cleanPhone) || cleanPhone.includes(customerPhone);
@@ -13668,7 +13960,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
       
-      const allAppointments = await storage.getAppointments();
+      const allAppointments = await storage.getAppointments(req.user?.garageId);
       const todayAppointments = allAppointments.filter((apt: any) => {
         const aptDate = new Date(apt.appointmentDate);
         return apt.customerId === customer.id && 
@@ -13934,7 +14226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update job card status (mobile)
-  app.patch("/api/mobile/technician/jobs/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/mobile/technician/jobs/:id", isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -14262,10 +14554,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Live Service Tracking
-  app.get('/api/service-tracking/:jobCardId', isAuthenticated, async (req, res) => {
+  app.get('/api/service-tracking/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
-      const timeline = await phase4Service.getServiceTrackingTimeline(jobCardId);
+      // The service exports this as getJobCardTimeline.
+      const timeline = await phase4Service.getJobCardTimeline(jobCardId);
       res.json(timeline);
     } catch (error) {
       console.error("Error fetching service tracking timeline:", error);
@@ -14273,22 +14566,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/service-tracking/:jobCardId/update', isAuthenticated, async (req: any, res) => {
+  app.post('/api/service-tracking/:jobCardId/update', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { jobCardId } = req.params;
       const userId = req.user?.id || 'default-user';
       
       const validated = serviceTrackingUpdateSchema.parse(req.body);
       
+      // createServiceUpdate writes service_tracking_updates, whose columns
+      // are title/description/technicianId/photoUrls — not message/photoUrl.
       const updateData = {
         jobCardId,
-        userId,
+        technicianId: userId,
         status: validated.status,
-        message: validated.message,
-        photoUrl: validated.photoUrl,
+        title: validated.status,
+        description: validated.message,
+        photoUrls: validated.photoUrl ? [validated.photoUrl] : undefined,
         estimatedCompletion: validated.estimatedCompletion ? new Date(validated.estimatedCompletion) : undefined,
       };
-      const update = await phase4Service.postServiceUpdate(updateData);
+      const update = await phase4Service.createServiceUpdate(updateData);
       res.status(201).json(update);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14315,7 +14611,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         thumbnailUrl: validated.thumbnailUrl,
         duration: validated.duration,
         transcription: validated.transcription,
-        estimatedCost: validated.estimatedCost,
+        // The service takes the cost as a number and stringifies it for the
+        // decimal column itself.
+        estimatedCost: Number(validated.estimatedCost) || undefined,
         recommendedServices: validated.recommendedServices,
       };
       const estimate = await phase4Service.createVideoEstimate(estimateData);
@@ -14329,9 +14627,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req, res) => {
+  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req: any, res) => {
     try {
       const { customerId } = req.params;
+      // Ownership: the customer must belong to the caller's garage, else any
+      // authenticated user could read another tenant's customer estimates.
+      const sessionGarage = req.user?.garageId;
+      if (sessionGarage) {
+        const customer = await storage.getCustomer(customerId);
+        if (!customer || ((customer as any).garageId && (customer as any).garageId !== sessionGarage)) {
+          return res.status(404).json({ message: "Customer not found" });
+        }
+      }
       const estimates = await phase4Service.getVideoEstimates(customerId);
       res.json(estimates);
     } catch (error) {
@@ -14340,10 +14647,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/video-estimates/:id/approve', isAuthenticated, async (req, res) => {
+  app.patch('/api/video-estimates/:id/approve', isAuthenticated, requireResourceOwnership({ table: 'video_estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
-      const estimate = await phase4Service.approveVideoEstimate(id);
+      // The service's status updater covers approval.
+      const estimate = await phase4Service.updateVideoEstimateStatus(id, 'approved');
       res.json(estimate);
     } catch (error) {
       console.error("Error approving video estimate:", error);
@@ -14358,15 +14666,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = digitalWalkaroundSchema.parse(req.body);
       
+      // digital_walkarounds has no garage_id or customer_id; its type column
+      // is walkaround_type and free-form damage notes land in
+      // new_damage_identified.
       const walkaroundData = {
-        garageId,
         jobCardId: validated.jobCardId,
         vehicleId: validated.vehicleId,
-        customerId: validated.customerId,
         technicianId: validated.technicianId,
-        inspectionType: validated.inspectionType,
+        walkaroundType: validated.inspectionType,
         photos: validated.photos,
-        damageNotes: validated.damageNotes,
+        newDamageIdentified: validated.damageNotes,
       };
       const walkaround = await phase4Service.createDigitalWalkaround(walkaroundData);
       res.status(201).json(walkaround);
@@ -14379,7 +14688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/digital-walkaround/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/digital-walkaround/:id', isAuthenticated, requireResourceOwnership({ table: 'digital_walkarounds', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const walkaround = await phase4Service.getDigitalWalkaround(id);
@@ -14400,16 +14709,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = customerReviewSchema.parse(req.body);
       
+      // customer_reviews keeps the text in `comment`; there is no review_url
+      // column, so the URL travels with the comment when provided.
       const reviewData = {
         garageId,
         customerId: validated.customerId,
         jobCardId: validated.jobCardId,
         platform: validated.platform,
         rating: validated.rating,
-        reviewText: validated.reviewText,
-        reviewUrl: validated.reviewUrl,
+        comment: validated.reviewUrl
+          ? [validated.reviewText, validated.reviewUrl].filter(Boolean).join('\n')
+          : validated.reviewText,
       };
-      const review = await phase4Service.postCustomerReview(reviewData);
+      const review = await phase4Service.createCustomerReview(reviewData);
       res.status(201).json(review);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14424,15 +14736,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { platform } = req.query;
-      const reviews = await phase4Service.getReviewsByPlatform(garageId, platform as string);
-      res.json(reviews);
+      // The service lists a garage's public reviews; platform filtering
+      // happens here since getGarageReviews does not take one.
+      const reviews = await phase4Service.getGarageReviews(garageId);
+      res.json(platform ? reviews.filter((r) => r.platform === platform) : reviews);
     } catch (error) {
       console.error("Error fetching reviews:", error);
       res.status(500).json({ message: "Failed to fetch reviews" });
     }
   });
 
-  app.post('/api/reviews/:id/respond', isAuthenticated, async (req: any, res) => {
+  app.post('/api/reviews/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'customer_reviews' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -14457,8 +14771,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = generateReferralCodeSchema.parse(req.body);
       
-      const code = await phase4Service.generateReferralCode(garageId, validated.customerId);
-      res.json({ code });
+      const referral = await phase4Service.generateReferralCode(
+        validated.customerId,
+        validated.programId,
+        validated.refereeEmail,
+        validated.refereeName,
+      );
+      res.json({ code: referral.referralCode });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json(sanitizeZodError(error));
@@ -14474,7 +14793,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = applyReferralCodeSchema.parse(req.body);
       
-      const result = await phase4Service.applyReferralCode(garageId, validated.referralCode, validated.newCustomerId);
+      // applyReferralCode resolves the referral by its code; the garage
+      // plays no part in the lookup.
+      const result = await phase4Service.applyReferralCode(validated.referralCode, validated.newCustomerId);
       res.json(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -14508,71 +14829,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Garage ID is required. Please ensure you are associated with a garage." });
       }
       const optimization = await phase5Service.runSchedulingOptimization(garageId);
-      res.status(201).json(optimization);
+      res.json(optimization);
     } catch (error) {
       console.error("Error running scheduling optimization:", error);
       res.status(500).json({ message: "Failed to run scheduling optimization" });
     }
   });
 
-  // Parts Auto-Reordering System
-  app.post('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = autoReorderRuleSchema.parse(req.body);
-      
-      const ruleData = {
-        garageId,
-        partId: validated.partId,
-        minQuantity: validated.minQuantity,
-        reorderQuantity: validated.reorderQuantity,
-        preferredSupplierId: validated.preferredSupplierId,
-      };
-      const rule = await phase5Service.createAutoReorderRule(ruleData);
-      res.status(201).json(rule);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating auto-reorder rule:", error);
-      res.status(500).json({ message: "Failed to create auto-reorder rule" });
-    }
-  });
-
-  app.get('/api/auto-reorder/rules', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const rules = await phase5Service.getAutoReorderRules(garageId);
-      res.json(rules);
-    } catch (error) {
-      console.error("Error fetching auto-reorder rules:", error);
-      res.status(500).json({ message: "Failed to fetch auto-reorder rules" });
-    }
-  });
-
-  app.post('/api/auto-reorder/check', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const triggeredOrders = await phase5Service.checkAndTriggerReorders(garageId);
-      res.json({ triggered: triggeredOrders.length, orders: triggeredOrders });
-    } catch (error) {
-      console.error("Error checking auto-reorders:", error);
-      res.status(500).json({ message: "Failed to check auto-reorders" });
-    }
-  });
-
-  app.get('/api/auto-reorder/history', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { limit } = req.query;
-      const history = await phase5Service.getReorderHistory(garageId, limit ? parseInt(limit) : 50);
-      res.json(history);
-    } catch (error) {
-      console.error("Error fetching reorder history:", error);
-      res.status(500).json({ message: "Failed to fetch reorder history" });
-    }
-  });
+  // Parts auto-reordering lives in server/routes/auto-reorder.ts (Wave J).
 
   // Multi-Location Routing Optimizer
   app.post('/api/routing/optimize', isAuthenticated, async (req: any, res) => {
@@ -14581,13 +14845,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = routingOptimizationSchema.parse(req.body);
       
+      // routing_optimizations.start_location is varchar and the service takes
+      // total_distance as a number, so both need converting from the
+      // validator's shapes.
       const routeData = {
         garageId,
         routeDate: new Date(validated.routeDate),
         routeType: validated.routeType,
-        startLocation: validated.startLocation,
+        startLocation: validated.startLocation.address,
         stops: validated.stops,
-        totalDistance: validated.totalDistance,
+        totalDistance: Number(validated.totalDistance) || undefined,
         estimatedDuration: validated.estimatedDuration,
         assignedDriver: validated.assignedDriver,
       };
@@ -14615,11 +14882,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Time Clock & Payroll
+  app.get('/api/timeclock/entries', isAuthenticated, async (req: any, res) => {
+    try {
+      const entries = await phase5Service.getTimeClockEntriesByEmployee(req.user.id);
+      res.json({ data: entries });
+    } catch (error) {
+      console.error("Error fetching time clock entries:", error);
+      res.status(500).json({ message: "Failed to fetch time clock entries" });
+    }
+  });
+
   app.post('/api/timeclock/clock-in', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
       const garageId = req.user?.garageId;
-      const entry = await phase5Service.clockIn(garageId, userId);
+      // clockIn is (employeeId, garageId) — the arguments were reversed, so
+      // every entry recorded the garage as the employee.
+      const entry = await phase5Service.clockIn(userId, garageId);
       res.status(201).json(entry);
     } catch (error) {
       console.error("Error clocking in:", error);
@@ -14630,7 +14909,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/timeclock/clock-out', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
-      const entry = await phase5Service.clockOut(userId);
+      // clockOut takes a time-clock entry id; the caller only knows who they
+      // are, so resolve their open entry first.
+      const entry = await phase5Service.clockOutByEmployee(userId, req.body?.breakDuration ?? 0);
       res.json(entry);
     } catch (error) {
       console.error("Error clocking out:", error);
@@ -14650,7 +14931,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/calculate/:periodId', isAuthenticated, async (req, res) => {
+  app.post('/api/payroll/calculate/:periodId', isAuthenticated, requireResourceOwnership({ table: 'pay_periods', idParam: 'periodId' }), requireManagerOrAbove, async (req, res) => {
     try {
       const { periodId } = req.params;
       const payrollEntries = await phase5Service.calculatePayroll(periodId);
@@ -14693,7 +14974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { days } = req.query;
-      const dueCalibrations = await phase5Service.getCalibrationsDue(garageId, days ? parseInt(days) : 30);
+      const dueCalibrations = await phase5Service.getDueCalibrations(garageId, days ? parseInt(days) : 30);
       res.json(dueCalibrations);
     } catch (error) {
       console.error("Error fetching due calibrations:", error);
@@ -14717,12 +14998,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         complianceType: validated.complianceType,
         recordDate: new Date(validated.recordDate),
         wasteType: validated.wasteType,
-        quantity: validated.quantity,
+        quantity: validated.quantity !== undefined ? Number(validated.quantity) || undefined : undefined,
         unit: validated.unit,
         disposalMethod: validated.disposalMethod,
         disposalCompany: validated.disposalCompany,
         certificationNumber: validated.certificationNumber,
-        cost: validated.cost,
+        // The service takes numbers and stringifies them for the decimal
+        // columns itself.
+        cost: validated.cost !== undefined ? Number(validated.cost) || undefined : undefined,
         regulatoryStandard: validated.regulatoryStandard,
         attachments: validated.attachments,
         notes: validated.notes,
@@ -14754,11 +15037,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
-      const analytics = await phase6Service.getComplianceAnalytics(
-        garageId,
-        startDate ? new Date(startDate as string) : undefined,
-        endDate ? new Date(endDate as string) : undefined
-      );
+      // The service aggregates over a closed date range; default to the
+      // trailing year when the caller doesn't narrow it.
+      const to = endDate ? new Date(endDate as string) : new Date();
+      const from = startDate
+        ? new Date(startDate as string)
+        : new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getComplianceAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching compliance analytics:", error);
@@ -14775,9 +15060,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const checklistData = {
         garageId,
-        checklistName: validated.checklistName,
-        checklistType: validated.checklistType,
-        items: validated.items,
+        // quality_checklists calls these name/category/checklist_items.
+        name: validated.checklistName,
+        category: validated.checklistType,
+        checklistItems: validated.items,
       };
       const checklist = await phase6Service.createQualityChecklist(checklistData);
       res.status(201).json(checklist);
@@ -14800,9 +15086,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         garageId,
         ncNumber: validated.ncNumber,
         jobCardId: validated.jobCardId,
+        // non_conformances requires a title and records who found it as
+        // detected_by/detected_date. Derive the title from the description.
+        title: validated.description.slice(0, 120),
         description: validated.description,
         severity: validated.severity,
-        reportedBy: validated.reportedBy,
+        detectedBy: validated.reportedBy,
+        detectedDate: new Date(),
         category: validated.category,
       };
       const nonConformance = await phase6Service.createNonConformance(ncData);
@@ -14878,11 +15168,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const garageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
-      const analytics = await phase6Service.getSafetyAnalytics(
-        garageId,
-        startDate ? new Date(startDate as string) : undefined,
-        endDate ? new Date(endDate as string) : undefined
-      );
+      // Same closed-range contract as the compliance analytics: default to
+      // the trailing year.
+      const to = endDate ? new Date(endDate as string) : new Date();
+      const from = startDate
+        ? new Date(startDate as string)
+        : new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getSafetyAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching safety analytics:", error);
@@ -14909,11 +15201,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         policyNumber: validated.data.policyNumber,
         claimType: validated.data.claimType,
         incidentDate: new Date(validated.data.incidentDate),
-        claimAmount: validated.data.claimAmount,
-        deductible: validated.data.deductible,
+        // The service takes amounts as numbers (it stringifies for the
+        // decimal columns), names the contact adjuster_contact, and stores
+        // free text in notes.
+        claimAmount: Number(validated.data.claimAmount) || 0,
+        deductible: validated.data.deductible !== undefined ? Number(validated.data.deductible) || undefined : undefined,
         adjusterName: validated.data.adjusterName,
-        adjusterPhone: validated.data.adjusterPhone,
-        description: validated.data.description,
+        adjusterContact: validated.data.adjusterPhone,
+        notes: validated.data.description,
         documents: validated.data.documents,
       };
       const claim = await phase6Service.createInsuranceClaim(claimData);
@@ -14936,7 +15231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/insurance/claims/:id/status', isAuthenticated, async (req, res) => {
+  app.patch('/api/insurance/claims/:id/status', isAuthenticated, requireResourceOwnership({ table: 'insurance_claims' }), async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -14944,10 +15239,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validated = validatePatchBody(req, res, updateInsuranceClaimSchema);
       if (!validated.ok) return;
 
+      // updateClaimStatus's third parameter is the approved amount, not
+      // free-text notes.
       const claim = await phase6Service.updateClaimStatus(
         id,
         validated.data.status!,
-        validated.data.notes
+        validated.data.approvedAmount !== undefined ? Number(validated.data.approvedAmount) : undefined
       );
       res.json(claim);
     } catch (error) {
@@ -14959,7 +15256,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/insurance/claims/analytics', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const analytics = await phase6Service.getClaimsAnalytics(garageId);
+      // Closed date range required; default to the trailing year.
+      const to = new Date();
+      const from = new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
+      const analytics = await phase6Service.getClaimsAnalytics(garageId, from, to);
       res.json(analytics);
     } catch (error) {
       console.error("Error fetching claims analytics:", error);
@@ -14978,12 +15278,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = barcodeScanSchema.parse(req.body);
       
+      // barcode_scans stores the payload as scan_type/barcode_data and links
+      // the scanned entity through the part/vehicle/tool id columns.
       const scanData = {
         garageId,
-        barcodeValue: validated.barcodeValue,
-        barcodeType: validated.barcodeType,
-        entityType: validated.entityType,
-        entityId: validated.entityId,
+        scanType: validated.entityType,
+        barcodeData: validated.barcodeValue,
+        partId: validated.entityType === 'part' ? validated.entityId : undefined,
+        vehicleId: validated.entityType === 'vehicle' ? validated.entityId : undefined,
+        toolId: validated.entityType === 'tool' ? validated.entityId : undefined,
         scannedBy: validated.scannedBy,
         location: validated.location,
       };
@@ -15001,12 +15304,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/barcode/history', isAuthenticated, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
-      const { entityType, limit } = req.query;
-      const history = await phase7Service.getScanHistory(
-        garageId,
-        entityType as string,
-        limit ? parseInt(limit) : 100
-      );
+      const { entityType } = req.query;
+      // Exported as getBarcodeScanHistory; it filters by scan type and caps
+      // its own result size.
+      const history = await phase7Service.getBarcodeScanHistory(garageId, entityType as string | undefined);
       res.json(history);
     } catch (error) {
       console.error("Error fetching scan history:", error);
@@ -15043,12 +15344,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = signageContentSchema.parse(req.body);
       
+      // signage_content keeps the payload in a single jsonb `content` column
+      // rather than separate url/title/description fields.
       const contentData = {
         displayId: validated.displayId,
         contentType: validated.contentType,
-        contentUrl: validated.contentUrl,
-        title: validated.title,
-        description: validated.description,
+        content: {
+          url: validated.contentUrl,
+          title: validated.title,
+          description: validated.description,
+        },
         duration: validated.duration,
         validFrom: validated.validFrom ? new Date(validated.validFrom) : undefined,
         validUntil: validated.validUntil ? new Date(validated.validUntil) : undefined,
@@ -15065,7 +15370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/signage/displays/:displayId/active-content', isAuthenticated, async (req, res) => {
+  app.get('/api/signage/displays/:displayId/active-content', isAuthenticated, requireResourceOwnership({ table: 'signage_displays', idParam: 'displayId' }), async (req, res) => {
     try {
       const { displayId } = req.params;
       const content = await phase7Service.getActiveContentForDisplay(displayId);
@@ -15083,12 +15388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validated = kioskSessionSchema.parse(req.body);
       
-      const sessionData = {
-        garageId,
-        kioskId: validated.kioskId,
-        sessionType: validated.sessionType,
-      };
-      const session = await phase7Service.createKioskSession(sessionData);
+      // Exported as startKioskSession(garageId, kioskId); kiosk_sessions has
+      // no session_type column.
+      const session = await phase7Service.startKioskSession(garageId, validated.kioskId);
       res.status(201).json(session);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -15103,14 +15405,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = kioskCheckInSchema.parse(req.body);
       
+      // kiosk_check_ins stores the requested service as jsonb and the
+      // signature as signature_url; there is no check_in_type or notes
+      // column, so those travel inside service_requested.
       const checkInData = {
         sessionId: validated.sessionId,
         customerId: validated.customerId,
         vehicleId: validated.vehicleId,
         appointmentId: validated.appointmentId,
-        checkInType: validated.checkInType,
-        signature: validated.signature,
-        additionalNotes: validated.additionalNotes,
+        serviceRequested: {
+          checkInType: validated.checkInType,
+          notes: validated.additionalNotes,
+        },
+        signatureUrl: validated.signature,
       };
       const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
       res.status(201).json(checkIn);
@@ -15154,10 +15461,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validated = cameraRecordingSchema.parse(req.body);
       
+      // camera_recordings names the window recording_start/recording_end.
       const recordingData = {
         cameraId: validated.cameraId,
-        startTime: new Date(validated.startTime),
-        endTime: new Date(validated.endTime),
+        recordingStart: new Date(validated.startTime),
+        recordingEnd: new Date(validated.endTime),
         recordingUrl: validated.recordingUrl,
         fileSize: validated.fileSize,
         eventType: validated.eventType,
@@ -15175,7 +15483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/security/recordings/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/security/recordings/:id', isAuthenticated, requireResourceOwnership({ table: 'camera_recordings', parent: { table: 'security_cameras', fk: 'camera_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const recording = await phase7Service.getRecordingPlayback(id);
@@ -15382,7 +15690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/emerging-tech/iot-readings', isAuthenticated, async (req, res) => {
     try {
       const { sensorId, vehicleId } = req.query;
-      const readings = await storage.getIotSensorReadings(
+      const readings = await storage.getIoTSensorReadings(
         sensorId as string | undefined,
         vehicleId as string | undefined
       );
@@ -15528,9 +15836,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user?.garageId;
       const userId = req.user?.id || 'default-user';
 
-      // Get first vehicle for testing (or use a sample vehicle ID)
+      // Seeding hangs sample rows off a real vehicle; without one the
+      // NOT NULL vehicle_id FKs cannot be satisfied.
       const vehicles = await storage.getVehicles(garageId);
-      const vehicleId = vehicles[0]?.id || 'sample-vehicle-id';
+      const vehicleId = vehicles[0]?.id;
+      if (!vehicleId) {
+        return res.status(400).json({ message: "Seed requires at least one vehicle in this garage" });
+      }
 
       const results = {
         blockchain: 0,
@@ -15549,25 +15861,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed Blockchain Records (3 records)
       for (let i = 0; i < 3; i++) {
+        // blockchain_records: the event is record_type/record_data, and
+        // timestamp is NOT NULL.
         await storage.createBlockchainRecord({
           vehicleId,
           garageId,
           transactionHash: `0x${Math.random().toString(16).substring(2, 66)}`,
           blockNumber: 15000000 + i,
-          eventType: ['service_completed', 'ownership_transfer', 'warranty_claim'][i % 3],
-          eventData: { description: `Sample event ${i + 1}`, amount: 100 + i * 50 },
-          verified: true,
+          recordType: ['service_completed', 'ownership_transfer', 'warranty_claim'][i % 3],
+          recordData: { description: `Sample event ${i + 1}`, amount: 100 + i * 50 },
+          timestamp: new Date(),
         });
         results.blockchain++;
       }
 
       // Seed AR Repair Guides (2 guides)
       for (let i = 0; i < 2; i++) {
+        // ar_repair_guides: title (not guideName), a single make/model pair
+        // and repair_category rather than free-form description fields.
         await storage.createArRepairGuide({
           garageId,
-          guideName: `${['Engine Repair', 'Brake Service'][i]} AR Guide`,
-          description: `Step-by-step AR instructions for ${['engine repair', 'brake service'][i]}`,
-          targetVehicleModels: ['Toyota Camry', 'Honda Accord'],
+          title: `${['Engine Repair', 'Brake Service'][i]} AR Guide`,
+          vehicleMake: ['Toyota', 'Honda'][i],
+          vehicleModel: ['Camry', 'Accord'][i],
+          repairCategory: ['engine', 'brakes'][i],
           difficultyLevel: ['intermediate', 'beginner'][i],
           estimatedDuration: [60, 45][i],
           arModelUrl: `https://example.com/ar/model-${i + 1}.glb`,
@@ -15583,13 +15900,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed IoT Sensors (4 sensors)
       for (let i = 0; i < 4; i++) {
+        // iot_sensors: sensor_identifier is the unique device id, and the
+        // install date column is installation_date (a timestamp).
         await storage.createIotSensor({
           vehicleId,
           sensorType: ['temperature', 'pressure', 'vibration', 'fuel_level'][i],
-          sensorId: `IOT-${1000 + i}`,
+          sensorIdentifier: `IOT-${Date.now()}-${i}`,
           manufacturer: 'SensorTech',
-          installDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          calibrationDate: new Date().toISOString(),
+          installationDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
           status: 'active',
         });
         results.iotSensors++;
@@ -15597,110 +15915,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed 3D Parts Models (3 models)
       for (let i = 0; i < 3; i++) {
+        // parts_3d_models is a global catalogue (no garage_id); files are
+        // model_file_url/texture_file_url and file_size is integer KB.
         await storage.createParts3DModel({
-          garageId,
           partName: ['Brake Rotor', 'Oil Filter', 'Air Filter'][i],
           partNumber: `PART-${2000 + i}`,
           manufacturer: 'AutoParts Inc',
-          modelUrl: `https://example.com/3d/part-${i + 1}.glb`,
-          thumbnailUrl: `https://example.com/3d/thumb-${i + 1}.jpg`,
-          fileSize: 5.2 + i * 0.5,
+          modelFileUrl: `https://example.com/3d/part-${i + 1}.glb`,
+          textureFileUrl: `https://example.com/3d/thumb-${i + 1}.jpg`,
+          fileSize: 5200 + i * 500,
           polygonCount: 10000 + i * 2000,
           category: 'Brake System',
+          uploadedBy: userId,
         });
         results.models3D++;
       }
 
       // Seed Drone Inspections (2 inspections)
       for (let i = 0; i < 2; i++) {
+        // drone_inspections: the pilot is a user reference, images are
+        // image_count, and the AI outcome lives in the boolean flags.
         await storage.createDroneInspection({
           garageId,
           vehicleId,
           inspectionType: ['exterior_damage', 'roof_inspection'][i],
-          pilotName: 'John Pilot',
-          flightDuration: 15 + i * 5,
-          capturedImages: 25 + i * 10,
-          aiAnalysisResults: { damageDetected: i === 0, confidence: 0.95, issues: i === 0 ? ['Dent on hood', 'Scratch on door'] : [] },
-          status: 'completed',
+          pilotId: userId,
+          flightDuration: (15 + i * 5) * 60,
+          imageCount: 25 + i * 10,
+          damageDetected: i === 0,
+          aiAnalysisCompleted: true,
+          inspectionStatus: 'completed',
+          completedAt: new Date(),
         });
         results.droneInspections++;
       }
 
       // Seed AI Video Analysis (2 analyses)
       for (let i = 0; i < 2; i++) {
+        // ai_video_analysis: customer_id references customer_profiles (the
+        // admin has none, and it is nullable), the category column is
+        // triage_category, decimals take strings, and the state column is
+        // analysis_status.
         await storage.createAiVideoAnalysis({
-          customerId: userId,
           vehicleId,
           videoUrl: `https://example.com/videos/analysis-${i + 1}.mp4`,
-          analysisType: ['damage_assessment', 'walkaround'][i],
+          triageCategory: ['damage_assessment', 'walkaround'][i],
           aiModel: 'GPT-5-Vision',
           detectedIssues: i === 0 ? ['Minor dent', 'Paint scratch'] : [],
-          estimatedCost: i === 0 ? 350.00 : 0,
-          confidence: 0.92,
-          status: 'completed',
+          estimatedCost: i === 0 ? '350.00' : '0',
+          confidence: '0.92',
+          analysisStatus: 'completed',
         });
         results.aiVideo++;
       }
 
       // Seed Digital Twins (1 twin)
+      // digital_twins is keyed by vehicle (no twin_name); counts live in
+      // data_points, predictions in predicted_failures, health inside
+      // performance_metrics, and the state column is twin_status.
       await storage.createDigitalTwin({
         vehicleId,
-        twinName: `Digital Twin - ${vehicleId.substring(0, 8)}`,
-        lastSyncTime: new Date().toISOString(),
-        sensorDataPoints: 1250,
-        predictedIssues: ['Brake pad wear in 2 months', 'Oil change due in 3 weeks'],
-        healthScore: 85,
-        status: 'active',
+        lastSyncedAt: new Date(),
+        dataPoints: 1250,
+        predictedFailures: ['Brake pad wear in 2 months', 'Oil change due in 3 weeks'],
+        performanceMetrics: { healthScore: 85 },
+        twinStatus: 'active',
       });
       results.digitalTwins++;
 
       // Seed Fraud Detection Cases (2 cases)
       for (let i = 0; i < 2; i++) {
+        // fraud_detection_cases: risk_score is a decimal string, the model
+        // is detection_method, triggers are anomaly_indicators, and
+        // detected_at takes a Date.
         await storage.createFraudDetectionCase({
           garageId,
           caseType: ['invoice_manipulation', 'parts_theft'][i],
-          detectedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-          riskScore: [75, 60][i],
-          mlModel: 'FraudDetector-v2',
-          indicators: i === 0 ? ['Unusual pricing', 'Multiple edits'] : ['Inventory mismatch'],
+          detectedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
+          riskScore: ['75', '60'][i],
+          detectionMethod: 'ml_algorithm',
+          anomalyIndicators: i === 0 ? ['Unusual pricing', 'Multiple edits'] : ['Inventory mismatch'],
           status: 'investigating',
         });
         results.fraudCases++;
       }
 
       // Seed Biometric Profile (1 profile)
+      // biometric_profiles: face_embedding is encrypted text, dates are
+      // enrollment_date/last_verified, and counters are
+      // verification_count/failed_attempts.
       await storage.createBiometricProfile({
         userId,
         fingerprintHash: `FP-${Math.random().toString(36).substring(7).toUpperCase()}`,
-        faceEmbedding: Array(128).fill(0).map(() => Math.random()),
-        enrolledAt: new Date().toISOString(),
-        lastAuthAt: new Date().toISOString(),
-        authSuccessCount: 42,
-        authFailureCount: 2,
-        status: 'active',
+        faceEmbedding: JSON.stringify(Array(128).fill(0).map(() => Math.random())),
+        enrollmentDate: new Date(),
+        lastVerified: new Date(),
+        verificationCount: 42,
+        failedAttempts: 2,
+        isActive: true,
       });
       results.biometricProfile = 1;
 
       // Seed Collaboration Sessions (2 sessions)
       for (let i = 0; i < 2; i++) {
+        // collaboration_sessions: the host is host_user_id, job_card_id is
+        // a real uuid FK (no sentinel strings), duration is seconds, and
+        // annotations have no column — shared_notes carries them.
         await storage.createCollaborationSession({
           garageId,
-          jobCardId: 'sample-job-' + i,
-          technicianId: userId,
+          hostUserId: userId,
           sessionType: ['video_call', 'ar_annotation'][i],
-          duration: 25 + i * 10,
+          sessionStatus: 'completed',
+          duration: (25 + i * 10) * 60,
           recordingUrl: `https://example.com/recordings/session-${i + 1}.mp4`,
-          annotations: i === 1 ? [{ x: 100, y: 200, note: 'Check here' }] : [],
+          sharedNotes: i === 1 ? 'Annotation at (100,200): Check here' : undefined,
         });
         results.collaborationSessions++;
       }
 
       // Seed Edge Devices (3 devices)
       for (let i = 0; i < 3; i++) {
+        // edge_devices requires a unique device_id.
         await storage.createEdgeDevice({
           garageId,
           deviceName: `Edge Gateway ${i + 1}`,
           deviceType: 'diagnostic_hub',
+          deviceId: `EDGE-${Date.now()}-${i}`,
           ipAddress: `192.168.1.${100 + i}`,
           macAddress: `00:1B:44:11:3A:${(10 + i).toString(16).toUpperCase()}`,
           firmwareVersion: '2.1.0',
@@ -15711,15 +16051,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Seed Pricing Optimizations (2 optimizations)
       for (let i = 0; i < 2; i++) {
+        // pricing_optimization: prices are decimal strings, revenue is
+        // estimated_revenue_impact, confidence is confidence_score, and the
+        // service is referenced by uuid — the label rides in factors.
         await storage.createPricingOptimization({
           garageId,
           optimizationType: 'dynamic_pricing',
-          targetService: ['Oil Change', 'Brake Service'][i],
-          currentPrice: [45.00, 220.00][i],
-          optimizedPrice: [49.99, 199.99][i],
-          expectedRevenue: [1250.00, 3500.00][i],
-          confidence: 0.88,
-          factors: ['Market demand', 'Competition', 'Time of day'],
+          currentPrice: ['45.00', '220.00'][i],
+          optimizedPrice: ['49.99', '199.99'][i],
+          estimatedRevenueImpact: ['1250.00', '3500.00'][i],
+          confidenceScore: '0.88',
+          factors: {
+            service: ['Oil Change', 'Brake Service'][i],
+            drivers: ['Market demand', 'Competition', 'Time of day'],
+          },
         });
         results.pricingOptimizations++;
       }
@@ -15862,36 +16207,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create quality check record
-      const checkData = {
+      // Create quality check record. vision_quality_checks requires
+      // image_url, defects_detected and ai_model, keeps the score as a
+      // decimal string, and links the vehicle by uuid — no 'demo-vehicle'
+      // sentinel.
+      const check = await storage.createVisionQualityCheck({
         garageId: req.user!.garageId!,
-        vehicleId: vehicleId || 'demo-vehicle',
+        vehicleId: vehicleId || undefined,
         checkType: checkType || 'paint_inspection',
-        inspectionDate: new Date().toISOString(),
-        qualityScore,
-        passed: qualityScore >= 80,
-        defectsFound: defects.length,
-        inspector: req.user!.id,
-        aiAnalysis: {
-          model: 'gpt-5-vision',
-          confidence: 0.85,
-          processingTime: 2.3
-        }
-      };
+        imageUrl: req.body.imageUrl || 'simulated://no-image',
+        defectsDetected: defects,
+        qualityScore: qualityScore.toString(),
+        passedInspection: qualityScore >= 80,
+        inspectorId: req.user!.id,
+        aiModel: 'gpt-5-vision',
+        processingTimeMs: 2300,
+      });
 
-      const check = await storage.createVisionQualityCheck(checkData);
-
-      // Create defect records
+      // Create defect records. vision_defects hangs off the quality check
+      // (no garage_id/status columns), takes location as jsonb and
+      // confidence as a decimal string.
       for (const defect of defects) {
         await storage.createVisionDefect({
-          garageId: req.user!.garageId!,
-          checkId: check.id,
+          qualityCheckId: check.id,
           defectType: defect.type,
           severity: defect.severity,
           description: defect.description,
-          location: JSON.stringify(defect.location),
-          confidence: defect.confidence,
-          status: 'pending'
+          location: defect.location,
+          confidence: defect.confidence.toString(),
         });
       }
 
@@ -16544,7 +16887,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // 1. Neural Diagnostics - Create 3 neural diagnostics with realistic AI prediction data
       for (let i = 0; i < 3; i++) {
-        const diagnostic = await storage.createNeuralDiagnostic({
+        // neural_diagnostics: predictions live in predicted_failures (jsonb,
+        // NOT NULL), confidence is a decimal string named confidence_score,
+        // and timing is processing_time_ms.
+        await storage.createNeuralDiagnostic({
           garageId,
           vehicleId,
           modelVersion: ['v2.5', 'v3.0', 'v2.8'][i],
@@ -16554,21 +16900,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fuelLevel: 75 - i * 10,
             batteryVoltage: 12.6 + i * 0.1
           },
-          prediction: ['engine_maintenance_required', 'normal_operation', 'oil_change_soon'][i],
-          confidence: 0.92 + i * 0.02,
-          processingTime: 150 + i * 50,
+          predictedFailures: [['engine_maintenance_required', 'normal_operation', 'oil_change_soon'][i]],
+          confidenceScore: (0.92 + i * 0.02).toFixed(2),
+          processingTimeMs: 150 + i * 50,
           status: 'completed',
         });
-        
+
         if (i < 2) {
+          // neural_training_sessions is standalone (no diagnostic FK); the
+          // sample size column is dataset_size and decimals take strings.
           await storage.createNeuralTrainingSession({
             garageId,
-            diagnosticId: diagnostic.id,
-            trainingDataCount: 5000 + i * 1000,
+            modelVersion: ['v2.5', 'v3.0'][i],
+            datasetSize: 5000 + i * 1000,
             epochs: 50 + i * 10,
-            accuracy: 0.94 + i * 0.02,
-            loss: 0.08 - i * 0.01,
+            accuracy: (0.94 + i * 0.02).toFixed(2),
+            loss: (0.08 - i * 0.01).toFixed(6),
             status: 'completed',
+            completedAt: new Date(),
           });
           totalRecords++;
         }
@@ -16577,34 +16926,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // 2. Computer Vision - Create 2 quality checks with defect detection results
       for (let i = 0; i < 2; i++) {
+        // vision_quality_checks: check_type and ai_model are NOT NULL,
+        // quality_score is a decimal string, and defects_detected is jsonb.
         const qualityCheck = await storage.createVisionQualityCheck({
           garageId,
           vehicleId,
+          checkType: 'exterior_inspection',
           imageUrl: `https://storage.example.com/qc/${Date.now()}-${i}.jpg`,
-          modelVersion: 'YOLOv8-QC',
-          overallScore: 88 + i * 5,
-          defectsDetected: i === 0 ? 2 : 0,
-          processingTime: 320 + i * 80,
-          status: 'completed',
+          aiModel: 'YOLOv8-QC',
+          qualityScore: String(88 + i * 5),
+          defectsDetected: i === 0 ? ['paint_scratch', 'dent'] : [],
+          passedInspection: i !== 0,
+          processingTimeMs: 320 + i * 80,
         });
 
         if (i === 0) {
+          // vision_defects: location is jsonb (NOT NULL), the box is
+          // `dimensions`, and confidence is a decimal string.
           await storage.createVisionDefect({
             qualityCheckId: qualityCheck.id,
             defectType: 'paint_scratch',
             severity: 'minor',
-            confidence: 0.89,
-            boundingBox: { x: 245, y: 156, width: 85, height: 42 },
-            location: 'front_door_panel',
+            confidence: '0.89',
+            dimensions: { x: 245, y: 156, width: 85, height: 42 },
+            location: { panel: 'front_door_panel' },
           });
 
           await storage.createVisionDefect({
             qualityCheckId: qualityCheck.id,
             defectType: 'dent',
             severity: 'moderate',
-            confidence: 0.93,
-            boundingBox: { x: 512, y: 234, width: 120, height: 95 },
-            location: 'rear_bumper',
+            confidence: '0.93',
+            dimensions: { x: 512, y: 234, width: 120, height: 95 },
+            location: { panel: 'rear_bumper' },
           });
           totalRecords += 2;
         }
@@ -16618,14 +16972,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Air conditioning is not cooling properly and makes a rattling sound'
       ];
 
+      // nlp_service_requests.customer_id references customer_profiles, so the
+      // seeding user needs a profile row (ignore the conflict on re-runs).
+      await storage.createCustomerProfile({ userId }).catch(() => undefined);
+
       for (let i = 0; i < 3; i++) {
+        // Columns: processed_complaint, extracted_symptoms (text[]),
+        // urgency_level; confidence is a decimal string.
         await storage.createNLPServiceRequest({
           garageId,
           customerId: userId,
           vehicleId,
           originalComplaint: complaints[i],
-          processedText: complaints[i].toLowerCase(),
-          detectedIssues: [
+          processedComplaint: complaints[i].toLowerCase(),
+          extractedSymptoms: [
             ['brake_noise', 'brake_service'],
             ['engine_misfire', 'fuel_leak', 'diagnostic_required'],
             ['ac_malfunction', 'ac_compressor']
@@ -16636,38 +16996,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ['AC System Diagnostic', 'AC Compressor Service']
           ][i],
           sentiment: ['neutral', 'concerned', 'frustrated'][i],
-          priority: ['medium', 'high', 'medium'][i],
-          confidence: 0.91 + i * 0.02,
-          modelVersion: 'GPT-4-Turbo',
-          status: 'processed',
+          urgencyLevel: ['medium', 'high', 'medium'][i],
+          confidence: (0.91 + i * 0.02).toFixed(2),
         });
         totalRecords++;
       }
 
       // 4. RL Parts Optimizer - Create 2 parts optimizations with learning metrics
-      for (let i = 0; i < 2; i++) {
-        const optimization = await storage.createRLPartsOptimization({
+      // rl_parts_optimizations references a real spare part (part_id is a
+      // NOT NULL FK) and requires expected_demand/lead_time; there is no
+      // part_category or cost_savings column. Skip if no parts are seeded.
+      const sparePartsForRl = await storage.getSpareParts();
+      for (let i = 0; i < 2 && i < sparePartsForRl.length; i++) {
+        await storage.createRLPartsOptimization({
           garageId,
-          partCategory: ['brake_pads', 'oil_filters'][i],
+          partId: sparePartsForRl[i].id,
           currentStockLevel: 45 + i * 15,
           recommendedStockLevel: 60 + i * 10,
           reorderPoint: 25 + i * 5,
           reorderQuantity: 30 + i * 10,
-          confidenceScore: 0.88 + i * 0.04,
-          costSavings: 450 + i * 200,
-          agentVersion: 'RL-Agent-v1.2',
-          status: 'active',
+          expectedDemand: String(55 + i * 5),
+          leadTime: 7,
+          confidenceLevel: (0.88 + i * 0.04).toFixed(2),
+          reward: (0.85 + i * 0.05).toFixed(2),
+          actionTaken: 'reorder_triggered',
+          modelVersion: 'RL-Agent-v1.2',
         });
 
+        // rl_learning_episodes is per garage (no optimization FK); rewards
+        // and rates are decimal strings and steps_completed is NOT NULL.
         await storage.createRLLearningEpisode({
-          optimizationId: optimization.id,
+          garageId,
           episodeNumber: 150 + i * 50,
-          reward: 0.85 + i * 0.05,
-          loss: 0.12 - i * 0.02,
-          epsilon: 0.15 - i * 0.03,
-          learningRate: 0.001,
-          stateData: { stockLevel: 45 + i * 15, demandForecast: 55 },
-          actionTaken: 'reorder_triggered',
+          totalReward: (0.85 + i * 0.05).toFixed(2),
+          explorationRate: (0.15 - i * 0.03).toFixed(4),
+          learningRate: '0.0010',
+          stepsCompleted: 500 + i * 100,
+          convergenceMetric: (0.12 - i * 0.02).toFixed(6),
+          status: 'completed',
         });
         totalRecords += 2;
       }
@@ -16675,28 +17041,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 5. Metaverse Showroom - Create 1 showroom with 2 virtual visits
       const showroom = await storage.createMetaverseShowroom({
         garageId,
-        showroomName: 'Virtual Service Center - Premium',
-        metaversePlatform: 'Decentraland',
-        showroomUrl: 'https://metaverse.example.com/garage/' + garageId,
-        virtualCoordinates: 'X:125, Y:67, Z:3',
-        featuredVehicles: [vehicleId],
-        interactiveFeatures: ['3D vehicle viewer', 'service history', 'live chat'],
-        status: 'active',
+        // Field names match metaverse_showrooms in shared/schema.ts. The
+        // previous literal used showroomName / metaversePlatform /
+        // showroomUrl / virtualCoordinates / featuredVehicles /
+        // interactiveFeatures / status — none are columns, so this insert
+        // threw before reaching the database.
+        name: 'Virtual Service Center - Premium',
+        platform: 'Decentraland',
+        virtualWorldUrl: 'https://metaverse.example.com/garage/' + garageId,
+        // vehiclesDisplayed is a count, not a list of ids.
+        vehiclesDisplayed: 1,
+        description: 'Premium virtual showroom with 3D vehicle viewer, service history and live chat',
+        isActive: true,
       });
       totalRecords++;
 
       const visitTime = Date.now();
       for (let i = 0; i < 2; i++) {
+        // Mapped onto metaverse_visits as declared: sessionId, duration,
+        // vehiclesViewed, interactionCount, deviceType. visitorId/visitorType/
+        // virtualAssistantUsed/visitDate are not columns.
         await storage.createMetaverseVisit({
           showroomId: showroom.id,
-          visitorId: `visitor-${Date.now()}-${i}`,
-          visitorType: i === 0 ? 'customer' : 'prospect',
-          durationMinutes: 15 + i * 8,
-          interactionsCount: 12 + i * 5,
-          viewedVehicles: [vehicleId],
-          virtualAssistantUsed: i === 0,
+          sessionId: `visitor-${visitTime}-${i}`,
+          duration: 15 + i * 8,
+          interactionCount: 12 + i * 5,
+          // vehicles_viewed is a text array.
+          vehiclesViewed: [vehicleId],
           leadGenerated: i === 1,
-          visitDate: new Date(visitTime - (i * 24 * 60 * 60 * 1000)).toISOString(),
+          deviceType: i === 0 ? 'vr-headset' : 'browser',
         });
         totalRecords++;
       }
@@ -16705,34 +17078,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 0; i < 2; i++) {
         const guide = await storage.createHolographicGuide({
           garageId,
-          guideName: ['Engine Oil Change Holographic Guide', 'Brake Service AR Guide'][i],
-          targetService: ['oil_change', 'brake_service'][i],
-          vehicleModels: ['Toyota Camry', 'Honda Accord', 'Nissan Altima'],
+          // holographic_guides uses title/description/difficulty/vehicleMake/
+          // vehicleModel; guideName, targetService and vehicleModels are not
+          // columns, and vehicle make/model are separate scalars here.
+          title: ['Engine Oil Change Holographic Guide', 'Brake Service AR Guide'][i],
+          description: `Step-by-step holographic guide for ${['oil_change', 'brake_service'][i]}`,
+          vehicleMake: 'Toyota',
+          vehicleModel: 'Camry',
           hologramModelUrl: `https://holograms.example.com/guides/${i + 1}.glb`,
           steps: [
             { stepNumber: 1, instruction: 'Prepare tools and safety equipment', duration: 120 },
             { stepNumber: 2, instruction: 'Locate service points', duration: 180 },
             { stepNumber: 3, instruction: 'Perform service procedure', duration: 600 }
           ],
-          difficultyLevel: i === 0 ? 'beginner' : 'intermediate',
+          difficulty: i === 0 ? 'beginner' : 'intermediate',
           estimatedDuration: i === 0 ? 30 : 60,
-          createdBy: userId,
-          status: 'published',
+          isActive: true,
         });
 
         if (i === 0) {
+          // holographic_sessions has no garageId/vehicleId/completionPercentage/
+          // status: it hangs off the guide, and completion is a boolean.
           await storage.createHolographicSession({
             guideId: guide.id,
-            garageId,
             technicianId: userId,
-            vehicleId,
             deviceType: 'HoloLens 3',
             sessionDuration: 28,
-            completionPercentage: 100,
             stepsCompleted: 3,
             totalSteps: 3,
+            errorsMade: 0,
+            completed: true,
+            rating: 5,
             feedback: 'Very helpful and clear instructions',
-            status: 'completed',
           });
           totalRecords++;
         }
@@ -16742,43 +17119,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 7. Spatial Computing - Create 1 workstation with 1 diagnostic session
       const workstation = await storage.createSpatialWorkstation({
         garageId,
-        workstationName: 'Bay 3 - Diagnostic Station',
+        // spatial_workstations uses name/lastCalibration/calibrationStatus/
+        // isActive; workstationName, capabilities, calibrationDate and status
+        // are not columns.
+        name: 'Bay 3 - Diagnostic Station',
         location: 'Service Bay 3',
         deviceType: 'Apple Vision Pro',
-        capabilities: ['3D overlay', 'parts identification', 'torque specs display', 'AR instructions'],
-        calibrationDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'active',
+        lastCalibration: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        calibrationStatus: 'calibrated',
+        assignedTechnician: userId,
+        isActive: true,
       });
       totalRecords++;
 
+      // spatial_diagnostic_sessions: no garage/status columns; the work done
+      // is recorded in diagnostics_performed (jsonb, NOT NULL) with counters
+      // for issues/assets/gestures, and accuracy is a decimal string.
       await storage.createSpatialDiagnosticSession({
         workstationId: workstation.id,
-        garageId,
         technicianId: userId,
         vehicleId,
-        diagnosticType: 'comprehensive',
-        spatialMarkers: 8,
-        annotationsCreated: 5,
-        measurementsTaken: 12,
-        sessionDuration: 45,
-        accuracy: 0.97,
-        status: 'completed',
+        sessionType: 'comprehensive',
+        diagnosticsPerformed: { spatialMarkers: 8, annotationsCreated: 5, measurementsTaken: 12 },
+        issuesFound: 2,
+        virtualAssetsLoaded: 5,
+        handGesturesUsed: 12,
+        duration: 45 * 60,
+        accuracy: '0.97',
+        endedAt: new Date(),
       });
       totalRecords++;
 
       // 8. Autonomous Robots - Create 2 robots with 3 tasks
       const robots = [];
       for (let i = 0; i < 2; i++) {
+        // autonomous_robots: serial_number is NOT NULL/unique and the
+        // maintenance column is last_maintenance (a timestamp).
         const robot = await storage.createAutonomousRobot({
           garageId,
           robotName: ['AutoBot-Inspect-01', 'AutoBot-Parts-02'][i],
           robotType: i === 0 ? 'inspection' : 'parts_delivery',
-          capabilities: i === 0 
+          serialNumber: `ROBOT-${Date.now()}-${i}`,
+          capabilities: i === 0
             ? ['undercarriage_scan', 'fluid_level_check', 'tire_pressure_check']
             : ['parts_retrieval', 'parts_delivery', 'inventory_scan'],
           batteryLevel: 85 + i * 10,
           firmwareVersion: 'v4.2.1',
-          lastMaintenanceDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+          lastMaintenance: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
           status: 'active',
         });
         robots.push(robot);
@@ -16787,61 +17174,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const taskTypes = ['undercarriage_inspection', 'parts_retrieval', 'inventory_scan'];
       for (let i = 0; i < 3; i++) {
+        // robot_tasks: no vehicle/estimate/percentage columns — duration is
+        // seconds, success_rate a decimal string, completed_at a Date.
         await storage.createRobotTask({
           robotId: robots[i % 2].id,
           taskType: taskTypes[i],
-          vehicleId: i === 0 ? vehicleId : undefined,
           priority: ['high', 'medium', 'low'][i],
-          estimatedDuration: [15, 8, 12][i],
-          actualDuration: [14, 9, 11][i],
-          completionPercentage: 100,
+          description: i === 0 ? `Inspection for vehicle ${vehicleId}` : undefined,
+          duration: [14, 9, 11][i] * 60,
+          successRate: '100.00',
           status: 'completed',
-          completedAt: new Date(Date.now() - (2 - i) * 60 * 60 * 1000).toISOString(),
+          assignedBy: userId,
+          completedAt: new Date(Date.now() - (2 - i) * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 9. Drone Fleet - Create 1 drone with 2 missions
+      // drone_fleets: drone_model/serial_number/max_flight_time/max_range are
+      // NOT NULL, sensors carries the capability list, hours are a decimal
+      // string, and last_maintenance is a timestamp.
       const drone = await storage.createDroneFleet({
         garageId,
         droneName: 'SkyInspect-Alpha',
-        droneType: 'inspection',
-        model: 'DJI Matrice 300 RTK',
-        capabilities: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
+        droneModel: 'DJI Matrice 300 RTK',
+        serialNumber: `DRONE-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+        maxFlightTime: 55,
+        maxRange: '15.00',
+        sensors: ['thermal_imaging', 'high_res_camera', 'lidar_scanning'],
         batteryLevel: 92,
-        flightHours: 245,
-        lastMaintenanceDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'ready',
+        totalFlightHours: '245.00',
+        lastMaintenance: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        status: 'available',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // drone_missions: target_location is jsonb (NOT NULL), media counts
+        // land in media_collected, findings in issues_detected (a count), and
+        // the completion time is end_time.
         await storage.createDroneMission({
           droneId: drone.id,
           missionType: i === 0 ? 'roof_inspection' : 'facility_survey',
-          targetLocation: i === 0 ? 'Customer Location - Warehouse' : 'Garage Facility',
-          flightDuration: 18 + i * 7,
-          imagesCaptured: 45 + i * 20,
-          videoRecorded: i === 0,
-          findingsDetected: i === 0 ? ['roof_damage', 'gutter_blockage'] : [],
+          targetLocation: { name: i === 0 ? 'Customer Location - Warehouse' : 'Garage Facility' },
+          flightDuration: (18 + i * 7) * 60,
+          mediaCollected: 45 + i * 20,
+          issuesDetected: i === 0 ? 2 : 0,
           pilotId: userId,
           status: 'completed',
-          completedAt: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+          endTime: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 10. Smart Contracts - Create 1 smart contract with 2 events
+      // smart_contracts: the network column is `blockchain` and there is no
+      // abi column — the interface definition rides inside terms.
       const contract = await storage.createSmartContract({
         garageId,
         contractType: 'service_warranty',
-        blockchainNetwork: 'Ethereum',
+        blockchain: 'Ethereum',
         contractAddress: '0x' + Math.random().toString(16).substring(2, 42),
-        abi: JSON.stringify([{ type: 'function', name: 'claimWarranty' }]),
         terms: {
           warrantyPeriod: '12 months',
           coverageAmount: 5000,
-          conditions: ['regular_maintenance', 'authorized_parts']
+          conditions: ['regular_maintenance', 'authorized_parts'],
+          abi: [{ type: 'function', name: 'claimWarranty' }],
         },
         partyA: garageId,
         partyB: userId,
@@ -16850,162 +17248,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // contract_events: gas_used is a decimal string and there is no
+        // event_date column (created_at defaults).
         await storage.createContractEvent({
           contractId: contract.id,
           eventType: i === 0 ? 'contract_created' : 'milestone_reached',
           transactionHash: '0x' + Math.random().toString(16).substring(2, 66),
           blockNumber: 18500000 + i * 100,
-          eventData: i === 0 
+          eventData: i === 0
             ? { action: 'contract_deployed', parties: 2 }
             : { milestone: 'first_service_completed', value: 1200 },
-          gasUsed: 21000 + i * 5000,
-          eventDate: new Date(Date.now() - (1 - i) * 12 * 60 * 60 * 1000).toISOString(),
+          gasUsed: String(21000 + i * 5000),
+          triggeredBy: userId,
         });
         totalRecords++;
       }
 
       // 11. Carbon Credits - Create 1 credit and 2 emission records
+      // carbon_credits: credit_type/quantity/unit_price/total_value are the
+      // NOT NULL core; there is no credit_amount or issuance_date.
       const carbonCredit = await storage.createCarbonCredit({
         garageId,
-        creditAmount: 15.5,
-        carbonOffsetTons: 15.5,
+        creditType: 'offset',
+        quantity: '15.50',
+        unitPrice: '25.00',
+        totalValue: '387.50',
         projectName: 'Solar Panel Installation & EV Fleet Conversion',
         verificationStandard: 'Gold Standard',
-        issuanceDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        expirationDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000).toISOString(),
+        vintageYear: new Date().getFullYear() - 1,
+        expiryDate: new Date(Date.now() + 305 * 24 * 60 * 60 * 1000),
         certificateUrl: 'https://certificates.example.com/carbon/' + garageId,
-        status: 'active',
+        status: 'available',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // carbon_emissions: the offset link is offset_by, the amount is
+        // co2_equivalent (decimal string), the date is emission_date, and
+        // verified_by references users, so free text cannot go there.
         await storage.createCarbonEmission({
           garageId,
-          creditId: carbonCredit.id,
+          offsetBy: carbonCredit.id,
+          isOffset: true,
           emissionSource: i === 0 ? 'electricity_usage' : 'vehicle_fleet',
-          co2Tons: i === 0 ? 8.5 : 6.2,
-          calculationMethod: 'EPA Standard',
-          verifiedBy: 'Third-party Auditor',
+          co2Equivalent: i === 0 ? '8.50' : '6.20',
+          unit: 'tons',
+          activity: 'EPA Standard calculation',
           reportingPeriod: `2024-Q${i + 3}`,
-          recordDate: new Date(Date.now() - (1 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          emissionDate: new Date(Date.now() - (1 - i) * 30 * 24 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
 
       // 12. Green Energy - Create 1 solar asset and 1 EV charging station
+      // green_energy_assets: decimals take strings, the unit column is
+      // `unit`, dates are timestamps, and there is no model column.
       await storage.createGreenEnergyAsset({
         garageId,
         assetName: 'Rooftop Solar Array - Main Building',
         assetType: 'solar_panel',
-        capacity: 50.0,
-        capacityUnit: 'kW',
-        installationDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
+        capacity: '50.00',
+        unit: 'kW',
+        installationDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
         manufacturer: 'SunPower',
-        model: 'Maxeon 5',
-        efficiency: 0.22,
-        currentOutput: 38.5,
-        totalEnergyGenerated: 15250.0,
+        efficiency: '22.00',
+        currentOutput: '38.50',
+        totalEnergyGenerated: '15250.00',
         status: 'operational',
       });
       totalRecords++;
 
+      // ev_charging_stations: charger_type/power_rating are the NOT NULL
+      // pair, connectors are an array, energy is total_energy_delivered and
+      // the state column is current_status.
       await storage.createEVChargingStation({
         garageId,
         stationName: 'Customer EV Charger - Bay 1',
-        stationType: 'Level 2',
-        powerOutput: 7.2,
-        connector: 'J1772',
-        manufacturer: 'ChargePoint',
-        installationDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-        utilizationRate: 0.68,
+        chargerType: 'Level 2',
+        powerRating: '7.20',
+        connectorTypes: ['J1772'],
+        networkProvider: 'ChargePoint',
         totalChargingSessions: 245,
-        totalEnergyDispensed: 3580.5,
-        status: 'available',
+        totalEnergyDelivered: '3580.50',
+        currentStatus: 'available',
       });
       totalRecords++;
 
       // 13. Circular Economy - Create 2 recycled parts and 1 sustainability metric
       for (let i = 0; i < 2; i++) {
+        // recycled_parts: condition and recycling_method are the NOT NULL
+        // pair; savings figures live in the environmental_savings jsonb, and
+        // part numbers/suppliers have no columns of their own.
         await storage.createRecycledPart({
           garageId,
           partName: ['Alternator - Remanufactured', 'Starter Motor - Refurbished'][i],
-          partNumber: `RCY-${10000 + i}`,
-          originalPartSource: i === 0 ? 'Toyota Camry 2020' : 'Honda Accord 2019',
-          recyclingProcess: i === 0 ? 'remanufacturing' : 'refurbishment',
+          condition: i === 0 ? 'remanufactured' : 'refurbished',
+          recyclingMethod: i === 0 ? 'remanufacturing' : 'refurbishment',
           qualityGrade: i === 0 ? 'A' : 'A-',
-          costSavings: i === 0 ? 250 : 180,
-          co2Saved: i === 0 ? 12.5 : 9.8,
+          sellingPrice: i === 0 ? '250.00' : '180.00',
+          environmentalSavings: {
+            costSavings: i === 0 ? 250 : 180,
+            co2SavedTons: i === 0 ? 12.5 : 9.8,
+            source: i === 0 ? 'Toyota Camry 2020' : 'Honda Accord 2019',
+            supplier: 'GreenParts International',
+          },
           certificationNumber: `CERT-RCY-${2025000 + i}`,
-          supplier: 'GreenParts International',
           status: 'available',
         });
         totalRecords++;
       }
 
+      // sustainability_metrics: values are decimal strings, the benchmark is
+      // target_value, progress is achievement_rate, and certifications is a
+      // text array; there is no notes/record_date.
       await storage.createSustainabilityMetric({
         garageId,
         metricType: 'waste_recycling',
-        metricValue: 78.5,
+        metricValue: '78.50',
         unit: 'percentage',
         reportingPeriod: '2024-Q4',
-        benchmark: 75.0,
-        improvement: 5.2,
-        certificationBody: 'ISO 14001',
-        notes: 'Exceeded quarterly recycling target',
-        recordDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        targetValue: '75.00',
+        achievementRate: '104.67',
+        certifications: ['ISO 14001'],
+        verified: false,
       });
       totalRecords++;
 
       // 14. Satellite - Create 1 satellite connection with 2 usage logs
+      // satellite_connections: provider (not providerName), location is
+      // jsonb NOT NULL, bandwidth is a decimal string in Mbps, terminal_id
+      // must be unique, and the allowance column is data_limit.
       const satellite = await storage.createSatelliteConnection({
         garageId,
-        providerName: 'Starlink Business',
-        connectionType: 'satellite_internet',
-        bandwidth: '250 Mbps',
+        provider: 'Starlink Business',
+        terminalId: `STARLINK-${garageId.substring(0, 8)}-${Date.now()}`,
+        location: { site: 'main_facility' },
+        bandwidth: '250.00',
         latency: 35,
-        terminalId: 'STARLINK-' + garageId.substring(0, 8),
-        installationDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
-        monthlyDataAllowance: 1000.0,
+        dataLimit: '1000.00',
         status: 'active',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // satellite_usage_logs: a session window (session_start NOT NULL)
+        // with data_transferred/average_speed as decimal strings.
         await storage.createSatelliteUsageLog({
           connectionId: satellite.id,
-          dataUsed: 45.5 + i * 12.3,
-          peakBandwidth: 185 + i * 25,
-          averageLatency: 38 + i * 3,
-          uptime: 99.8 - i * 0.2,
-          usageDate: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000).toISOString(),
+          sessionStart: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000),
+          sessionEnd: new Date(Date.now() - (1 - i) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000),
+          dataTransferred: (45.5 + i * 12.3).toFixed(2),
+          averageSpeed: String(185 + i * 25),
+          applicationUsed: 'telematics_sync',
+          userId,
         });
         totalRecords++;
       }
 
       // 15. Quantum Encryption - Create 1 encryption key and 2 secure messages
+      // quantum_encryption_keys: key_type and key_size are the NOT NULL
+      // pair; expiry is expires_at and generation defaults server-side.
       const quantumKey = await storage.createQuantumEncryptionKey({
         garageId,
         keyName: 'Master Encryption Key - Q1',
+        keyType: 'lattice',
         algorithm: 'Lattice-based-Kyber-1024',
-        keyLength: 1024,
-        generatedDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        expirationDate: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000).toISOString(),
-        quantumResistant: true,
+        keySize: 1024,
+        expiresAt: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000),
         usageCount: 24,
         status: 'active',
       });
       totalRecords++;
 
       for (let i = 0; i < 2; i++) {
+        // quantum_secure_messages: garage-scoped, the key link is
+        // encryption_key_id, payload/hash are encrypted_content/
+        // integrity_hash, message_type is NOT NULL, and delivery state is
+        // delivery_status.
         await storage.createQuantumSecureMessage({
-          keyId: quantumKey.id,
+          garageId,
+          encryptionKeyId: quantumKey.id,
           senderId: userId,
           recipientId: userId,
-          encryptedPayload: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
-          encryptionAlgorithm: 'Lattice-based-Kyber-1024',
-          messageHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
-          transmissionDate: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000).toISOString(),
-          status: i === 0 ? 'delivered' : 'pending',
+          messageType: 'notification',
+          encryptedContent: 'QE-' + Buffer.from(`Secure message ${i + 1}`).toString('base64'),
+          integrityHash: 'SHA3-512-' + Math.random().toString(36).substring(2, 15),
+          transmissionMethod: 'quantum_channel',
+          deliveryStatus: i === 0 ? 'delivered' : 'pending',
+          sentAt: new Date(Date.now() - (1 - i) * 6 * 60 * 60 * 1000),
         });
         totalRecords++;
       }
@@ -17051,7 +17481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/employees', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/employees', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayrollEmployeeSchema.parse(req.body);
       const employee = await storage.createPayrollEmployee(validatedData);
@@ -17064,7 +17494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/payroll/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'payroll_employees' }), async (req, res) => {
     try {
       const employee = await storage.updatePayrollEmployee(req.params.id, req.body);
       res.json({ data: employee });
@@ -17073,7 +17503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/payroll/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'payroll_employees' }), async (req, res) => {
     try {
       await storage.deletePayrollEmployee(req.params.id);
       res.json({ success: true });
@@ -17091,7 +17521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/periods', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/periods', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayPeriodSchema.parse(req.body);
       const period = await storage.createPayPeriod(validatedData);
@@ -17104,7 +17534,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payroll/runs/:periodId', isAuthenticated, async (req, res) => {
+  app.get('/api/payroll/runs/:periodId', isAuthenticated, requireResourceOwnership({ table: 'pay_periods', idParam: 'periodId' }), async (req, res) => {
     try {
       const runs = await storage.getPayrollRuns(req.params.periodId);
       res.json({ data: runs });
@@ -17113,7 +17543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/runs', isAuthenticated, async (req: any, res) => {
+  app.post('/api/payroll/runs', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validatedData = insertPayrollRunSchema.parse(req.body);
       const run = await storage.createPayrollRun(validatedData);
@@ -17171,7 +17601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/expenses/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/expenses/:id/approve', isAuthenticated, requireResourceOwnership({ table: 'expenses' }), async (req: any, res) => {
     try {
       const expense = await storage.approveExpense(req.params.id, req.user?.id);
       res.json({ data: expense });
@@ -17180,7 +17610,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/expenses/:id/reject', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/expenses/:id/reject', isAuthenticated, requireResourceOwnership({ table: 'expenses' }), async (req: any, res) => {
     try {
       const expense = await storage.rejectExpense(req.params.id, req.user?.id);
       res.json({ data: expense });
@@ -17212,7 +17642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/towing-jobs/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/towing-jobs/:id', isAuthenticated, requireResourceOwnership({ table: 'towing_jobs' }), async (req, res) => {
     try {
       const job = await storage.updateTowingJob(req.params.id, req.body);
       res.json({ data: job });
@@ -17311,7 +17741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, requireResourceOwnership({ table: 'telematics_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const alert = await storage.resolveTelematicsAlert(req.params.id, req.user?.id);
       res.json({ data: alert });
@@ -17423,7 +17853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/gmb/posts/:id/publish', isAuthenticated, async (req, res) => {
+  app.patch('/api/gmb/posts/:id/publish', isAuthenticated, requireResourceOwnership({ table: 'gmb_posts', parent: { table: 'google_business_profiles', fk: 'profile_id' } }), async (req, res) => {
     try {
       const post = await storage.publishGmbPost(req.params.id);
       res.json({ data: post });
@@ -17445,7 +17875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/gmb/reviews/:id/respond', isAuthenticated, async (req, res) => {
+  app.patch('/api/gmb/reviews/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'gmb_reviews', parent: { table: 'google_business_profiles', fk: 'profile_id' } }), async (req, res) => {
     try {
       const review = await storage.respondToGmbReview(req.params.id, req.body.responseText);
       res.json({ data: review });
@@ -17521,7 +17951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, async (req, res) => {
+  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, requireResourceOwnership({ table: 'compliance_tasks' }), async (req, res) => {
     try {
       const task = await storage.completeComplianceTask(req.params.id);
       res.json({ data: task });
@@ -17533,7 +17963,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== CLIENT PORTAL - CUSTOMER-SCOPED ROUTES ====================
   
   // Service Reminders - Customer-scoped
-  app.post('/api/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/service-reminders', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const { insertServiceReminderSchema } = await import("@shared/schema");
@@ -17544,7 +17974,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17558,7 +17987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Chat Messages - Customer-scoped by job card
-  app.post('/api/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
+  app.post('/api/job-cards/:jobCardId/chat', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
       const validationResult = insertServiceChatMessageSchema.safeParse({
@@ -17568,7 +17997,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17582,7 +18010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Reviews - Customer-scoped
-  app.post('/api/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/reviews', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const validationResult = insertServiceReviewSchema.safeParse({
@@ -17592,7 +18020,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17606,7 +18033,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Signatures - Customer-scoped
-  app.post('/api/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/signatures', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const validationResult = insertServiceSignatureSchema.safeParse({
@@ -17616,7 +18043,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!validationResult.success) {
         return res.status(400).json({ 
-          message: "Validation error", 
           ...sanitizeZodError(validationResult.error) 
         });
       }
@@ -17655,7 +18081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single sensor (with ownership check)
-  app.get('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const sensor = await storage.getIotSensor(req.params.id);
@@ -17700,7 +18126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update sensor (with validation and ownership check)
-  app.patch('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const updateSchema = insertIoTSensorSchema.partial().omit({ vehicleId: true });
@@ -17729,7 +18155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete sensor (with ownership check)
-  app.delete('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existingSensor = await storage.getIotSensor(req.params.id);
@@ -17773,7 +18199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get sensor readings (with ownership check and date validation)
-  app.get('/api/iot/sensors/:id/readings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/sensors/:id/readings', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
@@ -17814,7 +18240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get vehicle anomalies (with ownership check)
-  app.get('/api/iot/vehicles/:vehicleId/anomalies', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/vehicles/:vehicleId/anomalies', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const vehicle = await storage.getVehicle(req.params.vehicleId);
@@ -17861,7 +18287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single alert (with ownership check)
-  app.get('/api/iot/alerts/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/alerts/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const alert = await storage.getIotAlert(req.params.id);
@@ -17883,7 +18309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Acknowledge alert (with ownership check)
-  app.post('/api/iot/alerts/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/iot/alerts/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const alert = await storage.getIotAlert(req.params.id);
@@ -17939,7 +18365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get latest sensor readings per vehicle
-  app.get('/api/iot/vehicles/:vehicleId/latest-readings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/vehicles/:vehicleId/latest-readings', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const vehicle = await storage.getVehicle(req.params.vehicleId);
@@ -17966,7 +18392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Resolve alert (with ownership check and validation)
-  app.post('/api/iot/alerts/:id/resolve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/iot/alerts/:id/resolve', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const { resolution, jobCardId } = req.body;
@@ -18125,7 +18551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update geofence zone (with ownership check)
-  app.patch('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/fleet/geofences/:id', isAuthenticated, requireResourceOwnership({ table: 'geofence_zones' }), async (req: any, res) => {
     try {
       const zone = await storage.getGeofenceZone(req.params.id);
       if (!zone) {
@@ -18145,7 +18571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete geofence zone (with ownership check)
-  app.delete('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/fleet/geofences/:id', isAuthenticated, requireResourceOwnership({ table: 'geofence_zones' }), async (req: any, res) => {
     try {
       const zone = await storage.getGeofenceZone(req.params.id);
       if (!zone) {
@@ -18248,7 +18674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get route with checkpoints (with ownership check)
-  app.get('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/fleet/routes/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_routes' }), async (req: any, res) => {
     try {
       const route = await storage.getFleetRoute(req.params.id);
       if (!route) {
@@ -18268,7 +18694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update route status (with ownership check)
-  app.patch('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/fleet/routes/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_routes' }), async (req: any, res) => {
     try {
       const route = await storage.getFleetRoute(req.params.id);
       if (!route) {
@@ -18401,7 +18827,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit feedback
   app.post('/api/feedback', isAuthenticated, async (req: any, res) => {
     try {
-      const validated = schema.insertServiceFeedbackSchema.parse(req.body);
+      const validated = insertServiceFeedbackSchema.parse(req.body);
       const feedback = await storage.createServiceFeedback(validated);
       
       // Update technician summary asynchronously
@@ -18420,7 +18846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback for a job card
-  app.get('/api/feedback/job-card/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/job-card/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackByJobCard(req.params.jobCardId);
       res.json(feedback);
@@ -18431,7 +18857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback for a technician
-  app.get('/api/feedback/technician/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/technician/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', idParam: 'technicianId', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackByTechnician(req.params.technicianId);
       const summary = await storage.getTechnicianFeedbackSummary(req.params.technicianId);
@@ -18476,7 +18902,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback by ID
-  app.get('/api/feedback/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/:id', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackById(req.params.id);
       if (!feedback) {
@@ -18490,7 +18916,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Respond to feedback
-  app.post('/api/feedback/:id/respond', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const { response } = req.body;
       if (!response) {
@@ -18505,7 +18931,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Flag feedback
-  app.post('/api/feedback/:id/flag', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/flag', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const { reason } = req.body;
       if (!reason) {
@@ -18520,7 +18946,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Unflag feedback
-  app.post('/api/feedback/:id/unflag', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/unflag', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const updated = await storage.unflagFeedback(req.params.id);
       res.json(updated);
@@ -18531,7 +18957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analyze sentiment using OpenAI
-  app.post('/api/feedback/:id/analyze-sentiment', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/analyze-sentiment', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackById(req.params.id);
       if (!feedback) {
@@ -18630,7 +19056,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // Get maintenance recommendations for a vehicle
-  app.get('/api/maintenance/recommendations/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/maintenance/recommendations/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const recommendations = await storage.getMaintenanceRecommendations(req.params.vehicleId);
       res.json(recommendations);
@@ -18641,7 +19067,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Acknowledge recommendation
-  app.patch('/api/maintenance/recommendations/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/maintenance/recommendations/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'maintenance_recommendations', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const recommendation = await storage.acknowledgeMaintenanceRecommendation(req.params.id);
       res.json(recommendation);
@@ -18656,7 +19082,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // Get telematic device for vehicle
-  app.get('/api/telematics/device/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/telematics/device/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const device = await storage.getTelematicsDeviceByVehicle(req.params.vehicleId);
       if (!device) {
@@ -18670,7 +19096,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get latest telematics readings
-  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const { streamType, hours = 24 } = req.query;
       const readings = await storage.getTelematicsReadings(
@@ -18710,7 +19136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update widget
-  app.patch('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/dashboard/widgets/:id', isAuthenticated, requireResourceOwnership({ table: 'dashboard_widgets' }), async (req: any, res) => {
     try {
       const widget = await storage.updateDashboardWidget(req.params.id, req.body);
       res.json(widget);
@@ -18732,7 +19158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete widget
-  app.delete('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/dashboard/widgets/:id', isAuthenticated, requireResourceOwnership({ table: 'dashboard_widgets' }), async (req: any, res) => {
     try {
       await storage.deleteDashboardWidget(req.params.id);
       res.json({ success: true });
@@ -18823,7 +19249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single backup by ID
-  app.get('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/backups/:id', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const backup = await storage.getBackupJob(req.params.id);
       if (!backup) {
@@ -18837,7 +19263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete backup
-  app.delete('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/backups/:id', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       await storage.deleteBackupJob(req.params.id);
       res.json({ success: true });
@@ -18848,7 +19274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Restore from backup
-  app.post('/api/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+  app.post('/api/backups/:id/restore', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const backup = await storage.getBackupJob(req.params.id);
       if (!backup) {
@@ -18927,7 +19353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/departments/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_departments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrDepartments)
@@ -18944,7 +19370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/departments/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_departments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrDepartments).where(eq(hrDepartments.id, id));
@@ -18983,7 +19409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/positions/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_positions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrPositions)
@@ -19000,7 +19426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/positions/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_positions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrPositions).where(eq(hrPositions.id, id));
@@ -19025,7 +19451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [employee] = await db.select().from(hrEmployeeProfiles)
@@ -19054,7 +19480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrEmployeeProfiles)
@@ -19071,7 +19497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrEmployeeProfiles).where(eq(hrEmployeeProfiles.id, id));
@@ -19111,7 +19537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Leave Balances
-  app.get('/api/hr/leave-balances/:employeeId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/leave-balances/:employeeId', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles', idParam: 'employeeId' }), async (req: any, res) => {
     try {
       const { employeeId } = req.params;
       const balances = await db.select().from(hrLeaveBalances)
@@ -19138,7 +19564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/leave-balances/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/leave-balances/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_leave_balances', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrLeaveBalances)
@@ -19190,7 +19616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/leave-requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/leave-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_leave_requests', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -19251,7 +19677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/job-postings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/job-postings/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_job_postings' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -19309,7 +19735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/candidates/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/candidates/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_candidates', parent: { table: 'hr_job_postings', fk: 'job_posting_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrCandidates)
@@ -19355,7 +19781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Benefit Enrollments
-  app.get('/api/hr/benefit-enrollments/:employeeId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/benefit-enrollments/:employeeId', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles', idParam: 'employeeId' }), async (req: any, res) => {
     try {
       const { employeeId } = req.params;
       const enrollments = await db.select().from(hrBenefitEnrollments)
@@ -19503,7 +19929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/self-service-requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/self-service-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_self_service_requests', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -19541,7 +19967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/service-bays/:id/status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/service-bays/:id/status', isAuthenticated, requireResourceOwnership({ table: 'service_bays' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -19556,7 +19982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/service-bays/:bayId/sessions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/service-bays/:bayId/sessions', isAuthenticated, requireResourceOwnership({ table: 'service_bays', idParam: 'bayId' }), async (req: any, res) => {
     try {
       const { bayId } = req.params;
       const { vehicleId, jobCardId } = req.body;
@@ -19588,7 +20014,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get('/api/inventory-forecasts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const forecasts = await storage.getInventoryForecasts(garageId as string);
       res.json(forecasts);
@@ -19610,7 +20038,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/replenishment-orders', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, status } = req.query;
+      const { garageId: garageIdParam, status } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const orders = await storage.getReplenishmentOrders(garageId as string, status as string);
       res.json(orders);
     } catch (error: any) {
@@ -19619,7 +20049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/replenishment-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'replenishment_orders' }), async (req: any, res) => {
     try {
       const order = await storage.getReplenishmentOrder(req.params.id);
       if (!order) return res.status(404).json({ message: "Order not found" });
@@ -19640,7 +20070,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/replenishment-orders/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/replenishment-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'replenishment_orders' }), async (req: any, res) => {
     try {
       const order = await storage.updateReplenishmentOrder(req.params.id, req.body);
       res.json(order);
@@ -19650,7 +20080,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/replenishment-orders/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/replenishment-orders/:id/approve', isAuthenticated, requireResourceOwnership({ table: 'replenishment_orders' }), async (req: any, res) => {
     try {
       const order = await storage.approveReplenishmentOrder(req.params.id, req.user?.id || 'system');
       res.json(order);
@@ -19666,7 +20096,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-tiers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const tiers = await storage.getLoyaltyTiers(garageId as string);
       res.json(tiers);
@@ -19686,7 +20118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/loyalty-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_tiers' }), async (req: any, res) => {
     try {
       const tier = await storage.updateLoyaltyTier(req.params.id, req.body);
       res.json(tier);
@@ -19696,7 +20128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/loyalty-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_tiers' }), async (req: any, res) => {
     try {
       await storage.deleteLoyaltyTier(req.params.id);
       res.status(204).send();
@@ -19708,7 +20140,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-accounts', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const accounts = await storage.getLoyaltyAccounts(garageId as string);
       res.json(accounts);
     } catch (error: any) {
@@ -19748,7 +20182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, async (req: any, res) => {
+  app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, requireResourceOwnership({ table: 'loyalty_accounts' }), async (req: any, res) => {
     try {
       const { points } = req.body;
       const account = await storage.addLoyaltyPoints(req.params.id, points);
@@ -19759,7 +20193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/loyalty-accounts/:id/redeem-points', isAuthenticated, async (req: any, res) => {
+  app.post('/api/loyalty-accounts/:id/redeem-points', isAuthenticated, requireResourceOwnership({ table: 'loyalty_accounts' }), async (req: any, res) => {
     try {
       const { points } = req.body;
       const account = await storage.redeemLoyaltyPoints(req.params.id, points);
@@ -19772,7 +20206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/loyalty-offers', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, isActive } = req.query;
+      const { garageId: garageIdParam, isActive } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const offers = await storage.getLoyaltyOffers(garageId as string, isActive === 'true');
       res.json(offers);
     } catch (error: any) {
@@ -19781,7 +20217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       const offer = await storage.getLoyaltyOffer(req.params.id);
       if (!offer) return res.status(404).json({ message: "Offer not found" });
@@ -19802,7 +20238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       const offer = await storage.updateLoyaltyOffer(req.params.id, req.body);
       res.json(offer);
@@ -19812,7 +20248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       await storage.deleteLoyaltyOffer(req.params.id);
       res.status(204).send();
@@ -19828,7 +20264,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/workshop-resources', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const resources = await storage.getWorkshopResources(garageId as string);
       res.json(resources);
@@ -19848,7 +20286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/workshop-resources/:id', isAuthenticated, requireResourceOwnership({ table: 'workshop_resources' }), async (req: any, res) => {
     try {
       const resource = await storage.updateWorkshopResource(req.params.id, req.body);
       res.json(resource);
@@ -19858,7 +20296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/workshop-resources/:id', isAuthenticated, requireResourceOwnership({ table: 'workshop_resources' }), async (req: any, res) => {
     try {
       await storage.deleteWorkshopResource(req.params.id);
       res.status(204).send();
@@ -19870,7 +20308,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/calendar-appointments', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, startDate, endDate } = req.query;
+      const { garageId: garageIdParam, startDate, endDate } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const appointments = await storage.getCalendarAppointments(
         garageId as string,
@@ -19884,7 +20324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/calendar-appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_appointments' }), async (req: any, res) => {
     try {
       const appointment = await storage.getCalendarAppointment(req.params.id);
       if (!appointment) return res.status(404).json({ message: "Appointment not found" });
@@ -19905,7 +20345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/calendar-appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_appointments' }), async (req: any, res) => {
     try {
       const appointment = await storage.updateCalendarAppointment(req.params.id, req.body);
       res.json(appointment);
@@ -19915,7 +20355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/calendar-appointments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/calendar-appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_appointments' }), async (req: any, res) => {
     try {
       await storage.deleteCalendarAppointment(req.params.id);
       res.status(204).send();
@@ -19925,7 +20365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/calendar-appointments/:id/move', isAuthenticated, async (req: any, res) => {
+  app.post('/api/calendar-appointments/:id/move', isAuthenticated, requireResourceOwnership({ table: 'calendar_appointments' }), async (req: any, res) => {
     try {
       const { startTime, endTime, resourceId } = req.body;
       const appointment = await storage.moveCalendarAppointment(
@@ -19947,7 +20387,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-instructions', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       const instructions = await storage.getArWorkInstructions(garageId as string);
       res.json(instructions);
     } catch (error: any) {
@@ -19956,7 +20398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       const instruction = await storage.getArWorkInstruction(req.params.id);
       if (!instruction) return res.status(404).json({ message: "Instruction not found" });
@@ -19977,7 +20419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       const instruction = await storage.updateArWorkInstruction(req.params.id, req.body);
       res.json(instruction);
@@ -19987,7 +20429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       await storage.deleteArWorkInstruction(req.params.id);
       res.status(204).send();
@@ -19999,7 +20441,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-sessions', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId, technicianId } = req.query;
+      const { garageId: garageIdParam, technicianId } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const sessions = await storage.getArSessionLogs(garageId as string, technicianId as string);
       res.json(sessions);
@@ -20019,7 +20463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-sessions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_session_logs' }), async (req: any, res) => {
     try {
       const session = await storage.updateArSessionLog(req.params.id, req.body);
       res.json(session);
@@ -20031,7 +20475,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/ar-devices', isAuthenticated, async (req: any, res) => {
     try {
-      const { garageId } = req.query;
+      const { garageId: garageIdParam } = req.query;
+      // Session garage wins; ?garageId honored only for garage-less principals.
+      const garageId = req.user?.garageId || garageIdParam;
       if (!garageId) return res.status(400).json({ message: "garageId is required" });
       const devices = await storage.getArDevicePairings(garageId as string);
       res.json(devices);
@@ -20051,7 +20497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-devices/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_device_pairings' }), async (req: any, res) => {
     try {
       const device = await storage.updateArDevicePairing(req.params.id, req.body);
       res.json(device);
@@ -20061,7 +20507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/ar-devices/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_device_pairings' }), async (req: any, res) => {
     try {
       await storage.deleteArDevicePairing(req.params.id);
       res.status(204).send();
@@ -20174,7 +20620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update market pricing data
-  app.patch('/api/dynamic-pricing/market-data/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/dynamic-pricing/market-data/:id', isAuthenticated, requireResourceOwnership({ table: 'market_pricing_data' }), async (req, res) => {
     try {
       const data = await storage.updateMarketPricingData(req.params.id, req.body);
       res.json(data);
@@ -20185,7 +20631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete market pricing data
-  app.delete('/api/dynamic-pricing/market-data/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/market-data/:id', isAuthenticated, requireResourceOwnership({ table: 'market_pricing_data' }), async (req, res) => {
     try {
       await storage.deleteMarketPricingData(req.params.id);
       res.json({ success: true });
@@ -20220,7 +20666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update vehicle pricing factor
-  app.patch('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_pricing_factors' }), async (req, res) => {
     try {
       const data = await storage.updateVehiclePricingFactor(req.params.id, req.body);
       res.json(data);
@@ -20231,7 +20677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete vehicle pricing factor
-  app.delete('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_pricing_factors' }), async (req, res) => {
     try {
       await storage.deleteVehiclePricingFactor(req.params.id);
       res.json({ success: true });
@@ -20261,7 +20707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single pricing suggestion
-  app.get('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req, res) => {
     try {
       const data = await storage.getDynamicPricingSuggestion(req.params.id);
       if (!data) {
@@ -20287,7 +20733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update pricing suggestion (accept/reject)
-  app.patch('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req: any, res) => {
     try {
       const updateData: any = { ...req.body };
       if (req.body.status === 'accepted') {
@@ -20303,7 +20749,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete pricing suggestion
-  app.delete('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req, res) => {
     try {
       await storage.deleteDynamicPricingSuggestion(req.params.id);
       res.json({ success: true });
@@ -20422,7 +20868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== Service Reminders API ====================
 
-  app.patch('/api/service-reminders/:id/status', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminders/:id/status', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { status } = req.body;
       if (!['pending', 'sent', 'acknowledged', 'completed', 'snoozed'].includes(status)) {
@@ -20438,7 +20884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/service-reminders/generate', isAuthenticated, async (req: any, res) => {
     try {
-      const reminders = await storage.generateAutoServiceReminders();
+      const reminders = await storage.generateAutoServiceReminders(req.user?.garageId);
       res.json({ generated: reminders.length, reminders });
     } catch (error: any) {
       console.error("Error generating reminders:", error);
@@ -20459,7 +20905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminder-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminder_templates' }), async (req, res) => {
     try {
       const template = await storage.updateServiceReminderTemplate(req.params.id, req.body);
       res.json(template);
@@ -20469,7 +20915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-reminder-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminder_templates' }), async (req, res) => {
     try {
       await storage.deleteServiceReminderTemplate(req.params.id);
       res.json({ success: true });
@@ -20506,7 +20952,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/push-subscriptions/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/push-subscriptions/:id', isAuthenticated, requireResourceOwnership({ table: 'push_subscriptions', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       await storage.deletePushSubscription(req.params.id);
       res.json({ success: true });
@@ -20546,9 +20992,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
+  app.patch('/api/push-notifications/:id/read', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
-      const notification = await storage.markNotificationAsRead(req.params.id);
+      const notification = await storage.markPushNotificationAsRead(req.params.id);
       res.json(notification);
     } catch (error: any) {
       console.error("Error marking notification as read:", error);
@@ -20556,7 +21002,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/push-notifications/:id/clicked', isAuthenticated, async (req, res) => {
+  app.patch('/api/push-notifications/:id/clicked', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
       const notification = await storage.markNotificationAsClicked(req.params.id);
       res.json(notification);
@@ -20566,7 +21012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/push-notifications/:id/send', isAuthenticated, async (req, res) => {
+  app.post('/api/push-notifications/:id/send', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
       const notification = await storage.sendPushNotification(req.params.id);
       res.json(notification);
@@ -20665,7 +21111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/parts-3d-models/:id', async (req, res) => {
     try {
-      const result = await db.execute(sql`SELECT * FROM parts_3d_models WHERE id = ${req.params.id}`);
+      const result = await db.execute(sql`SELECT * FROM parts_3d_models WHERE id = ${req.params.id} AND is_public = true`);
       if (result.rows && result.rows.length > 0) {
         // Increment view count
         await db.execute(sql`UPDATE parts_3d_models SET view_count = view_count + 1 WHERE id = ${req.params.id}`);
@@ -20683,27 +21129,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PLATFORM ADMIN ROUTES
   // ============================================================
 
-  app.get('/api/platform-admin/stats', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/stats', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const totalGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages`);
-      const activeGarages = await db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`);
-      const totalUsers = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
+      const [totalGarages, activeGarages, totalUsers, plans, tickets, pendingApps, pendingSubs, totalSuppliers, roleRows] = await Promise.all([
+        db.execute(sql`SELECT COUNT(*) as count FROM garages`),
+        db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`),
+        db.execute(sql`SELECT COUNT(*) as count FROM users`),
+        db.execute(sql`SELECT plan, COUNT(*) as count FROM subscriptions WHERE status IN ('active','trialing') GROUP BY plan`),
+        db.execute(sql`SELECT COUNT(*) as count FROM support_tickets WHERE status NOT IN ('resolved','closed')`),
+        db.execute(sql`SELECT COUNT(*) as count FROM garage_applications WHERE status = 'pending'`),
+        db.execute(sql`SELECT COUNT(*) as count FROM subscription_requests WHERE status = 'pending'`),
+        db.execute(sql`SELECT COUNT(*) as count FROM suppliers`),
+        db.execute(sql`SELECT role, COUNT(*) as count FROM users GROUP BY role ORDER BY count DESC`),
+      ]);
+
+      // Real MRR from the subscription plan mix (display prices from the
+      // shared plan catalog — Stripe is the billing source of truth).
+      const { PLANS } = await import("@shared/plans");
+      const priceByPlan = new Map(Object.values(PLANS).map((p: any) => [p.id, p.priceMonthly ?? 0]));
+      let monthlyRevenue = 0;
+      for (const row of plans.rows as any[]) {
+        monthlyRevenue += (priceByPlan.get(row.plan) ?? 0) * Number(row.count);
+      }
 
       res.json({
         totalGarages: Number(totalGarages.rows[0]?.count ?? 0),
         activeGarages: Number(activeGarages.rows[0]?.count ?? 0),
         totalUsers: Number(totalUsers.rows[0]?.count ?? 0),
-        monthlyRevenue: 485200,
-        revenueGrowth: 14.2,
-        supportTickets: 18,
-        systemUptime: 99.97,
+        totalSuppliers: Number(totalSuppliers.rows[0]?.count ?? 0),
+        monthlyRevenue,
+        supportTickets: Number(tickets.rows[0]?.count ?? 0),
+        pendingApplications: Number(pendingApps.rows[0]?.count ?? 0),
+        pendingSubscriptionRequests: Number(pendingSubs.rows[0]?.count ?? 0),
+        // Live subscription plan mix — feeds the overview distribution chart.
+        planMix: (plans.rows as any[]).map((r) => ({ plan: r.plan, count: Number(r.count) })),
+        // Real user counts per role — feeds the RBAC tab.
+        roleCounts: (roleRows.rows as any[]).map((r) => ({ role: r.role, count: Number(r.count) })),
+        // Honest process uptime (seconds), not an invented SLA percentage.
+        uptimeSeconds: Math.round(process.uptime()),
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get('/api/platform-admin/garages', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/garages', requirePlatformAdmin, async (req: any, res) => {
     try {
       const result = await db.execute(sql`
         SELECT g.*, COUNT(u.id) as user_count
@@ -20719,7 +21189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/platform-admin/garages', requireAdmin, auditLog, async (req: any, res) => {
+  app.post('/api/platform-admin/garages', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { name, ownerName, email, phone, address, city, country, subscriptionPlan, vatNumber, maxBranches } = req.body;
 
@@ -20729,10 +21199,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const result = await db.execute(sql`
-        INSERT INTO garages (id, name, address, phone, email, subscription_plan, is_active, created_at, updated_at)
+        INSERT INTO garages (id, name, address, phone, email, subscription_plan, is_active, created_at)
         VALUES (
           gen_random_uuid(), ${name}, ${`${address}, ${city}, ${country}`}, ${phone}, ${email},
-          ${subscriptionPlan ?? 'STARTER'}, true, NOW(), NOW()
+          ${subscriptionPlan ?? 'STARTER'}, true, NOW()
         )
         RETURNING *
       `);
@@ -20744,101 +21214,1061 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/platform-admin/garages/:id/status', requireAdmin, auditLog, async (req: any, res) => {
+  app.patch('/api/platform-admin/garages/:id/status', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
       const { status } = req.body;
       const isActive = status === 'active';
-      await db.execute(sql`UPDATE garages SET is_active = ${isActive}, updated_at = NOW() WHERE id = ${req.params.id}`);
+      await db.execute(sql`UPDATE garages SET is_active = ${isActive} WHERE id = ${req.params.id}`);
       res.json({ success: true });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.post('/api/platform-admin/suppliers', requireAdmin, auditLog, async (req: any, res) => {
+  // Cross-tenant oversight view: every garage's suppliers with the owning
+  // garage joined. Read-only — suppliers are created by each garage in its
+  // own procurement module; platform-level parts vendors live in the
+  // marketplace as parts_store providers.
+  app.get('/api/platform-admin/suppliers', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const { name, contactPerson, email, phone, address, country, category, paymentTerms, website, notes } = req.body;
-
       const result = await db.execute(sql`
-        INSERT INTO suppliers (id, name, contact_person, email, phone, address, country, category, payment_terms, website, notes, is_active, created_at, updated_at)
-        VALUES (
-          gen_random_uuid(), ${name}, ${contactPerson}, ${email}, ${phone},
-          ${address}, ${country}, ${category}, ${paymentTerms},
-          ${website ?? null}, ${notes ?? null}, true, NOW(), NOW()
-        )
-        RETURNING *
+        SELECT s.id, s.name, s.contact_person, s.email, s.phone, s.country,
+               s.payment_terms, s.is_active, s.created_at, g.name AS garage
+        FROM suppliers s
+        LEFT JOIN garages g ON g.id = s.garage_id
+        ORDER BY s.created_at DESC
+        LIMIT 100
       `);
-
-      res.status(201).json(result.rows[0]);
-    } catch (error: any) {
-      console.error('Error creating supplier:', error);
-      const fallback = { id: Math.random().toString(36).substring(2), ...req.body, status: 'active', createdAt: new Date().toISOString() };
-      res.status(201).json(fallback);
-    }
-  });
-
-  app.post('/api/platform-admin/stores', requireAdmin, auditLog, async (req: any, res) => {
-    try {
-      const { name, ownerEmail, description, category, country, city, commissionRate, currency } = req.body;
-      const fallback = {
-        id: Math.random().toString(36).substring(2),
-        name, ownerEmail, description, category, country, city,
-        commissionRate, currency, status: 'pending', createdAt: new Date().toISOString()
-      };
-      res.status(201).json(fallback);
+      res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get('/api/platform-admin/support-tickets', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/support-tickets', requirePlatformAdmin, async (req: any, res) => {
     try {
-      const tickets = [
-        { id: "T-001", garageId: "g1", garage: "Al-Rashid Auto Center", user: "Mohammed Al-Rashid", subject: "Invoice ZATCA sync issue", priority: "HIGH", status: "open", created: "2026-03-08", type: "Technical" },
-        { id: "T-002", garageId: "g2", garage: "Gulf Motors Workshop", user: "Ahmed Al-Farsi", subject: "Cannot add technician accounts", priority: "MEDIUM", status: "in_progress", created: "2026-03-09", type: "Account" },
-      ];
-      res.json(tickets);
+      // Cross-garage view for the platform team (real data, garage name joined).
+      const result = await db.execute(sql`
+        SELECT t.id, t.garage_id, g.name AS garage, t.subject, t.priority, t.status,
+               t.category, t.created_at
+        FROM support_tickets t
+        LEFT JOIN garages g ON g.id = t.garage_id
+        ORDER BY t.created_at DESC
+        LIMIT 100`);
+      res.json(result.rows);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.patch('/api/platform-admin/support-tickets/:id', requireAdmin, auditLog, async (req: any, res) => {
+  app.patch('/api/platform-admin/support-tickets/:id', requirePlatformAdmin, auditLog, async (req: any, res) => {
     try {
-      res.json({ success: true, id: req.params.id, ...req.body });
+      const allowed: any = {};
+      if (typeof req.body?.status === "string") allowed.status = req.body.status;
+      if (typeof req.body?.priority === "string") allowed.priority = req.body.priority;
+      if (typeof req.body?.assignedTo === "string") allowed.assignedTo = req.body.assignedTo;
+      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
+      const updated = await storage.updateSupportTicket(req.params.id, allowed);
+      if (!updated) return res.status(404).json({ message: "Ticket not found" });
+      res.json(updated);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.get('/api/platform-admin/system-health', requireAdmin, async (req: any, res) => {
+  app.get('/api/platform-admin/system-health', requirePlatformAdmin, async (req: any, res) => {
+    // Honest, measured metrics only — no invented SLA numbers. Integrations
+    // report "configured" from their env keys; only the DB is actively pinged.
     try {
+      const dbStart = Date.now();
+      let dbOk = true;
+      let dbConnections = 0;
+      try {
+        const conns = await db.execute(sql`SELECT COUNT(*) as count FROM pg_stat_activity WHERE datname = current_database()`);
+        dbConnections = Number(conns.rows[0]?.count ?? 0);
+      } catch {
+        dbOk = false;
+      }
+      const dbLatencyMs = Date.now() - dbStart;
+      const mem = process.memoryUsage();
+
       res.json({
-        apiLatency: 87,
-        dbConnections: 124,
-        uptime: 99.97,
-        cpuUsage: 38,
-        memoryUsage: 62,
-        diskUsage: 44,
-        activeWebSockets: 312,
-        cacheHitRate: 94.2,
-        services: [
-          { name: "API Server", status: "operational", latency: "87ms" },
-          { name: "PostgreSQL Database", status: "operational", latency: "12ms" },
-          { name: "WebSocket Server", status: "operational" },
-          { name: "Email Service", status: "operational" },
-          { name: "SMS Service", status: "operational" },
-        ]
+        uptimeSeconds: Math.round(process.uptime()),
+        dbOk,
+        dbLatencyMs,
+        dbConnections,
+        memoryRssMb: Math.round(mem.rss / 1024 / 1024),
+        memoryHeapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+        nodeVersion: process.version,
+        integrations: [
+          { name: "PostgreSQL Database", configured: true, operational: dbOk },
+          { name: "Stripe Billing", configured: !!process.env.STRIPE_SECRET_KEY },
+          { name: "Stripe Webhook Signing", configured: !!process.env.STRIPE_WEBHOOK_SECRET },
+          { name: "Wathq CR Registry", configured: !!process.env.WATHQ_API_KEY },
+          { name: "Google Vision OCR", configured: !!process.env.GOOGLE_VISION_API_KEY },
+          { name: "Sentry Error Tracking", configured: !!process.env.SENTRY_DSN },
+          { name: "SMS Provider", configured: !!process.env.SMS_PROVIDER },
+          { name: "WhatsApp Webhook", configured: !!process.env.WHATSAPP_VERIFY_TOKEN },
+        ],
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
+  // ==========================================================================
+  // Platform SuperAdmin — garage onboarding applications
+  // ==========================================================================
+
+  // Public: a prospective service provider submits an onboarding application.
+  // Runs automated government-identifier verification (ZATCA VAT + commercial
+  // registration). Verified applications are AUTO-APPROVED and provisioned on
+  // the spot; well-formed-but-unconfirmed ones go to a PLATFORM_ADMIN review
+  // queue; bad-format submissions are rejected immediately.
+  app.post('/api/garage-applications', async (req, res) => {
+    try {
+      const { insertGarageApplicationSchema } = await import("@shared/schema");
+      const parsed = insertGarageApplicationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const password = typeof req.body?.password === "string" ? req.body.password : "";
+      if (password.length < 8) {
+        return res.status(400).json({ message: "A password of at least 8 characters is required" });
+      }
+      const isDemo = req.body?.isDemo === true;
+      if (!parsed.data.taxNumber || !parsed.data.commercialRegistration) {
+        return res.status(400).json({ message: "Tax number and commercial registration are required" });
+      }
+
+      // Reject if the email is already a user or already has a pending application.
+      const existingUser = await storage.getUserByEmail(parsed.data.email);
+      if (existingUser) {
+        return res.status(409).json({ message: "An account with this email already exists" });
+      }
+      const pending = (await storage.listGarageApplications("pending"))
+        .find((a) => a.email.toLowerCase() === parsed.data.email.toLowerCase());
+      if (pending) {
+        return res.status(409).json({ message: "An application with this email is already pending review" });
+      }
+
+      // Automated verification of the official government identifiers.
+      const verification = await verifyBusiness({
+        taxNumber: parsed.data.taxNumber,
+        commercialRegistration: parsed.data.commercialRegistration,
+        country: parsed.data.country,
+        isDemo,
+      });
+      if (verification.status === "failed") {
+        return res.status(400).json({
+          message: "Business identifiers are invalid",
+          verification,
+        });
+      }
+
+      const ownerPasswordHash = await hashPassword(password);
+      const application = await storage.createGarageApplication({
+        ...parsed.data,
+        isDemo,
+        ownerPasswordHash,
+        verificationStatus: verification.status,
+        verificationDetails: verification as any,
+      } as any);
+
+      // Verified -> auto-approve + provision immediately (no manual step).
+      if (verification.status === "verified") {
+        const result = await storage.approveGarageApplication(application.id, null, { autoApproved: true });
+        return res.status(201).json({
+          id: application.id,
+          status: "approved",
+          autoApproved: true,
+          garageId: result.garageId,
+          verification,
+        });
+      }
+
+      // Well-formed but unconfirmed -> manual review queue.
+      res.status(201).json({ id: application.id, status: "pending", verification });
+    } catch (error) {
+      console.error("Error submitting garage application:", error);
+      res.status(500).json({ message: "Failed to submit application" });
+    }
+  });
+
+  app.get('/api/platform-admin/garage-applications', requirePlatformAdmin, async (req: any, res) => {
+    try {
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listGarageApplications(status));
+    } catch (error: any) {
+      console.error("Error listing garage applications:", error);
+      res.status(500).json({ message: "Failed to list applications" });
+    }
+  });
+
+  app.post('/api/platform-admin/garage-applications/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const app_ = await storage.getGarageApplication(req.params.id);
+      if (!app_) return res.status(404).json({ message: "Application not found" });
+      if (app_.status === "rejected") return res.status(409).json({ message: "Application already rejected" });
+
+      // If the applicant set their own password at signup, provision with it
+      // (they can log in immediately). Otherwise mint a one-time temp password,
+      // hash it for storage, and return the plaintext ONCE for the super admin
+      // to relay (never persisted/logged).
+      let tempPassword: string | undefined;
+      let hashed: string | undefined;
+      if (!app_.ownerPasswordHash) {
+        tempPassword = randomBytes(9).toString("base64url");
+        hashed = await hashPassword(tempPassword);
+      }
+      const result = await storage.approveGarageApplication(req.params.id, req.user.id, { hashedPassword: hashed });
+      res.json({
+        application: result.application,
+        garageId: result.garageId,
+        ownerEmail: app_.email,
+        ...(tempPassword ? { tempPassword } : {}),
+      });
+    } catch (error: any) {
+      console.error("Error approving garage application:", error);
+      res.status(500).json({ message: error.message || "Failed to approve application" });
+    }
+  });
+
+  app.post('/api/platform-admin/garage-applications/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const rejected = await storage.rejectGarageApplication(req.params.id, req.user.id, req.body?.reason);
+      if (!rejected) return res.status(404).json({ message: "Pending application not found" });
+      res.json(rejected);
+    } catch (error: any) {
+      console.error("Error rejecting garage application:", error);
+      res.status(500).json({ message: "Failed to reject application" });
+    }
+  });
+
+  // ==========================================================================
+  // Platform SuperAdmin — subscription change requests
+  // ==========================================================================
+
+  // A garage requests a plan change; a PLATFORM_ADMIN reviews and approves.
+  app.post('/api/subscription-requests', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: "No garage associated" });
+      const requestedPlan = String(req.body?.requestedPlan || "").toUpperCase();
+      if (!["STARTER", "PRO", "ENTERPRISE"].includes(requestedPlan)) {
+        return res.status(400).json({ message: "Invalid plan. Use STARTER, PRO or ENTERPRISE." });
+      }
+      const existing = await storage.getPendingSubscriptionRequest(garageId);
+      if (existing) {
+        return res.status(409).json({ message: "You already have a pending subscription request" });
+      }
+      const sub = await storage.ensureSubscription(garageId);
+      const request = await storage.createSubscriptionRequest({
+        garageId,
+        currentPlan: sub.plan,
+        requestedPlan,
+        requestedBy: req.user.id,
+      } as any);
+      res.status(201).json(request);
+    } catch (error) {
+      console.error("Error creating subscription request:", error);
+      res.status(500).json({ message: "Failed to create request" });
+    }
+  });
+
+  app.get('/api/platform-admin/subscription-requests', requirePlatformAdmin, async (req: any, res) => {
+    try {
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listSubscriptionRequests(status));
+    } catch (error) {
+      console.error("Error listing subscription requests:", error);
+      res.status(500).json({ message: "Failed to list requests" });
+    }
+  });
+
+  app.post('/api/platform-admin/subscription-requests/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const approved = await storage.approveSubscriptionRequest(req.params.id, req.user.id);
+      if (!approved) return res.status(404).json({ message: "Request not found" });
+      res.json(approved);
+    } catch (error: any) {
+      if (/already/.test(error?.message || "")) return res.status(409).json({ message: error.message });
+      console.error("Error approving subscription request:", error);
+      res.status(500).json({ message: "Failed to approve request" });
+    }
+  });
+
+  app.post('/api/platform-admin/subscription-requests/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
+    try {
+      const rejected = await storage.rejectSubscriptionRequest(req.params.id, req.user.id, req.body?.reason);
+      if (!rejected) return res.status(404).json({ message: "Pending request not found" });
+      res.json(rejected);
+    } catch (error) {
+      console.error("Error rejecting subscription request:", error);
+      res.status(500).json({ message: "Failed to reject request" });
+    }
+  });
+
+  // ==========================================================================
+  // Customer marketplace — platform-wide customer accounts + provider directory
+  // ==========================================================================
+
+  // Public: a customer signs up on the PLATFORM (not tied to any one garage) to
+  // browse and use every provider. userType 'customer', no garageId.
+  app.post('/api/customer/register', async (req, res) => {
+    try {
+      const { email, password, fullName, phone } = req.body ?? {};
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      if (String(password).length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      const existing = await storage.getUserByEmail(email);
+      if (existing) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        email,
+        password: hashedPassword,
+        fullName,
+        phone,
+        role: "CUSTOMER",
+        userType: "customer",
+        isActive: true,
+      } as any);
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Login error after customer registration:", err);
+          return res.status(500).json({ message: "Registered but login failed" });
+        }
+        const { password: _pw, ...safe } = user as any;
+        res.status(201).json(safe);
+      });
+    } catch (error) {
+      console.error("Error registering customer:", error);
+      res.status(500).json({ message: "Failed to register" });
+    }
+  });
+
+  // ── Customer phone verification (OTP) ──────────────────────────────────────
+  // Session-backed: the code lives in the caller's session (10-min expiry), so
+  // no table is needed and it dies with the session. SMS delivery is a seam
+  // (SMS_PROVIDER); until one is configured the code is returned in the
+  // response ONLY in demo mode so the flow stays fully testable end-to-end.
+  app.post('/api/customer/request-otp', isAuthenticated, async (req: any, res) => {
+    try {
+      const phone = String(req.body?.phone ?? req.user?.phone ?? "").trim();
+      if (!/^\+?\d{9,15}$/.test(phone)) {
+        return res.status(400).json({ message: "A valid phone number is required" });
+      }
+      const code = String(Math.floor(100000 + Math.random() * 900000));
+      (req.session as any).phoneOtp = { code, phone, expiresAt: Date.now() + 10 * 60 * 1000 };
+
+      const smsProvider = process.env.SMS_PROVIDER;
+      if (smsProvider) {
+        // Seam: a configured SMS provider (Unifonic/Twilio/...) sends the code here.
+        console.log(`[otp] would send code via ${smsProvider} to ${phone}`);
+        return res.json({ sent: true, provider: smsProvider });
+      }
+      const demo = process.env.DEMO_MODE === "true" || process.env.NODE_ENV !== "production";
+      return res.json({ sent: false, ...(demo ? { demoOtp: code } : {}), message: demo ? "SMS not configured — demo code returned" : "SMS not configured" });
+    } catch (error) {
+      console.error("Error requesting OTP:", error);
+      res.status(500).json({ message: "Failed to send verification code" });
+    }
+  });
+
+  app.post('/api/customer/verify-otp', isAuthenticated, async (req: any, res) => {
+    try {
+      const supplied = String(req.body?.code ?? "").trim();
+      const pending = (req.session as any).phoneOtp;
+      if (!pending || Date.now() > pending.expiresAt) {
+        return res.status(400).json({ message: "No pending code — request a new one" });
+      }
+      if (supplied !== pending.code) {
+        return res.status(400).json({ message: "Incorrect code" });
+      }
+      delete (req.session as any).phoneOtp;
+      await db.execute(sql`
+        UPDATE users SET phone = ${pending.phone}, phone_verified_at = NOW()
+        WHERE id = ${req.user.id}`);
+      res.json({ verified: true, phone: pending.phone });
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      res.status(500).json({ message: "Failed to verify code" });
+    }
+  });
+
+  // Public: browse approved providers (garages today; parts_store/insurance next).
+  app.get('/api/marketplace/providers', async (req, res) => {
+    try {
+      const type = typeof req.query.type === "string" ? req.query.type : undefined;
+      const q = typeof req.query.q === "string" ? req.query.q : undefined;
+      const city = typeof req.query.city === "string" ? req.query.city : undefined;
+      res.json(await storage.listMarketplaceProviders({ type, q, city }));
+    } catch (error) {
+      console.error("Error listing marketplace providers:", error);
+      res.status(500).json({ message: "Failed to load providers" });
+    }
+  });
+
+  // Public: a single provider and the services it presents.
+  app.get('/api/marketplace/providers/:id', async (req, res) => {
+    try {
+      const provider = await storage.getMarketplaceProvider(req.params.id);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      res.json(provider);
+    } catch (error) {
+      console.error("Error loading marketplace provider:", error);
+      res.status(500).json({ message: "Failed to load provider" });
+    }
+  });
+
+  // Public: smart search across providers and the services they offer.
+  // Named /find to avoid the pre-existing authenticated parts-marketplace
+  // /api/marketplace/search (a different feature) registered earlier.
+  app.get('/api/marketplace/find', async (req, res) => {
+    try {
+      const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+      if (q.length < 2) {
+        return res.status(400).json({ message: "Search query must be at least 2 characters" });
+      }
+      res.json(await storage.searchMarketplace(q));
+    } catch (error) {
+      console.error("Error searching marketplace:", error);
+      res.status(500).json({ message: "Failed to search" });
+    }
+  });
+
+  // ==========================================================================
+  // Customer vehicles — a signed-in customer manages their own vehicles.
+  // Every route is scoped to req.user.id, so a customer only ever sees/edits
+  // their own vehicles.
+  // ==========================================================================
+
+  app.get('/api/my/vehicles', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerVehicles(req.user.id));
+    } catch (error) {
+      console.error("Error listing customer vehicles:", error);
+      res.status(500).json({ message: "Failed to load vehicles" });
+    }
+  });
+
+  app.post('/api/my/vehicles', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCustomerVehicleSchema } = await import("@shared/schema");
+      const parsed = insertCustomerVehicleSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const vehicle = await storage.createCustomerVehicle({ ...parsed.data, customerId: req.user.id } as any);
+      res.status(201).json(vehicle);
+    } catch (error) {
+      console.error("Error adding customer vehicle:", error);
+      res.status(500).json({ message: "Failed to add vehicle" });
+    }
+  });
+
+  app.patch('/api/my/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { insertCustomerVehicleSchema } = await import("@shared/schema");
+      const parsed = insertCustomerVehicleSchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json(sanitizeZodError(parsed.error));
+      }
+      const updated = await storage.updateCustomerVehicle(req.params.id, parsed.data as any, req.user.id);
+      if (!updated) return res.status(404).json({ message: "Vehicle not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating customer vehicle:", error);
+      res.status(500).json({ message: "Failed to update vehicle" });
+    }
+  });
+
+  app.delete('/api/my/vehicles/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      await storage.deleteCustomerVehicle(req.params.id, req.user.id); // scoped soft-delete
+      res.json({ message: "Vehicle removed" });
+    } catch (error) {
+      console.error("Error deleting customer vehicle:", error);
+      res.status(500).json({ message: "Failed to remove vehicle" });
+    }
+  });
+
+  // ==========================================================================
+  // Marketplace bookings — a customer books a provider for a service.
+  // ==========================================================================
+
+  app.post('/api/my/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, serviceTemplateId, customerVehicleId, preferredDate, notes } = req.body ?? {};
+      if (!providerId) return res.status(400).json({ message: "providerId is required" });
+
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      // Snapshot the chosen service (must belong to the provider).
+      let serviceName: string | undefined;
+      if (serviceTemplateId) {
+        const svc = (provider.services ?? []).find((s: any) => s.id === serviceTemplateId);
+        if (!svc) return res.status(400).json({ message: "Selected service is not offered by this provider" });
+        serviceName = svc.name;
+      }
+
+      // Snapshot the chosen vehicle (must belong to the caller).
+      let veh: any;
+      if (customerVehicleId) {
+        veh = await storage.getCustomerVehicle(customerVehicleId, req.user.id);
+        if (!veh) return res.status(400).json({ message: "Vehicle not found" });
+      }
+
+      const booking = await storage.createMarketplaceBooking({
+        customerId: req.user.id,
+        providerId,
+        serviceTemplateId: serviceTemplateId || null,
+        customerVehicleId: customerVehicleId || null,
+        serviceName: serviceName ?? null,
+        vehicleMake: veh?.make ?? null,
+        vehicleModel: veh?.model ?? null,
+        vehicleYear: veh?.year ?? null,
+        vehiclePlate: veh?.licensePlate ?? null,
+        preferredDate: preferredDate ? new Date(preferredDate) : null,
+        notes: notes ?? null,
+      } as any);
+
+      // Notify the provider's admins/managers about the new request. Best-effort:
+      // a notification failure must never fail the booking itself.
+      try {
+        const admins = await db.execute(sql`
+          SELECT id FROM users
+          WHERE garage_id = ${providerId} AND role IN ('ADMIN', 'MANAGER') AND is_active = true
+          LIMIT 5`);
+        const label = [serviceName ?? "General service", veh ? `${veh.make} ${veh.model ?? ""}`.trim() : null]
+          .filter(Boolean).join(" — ");
+        for (const row of admins.rows as any[]) {
+          await storage.createNotification({
+            type: "in-app",
+            category: "appointment",
+            recipientId: row.id,
+            garageId: providerId,
+            title: "New marketplace booking request",
+            message: `A customer requested: ${label}`,
+            metadata: { bookingId: booking.id },
+          } as any);
+        }
+      } catch (notifyErr) {
+        console.error("Booking notification (provider) failed:", notifyErr);
+      }
+
+      res.status(201).json(booking);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      res.status(500).json({ message: "Failed to create booking" });
+    }
+  });
+
+  app.get('/api/my/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerBookings(req.user.id));
+    } catch (error) {
+      console.error("Error listing bookings:", error);
+      res.status(500).json({ message: "Failed to load bookings" });
+    }
+  });
+
+  app.post('/api/my/bookings/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const cancelled = await storage.cancelCustomerBooking(req.params.id, req.user.id);
+      if (!cancelled) return res.status(404).json({ message: "Booking not found or not cancellable" });
+      res.json(cancelled);
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      res.status(500).json({ message: "Failed to cancel booking" });
+    }
+  });
+
+  // Provider side: bookings made TO the caller's garage.
+  app.get('/api/provider/bookings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listProviderBookings(providerId, status));
+    } catch (error) {
+      console.error("Error listing provider bookings:", error);
+      res.status(500).json({ message: "Failed to load bookings" });
+    }
+  });
+
+  app.patch('/api/provider/bookings/:id', isAuthenticated, requireResourceOwnership({ table: 'marketplace_bookings', tenantColumn: 'provider_id' }), async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = req.body?.status;
+      if (status && !["accepted", "declined", "completed"].includes(status)) {
+        return res.status(400).json({ message: "status must be accepted, declined or completed" });
+      }
+      const updated = await storage.updateProviderBooking(req.params.id, providerId, {
+        status,
+        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Booking not found" });
+
+      // Tell the customer their booking changed state. Best-effort.
+      if (status) {
+        try {
+          const verb = status === "accepted" ? "accepted" : status === "declined" ? "declined" : "marked complete";
+          await storage.createNotification({
+            type: "in-app",
+            category: "appointment",
+            recipientId: updated.customerId,
+            garageId: providerId,
+            title: `Booking ${verb}`,
+            message: `Your booking${updated.serviceName ? ` for ${updated.serviceName}` : ""} was ${verb}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
+            metadata: { bookingId: updated.id, status },
+          } as any);
+        } catch (notifyErr) {
+          console.error("Booking notification (customer) failed:", notifyErr);
+        }
+      }
+
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider booking:", error);
+      res.status(500).json({ message: "Failed to update booking" });
+    }
+  });
+
+  // A user's own in-app notifications (customers have no garage, so this is
+  // recipient-scoped, unlike the garage-wide /api/notifications).
+  app.get('/api/my/notifications', isAuthenticated, async (req: any, res) => {
+    try {
+      const rows = await storage.getNotifications(req.user.id);
+      res.json(rows.slice(0, 50));
+    } catch (error) {
+      console.error("Error listing my notifications:", error);
+      res.status(500).json({ message: "Failed to load notifications" });
+    }
+  });
+
+  app.post('/api/my/notifications/:id/read', isAuthenticated, async (req: any, res) => {
+    try {
+      const n = await storage.getNotification(req.params.id);
+      if (!n || n.recipientId !== req.user.id) return res.status(404).json({ message: "Notification not found" });
+      res.json(await storage.updateNotification(req.params.id, { status: "read", readAt: new Date() } as any));
+    } catch (error) {
+      console.error("Error marking notification read:", error);
+      res.status(500).json({ message: "Failed to update notification" });
+    }
+  });
+
+  // ==========================================================================
+  // Provider offerings — a provider manages the products/plans/services it
+  // presents in the marketplace (scoped to the caller's garage).
+  // ==========================================================================
+
+  app.get('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderOfferings(providerId));
+    } catch (error) {
+      console.error("Error listing provider offerings:", error);
+      res.status(500).json({ message: "Failed to load offerings" });
+    }
+  });
+
+  app.post('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { insertProviderOfferingSchema } = await import("@shared/schema");
+      const parsed = insertProviderOfferingSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
+      const offering = await storage.createProviderOffering({ ...parsed.data, providerId } as any);
+      res.status(201).json(offering);
+    } catch (error) {
+      console.error("Error creating provider offering:", error);
+      res.status(500).json({ message: "Failed to create offering" });
+    }
+  });
+
+  app.patch('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { insertProviderOfferingSchema } = await import("@shared/schema");
+      const parsed = insertProviderOfferingSchema.partial().safeParse(req.body);
+      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
+      const updated = await storage.updateProviderOffering(req.params.id, providerId, parsed.data as any);
+      if (!updated) return res.status(404).json({ message: "Offering not found" });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider offering:", error);
+      res.status(500).json({ message: "Failed to update offering" });
+    }
+  });
+
+  app.delete('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      await storage.deleteProviderOffering(req.params.id, providerId); // scoped
+      res.json({ message: "Offering removed" });
+    } catch (error) {
+      console.error("Error deleting provider offering:", error);
+      res.status(500).json({ message: "Failed to remove offering" });
+    }
+  });
+
+  // ==========================================================================
+  // Marketplace C3 — provider profile + customer reviews
+  // ==========================================================================
+
+  app.get('/api/provider/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      res.json(provider);
+    } catch (error) {
+      console.error("Error loading provider profile:", error);
+      res.status(500).json({ message: "Failed to load profile" });
+    }
+  });
+
+  app.patch('/api/provider/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const allowed: any = {};
+      for (const k of ["description", "phone", "email", "address", "photoUrl", "workingHours"]) {
+        if (typeof req.body?.[k] === "string") allowed[k] = req.body[k];
+      }
+      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
+      const updated = await storage.updateProviderProfile(providerId, allowed);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // Public: a provider's reviews.
+  app.get('/api/marketplace/providers/:id/reviews', async (req, res) => {
+    try {
+      res.json(await storage.listProviderReviews(req.params.id, 50));
+    } catch (error) {
+      console.error("Error listing reviews:", error);
+      res.status(500).json({ message: "Failed to load reviews" });
+    }
+  });
+
+  // A customer reviews a provider they have actually transacted with
+  // (completed booking, fulfilled order, or accepted quote). One review per
+  // provider per customer — resubmitting updates it.
+  app.post('/api/my/reviews', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, rating, comment } = req.body ?? {};
+      const r = Number(rating);
+      if (!providerId || !Number.isInteger(r) || r < 1 || r > 5) {
+        return res.status(400).json({ message: "providerId and a whole-number rating 1–5 are required" });
+      }
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+      if (!(await storage.hasTransactedWith(req.user.id, providerId))) {
+        return res.status(403).json({ message: "You can review a provider after completing a booking, order or quote with them" });
+      }
+      const review = await storage.upsertProviderReview(
+        providerId, req.user.id, r,
+        typeof comment === "string" && comment.trim() ? comment.trim().slice(0, 2000) : undefined,
+      );
+      res.status(201).json(review);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      res.status(500).json({ message: "Failed to submit review" });
+    }
+  });
+
+  // ==========================================================================
+  // Marketplace C2 — product orders (customer -> parts store)
+  // ==========================================================================
+
+  // Best-effort notify of the provider's active admins/managers.
+  const notifyProviderAdmins = async (providerId: string, title: string, message: string, metadata: any) => {
+    try {
+      const admins = await db.execute(sql`
+        SELECT id FROM users
+        WHERE garage_id = ${providerId} AND role IN ('ADMIN', 'MANAGER') AND is_active = true
+        LIMIT 5`);
+      for (const row of admins.rows as any[]) {
+        await storage.createNotification({
+          type: "in-app", category: "general", recipientId: row.id, garageId: providerId,
+          title, message, metadata,
+        } as any);
+      }
+    } catch (e) {
+      console.error("Provider notification failed:", e);
+    }
+  };
+  const notifyCustomer = async (customerId: string, providerId: string, title: string, message: string, metadata: any) => {
+    try {
+      await storage.createNotification({
+        type: "in-app", category: "general", recipientId: customerId, garageId: providerId,
+        title, message, metadata,
+      } as any);
+    } catch (e) {
+      console.error("Customer notification failed:", e);
+    }
+  };
+
+  app.post('/api/my/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, items, notes } = req.body ?? {};
+      if (!providerId || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ message: "providerId and at least one item are required" });
+      }
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      // Every line must reference one of the provider's ACTIVE offerings; name
+      // and unit price are snapshotted from the offering, never from the body.
+      const offerings = new Map((provider.offerings ?? []).map((o: any) => [o.id, o]));
+      const lines: Array<{ offeringId: string; name: string; unitPrice: string; quantity: number }> = [];
+      for (const item of items) {
+        const off: any = offerings.get(item?.offeringId);
+        if (!off) return res.status(400).json({ message: "An item references an offering this provider does not sell" });
+        const qty = Number(item?.quantity ?? 1);
+        if (!Number.isInteger(qty) || qty < 1 || qty > 999) {
+          return res.status(400).json({ message: "Item quantity must be a whole number between 1 and 999" });
+        }
+        lines.push({ offeringId: off.id, name: off.name, unitPrice: String(off.price ?? "0"), quantity: qty });
+      }
+
+      const order = await storage.createProviderOrder(
+        { customerId: req.user.id, providerId, notes: notes ?? null } as any,
+        lines,
+      );
+      await notifyProviderAdmins(providerId, "New product order",
+        `${lines.length} item(s), total ${order.totalAmount} ${order.currency}`, { orderId: order.id });
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ message: "Failed to create order" });
+    }
+  });
+
+  app.get('/api/my/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerOrders(req.user.id));
+    } catch (error) {
+      console.error("Error listing orders:", error);
+      res.status(500).json({ message: "Failed to load orders" });
+    }
+  });
+
+  app.post('/api/my/orders/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const cancelled = await storage.cancelCustomerOrder(req.params.id, req.user.id);
+      if (!cancelled) return res.status(404).json({ message: "Order not found or not cancellable" });
+      res.json(cancelled);
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      res.status(500).json({ message: "Failed to cancel order" });
+    }
+  });
+
+  app.get('/api/provider/orders', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderOrders(providerId));
+    } catch (error) {
+      console.error("Error listing provider orders:", error);
+      res.status(500).json({ message: "Failed to load orders" });
+    }
+  });
+
+  app.patch('/api/provider/orders/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_orders', tenantColumn: 'provider_id' }), async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const status = req.body?.status;
+      if (status && !["confirmed", "fulfilled", "declined"].includes(status)) {
+        return res.status(400).json({ message: "status must be confirmed, fulfilled or declined" });
+      }
+      const updated = await storage.updateProviderOrder(req.params.id, providerId, {
+        status,
+        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Order not found" });
+      if (status) {
+        await notifyCustomer(updated.customerId, providerId, `Order ${status}`,
+          `Your order (${updated.totalAmount} ${updated.currency}) is now ${status}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
+          { orderId: updated.id, status });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating provider order:", error);
+      res.status(500).json({ message: "Failed to update order" });
+    }
+  });
+
+  // ==========================================================================
+  // Marketplace C2 — insurance-quote requests (customer -> insurer)
+  // ==========================================================================
+
+  app.post('/api/my/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      const { providerId, offeringId, customerVehicleId } = req.body ?? {};
+      if (!providerId) return res.status(400).json({ message: "providerId is required" });
+      const provider = await storage.getMarketplaceProvider(providerId);
+      if (!provider) return res.status(404).json({ message: "Provider not found" });
+
+      let planName: string | undefined;
+      if (offeringId) {
+        const off = (provider.offerings ?? []).find((o: any) => o.id === offeringId && o.kind === "insurance_plan");
+        if (!off) return res.status(400).json({ message: "Selected plan is not offered by this insurer" });
+        planName = off.name;
+      }
+      let veh: any;
+      if (customerVehicleId) {
+        veh = await storage.getCustomerVehicle(customerVehicleId, req.user.id);
+        if (!veh) return res.status(400).json({ message: "Vehicle not found" });
+      }
+
+      const quote = await storage.createInsuranceQuote({
+        customerId: req.user.id,
+        providerId,
+        offeringId: offeringId || null,
+        planName: planName ?? null,
+        customerVehicleId: customerVehicleId || null,
+        vehicleMake: veh?.make ?? null,
+        vehicleModel: veh?.model ?? null,
+        vehicleYear: veh?.year ?? null,
+      } as any);
+      await notifyProviderAdmins(providerId, "New insurance quote request",
+        `${planName ?? "General"}${veh ? ` — ${veh.make} ${veh.model ?? ""}`.trim() : ""}`, { quoteId: quote.id });
+      res.status(201).json(quote);
+    } catch (error) {
+      console.error("Error creating quote request:", error);
+      res.status(500).json({ message: "Failed to request quote" });
+    }
+  });
+
+  app.get('/api/my/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json(await storage.listCustomerQuotes(req.user.id));
+    } catch (error) {
+      console.error("Error listing quotes:", error);
+      res.status(500).json({ message: "Failed to load quotes" });
+    }
+  });
+
+  app.post('/api/my/quotes/:id/:decision(accept|cancel)', isAuthenticated, async (req: any, res) => {
+    try {
+      const decision = req.params.decision === "accept" ? "accepted" : "cancelled";
+      const updated = await storage.decideInsuranceQuote(req.params.id, req.user.id, decision as any);
+      if (!updated) return res.status(404).json({ message: "Quote not found or not in a decidable state" });
+      await notifyProviderAdmins(updated.providerId, `Quote ${decision}`,
+        `The customer ${decision} the quote${updated.planName ? ` for ${updated.planName}` : ""}.`,
+        { quoteId: updated.id, status: decision });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error deciding quote:", error);
+      res.status(500).json({ message: "Failed to update quote" });
+    }
+  });
+
+  app.get('/api/provider/quotes', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      res.json(await storage.listProviderQuotes(providerId));
+    } catch (error) {
+      console.error("Error listing provider quotes:", error);
+      res.status(500).json({ message: "Failed to load quotes" });
+    }
+  });
+
+  app.post('/api/provider/quotes/:id/respond', isAuthenticated, async (req: any, res) => {
+    try {
+      const providerId = req.user?.garageId;
+      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
+      const { status, quotedPremium, quoteNotes, validUntil } = req.body ?? {};
+      if (!["quoted", "declined"].includes(status)) {
+        return res.status(400).json({ message: "status must be quoted or declined" });
+      }
+      if (status === "quoted" && !(Number(quotedPremium) > 0)) {
+        return res.status(400).json({ message: "quotedPremium is required to quote" });
+      }
+      const updated = await storage.respondInsuranceQuote(req.params.id, providerId, {
+        status,
+        quotedPremium: status === "quoted" ? String(quotedPremium) : undefined,
+        quoteNotes: typeof quoteNotes === "string" ? quoteNotes : undefined,
+        validUntil: validUntil ? new Date(validUntil) : undefined,
+      });
+      if (!updated) return res.status(404).json({ message: "Quote not found" });
+      await notifyCustomer(updated.customerId, providerId,
+        status === "quoted" ? "Your insurance quote is ready" : "Quote request declined",
+        status === "quoted"
+          ? `Premium: ${updated.quotedPremium} ${updated.currency}${updated.quoteNotes ? ` — ${updated.quoteNotes}` : ""}`
+          : `The insurer declined${updated.quoteNotes ? `: ${updated.quoteNotes}` : "."}`,
+        { quoteId: updated.id, status });
+      res.json(updated);
+    } catch (error) {
+      console.error("Error responding to quote:", error);
+      res.status(500).json({ message: "Failed to respond to quote" });
+    }
+  });
+
+  // Scan a vehicle registration/license or insurance card and extract fields.
+  // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
+  // runs; otherwise we report ocrAvailable:false so the UI falls back to manual
+  // entry (no fabricated data). VIN decoding uses the existing /api/vin-decode.
+  app.post('/api/my/vehicles/scan', isAuthenticated, async (req: any, res) => {
+    try {
+      const docType = req.body?.docType;
+      if (docType !== "license" && docType !== "insurance") {
+        return res.status(400).json({ message: "docType must be 'license' or 'insurance'" });
+      }
+      const { extractVehicleFields } = await import("./services/ocr/vehicleDocOcr");
+
+      // Path 1: the caller supplies OCR text (client-side OCR / paste) and we
+      // extract structured fields from it.
+      const rawText = typeof req.body?.rawText === "string" ? req.body.rawText : "";
+      if (rawText.trim()) {
+        return res.json({ ocrAvailable: true, source: "text", fields: extractVehicleFields(rawText, docType) });
+      }
+
+      // Path 2: the caller supplies an image and a server-side OCR provider is
+      // configured (GOOGLE_VISION_API_KEY) — image -> text -> same extractor.
+      const imageBase64 = typeof req.body?.imageBase64 === "string" ? req.body.imageBase64 : "";
+      const { imageToText, imageOcrConfigured } = await import("./services/ocr/imageOcr");
+      if (imageBase64 && imageOcrConfigured()) {
+        const text = await imageToText(imageBase64);
+        if (text) {
+          return res.json({ ocrAvailable: true, source: "image", fields: extractVehicleFields(text, docType) });
+        }
+        return res.json({ ocrAvailable: true, source: "image", fields: {}, message: "Could not read the image — try a clearer photo or enter details manually." });
+      }
+
+      // No text, no configured image provider → honest fallback to manual entry.
+      return res.json({ ocrAvailable: false, fields: {}, message: "Automatic scanning is not configured — please enter details manually or paste the document text." });
+    } catch (error) {
+      console.error("Error scanning document:", error);
+      res.status(500).json({ message: "Failed to scan document" });
+    }
+  });
+
   const httpServer = createServer(app);
-  
+
   // Initialize WebSocket server for chat
   initializeChatWebSocket(httpServer);
-  
+
   return httpServer;
 }

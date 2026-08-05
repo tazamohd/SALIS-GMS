@@ -27,7 +27,7 @@ describe('Appointment read route extraction (Wave J)', () => {
   it('preserves appointment list pagination, garage scoping, and detail lookup', () => {
     expect(appointmentRoutesSource).toMatch(/router\.get\(['"]\/appointments['"],\s*isAuthenticated/);
     expect(appointmentRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(appointmentRoutesSource).toMatch(/const gid = \(garage_id as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    expect(appointmentRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
     expect(appointmentRoutesSource).toMatch(/storage\.getAppointmentsPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(appointmentRoutesSource).toMatch(/storage\.countAppointments\(gid\)/);
     expect(appointmentRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);

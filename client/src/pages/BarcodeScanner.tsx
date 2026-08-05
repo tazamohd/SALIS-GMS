@@ -194,7 +194,7 @@ export default function BarcodeScanner() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-sm text-[#64748B]">{scan.scannedBy || "Unknown"}</p>
                     <p className="text-xs text-[#64748B]">
                       {scan.createdAt ? new Date(scan.createdAt).toLocaleTimeString() : ""}

@@ -30,7 +30,7 @@ const expenseSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   vendorName: z.string().min(1, "Vendor name is required"),
   amount: z.number().min(0.01, "Amount must be greater than 0"),
-  currency: z.string().default("USD"),
+  currency: z.string().default("SAR"),
   expenseDate: z.string(),
   description: z.string().optional(),
   receiptUrl: z.string().optional(),
@@ -72,7 +72,7 @@ export default function ExpenseTracking() {
       categoryId: "",
       vendorName: "",
       amount: 0,
-      currency: "USD",
+      currency: "SAR",
       expenseDate: new Date().toISOString().split('T')[0],
       description: "",
       paymentMethod: "credit_card",
@@ -211,7 +211,7 @@ export default function ExpenseTracking() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white font-poppins"
           data-testid="button-create-category"
         >
-          <FolderPlus className="mr-2 h-4 w-4" />
+          <FolderPlus className="me-2 h-4 w-4" />
           {t('payments.expenses.createCategory', 'Create Category')}
         </Button>
       </div>
@@ -244,7 +244,7 @@ export default function ExpenseTracking() {
                           {category.description || "No description"}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         {category.budgetLimit && (
                           <div>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('payments.expenses.budgetLimit', 'Budget Limit')}</p>

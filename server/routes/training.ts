@@ -6,7 +6,9 @@ const router = Router();
 
 router.get('/training/modules', isAuthenticated, async (req, res) => {
   try {
-    const modules = await storage.getTrainingModules(req.query.isActive === 'true');
+    // Only filter when the param is present; `=== 'true'` alone turned an
+    // absent param into isActive=false.
+    const modules = await storage.getTrainingModules(req.query.isActive === undefined ? undefined : req.query.isActive === 'true');
     res.json({ data: modules });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -15,7 +17,7 @@ router.get('/training/modules', isAuthenticated, async (req, res) => {
 
 router.get('/training/certifications', isAuthenticated, async (req, res) => {
   try {
-    const certifications = await storage.getCertifications(req.query.isActive === 'true');
+    const certifications = await storage.getCertifications(req.query.isActive === undefined ? undefined : req.query.isActive === 'true');
     res.json({ data: certifications });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

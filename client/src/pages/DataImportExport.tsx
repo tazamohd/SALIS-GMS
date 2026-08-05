@@ -48,7 +48,7 @@ export default function DataImportExport() {
         garageId,
         module: selectedModule,
         format: selectedFormat,
-      });
+      }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -68,7 +68,7 @@ export default function DataImportExport() {
         garageId,
         module: selectedModule,
         data,
-      });
+      }).then((r) => r.json());
     },
     onSuccess: (result: any) => {
       toast({ 
@@ -151,11 +151,11 @@ export default function DataImportExport() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-600 text-white"><CheckCircle className="h-3 w-3 mr-1" />{t('common.completed', 'Completed')}</Badge>;
+        return <Badge className="bg-green-600 text-white"><CheckCircle className="h-3 w-3 me-1" />{t('common.completed', 'Completed')}</Badge>;
       case 'processing':
         return <Badge className="bg-[#0A5ED7] text-white">{t('dataImportExport.processing', 'Processing...')}</Badge>;
       case 'failed':
-        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />{t('common.failed', 'Failed')}</Badge>;
+        return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 me-1" />{t('common.failed', 'Failed')}</Badge>;
       default:
         return <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">{t('common.pending', 'Pending')}</Badge>;
     }
@@ -223,7 +223,7 @@ export default function DataImportExport() {
           disabled={exportMutation.isPending || !garageId}
           data-testid="button-export"
         >
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4 me-2" />
           {exportMutation.isPending ? t('dataImportExport.startingExport', 'Starting Export...') : t('dataImportExport.exportData', 'Export Data')}
         </Button>
       </CardContent>
@@ -276,7 +276,7 @@ export default function DataImportExport() {
           disabled={importMutation.isPending || !importFile}
           data-testid="button-import"
         >
-          <Upload className="h-4 w-4 mr-2" />
+          <Upload className="h-4 w-4 me-2" />
           {importMutation.isPending ? t('dataImportExport.importing', 'Importing...') : t('dataImportExport.importData', 'Import Data')}
         </Button>
       </CardContent>
@@ -328,7 +328,7 @@ export default function DataImportExport() {
                       data-testid={`button-download-${job.id}`}
                     >
                       <a href={job.fileUrl} download={job.fileName}>
-                        <Download className="h-4 w-4 mr-2" />
+                        <Download className="h-4 w-4 me-2" />
                         {t('common.download', 'Download')}
                       </a>
                     </Button>

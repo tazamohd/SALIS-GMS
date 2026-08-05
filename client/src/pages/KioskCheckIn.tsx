@@ -266,7 +266,7 @@ export default function KioskCheckIn() {
               <div className="text-center space-y-6 w-full max-w-md">
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg">
                   <User className="h-8 w-8 text-[#0A5ED7]" />
-                  <div className="text-left">
+                  <div className="text-start">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">{t('kiosk.welcomeBack', 'Welcome back')}, {customerData.customer?.fullName}!</p>
                     <p className="text-sm text-[#64748B]">{customerData.customer?.phone}</p>
                   </div>
@@ -290,7 +290,7 @@ export default function KioskCheckIn() {
                         className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" 
                         onClick={() => handleVehicleSelect(vehicle)}
                       >
-                        <Car className="h-6 w-6 mr-3 text-[#0A5ED7]" />
+                        <Car className="h-6 w-6 me-3 text-[#0A5ED7]" />
                         {vehicle.year} {vehicle.make} {vehicle.model} ({vehicle.plateNumber})
                       </Button>
                     ))
@@ -307,7 +307,7 @@ export default function KioskCheckIn() {
               <div className="text-center space-y-6 w-full max-w-md">
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 rounded-lg">
                   <Car className="h-8 w-8 text-[#0A5ED7]" />
-                  <div className="text-left">
+                  <div className="text-start">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</p>
                     <p className="text-sm text-[#64748B]">{selectedVehicle.plateNumber}</p>
                   </div>
@@ -321,8 +321,8 @@ export default function KioskCheckIn() {
                       className="w-full justify-start text-lg p-6 border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]" 
                       onClick={() => handleAppointmentSelect(apt)}
                     >
-                      <Calendar className="h-6 w-6 mr-3 text-[#0A5ED7]" />
-                      <div className="text-left">
+                      <Calendar className="h-6 w-6 me-3 text-[#0A5ED7]" />
+                      <div className="text-start">
                         <div className="font-semibold">{apt.serviceType}</div>
                         <div className="text-sm text-[#64748B]">#{apt.appointmentNumber}</div>
                       </div>
@@ -333,7 +333,7 @@ export default function KioskCheckIn() {
                     className="w-full justify-start text-lg p-6 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10" 
                     onClick={() => handleAppointmentSelect(null)}
                   >
-                    <User className="h-6 w-6 mr-3" />
+                    <User className="h-6 w-6 me-3" />
                     {t('kiosk.walkInService', 'Walk-in Service (No Appointment)')}
                   </Button>
                 </div>
@@ -370,7 +370,7 @@ export default function KioskCheckIn() {
                   disabled={checkInMutation.isPending}
                   className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white"
                 >
-                  {checkInMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+                  {checkInMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin me-2" /> : null}
                   {t('kiosk.confirmCheckIn', 'Confirm Check-In')}
                 </Button>
                 <Button variant="ghost" className="text-[#64748B]" onClick={() => setCheckInStep("vehicle")}>
@@ -420,7 +420,7 @@ export default function KioskCheckIn() {
                       {session.vehicleMake} {session.vehicleModel} - {session.vehiclePlate}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-sm font-medium text-[#0A5ED7]">
                       {session.appointmentId ? t('kiosk.appointment', 'Appointment') : t('kiosk.walkIn', 'Walk-In')}
                     </p>

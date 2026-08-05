@@ -258,7 +258,7 @@ export default function LiabilitiesManagement() {
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-liability">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('liabilities.addLiability', 'Add Liability')}
                 </Button>
               </DialogTrigger>
@@ -404,7 +404,7 @@ export default function LiabilitiesManagement() {
                 placeholder={t('liabilities.searchLiabilities', 'Search liabilities...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-liabilities"
               />
             </div>
@@ -422,7 +422,7 @@ export default function LiabilitiesManagement() {
               </SelectContent>
             </Select>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-liabilities">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('common.export', 'Export')}
             </Button>
           </div>

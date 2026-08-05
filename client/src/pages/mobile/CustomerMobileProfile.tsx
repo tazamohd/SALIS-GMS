@@ -111,7 +111,7 @@ export default function CustomerMobileProfile() {
         onClick={() => logoutMutation.mutate()}
         data-testid="button-logout"
       >
-        <LogOut className="h-4 w-4 mr-2" />
+        <LogOut className="h-4 w-4 me-2" />
         Logout
       </Button>
 

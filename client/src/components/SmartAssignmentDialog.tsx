@@ -148,12 +148,12 @@ export function SmartAssignmentDialog({ open, onOpenChange }: SmartAssignmentDia
                 >
                   {analyzing ? (
                     <>
-                      <Clock className="w-4 h-4 mr-2 animate-spin" />
+                      <Clock className="w-4 h-4 me-2 animate-spin" />
                       Analyzing Job Requirements...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 mr-2" />
+                      <Sparkles className="w-4 h-4 me-2" />
                       Analyze & Recommend
                     </>
                   )}

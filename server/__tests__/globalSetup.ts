@@ -1,11 +1,13 @@
-import EmbeddedPostgres from "embedded-postgres";
 import { execSync } from "child_process";
 import fs from "fs";
 import { Client } from "pg";
 
 const EMBEDDED_URL = "postgresql://postgres:postgres@localhost:5432/slis_gms";
 
-let pg: EmbeddedPostgres | undefined;
+// embedded-postgres is an optional dev dependency: it is only reached when
+// neither TEST_DATABASE_URL nor a local server on 5432 exists, so it is
+// imported lazily instead of at module load.
+let pg: { stop(): Promise<void> } | undefined;
 let activeUrl: string;
 
 function isPortInUse(port: number): Promise<boolean> {
@@ -115,23 +117,32 @@ export async function setup() {
         }
       }
 
-      pg = new EmbeddedPostgres({
+      // @ts-expect-error -- optional dev dependency with no installed types;
+      // only reached when the embedded fallback is actually wanted.
+      const { default: EmbeddedPostgres } = await import("embedded-postgres").catch(() => {
+        throw new Error(
+          "No TEST_DATABASE_URL, no Postgres on 5432, and embedded-postgres is not installed. " +
+          "Set TEST_DATABASE_URL or `npm i -D embedded-postgres`.",
+        );
+      });
+      const embedded = new EmbeddedPostgres({
         databaseDir: dataDir,
         user: "postgres",
         password: "postgres",
         port: 5432,
         persistent: false,
       });
+      pg = embedded;
 
       try {
-        await pg.initialise();
+        await embedded.initialise();
       } catch (err: any) {
         if (!err.message?.includes("already exist")) throw err;
       }
-      await pg.start();
+      await embedded.start();
 
       try {
-        await pg.createDatabase("slis_gms");
+        await embedded.createDatabase("slis_gms");
       } catch (err: any) {
         if (!err.message?.includes("exists")) throw err;
       }

@@ -165,7 +165,7 @@ export default function Suppliers() {
             placeholder={t('inventory.searchSuppliers', 'Search by name, contact person, or email...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
@@ -220,7 +220,7 @@ export default function Suppliers() {
                 data-testid="button-create-first"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
-                <Plus className="mr-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
+                <Plus className="me-2 h-4 w-4" /> {t('inventory.addSupplier', 'Add Supplier')}
               </Button>
             )}
           </CardContent>
@@ -260,19 +260,19 @@ export default function Suppliers() {
               <CardContent className="space-y-2">
                 {supplier.email && (
                   <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-email-${supplier.id}`}>
-                    <Mail className="mr-2 h-4 w-4" />
+                    <Mail className="me-2 h-4 w-4" />
                     {supplier.email}
                   </div>
                 )}
                 {supplier.phone && (
                   <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-phone-${supplier.id}`}>
-                    <Phone className="mr-2 h-4 w-4" />
+                    <Phone className="me-2 h-4 w-4" />
                     {supplier.phone}
                   </div>
                 )}
                 {(supplier.city || supplier.country) && (
                   <div className="flex items-center text-sm text-[#64748B]" data-testid={`text-location-${supplier.id}`}>
-                    <MapPin className="mr-2 h-4 w-4" />
+                    <MapPin className="me-2 h-4 w-4" />
                     {[supplier.city, supplier.country].filter(Boolean).join(", ")}
                   </div>
                 )}
@@ -685,11 +685,11 @@ export default function Suppliers() {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => handleEdit(selectedSupplier)} className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-details-edit">
-                  <Pencil className="mr-2 h-4 w-4" />
+                  <Pencil className="me-2 h-4 w-4" />
                   {t('common.edit', 'Edit')}
                 </Button>
                 <Button variant="outline" onClick={() => deleteSupplier(selectedSupplier.id)} className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10" data-testid="button-details-delete">
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="me-2 h-4 w-4" />
                   {t('common.delete', 'Delete')}
                 </Button>
               </div>

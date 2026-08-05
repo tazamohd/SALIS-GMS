@@ -203,7 +203,7 @@ export default function SecurityCameras() {
                       {recording.recordingEnd ? new Date(recording.recordingEnd).toLocaleTimeString() : ""}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <Badge className="bg-[#F8FAFC] dark:bg-[#232A36] text-[#0B1F3B] dark:text-white">{recording.eventType}</Badge>
                     <p className="text-sm text-[#64748B] mt-1">
                       {recording.fileSize ? `${(recording.fileSize / 1000).toFixed(1)} MB` : t('drone.na', 'N/A')}

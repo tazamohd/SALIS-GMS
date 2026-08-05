@@ -202,7 +202,7 @@ export default function PartsNetworkDashboard() {
               <Link href="/parts-network/send-request">
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-send-request">
                   Send Request
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                  <ArrowUpRight className="ms-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -222,7 +222,7 @@ export default function PartsNetworkDashboard() {
               <Link href="/parts-network/incoming-requests">
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-view-incoming">
                   View Requests
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                  <ArrowUpRight className="ms-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -243,7 +243,7 @@ export default function PartsNetworkDashboard() {
               <Link href="/parts-network/my-requests">
                 <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0A5ED7]">
                   View All
-                  <ArrowRight className="ml-1 h-4 w-4" />
+                  <ArrowRight className="ms-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -267,7 +267,7 @@ export default function PartsNetworkDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right flex flex-col items-end gap-1">
+                  <div className="text-end flex flex-col items-end gap-1">
                     {getStatusBadge(request.status)}
                     <p className="text-sm text-[#64748B]">
                       {request.responseCount} quotes
@@ -290,7 +290,7 @@ export default function PartsNetworkDashboard() {
               <Link href="/parts-network/quotations">
                 <Button variant="ghost" size="sm" className="text-[#64748B] hover:text-[#0A5ED7]">
                   View All
-                  <ArrowRight className="ml-1 h-4 w-4" />
+                  <ArrowRight className="ms-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -314,7 +314,7 @@ export default function PartsNetworkDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right flex flex-col items-end gap-1">
+                  <div className="text-end flex flex-col items-end gap-1">
                     <p className="font-bold text-[#0B1F3B] dark:text-white">
                       {quote.unitPrice} {quote.currency}
                     </p>

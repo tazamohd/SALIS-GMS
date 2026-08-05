@@ -56,11 +56,16 @@ export async function recommendParts(garageId: string, params: {
   const recommendations: PartRecommendation[] = [];
 
   for (const partName of matchedParts) {
+    // Columns are snake_case in the DB; alias to the camelCase keys the code
+    // reads. spare_parts has no part-number column — partNumber falls back to
+    // a generated value below.
     const inventory = await db.execute(sql`
-      SELECT sp.id, sp.name, sp."partNumber", sp.category,
-        spi."stockQuantity", spi."sellingPrice", spi."costPrice"
+      SELECT sp.id, sp.name, sp.category,
+        spi.stock_quantity as "stockQuantity",
+        spi.selling_price as "sellingPrice",
+        spi.cost_price as "costPrice"
       FROM spare_parts sp
-      LEFT JOIN spare_part_inventories spi ON spi."sparePartId" = sp.id AND spi."garageId" = ${garageId}
+      LEFT JOIN spare_part_inventories spi ON spi.spare_part_id = sp.id AND spi.garage_id = ${garageId}
       WHERE LOWER(sp.name) LIKE ${`%${partName.toLowerCase()}%`}
       LIMIT 3
     `);

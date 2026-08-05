@@ -224,7 +224,7 @@ export default function BankAccountManagement() {
           </Card>
         </div>
         <Button onClick={() => setIsAccountDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-account">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('bankAccounts.addBankAccount', 'Add Bank Account')}
         </Button>
       </div>
@@ -293,7 +293,7 @@ export default function BankAccountManagement() {
                     }}
                     data-testid={`button-add-transaction-${account.id}`}
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <Plus className="h-4 w-4 me-1" />
                     {t('bankAccounts.addTransaction', 'Add Transaction')}
                   </Button>
                   <Button
@@ -315,7 +315,7 @@ export default function BankAccountManagement() {
                     }}
                     data-testid={`button-reconcile-${account.id}`}
                   >
-                    <RefreshCw className="h-4 w-4 mr-1" />
+                    <RefreshCw className="h-4 w-4 me-1" />
                     {t('bankAccounts.reconcile', 'Reconcile')}
                   </Button>
                 </div>
@@ -350,7 +350,7 @@ export default function BankAccountManagement() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90 disabled:opacity-50"
           data-testid="button-new-transaction"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('bankAccounts.newTransaction', 'New Transaction')}
         </Button>
       </div>
@@ -380,7 +380,7 @@ export default function BankAccountManagement() {
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('bankAccounts.reference', 'Reference')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -402,7 +402,7 @@ export default function BankAccountManagement() {
                   </TableCell>
                   <TableCell className="text-[#0B1F3B] dark:text-white">{tx.description}</TableCell>
                   <TableCell className="text-[#64748B]">{tx.referenceNumber || "-"}</TableCell>
-                  <TableCell className={`text-right font-medium ${
+                  <TableCell className={`text-end font-medium ${
                     tx.transactionType === "deposit" || tx.transactionType === "interest" 
                       ? "text-green-600 dark:text-green-400" 
                       : "text-red-600 dark:text-red-400"
@@ -413,12 +413,12 @@ export default function BankAccountManagement() {
                   <TableCell>
                     {tx.reconciled ? (
                       <Badge className="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200">
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                        <CheckCircle className="h-3 w-3 me-1" />
                         {t('bankAccounts.reconciled', 'Reconciled')}
                       </Badge>
                     ) : (
                       <Badge className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border border-[#E2E8F0] dark:border-[#232A36]">
-                        <Clock className="h-3 w-3 mr-1" />
+                        <Clock className="h-3 w-3 me-1" />
                         {t('common.pending', 'Pending')}
                       </Badge>
                     )}
@@ -449,7 +449,7 @@ export default function BankAccountManagement() {
                   <p className="font-medium text-[#0B1F3B] dark:text-white">{account.accountName}</p>
                   <p className="text-sm text-[#64748B]">{account.bankName}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {parseFloat(account.currentBalance).toLocaleString()}</p>
                   <p className="text-sm text-[#64748B]">{t('bankAccounts.currentBalance', 'Current Balance')}</p>
                 </div>
@@ -462,7 +462,7 @@ export default function BankAccountManagement() {
                   }}
                   data-testid={`button-reconcile-account-${account.id}`}
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4 me-2" />
                   {t('bankAccounts.startReconciliation', 'Start Reconciliation')}
                 </Button>
               </div>

@@ -15,6 +15,7 @@ import {
   insertMaintenanceScheduleSchema,
   insertServiceReminderSchema
 } from "@shared/schema";
+import { vehicleMakes } from "@shared/vehicleCatalogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -246,7 +247,7 @@ export default function VehiclesEnhanced() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
           data-testid="button-add-vehicle"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -339,7 +340,20 @@ export default function VehiclesEnhanced() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Toyota" className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
+                        <select
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                          data-testid="input-make"
+                          className="w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                        >
+                          <option value="">{t('vehicles.selectMake', 'Select make')}</option>
+                          {vehicleMakes.map((m) => (
+                            <option key={m.id} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -597,7 +611,7 @@ export default function VehiclesEnhanced() {
               placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-search"
             />
           </div>
@@ -642,23 +656,23 @@ export default function VehiclesEnhanced() {
               <TabsList className="grid w-full grid-cols-6 bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
                 <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-overview">{t('vehicles.overview', 'Overview')}</TabsTrigger>
                 <TabsTrigger value="history" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-history">
-                  <Clock className="w-4 h-4 mr-1" />
+                  <Clock className="w-4 h-4 me-1" />
                   {t('vehicles.history', 'History')}
                 </TabsTrigger>
                 <TabsTrigger value="maintenance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-maintenance">
-                  <Wrench className="w-4 h-4 mr-1" />
+                  <Wrench className="w-4 h-4 me-1" />
                   {t('vehicles.maintenance', 'Maintenance')}
                 </TabsTrigger>
                 <TabsTrigger value="reminders" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-reminders">
-                  <Bell className="w-4 h-4 mr-1" />
+                  <Bell className="w-4 h-4 me-1" />
                   {t('vehicles.reminders', 'Reminders')}
                 </TabsTrigger>
                 <TabsTrigger value="warranty" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-warranty">
-                  <Shield className="w-4 h-4 mr-1" />
+                  <Shield className="w-4 h-4 me-1" />
                   {t('vehicles.warranty', 'Warranty')}
                 </TabsTrigger>
                 <TabsTrigger value="photos" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-photos">
-                  <Image className="w-4 h-4 mr-1" />
+                  <Image className="w-4 h-4 me-1" />
                   {t('vehicles.photos', 'Photos')}
                 </TabsTrigger>
               </TabsList>
@@ -715,7 +729,7 @@ export default function VehiclesEnhanced() {
                     ) : (
                       <div className="space-y-4">
                         {serviceHistory.map((service) => (
-                          <div key={service.id} className="border-l-2 border-[#0A5ED7] pl-4 pb-4">
+                          <div key={service.id} className="border-l-2 border-[#0A5ED7] ps-4 pb-4">
                             <div className="flex justify-between items-start">
                               <div>
                                 <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{service.serviceType}</h4>
@@ -727,7 +741,7 @@ export default function VehiclesEnhanced() {
                                 )}
                               </div>
                               {service.cost && (
-                                <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7]">${service.cost}</Badge>
+                                <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7]">SAR {service.cost}</Badge>
                               )}
                             </div>
                           </div>

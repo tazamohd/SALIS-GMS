@@ -235,7 +235,7 @@ export function NotificationBell() {
                 data-testid="button-mark-all-read"
                 aria-label={t('notifications.markAllAsRead', 'Mark all as read')}
               >
-                <CheckCheck className="h-4 w-4 mr-1" aria-hidden="true" />
+                <CheckCheck className="h-4 w-4 me-1" aria-hidden="true" />
                 {t('notifications.markAllRead', 'Mark all')}
               </Button>
             )}
@@ -341,7 +341,7 @@ export function NotificationBell() {
               onClick={() => setIsOpen(false)}
               data-testid="link-view-all-notifications"
             >
-              <ExternalLink className="h-4 w-4 mr-2" aria-hidden="true" />
+              <ExternalLink className="h-4 w-4 me-2" aria-hidden="true" />
               {t('notifications.viewAll', 'View All Notifications')}
             </Button>
           </Link>

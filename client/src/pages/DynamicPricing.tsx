@@ -185,15 +185,15 @@ export default function DynamicPricing() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="calculator" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-calculator">
-            <Calculator className="h-4 w-4 mr-2" />
+            <Calculator className="h-4 w-4 me-2" />
             {t('dynamicPricing.priceCalculator', 'Price Calculator')}
           </TabsTrigger>
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-market">
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-4 w-4 me-2" />
             {t('dynamicPricing.marketData', 'Market Data')}
           </TabsTrigger>
           <TabsTrigger value="factors" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white" data-testid="tab-factors">
-            <Settings className="h-4 w-4 mr-2" />
+            <Settings className="h-4 w-4 me-2" />
             {t('dynamicPricing.vehicleFactors', 'Vehicle Factors')}
           </TabsTrigger>
         </TabsList>
@@ -291,12 +291,12 @@ export default function DynamicPricing() {
                 >
                   {calculateMutation.isPending ? (
                     <>
-                      <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                      <Sparkles className="h-4 w-4 me-2 animate-spin" />
                       {t('dynamicPricing.calculating', 'Calculating...')}
                     </>
                   ) : (
                     <>
-                      <Calculator className="h-4 w-4 mr-2" />
+                      <Calculator className="h-4 w-4 me-2" />
                       {t('dynamicPricing.calculatePrice', 'Calculate Price')}
                     </>
                   )}
@@ -436,7 +436,7 @@ export default function DynamicPricing() {
                           <span>{item.region.replace(/_/g, ' ')}</span>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="font-medium bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">SAR {parseFloat(item.avgPrice).toLocaleString()}</p>
                         <p className="text-xs text-[#64748B]">
                           {t('dynamicPricing.range', 'Range')}: SAR {parseFloat(item.minPrice).toLocaleString()} - {parseFloat(item.maxPrice).toLocaleString()}

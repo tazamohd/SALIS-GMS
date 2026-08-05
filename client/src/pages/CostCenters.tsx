@@ -355,7 +355,7 @@ export default function CostCenters() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="font-mono font-bold text-[#0A5ED7]">SAR {deptActual.toLocaleString()}</p>
                       <p className="text-xs text-[#64748B]">
                         {t('costCenters.of', 'of')} SAR {deptBudget.toLocaleString()}
@@ -378,30 +378,30 @@ export default function CostCenters() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/budget-management">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:border-[#0A5ED7]" data-testid="link-budget">
-                <Target className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <Target className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('costCenters.budgetManagement', 'Budget Management')}
-                <ExternalLink className="h-3 w-3 ml-auto text-[#64748B]" />
+                <ExternalLink className="h-3 w-3 ms-auto text-[#64748B]" />
               </Button>
             </Link>
             <Link href="/expenses-management">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:border-[#0A5ED7]" data-testid="link-expenses">
-                <DollarSign className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <DollarSign className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('costCenters.expenses', 'Expenses')}
-                <ExternalLink className="h-3 w-3 ml-auto text-[#64748B]" />
+                <ExternalLink className="h-3 w-3 ms-auto text-[#64748B]" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:border-[#0A5ED7]" data-testid="link-income">
-                <TrendingUp className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <TrendingUp className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('costCenters.incomeStatement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto text-[#64748B]" />
+                <ExternalLink className="h-3 w-3 ms-auto text-[#64748B]" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:border-[#0A5ED7]" data-testid="link-ledger">
-                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('costCenters.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto text-[#64748B]" />
+                <ExternalLink className="h-3 w-3 ms-auto text-[#64748B]" />
               </Button>
             </Link>
           </div>
@@ -420,7 +420,7 @@ export default function CostCenters() {
               placeholder={t('costCenters.searchCostCenters', 'Search cost centers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-search"
             />
           </div>
@@ -440,13 +440,13 @@ export default function CostCenters() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-center">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('costCenters.addCostCenter', 'Add Cost Center')}
               </Button>
             </DialogTrigger>
@@ -590,9 +590,9 @@ export default function CostCenters() {
               <TableHead className="text-[#64748B]">{t('costCenters.name', 'Name')}</TableHead>
               <TableHead className="text-[#64748B]">{t('costCenters.department', 'Department')}</TableHead>
               <TableHead className="text-[#64748B]">{t('costCenters.manager', 'Manager')}</TableHead>
-              <TableHead className="text-right text-[#64748B]">{t('costCenters.budget', 'Budget')}</TableHead>
-              <TableHead className="text-right text-[#64748B]">{t('costCenters.actual', 'Actual')}</TableHead>
-              <TableHead className="text-right text-[#64748B]">{t('costCenters.variance', 'Variance')}</TableHead>
+              <TableHead className="text-end text-[#64748B]">{t('costCenters.budget', 'Budget')}</TableHead>
+              <TableHead className="text-end text-[#64748B]">{t('costCenters.actual', 'Actual')}</TableHead>
+              <TableHead className="text-end text-[#64748B]">{t('costCenters.variance', 'Variance')}</TableHead>
               <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
             </TableRow>
           </TableHeader>
@@ -615,9 +615,9 @@ export default function CostCenters() {
                     </div>
                   </TableCell>
                   <TableCell className="text-[#0B1F3B] dark:text-white">{cc.manager}</TableCell>
-                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {cc.budgetAmount.toLocaleString()}</TableCell>
-                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {cc.actualSpend.toLocaleString()}</TableCell>
-                  <TableCell className={`text-right ${cc.variance >= 0 ? "text-[#0A5ED7]" : "text-[#F97316]"}`}>
+                  <TableCell className="text-end text-[#0B1F3B] dark:text-white">SAR {cc.budgetAmount.toLocaleString()}</TableCell>
+                  <TableCell className="text-end text-[#0B1F3B] dark:text-white">SAR {cc.actualSpend.toLocaleString()}</TableCell>
+                  <TableCell className={`text-end ${cc.variance >= 0 ? "text-[#0A5ED7]" : "text-[#F97316]"}`}>
                     {cc.variance >= 0 ? "+" : ""}SAR {cc.variance.toLocaleString()}
                   </TableCell>
                   <TableCell>

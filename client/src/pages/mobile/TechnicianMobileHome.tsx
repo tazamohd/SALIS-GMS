@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clipboard, Clock, CheckCircle, AlertCircle, Play, Wrench } from "lucide-react";
@@ -7,21 +8,22 @@ import { Link } from "wouter";
 import type { JobCard } from "@shared/schema";
 
 export default function TechnicianMobileHome() {
-  const { data: jobCards } = useQuery<{ data: JobCard[] }>({
+  const { data: jobCards } = useQuery<JobCard[]>({
     queryKey: ["/api/job-cards"],
+    select: asList,
   });
 
-  const activeJobs = jobCards?.data?.filter(
+  const activeJobs = jobCards?.filter(
     (job) => job.status === "in_progress" || job.status === "pending"
   ) || [];
 
-  const completedToday = jobCards?.data?.filter(
+  const completedToday = jobCards?.filter(
     (job) => job.status === "completed" && 
       new Date(job.updatedAt).toDateString() === new Date().toDateString()
   )?.length || 0;
 
-  const pendingJobs = jobCards?.data?.filter((job) => job.status === "pending")?.length || 0;
-  const inProgressJobs = jobCards?.data?.filter((job) => job.status === "in_progress")?.length || 0;
+  const pendingJobs = jobCards?.filter((job) => job.status === "pending")?.length || 0;
+  const inProgressJobs = jobCards?.filter((job) => job.status === "in_progress")?.length || 0;
 
   const quickActions = [
     { icon: Play, label: "Clock In", route: "/technician-app/clock", color: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF]" },
@@ -107,7 +109,7 @@ export default function TechnicianMobileHome() {
                 </p>
                 <p className="text-xs text-[#64748B]">{job.serviceType}</p>
               </div>
-              <div className="text-right">
+              <div className="text-end">
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   job.status === "in_progress" 
                     ? "bg-[#0A5ED7]/10 text-[#0A5ED7] border border-[#0A5ED7]" 

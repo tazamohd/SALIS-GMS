@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { asList } from "@/lib/asList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Receipt, Download, CreditCard, Clock, CheckCircle } from "lucide-react";
@@ -6,15 +7,16 @@ import { Link } from "wouter";
 import type { Invoice } from "@shared/schema";
 
 export default function CustomerMobilePayments() {
-  const { data: invoices, isLoading } = useQuery<{ data: Invoice[] }>({
+  const { data: invoices, isLoading } = useQuery<Invoice[]>({
     queryKey: ["/api/invoices"],
+    select: asList,
   });
 
-  const pendingInvoices = invoices?.data?.filter(
+  const pendingInvoices = invoices?.filter(
     (inv) => inv.status === "pending" || inv.status === "overdue"
   ) || [];
   
-  const paidInvoices = invoices?.data?.filter(
+  const paidInvoices = invoices?.filter(
     (inv) => inv.status === "paid"
   ) || [];
 
@@ -45,7 +47,7 @@ export default function CustomerMobilePayments() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm opacity-90 mb-1">Total Pending</p>
-              <p className="text-3xl font-bold">${totalPending.toFixed(2)}</p>
+              <p className="text-3xl font-bold">SAR {totalPending.toFixed(2)}</p>
               <p className="text-xs opacity-75 mt-1">{pendingInvoices.length} invoice(s)</p>
             </div>
             <CreditCard className="h-16 w-16 opacity-20" />
@@ -84,7 +86,7 @@ export default function CustomerMobilePayments() {
                         {new Date(invoice.invoiceDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="text-lg font-bold text-[#F97316]">
                         ${Number(invoice.totalAmount).toFixed(2)}
                       </p>
@@ -146,7 +148,7 @@ export default function CustomerMobilePayments() {
                       {new Date(invoice.invoiceDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       ${Number(invoice.totalAmount).toFixed(2)}
                     </p>

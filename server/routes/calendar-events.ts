@@ -4,6 +4,22 @@ import { storage } from '../storage';
 
 const router = Router();
 
+// Registered before the :garageId matcher, which would otherwise capture
+// /calendar-events/detail/<id> and 400 on missing dates.
+router.get('/calendar-events/detail/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await storage.getCalendarEvent(id);
+    if (!event) {
+      return res.status(404).json({ message: 'Calendar event not found' });
+    }
+    res.json(event);
+  } catch (error) {
+    console.error('Error fetching calendar event:', error);
+    res.status(500).json({ message: 'Failed to fetch calendar event' });
+  }
+});
+
 router.get('/calendar-events/:garageId', isAuthenticated, async (req, res) => {
   try {
     const { garageId } = req.params;
@@ -25,18 +41,5 @@ router.get('/calendar-events/:garageId', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/calendar-events/detail/:id', isAuthenticated, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const event = await storage.getCalendarEvent(id);
-    if (!event) {
-      return res.status(404).json({ message: 'Calendar event not found' });
-    }
-    res.json(event);
-  } catch (error) {
-    console.error('Error fetching calendar event:', error);
-    res.status(500).json({ message: 'Failed to fetch calendar event' });
-  }
-});
 
 export default router;

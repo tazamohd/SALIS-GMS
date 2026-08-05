@@ -35,23 +35,23 @@ describe('Purchase order and task read route extraction (Wave J)', () => {
 
   it('preserves purchase order list, detail, and item read behavior', () => {
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-orders['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/const \{ garage_id,\s*status \} = req\.query/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrders\(garage_id as string,\s*status as string\)/);
+    // B11: list scopes to the session garage, not a client-supplied query param.
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrders\(req\.user\.garageId,\s*status as string\)/);
+    expect(purchaseRoutesSource).not.toMatch(/getPurchaseOrders\(garage_id/);
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-orders\/:id['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrder\(id\)/);
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrder\(req\.params\.id,\s*req\.user\.garageId\)/);
     expect(purchaseRoutesSource).toMatch(/Purchase order not found/);
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-orders\/:id\/items['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrderItems\(id\)/);
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseOrderItems\(req\.params\.id\)/);
   });
 
   it('preserves purchase task list, detail, and parts read behavior', () => {
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-tasks['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/const \{ garage_id,\s*status,\s*priority \} = req\.query/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTasks\(\s*garage_id as string,\s*status as string,\s*priority as string,\s*\)/);
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTasks\(\s*req\.user\.garageId,\s*status as string,\s*priority as string,\s*\)/);
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-tasks\/:id['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTask\(id\)/);
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTask\(req\.params\.id,\s*req\.user\.garageId\)/);
     expect(purchaseRoutesSource).toMatch(/Task not found/);
     expect(purchaseRoutesSource).toMatch(/router\.get\(['"]\/purchase-tasks\/:id\/parts['"],\s*isAuthenticated/);
-    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTaskParts\(id\)/);
+    expect(purchaseRoutesSource).toMatch(/storage\.getPurchaseTaskParts\(req\.params\.id\)/);
   });
 });

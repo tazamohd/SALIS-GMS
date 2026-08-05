@@ -168,7 +168,7 @@ export function SignaturePad({
             disabled={!hasSignature}
             data-testid="button-clear-signature"
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <RotateCcw className="w-4 h-4 me-2" />
             Clear
           </Button>
 
@@ -178,7 +178,7 @@ export function SignaturePad({
               onClick={onCancel}
               data-testid="button-cancel-signature"
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 me-2" />
               Cancel
             </Button>
             <Button
@@ -187,7 +187,7 @@ export function SignaturePad({
               className="bg-salis-black hover:bg-salis-gray text-white"
               data-testid="button-save-signature"
             >
-              <Check className="w-4 h-4 mr-2" />
+              <Check className="w-4 h-4 me-2" />
               Sign & Save
             </Button>
           </div>

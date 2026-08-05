@@ -22,18 +22,23 @@ export function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
+  // Honest placeholders: no profile-update or change-password API exists yet.
+  // The previous handlers toasted success without sending anything — silently
+  // discarding edits and falsely confirming a password change.
   const handleSave = () => {
     toast({
-      title: t('common.success', 'Success'),
-      description: t('profile.profileUpdatedSuccessfully', 'Profile updated successfully'),
+      title: t('common.notAvailable', 'Not available yet'),
+      description: t('profile.editNotAvailable', 'Profile editing is not connected to the server yet. Your changes were not saved.'),
+      variant: 'destructive',
     });
     setIsEditing(false);
   };
 
   const handleChangePassword = () => {
     toast({
-      title: t('common.success', 'Success'),
-      description: t('profile.passwordChangedSuccessfully', 'Password changed successfully'),
+      title: t('common.notAvailable', 'Not available yet'),
+      description: t('profile.passwordChangeNotAvailable', 'Password change is not available yet. Contact your administrator to reset a password.'),
+      variant: 'destructive',
     });
     setIsChangingPassword(false);
   };

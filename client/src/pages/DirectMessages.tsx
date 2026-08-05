@@ -89,6 +89,16 @@ export default function DirectMessages() {
 
   const { data: messages = [], isLoading: messagesLoading } = useQuery<ChatMessage[]>({
     queryKey: ["/api/chat/conversations", selectedConversationId, "messages"],
+    // Explicit queryFn: the default one fetches only queryKey[0]
+    // (/api/chat/conversations — the LIST), so without this the message pane
+    // showed conversations instead of the selected thread's messages.
+    queryFn: async () => {
+      const res = await fetch(`/api/chat/conversations/${selectedConversationId}/messages`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+      return res.json();
+    },
     enabled: !!selectedConversationId,
   });
 
@@ -104,6 +114,14 @@ export default function DirectMessages() {
 
   const { data: unreadCount = 0 } = useQuery<number>({
     queryKey: ["/api/chat/unread-count"],
+    // The endpoint returns { count }; extract it so the badge shows a number
+    // rather than rendering "[object Object]".
+    queryFn: async () => {
+      const res = await fetch("/api/chat/unread-count", { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}`);
+      const data = await res.json();
+      return typeof data === "number" ? data : (data?.count ?? 0);
+    },
     enabled: !!user?.id,
   });
 
@@ -349,7 +367,7 @@ export default function DirectMessages() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t("directMessages.conversations", "Conversations")}
                 {unreadCount > 0 && (
-                  <Badge variant="destructive" className="ml-2">
+                  <Badge variant="destructive" className="ms-2">
                     {unreadCount}
                   </Badge>
                 )}
@@ -361,7 +379,7 @@ export default function DirectMessages() {
                 className="text-primary hover:text-primary/80"
                 data-testid="button-new-conversation"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="h-4 w-4 me-1" />
                 {t("directMessages.new", "New")}
               </Button>
             </div>
@@ -374,7 +392,7 @@ export default function DirectMessages() {
                 placeholder={t("directMessages.searchConversations", "Search conversations...")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={cn("bg-background border-border", isRtl ? "pr-9" : "pl-9")}
+                className={cn("bg-background border-border", isRtl ? "pe-9" : "ps-9")}
                 data-testid="input-search-conversations"
               />
             </div>
@@ -412,7 +430,7 @@ export default function DirectMessages() {
                       key={conversation.id}
                       onClick={() => setSelectedConversationId(conversation.id)}
                       className={cn(
-                        "w-full p-3 rounded-lg mb-1 text-left transition-colors",
+                        "w-full p-3 rounded-lg mb-1 text-start transition-colors",
                         isSelected
                           ? "bg-primary/10 border border-primary/30"
                           : "hover:bg-muted border border-transparent"
@@ -653,7 +671,7 @@ export default function DirectMessages() {
                 {t("directMessages.selectConversationDesc", "Choose a conversation from the list or start a new one to begin messaging.")}
               </p>
               <Button onClick={() => setShowNewConversationDialog(true)} className="bg-primary hover:bg-primary/90">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t("directMessages.newConversation", "New Conversation")}
               </Button>
             </div>
@@ -712,7 +730,7 @@ export default function DirectMessages() {
               data-testid="button-create-conversation"
             >
               {createConversationMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-4 w-4 animate-spin me-2" />
               ) : null}
               {t("directMessages.startConversation", "Start Conversation")}
             </Button>

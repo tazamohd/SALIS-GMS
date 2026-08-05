@@ -265,7 +265,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                         {item.itemType} • Qty: {item.quantity} • ${parseFloat(item.unitPrice).toFixed(2)} each
                       </p>
                     </div>
-                    <p className="font-semibold text-soft-white" data-testid={`item-total-${item.id}`}>${parseFloat(item.lineTotal).toFixed(2)}</p>
+                    <p className="font-semibold text-soft-white" data-testid={`item-total-${item.id}`}>SAR {parseFloat(item.lineTotal).toFixed(2)}</p>
                   </div>
                 ))}
                 {(items ?? []).length === 0 && (
@@ -278,19 +278,19 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-soft-white/70">Subtotal:</span>
-                  <span className="font-semibold text-soft-white" data-testid="text-estimate-subtotal">${parseFloat(estimate.subtotal).toFixed(2)}</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-subtotal">SAR {parseFloat(estimate.subtotal).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-soft-white/70">Tax ({parseFloat(estimate.taxRate).toFixed(0)}%):</span>
-                  <span className="font-semibold text-soft-white" data-testid="text-estimate-tax">${parseFloat(estimate.taxAmount).toFixed(2)}</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-tax">SAR {parseFloat(estimate.taxAmount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-soft-white/70">Discount:</span>
-                  <span className="font-semibold text-soft-white" data-testid="text-estimate-discount">${parseFloat(estimate.discountAmount).toFixed(2)}</span>
+                  <span className="font-semibold text-soft-white" data-testid="text-estimate-discount">SAR {parseFloat(estimate.discountAmount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t border-neon-blue/30 pt-2 text-soft-white">
                   <span>Total:</span>
-                  <span data-testid="text-estimate-total">${parseFloat(estimate.totalAmount).toFixed(2)}</span>
+                  <span data-testid="text-estimate-total">SAR {parseFloat(estimate.totalAmount).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -311,7 +311,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                     className="bg-blue-600 hover:bg-blue-700"
                     data-testid="button-convert-to-job-card"
                   >
-                    <Wrench className="w-4 h-4 mr-2" />
+                    <Wrench className="w-4 h-4 me-2" />
                     {convertToJobCardMutation.isPending ? "Converting..." : "Convert to Job Card"}
                   </Button>
                   <Button
@@ -320,7 +320,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                     className="bg-green-600 hover:bg-green-700"
                     data-testid="button-convert-to-invoice"
                   >
-                    <FileText className="w-4 h-4 mr-2" />
+                    <FileText className="w-4 h-4 me-2" />
                     {convertToInvoiceMutation.isPending ? "Converting..." : "Convert to Invoice"}
                   </Button>
                 </>
@@ -330,7 +330,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                 onClick={() => setDeleteDialogOpen(true)}
                 data-testid="button-delete-estimate"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4 me-2" />
                 Delete
               </Button>
             </div>

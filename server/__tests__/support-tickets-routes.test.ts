@@ -24,17 +24,17 @@ describe('Support ticket read route extraction (Wave J)', () => {
     expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/support\/tickets\/:id\/assign['"]/);
   });
 
-  it('preserves support ticket list filters and garage fallback', () => {
+  it('preserves support ticket list filters and scopes to the session garage', () => {
     expect(supportTicketRoutesSource).toMatch(/router\.get\(['"]\/support\/tickets['"],\s*isAuthenticated/);
-    expect(supportTicketRoutesSource).toMatch(/const \{ status,\s*priority,\s*assignedTo,\s*category,\s*garageId \} = req\.query/);
-    expect(supportTicketRoutesSource).toMatch(/const userGarageId = req\.user\?\.garageId \|\| garageId/);
-    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTickets\(userGarageId,\s*\{/);
+    // B11: no client-supplied garageId fallback — always the session garage.
+    expect(supportTicketRoutesSource).not.toMatch(/req\.user\?\.garageId \|\| garageId/);
+    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTickets\(req\.user\.garageId,\s*\{/);
     expect(supportTicketRoutesSource).toMatch(/assignedTo: assignedTo as string/);
   });
 
-  it('preserves detail 404 and ticket event behavior', () => {
+  it('scopes detail + events to the garage and preserves 404 behavior', () => {
     expect(supportTicketRoutesSource).toMatch(/router\.get\(['"]\/support\/tickets\/:id['"],\s*isAuthenticated/);
-    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTicket\(id\)/);
+    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTicket\(id,\s*req\.user\.garageId\)/);
     expect(supportTicketRoutesSource).toMatch(/return res\.status\(404\)\.json\(\{ message: ['"]Ticket not found['"] \}\)/);
     expect(supportTicketRoutesSource).toMatch(/router\.get\(['"]\/support\/tickets\/:id\/events['"],\s*isAuthenticated/);
     expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTicketEvents\(id\)/);

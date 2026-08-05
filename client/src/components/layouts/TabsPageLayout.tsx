@@ -84,10 +84,10 @@ export function TabsPageLayout({
                 data-testid={`tab-${tab.id}`}
                 className="relative rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white data-[state=active]:shadow-lg transition-all text-[#64748B] dark:text-[#9BA4B0] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
               >
-                {tab.icon && <tab.icon className="mr-2 h-4 w-4" />}
+                {tab.icon && <tab.icon className="me-2 h-4 w-4" />}
                 {tab.label}
                 {tab.badge !== undefined && (
-                  <span className="ml-2 rounded-full bg-white/20 dark:bg-white/10 px-2 py-0.5 text-xs font-medium">
+                  <span className="ms-2 rounded-full bg-white/20 dark:bg-white/10 px-2 py-0.5 text-xs font-medium">
                     {tab.badge}
                   </span>
                 )}

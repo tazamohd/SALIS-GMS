@@ -13,14 +13,17 @@ router.get('/customers', isAuthenticated, async (req, res) => {
     // Otherwise return a paginated list. (SA-017)
     if (search && typeof search === 'string' && search.length >= 2) {
       const searchPattern = `%${search.toLowerCase()}%`;
+      // Pin to the caller's garage; honor ?garage_id only when the session
+      // has none (platform admins). The reverse order let any tenant read
+      // another garage's customers by forging the query param.
       const results = await storage.searchCustomers(
-        (garage_id as string) || (req.user as any)?.garageId,
+        (req.user as any)?.garageId || (garage_id as string),
         searchPattern,
         pagination.limit,
       );
       return sendPaginated(res, results, results.length, pagination, pagination.explicit);
     }
-    const garageId = (garage_id as string) || (req.user as any)?.garageId;
+    const garageId = (req.user as any)?.garageId || (garage_id as string);
     const [data, total] = await Promise.all([
       storage.getCustomersPaginated(garageId, pagination.limit, pagination.offset),
       storage.countCustomers(garageId),
@@ -39,6 +42,12 @@ router.get('/customers/:id', isAuthenticated, async (req, res) => {
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
+    // Ownership check: a caller with a garage may only read records of that
+    // garage (404, not 403, to avoid confirming the record exists).
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && customer.garageId && customer.garageId !== sessionGarage) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
     res.json(customer);
   } catch (error) {
     console.error('Error fetching customer:', error);
@@ -46,7 +55,29 @@ router.get('/customers/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/vehicles', isAuthenticated, async (req, res) => {
+
+/**
+ * Sub-resource guard: the parent customer must belong to the caller's garage
+ * (404 on cross-garage access; garage-less platform admins pass).
+ */
+async function requireOwnCustomer(req: any, res: any, next: any) {
+  try {
+    const id = req.params.id || req.params.customerId;
+    const sessionGarage = (req.user as any)?.garageId;
+    if (sessionGarage && id) {
+      const customer = await storage.getCustomer(id);
+      if (!customer || (customer as any).garageId && (customer as any).garageId !== sessionGarage) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+    }
+    next();
+  } catch (e) {
+    console.error('Customer ownership check failed:', e);
+    res.status(500).json({ message: 'Failed to verify customer' });
+  }
+}
+
+router.get('/customers/:id/vehicles', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const vehicles = await storage.getCustomerVehicles(id);
@@ -57,7 +88,7 @@ router.get('/customers/:id/vehicles', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/job-cards', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/job-cards', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const jobCards = await storage.getCustomerJobCards(id);
@@ -68,7 +99,7 @@ router.get('/customers/:id/job-cards', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/invoices', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/invoices', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const invoices = await storage.getCustomerInvoices(id);
@@ -79,7 +110,7 @@ router.get('/customers/:id/invoices', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/payments', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/payments', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const payments = await storage.getCustomerPayments(id);
@@ -90,7 +121,7 @@ router.get('/customers/:id/payments', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:id/notes', isAuthenticated, async (req, res) => {
+router.get('/customers/:id/notes', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { id } = req.params;
     const notes = await storage.getCustomerNotes(id);
@@ -101,7 +132,7 @@ router.get('/customers/:id/notes', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/service-reminders', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const reminders = await storage.getCustomerServiceReminders(customerId);
@@ -112,7 +143,7 @@ router.get('/customers/:customerId/service-reminders', isAuthenticated, async (r
   }
 });
 
-router.get('/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/reviews', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const reviews = await storage.getCustomerServiceReviews(customerId);
@@ -123,7 +154,7 @@ router.get('/customers/:customerId/reviews', isAuthenticated, async (req, res) =
   }
 });
 
-router.get('/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+router.get('/customers/:customerId/signatures', isAuthenticated, requireOwnCustomer, async (req, res) => {
   try {
     const { customerId } = req.params;
     const signatures = await storage.getCustomerServiceSignatures(customerId);

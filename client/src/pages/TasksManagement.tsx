@@ -155,7 +155,7 @@ export function TasksManagement() {
                 placeholder={t('common.search', 'Search')}
                 value={searchQuery}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-10 border-gray-200 dark:border-salis-gray-dark"
+                className="ps-10 border-gray-200 dark:border-salis-gray-dark"
                 data-testid="input-search-tasks"
               />
             </div>
@@ -169,13 +169,13 @@ export function TasksManagement() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-salis-gray-dark">
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.taskId', 'Task ID')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.customerName', 'Customer Name')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.serviceType', 'Service Type')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.dueDateTime', 'Due Date/Time')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.priority', 'Priority')}</th>
-                  <th className="text-left py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.actions', 'Action')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.taskId', 'Task ID')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.customerName', 'Customer Name')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.serviceType', 'Service Type')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.status', 'Status')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.dueDateTime', 'Due Date/Time')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('tasks.priority', 'Priority')}</th>
+                  <th className="text-start py-3 px-4 font-['Poppins',Helvetica] font-medium text-sm text-gray-900 dark:text-white/60">{t('common.actions', 'Action')}</th>
                 </tr>
               </thead>
               <tbody>

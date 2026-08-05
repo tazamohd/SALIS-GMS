@@ -33,7 +33,7 @@ export default function VideoEstimates() {
 
   const approveEstimate = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video-estimates/${id}/approve`, "PATCH", {});
+      return await apiRequest("PATCH", `/api/video-estimates/${id}/approve`, {});
     },
     onSuccess: () => {
       toast({ title: t('videoEstimates.estimateApproved', 'Estimate approved'), description: t('videoEstimates.estimateApprovedDesc', 'Video estimate has been approved.') });
@@ -62,7 +62,7 @@ export default function VideoEstimates() {
     {
       header: t('videoEstimates.estimatedCost', 'Estimated Cost'),
       accessorKey: "estimatedCost",
-      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">${row.estimatedCost || 0}</span>,
+      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">SAR {row.estimatedCost || 0}</span>,
     },
     {
       header: t('common.status', 'Status'),
@@ -82,7 +82,7 @@ export default function VideoEstimates() {
               onClick={() => window.open(row.videoUrl, "_blank")}
               data-testid={`button-play-${row.id}`}
             >
-              <Play className="h-3 w-3 mr-1" />
+              <Play className="h-3 w-3 me-1" />
               {t('videoEstimates.watch', 'Watch')}
             </Button>
           )}
@@ -93,7 +93,7 @@ export default function VideoEstimates() {
               onClick={() => approveEstimate.mutate(row.id)}
               data-testid={`button-approve-${row.id}`}
             >
-              <CheckCircle className="h-3 w-3 mr-1" />
+              <CheckCircle className="h-3 w-3 me-1" />
               {t('videoEstimates.approve', 'Approve')}
             </Button>
           )}

@@ -74,7 +74,7 @@ export default function AIAutomation() {
 
   const estimateJobMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/estimate-job', 'POST', data);
+      return await apiRequest('POST', '/api/ai/estimate-job', data).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/job-estimations'] });
@@ -100,7 +100,7 @@ export default function AIAutomation() {
 
   const predictMaintenanceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/predict-maintenance', 'POST', data);
+      return await apiRequest('POST', '/api/ai/predict-maintenance', data).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });
@@ -126,7 +126,7 @@ export default function AIAutomation() {
 
   const recommendPartsMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/ai/recommend-parts', 'POST', data);
+      return await apiRequest('POST', '/api/ai/recommend-parts', data).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/parts-recommendations'] });
@@ -152,7 +152,7 @@ export default function AIAutomation() {
 
   const optimizeScheduleMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/ai/optimize-schedule', 'POST', { appointments: [], technicians: [] });
+      return await apiRequest('POST', '/api/ai/optimize-schedule', { appointments: [], technicians: [] }).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/schedule-optimizations'] });
@@ -177,7 +177,7 @@ export default function AIAutomation() {
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; conversationId?: string }) => {
-      return await apiRequest('/api/ai/chat', 'POST', data);
+      return await apiRequest('POST', '/api/ai/chat', data).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/chat-conversations'] });
@@ -201,7 +201,7 @@ export default function AIAutomation() {
 
   const acknowledgePredictionMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/ai/maintenance-predictions/${id}/acknowledge`, 'POST', {});
+      return await apiRequest('POST', `/api/ai/maintenance-predictions/${id}/acknowledge`, {}).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/ai/maintenance-predictions'] });
@@ -302,11 +302,11 @@ export default function AIAutomation() {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-[#64748B]">{t('aiAutomation.estimatedHours', 'Estimated Hours')}:</span>
-                          <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{est.estimatedHours || t('common.notAvailable', 'N/A')}</span>
+                          <span className="ms-2 font-medium text-[#0B1F3B] dark:text-white">{est.estimatedHours || t('common.notAvailable', 'N/A')}</span>
                         </div>
                         <div>
                           <span className="text-[#64748B]">{t('aiAutomation.estimatedCost', 'Estimated Cost')}:</span>
-                          <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">${est.estimatedCost || t('common.notAvailable', 'N/A')}</span>
+                          <span className="ms-2 font-medium text-[#0B1F3B] dark:text-white">SAR {est.estimatedCost || t('common.notAvailable', 'N/A')}</span>
                         </div>
                       </div>
                       {est.reasoning && (
@@ -529,7 +529,7 @@ export default function AIAutomation() {
                         <div className="flex flex-wrap gap-2 mt-2">
                           {rec.parts.map((part: any, idx: number) => (
                             <Badge key={idx} variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">
-                              <Package className="h-3 w-3 mr-1" />
+                              <Package className="h-3 w-3 me-1" />
                               {part.name}
                             </Badge>
                           ))}
@@ -562,7 +562,7 @@ export default function AIAutomation() {
                 data-testid="button-optimize-schedule"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
-                <Sparkles className="h-4 w-4 mr-2" />
+                <Sparkles className="h-4 w-4 me-2" />
                 {optimizeScheduleMutation.isPending ? t('aiAutomation.optimizing', 'Optimizing...') : t('aiAutomation.optimizeSchedule', 'Optimize Schedule')}
               </Button>
             </CardContent>
@@ -635,7 +635,7 @@ export default function AIAutomation() {
                 data-testid="button-send-chat"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
-                <MessageSquare className="h-4 w-4 mr-2" />
+                <MessageSquare className="h-4 w-4 me-2" />
                 {chatMutation.isPending ? t('aiAutomation.sending', 'Sending...') : t('aiAutomation.sendMessage', 'Send Message')}
               </Button>
             </CardContent>

@@ -298,7 +298,7 @@ export default function VehicleInspections() {
           data-testid="button-create-template"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('vehicles.createTemplate', 'Create Template')}
         </Button>
       </div>
@@ -360,7 +360,7 @@ export default function VehicleInspections() {
                       data-testid={`button-delete-template-${template.id}`} 
                       onClick={() => deleteTemplateMutation.mutate(template.id)}
                     >
-                      <Trash2 className="h-3 w-3 mr-1" />
+                      <Trash2 className="h-3 w-3 me-1" />
                       {t('common.delete', 'Delete')}
                     </Button>
                   </div>
@@ -385,7 +385,7 @@ export default function VehicleInspections() {
           data-testid="button-create-inspection"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('vehicles.newInspection', 'New Inspection')}
         </Button>
       </div>
@@ -427,13 +427,13 @@ export default function VehicleInspections() {
                   <div className="flex gap-2">
                     {inspection.estimateGenerated && (
                       <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                        <CheckCircle className="h-3 w-3 me-1" />
                         {t('vehicles.estimate', 'Estimate')}
                       </Badge>
                     )}
                     {inspection.customerNotified && (
                       <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0">
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                        <CheckCircle className="h-3 w-3 me-1" />
                         {t('vehicles.notified', 'Notified')}
                       </Badge>
                     )}

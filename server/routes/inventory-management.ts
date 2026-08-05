@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { db } from '../db';
 import { spareParts, sparePartInventories, purchaseOrders, purchaseOrderItems, suppliers, supplierPerformance } from '../../shared/schema';
 import { eq, sql, and, lte, desc } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
 // GET /api/inventory/overview — Stock summary
-router.get('/inventory/overview', async (req, res) => {
+router.get('/inventory/overview', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -21,7 +22,7 @@ router.get('/inventory/overview', async (req, res) => {
     // Total inventory value (stockQuantity * costPrice)
     const totalValueResult = await db
       .select({
-        value: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        value: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
       })
       .from(sparePartInventories)
       .where(garageId ? eq(sparePartInventories.garageId, garageId) : undefined);
@@ -68,7 +69,7 @@ router.get('/inventory/overview', async (req, res) => {
         category: spareParts.category,
         count: sql<number>`count(*)`,
         totalQty: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
       })
       .from(sparePartInventories)
       .innerJoin(spareParts, eq(sparePartInventories.sparePartId, spareParts.id))
@@ -100,7 +101,7 @@ router.get('/inventory/overview', async (req, res) => {
 });
 
 // GET /api/inventory/items — All inventory items with stock levels, reorder points, supplier info
-router.get('/inventory/items', async (req, res) => {
+router.get('/inventory/items', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -162,7 +163,7 @@ router.get('/inventory/items', async (req, res) => {
 });
 
 // GET /api/inventory/low-stock — Items below minimum threshold
-router.get('/inventory/low-stock', async (req, res) => {
+router.get('/inventory/low-stock', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -211,7 +212,7 @@ router.get('/inventory/low-stock', async (req, res) => {
 });
 
 // POST /api/inventory/reorder — Create purchase order for restocking
-router.post('/inventory/reorder', async (req, res) => {
+router.post('/inventory/reorder', isAuthenticated, async (req, res) => {
   try {
     const user = (req as any).user;
     const garageId = user?.garageId;
@@ -281,7 +282,7 @@ router.post('/inventory/reorder', async (req, res) => {
 });
 
 // GET /api/inventory/suppliers — Supplier list with performance metrics
-router.get('/inventory/suppliers', async (req, res) => {
+router.get('/inventory/suppliers', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -329,7 +330,7 @@ router.get('/inventory/suppliers', async (req, res) => {
 });
 
 // GET /api/inventory/turnover — Inventory turnover analysis by category
-router.get('/inventory/turnover', async (req, res) => {
+router.get('/inventory/turnover', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -338,7 +339,7 @@ router.get('/inventory/turnover', async (req, res) => {
         category: spareParts.category,
         totalItems: sql<number>`count(*)`,
         totalStock: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
         avgCostPrice: sql<string>`coalesce(avg(${sparePartInventories.costPrice}), 0)`,
       })
       .from(sparePartInventories)
@@ -371,7 +372,7 @@ router.get('/inventory/turnover', async (req, res) => {
 });
 
 // GET /api/inventory/valuation — Total inventory value
-router.get('/inventory/valuation', async (req, res) => {
+router.get('/inventory/valuation', isAuthenticated, async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -380,7 +381,7 @@ router.get('/inventory/valuation', async (req, res) => {
         category: spareParts.category,
         itemCount: sql<number>`count(*)`,
         totalQuantity: sql<number>`coalesce(sum(${sparePartInventories.stockQuantity}), 0)`,
-        totalCostValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.costPrice}), 0)`,
+        totalCostValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * coalesce(${sparePartInventories.costPrice}, ${sparePartInventories.purchasePrice})), 0)`,
         totalSellingValue: sql<string>`coalesce(sum(${sparePartInventories.stockQuantity} * ${sparePartInventories.sellingPrice}), 0)`,
       })
       .from(sparePartInventories)

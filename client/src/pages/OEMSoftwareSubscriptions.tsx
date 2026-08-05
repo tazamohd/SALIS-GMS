@@ -44,17 +44,17 @@ export default function OEMSoftwareSubscriptions() {
   });
 
   const createCatalogMutation = useMutation({
-    mutationFn: (data: InsertVendorCatalog) => apiRequest("/api/vendor-catalogs", "POST", data),
+    mutationFn: (data: InsertVendorCatalog) => apiRequest("POST", "/api/vendor-catalogs", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/vendor-catalogs"] }); setShowCatalogDialog(false); toast({ title: t('oem.catalogCreated', 'Catalog created') }); },
   });
 
   const createProductMutation = useMutation({
-    mutationFn: (data: InsertOemProduct) => apiRequest("/api/oem-products", "POST", data),
+    mutationFn: (data: InsertOemProduct) => apiRequest("POST", "/api/oem-products", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/oem-products"] }); setShowProductDialog(false); toast({ title: t('oem.productCreated', 'Product created') }); },
   });
 
   const createLicenseMutation = useMutation({
-    mutationFn: (data: InsertSubscriptionLicense) => apiRequest("/api/subscription-licenses", "POST", data),
+    mutationFn: (data: InsertSubscriptionLicense) => apiRequest("POST", "/api/subscription-licenses", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/subscription-licenses"] }); setShowLicenseDialog(false); toast({ title: t('oem.licenseCreated', 'License created') }); },
   });
 
@@ -109,7 +109,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-catalog"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addVendor', 'Add Vendor')}
         </Button>
       </div>
@@ -154,7 +154,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-product"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addProduct', 'Add Product')}
         </Button>
       </div>
@@ -201,7 +201,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-license"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addLicense', 'Add License')}
         </Button>
       </div>

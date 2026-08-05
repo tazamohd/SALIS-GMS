@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { JobCard, Garage, User as UserType, InsertJobCard, TechnicianProfile } from "@shared/schema";
+import { vehicleMakes } from "@shared/vehicleCatalogs";
 import { insertJobCardSchema } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -174,7 +175,7 @@ export function JobCards() {
       } else if (status === 'completed' && !jobCard.completedAt) {
         updates.completedAt = new Date().toISOString();
       }
-      return apiRequest("PUT", `/api/job-cards/${id}`, updates);
+      return apiRequest("PATCH", `/api/job-cards/${id}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ predicate: (query) => {
@@ -240,7 +241,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.garage', 'Garage')}</Label>
                 <Select value={filterGarageId} onValueChange={setFilterGarageId}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-garage">
-                    <Building2 className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Building2 className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -257,7 +258,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</Label>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-status">
-                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Filter className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,7 +275,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.priority', 'Priority')}</Label>
                 <Select value={filterPriority} onValueChange={setFilterPriority}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-priority">
-                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Filter className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -314,7 +315,7 @@ export function JobCards() {
               onClick={() => setIsCreateOpen(true)}
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {t('jobCards.create', 'Create Job Card')}
             </Button>
           </div>
@@ -386,7 +387,7 @@ export function JobCards() {
                         className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-view-details-${jobCard.id}`}
                       >
-                        <Eye className="w-4 h-4 mr-1" />
+                        <Eye className="w-4 h-4 me-1" />
                         {t('common.details', 'Details')}
                       </Button>
                       {jobCard.status !== 'completed' && jobCard.status !== 'cancelled' && (
@@ -463,13 +464,17 @@ export function JobCards() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="make" className="text-[#0B1F3B] dark:text-white">{t('jobCards.make', 'Make')} *</Label>
-                  <Input
+                  <select
                     id="make"
                     {...createForm.register("vehicleInfo.make")}
-                    placeholder="Toyota"
-                    className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid="input-vehicle-make"
-                  />
+                    className="w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                  >
+                    <option value="">{t('jobCards.selectMake', 'Select make')}</option>
+                    {vehicleMakes.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="model" className="text-[#0B1F3B] dark:text-white">{t('jobCards.model', 'Model')} *</Label>

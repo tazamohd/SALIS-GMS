@@ -497,7 +497,7 @@ export default function RoleManagement() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-add-role"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {t('roles.addRole', 'Add Role')}
             </Button>
           </CardHeader>
@@ -509,7 +509,7 @@ export default function RoleManagement() {
                   placeholder={t('roles.searchRoles', 'Search roles...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-roles"
                 />
               </div>
@@ -534,7 +534,7 @@ export default function RoleManagement() {
                       <category.icon className="w-4 h-4" style={{ color: category.color }} />
                     </div>
                     <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{category.name}</h3>
-                    <Badge variant="outline" className="ml-2">{category.roles.length}</Badge>
+                    <Badge variant="outline" className="ms-2">{category.roles.length}</Badge>
                   </div>
                   <div className="grid gap-3">
                     {category.roles.map(role => (
@@ -565,7 +565,7 @@ export default function RoleManagement() {
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
-                            <div className="text-right">
+                            <div className="text-end">
                               <div className="flex items-center gap-1 text-[#0A5ED7]">
                                 <Users className="w-4 h-4" />
                                 <span className="font-semibold">{role.userCount}</span>
@@ -650,7 +650,7 @@ export default function RoleManagement() {
                       value={newRole.nameAr}
                       onChange={(e) => setNewRole(prev => ({ ...prev, nameAr: e.target.value }))}
                       placeholder={t('roles.enterRoleNameAr', 'Enter Role Name Ar')}
-                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right"
+                      className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-end"
                       dir="rtl"
                       data-testid="input-role-name-ar"
                     />
@@ -745,7 +745,7 @@ export default function RoleManagement() {
                               />
                               <group.icon className="w-4 h-4 text-[#0A5ED7]" />
                               <span className="font-medium text-[#0B1F3B] dark:text-white">{group.name}</span>
-                              <Badge variant="outline" className="ml-auto mr-2">
+                              <Badge variant="outline" className="ms-auto me-2">
                                 {selectedCount}/{group.permissions.length}
                               </Badge>
                             </div>
@@ -831,7 +831,7 @@ export default function RoleManagement() {
                       <Input
                         value={editingRole.nameAr}
                         onChange={(e) => setEditingRole({ ...editingRole, nameAr: e.target.value })}
-                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right"
+                        className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-end"
                         dir="rtl"
                         data-testid="input-edit-role-name-ar"
                       />
@@ -925,7 +925,7 @@ export default function RoleManagement() {
                                 />
                                 <group.icon className="w-4 h-4 text-[#0A5ED7]" />
                                 <span className="font-medium text-[#0B1F3B] dark:text-white">{group.name}</span>
-                                <Badge variant="outline" className="ml-auto mr-2">
+                                <Badge variant="outline" className="ms-auto me-2">
                                   {selectedCount}/{group.permissions.length}
                                 </Badge>
                               </div>

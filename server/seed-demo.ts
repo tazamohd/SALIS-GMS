@@ -156,6 +156,26 @@ export async function seedDemo(): Promise<void> {
     );
   }
 
+  // 4. A garageless PLATFORM_ADMIN (super admin) so the platform control plane
+  //    (Approvals, subscriptions, provider management) is demoable out of the box.
+  const platformAdminEmail = "platform_admin@demo.salisauto.com";
+  const [existingPa] = await db.select().from(users).where(eq(users.email, platformAdminEmail)).limit(1);
+  const paValues = {
+    email: platformAdminEmail,
+    password: hashedPassword,
+    fullName: "Demo Platform Admin",
+    userType: "platform_admin",
+    role: "PLATFORM_ADMIN",
+    garageId: null as any,
+    isActive: true,
+  };
+  if (existingPa) {
+    await db.update(users).set(paValues).where(eq(users.id, existingPa.id));
+  } else {
+    await db.insert(users).values(paValues);
+  }
+  console.log(`  ✓ ${platformAdminEmail.padEnd(36)} role=PLATFORM_ADMIN (super admin)`);
+
   console.log("\n✅ Demo seeding complete.");
   console.log(`   Shared password for every demo account: ${password}`);
   console.log("   Log in with any email above, or use the demo quick-pick on the login page.\n");

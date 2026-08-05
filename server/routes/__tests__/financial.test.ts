@@ -28,9 +28,12 @@ describe('Financial API Routes', () => {
     it('should include date, description, amount in each entry', async () => {
       const res = await agent.get('/api/financial/general-ledger');
       if (res.status === 200 && res.body.entries?.length > 0) {
-        expect(res.body.entries[0]).toHaveProperty('date');
-        expect(res.body.entries[0]).toHaveProperty('description');
-        expect(res.body.entries[0]).toHaveProperty('amount');
+        const entry = res.body.entries[0];
+        expect(entry).toHaveProperty('date');
+        expect(entry).toHaveProperty('description');
+        // General ledger uses double-entry (debit/credit), not a single amount.
+        expect(entry).toHaveProperty('debit');
+        expect(entry).toHaveProperty('credit');
       }
     });
   });

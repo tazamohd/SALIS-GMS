@@ -182,7 +182,7 @@ export default function VehicleStorage() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white font-poppins"
           data-testid="button-create-assignment"
         >
-          <Car className="mr-2 h-4 w-4" />
+          <Car className="me-2 h-4 w-4" />
           {t('vehicles.assignVehicle', 'Assign Vehicle')}
         </Button>
       </div>
@@ -221,7 +221,7 @@ export default function VehicleStorage() {
                     <TableCell className="text-[#64748B]" data-testid={`text-end-${assignment.id}`}>
                       {assignment.endDate ? new Date(assignment.endDate).toLocaleDateString() : t('vehicles.ongoing', 'Ongoing')}
                     </TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-monthly-rate-${assignment.id}`}>${assignment.monthlyRate.toFixed(2)}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-monthly-rate-${assignment.id}`}>SAR {assignment.monthlyRate.toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge className={assignment.status === "active" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0" : "bg-[#64748B]/10 text-[#64748B] border-0"} data-testid={`badge-status-${assignment.id}`}>
                         {assignment.status}

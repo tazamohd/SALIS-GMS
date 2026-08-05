@@ -10,19 +10,24 @@ import { invoices, invoiceItems, users, garages } from '../../shared/schema';
 import { eq, and, gte, sql, count, sum } from 'drizzle-orm';
 import { generateZATCAQRCode, validateZATCACompliance } from '../../shared/zatcaUtils';
 import { formatDualCalendar, getCurrentHijriDate, isRamadan } from '../../shared/hijriUtils';
+import { isAuthenticated } from '../auth';
 import {
   generateEInvoice,
   submitToClearance,
+  generateComplianceQR,
+  ZATCA_INITIAL_PIH,
   type ZATCAPhase2Invoice,
   type ZATCALineItem,
 } from '../services/zatca-phase2';
+import { storage } from '../storage';
+import { isNotNull, desc } from 'drizzle-orm';
 
 const router = Router();
 
 // ---------------------------------------------------------------------------
 // GET /api/saudi/dashboard — Saudi compliance dashboard (aggregated view)
 // ---------------------------------------------------------------------------
-router.get('/saudi/dashboard', async (req: Request, res: Response) => {
+router.get('/saudi/dashboard', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -168,7 +173,7 @@ router.get('/saudi/dashboard', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // POST /api/saudi/zatca/validate-invoice/:id — Validate a specific invoice
 // ---------------------------------------------------------------------------
-router.post('/saudi/zatca/validate-invoice/:id', async (req: Request, res: Response) => {
+router.post('/saudi/zatca/validate-invoice/:id', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -229,7 +234,7 @@ router.post('/saudi/zatca/validate-invoice/:id', async (req: Request, res: Respo
 // ---------------------------------------------------------------------------
 // GET /api/saudi/zatca/qr/:invoiceId — Generate ZATCA QR code for an invoice
 // ---------------------------------------------------------------------------
-router.get('/saudi/zatca/qr/:invoiceId', async (req: Request, res: Response) => {
+router.get('/saudi/zatca/qr/:invoiceId', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -288,7 +293,7 @@ router.get('/saudi/zatca/qr/:invoiceId', async (req: Request, res: Response) => 
 // the real FATOORA clearance API. Either way the clearance result is persisted
 // back onto the invoice row.
 // ---------------------------------------------------------------------------
-router.post('/saudi/zatca/submit/:invoiceId', async (req: Request, res: Response) => {
+router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -383,9 +388,32 @@ router.post('/saudi/zatca/submit/:invoiceId', async (req: Request, res: Response
       paymentMethod: 'cash',
     };
 
-    // Generate the UBL e-invoice and submit for clearance (stub or real).
-    const ubl = generateEInvoice(zatcaInvoice);
-    const clearance = await submitToClearance(ubl);
+    // ICV: per-garage monotonic counter; PIH: hash of this garage's most
+    // recently ACCEPTED e-invoice (spec-defined constant for the first link).
+    // Ordered by clearance time — updatedAt is bumped by unrelated invoice
+    // mutations (payments etc.) and would corrupt the chain order. Note: a
+    // rejected submission still consumes an ICV; ZATCA tolerates counter
+    // gaps but not chain divergence.
+    const icv = await storage.nextDocNumber(user.garageId, 'zatca_icv');
+    const [prev] = await db
+      .select({ hash: invoices.zatcaInvoiceHash })
+      .from(invoices)
+      .where(and(
+        eq(invoices.garageId, user.garageId),
+        isNotNull(invoices.zatcaInvoiceHash),
+        isNotNull(invoices.zatcaClearedAt),
+      ))
+      .orderBy(desc(invoices.zatcaClearedAt))
+      .limit(1);
+    const pih = prev?.hash ?? ZATCA_INITIAL_PIH;
+
+    // Generate the UBL e-invoice and submit (clearance for standard,
+    // reporting for simplified — stub until ZATCA_CSID is configured).
+    const ubl = generateEInvoice(zatcaInvoice, icv, pih);
+    const clearance = await submitToClearance(ubl, '', zatcaInvoice.invoiceType);
+    // Local stamp QR: phase-2 signed (9 tags) when a signing key is
+    // configured, phase-1 otherwise. ZATCA-returned QR wins when present.
+    const localQr = generateComplianceQR(zatcaInvoice, ubl);
 
     const cleared = clearance.status === 'CLEARED' || clearance.status === 'REPORTED';
 
@@ -395,8 +423,10 @@ router.post('/saudi/zatca/submit/:invoiceId', async (req: Request, res: Response
       .set({
         zatcaClearanceStatus: clearance.status,
         zatcaClearanceId: clearance.clearanceId ?? null,
-        zatcaInvoiceHash: clearance.invoiceHash ?? ubl.hash,
-        zatcaQrCode: clearance.qrCode ?? null,
+        // A rejected/failed submission must NOT enter the hash chain: the
+        // next invoice's PIH may only reference an invoice ZATCA accepted.
+        zatcaInvoiceHash: cleared ? (clearance.invoiceHash ?? ubl.hash) : null,
+        zatcaQrCode: cleared ? (clearance.qrCode ?? (localQr.qrCode || null)) : null,
         zatcaClearedAt: cleared ? new Date() : null,
         updatedAt: new Date(),
       })
@@ -418,7 +448,7 @@ router.post('/saudi/zatca/submit/:invoiceId', async (req: Request, res: Response
 // ---------------------------------------------------------------------------
 // GET /api/saudi/vat/summary — VAT summary for a period
 // ---------------------------------------------------------------------------
-router.get('/saudi/vat/summary', async (req: Request, res: Response) => {
+router.get('/saudi/vat/summary', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -498,7 +528,7 @@ router.get('/saudi/vat/summary', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // GET /api/saudi/labor/compliance — Saudization / GOSI compliance (stub)
 // ---------------------------------------------------------------------------
-router.get('/saudi/labor/compliance', async (req: Request, res: Response) => {
+router.get('/saudi/labor/compliance', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -554,7 +584,7 @@ router.get('/saudi/labor/compliance', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // GET /api/saudi/hijri/today — Current Hijri date information
 // ---------------------------------------------------------------------------
-router.get('/saudi/hijri/today', async (_req: Request, res: Response) => {
+router.get('/saudi/hijri/today', isAuthenticated, async (_req: Request, res: Response) => {
   try {
     const hijriDate = getCurrentHijriDate();
     const now = new Date();

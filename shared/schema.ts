@@ -1,5 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
+  bigint,
   boolean,
   date,
   decimal,
@@ -8,6 +10,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -15,8 +18,16 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createSchemaFactory } from "drizzle-zod";
 import { z } from "zod";
+
+// JSON clients send timestamps as ISO strings; the plain factory derives
+// z.date() for timestamp columns and rejects every such request with a 400.
+// Coercing dates at the API boundary fixes that for all insert schemas at
+// once.
+const { createInsertSchema, createSelectSchema } = createSchemaFactory({
+  coerce: { date: true },
+});
 
 // Session storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
@@ -56,7 +67,32 @@ export const garages = pgTable("garages", {
   createdAt: timestamp("created_at").defaultNow(),
   // Subscription plan for feature gating: STARTER, PRO, ENTERPRISE
   subscriptionPlan: varchar("subscription_plan", { length: 50 }).default("STARTER"),
+  // Marketplace provider kind — this "business account" backs every provider
+  // type, not only auto-repair garages.
+  businessType: varchar("business_type", { length: 30 }).default("garage").notNull(), // garage | parts_store | insurance
+  // Public marketplace profile (C3).
+  description: text("description"),
+  phone: varchar("phone", { length: 50 }),
+  email: varchar("email", { length: 255 }),
+  address: text("address"),
+  photoUrl: text("photo_url"),
 });
+
+// Customer reviews of marketplace providers (C3). One review per customer per
+// provider (upsert semantics); only customers with a completed transaction may
+// review — enforced in the route.
+export const providerReviews = pgTable("provider_reviews", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  rating: integer("rating").notNull(), // 1..5
+  comment: text("comment"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  onePerCustomer: uniqueIndex("provider_reviews_provider_customer_unique").on(table.providerId, table.customerId),
+  providerIdx: index("provider_reviews_provider_idx").on(table.providerId),
+}));
 
 // Branches
 export const branches = pgTable("branches", {
@@ -91,6 +127,7 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
+  phoneVerifiedAt: timestamp("phone_verified_at"),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
   nationalId: varchar("national_id", { length: 50 }),
   isActive: boolean("is_active").default(true),
@@ -564,7 +601,7 @@ export const sparePartInventories = pgTable("spare_part_inventories", {
   purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 }),
   sellingPrice: decimal("selling_price", { precision: 10, scale: 2 }),
   costPrice: decimal("cost_price", { precision: 10, scale: 2 }),
-  currency: varchar("currency").default("USD"),
+  currency: varchar("currency").default("SAR"),
   purchaseTaxRate: decimal("purchase_tax_rate", {
     precision: 5,
     scale: 2,
@@ -1227,6 +1264,13 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  // ZATCA Phase 2 (Fatoora) clearance tracking.
+  // See migrations/0009_zatca_clearance.sql.
+  zatcaClearanceStatus: varchar("zatca_clearance_status", { length: 20 }),
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaClearedAt: timestamp("zatca_cleared_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1268,7 +1312,27 @@ export const payments = pgTable("payments", {
     .notNull()
     .references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
-});
+  // Multi-gateway payment layer (migration 0006). These columns existed only
+  // in the migration; drizzle silently dropped them from every insert, losing
+  // gateway/status/transaction-id and breaking webhook idempotency.
+  gateway: varchar("gateway", { length: 30 }), // moyasar, hyperpay, tap, tabby, tamara, paypal, stripe, manual
+  methodType: varchar("method_type", { length: 30 }),
+  status: varchar("status", { length: 20 }).default("completed"), // pending, completed, failed, refunded
+  currency: varchar("currency", { length: 3 }).default("SAR"),
+  gatewayTransactionId: varchar("gateway_transaction_id", { length: 255 }),
+  gatewayReference: varchar("gateway_reference", { length: 255 }),
+  processingFee: decimal("processing_fee", { precision: 10, scale: 2 }),
+  failureReason: text("failure_reason"),
+  gatewayMetadata: jsonb("gateway_metadata"),
+}, (table) => ({
+  // Exactly-once gateway settlement (deep-audit blocker B9): a duplicate
+  // (gateway, gateway_transaction_id) is impossible, so a retried webhook cannot
+  // double-credit an invoice. Partial so the many manual/pending rows that carry
+  // a NULL transaction id are unaffected. Mirrors migration 0011.
+  gatewayTxnUnique: uniqueIndex("payments_gateway_txn_unique")
+    .on(table.gateway, table.gatewayTransactionId)
+    .where(sql`${table.gatewayTransactionId} IS NOT NULL`),
+}));
 
 // Module 21: Notifications & Communication
 export const notifications = pgTable("notifications", {
@@ -1683,7 +1747,7 @@ export const pricingHistory = pgTable("pricing_history", {
   priceType: varchar("price_type", { length: 50 }).notNull(), // "purchase", "selling", "cost"
   oldPrice: decimal("old_price", { precision: 10, scale: 2 }),
   newPrice: decimal("new_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency").default("USD"),
+  currency: varchar("currency").default("SAR"),
   changeReason: varchar("change_reason", { length: 255 }), // "market_adjustment", "supplier_change", "promotion", "manual"
   notes: text("notes"),
   effectiveDate: timestamp("effective_date").defaultNow(),
@@ -2520,7 +2584,7 @@ export const accountingTransactions = pgTable("accounting_transactions", {
   externalId: varchar("external_id", { length: 255 }),
   transactionType: varchar("transaction_type", { length: 100 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   description: text("description"),
   transactionDate: timestamp("transaction_date").notNull(),
   syncStatus: varchar("sync_status", { length: 50 }).default("pending"),
@@ -2579,9 +2643,9 @@ export const auditLogs = pgTable("audit_logs", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: uuid("garage_id")
-    .references(() => garages.id)
-    .notNull(),
+  // Nullable: platform-admin actions are cross-tenant and belong to no
+  // single garage. See migrations/0010_audit_logs_nullable_garage.sql.
+  garageId: uuid("garage_id").references(() => garages.id),
   userId: varchar("user_id")
     .references(() => users.id)
     .notNull(),
@@ -2719,7 +2783,7 @@ export const userSettings = pgTable("user_settings", {
     .notNull()
     .unique(),
   language: varchar("language", { length: 10 }).default("en").notNull(),
-  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  currency: varchar("currency", { length: 3 }).default("SAR").notNull(),
   timezone: varchar("timezone", { length: 50 }).default("UTC"),
   dateFormat: varchar("date_format", { length: 20 }).default("MM/DD/YYYY"),
   timeFormat: varchar("time_format", { length: 10 }).default("12h"),
@@ -3319,7 +3383,9 @@ export const vehicleLocationHistory = pgTable("vehicle_location_history", {
 }, (table) => ({
   vehicleTimestampIdx: index("vehicle_location_history_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("vehicle_location_history_timestamp_idx").on(table.timestamp.desc()),
-  vehicleLatestIdx: uniqueIndex("vehicle_location_history_vehicle_latest_idx").on(table.vehicleId, table.timestamp.desc()).where(sql`timestamp >= NOW() - INTERVAL '1 hour'`),
+  // A "latest location" partial index keyed on NOW() cannot be created: Postgres
+  // requires index predicates to be IMMUTABLE. vehicleTimestampIdx above already
+  // covers the (vehicle, most-recent-first) lookup this was meant to serve.
 }));
 
 export const geofenceZones = pgTable("geofence_zones", {
@@ -3403,7 +3469,10 @@ export const geofenceEvents = pgTable("geofence_events", {
   geofenceTimestampIdx: index("geofence_events_geofence_timestamp_idx").on(table.geofenceZoneId, table.timestamp.desc()),
   vehicleTimestampIdx: index("geofence_events_vehicle_timestamp_idx").on(table.vehicleId, table.timestamp.desc()),
   timestampIdx: index("geofence_events_timestamp_idx").on(table.timestamp.desc()),
-  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false AND timestamp >= NOW() - INTERVAL '1 hour'`),
+  // The NOW() half of this predicate is dropped: index predicates must be
+  // IMMUTABLE. Filtering to unsent events is the part that makes the index
+  // selective; callers still bound the time range in the query itself.
+  pendingNotificationIdx: index("geofence_events_pending_notification_idx").on(table.notificationSent).where(sql`notification_sent = false`),
 }));
 
 export const fleetRoutes = pgTable("fleet_routes", {
@@ -3578,7 +3647,7 @@ export const supplierPriceList = pgTable("supplier_price_list", {
   partName: varchar("part_name", { length: 255 }).notNull(),
   partNumber: varchar("part_number", { length: 100 }),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   minimumOrderQuantity: integer("minimum_order_quantity").default(1),
   leadTimeDays: integer("lead_time_days"),
   availability: varchar("availability", { length: 50 }).default("in_stock"), // "in_stock", "limited", "out_of_stock", "discontinued"
@@ -5266,7 +5335,7 @@ export const marketplaceOrders = pgTable("marketplace_orders", {
   quantity: integer("quantity").notNull(),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   sellerId: varchar("seller_id"),
   sellerName: varchar("seller_name"),
   sellerRating: decimal("seller_rating", { precision: 3, scale: 2 }),
@@ -7155,7 +7224,7 @@ export const smartContracts = pgTable("smart_contracts", {
   partyB: varchar("party_b", { length: 255 }).notNull(),
   terms: jsonb("terms").notNull(),
   contractValue: decimal("contract_value", { precision: 15, scale: 2 }),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   status: varchar("status", { length: 50 }).default("draft"),
   deployedAt: timestamp("deployed_at"),
   executedAt: timestamp("executed_at"),
@@ -9471,7 +9540,7 @@ export const marketingAccounts = pgTable("marketing_accounts", {
   syncStatus: varchar("sync_status", { length: 50 }).default("never"), // "never", "syncing", "success", "failed"
   totalSpend: decimal("total_spend", { precision: 12, scale: 2 }).default("0.00"),
   monthlyBudget: decimal("monthly_budget", { precision: 12, scale: 2 }),
-  currency: varchar("currency", { length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
   notes: text("notes"),
   createdBy: varchar("created_by").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
@@ -9800,7 +9869,7 @@ export const hrDepartments = pgTable("hr_departments", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 50 }),
@@ -9818,7 +9887,7 @@ export const hrPositions = pgTable("hr_positions", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   title: varchar("title", { length: 255 }).notNull(),
   titleAr: varchar("title_ar", { length: 255 }),
@@ -9839,7 +9908,7 @@ export const hrEmployeeProfiles = pgTable("hr_employee_profiles", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   employeeNumber: varchar("employee_number", { length: 50 }),
   departmentId: uuid("department_id").references(() => hrDepartments.id),
   positionId: uuid("position_id").references(() => hrPositions.id),
@@ -9924,7 +9993,7 @@ export const hrLeaveTypes = pgTable("hr_leave_types", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   code: varchar("code", { length: 20 }),
@@ -9986,7 +10055,7 @@ export const hrJobPostings = pgTable("hr_job_postings", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   positionId: uuid("position_id").references(() => hrPositions.id),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -10064,7 +10133,7 @@ export const hrBenefitPlans = pgTable("hr_benefit_plans", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   nameAr: varchar("name_ar", { length: 255 }),
   type: varchar("type", { length: 100 }).notNull(), // "health_insurance", "life_insurance", "dental", "vision", "retirement", "housing", "transportation", "education", "other"
@@ -10153,7 +10222,7 @@ export const hrAnnouncements = pgTable("hr_announcements", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  garageId: varchar("garage_id").references(() => garages.id).notNull(),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   type: varchar("type", { length: 50 }).default("general"), // "general", "policy", "event", "holiday", "urgent"
@@ -10404,7 +10473,9 @@ export const loyaltyAccounts = pgTable("loyalty_accounts", {
   totalVisits: integer("total_visits").default(0),
   lastVisitDate: timestamp("last_visit_date"),
   referralCode: varchar("referral_code", { length: 50 }).unique(),
-  referredBy: uuid("referred_by").references(() => loyaltyAccounts.id),
+  // Self-reference: without the explicit return type the table's own type
+  // depends on itself and TypeScript falls back to `any`.
+  referredBy: uuid("referred_by").references((): AnyPgColumn => loyaltyAccounts.id),
   referralCount: integer("referral_count").default(0),
   birthdayMonth: integer("birthday_month"),
   preferredContactMethod: varchar("preferred_contact_method", { length: 50 }), // "email", "sms", "whatsapp"
@@ -10893,7 +10964,9 @@ export const insertPushNotificationSchema = createInsertSchema(pushNotifications
 
 export type NotificationPreference = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
-export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+// notification_preferences is keyed by user_id and has no id/createdAt/
+// updatedAt columns, so there is nothing to omit.
+export const insertNotificationPreferenceSchema = createInsertSchema(notificationPreferences);
 
 // Purchase Agent - Task Inbox
 export type PurchaseTask = typeof purchaseTasks.$inferSelect;
@@ -10939,3 +11012,599 @@ export const insertDeliveryTimelineEventSchema = createInsertSchema(deliveryTime
 export type LiveDeliveryStatus = typeof liveDeliveryStatuses.$inferSelect;
 export type InsertLiveDeliveryStatus = typeof liveDeliveryStatuses.$inferInsert;
 export const insertLiveDeliveryStatusSchema = createInsertSchema(liveDeliveryStatuses).omit({ id: true, createdAt: true, updatedAt: true });
+
+// ============================================================================
+// Schema-drift catch-up tables
+//
+// These 17 tables were created by migrations 0003-0008 but were never declared
+// here, so every route and storage method that touched them failed to compile.
+// Column definitions below mirror the migration DDL exactly:
+//   backup_history, currency_transactions, document_library_items,
+//   fleet_accounts, fleet_account_vehicles, fleet_maintenance_entries,
+//   hr_leave_request_entries, kiosk_tickets, mobile_devices, qc_inspections,
+//   qc_defects, scheduling_optimization_runs, subscriptions,
+//   supplier_parts_availability  -> 0003/0004
+//   vat_config, gosi_config                                    -> 0007
+//   gate_passes                                                -> 0008
+// ============================================================================
+
+export const backupHistory = pgTable("backup_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  backupRef: varchar("backup_ref", { length: 100 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  size: integer("size").notNull(),
+  totalRecords: integer("total_records").default(0).notNull(),
+  tableCounts: jsonb("table_counts").default({}).notNull(),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const currencyTransactions = pgTable("currency_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5): this table was structurally tenant-less,
+  // so any list over it returned every garage's rows. Nullable for legacy rows;
+  // new rows are pinned to the session garage by enforceTenantOnBody + the routes.
+  garageId: uuid("garage_id"),
+  txDate: timestamp("tx_date").defaultNow().notNull(),
+  description: text("description").notNull(),
+  originalAmount: decimal("original_amount", { precision: 18, scale: 4 }).notNull(),
+  originalCurrency: varchar("original_currency", { length: 10 }).notNull(),
+  rateUsed: decimal("rate_used", { precision: 18, scale: 6 }).notNull(),
+  sarEquivalent: decimal("sar_equivalent", { precision: 18, scale: 4 }).notNull(),
+  type: varchar("type", { length: 30 }).notNull(),
+  reference: varchar("reference", { length: 100 }),
+  customerName: varchar("customer_name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("currency_transactions_garage_idx").on(table.garageId),
+}));
+
+export const documentLibraryItems = pgTable("document_library_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5) — see currency_transactions above.
+  garageId: uuid("garage_id"),
+  name: varchar("name", { length: 500 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  size: integer("size").default(0).notNull(),
+  uploadedBy: varchar("uploaded_by", { length: 255 }),
+  tags: jsonb("tags").default([]).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("document_library_items_garage_idx").on(table.garageId),
+}));
+
+export const fleetAccounts = pgTable("fleet_accounts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Tenant scope (deep-audit blocker B5) — see currency_transactions above.
+  garageId: uuid("garage_id"),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  contactPerson: varchar("contact_person", { length: 255 }),
+  contactEmail: varchar("contact_email", { length: 255 }),
+  contactPhone: varchar("contact_phone", { length: 50 }),
+  contractStatus: varchar("contract_status", { length: 30 }).default("pending").notNull(),
+  contractStart: date("contract_start"),
+  contractEnd: date("contract_end"),
+  monthlySpend: decimal("monthly_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0").notNull(),
+  discountPercentage: integer("discount_percentage").default(0).notNull(),
+  paymentTerms: varchar("payment_terms", { length: 50 }).default("Net 30"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  // Tenant lookup index; mirrors migration 0012 so drizzle-kit push keeps it.
+  garageIdx: index("fleet_accounts_garage_idx").on(table.garageId),
+}));
+
+export const fleetAccountVehicles = pgTable("fleet_account_vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  fleetAccountId: uuid("fleet_account_id").notNull(),
+  plateNumber: varchar("plate_number", { length: 50 }).notNull(),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }).notNull(),
+  year: integer("year").notNull(),
+  vin: varchar("vin", { length: 50 }),
+  status: varchar("status", { length: 30 }).default("active").notNull(),
+  mileage: integer("mileage").default(0).notNull(),
+  lastServiceDate: date("last_service_date"),
+  lastServiceType: varchar("last_service_type", { length: 100 }),
+  nextServiceDue: date("next_service_due"),
+  nextServiceType: varchar("next_service_type", { length: 100 }),
+  avgMonthlyCost: decimal("avg_monthly_cost", { precision: 12, scale: 2 }).default("0"),
+  totalSpend: decimal("total_spend", { precision: 14, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const fleetMaintenanceEntries = pgTable("fleet_maintenance_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  externalRef: varchar("external_ref", { length: 50 }).unique(),
+  vehicleId: uuid("vehicle_id").notNull(),
+  fleetAccountId: uuid("fleet_account_id").notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  scheduledDate: date("scheduled_date").notNull(),
+  status: varchar("status", { length: 30 }).default("scheduled").notNull(),
+  estimatedCost: decimal("estimated_cost", { precision: 12, scale: 2 }).default("0").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const hrLeaveRequestEntries = pgTable("hr_leave_request_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id", { length: 100 }).notNull(),
+  employeeName: varchar("employee_name", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  days: integer("days").notNull(),
+  reason: text("reason"),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  approvedBy: varchar("approved_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const kioskTickets = pgTable("kiosk_tickets", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketNumber: varchar("ticket_number", { length: 20 }).notNull(),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  vehiclePlate: varchar("vehicle_plate", { length: 50 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 255 }),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  status: varchar("status", { length: 20 }).default("waiting").notNull(),
+  type: varchar("type", { length: 20 }).default("walk-in").notNull(),
+  appointmentId: varchar("appointment_id", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const mobileDevices = pgTable("mobile_devices", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull(),
+  deviceName: varchar("device_name", { length: 200 }).notNull(),
+  deviceType: varchar("device_type", { length: 30 }).notNull(),
+  assignedTo: varchar("assigned_to"),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  batteryLevel: integer("battery_level"),
+  lastSync: timestamp("last_sync"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const qcInspections = pgTable("qc_inspections", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobCardRef: varchar("job_card_ref", { length: 100 }).notNull(),
+  vehicleInfo: varchar("vehicle_info", { length: 500 }).notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  inspector: varchar("inspector", { length: 255 }),
+  inspectorId: varchar("inspector_id", { length: 100 }),
+  result: varchar("result", { length: 20 }).default("pending").notNull(),
+  notes: text("notes"),
+  checklistId: varchar("checklist_id", { length: 50 }),
+  completedItems: integer("completed_items").default(0).notNull(),
+  totalItems: integer("total_items").default(0).notNull(),
+  inspectionTimeMinutes: integer("inspection_time_minutes").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const qcDefects = pgTable("qc_defects", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  inspectionId: uuid("inspection_id"),
+  jobCardRef: varchar("job_card_ref", { length: 100 }),
+  description: text("description").notNull(),
+  severity: varchar("severity", { length: 20 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  status: varchar("status", { length: 30 }).default("open").notNull(),
+  resolutionNotes: text("resolution_notes"),
+  reportedBy: varchar("reported_by", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
+export const schedulingOptimizationRuns = pgTable("scheduling_optimization_runs", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  runAt: timestamp("run_at").defaultNow().notNull(),
+  appointmentsOptimized: integer("appointments_optimized").default(0).notNull(),
+  efficiencyGain: varchar("efficiency_gain", { length: 20 }),
+  technicianUtilization: jsonb("technician_utilization").default({}).notNull(),
+  suggestions: jsonb("suggestions").default([]).notNull(),
+  assignments: jsonb("assignments").default([]).notNull(),
+  report: jsonb("report").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().unique(),
+  plan: varchar("plan", { length: 20 }).default("STARTER").notNull(),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAt: timestamp("cancel_at"),
+  canceledAt: timestamp("canceled_at"),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 120 }).unique(),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 120 }),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// supplier_parts_availability was already declared earlier in this file, so it
+// is deliberately not repeated here despite also originating in migration 0003.
+
+// Platform SuperAdmin — garage onboarding applications. A public garage signup
+// creates a PENDING application; a PLATFORM_ADMIN reviews and approves (which
+// provisions the garage + owner user + trial subscription) or rejects it.
+export const garageApplications = pgTable("garage_applications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // Provider kind — this table backs onboarding for all business types.
+  providerType: varchar("provider_type", { length: 30 }).default("garage").notNull(), // garage | parts_store | insurance
+  businessName: varchar("business_name", { length: 255 }).notNull(),
+  ownerName: varchar("owner_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  requestedPlan: varchar("requested_plan", { length: 20 }).default("STARTER").notNull(),
+  notes: text("notes"),
+  // Official government identifiers, verified before activation.
+  taxNumber: varchar("tax_number", { length: 20 }), // ZATCA VAT: 15 digits, starts with 3
+  commercialRegistration: varchar("commercial_registration", { length: 20 }), // Sejel/CR: 10 digits
+  isDemo: boolean("is_demo").default(false).notNull(), // trial account, verification bypassed
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  // Automated verification outcome (format + registry check).
+  verificationStatus: varchar("verification_status", { length: 20 }).default("unverified").notNull(), // unverified | verified | failed | manual_review
+  verificationDetails: jsonb("verification_details"),
+  autoApproved: boolean("auto_approved").default(false).notNull(),
+  // Applicant-set password, hashed at submit, used to provision the owner login.
+  ownerPasswordHash: varchar("owner_password_hash", { length: 255 }),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  provisionedGarageId: uuid("provisioned_garage_id").references(() => garages.id),
+  provisionedUserId: varchar("provisioned_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("garage_applications_status_idx").on(table.status),
+}));
+
+// Customer marketplace — a platform customer's own vehicles (garage-agnostic).
+// Kept separate from the garage-scoped `vehicles` table so a marketplace
+// customer can manage their fleet before/without belonging to any one garage.
+export const customerVehicles = pgTable("customer_vehicles", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  make: varchar("make", { length: 100 }).notNull(),
+  model: varchar("model", { length: 100 }),
+  year: integer("year"),
+  vin: varchar("vin", { length: 100 }),
+  licensePlate: varchar("license_plate", { length: 50 }),
+  color: varchar("color", { length: 50 }),
+  mileage: integer("mileage"),
+  engineType: varchar("engine_type", { length: 100 }),
+  transmissionType: varchar("transmission_type", { length: 50 }),
+  // Insurance (optional — captured from a scanned card or entered manually).
+  insuranceProvider: varchar("insurance_provider", { length: 255 }),
+  insurancePolicyNumber: varchar("insurance_policy_number", { length: 100 }),
+  insuranceExpiry: timestamp("insurance_expiry"),
+  // Scanned document references (registration/license + insurance).
+  licenseDocUrl: text("license_doc_url"),
+  insuranceDocUrl: text("insurance_doc_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("customer_vehicles_customer_idx").on(table.customerId),
+}));
+
+// Per-garage sequential document counters (ZATCA prefers gapless sequences per
+// seller). One row per (garage, docType); incremented atomically via upsert.
+export const docSequences = pgTable("doc_sequences", {
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  docType: varchar("doc_type", { length: 30 }).notNull(),
+  nextValue: bigint("next_value", { mode: "number" }).default(0).notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.garageId, table.docType] }),
+}));
+
+// Customer marketplace — the offerings a provider presents (products for parts
+// stores, plans for insurers, extra services for garages). Garages also keep
+// their service_templates; the directory surfaces both.
+export const providerOfferings = pgTable("provider_offerings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  kind: varchar("kind", { length: 20 }).default("service").notNull(), // service | product | insurance_plan
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR"),
+  attributes: jsonb("attributes"), // type-specific extras (sku, coverage, etc.)
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  providerIdx: index("provider_offerings_provider_idx").on(table.providerId),
+}));
+
+// Customer marketplace — a product order a customer places with a parts store.
+// Prices/names are snapshotted per line so the order stands if the offering
+// changes later.
+export const providerOrders = pgTable("provider_orders", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | confirmed | fulfilled | declined | cancelled
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).default("0").notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  notes: text("notes"),
+  providerNotes: text("provider_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("provider_orders_customer_idx").on(table.customerId),
+  providerIdx: index("provider_orders_provider_idx").on(table.providerId),
+}));
+
+export const providerOrderItems = pgTable("provider_order_items", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderId: uuid("order_id").notNull().references(() => providerOrders.id, { onDelete: "cascade" }),
+  offeringId: uuid("offering_id").references(() => providerOfferings.id),
+  name: varchar("name", { length: 255 }).notNull(), // snapshot
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).default("0").notNull(), // snapshot
+  quantity: integer("quantity").default(1).notNull(),
+});
+
+// Customer marketplace — an insurance-quote request against an insurer's plan,
+// tied to one of the customer's vehicles (snapshotted).
+export const insuranceQuotes = pgTable("insurance_quotes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  offeringId: uuid("offering_id").references(() => providerOfferings.id),
+  planName: varchar("plan_name", { length: 255 }), // snapshot
+  customerVehicleId: uuid("customer_vehicle_id").references(() => customerVehicles.id),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYear: integer("vehicle_year"),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | quoted | accepted | declined | cancelled
+  quotedPremium: decimal("quoted_premium", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  quoteNotes: text("quote_notes"),
+  validUntil: timestamp("valid_until"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("insurance_quotes_customer_idx").on(table.customerId),
+  providerIdx: index("insurance_quotes_provider_idx").on(table.providerId),
+}));
+
+// Customer marketplace — a booking a customer makes with a provider for a
+// service, optionally tied to one of their saved vehicles. Vehicle/service
+// details are snapshotted so the record stands even if the source changes.
+export const marketplaceBookings = pgTable("marketplace_bookings", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull().references(() => users.id),
+  providerId: uuid("provider_id").notNull().references(() => garages.id),
+  serviceTemplateId: uuid("service_template_id").references(() => serviceTemplates.id),
+  customerVehicleId: uuid("customer_vehicle_id").references(() => customerVehicles.id),
+  // Snapshots at booking time.
+  serviceName: varchar("service_name", { length: 255 }),
+  vehicleMake: varchar("vehicle_make", { length: 100 }),
+  vehicleModel: varchar("vehicle_model", { length: 100 }),
+  vehicleYear: integer("vehicle_year"),
+  vehiclePlate: varchar("vehicle_plate", { length: 50 }),
+  preferredDate: timestamp("preferred_date"),
+  notes: text("notes"),
+  // requested | accepted | declined | completed | cancelled
+  status: varchar("status", { length: 20 }).default("requested").notNull(),
+  providerNotes: text("provider_notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("marketplace_bookings_customer_idx").on(table.customerId),
+  providerIdx: index("marketplace_bookings_provider_idx").on(table.providerId),
+  statusIdx: index("marketplace_bookings_status_idx").on(table.status),
+}));
+
+// Platform SuperAdmin — subscription change requests. A garage requests a plan
+// change; a PLATFORM_ADMIN reviews and approves (applies the plan) or rejects.
+export const subscriptionRequests = pgTable("subscription_requests", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  currentPlan: varchar("current_plan", { length: 20 }),
+  requestedPlan: varchar("requested_plan", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  requestedBy: varchar("requested_by").references(() => users.id),
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("subscription_requests_status_idx").on(table.status),
+  garageIdx: index("subscription_requests_garage_idx").on(table.garageId),
+}));
+
+export const vatConfig = pgTable("vat_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  countryCode: varchar("country_code", { length: 2 }).default("SA").notNull(),
+  vatRate: doublePrecision("vat_rate").default(0.15).notNull(),
+  vatRegistrationNumber: varchar("vat_registration_number", { length: 50 }),
+  companyNameEn: varchar("company_name_en", { length: 255 }),
+  companyNameAr: varchar("company_name_ar", { length: 255 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  effectiveFrom: timestamp("effective_from").defaultNow().notNull(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gosiConfig = pgTable("gosi_config", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  saudiEmployeeRate: doublePrecision("saudi_employee_rate").default(0.0975).notNull(),
+  saudiEmployerRate: doublePrecision("saudi_employer_rate").default(0.1175).notNull(),
+  nonSaudiEmployeeRate: doublePrecision("non_saudi_employee_rate").default(0).notNull(),
+  nonSaudiEmployerRate: doublePrecision("non_saudi_employer_rate").default(0.02).notNull(),
+  maxContributionSalary: decimal("max_contribution_salary", { precision: 12, scale: 2 })
+    .default("45000")
+    .notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  effectiveFrom: timestamp("effective_from").defaultNow().notNull(),
+  effectiveTo: timestamp("effective_to"),
+  changedBy: varchar("changed_by", { length: 255 }),
+  changeReason: text("change_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gatePasses = pgTable("gate_passes", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  invoiceId: uuid("invoice_id")
+    .references(() => invoices.id, { onDelete: "cascade" })
+    .notNull(),
+  garageId: uuid("garage_id").references(() => garages.id),
+  customerId: varchar("customer_id"),
+  vehicleId: uuid("vehicle_id"),
+  passCode: varchar("pass_code", { length: 20 }).notNull().unique(),
+  status: varchar("status", { length: 20 }).default("active").notNull(),
+  issuedBy: varchar("issued_by"),
+  issuedAt: timestamp("issued_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"),
+  usedAt: timestamp("used_at"),
+  usedBy: varchar("used_by"),
+  notes: text("notes"),
+});
+
+// Types + insert schemas for the drift catch-up tables above.
+export type BackupHistory = typeof backupHistory.$inferSelect;
+export type InsertBackupHistory = typeof backupHistory.$inferInsert;
+export const insertBackupHistorySchema = createInsertSchema(backupHistory).omit({ id: true, createdAt: true });
+
+export type CurrencyTransaction = typeof currencyTransactions.$inferSelect;
+export type InsertCurrencyTransaction = typeof currencyTransactions.$inferInsert;
+export const insertCurrencyTransactionSchema = createInsertSchema(currencyTransactions).omit({ id: true, createdAt: true });
+
+export type DocumentLibraryItem = typeof documentLibraryItems.$inferSelect;
+export type InsertDocumentLibraryItem = typeof documentLibraryItems.$inferInsert;
+export const insertDocumentLibraryItemSchema = createInsertSchema(documentLibraryItems).omit({ id: true, createdAt: true });
+
+export type FleetAccount = typeof fleetAccounts.$inferSelect;
+export type InsertFleetAccount = typeof fleetAccounts.$inferInsert;
+export const insertFleetAccountSchema = createInsertSchema(fleetAccounts).omit({ id: true, createdAt: true });
+
+export type FleetAccountVehicle = typeof fleetAccountVehicles.$inferSelect;
+export type InsertFleetAccountVehicle = typeof fleetAccountVehicles.$inferInsert;
+export const insertFleetAccountVehicleSchema = createInsertSchema(fleetAccountVehicles).omit({ id: true, createdAt: true });
+
+export type FleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferSelect;
+export type InsertFleetMaintenanceEntry = typeof fleetMaintenanceEntries.$inferInsert;
+export const insertFleetMaintenanceEntrySchema = createInsertSchema(fleetMaintenanceEntries).omit({ id: true, createdAt: true });
+
+export type HrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferSelect;
+export type InsertHrLeaveRequestEntry = typeof hrLeaveRequestEntries.$inferInsert;
+export const insertHrLeaveRequestEntrySchema = createInsertSchema(hrLeaveRequestEntries).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type KioskTicket = typeof kioskTickets.$inferSelect;
+export type InsertKioskTicket = typeof kioskTickets.$inferInsert;
+export const insertKioskTicketSchema = createInsertSchema(kioskTickets).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type MobileDevice = typeof mobileDevices.$inferSelect;
+export type InsertMobileDevice = typeof mobileDevices.$inferInsert;
+// garageId is omitted because the route always takes it from the session —
+// requiring it here made every valid client payload a 400.
+export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({ id: true, garageId: true, createdAt: true, updatedAt: true });
+
+export type QcInspection = typeof qcInspections.$inferSelect;
+export type InsertQcInspection = typeof qcInspections.$inferInsert;
+export const insertQcInspectionSchema = createInsertSchema(qcInspections).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type QcDefect = typeof qcDefects.$inferSelect;
+export type InsertQcDefect = typeof qcDefects.$inferInsert;
+export const insertQcDefectSchema = createInsertSchema(qcDefects).omit({ id: true, createdAt: true });
+
+export type SchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferSelect;
+export type InsertSchedulingOptimizationRun = typeof schedulingOptimizationRuns.$inferInsert;
+export const insertSchedulingOptimizationRunSchema = createInsertSchema(schedulingOptimizationRuns).omit({ id: true, createdAt: true });
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;
+export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type SubscriptionRequest = typeof subscriptionRequests.$inferSelect;
+export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert;
+
+export type MarketplaceBooking = typeof marketplaceBookings.$inferSelect;
+export type InsertMarketplaceBooking = typeof marketplaceBookings.$inferInsert;
+
+export type ProviderOffering = typeof providerOfferings.$inferSelect;
+export type InsertProviderOffering = typeof providerOfferings.$inferInsert;
+
+export type ProviderReview = typeof providerReviews.$inferSelect;
+export type InsertProviderReview = typeof providerReviews.$inferInsert;
+
+export type ProviderOrder = typeof providerOrders.$inferSelect;
+export type InsertProviderOrder = typeof providerOrders.$inferInsert;
+export type ProviderOrderItem = typeof providerOrderItems.$inferSelect;
+export type InsertProviderOrderItem = typeof providerOrderItems.$inferInsert;
+export type InsuranceQuote = typeof insuranceQuotes.$inferSelect;
+export type InsertInsuranceQuote = typeof insuranceQuotes.$inferInsert;
+export const insertProviderOfferingSchema = createInsertSchema(providerOfferings).omit({
+  id: true,
+  providerId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CustomerVehicle = typeof customerVehicles.$inferSelect;
+export type InsertCustomerVehicle = typeof customerVehicles.$inferInsert;
+// Applicant-supplied fields only; ownership + timestamps are server-set.
+export const insertCustomerVehicleSchema = createInsertSchema(customerVehicles).omit({
+  id: true,
+  customerId: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GarageApplication = typeof garageApplications.$inferSelect;
+export type InsertGarageApplication = typeof garageApplications.$inferInsert;
+// Public garage signup — only the applicant-supplied fields; review/provisioning
+// columns are set server-side, never by the untrusted request body.
+export const insertGarageApplicationSchema = createInsertSchema(garageApplications).omit({
+  id: true,
+  status: true,
+  verificationStatus: true,
+  verificationDetails: true,
+  autoApproved: true,
+  ownerPasswordHash: true,
+  isDemo: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  rejectionReason: true,
+  provisionedGarageId: true,
+  provisionedUserId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VatConfig = typeof vatConfig.$inferSelect;
+export type InsertVatConfig = typeof vatConfig.$inferInsert;
+export const insertVatConfigSchema = createInsertSchema(vatConfig).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GosiConfig = typeof gosiConfig.$inferSelect;
+export type InsertGosiConfig = typeof gosiConfig.$inferInsert;
+export const insertGosiConfigSchema = createInsertSchema(gosiConfig).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type GatePass = typeof gatePasses.$inferSelect;
+export type InsertGatePass = typeof gatePasses.$inferInsert;
+export const insertGatePassSchema = createInsertSchema(gatePasses).omit({ id: true, issuedAt: true });

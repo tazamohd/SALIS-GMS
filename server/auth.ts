@@ -10,6 +10,19 @@ import { db } from "./db";
 import { garages } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
+// Passport declares `Express.User` as an empty interface, so every
+// `req.user.garageId` read was a type error even though deserializeUser
+// puts the full row there. Describe what is actually attached: the users
+// row with `password` stripped, plus the subscription plan resolved from
+// the owning garage.
+declare global {
+  namespace Express {
+    interface User extends Omit<import("@shared/schema").User, "password"> {
+      subscriptionPlan?: string;
+    }
+  }
+}
+
 const SALT_ROUNDS = 10;
 
 export function validateSessionSecret(): string {
@@ -60,7 +73,13 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      // Secure (HTTPS-only) by default in production. SESSION_COOKIE_SECURE
+      // explicitly overrides it so a plain-HTTP demo (e.g. local docker) can log
+      // in; leave it unset for real HTTPS deployments.
+      secure: process.env.SESSION_COOKIE_SECURE !== undefined
+        ? process.env.SESSION_COOKIE_SECURE === "true"
+        : process.env.NODE_ENV === "production",
+      sameSite: "lax", // mitigates cross-site request forgery on the session cookie
       maxAge: sessionTtl,
     },
   });
@@ -142,8 +161,17 @@ export async function setupAuth(app: Express) {
   });
 }
 
-// Feature flag for auth bypass during development
+// Feature flag for auth bypass during development.
+// Fail closed: this flag disables authentication entirely, so it must never be
+// reachable in production. Hard-fail at startup rather than silently honoring
+// it if it is somehow set in a production build (audit 3.1, medium).
 const AUTH_BYPASS_ENABLED = process.env.AUTH_BYPASS === 'true';
+if (AUTH_BYPASS_ENABLED && process.env.NODE_ENV === 'production') {
+  throw new Error(
+    "AUTH_BYPASS=true is set in a production environment. This disables all " +
+    "authentication and must never be enabled in production. Unset AUTH_BYPASS.",
+  );
+}
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {

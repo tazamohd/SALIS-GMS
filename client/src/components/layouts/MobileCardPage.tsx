@@ -54,7 +54,7 @@ export function MobileCardPage({
             )}
           </div>
           {headerActions && (
-            <div className="ml-4 flex-shrink-0">
+            <div className="ms-4 flex-shrink-0">
               {headerActions}
             </div>
           )}

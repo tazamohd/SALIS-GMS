@@ -26,7 +26,7 @@ export default function CustomerReviewsRatings() {
 
   const respondMutation = useMutation({
     mutationFn: async ({ id, response }: any) => {
-      return await apiRequest(`/api/reviews/${id}/respond`, "POST", { response });
+      return await apiRequest("POST", `/api/reviews/${id}/respond`, { response });
     },
     onSuccess: () => {
       toast({ title: "Response posted", description: "Your response has been published." });
@@ -255,7 +255,7 @@ export default function CustomerReviewsRatings() {
                       }}
                       data-testid={`button-respond-${review.id || index}`}
                     >
-                      <MessageCircle className="h-4 w-4 mr-2" />
+                      <MessageCircle className="h-4 w-4 me-2" />
                       {t('customers.reviews.respondToReview', 'Respond to Review')}
                     </Button>
                   )}

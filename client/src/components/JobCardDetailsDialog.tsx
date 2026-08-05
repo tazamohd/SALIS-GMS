@@ -86,7 +86,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
             className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent"
             data-testid={`button-view-job-${jobCardId}`}
           >
-            <Eye className="h-4 w-4 mr-1" />
+            <Eye className="h-4 w-4 me-1" />
             {t('common.viewDetails', 'View Details')}
           </Button>
         )}
@@ -110,7 +110,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
           </div>
         ) : (
           <ScrollArea className="max-h-[70vh]">
-            <div className="space-y-4 pr-4">
+            <div className="space-y-4 pe-4">
               <Card className="bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]">
                 <CardContent className="p-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -121,8 +121,8 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                     <div>
                       <p className="text-xs text-[#64748B]">{t('common.status', 'Status')}</p>
                       <Badge variant="outline" className={getStatusColor(jobDetails.status)}>
-                        {jobDetails.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1" />}
-                        {jobDetails.status === 'in_progress' && <Clock className="w-3 h-3 mr-1" />}
+                        {jobDetails.status === 'completed' && <CheckCircle className="w-3 h-3 me-1" />}
+                        {jobDetails.status === 'in_progress' && <Clock className="w-3 h-3 me-1" />}
                         {jobDetails.status}
                       </Badge>
                     </div>
@@ -174,19 +174,19 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
               <Tabs defaultValue="description" className="w-full">
                 <TabsList className="bg-[#F1F5F9] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
                   <TabsTrigger value="description" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                    <ClipboardList className="w-4 h-4 mr-1" />
+                    <ClipboardList className="w-4 h-4 me-1" />
                     {t('common.description', 'Description')}
                   </TabsTrigger>
                   <TabsTrigger value="diagnostics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                    <Activity className="w-4 h-4 mr-1" />
+                    <Activity className="w-4 h-4 me-1" />
                     {t('diagnostics.title', 'Diagnostics')} ({jobDetails.diagnostics?.length || 0})
                   </TabsTrigger>
                   <TabsTrigger value="recommendations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                    <Lightbulb className="w-4 h-4 mr-1" />
+                    <Lightbulb className="w-4 h-4 me-1" />
                     {t('recommendations.title', 'Advice')} ({jobDetails.recommendations?.length || 0})
                   </TabsTrigger>
                   <TabsTrigger value="invoices" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                    <FileText className="w-4 h-4 mr-1" />
+                    <FileText className="w-4 h-4 me-1" />
                     {t('invoices.title', 'Invoices')} ({jobDetails.invoices?.length || 0})
                   </TabsTrigger>
                 </TabsList>
@@ -316,7 +316,7 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                                     {inv.items.slice(0, 3).map((item: any, idx: number) => (
                                       <div key={idx} className="flex justify-between text-sm">
                                         <span className="text-[#64748B]">{item.description}</span>
-                                        <span className="text-[#0B1F3B] dark:text-white">${Number(item.total || item.amount || 0).toFixed(2)}</span>
+                                        <span className="text-[#0B1F3B] dark:text-white">SAR {Number(item.total || item.amount || 0).toFixed(2)}</span>
                                       </div>
                                     ))}
                                     {inv.items.length > 3 && (
@@ -327,11 +327,11 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                               )}
 
                               <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0] dark:border-[#232A36]">
-                                <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">${Number(inv.totalAmount || 0).toFixed(2)}</span>
+                                <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">SAR {Number(inv.totalAmount || 0).toFixed(2)}</span>
                                 <div className="flex gap-2">
                                   <InvoiceDetailsDialog invoiceId={inv.id}>
                                     <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-invoice-${inv.id}`}>
-                                      <Eye className="h-4 w-4 mr-1" />
+                                      <Eye className="h-4 w-4 me-1" />
                                       {t('common.view', 'View')}
                                     </Button>
                                   </InvoiceDetailsDialog>
@@ -345,8 +345,8 @@ export function JobCardDetailsDialog({ jobCardId, children }: JobCardDetailsDial
                                     {inv.payments.map((payment: any) => (
                                       <div key={payment.id} className="flex items-center justify-between text-sm bg-[#F8FAFC] dark:bg-[#0E1117] p-2 rounded">
                                         <div>
-                                          <span className="text-[#0B1F3B] dark:text-white">${Number(payment.amount).toFixed(2)}</span>
-                                          <span className="text-[#64748B] ml-2">({payment.paymentMethod})</span>
+                                          <span className="text-[#0B1F3B] dark:text-white">SAR {Number(payment.amount).toFixed(2)}</span>
+                                          <span className="text-[#64748B] ms-2">({payment.paymentMethod})</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                           <span className="text-xs text-[#64748B]">{new Date(payment.paymentDate).toLocaleDateString()}</span>

@@ -48,7 +48,7 @@ export function AddToolDialog({ open, onOpenChange }: AddToolDialogProps) {
 
   const createToolMutation = useMutation({
     mutationFn: async (data: AddToolFormData) => {
-      return await apiRequest('/api/tools', 'POST', data);
+      return await apiRequest('POST', '/api/tools', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tools'] });
@@ -216,7 +216,7 @@ export function AddToolDialog({ open, onOpenChange }: AddToolDialogProps) {
               >
                 {createToolMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                     Adding...
                   </>
                 ) : (

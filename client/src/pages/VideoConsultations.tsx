@@ -23,7 +23,7 @@ export default function VideoConsultations() {
 
   const createConsultation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/video/consultations", "POST", data);
+      return await apiRequest("POST", "/api/video/consultations", data).then((r) => r.json());
     },
     onSuccess: () => {
       toast({ title: t('videoConsultations.consultationScheduled', 'Consultation scheduled'), description: t('videoConsultations.meetingLinkSent', 'Video meeting link sent to customer.') });
@@ -34,7 +34,7 @@ export default function VideoConsultations() {
 
   const startMeeting = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video/consultations/${id}/start`, "POST", {});
+      return await apiRequest("POST", `/api/video/consultations/${id}/start`, {}).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       if (data.meetingUrl) {
@@ -160,7 +160,7 @@ export default function VideoConsultations() {
                 onClick={() => startMeeting.mutate(row.id)}
                 data-testid={`button-start-${row.id}`}
               >
-                <PlayCircle className="h-3 w-3 mr-1" />
+                <PlayCircle className="h-3 w-3 me-1" />
                 {t('common.start', 'Start')}
               </Button>
               <Button

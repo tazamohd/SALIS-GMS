@@ -41,7 +41,7 @@ export default function Integrations() {
 
   const toggleConnectionMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return await apiRequest('PATCH', `/api/integrations/connections/${id}`, { isActive });
+      return await apiRequest('PATCH', `/api/integrations/connections/${id}`, { isActive }).then((r) => r.json());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/connections'] });
@@ -61,7 +61,7 @@ export default function Integrations() {
 
   const syncAccountingMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('POST', '/api/integrations/accounting/sync', undefined);
+      return await apiRequest('POST', '/api/integrations/accounting/sync', undefined).then((r) => r.json());
     },
     onSuccess: async (res) => {
       const result = await res.json();
@@ -89,9 +89,7 @@ export default function Integrations() {
 
   const obdScanMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/integrations/obd/scan', {
-        method: 'POST',
-      });
+      return await apiRequest('POST', '/api/integrations/obd/scan').then((r) => r.json());
     },
     onSuccess: (result) => {
       if (result.success) {
@@ -209,7 +207,7 @@ export default function Integrations() {
                           className="border-[#E2E8F0] dark:border-[#232A36]"
                           data-testid="button-sync-accounting"
                         >
-                          <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
+                          <RefreshCw className={`h-4 w-4 me-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
                           {t('integrations.sync', 'Sync')}
                         </Button>
                       )}
@@ -222,7 +220,7 @@ export default function Integrations() {
                           className="border-[#E2E8F0] dark:border-[#232A36]"
                           data-testid="button-scan-obd"
                         >
-                          <Activity className={`h-4 w-4 mr-2 ${obdScanMutation.isPending ? 'animate-spin' : ''}`} />
+                          <Activity className={`h-4 w-4 me-2 ${obdScanMutation.isPending ? 'animate-spin' : ''}`} />
                           {t('integrations.scan', 'Scan')}
                         </Button>
                       )}
@@ -364,7 +362,7 @@ export default function Integrations() {
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                 data-testid="button-sync-all-accounting"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 me-2 ${syncAccountingMutation.isPending ? 'animate-spin' : ''}`} />
                 {t('integrations.syncAll', 'Sync All')}
               </Button>
             </div>
@@ -396,7 +394,7 @@ export default function Integrations() {
                             {new Date(transaction.transactionDate).toLocaleDateString()}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="font-semibold text-[#0B1F3B] dark:text-white">
                             {transaction.currency} {transaction.amount}
                           </p>

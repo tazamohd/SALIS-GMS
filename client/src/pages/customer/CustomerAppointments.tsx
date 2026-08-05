@@ -99,7 +99,7 @@ export function CustomerAppointments() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
               data-testid="button-book-first-appointment"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Book Your First Appointment
             </Button>
           </CardContent>

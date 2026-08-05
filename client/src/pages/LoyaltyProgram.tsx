@@ -354,12 +354,12 @@ export default function LoyaltyProgram() {
             placeholder={t('loyalty.searchMembers', 'Search members...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-members"
           />
         </div>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-add-member">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('loyalty.addMember', 'Add Member')}
         </Button>
       </div>
@@ -389,7 +389,7 @@ export default function LoyaltyProgram() {
                     {member.tierName}
                   </Badge>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="font-bold text-[#0A5ED7]">{member.currentPoints.toLocaleString()} {t('loyalty.pts', 'pts')}</p>
                   <p className="text-sm text-[#64748B]">
                     {member.pointsToNextTier > 0 
@@ -405,7 +405,7 @@ export default function LoyaltyProgram() {
                     onClick={() => setViewingMember(member)}
                     data-testid={`button-view-member-${member.id}`}
                   >
-                    <Eye className="w-4 h-4 mr-1" />
+                    <Eye className="w-4 h-4 me-1" />
                     {t('common.view', 'View')}
                   </Button>
                 </div>
@@ -504,7 +504,7 @@ export default function LoyaltyProgram() {
           onClick={() => setIsOfferDialogOpen(true)} 
           data-testid="button-add-offer"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('loyalty.addOffer', 'Add Offer')}
         </Button>
       </div>
@@ -566,7 +566,7 @@ export default function LoyaltyProgram() {
                     }}
                     data-testid={`button-edit-offer-${offer.id}`}
                   >
-                    <Edit className="w-4 h-4 mr-1" />
+                    <Edit className="w-4 h-4 me-1" />
                     {t('common.edit', 'Edit')}
                   </Button>
                   <Button 
@@ -576,7 +576,7 @@ export default function LoyaltyProgram() {
                     onClick={() => setViewingOffer({ ...offer, ...(offerEdits[offer.id] || {}) })}
                     data-testid={`button-view-offer-${offer.id}`}
                   >
-                    <Eye className="w-4 h-4 mr-1" />
+                    <Eye className="w-4 h-4 me-1" />
                     {t('common.view', 'View')}
                   </Button>
                 </div>

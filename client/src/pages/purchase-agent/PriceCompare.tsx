@@ -158,7 +158,7 @@ export default function PurchaseAgentPriceCompare() {
                   placeholder="Search parts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search"
                 />
               </div>
@@ -209,7 +209,7 @@ export default function PurchaseAgentPriceCompare() {
                         </p>
                       </div>
                       {bestPrice && (
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm text-[#64748B]">Best Price</p>
                           <p className="text-lg font-bold text-green-600">
                             ${bestPrice.unitPrice}
@@ -247,7 +247,7 @@ export default function PurchaseAgentPriceCompare() {
                                 </span>
                                 {index === 0 && (
                                   <Badge variant="outline" className="text-green-600 border-green-600">
-                                    <TrendingDown className="h-3 w-3 mr-1" />
+                                    <TrendingDown className="h-3 w-3 me-1" />
                                     Best
                                   </Badge>
                                 )}

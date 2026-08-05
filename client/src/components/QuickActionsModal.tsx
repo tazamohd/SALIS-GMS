@@ -240,7 +240,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
               placeholder="Search actions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#94A3B8] dark:placeholder:text-[#6B7280]"
+              className="ps-10 border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#94A3B8] dark:placeholder:text-[#6B7280]"
               data-testid="input-quick-actions-search"
               autoFocus
             />
@@ -262,7 +262,7 @@ export function QuickActionsModal({ open, onOpenChange }: QuickActionsModalProps
                   <button
                     key={action.id}
                     onClick={() => handleActionClick(action.path)}
-                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors text-left"
+                    className="w-full flex items-start gap-4 px-4 py-3 rounded-lg hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors text-start"
                     data-testid={`button-${action.id}`}
                   >
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-r from-[#0A5ED7]/20 to-[#0BB3FF]/20 flex items-center justify-center">

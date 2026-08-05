@@ -168,7 +168,7 @@ export default function CustomerLTVAnalysis() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-[#64748B]">{t('customers.ltv.avgLTV', 'Avg LTV')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">$51,600</h3>
+              <h3 className="text-2xl font-bold mt-2 text-[#0B1F3B] dark:text-white">SAR 51,600</h3>
               <p className="text-sm text-[#0A5ED7] mt-1">+8.5% vs last year</p>
             </div>
             <DollarSign className="h-12 w-12 text-[#0A5ED7]" />
@@ -236,7 +236,7 @@ export default function CustomerLTVAnalysis() {
               placeholder={t('customers.searchPlaceholder', 'Search customers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-search-customers"
             />
           </div>
@@ -259,22 +259,22 @@ export default function CustomerLTVAnalysis() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-[#64748B]">
                   <div>
-                    <span className="font-medium">Revenue:</span> ${customer.totalRevenue.toLocaleString()}
+                    <span className="font-medium">Revenue:</span> SAR {customer.totalRevenue.toLocaleString()}
                   </div>
                   <div>
                     <span className="font-medium">Visits:</span> {customer.visits}
                   </div>
                   <div>
-                    <span className="font-medium">Avg Order:</span> ${customer.avgOrderValue.toLocaleString()}
+                    <span className="font-medium">Avg Order:</span> SAR {customer.avgOrderValue.toLocaleString()}
                   </div>
                   <div>
                     <span className="font-medium">Last Visit:</span> {new Date(customer.lastVisit).toLocaleDateString()}
                   </div>
                 </div>
               </div>
-              <div className="text-right ml-4">
+              <div className="text-end ms-4">
                 <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
-                  ${customer.predictedLTV.toLocaleString()}
+                  SAR {customer.predictedLTV.toLocaleString()}
                 </p>
                 <p className="text-xs text-[#64748B]">Predicted LTV</p>
                 <p className={`text-sm font-medium mt-1 ${getRiskColor(customer.retentionRisk)}`}>
@@ -308,7 +308,7 @@ export default function CustomerLTVAnalysis() {
                 <div>
                   <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{customer.name}</h3>
                   <p className="text-sm text-[#64748B] mt-1">
-                    LTV: ${customer.predictedLTV.toLocaleString()} | {customer.visits} visits
+                    LTV: SAR {customer.predictedLTV.toLocaleString()} | {customer.visits} visits
                   </p>
                   <p className="text-sm text-[#0A5ED7] mt-2 font-medium">
                     ✓ {customer.recommendedAction}

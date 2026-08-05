@@ -168,7 +168,7 @@ export default function EquityManagement() {
               SAR {totalEquity.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-[#0A5ED7] mt-1">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
+              <ArrowUpRight className="h-3 w-3 me-1" />
               {t('equity.fromLastYear', '+5.4% from last year')}
             </div>
           </CardContent>
@@ -363,7 +363,7 @@ export default function EquityManagement() {
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-capital">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('equity.addEntry', 'Add Entry')}
                 </Button>
               </DialogTrigger>
@@ -525,7 +525,7 @@ export default function EquityManagement() {
                   <p className="font-medium text-[#0B1F3B] dark:text-white">Mohammed Al-Salem</p>
                   <p className="text-sm text-[#64748B]">{t('equity.founderCEO', 'Founder & CEO')}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="font-bold text-[#0A5ED7]">60%</p>
                   <p className="text-sm text-[#64748B]">{t('equity.shares', '1,200 shares')}</p>
                 </div>
@@ -535,7 +535,7 @@ export default function EquityManagement() {
                   <p className="font-medium text-[#0B1F3B] dark:text-white">Ahmed Al-Salem</p>
                   <p className="text-sm text-[#64748B]">{t('equity.coFounder', 'Co-Founder')}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="font-bold text-[#0A5ED7]">40%</p>
                   <p className="text-sm text-[#64748B]">{t('equity.shares', '800 shares')}</p>
                 </div>

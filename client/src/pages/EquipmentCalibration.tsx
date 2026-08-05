@@ -128,7 +128,7 @@ export default function EquipmentCalibration() {
                       {record.calibrationType || t('calibration.standardCalibration', 'Standard Calibration')}
                     </p>
                   </div>
-                  <div className="text-right mr-4">
+                  <div className="text-end me-4">
                     <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">
                       {t('calibration.due', 'Due')}: {record.nextCalibrationDue ? new Date(record.nextCalibrationDue).toLocaleDateString() : t('common.notAvailable', 'N/A')}
                     </p>

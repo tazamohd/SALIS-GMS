@@ -127,7 +127,7 @@ export default function AuditTrail() {
           </Badge>
         </div>
         <Button onClick={() => seedMutation.mutate()} disabled={seedMutation.isPending} variant="outline" size="sm">
-          <Database className="w-4 h-4 mr-2" />
+          <Database className="w-4 h-4 me-2" />
           Seed Demo Data
         </Button>
       </div>
@@ -293,13 +293,13 @@ export default function AuditTrail() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b bg-muted/50">
-                        <th className="text-left p-3 font-medium">Timestamp</th>
-                        <th className="text-left p-3 font-medium">User</th>
-                        <th className="text-left p-3 font-medium">Action</th>
-                        <th className="text-left p-3 font-medium">Resource</th>
-                        <th className="text-left p-3 font-medium">Details</th>
-                        <th className="text-left p-3 font-medium">Severity</th>
-                        <th className="text-left p-3 font-medium">IP Address</th>
+                        <th className="text-start p-3 font-medium">Timestamp</th>
+                        <th className="text-start p-3 font-medium">User</th>
+                        <th className="text-start p-3 font-medium">Action</th>
+                        <th className="text-start p-3 font-medium">Resource</th>
+                        <th className="text-start p-3 font-medium">Details</th>
+                        <th className="text-start p-3 font-medium">Severity</th>
+                        <th className="text-start p-3 font-medium">IP Address</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -316,7 +316,7 @@ export default function AuditTrail() {
                           </td>
                           <td className="p-3">
                             <span className="capitalize">{entry.resource.replace(/_/g, " ")}</span>
-                            <span className="text-muted-foreground ml-1 text-xs">({entry.resourceId})</span>
+                            <span className="text-muted-foreground ms-1 text-xs">({entry.resourceId})</span>
                           </td>
                           <td className="p-3 max-w-[300px] truncate">{entry.details}</td>
                           <td className="p-3">
@@ -501,7 +501,7 @@ export default function AuditTrail() {
                           <p className="text-xs text-muted-foreground">{entry.details}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-xs text-muted-foreground">{new Date(entry.timestamp).toLocaleString()}</p>
                         <p className="text-xs font-mono text-muted-foreground">{entry.ipAddress}</p>
                       </div>

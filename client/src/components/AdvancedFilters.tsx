@@ -124,7 +124,7 @@ export function AdvancedFilters({ garageId, module, onApplyFilter, currentFilter
           disabled={!currentFilter}
           data-testid="button-save-filter"
         >
-          <Save className="h-4 w-4 mr-2" />
+          <Save className="h-4 w-4 me-2" />
           Save Current Filter
         </Button>
       </div>

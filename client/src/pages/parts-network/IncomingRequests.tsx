@@ -153,7 +153,7 @@ export default function IncomingRequests() {
             placeholder="Search by part, request ID, or garage name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
@@ -248,7 +248,7 @@ export default function IncomingRequests() {
                       <div className="flex flex-wrap items-center gap-2 mb-1">
                         <h3 className="font-bold text-lg text-[#0B1F3B] dark:text-white">{request.partName}</h3>
                         <Badge className={getUrgencyColor(request.urgency)}>
-                          {request.urgency === "urgent" && <AlertCircle className="h-3 w-3 mr-1" />}
+                          {request.urgency === "urgent" && <AlertCircle className="h-3 w-3 me-1" />}
                           {request.urgency}
                         </Badge>
                         {request.hasResponded && (
@@ -314,7 +314,7 @@ export default function IncomingRequests() {
                         }
                         data-testid={`btn-respond-${request.id}`}
                       >
-                        <Send className="h-4 w-4 mr-2" />
+                        <Send className="h-4 w-4 me-2" />
                         {request.hasResponded ? "Update Quote" : "Send Quote"}
                       </Button>
                     </Link>

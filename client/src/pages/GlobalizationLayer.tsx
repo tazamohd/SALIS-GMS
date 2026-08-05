@@ -51,22 +51,22 @@ export default function GlobalizationLayer() {
   });
 
   const createLocaleMutation = useMutation({
-    mutationFn: (data: InsertLocale) => apiRequest("/api/locales", "POST", data),
+    mutationFn: (data: InsertLocale) => apiRequest("POST", "/api/locales", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/locales"] }); setShowLocaleDialog(false); toast({ title: t('globalization.localeCreated', 'Locale created') }); },
   });
 
   const createTranslationMutation = useMutation({
-    mutationFn: (data: InsertTranslationResource) => apiRequest("/api/translation-resources", "POST", data),
+    mutationFn: (data: InsertTranslationResource) => apiRequest("POST", "/api/translation-resources", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/translation-resources"] }); setShowTranslationDialog(false); toast({ title: t('globalization.translationCreated', 'Translation created') }); },
   });
 
   const createCurrencyMutation = useMutation({
-    mutationFn: (data: InsertCurrencyRate) => apiRequest("/api/currency-rates", "POST", data),
+    mutationFn: (data: InsertCurrencyRate) => apiRequest("POST", "/api/currency-rates", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/currency-rates"] }); setShowCurrencyDialog(false); toast({ title: t('globalization.currencyRateCreated', 'Currency rate created') }); },
   });
 
   const createTaxMutation = useMutation({
-    mutationFn: (data: InsertTaxRegion) => apiRequest("/api/tax-regions", "POST", data),
+    mutationFn: (data: InsertTaxRegion) => apiRequest("POST", "/api/tax-regions", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tax-regions"] }); setShowTaxDialog(false); toast({ title: t('globalization.taxRegionCreated', 'Tax region created') }); },
   });
 
@@ -75,7 +75,7 @@ export default function GlobalizationLayer() {
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.languageLocales', 'Language Locales')}</h2>
         <Button onClick={() => { localeForm.reset(); setShowLocaleDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-locale">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('globalization.addLocale', 'Add Locale')}
         </Button>
       </div>
@@ -116,7 +116,7 @@ export default function GlobalizationLayer() {
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.translationResources', 'Translation Resources')}</h2>
         <Button onClick={() => { translationForm.reset(); setShowTranslationDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-translation">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('globalization.addTranslation', 'Add Translation')}
         </Button>
       </div>
@@ -151,7 +151,7 @@ export default function GlobalizationLayer() {
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.currencyExchangeRates', 'Currency Exchange Rates')}</h2>
         <Button onClick={() => { currencyForm.reset(); setShowCurrencyDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-currency">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('globalization.addRate', 'Add Rate')}
         </Button>
       </div>
@@ -192,7 +192,7 @@ export default function GlobalizationLayer() {
       <div className="flex justify-between items-center">
         <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('globalization.taxRegions', 'Tax Regions')}</h2>
         <Button onClick={() => { taxForm.reset(); setShowTaxDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-tax">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('globalization.addTaxRegion', 'Add Tax Region')}
         </Button>
       </div>
@@ -359,7 +359,7 @@ export default function GlobalizationLayer() {
               <FormField control={currencyForm.control} name="fromCurrency" render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('globalization.fromCurrency', 'From Currency')}</FormLabel>
-                  <FormControl><Input {...field} placeholder="USD" /></FormControl>
+                  <FormControl><Input {...field} placeholder="SAR" /></FormControl>
                 </FormItem>
               )} />
               <FormField control={currencyForm.control} name="toCurrency" render={({ field }) => (

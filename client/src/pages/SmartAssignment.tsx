@@ -33,7 +33,7 @@ export function SmartAssignment() {
 
   const recommendationsMutation = useMutation({
     mutationFn: async (jobId: string) => {
-      return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {});
+      return await apiRequest("POST", `/api/assignments/recommend/${jobId}`, {}).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       setRecommendations(data.recommendations || []);
@@ -50,7 +50,7 @@ export function SmartAssignment() {
 
   const assignMutation = useMutation({
     mutationFn: async (params: { jobCardId: string; technicianId: string; aiRecommendationId?: string }) => {
-      return await apiRequest("POST", "/api/assignments/assign", params);
+      return await apiRequest("POST", "/api/assignments/assign", params).then((r) => r.json());
     },
     onSuccess: () => {
       toast({
@@ -242,7 +242,7 @@ export function SmartAssignment() {
                         className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                         data-testid={`button-assign-${rec.technicianId}`}
                       >
-                        <CheckCircle className="h-4 w-4 mr-2" />
+                        <CheckCircle className="h-4 w-4 me-2" />
                         {assignMutation.isPending ? t('smartAssignment.assigning', 'Assigning...') : t('smartAssignment.assignToJob', 'Assign to Job')}
                       </Button>
                     </CardContent>

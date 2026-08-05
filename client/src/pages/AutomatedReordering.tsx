@@ -70,11 +70,11 @@ export default function AutomatedReordering() {
   const [selectedTimeframe, setSelectedTimeframe] = useState("30d");
 
   const { data: forecasts = [], isLoading: loadingForecasts } = useQuery<InventoryForecast[]>({
-    queryKey: ['/api/inventory/forecasts', selectedTimeframe],
+    queryKey: ['/api/inventory-forecasts', selectedTimeframe],
   });
 
   const { data: rules = [], isLoading: loadingRules } = useQuery<ReorderRule[]>({
-    queryKey: ['/api/inventory/reorder-rules'],
+    queryKey: ['/api/auto-reorder/rules'],
   });
 
   const { data: apiPendingOrders, isFetched: pendingOrdersFetched, isError: pendingOrdersError } = useQuery<any[]>({
@@ -285,7 +285,7 @@ export default function AutomatedReordering() {
             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-lg shadow-[#0A5ED7]/40 hover:shadow-[#0A5ED7]/60 hover:scale-105 transition-all duration-300"
             data-testid="button-run-forecast"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${runForecastMutation.isPending ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 me-2 ${runForecastMutation.isPending ? 'animate-spin' : ''}`} />
             {t('autoReorder.runForecast', 'Run Forecast')}
           </Button>
         </CardHeader>
@@ -362,7 +362,7 @@ export default function AutomatedReordering() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-xs text-[#64748B]">{t('autoReorder.aiConfidence', 'AI Confidence')}</p>
                         <p className="text-sm font-semibold text-[#0B1F3B] dark:text-white">{confidence}%</p>
                       </div>
@@ -379,7 +379,7 @@ export default function AutomatedReordering() {
                       </div>
                       {isCritical && (
                         <Badge className="bg-[#F97316] text-white border-0 animate-pulse">
-                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          <AlertTriangle className="w-3 h-3 me-1" />
                           {t('autoReorder.critical', 'Critical')}
                         </Badge>
                       )}
@@ -585,7 +585,7 @@ export default function AutomatedReordering() {
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                 data-testid="button-add-reorder-rule"
               >
-                <Settings className="w-4 h-4 mr-2" />
+                <Settings className="w-4 h-4 me-2" />
                 {t('autoReorder.addRule', 'Add Rule')}
               </Button>
             </DialogTrigger>
@@ -865,7 +865,7 @@ export default function AutomatedReordering() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="font-bold text-[#0A5ED7]">SAR {order.estimatedCost?.toLocaleString()}</p>
                       <Badge 
                         className={currentStatus === 'approved' 
@@ -1083,7 +1083,7 @@ export default function AutomatedReordering() {
                 <CardTitle className="text-lg text-[#0B1F3B] dark:text-white flex items-center gap-2">
                   {t('autoReorder.forecastPerformance', 'Forecast Performance')}
                   <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">
-                    <Activity className="w-3 h-3 mr-1" />
+                    <Activity className="w-3 h-3 me-1" />
                     {t('common.live', 'Live')}
                   </Badge>
                 </CardTitle>
@@ -1095,7 +1095,7 @@ export default function AutomatedReordering() {
                 {t('common.export', 'Export')}
               </Button>
               <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-refresh-analytics">
-                <RefreshCw className="w-4 h-4 mr-1" />
+                <RefreshCw className="w-4 h-4 me-1" />
                 {t('common.refresh', 'Refresh')}
               </Button>
             </div>

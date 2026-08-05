@@ -203,7 +203,7 @@ export default function SalesManagement() {
               SAR {totalRevenue.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-green-600 dark:text-green-400 mt-1">
-              <ArrowUpRight className="h-3 w-3 mr-1" />
+              <ArrowUpRight className="h-3 w-3 me-1" />
               {t('salesManagement.fromLastMonth', '+12.5% from last month')}
             </div>
           </CardContent>
@@ -353,7 +353,7 @@ export default function SalesManagement() {
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-add-sale">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('salesManagement.newSale', 'New Sale')}
                 </Button>
               </DialogTrigger>
@@ -505,7 +505,7 @@ export default function SalesManagement() {
                 placeholder={t('salesManagement.searchByCustomerOrInvoice', 'Search by customer or invoice...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-sales"
               />
             </div>
@@ -520,7 +520,7 @@ export default function SalesManagement() {
               </SelectContent>
             </Select>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-sales">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('common.export', 'Export')}
             </Button>
           </div>

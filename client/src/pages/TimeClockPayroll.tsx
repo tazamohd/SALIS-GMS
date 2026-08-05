@@ -29,7 +29,7 @@ export default function TimeClockPayroll() {
 
   const clockInMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/timeclock/clock-in", "POST", {
+      return apiRequest("POST", "/api/timeclock/clock-in", {
         timestamp: new Date().toISOString(),
       });
     },
@@ -44,7 +44,7 @@ export default function TimeClockPayroll() {
 
   const clockOutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/timeclock/clock-out", "POST", {
+      return apiRequest("POST", "/api/timeclock/clock-out", {
         timestamp: new Date().toISOString(),
       });
     },
@@ -59,7 +59,7 @@ export default function TimeClockPayroll() {
 
   const calculatePayrollMutation = useMutation({
     mutationFn: async (periodId: string) => {
-      return apiRequest(`/api/payroll/calculate/${periodId}`, "POST", {});
+      return apiRequest("POST", `/api/payroll/calculate/${periodId}`, {});
     },
     onSuccess: () => {
       toast({ title: t('payroll.calculated', 'Payroll Calculated'), description: t('payroll.calculatedSuccess', 'Payroll has been calculated successfully') });
@@ -81,9 +81,9 @@ export default function TimeClockPayroll() {
   const statsContent = (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {[
-        { label: t('payroll.periodGross', 'Period Gross'), value: `$${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-emerald-600 dark:text-emerald-400", testId: "text-period-gross" },
-        { label: t('payroll.deductions', 'Deductions'), value: `$${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#F97316]", testId: "text-deductions" },
-        { label: t('payroll.netPay', 'Net Pay'), value: `$${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#0A5ED7]", testId: "text-net-pay" },
+        { label: t('payroll.periodGross', 'Period Gross'), value: `SAR ${(currentPeriod.totalGrossPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-emerald-600 dark:text-emerald-400", testId: "text-period-gross" },
+        { label: t('payroll.deductions', 'Deductions'), value: `SAR ${(currentPeriod.totalDeductions || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#F97316]", testId: "text-deductions" },
+        { label: t('payroll.netPay', 'Net Pay'), value: `SAR ${(currentPeriod.totalNetPay || 0).toLocaleString()}`, icon: DollarSign, color: "text-[#0A5ED7]", testId: "text-net-pay" },
         { label: t('payroll.employees', 'Employees'), value: "12", icon: Users, color: "text-purple-600 dark:text-purple-400", testId: "text-employees" },
       ].map((stat, i) => (
         <Card key={i} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -148,7 +148,7 @@ export default function TimeClockPayroll() {
             <div className="space-y-2">
               <div className="flex justify-between p-2">
                 <span className="text-[#64748B]">{t('payroll.totalGrossPay', 'Total Gross Pay')}</span>
-                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-gross-detail">${(currentPeriod.totalGrossPay || 0).toLocaleString()}</span>
+                <span className="font-semibold text-[#0B1F3B] dark:text-white" data-testid="text-gross-detail">SAR {(currentPeriod.totalGrossPay || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between p-2">
                 <span className="text-[#64748B]">{t('payroll.totalDeductions', 'Total Deductions')}</span>
@@ -156,7 +156,7 @@ export default function TimeClockPayroll() {
               </div>
               <div className="flex justify-between p-3 bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/20 dark:to-[#0BB3FF]/20 rounded font-semibold">
                 <span className="text-[#0B1F3B] dark:text-white">{t('payroll.totalNetPay', 'Total Net Pay')}</span>
-                <span className="text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="text-net-detail">${(currentPeriod.totalNetPay || 0).toLocaleString()}</span>
+                <span className="text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="text-net-detail">SAR {(currentPeriod.totalNetPay || 0).toLocaleString()}</span>
               </div>
             </div>
             <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-process-payroll">{t('payroll.processPayroll', 'Process Payroll')}</Button>

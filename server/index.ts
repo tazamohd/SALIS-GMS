@@ -1,13 +1,65 @@
+// Load + validate environment FIRST (dotenv.config lives in ./config). Nothing
+// above this import may read process.env for required vars. This also fixes the
+// audit finding that config.ts (the only dotenv loader) was imported by no boot
+// file, so a .env-based deploy never loaded its variables.
+import "./config";
+// Sentry (no-op without SENTRY_DSN) — must load before the rest of the app so
+// platform-wide errors are captured.
+import { sentryEnabled, Sentry } from "./instrument";
+
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
 }
 
 import express, { type Request, Response, NextFunction } from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes/index";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeChatWebSocket } from "./websocket";
 
 const app = express();
+
+// Behind a TLS-terminating proxy: trust the first hop so secure cookies work
+// and express-rate-limit reads the real client IP (not the proxy's).
+app.set("trust proxy", 1);
+
+// Security headers (HSTS, X-Frame-Options, noSniff, etc.). CSP is disabled here
+// because the SPA/Vite manage their own asset origins; enabling helmet's default
+// CSP would break the client. HSTS only takes effect over HTTPS.
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// Brute-force / credential-stuffing protection. Strict limiter on the session-
+// creating auth endpoints; generous global limiter as a backstop. Webhooks and
+// non-/api paths are exempt (gateway retries, static assets).
+// Both limits are env-tunable: a busy garage office shares one NAT IP (so a
+// deployment may need RATE_LIMIT_MAX raised), and load tests need it lifted
+// without a code change.
+const envInt = (name: string, fallback: number): number => {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && v > 0 ? v : fallback;
+};
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: envInt("AUTH_RATE_LIMIT_MAX", 10),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { message: "Too many attempts, please try again later." },
+});
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: envInt("RATE_LIMIT_MAX", 2000),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !req.path.startsWith("/api") || req.path.includes("/webhook"),
+});
+app.use("/api/login", authLimiter);
+app.use("/api/register", authLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/customer-portal/login", authLimiter);
+app.use(globalLimiter);
 
 // Capture raw body for webhook signature verification (Stripe, etc.)
 // We use the `verify` hook to store the raw Buffer before JSON parsing.
@@ -41,16 +93,9 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
+      // Log status + timing only. Response bodies were being serialized here,
+      // leaking customer/financial PII into stdout (and truncation corrupted it).
+      log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
     }
   });
 
@@ -68,8 +113,14 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    // Log the error but do NOT re-throw: throwing after the response is sent, in
+    // the terminal handler, produced an uncaughtException that could crash the
+    // process on ordinary 4xx/5xx.
+    if (status >= 500) {
+      console.error("Unhandled error:", err);
+      if (sentryEnabled) Sentry.captureException(err);
+    }
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after

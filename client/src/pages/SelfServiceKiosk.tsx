@@ -164,7 +164,7 @@ export default function SelfServiceKiosk() {
   });
 
   const statusQuery = useQuery<{ success: boolean; ticket: KioskTicket; message: string }>({
-    queryKey: ["/api/kiosk/status", statusTicketId],
+    queryKey: [`/api/kiosk/status/${statusTicketId}`],
     enabled: screen === "status-check" && statusTicketId.length > 0,
     refetchInterval: screen === "status-check" ? 10000 : false,
   });
@@ -225,7 +225,7 @@ export default function SelfServiceKiosk() {
               className="h-12 px-6 text-lg"
               onClick={resetAll}
             >
-              <ArrowLeft className="h-5 w-5 mr-2" />
+              <ArrowLeft className="h-5 w-5 me-2" />
               Start Over
             </Button>
           )}
@@ -271,7 +271,7 @@ export default function SelfServiceKiosk() {
                 className="bg-white hover:bg-gray-50 active:bg-gray-100 border-2 border-gray-200 rounded-2xl p-8 flex items-center gap-6 transition-all shadow min-h-[100px]"
               >
                 <Users className="h-12 w-12 text-blue-600" />
-                <div className="text-left">
+                <div className="text-start">
                   <span className="text-2xl font-bold text-gray-900 block">View Queue</span>
                   <span className="text-lg text-gray-500">
                     {summary ? `${summary.totalInQueue} customers waiting` : "See current wait times"}
@@ -287,7 +287,7 @@ export default function SelfServiceKiosk() {
                 className="bg-white hover:bg-gray-50 active:bg-gray-100 border-2 border-gray-200 rounded-2xl p-8 flex items-center gap-6 transition-all shadow min-h-[100px]"
               >
                 <Clock className="h-12 w-12 text-orange-500" />
-                <div className="text-left">
+                <div className="text-start">
                   <span className="text-2xl font-bold text-gray-900 block">Check Status</span>
                   <span className="text-lg text-gray-500">Look up your ticket</span>
                 </div>
@@ -312,7 +312,7 @@ export default function SelfServiceKiosk() {
                 className="h-16 px-8 text-xl"
                 onClick={() => { setLookupType("phone"); setInputValue(""); }}
               >
-                <Phone className="h-6 w-6 mr-3" />
+                <Phone className="h-6 w-6 me-3" />
                 Phone Number
               </Button>
               <Button
@@ -321,7 +321,7 @@ export default function SelfServiceKiosk() {
                 className="h-16 px-8 text-xl"
                 onClick={() => { setLookupType("plate"); setInputValue(""); }}
               >
-                <Car className="h-6 w-6 mr-3" />
+                <Car className="h-6 w-6 me-3" />
                 Plate Number
               </Button>
             </div>
@@ -381,9 +381,9 @@ export default function SelfServiceKiosk() {
               size="lg"
             >
               {checkInMutation.isPending ? (
-                <Loader2 className="h-6 w-6 animate-spin mr-3" />
+                <Loader2 className="h-6 w-6 animate-spin me-3" />
               ) : (
-                <CheckCircle className="h-6 w-6 mr-3" />
+                <CheckCircle className="h-6 w-6 me-3" />
               )}
               Check In
             </Button>
@@ -401,7 +401,7 @@ export default function SelfServiceKiosk() {
               </p>
             </div>
 
-            <Card className="text-left">
+            <Card className="text-start">
               <CardContent className="p-8 space-y-4">
                 <div className="flex justify-between items-center border-b pb-4">
                   <span className="text-xl text-gray-500">Ticket Number</span>
@@ -449,7 +449,7 @@ export default function SelfServiceKiosk() {
             <div className="space-y-5">
               <div>
                 <label className="text-lg font-semibold text-gray-700 mb-2 block">
-                  <User className="inline h-5 w-5 mr-2" />
+                  <User className="inline h-5 w-5 me-2" />
                   Full Name *
                 </label>
                 <Input
@@ -462,7 +462,7 @@ export default function SelfServiceKiosk() {
 
               <div>
                 <label className="text-lg font-semibold text-gray-700 mb-2 block">
-                  <Phone className="inline h-5 w-5 mr-2" />
+                  <Phone className="inline h-5 w-5 me-2" />
                   Phone Number *
                 </label>
                 <Input
@@ -476,7 +476,7 @@ export default function SelfServiceKiosk() {
 
               <div>
                 <label className="text-lg font-semibold text-gray-700 mb-2 block">
-                  <Car className="inline h-5 w-5 mr-2" />
+                  <Car className="inline h-5 w-5 me-2" />
                   Vehicle Plate Number *
                 </label>
                 <Input
@@ -489,7 +489,7 @@ export default function SelfServiceKiosk() {
 
               <div>
                 <label className="text-lg font-semibold text-gray-700 mb-2 block">
-                  <Car className="inline h-5 w-5 mr-2" />
+                  <Car className="inline h-5 w-5 me-2" />
                   Vehicle Info (optional)
                 </label>
                 <Input
@@ -531,7 +531,7 @@ export default function SelfServiceKiosk() {
                       <button
                         key={svc.id}
                         onClick={() => setWalkInData({ ...walkInData, serviceType: svc.name })}
-                        className={`p-6 rounded-xl border-2 text-left transition-all active:scale-[0.98] min-h-[100px] ${
+                        className={`p-6 rounded-xl border-2 text-start transition-all active:scale-[0.98] min-h-[100px] ${
                           walkInData.serviceType === svc.name
                             ? "border-emerald-500 bg-emerald-50 shadow-md"
                             : "border-gray-200 bg-white hover:border-gray-300 hover:shadow"
@@ -567,7 +567,7 @@ export default function SelfServiceKiosk() {
                       <button
                         key={svc.id}
                         onClick={() => setWalkInData({ ...walkInData, serviceType: svc.name })}
-                        className={`p-6 rounded-xl border-2 text-left transition-all active:scale-[0.98] min-h-[100px] ${
+                        className={`p-6 rounded-xl border-2 text-start transition-all active:scale-[0.98] min-h-[100px] ${
                           walkInData.serviceType === svc.name
                             ? "border-emerald-500 bg-emerald-50 shadow-md"
                             : "border-gray-200 bg-white hover:border-gray-300 hover:shadow"
@@ -602,9 +602,9 @@ export default function SelfServiceKiosk() {
               size="lg"
             >
               {walkInMutation.isPending ? (
-                <Loader2 className="h-6 w-6 animate-spin mr-3" />
+                <Loader2 className="h-6 w-6 animate-spin me-3" />
               ) : (
-                <CheckCircle className="h-6 w-6 mr-3" />
+                <CheckCircle className="h-6 w-6 me-3" />
               )}
               Confirm & Get Ticket
             </Button>
@@ -725,7 +725,7 @@ export default function SelfServiceKiosk() {
                         <p className="text-lg text-gray-500">{ticket.serviceType}</p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       {ticket.status === "in-progress" ? (
                         <div className="flex items-center gap-2 text-blue-600">
                           <CircleDot className="h-5 w-5 animate-pulse" />

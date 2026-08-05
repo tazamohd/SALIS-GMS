@@ -139,7 +139,7 @@ function ActiveContractsTab() {
             placeholder="Search by customer, vehicle, plate..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -162,11 +162,11 @@ function ActiveContractsTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/40">
-                  <th className="px-4 py-3 text-left font-medium">Customer</th>
-                  <th className="px-4 py-3 text-left font-medium">Vehicle</th>
-                  <th className="px-4 py-3 text-left font-medium">Plan</th>
-                  <th className="px-4 py-3 text-left font-medium">Coverage Period</th>
-                  <th className="px-4 py-3 text-left font-medium">Amount</th>
+                  <th className="px-4 py-3 text-start font-medium">Customer</th>
+                  <th className="px-4 py-3 text-start font-medium">Vehicle</th>
+                  <th className="px-4 py-3 text-start font-medium">Plan</th>
+                  <th className="px-4 py-3 text-start font-medium">Coverage Period</th>
+                  <th className="px-4 py-3 text-start font-medium">Amount</th>
                   <th className="px-4 py-3 text-center font-medium">Claims</th>
                   <th className="px-4 py-3 text-center font-medium">Status</th>
                 </tr>
@@ -253,7 +253,7 @@ function ClaimsTab() {
             placeholder="Search claims..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -276,12 +276,12 @@ function ClaimsTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/40">
-                  <th className="px-4 py-3 text-left font-medium">Claim #</th>
-                  <th className="px-4 py-3 text-left font-medium">Contract Ref</th>
-                  <th className="px-4 py-3 text-left font-medium">Description</th>
-                  <th className="px-4 py-3 text-right font-medium">Amount</th>
+                  <th className="px-4 py-3 text-start font-medium">Claim #</th>
+                  <th className="px-4 py-3 text-start font-medium">Contract Ref</th>
+                  <th className="px-4 py-3 text-start font-medium">Description</th>
+                  <th className="px-4 py-3 text-end font-medium">Amount</th>
                   <th className="px-4 py-3 text-center font-medium">Status</th>
-                  <th className="px-4 py-3 text-left font-medium">Date</th>
+                  <th className="px-4 py-3 text-start font-medium">Date</th>
                   <th className="px-4 py-3 text-center font-medium">Actions</th>
                 </tr>
               </thead>
@@ -298,7 +298,7 @@ function ClaimsTab() {
                       <td className="px-4 py-3 font-mono font-medium">{cl.claimNumber}</td>
                       <td className="px-4 py-3 text-xs">{cl.contractRef}</td>
                       <td className="px-4 py-3 max-w-[260px] truncate">{cl.description}</td>
-                      <td className="px-4 py-3 text-right font-medium">{currency(cl.amount)}</td>
+                      <td className="px-4 py-3 text-end font-medium">{currency(cl.amount)}</td>
                       <td className="px-4 py-3 text-center">{statusBadge(cl.status)}</td>
                       <td className="px-4 py-3 text-xs">{fmt(cl.submittedAt)}</td>
                       <td className="px-4 py-3 text-center">
@@ -310,7 +310,7 @@ function ClaimsTab() {
                               className="h-7 text-xs text-green-600 border-green-200 hover:bg-green-50"
                               onClick={() => updateClaim.mutate({ id: cl.id, status: "approved" })}
                             >
-                              <CheckCircle className="h-3 w-3 mr-1" />
+                              <CheckCircle className="h-3 w-3 me-1" />
                               Approve
                             </Button>
                             <Button
@@ -319,7 +319,7 @@ function ClaimsTab() {
                               className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50"
                               onClick={() => updateClaim.mutate({ id: cl.id, status: "rejected" })}
                             >
-                              <XCircle className="h-3 w-3 mr-1" />
+                              <XCircle className="h-3 w-3 me-1" />
                               Reject
                             </Button>
                           </div>
@@ -526,7 +526,7 @@ function NewContractTab() {
           </div>
 
           <Button type="submit" disabled={create.isPending} className="w-full sm:w-auto">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {create.isPending ? "Creating..." : "Create Contract"}
           </Button>
         </form>

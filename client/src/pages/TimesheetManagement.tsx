@@ -158,7 +158,7 @@ export default function TimesheetManagement() {
       cell: (row: Timesheet) => (
         <div className="flex items-center gap-2" data-testid={`timesheet-pay-${row.id}`}>
           <DollarSign className="w-4 h-4 text-[#64748B]" />
-          <span className="font-semibold text-[#0B1F3B] dark:text-white">${row.totalPay.toFixed(2)}</span>
+          <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR {row.totalPay.toFixed(2)}</span>
         </div>
       ),
     },

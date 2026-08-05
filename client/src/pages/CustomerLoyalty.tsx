@@ -265,7 +265,7 @@ export default function CustomerLoyalty() {
                             </p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.totalEarned', 'Total Earned')}</p>
                           <p className="font-semibold text-salis-black dark:text-white" data-testid={`text-member-total-${account.id}`}>
                             {account.totalPointsEarned ?? 0} pts
@@ -300,7 +300,7 @@ export default function CustomerLoyalty() {
                 className="bg-salis-black hover:bg-salis-gray-dark text-white font-poppins"
                 data-testid="button-create-reward"
               >
-                <Gift className="mr-2 h-4 w-4" />
+                <Gift className="me-2 h-4 w-4" />
                 {t('customers.loyalty.addReward', 'Add Reward')}
               </Button>
             )}
@@ -338,7 +338,7 @@ export default function CustomerLoyalty() {
                             {reward.pointsCost} pts
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-xs text-salis-gray dark:text-salis-gray-light font-poppins">{t('customers.loyalty.value', 'Value')}</p>
                           <p className="text-lg font-bold text-salis-black dark:text-white" data-testid={`text-reward-value-${reward.id}`}>
                             ${reward.value}

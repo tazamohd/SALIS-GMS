@@ -125,11 +125,11 @@ export default function IncomeStatement() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-print">
-            <Printer className="h-4 w-4 mr-2" />
+            <Printer className="h-4 w-4 me-2" />
             {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
         </div>
@@ -151,9 +151,9 @@ export default function IncomeStatement() {
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[100px]">{t('incomeStatement.code', 'Code')}</TableHead>
                 <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right">{t('incomeStatement.currentPeriod', 'Current Period')}</TableHead>
-                <TableHead className="text-right">{t('incomeStatement.previousPeriod', 'Previous Period')}</TableHead>
-                <TableHead className="text-right">{t('incomeStatement.change', 'Change')}</TableHead>
+                <TableHead className="text-end">{t('incomeStatement.currentPeriod', 'Current Period')}</TableHead>
+                <TableHead className="text-end">{t('incomeStatement.previousPeriod', 'Previous Period')}</TableHead>
+                <TableHead className="text-end">{t('incomeStatement.change', 'Change')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -166,13 +166,13 @@ export default function IncomeStatement() {
                 <TableRow key={item.code} data-testid={`row-revenue-${item.code}`}>
                   <TableCell className="font-mono text-sm">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     {item.amount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     {getChangeIndicator(item.amount, item.previousAmount)}
                   </TableCell>
                 </TableRow>
@@ -180,13 +180,13 @@ export default function IncomeStatement() {
               <TableRow className="bg-muted/50 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('incomeStatement.totalRevenue', 'Total Revenue')}</TableCell>
-                <TableCell className="text-right font-mono text-green-600">
+                <TableCell className="text-end font-mono text-green-600">
                   {totalRevenue.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {totalPreviousRevenue.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   {getChangeIndicator(totalRevenue, totalPreviousRevenue)}
                 </TableCell>
               </TableRow>
@@ -200,13 +200,13 @@ export default function IncomeStatement() {
                 <TableRow key={item.code} data-testid={`row-cogs-${item.code}`}>
                   <TableCell className="font-mono text-sm">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     ({item.amount.toLocaleString()})
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     ({item.previousAmount.toLocaleString()})
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     {getChangeIndicator(item.previousAmount, item.amount)}
                   </TableCell>
                 </TableRow>
@@ -214,10 +214,10 @@ export default function IncomeStatement() {
               <TableRow className="bg-muted/50 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('incomeStatement.totalCostOfGoodsSold', 'Total Cost of Goods Sold')}</TableCell>
-                <TableCell className="text-right font-mono text-red-600">
+                <TableCell className="text-end font-mono text-red-600">
                   ({totalCOGS.toLocaleString()})
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   ({totalPreviousCOGS.toLocaleString()})
                 </TableCell>
                 <TableCell></TableCell>
@@ -226,13 +226,13 @@ export default function IncomeStatement() {
               <TableRow className="bg-blue-50 dark:bg-blue-900/20 font-bold">
                 <TableCell></TableCell>
                 <TableCell className="text-blue-700 dark:text-blue-400">{t('incomeStatement.grossProfit', 'GROSS PROFIT')}</TableCell>
-                <TableCell className="text-right font-mono text-blue-600">
+                <TableCell className="text-end font-mono text-blue-600">
                   {grossProfit.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {previousGrossProfit.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   {getChangeIndicator(grossProfit, previousGrossProfit)}
                 </TableCell>
               </TableRow>
@@ -246,13 +246,13 @@ export default function IncomeStatement() {
                 <TableRow key={item.code} data-testid={`row-opex-${item.code}`}>
                   <TableCell className="font-mono text-sm">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     ({item.amount.toLocaleString()})
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     ({item.previousAmount.toLocaleString()})
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     {getChangeIndicator(item.previousAmount, item.amount)}
                   </TableCell>
                 </TableRow>
@@ -260,10 +260,10 @@ export default function IncomeStatement() {
               <TableRow className="bg-muted/50 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('incomeStatement.totalOperatingExpenses', 'Total Operating Expenses')}</TableCell>
-                <TableCell className="text-right font-mono text-red-600">
+                <TableCell className="text-end font-mono text-red-600">
                   ({totalOperatingExpenses.toLocaleString()})
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   ({previousOperatingExpenses.toLocaleString()})
                 </TableCell>
                 <TableCell></TableCell>
@@ -272,13 +272,13 @@ export default function IncomeStatement() {
               <TableRow className="bg-purple-50 dark:bg-purple-900/20 font-bold">
                 <TableCell></TableCell>
                 <TableCell className="text-purple-700 dark:text-purple-400">{t('incomeStatement.operatingIncome', 'OPERATING INCOME')}</TableCell>
-                <TableCell className="text-right font-mono text-purple-600">
+                <TableCell className="text-end font-mono text-purple-600">
                   {operatingIncome.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {previousOperatingIncome.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   {getChangeIndicator(operatingIncome, previousOperatingIncome)}
                 </TableCell>
               </TableRow>
@@ -292,10 +292,10 @@ export default function IncomeStatement() {
                 <TableRow key={item.code} data-testid={`row-other-${item.code}`}>
                   <TableCell className="font-mono text-sm">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     ({item.amount.toLocaleString()})
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     ({item.previousAmount.toLocaleString()})
                   </TableCell>
                   <TableCell></TableCell>
@@ -305,13 +305,13 @@ export default function IncomeStatement() {
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
                 <TableCell></TableCell>
                 <TableCell className="text-green-800 dark:text-green-300">{t('incomeStatement.netIncome', 'NET INCOME')}</TableCell>
-                <TableCell className="text-right font-mono text-green-700 dark:text-green-400">
+                <TableCell className="text-end font-mono text-green-700 dark:text-green-400">
                   SAR {netIncome.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   SAR {previousNetIncome.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-end">
                   {getChangeIndicator(netIncome, previousNetIncome)}
                 </TableCell>
               </TableRow>
@@ -466,30 +466,30 @@ export default function IncomeStatement() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/balance-sheet">
               <Button variant="outline" className="w-full justify-start" data-testid="link-balance-sheet">
-                <Scale className="h-4 w-4 mr-2" />
+                <Scale className="h-4 w-4 me-2" />
                 {t('incomeStatement.balanceSheet', 'Balance Sheet')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/cash-flow-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-cash-flow">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('incomeStatement.cashFlow', 'Cash Flow')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/trial-balance">
               <Button variant="outline" className="w-full justify-start" data-testid="link-trial-balance">
-                <BarChart3 className="h-4 w-4 mr-2" />
+                <BarChart3 className="h-4 w-4 me-2" />
                 {t('incomeStatement.trialBalance', 'Trial Balance')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('incomeStatement.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>

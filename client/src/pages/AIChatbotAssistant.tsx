@@ -131,7 +131,7 @@ export default function AIChatbotAssistant() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col">
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4" data-testid="chat-messages">
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4 pe-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4" data-testid="chat-messages">
                 {messages.length === 0 && (
                   <div className="text-center text-[#64748B] py-12">
                     <Bot className="w-16 h-16 mx-auto mb-4 text-[#64748B]" />
@@ -226,7 +226,7 @@ export default function AIChatbotAssistant() {
                 onClick={() => handleQuickAction(t('aiChatbot.bookOilChangeMessage', 'I need to book an oil change service'))}
                 data-testid="quick-oil-change"
               >
-                <Calendar className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                <Calendar className="w-4 h-4 me-2 text-[#0A5ED7]" />
                 {t('aiChatbot.bookOilChange', 'Book Oil Change')}
               </Button>
               <Button
@@ -235,7 +235,7 @@ export default function AIChatbotAssistant() {
                 onClick={() => handleQuickAction(t('aiChatbot.viewServicesMessage', 'What services do you offer?'))}
                 data-testid="quick-services"
               >
-                <Wrench className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                <Wrench className="w-4 h-4 me-2 text-[#0A5ED7]" />
                 {t('aiChatbot.viewServices', 'View Services')}
               </Button>
               <Button
@@ -244,7 +244,7 @@ export default function AIChatbotAssistant() {
                 onClick={() => handleQuickAction(t('aiChatbot.checkEngineLightMessage', 'My check engine light is on. What should I do?'))}
                 data-testid="quick-diagnosis"
               >
-                <AlertCircle className="w-4 h-4 mr-2 text-[#F97316]" />
+                <AlertCircle className="w-4 h-4 me-2 text-[#F97316]" />
                 {t('aiChatbot.checkEngineLight', 'Check Engine Light')}
               </Button>
             </CardContent>

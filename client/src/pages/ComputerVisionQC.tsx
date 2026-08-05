@@ -143,12 +143,12 @@ export default function ComputerVisionQC() {
                   >
                     {analyzeImageMutation.isPending ? (
                       <>
-                        <Zap className="mr-2 h-4 w-4 animate-pulse" />
+                        <Zap className="me-2 h-4 w-4 animate-pulse" />
                         {t('vision.analyzingWithAI', 'Analyzing with AI...')}
                       </>
                     ) : (
                       <>
-                        <Eye className="mr-2 h-4 w-4" />
+                        <Eye className="me-2 h-4 w-4" />
                         {t('vision.analyzeWithGPT', 'Analyze with GPT-5 Vision')}
                       </>
                     )}
@@ -277,7 +277,7 @@ export default function ComputerVisionQC() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                    <tr className="text-left text-sm">
+                    <tr className="text-start text-sm">
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.date', 'Date')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.type', 'Type')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vision.qualityScore', 'Quality Score')}</th>

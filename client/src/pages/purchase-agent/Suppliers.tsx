@@ -141,7 +141,7 @@ export default function PurchaseAgentSuppliers() {
                 placeholder="Search suppliers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search"
               />
             </div>
@@ -163,7 +163,7 @@ export default function PurchaseAgentSuppliers() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Location</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Rating</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
-                  <TableHead className="text-right text-[#0B1F3B] dark:text-white">Actions</TableHead>
+                  <TableHead className="text-end text-[#0B1F3B] dark:text-white">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -216,7 +216,7 @@ export default function PurchaseAgentSuppliers() {
                           {supplier.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button
                           variant="ghost"
                           size="sm"

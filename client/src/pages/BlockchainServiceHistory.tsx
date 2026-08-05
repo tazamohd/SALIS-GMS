@@ -90,7 +90,7 @@ export default function BlockchainServiceHistory() {
                   onClick={() => setSelectedVehicle(vehicle.id)}
                   data-testid={`button-select-vehicle-${vehicle.id}`}
                 >
-                  <div className="text-left">
+                  <div className="text-start">
                     <div className="font-semibold">
                       {vehicle.make} {vehicle.model}
                     </div>
@@ -132,7 +132,7 @@ export default function BlockchainServiceHistory() {
                   disabled={verifyChainMutation.isPending}
                   data-testid="button-verify-chain"
                 >
-                  <FileCheck className="w-4 h-4 mr-2" />
+                  <FileCheck className="w-4 h-4 me-2" />
                   {t('blockchain.verifyChain', 'Verify Chain Integrity')}
                 </Button>
               </CardContent>

@@ -99,7 +99,7 @@ export function ToolAvailabilityDialog({ open, onOpenChange }: ToolAvailabilityD
                         )}
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <div className={`text-sm font-semibold ${tool.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-500'}`}>
                         {tool.isActive ? 'Available' : 'Unavailable'}
                       </div>

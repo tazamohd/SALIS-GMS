@@ -207,7 +207,7 @@ export default function TrainingLMS() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
           data-testid="button-create-certification"
         >
-          <Award className="mr-2 h-4 w-4" />
+          <Award className="me-2 h-4 w-4" />
           {t('training.createCertification', 'Create Certification')}
         </Button>
       </div>
@@ -264,7 +264,7 @@ export default function TrainingLMS() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
           data-testid="button-record-attempt"
         >
-          <Users className="mr-2 h-4 w-4" />
+          <Users className="me-2 h-4 w-4" />
           {t('training.recordAttempt', 'Record Attempt')}
         </Button>
       </div>

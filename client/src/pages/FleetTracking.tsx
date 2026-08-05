@@ -48,7 +48,7 @@ export default function FleetTracking() {
 
   const createGeofenceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/fleet/geofences', 'POST', data);
+      return await apiRequest('POST', '/api/fleet/geofences', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });
@@ -78,7 +78,7 @@ export default function FleetTracking() {
 
   const deleteGeofenceMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/fleet/geofences/${id}`, 'DELETE', {});
+      return await apiRequest('DELETE', `/api/fleet/geofences/${id}`, {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });
@@ -157,7 +157,7 @@ export default function FleetTracking() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                    <tr className="text-left">
+                    <tr className="text-start">
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.vehicle', 'Vehicle')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.lastKnownLocation', 'Last Known Location')}</th>
@@ -180,7 +180,7 @@ export default function FleetTracking() {
                         </td>
                         <td className="py-3">
                           <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-0">
-                            <CheckCircle className="h-3 w-3 mr-1" />
+                            <CheckCircle className="h-3 w-3 me-1" />
                             {t('common.active', 'Active')}
                           </Badge>
                         </td>
@@ -197,7 +197,7 @@ export default function FleetTracking() {
                         </td>
                         <td className="py-3">
                           <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-${vehicle.id}`}>
-                            <Navigation className="h-4 w-4 mr-1" />
+                            <Navigation className="h-4 w-4 me-1" />
                             {t('common.view', 'View')}
                           </Button>
                         </td>
@@ -221,7 +221,7 @@ export default function FleetTracking() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-[#0B1F3B] dark:text-white">{t('vehicles.geofenceZones', 'Geofence Zones')}</CardTitle>
             <Button onClick={() => setIsGeofenceDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-create-geofence">
-              <Radio className="h-4 w-4 mr-2" />
+              <Radio className="h-4 w-4 me-2" />
               {t('vehicles.createGeofence', 'Create Geofence')}
             </Button>
           </CardHeader>
@@ -244,7 +244,7 @@ export default function FleetTracking() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                    <tr className="text-left">
+                    <tr className="text-start">
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.name', 'Name')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</th>
                       <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('vehicles.center', 'Center')}</th>
@@ -335,15 +335,15 @@ export default function FleetTracking() {
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
                         <span className="text-[#64748B]">{t('vehicles.distance', 'Distance')}:</span>
-                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{route.totalDistance ? `${route.totalDistance} km` : '-'}</span>
+                        <span className="ms-2 font-medium text-[#0B1F3B] dark:text-white">{route.totalDistance ? `${route.totalDistance} km` : '-'}</span>
                       </div>
                       <div>
                         <span className="text-[#64748B]">{t('vehicles.duration', 'Duration')}:</span>
-                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{route.estimatedDuration ? `${route.estimatedDuration} min` : '-'}</span>
+                        <span className="ms-2 font-medium text-[#0B1F3B] dark:text-white">{route.estimatedDuration ? `${route.estimatedDuration} min` : '-'}</span>
                       </div>
                       <div>
                         <span className="text-[#64748B]">{t('vehicles.created', 'Created')}:</span>
-                        <span className="ml-2 font-medium text-[#0B1F3B] dark:text-white">{format(new Date(route.createdAt), 'PP')}</span>
+                        <span className="ms-2 font-medium text-[#0B1F3B] dark:text-white">{format(new Date(route.createdAt), 'PP')}</span>
                       </div>
                     </div>
                   </div>

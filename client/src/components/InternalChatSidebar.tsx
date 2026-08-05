@@ -317,7 +317,7 @@ export function InternalChatSidebar() {
                           </Avatar>
                           <span className="text-sm text-[#0B1F3B] dark:text-white">{u.email}</span>
                           {selectedUsers.includes(u.id) && (
-                            <CheckCheck className="h-4 w-4 text-[#0A5ED7] ml-auto" aria-hidden="true" />
+                            <CheckCheck className="h-4 w-4 text-[#0A5ED7] ms-auto" aria-hidden="true" />
                           )}
                         </div>
                       ))}
@@ -332,9 +332,9 @@ export function InternalChatSidebar() {
                     data-testid="button-create-conversation"
                   >
                     {createConversationMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
+                      <Loader2 className="h-4 w-4 animate-spin me-2" aria-hidden="true" />
                     ) : (
-                      <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
+                      <Plus className="h-4 w-4 me-2" aria-hidden="true" />
                     )}
                     {t('chat.create', 'Create')}
                   </Button>
@@ -353,7 +353,7 @@ export function InternalChatSidebar() {
                   placeholder={t('chat.searchConversations', 'Search conversations...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 border-[#0A5ED7]/20 focus:border-[#0A5ED7] bg-[#F8FAFC] dark:bg-[#0B1F3B]/30"
+                  className="ps-9 border-[#0A5ED7]/20 focus:border-[#0A5ED7] bg-[#F8FAFC] dark:bg-[#0B1F3B]/30"
                   data-testid="input-search-conversations"
                 />
               </div>
@@ -377,7 +377,7 @@ export function InternalChatSidebar() {
                     onClick={() => setShowNewChatDialog(true)}
                     data-testid="button-start-conversation"
                   >
-                    <Plus className="h-4 w-4 mr-1" aria-hidden="true" />
+                    <Plus className="h-4 w-4 me-1" aria-hidden="true" />
                     {t('chat.startConversation', 'Start a conversation')}
                   </Button>
                 </div>
@@ -478,7 +478,7 @@ export function InternalChatSidebar() {
                           >
                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                           </div>
-                          <span className={`text-[10px] text-[#0B1F3B]/60 dark:text-white/60 mt-1 block ${isOwn ? 'text-right' : 'text-left'}`}>
+                          <span className={`text-[10px] text-[#0B1F3B]/60 dark:text-white/60 mt-1 block ${isOwn ? 'text-end' : 'text-start'}`}>
                             {formatTime(msg.createdAt)}
                           </span>
                         </div>

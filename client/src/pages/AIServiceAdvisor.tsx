@@ -182,7 +182,7 @@ export default function AIServiceAdvisor() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <ScrollArea className="h-[500px] pr-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4">
+            <ScrollArea className="h-[500px] pe-4 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg p-4">
               <div className="space-y-4">
                 {messages.map((message, idx) => (
                   <div key={idx} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -195,7 +195,7 @@ export default function AIServiceAdvisor() {
                     <div className={`flex-1 max-w-[80%] ${message.role === "user" ? "order-first" : ""}`}>
                       <div className={`rounded-lg p-4 ${
                         message.role === "user" 
-                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white ml-auto" 
+                          ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white ms-auto" 
                           : "bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       }`}>
                         <p className="text-sm">{message.content}</p>
@@ -225,13 +225,13 @@ export default function AIServiceAdvisor() {
                                 <div className="flex items-center gap-4 mt-3 text-xs text-[#64748B]">
                                   <div className="flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" />
-                                    <span data-testid={`text-cost-${recIdx}`}>${rec.cost}</span>
+                                    <span data-testid={`text-cost-${recIdx}`}>SAR {rec.cost}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
                                     <span data-testid={`text-duration-${recIdx}`}>{rec.duration} {t('aiServiceAdvisor.hours', 'hrs')}</span>
                                   </div>
-                                  <Button size="sm" variant="outline" className="ml-auto border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid={`button-book-${recIdx}`}>
+                                  <Button size="sm" variant="outline" className="ms-auto border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid={`button-book-${recIdx}`}>
                                     {t('aiServiceAdvisor.bookService', 'Book Service')}
                                   </Button>
                                 </div>
@@ -298,11 +298,11 @@ export default function AIServiceAdvisor() {
                 <Button
                   key={idx}
                   variant="outline"
-                  className="w-full justify-start text-left h-auto py-3 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                  className="w-full justify-start text-start h-auto py-3 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                   onClick={() => setInput(query)}
                   data-testid={`button-example-${idx}`}
                 >
-                  <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0 text-[#0A5ED7]" />
+                  <MessageCircle className="w-4 h-4 me-2 flex-shrink-0 text-[#0A5ED7]" />
                   <span className="text-sm">{query}</span>
                 </Button>
               ))}

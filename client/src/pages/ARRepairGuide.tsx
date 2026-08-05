@@ -180,7 +180,7 @@ export default function ARRepairGuide() {
                 data-testid="button-next-step"
               >
                 {t('arRepairGuide.nextStep', 'Next Step')}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ms-2 h-4 w-4" />
               </Button>
             </div>
           </CardContent>
@@ -191,7 +191,7 @@ export default function ARRepairGuide() {
             <CardTitle className="text-[#0B1F3B] dark:text-white">
               {t('arRepairGuide.repairSteps', 'Repair Steps')}
               {repairGuideMutation.data && (
-                <Badge className="ml-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white text-xs">AI</Badge>
+                <Badge className="ms-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white text-xs">AI</Badge>
               )}
             </CardTitle>
           </CardHeader>

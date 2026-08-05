@@ -83,7 +83,9 @@ describe('Search API security and scope (SA-018)', () => {
     });
 
     it('implements searchCustomers in DatabaseStorage', () => {
-      expect(storageSource).toMatch(/async searchCustomers\([^)]+\):\s*Promise<User\[\]>/);
+      // SafeUser, not User: customer rows are serialised straight into API
+      // responses, so storage strips the bcrypt hash before returning them.
+      expect(storageSource).toMatch(/async searchCustomers\([^)]+\):\s*Promise<SafeUser\[\]>/);
     });
 
     it('implements searchVehicles in DatabaseStorage', () => {

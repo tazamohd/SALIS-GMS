@@ -182,7 +182,7 @@ export function Appointments() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-appointments"
               />
             </div>
@@ -238,25 +238,25 @@ export function Appointments() {
                 <table className="w-full text-sm">
                   <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <tr className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('appointments.appointmentNumber', 'Appointment #')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('appointments.customer', 'Customer')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('appointments.vehicle', 'Vehicle')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('appointments.serviceType', 'Service Type')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('appointments.dateTime', 'Date & Time')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('common.status', 'Status')}
                       </th>
-                      <th className="text-left py-3 px-4 font-semibold text-xs text-[#64748B]">
+                      <th className="text-start py-3 px-4 font-semibold text-xs text-[#64748B]">
                         {t('common.actions', 'Actions')}
                       </th>
                     </tr>
@@ -326,7 +326,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'confirmed')}
                                         className="text-[#0A5ED7]"
                                       >
-                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        <CheckCircle className="h-4 w-4 me-2" />
                                         {t('appointments.confirm', 'Confirm')}
                                       </DropdownMenuItem>
                                     )}
@@ -335,7 +335,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'in_progress')}
                                         className="text-[#0A5ED7]"
                                       >
-                                        <PlayCircle className="h-4 w-4 mr-2" />
+                                        <PlayCircle className="h-4 w-4 me-2" />
                                         {t('appointments.startService', 'Start Service')}
                                       </DropdownMenuItem>
                                     )}
@@ -344,7 +344,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'completed')}
                                         className="text-[#0A5ED7]"
                                       >
-                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        <CheckCircle className="h-4 w-4 me-2" />
                                         {t('appointments.markComplete', 'Mark Complete')}
                                       </DropdownMenuItem>
                                     )}
@@ -353,7 +353,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'scheduled')}
                                         className="text-[#0A5ED7]"
                                       >
-                                        <Calendar className="h-4 w-4 mr-2" />
+                                        <Calendar className="h-4 w-4 me-2" />
                                         {t('appointments.reschedule', 'Reschedule')}
                                       </DropdownMenuItem>
                                     )}
@@ -363,7 +363,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'no_show')}
                                         className="text-[#F97316]"
                                       >
-                                        <AlertTriangle className="h-4 w-4 mr-2" />
+                                        <AlertTriangle className="h-4 w-4 me-2" />
                                         {t('appointments.markNoShow', 'Mark No-Show')}
                                       </DropdownMenuItem>
                                     )}
@@ -372,7 +372,7 @@ export function Appointments() {
                                         onClick={() => handleStatusChange(apt.id, 'cancelled')}
                                         className="text-[#F97316]"
                                       >
-                                        <XCircle className="h-4 w-4 mr-2" />
+                                        <XCircle className="h-4 w-4 me-2" />
                                         {t('appointments.cancel', 'Cancel')}
                                       </DropdownMenuItem>
                                     )}

@@ -106,12 +106,12 @@ export default function TechnicianLeaderboards() {
                             </div>
                             <div>
                               <p className="text-[#64748B]">{t('leaderboards.revenue', 'Revenue')}</p>
-                              <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>${tech.revenue.toLocaleString()}</p>
+                              <p className="font-semibold text-green-600" data-testid={`text-revenue-${tech.id}`}>SAR {tech.revenue.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>
 
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm text-[#64748B] mb-1">{t('leaderboards.efficiency', 'Efficiency')}</p>
                           <div className="flex items-center gap-2">
                             <Progress value={tech.efficiency} className="w-24" />

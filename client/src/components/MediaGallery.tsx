@@ -38,7 +38,7 @@ export function MediaGallery({
   const { toast } = useToast();
 
   const { data: media = [], isLoading } = useQuery<MediaAttachment[]>({
-    queryKey: ['/api/media-attachments', relatedType, relatedId],
+    queryKey: [`/api/media-attachments/${relatedType}/${relatedId}`],
   });
 
   const beforeMedia = media.filter(m => m.category === 'before');
@@ -50,7 +50,7 @@ export function MediaGallery({
       await apiRequest('DELETE', `/api/media-attachments/${id}`);
 
       queryClient.invalidateQueries({ 
-        queryKey: ['/api/media-attachments', relatedType, relatedId] 
+        queryKey: [`/api/media-attachments/${relatedType}/${relatedId}`] 
       });
 
       toast({

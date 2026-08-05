@@ -83,7 +83,7 @@ export function SystemSyncDialog({ open, onOpenChange }: SystemSyncDialogProps) 
                   <h3 className="font-semibold text-lg">Overall System Health</h3>
                   <p className="text-sm text-gray-600">{syncedCount} of {modules.length} modules synced</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <div className="text-3xl font-bold text-blue-600">{totalProgress}%</div>
                   <p className="text-xs text-gray-500">Complete</p>
                 </div>

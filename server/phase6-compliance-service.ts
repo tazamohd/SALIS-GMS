@@ -207,12 +207,18 @@ export async function createCorrectiveAction(data: {
   actionDescription: string;
   assignedTo: string;
   targetDate: Date;
-  priority?: string;
 }) {
   try {
+    // corrective_actions calls these non_conformance_id and due_date, and has
+    // no priority column, so the caller's shape has to be mapped explicitly.
     const [action] = await db
       .insert(correctiveActions)
-      .values(data)
+      .values({
+        nonConformanceId: data.ncId,
+        actionDescription: data.actionDescription,
+        assignedTo: data.assignedTo,
+        dueDate: data.targetDate,
+      })
       .returning();
     
     return action;

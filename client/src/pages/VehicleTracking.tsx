@@ -282,7 +282,7 @@ export default function VehicleTracking() {
             className="border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="button-refresh"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 me-2" />
             {t('common.refresh', 'Refresh')}
           </Button>
           {unreadCount && unreadCount.count > 0 && (
@@ -307,7 +307,7 @@ export default function VehicleTracking() {
             <BellRing className="h-4 w-4" />
             {t('vehicleTracking.tabs.notifications', 'Notifications')}
             {unreadCount && unreadCount.count > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs bg-[#0A5ED7]/10 text-[#0A5ED7]">
+              <Badge variant="secondary" className="ms-1 text-xs bg-[#0A5ED7]/10 text-[#0A5ED7]">
                 {unreadCount.count}
               </Badge>
             )}
@@ -447,7 +447,7 @@ export default function VehicleTracking() {
                             </span>
                             {vehicle.isMoving && (
                               <Badge variant="outline" className="text-xs border-[#0A5ED7] text-[#0A5ED7]">
-                                <Navigation className="h-3 w-3 mr-1" />
+                                <Navigation className="h-3 w-3 me-1" />
                                 {t('vehicleTracking.moving', 'Moving')}
                               </Badge>
                             )}
@@ -467,9 +467,9 @@ export default function VehicleTracking() {
                             </span>
                           </div>
                         </div>
-                        <div className="text-right text-sm">
+                        <div className="text-end text-sm">
                           <Badge variant={vehicle.engineStatus === 'running' ? 'default' : 'secondary'} className={vehicle.engineStatus === 'running' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0' : 'bg-[#64748B]/10 text-[#64748B] border-0'}>
-                            <Power className="h-3 w-3 mr-1" />
+                            <Power className="h-3 w-3 me-1" />
                             {vehicle.engineStatus}
                           </Badge>
                           <div className="text-xs text-[#64748B] mt-1">
@@ -505,7 +505,7 @@ export default function VehicleTracking() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               data-testid="button-generate-reminders"
             >
-              <Wrench className="h-4 w-4 mr-2" />
+              <Wrench className="h-4 w-4 me-2" />
               {t('vehicleTracking.reminders.generate', 'Generate Reminders')}
             </Button>
           </div>

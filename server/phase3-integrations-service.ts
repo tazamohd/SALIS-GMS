@@ -124,13 +124,14 @@ export async function getAccountingDashboard(garageId: string) {
     where: (ac, { eq }) => eq(ac.garageId, garageId)
   });
 
-  // Get recent sync history
+  // Recent sync history for this garage. accounting_sync is scoped by
+  // garage_id directly (no entity_id / connection FK), and its timestamp
+  // column is last_synced_at.
   const recentSyncs = await db.execute(sql`
-    SELECT sh.*, ac.provider
+    SELECT sh.*
     FROM ${accountingSync} sh
-    JOIN ${accountingConnections} ac ON sh.entity_id = ac.id
-    WHERE ac.garage_id = ${garageId}
-    ORDER BY sh.synced_at DESC
+    WHERE sh.garage_id = ${garageId}
+    ORDER BY sh.last_synced_at DESC NULLS LAST
     LIMIT 10
   `);
 
@@ -140,7 +141,7 @@ export async function getAccountingDashboard(garageId: string) {
     summary: {
       totalConnections: connections.length,
       activeConnections: connections.filter(c => c.isActive).length,
-      lastSyncAt: recentSyncs.rows[0]?.synced_at || null
+      lastSyncAt: (recentSyncs.rows[0] as any)?.last_synced_at || null
     }
   };
 }
@@ -215,11 +216,23 @@ export async function trackEmailEngagement(
   campaignId: string,
   action: 'opens' | 'clicks' | 'bounces' | 'unsubscribes'
 ) {
-  // Update campaign stats
-  const column = action;
+  // Whitelist the action to a fixed drizzle column reference. The previous code
+  // passed the raw request value into sql.raw(), letting any authenticated
+  // caller inject SQL into the UPDATE SET clause. A drizzle column object emits
+  // a safely-quoted identifier — never a raw string.
+  const COLUMN = {
+    opens: emailCampaigns.emailsOpened,
+    clicks: emailCampaigns.clickThroughs,
+    bounces: emailCampaigns.bounces,
+    unsubscribes: emailCampaigns.unsubscribes,
+  } as const;
+  const col = COLUMN[action as keyof typeof COLUMN];
+  if (!col) {
+    throw new Error(`Invalid engagement action: ${String(action)}`);
+  }
   await db.execute(sql`
     UPDATE ${emailCampaigns}
-    SET ${sql.raw(column)} = ${sql.raw(column)} + 1
+    SET ${col} = ${col} + 1
     WHERE id = ${campaignId}
   `);
 

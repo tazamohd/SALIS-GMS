@@ -63,9 +63,16 @@ export default function DigitalTwinViewer() {
     queryKey: ['/api/vehicles'],
   });
 
-  // Fetch selected vehicle details
+  // Fetch selected vehicle details. Explicit queryFn: the default fetches only
+  // queryKey[0] (/api/vehicles — the LIST), so the detail pane never loaded the
+  // selected vehicle.
   const { data: vehicleDetail } = useQuery<VehicleDetail>({
     queryKey: ['/api/vehicles', selectedVehicleId],
+    queryFn: async () => {
+      const res = await fetch(`/api/vehicles/${selectedVehicleId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`${res.status}`);
+      return res.json();
+    },
     enabled: !!selectedVehicleId,
   });
 
@@ -129,7 +136,7 @@ export default function DigitalTwinViewer() {
             </span>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={resetView} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-reset-view">
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-4 w-4 me-2" />
                 {t('digitalTwin.resetView', 'Reset View')}
               </Button>
             </div>

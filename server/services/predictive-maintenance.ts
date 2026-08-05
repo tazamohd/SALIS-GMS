@@ -29,14 +29,24 @@ const SERVICE_INTERVALS: Record<string, { km: number; months: number; avgCost: n
 
 export async function predictMaintenance(garageId: string): Promise<ServicePrediction[]> {
   // Get vehicles with their service history
+  // Columns are snake_case. job_cards has no vehicle FK — it stores the
+  // vehicle as JSONB (vehicle_info), so completed jobs are linked to a
+  // vehicle by license plate within the same garage. FILTER drops the
+  // null row a LEFT JOIN emits for vehicles with no completed jobs.
   const vehicles = await db.execute(sql`
-    SELECT v.id, v.make, v.model, v.year, v."licensePlate", v."currentMileage",
-      json_agg(json_build_object(
-        'description', j.description, 'completedAt', j."completedAt", 'totalCost', j."totalCost"
-      ) ORDER BY j."completedAt" DESC) as "serviceHistory"
+    SELECT v.id, v.make, v.model, v.year, v.license_plate as "licensePlate", v.mileage as "currentMileage",
+      COALESCE(
+        json_agg(json_build_object(
+          'description', j.description, 'completedAt', j.completed_at, 'totalCost', j.total_cost
+        ) ORDER BY j.completed_at DESC) FILTER (WHERE j.id IS NOT NULL),
+        '[]'
+      ) as "serviceHistory"
     FROM vehicles v
-    LEFT JOIN job_cards j ON j."vehicleId" = v.id AND j.status = 'completed'
-    WHERE v."garageId" = ${garageId}
+    LEFT JOIN job_cards j
+      ON j.vehicle_info->>'licensePlate' = v.license_plate
+      AND j.garage_id = v.garage_id
+      AND j.status = 'completed'
+    WHERE v.garage_id = ${garageId}
     GROUP BY v.id
     LIMIT 50
   `);

@@ -250,22 +250,22 @@ export default function RetainedEarnings() {
                 <TableHeader>
                   <TableRow className="border-[#E2E8F0] dark:border-[#232A36]">
                     <TableHead className="text-[#64748B]">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.revenue', 'Revenue')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.expenses', 'Expenses')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.netProfit', 'Net Profit')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.retained', 'Retained')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('retainedEarnings.distributed', 'Distributed')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('retainedEarnings.revenue', 'Revenue')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('retainedEarnings.expenses', 'Expenses')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('retainedEarnings.netProfit', 'Net Profit')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('retainedEarnings.retained', 'Retained')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('retainedEarnings.distributed', 'Distributed')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {profitLossHistory.map((record) => (
                     <TableRow key={record.id} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-profit-loss-${record.id}`}>
                       <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{record.year}</TableCell>
-                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.revenue.toLocaleString()}</TableCell>
-                      <TableCell className="text-right text-[#F97316]">SAR {record.expenses.toLocaleString()}</TableCell>
-                      <TableCell className="text-right text-[#0A5ED7] font-bold">SAR {record.netProfit.toLocaleString()}</TableCell>
-                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.retained.toLocaleString()}</TableCell>
-                      <TableCell className="text-right text-[#0B1F3B] dark:text-white">SAR {record.distributed.toLocaleString()}</TableCell>
+                      <TableCell className="text-end text-[#0B1F3B] dark:text-white">SAR {record.revenue.toLocaleString()}</TableCell>
+                      <TableCell className="text-end text-[#F97316]">SAR {record.expenses.toLocaleString()}</TableCell>
+                      <TableCell className="text-end text-[#0A5ED7] font-bold">SAR {record.netProfit.toLocaleString()}</TableCell>
+                      <TableCell className="text-end text-[#0B1F3B] dark:text-white">SAR {record.retained.toLocaleString()}</TableCell>
+                      <TableCell className="text-end text-[#0B1F3B] dark:text-white">SAR {record.distributed.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -310,7 +310,7 @@ export default function RetainedEarnings() {
             <Dialog open={isReserveDialogOpen} onOpenChange={setIsReserveDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-reserve">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('retainedEarnings.allocateToReserve', 'Allocate to Reserve')}
                 </Button>
               </DialogTrigger>
@@ -447,7 +447,7 @@ export default function RetainedEarnings() {
                     <TableHead className="text-[#64748B]">{t('retainedEarnings.reserveType', 'Reserve Type')}</TableHead>
                     <TableHead className="text-[#64748B]">{t('retainedEarnings.fiscalYear', 'Fiscal Year')}</TableHead>
                     <TableHead className="text-[#64748B]">{t('retainedEarnings.approvedBy', 'Approved By')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -459,7 +459,7 @@ export default function RetainedEarnings() {
                       </TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white">{allocation.year}</TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white">{allocation.approvedBy}</TableCell>
-                      <TableCell className="text-right text-[#0A5ED7]">
+                      <TableCell className="text-end text-[#0A5ED7]">
                         SAR {allocation.amount.toLocaleString()}
                       </TableCell>
                     </TableRow>
@@ -482,7 +482,7 @@ export default function RetainedEarnings() {
             <Dialog open={isDistributionDialogOpen} onOpenChange={setIsDistributionDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-distribution">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('retainedEarnings.newDistribution', 'New Distribution')}
                 </Button>
               </DialogTrigger>
@@ -591,7 +591,7 @@ export default function RetainedEarnings() {
                     <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
                     <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
                     <TableHead className="text-[#64748B]">{t('retainedEarnings.recipients', 'Recipients')}</TableHead>
-                    <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-end text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
                     <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -603,7 +603,7 @@ export default function RetainedEarnings() {
                         <Badge className="bg-[#0A5ED7] text-white">{dist.type}</Badge>
                       </TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white">{dist.recipients}</TableCell>
-                      <TableCell className="text-right text-[#F97316] font-medium">
+                      <TableCell className="text-end text-[#F97316] font-medium">
                         SAR {dist.amount.toLocaleString()}
                       </TableCell>
                       <TableCell>

@@ -199,7 +199,7 @@ export default function ServiceGuides() {
             placeholder="Search guides, manuals, bulletins..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-guides"
           />
         </div>
@@ -231,19 +231,19 @@ export default function ServiceGuides() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="guides" data-testid="tab-guides">
-            <BookOpen className="h-4 w-4 mr-2" />
+            <BookOpen className="h-4 w-4 me-2" />
             Guides
           </TabsTrigger>
           <TabsTrigger value="manuals" data-testid="tab-manuals">
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="h-4 w-4 me-2" />
             Manuals
           </TabsTrigger>
           <TabsTrigger value="brands" data-testid="tab-brands">
-            <Car className="h-4 w-4 mr-2" />
+            <Car className="h-4 w-4 me-2" />
             By Brand
           </TabsTrigger>
           <TabsTrigger value="favorites" data-testid="tab-favorites">
-            <Bookmark className="h-4 w-4 mr-2" />
+            <Bookmark className="h-4 w-4 me-2" />
             Favorites
           </TabsTrigger>
         </TabsList>
@@ -313,7 +313,7 @@ export default function ServiceGuides() {
                       <p className="text-sm text-[#64748B]">{guide.brand} {guide.model} ({guide.year})</p>
                     </div>
                     <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" data-testid={`button-view-manual-${guide.id}`}>
-                      <FileText className="h-4 w-4 mr-2" />
+                      <FileText className="h-4 w-4 me-2" />
                       View Manual
                     </Button>
                   </div>
@@ -387,7 +387,7 @@ export default function ServiceGuides() {
                 className="justify-start border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid={`button-procedure-${index}`}
               >
-                <ChevronRight className="h-4 w-4 mr-2" />
+                <ChevronRight className="h-4 w-4 me-2" />
                 {procedure}
               </Button>
             ))}

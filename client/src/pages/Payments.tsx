@@ -114,7 +114,7 @@ function RecordPaymentDialog({ invoices }: { invoices: Invoice[] }) {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
           data-testid="button-record-payment"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('payments.recordPayment', 'Record Payment')}
         </Button>
       </DialogTrigger>
@@ -153,8 +153,8 @@ function RecordPaymentDialog({ invoices }: { invoices: Invoice[] }) {
 
             {selectedInvoice && (
               <div className="p-3 bg-[#F1F5F9] dark:bg-[#1A1F2B] rounded-lg text-sm">
-                <p className="text-[#64748B]">{t('payments.invoiceTotal', 'Invoice Total')}: <span className="font-semibold text-[#0B1F3B] dark:text-white">${parseFloat(selectedInvoice.totalAmount).toFixed(2)}</span></p>
-                <p className="text-[#64748B]">{t('payments.balanceDue', 'Balance Due')}: <span className="font-semibold text-[#F97316]">${parseFloat(selectedInvoice.balanceAmount).toFixed(2)}</span></p>
+                <p className="text-[#64748B]">{t('payments.invoiceTotal', 'Invoice Total')}: <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR {parseFloat(selectedInvoice.totalAmount).toFixed(2)}</span></p>
+                <p className="text-[#64748B]">{t('payments.balanceDue', 'Balance Due')}: <span className="font-semibold text-[#F97316]">SAR {parseFloat(selectedInvoice.balanceAmount).toFixed(2)}</span></p>
               </div>
             )}
 
@@ -324,7 +324,7 @@ export default function Payments() {
       key: "amount",
       label: t('common.amount', 'Amount'),
       render: (payment) => (
-        <span className="font-semibold text-[#0B1F3B] dark:text-white">${parseFloat(payment.amount).toFixed(2)}</span>
+        <span className="font-semibold text-[#0B1F3B] dark:text-white">SAR {parseFloat(payment.amount).toFixed(2)}</span>
       ),
     },
     {
@@ -342,7 +342,7 @@ export default function Payments() {
       label: t('common.status', 'Status'),
       render: () => (
         <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-          <CheckCircle className="h-3 w-3 mr-1" />
+          <CheckCircle className="h-3 w-3 me-1" />
           {t('common.completed', 'Completed')}
         </Badge>
       ),
@@ -375,7 +375,7 @@ export default function Payments() {
           data-testid={`button-receipt-${payment.id}`}
           onClick={() => exportPaymentReceiptToPDF(payment)}
         >
-          <Download className="h-4 w-4 mr-1" />
+          <Download className="h-4 w-4 me-1" />
           {t('payments.receipt', 'Receipt')}
         </Button>
       ),
@@ -433,11 +433,11 @@ export default function Payments() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
             <p className="text-sm text-[#64748B]">{t('payments.totalReceived', 'Total Received')}</p>
-            <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">${totalAmount.toFixed(2)}</p>
+            <p className="text-2xl font-bold bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] bg-clip-text text-transparent">SAR {totalAmount.toFixed(2)}</p>
           </div>
           <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
             <p className="text-sm text-[#64748B]">{t('payments.outstandingBalance', 'Outstanding Balance')}</p>
-            <p className="text-2xl font-bold text-[#F97316]">${unpaidInvoicesAmount.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-[#F97316]">SAR {unpaidInvoicesAmount.toFixed(2)}</p>
           </div>
           <div className="p-4 bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36] rounded-lg">
             <p className="text-sm text-[#64748B]">{t('payments.totalTransactions', 'Total Transactions')}</p>

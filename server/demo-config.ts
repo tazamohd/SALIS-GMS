@@ -57,12 +57,12 @@ interface DemoPersona {
 }
 
 /**
- * The curated demo line-up: exactly one persona per guard role, ordered from
- * most to least privileged. Covers the full access spectrum the route guards
- * enforce (ADMIN → MANAGER → ADVISOR → TECHNICIAN → ACCOUNTANT) without the
- * noise of the ~20 granular roles.
+ * Curated personas — richer labels/descriptions for the five headline roles
+ * shown most prominently on the login quick-pick. Every remaining
+ * STANDARD_ROLE is still exposed as a demo account below, with its guard
+ * role derived from the mapping table.
  */
-const DEMO_PERSONAS: readonly DemoPersona[] = [
+const CURATED_PERSONAS: readonly DemoPersona[] = [
   {
     roleKey: "OWNER",
     guardRole: "ADMIN",
@@ -100,16 +100,53 @@ const DEMO_PERSONAS: readonly DemoPersona[] = [
   },
 ];
 
-/** The curated set of demo accounts — one per guard role. */
-export const DEMO_ROLES: DemoRoleSpec[] = DEMO_PERSONAS.map((persona) => ({
-  roleKey: persona.roleKey,
-  roleName: (STANDARD_ROLES[persona.roleKey] as { name: string }).name,
-  guardRole: persona.guardRole,
-  userType: persona.userType,
-  email: `${persona.roleKey.toLowerCase()}@${DEMO_EMAIL_DOMAIN}`,
-  label: persona.label,
-  description: persona.description,
-}));
+/**
+ * Guard-role mapping for every non-curated STANDARD_ROLE, so the full ~20-role
+ * catalog is demo-able (the demo-access suite requires all of them listed).
+ */
+const ROLE_GUARD_MAP: Record<string, { guardRole: GuardRole; userType: string }> = {
+  SYSTEM_ADMIN: { guardRole: "ADMIN", userType: "admin" },
+  SERVICE_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  PARTS_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  LEAD_TECHNICIAN: { guardRole: "TECHNICIAN", userType: "technician" },
+  FINANCE_MANAGER: { guardRole: "ACCOUNTANT", userType: "accountant" },
+  HR_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  MARKETING_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  CSR: { guardRole: "ADVISOR", userType: "advisor" },
+  RECEPTIONIST: { guardRole: "ADVISOR", userType: "advisor" },
+  QC_INSPECTOR: { guardRole: "TECHNICIAN", userType: "technician" },
+  WAREHOUSE_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  FRANCHISE_MANAGER: { guardRole: "MANAGER", userType: "manager" },
+  ANALYST: { guardRole: "MANAGER", userType: "manager" },
+  CALL_CENTER_AGENT: { guardRole: "ADVISOR", userType: "advisor" },
+  APPRENTICE: { guardRole: "TECHNICIAN", userType: "technician" },
+};
+
+/** Every STANDARD_ROLE as a demo account: curated personas first, then the
+ *  rest with names/descriptions taken from the role catalog itself. */
+export const DEMO_ROLES: DemoRoleSpec[] = [
+  ...CURATED_PERSONAS.map((persona) => ({
+    roleKey: persona.roleKey as string,
+    roleName: (STANDARD_ROLES[persona.roleKey] as { name: string }).name,
+    guardRole: persona.guardRole,
+    userType: persona.userType,
+    email: `${(persona.roleKey as string).toLowerCase()}@${DEMO_EMAIL_DOMAIN}`,
+    label: persona.label,
+    description: persona.description,
+  })),
+  ...Object.entries(ROLE_GUARD_MAP).map(([roleKey, mapping]) => {
+    const role = STANDARD_ROLES[roleKey as RoleKey] as { name: string; description: string };
+    return {
+      roleKey,
+      roleName: role.name,
+      guardRole: mapping.guardRole,
+      userType: mapping.userType,
+      email: `${roleKey.toLowerCase()}@${DEMO_EMAIL_DOMAIN}`,
+      label: role.name,
+      description: role.description,
+    };
+  }),
+];
 
 /** Look up a demo spec by its STANDARD_ROLE key (case-insensitive). */
 export function getDemoRole(roleKey: string): DemoRoleSpec | undefined {
@@ -120,15 +157,19 @@ export function getDemoRole(roleKey: string): DemoRoleSpec | undefined {
 /**
  * Whether demo access (seeding + one-click demo login) is enabled.
  *
- * Explicit `DEMO_MODE` wins; otherwise demo access is on in any non-production
- * environment and off in production. This gates BOTH the public demo endpoints
+ * Explicit `DEMO_MODE` wins; otherwise demo access auto-enables ONLY in an
+ * explicit local development run. This gates BOTH the public demo endpoints
  * and is the default guard for the seed script.
  */
 export function isDemoModeEnabled(): boolean {
   const flag = String(process.env.DEMO_MODE || "").toLowerCase();
   if (flag === "true" || flag === "1") return true;
   if (flag === "false" || flag === "0") return false;
-  return process.env.NODE_ENV !== "production";
+  // No explicit flag: auto-enable ONLY in an explicit local development run.
+  // Any other environment (production, staging, preview, or an unset NODE_ENV)
+  // must opt in via DEMO_MODE — never infer demo access, and never enable
+  // one-click passwordless login, merely from "not production" (audit 3.1).
+  return process.env.NODE_ENV === "development";
 }
 
 /**

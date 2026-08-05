@@ -108,7 +108,7 @@ export default function SmartContracts() {
       partyA: newContract.partyA || t('smartContracts.garage', 'Garage'),
       partyB: newContract.partyB || t('smartContracts.customer', 'Customer'),
       contractValue: newContract.contractValue,
-      currency: "USD",
+      currency: "SAR",
       terms: newContract.terms,
       status: "draft",
     });
@@ -264,7 +264,7 @@ export default function SmartContracts() {
                   className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                   data-testid="button-submit-contract"
                 >
-                  <Shield className="w-4 h-4 mr-2" />
+                  <Shield className="w-4 h-4 me-2" />
                   {t('smartContracts.createSignedContract', 'Create Signed Contract')}
                 </Button>
                 <Button variant="outline" onClick={() => setShowCreateForm(false)} className="border-[#E2E8F0] dark:border-[#232A36]">
@@ -350,7 +350,7 @@ export default function SmartContracts() {
               {t('smartContracts.createFirstContract', 'Create your first smart contract with automated payment processing')}
             </p>
             <Button onClick={() => setShowCreateForm(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white">
-              <FileSignature className="w-4 h-4 mr-2" />
+              <FileSignature className="w-4 h-4 me-2" />
               {t('smartContracts.createContract', 'Create Contract')}
             </Button>
           </CardContent>
@@ -389,7 +389,7 @@ export default function SmartContracts() {
                         className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                         data-testid={`button-sign-contract-${contract.id}`}
                       >
-                        <FileSignature className="w-4 h-4 mr-2" />
+                        <FileSignature className="w-4 h-4 me-2" />
                         {t('smartContracts.signContract', 'Sign Contract')}
                       </Button>
                     )}
@@ -401,7 +401,7 @@ export default function SmartContracts() {
                         className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                         data-testid={`button-execute-contract-${contract.id}`}
                       >
-                        <Zap className="w-4 h-4 mr-2" />
+                        <Zap className="w-4 h-4 me-2" />
                         {t('smartContracts.executeContract', 'Execute Contract')}
                       </Button>
                     )}
@@ -416,7 +416,7 @@ export default function SmartContracts() {
                   </div>
                   <div>
                     <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.contractValue', 'Contract Value')}</p>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${contract.contractValue} {contract.currency}</p>
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {contract.contractValue} {contract.currency}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#64748B] mb-1">{t('smartContracts.blockchain', 'Blockchain')}</p>

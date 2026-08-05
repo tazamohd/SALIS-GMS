@@ -193,7 +193,7 @@ export default function GoogleMyBusiness() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white font-poppins"
           data-testid="button-create-post"
         >
-          <MessageCircle className="mr-2 h-4 w-4" />
+          <MessageCircle className="me-2 h-4 w-4" />
           {t('gmb.createPost', 'Create Post')}
         </Button>
       </div>
@@ -240,7 +240,7 @@ export default function GoogleMyBusiness() {
                           className="bg-green-500 hover:bg-green-600 text-white"
                           data-testid={`button-publish-${post.id}`}
                         >
-                          <Send className="h-4 w-4 mr-1" />
+                          <Send className="h-4 w-4 me-1" />
                           {t('gmb.publish', 'Publish')}
                         </Button>
                       )}

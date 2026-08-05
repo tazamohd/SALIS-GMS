@@ -92,6 +92,25 @@ export default function Subscriptions() {
     },
   });
 
+  // Submit a plan change for platform-admin review (approval-gated path,
+  // complementing the immediate self-service change above).
+  const [requestPlan, setRequestPlan] = useState<PlanId>("PRO");
+  const requestChangeMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/subscription-requests", { requestedPlan: requestPlan });
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Request submitted", description: "A platform admin will review your plan change." });
+    },
+    onError: (err: Error) => {
+      let msg = err.message;
+      const m = err.message.match(/\{.*\}/);
+      if (m) { try { msg = JSON.parse(m[0]).message || msg; } catch { /* keep raw */ } }
+      toast({ title: "Could not submit request", description: msg, variant: "destructive" });
+    },
+  });
+
   const plans = catalog?.plans ?? [];
 
   return (
@@ -141,7 +160,7 @@ export default function Subscriptions() {
                     disabled={resumeMutation.isPending}
                     data-testid="button-resume"
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
+                    <RefreshCw className="w-4 h-4 me-2" />
                     Resume
                   </Button>
                 ) : currentPlan !== "STARTER" ? (
@@ -152,7 +171,7 @@ export default function Subscriptions() {
                     disabled={cancelMutation.isPending}
                     data-testid="button-cancel"
                   >
-                    <XCircle className="w-4 h-4 mr-2" />
+                    <XCircle className="w-4 h-4 me-2" />
                     Cancel at period end
                   </Button>
                 ) : null}
@@ -168,6 +187,38 @@ export default function Subscriptions() {
                 label="Stripe"
                 value={subscription?.stripeSubscriptionId ? "Connected" : "Dev mode"}
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Request a plan change (approval-gated) */}
+        <Card className="border-[#E2E8F0] dark:border-[#232A36] bg-white dark:bg-[#151A23]">
+          <CardHeader>
+            <CardTitle className="text-base text-[#0B1F3B] dark:text-white">Request a plan change</CardTitle>
+            <CardDescription>
+              Prefer approval? Submit a request and a platform admin will review and apply it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-3">
+              <select
+                value={requestPlan}
+                onChange={(e) => setRequestPlan(e.target.value as PlanId)}
+                data-testid="select-request-plan"
+                className="h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0]"
+              >
+                <option value="STARTER">Starter</option>
+                <option value="PRO">Pro</option>
+                <option value="ENTERPRISE">Enterprise</option>
+              </select>
+              <Button
+                onClick={() => requestChangeMutation.mutate()}
+                disabled={requestChangeMutation.isPending}
+                data-testid="button-request-plan"
+                className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
+              >
+                {requestChangeMutation.isPending ? "Submitting…" : "Submit for approval"}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -263,7 +314,7 @@ function PlanCard({
         <CardDescription className="text-[#64748B]">{plan.tagline}</CardDescription>
         <div className="mt-4 flex items-baseline gap-2">
           <span className="text-3xl font-bold text-[#0B1F3B] dark:text-white">
-            {plan.priceMonthly === 0 ? "Free" : `$${plan.priceMonthly}`}
+            {plan.priceMonthly === 0 ? "Free" : `SAR ${plan.priceMonthly}`}
           </span>
           {plan.priceMonthly > 0 && (
             <span className="text-sm text-[#64748B]">/ month / garage</span>
@@ -302,7 +353,7 @@ function PlanCard({
             <>Switching…</>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-4 h-4 me-2" />
               Switch to {plan.name}
             </>
           )}

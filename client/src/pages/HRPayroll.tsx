@@ -216,7 +216,7 @@ function EmployeesTab() {
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button>
-              <UserPlus className="w-4 h-4 mr-2" />
+              <UserPlus className="w-4 h-4 me-2" />
               Add Employee
             </Button>
           </DialogTrigger>
@@ -274,7 +274,7 @@ function EmployeesTab() {
                 <TableHead>Email</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Position</TableHead>
-                <TableHead className="text-right">Salary (SAR)</TableHead>
+                <TableHead className="text-end">Salary (SAR)</TableHead>
                 <TableHead>Level</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
@@ -297,7 +297,7 @@ function EmployeesTab() {
                       <Badge variant="outline">{emp.department || "General"}</Badge>
                     </TableCell>
                     <TableCell>{emp.position || "Staff"}</TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(emp.salary)}</TableCell>
+                    <TableCell className="text-end font-mono">{formatCurrency(emp.salary)}</TableCell>
                     <TableCell>{emp.level}</TableCell>
                     <TableCell>{statusBadge(emp.status)}</TableCell>
                   </TableRow>
@@ -343,7 +343,7 @@ function AttendanceTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-4">
         <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="max-w-[200px]" />
-        <div className="flex gap-3 ml-auto">
+        <div className="flex gap-3 ms-auto">
           <Card className="px-4 py-2">
             <div className="text-xs text-muted-foreground">Present</div>
             <div className="text-lg font-bold text-emerald-600">{data?.present || 0}</div>
@@ -368,8 +368,8 @@ function AttendanceTab() {
                 <TableHead>Department</TableHead>
                 <TableHead>Clock In</TableHead>
                 <TableHead>Clock Out</TableHead>
-                <TableHead className="text-right">Hours</TableHead>
-                <TableHead className="text-right">Overtime</TableHead>
+                <TableHead className="text-end">Hours</TableHead>
+                <TableHead className="text-end">Overtime</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -390,8 +390,8 @@ function AttendanceTab() {
                     <TableCell><Badge variant="outline">{rec.department}</Badge></TableCell>
                     <TableCell>{rec.clockIn ? new Date(rec.clockIn).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "--"}</TableCell>
                     <TableCell>{rec.clockOut ? new Date(rec.clockOut).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "--"}</TableCell>
-                    <TableCell className="text-right font-mono">{rec.hoursWorked.toFixed(1)}</TableCell>
-                    <TableCell className="text-right font-mono">{rec.overtime > 0 ? `+${rec.overtime}h` : "--"}</TableCell>
+                    <TableCell className="text-end font-mono">{rec.hoursWorked.toFixed(1)}</TableCell>
+                    <TableCell className="text-end font-mono">{rec.overtime > 0 ? `+${rec.overtime}h` : "--"}</TableCell>
                     <TableCell>{statusBadge(rec.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -486,7 +486,7 @@ function LeaveTab() {
           </Select>
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
-              <Button><CalendarDays className="w-4 h-4 mr-2" />Request Leave</Button>
+              <Button><CalendarDays className="w-4 h-4 me-2" />Request Leave</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -544,7 +544,7 @@ function LeaveTab() {
                 <TableHead>Type</TableHead>
                 <TableHead>Start</TableHead>
                 <TableHead>End</TableHead>
-                <TableHead className="text-right">Days</TableHead>
+                <TableHead className="text-end">Days</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -570,7 +570,7 @@ function LeaveTab() {
                     </TableCell>
                     <TableCell>{lr.startDate}</TableCell>
                     <TableCell>{lr.endDate}</TableCell>
-                    <TableCell className="text-right font-mono">{lr.days}</TableCell>
+                    <TableCell className="text-end font-mono">{lr.days}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{lr.reason}</TableCell>
                     <TableCell>{statusBadge(lr.status)}</TableCell>
                     <TableCell>
@@ -703,12 +703,12 @@ function PayrollTab() {
               <TableRow>
                 <TableHead>Employee</TableHead>
                 <TableHead>Saudi</TableHead>
-                <TableHead className="text-right">Base Salary</TableHead>
-                <TableHead className="text-right">Allowances</TableHead>
-                <TableHead className="text-right">Gross</TableHead>
-                <TableHead className="text-right">GOSI (ER)</TableHead>
-                <TableHead className="text-right">GOSI (EE)</TableHead>
-                <TableHead className="text-right">Net Pay</TableHead>
+                <TableHead className="text-end">Base Salary</TableHead>
+                <TableHead className="text-end">Allowances</TableHead>
+                <TableHead className="text-end">Gross</TableHead>
+                <TableHead className="text-end">GOSI (ER)</TableHead>
+                <TableHead className="text-end">GOSI (EE)</TableHead>
+                <TableHead className="text-end">Net Pay</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -735,12 +735,12 @@ function PayrollTab() {
                         <Badge variant="outline">Non-Saudi</Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(emp.baseSalary)}</TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(emp.housingAllowance + emp.transportAllowance)}</TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(emp.grossSalary)}</TableCell>
-                    <TableCell className="text-right font-mono text-blue-600">{formatCurrency(emp.gosiEmployer)}</TableCell>
-                    <TableCell className="text-right font-mono text-amber-600">{formatCurrency(emp.gosiEmployee)}</TableCell>
-                    <TableCell className="text-right font-mono font-bold">{formatCurrency(emp.netPay)}</TableCell>
+                    <TableCell className="text-end font-mono">{formatCurrency(emp.baseSalary)}</TableCell>
+                    <TableCell className="text-end font-mono">{formatCurrency(emp.housingAllowance + emp.transportAllowance)}</TableCell>
+                    <TableCell className="text-end font-mono">{formatCurrency(emp.grossSalary)}</TableCell>
+                    <TableCell className="text-end font-mono text-blue-600">{formatCurrency(emp.gosiEmployer)}</TableCell>
+                    <TableCell className="text-end font-mono text-amber-600">{formatCurrency(emp.gosiEmployee)}</TableCell>
+                    <TableCell className="text-end font-mono font-bold">{formatCurrency(emp.netPay)}</TableCell>
                   </TableRow>
                 ))
               )}

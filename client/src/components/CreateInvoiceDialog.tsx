@@ -175,7 +175,7 @@ export function CreateInvoiceDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-invoice">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Create Invoice
         </Button>
       </DialogTrigger>
@@ -329,7 +329,7 @@ export function CreateInvoiceDialog() {
                       <div className="flex items-center gap-4">
                         <span className="text-sm">Qty: {item.quantity}</span>
                         <span className="text-sm">@ ${item.unitPrice.toFixed(2)}</span>
-                        <span className="font-medium">${(item.quantity * item.unitPrice).toFixed(2)}</span>
+                        <span className="font-medium">SAR {(item.quantity * item.unitPrice).toFixed(2)}</span>
                         <Button
                           type="button"
                           variant="ghost"
@@ -348,15 +348,15 @@ export function CreateInvoiceDialog() {
                       <div className="space-y-1">
                         <div className="flex justify-between gap-4">
                           <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">${subtotal.toFixed(2)}</span>
+                          <span className="font-medium">SAR {subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4">
                           <span className="text-gray-600">Tax:</span>
-                          <span className="font-medium">${taxAmount.toFixed(2)}</span>
+                          <span className="font-medium">SAR {taxAmount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between gap-4 text-base font-bold">
                           <span>Total:</span>
-                          <span>${total.toFixed(2)}</span>
+                          <span>SAR {total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

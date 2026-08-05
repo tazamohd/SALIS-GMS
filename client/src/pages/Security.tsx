@@ -188,7 +188,7 @@ function TwoFactorAuthTab() {
                 className="border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="button-copy-backup-codes"
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="h-4 w-4 me-2" />
                 {t('security.copyAllCodes', 'Copy All Codes')}
               </Button>
             </div>
@@ -237,7 +237,7 @@ function TwoFactorAuthTab() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-setup-2fa"
             >
-              <Lock className="h-4 w-4 mr-2" />
+              <Lock className="h-4 w-4 me-2" />
               {t('security.setup2fa', 'Setup 2FA')}
             </Button>
           </div>
@@ -424,7 +424,7 @@ function BackupRestoreTab() {
             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
             data-testid="button-create-backup"
           >
-            <Database className="h-4 w-4 mr-2" />
+            <Database className="h-4 w-4 me-2" />
             {t('security.createBackup', 'Create Backup')}
           </Button>
         </div>
@@ -474,7 +474,7 @@ function BackupRestoreTab() {
                               className="border-[#E2E8F0] dark:border-[#232A36]"
                               data-testid={`button-restore-${backup.id}`}
                             >
-                              <Upload className="h-3 w-3 mr-1" />
+                              <Upload className="h-3 w-3 me-1" />
                               {t('security.restore', 'Restore')}
                             </Button>
                             <Button 
@@ -483,7 +483,7 @@ function BackupRestoreTab() {
                               className="border-[#E2E8F0] dark:border-[#232A36]"
                               data-testid={`button-download-${backup.id}`}
                             >
-                              <Download className="h-3 w-3 mr-1" />
+                              <Download className="h-3 w-3 me-1" />
                               {t('common.download', 'Download')}
                             </Button>
                           </>

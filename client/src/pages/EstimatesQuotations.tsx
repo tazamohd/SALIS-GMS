@@ -256,7 +256,7 @@ export default function EstimatesQuotations() {
           </p>
         </div>
         <Button onClick={() => setActiveTab("create")} className="bg-[#0A5ED7] hover:bg-[#0A5ED7]/90">
-          <Plus className="h-4 w-4 mr-2" /> New Estimate
+          <Plus className="h-4 w-4 me-2" /> New Estimate
         </Button>
       </div>
 
@@ -326,12 +326,12 @@ export default function EstimatesQuotations() {
                 placeholder="Search by estimate #, customer, vehicle..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="ps-9"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-[180px]">
-                <Filter className="h-4 w-4 mr-2 text-[#64748B]" />
+                <Filter className="h-4 w-4 me-2 text-[#64748B]" />
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
@@ -352,13 +352,13 @@ export default function EstimatesQuotations() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-slate-50 dark:bg-slate-900">
-                    <th className="text-left p-3 font-medium text-[#64748B]">Estimate #</th>
-                    <th className="text-left p-3 font-medium text-[#64748B]">Customer</th>
-                    <th className="text-left p-3 font-medium text-[#64748B]">Vehicle</th>
-                    <th className="text-left p-3 font-medium text-[#64748B]">Date</th>
-                    <th className="text-right p-3 font-medium text-[#64748B]">Total (incl. VAT)</th>
+                    <th className="text-start p-3 font-medium text-[#64748B]">Estimate #</th>
+                    <th className="text-start p-3 font-medium text-[#64748B]">Customer</th>
+                    <th className="text-start p-3 font-medium text-[#64748B]">Vehicle</th>
+                    <th className="text-start p-3 font-medium text-[#64748B]">Date</th>
+                    <th className="text-end p-3 font-medium text-[#64748B]">Total (incl. VAT)</th>
                     <th className="text-center p-3 font-medium text-[#64748B]">Status</th>
-                    <th className="text-right p-3 font-medium text-[#64748B]">Actions</th>
+                    <th className="text-end p-3 font-medium text-[#64748B]">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -394,7 +394,7 @@ export default function EstimatesQuotations() {
                           <td className="p-3 text-[#64748B]">
                             {new Date(est.createdAt).toLocaleDateString("en-GB")}
                           </td>
-                          <td className="p-3 text-right font-semibold text-[#0B1F3B] dark:text-white">
+                          <td className="p-3 text-end font-semibold text-[#0B1F3B] dark:text-white">
                             {SAR(est.total)}
                           </td>
                           <td className="p-3 text-center">
@@ -402,7 +402,7 @@ export default function EstimatesQuotations() {
                               {sc.label}
                             </Badge>
                           </td>
-                          <td className="p-3 text-right">
+                          <td className="p-3 text-end">
                             <div className="flex items-center justify-end gap-1">
                               {actions.map((a) => (
                                 <Button
@@ -418,7 +418,7 @@ export default function EstimatesQuotations() {
                                 </Button>
                               ))}
                               {est.convertedJobCardId && (
-                                <span className="text-xs text-purple-600 dark:text-purple-400 ml-1">
+                                <span className="text-xs text-purple-600 dark:text-purple-400 ms-1">
                                   JC: {est.convertedJobCardId}
                                 </span>
                               )}
@@ -535,7 +535,7 @@ export default function EstimatesQuotations() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base">Line Items</CardTitle>
                 <Button type="button" variant="outline" size="sm" onClick={addLineItem}>
-                  <Plus className="h-4 w-4 mr-1" /> Add Row
+                  <Plus className="h-4 w-4 me-1" /> Add Row
                 </Button>
               </CardHeader>
               <CardContent>
@@ -543,11 +543,11 @@ export default function EstimatesQuotations() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b bg-slate-50 dark:bg-slate-900">
-                        <th className="text-left p-2 font-medium text-[#64748B] w-[120px]">Type</th>
-                        <th className="text-left p-2 font-medium text-[#64748B]">Description</th>
-                        <th className="text-right p-2 font-medium text-[#64748B] w-[80px]">Qty</th>
-                        <th className="text-right p-2 font-medium text-[#64748B] w-[120px]">Unit Price</th>
-                        <th className="text-right p-2 font-medium text-[#64748B] w-[120px]">Line Total</th>
+                        <th className="text-start p-2 font-medium text-[#64748B] w-[120px]">Type</th>
+                        <th className="text-start p-2 font-medium text-[#64748B]">Description</th>
+                        <th className="text-end p-2 font-medium text-[#64748B] w-[80px]">Qty</th>
+                        <th className="text-end p-2 font-medium text-[#64748B] w-[120px]">Unit Price</th>
+                        <th className="text-end p-2 font-medium text-[#64748B] w-[120px]">Line Total</th>
                         <th className="w-[50px]"></th>
                       </tr>
                     </thead>
@@ -583,7 +583,7 @@ export default function EstimatesQuotations() {
                               min={1}
                               value={li.quantity}
                               onChange={(e) => updateLineItem(idx, "quantity", Number(e.target.value))}
-                              className="h-8 text-xs text-right"
+                              className="h-8 text-xs text-end"
                             />
                           </td>
                           <td className="p-2">
@@ -593,10 +593,10 @@ export default function EstimatesQuotations() {
                               step={0.01}
                               value={li.unitPrice}
                               onChange={(e) => updateLineItem(idx, "unitPrice", Number(e.target.value))}
-                              className="h-8 text-xs text-right"
+                              className="h-8 text-xs text-end"
                             />
                           </td>
-                          <td className="p-2 text-right font-medium text-[#0B1F3B] dark:text-white">
+                          <td className="p-2 text-end font-medium text-[#0B1F3B] dark:text-white">
                             {SAR(li.quantity * li.unitPrice)}
                           </td>
                           <td className="p-2 text-center">

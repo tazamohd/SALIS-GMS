@@ -186,7 +186,7 @@ export default function PredictiveDemandForecasting() {
                   <div className="flex-1 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-full h-2">
                     <div className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] h-2 rounded-full" style={{ width: `${item.confidence}%` }} />
                   </div>
-                  <span className="text-sm font-medium w-12 text-right text-[#0B1F3B] dark:text-white">{item.confidence}%</span>
+                  <span className="text-sm font-medium w-12 text-end text-[#0B1F3B] dark:text-white">{item.confidence}%</span>
                 </div>
               ))
             )}

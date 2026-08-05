@@ -20,6 +20,7 @@ export default function TechnicianDashboard() {
 
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
     queryKey: ["/api/technicians", user?.id, "job-cards"],
+    queryFn: () => fetch(`/api/technicians/${user!.id}/job-cards`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!user?.id,
   });
 
@@ -196,7 +197,7 @@ export default function TechnicianDashboard() {
                     </p>
                     {job.scheduledDate && (
                       <p className="text-xs text-[#64748B] mt-1">
-                        <Clock className="h-3 w-3 inline mr-1" />
+                        <Clock className="h-3 w-3 inline me-1" />
                         {format(new Date(job.scheduledDate), "h:mm a")}
                       </p>
                     )}

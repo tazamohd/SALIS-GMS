@@ -30,7 +30,7 @@ export default function SocialMediaIntegration() {
 
   const createPost = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/social/posts", "POST", data);
+      return await apiRequest("POST", "/api/social/posts", data);
     },
     onSuccess: () => {
       toast({ title: t('social.postCreated', 'Post created'), description: t('social.postScheduled', 'Your post has been scheduled.') });

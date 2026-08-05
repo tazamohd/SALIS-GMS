@@ -51,7 +51,7 @@ export function PlanGate({ minPlan, children, fallback, moduleName }: PlanGatePr
               <Lock className="w-6 h-6" />
             </div>
             <Badge className={PLAN_BADGE[minPlan]}>
-              <Sparkles className="w-3 h-3 mr-1" />
+              <Sparkles className="w-3 h-3 me-1" />
               {minPlan}
             </Badge>
           </div>
@@ -70,7 +70,7 @@ export function PlanGate({ minPlan, children, fallback, moduleName }: PlanGatePr
               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
             >
               Compare plans & upgrade
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4 ms-2" />
             </Button>
           </Link>
           <p className="text-xs text-[#64748B] text-center">

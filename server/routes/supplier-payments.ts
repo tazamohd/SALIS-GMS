@@ -4,10 +4,10 @@ import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/supplier-payments', isAuthenticated, async (req, res) => {
+router.get('/supplier-payments', isAuthenticated, async (req: any, res) => {
   try {
-    const { garage_id, status } = req.query;
-    const payments = await storage.getSupplierPayments(garage_id as string, status as string);
+    const { status } = req.query;
+    const payments = await storage.getSupplierPayments(req.user.garageId, status as string);
     res.json(payments);
   } catch (error) {
     console.error('Error fetching supplier payments:', error);
@@ -15,10 +15,10 @@ router.get('/supplier-payments', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/supplier-payments/:id', isAuthenticated, async (req, res) => {
+router.get('/supplier-payments/:id', isAuthenticated, async (req: any, res) => {
   try {
     const { id } = req.params;
-    const payment = await storage.getSupplierPayment(id);
+    const payment = await storage.getSupplierPayment(id, req.user.garageId);
     if (!payment) {
       return res.status(404).json({ message: 'Payment not found' });
     }

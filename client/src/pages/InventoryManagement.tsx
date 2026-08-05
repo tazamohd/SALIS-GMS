@@ -59,14 +59,14 @@ import {
 const CHART_COLORS = ["#0A5ED7", "#0BB3FF", "#F97316", "#10B981", "#8B5CF6", "#EC4899", "#F59E0B", "#6366F1"];
 
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "SAR" }).format(value);
 }
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "in_stock") {
     return (
       <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0">
-        <CheckCircle className="w-3 h-3 mr-1" />
+        <CheckCircle className="w-3 h-3 me-1" />
         In Stock
       </Badge>
     );
@@ -74,14 +74,14 @@ function StatusBadge({ status }: { status: string }) {
   if (status === "low") {
     return (
       <Badge className="bg-[#F97316]/10 text-[#F97316] border-0">
-        <AlertTriangle className="w-3 h-3 mr-1" />
+        <AlertTriangle className="w-3 h-3 me-1" />
         Low Stock
       </Badge>
     );
   }
   return (
     <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-0">
-      <XCircle className="w-3 h-3 mr-1" />
+      <XCircle className="w-3 h-3 me-1" />
       Out of Stock
     </Badge>
   );
@@ -430,7 +430,7 @@ export default function InventoryManagement() {
           placeholder="Search by name, part number, or category..."
           value={stockSearch}
           onChange={(e) => setStockSearch(e.target.value)}
-          className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+          className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
         />
       </div>
 
@@ -454,12 +454,12 @@ export default function InventoryManagement() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Part Name</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Part Number</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Quantity</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Min Threshold</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Reorder Point</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Quantity</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Min Threshold</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Reorder Point</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Unit Cost</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Line Value</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Unit Cost</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Line Value</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -473,12 +473,12 @@ export default function InventoryManagement() {
                         {item.category}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-semibold text-[#0B1F3B] dark:text-white">{item.stockQuantity}</TableCell>
-                    <TableCell className="text-right text-[#64748B]">{item.minThreshold}</TableCell>
-                    <TableCell className="text-right text-[#64748B]">{item.reorderPoint}</TableCell>
+                    <TableCell className="text-end font-semibold text-[#0B1F3B] dark:text-white">{item.stockQuantity}</TableCell>
+                    <TableCell className="text-end text-[#64748B]">{item.minThreshold}</TableCell>
+                    <TableCell className="text-end text-[#64748B]">{item.reorderPoint}</TableCell>
                     <TableCell><StatusBadge status={item.status} /></TableCell>
-                    <TableCell className="text-right text-[#64748B]">{formatCurrency(item.costPrice)}</TableCell>
-                    <TableCell className="text-right font-medium text-[#0B1F3B] dark:text-white">{formatCurrency(item.lineValue)}</TableCell>
+                    <TableCell className="text-end text-[#64748B]">{formatCurrency(item.costPrice)}</TableCell>
+                    <TableCell className="text-end font-medium text-[#0B1F3B] dark:text-white">{formatCurrency(item.lineValue)}</TableCell>
                     <TableCell>
                       {(item.status === "low" || item.status === "out_of_stock") && (
                         <Button
@@ -488,7 +488,7 @@ export default function InventoryManagement() {
                           onClick={() => handleReorderItem(item)}
                           disabled={reorderingItems.has(item.inventoryId || item.sparePartId)}
                         >
-                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          <ShoppingCart className="w-3 h-3 me-1" />
                           {reorderingItems.has(item.inventoryId || item.sparePartId) ? "Ordering..." : "Reorder"}
                         </Button>
                       )}
@@ -585,7 +585,7 @@ export default function InventoryManagement() {
                 {supplier.paymentTerms && (
                   <div className="pt-1">
                     <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">
-                      <Clock className="w-3 h-3 mr-1" />
+                      <Clock className="w-3 h-3 me-1" />
                       {supplier.paymentTerms}
                     </Badge>
                   </div>
@@ -613,7 +613,7 @@ export default function InventoryManagement() {
           disabled={lowStockItems.length === 0 || reorderMutation.isPending}
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
         >
-          <ShoppingCart className="w-4 h-4 mr-2" />
+          <ShoppingCart className="w-4 h-4 me-2" />
           {reorderMutation.isPending ? "Processing..." : `Bulk Reorder All (${lowStockItems.length})`}
         </Button>
       </div>
@@ -639,10 +639,10 @@ export default function InventoryManagement() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Part Name</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Part Number</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Category</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Current Stock</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Min Threshold</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Suggested Order Qty</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Est. Cost</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Current Stock</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Min Threshold</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Suggested Order Qty</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Est. Cost</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Action</TableHead>
                 </TableRow>
@@ -662,10 +662,10 @@ export default function InventoryManagement() {
                           {item.category}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-red-600">{item.stockQuantity}</TableCell>
-                      <TableCell className="text-right text-[#64748B]">{item.minThreshold}</TableCell>
-                      <TableCell className="text-right font-semibold text-[#0B1F3B] dark:text-white">{suggestedQty}</TableCell>
-                      <TableCell className="text-right text-[#64748B]">{formatCurrency(estCost)}</TableCell>
+                      <TableCell className="text-end font-semibold text-red-600">{item.stockQuantity}</TableCell>
+                      <TableCell className="text-end text-[#64748B]">{item.minThreshold}</TableCell>
+                      <TableCell className="text-end font-semibold text-[#0B1F3B] dark:text-white">{suggestedQty}</TableCell>
+                      <TableCell className="text-end text-[#64748B]">{formatCurrency(estCost)}</TableCell>
                       <TableCell><StatusBadge status={item.status} /></TableCell>
                       <TableCell>
                         <Button
@@ -674,7 +674,7 @@ export default function InventoryManagement() {
                           disabled={reorderingItems.has(itemKey)}
                           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                         >
-                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          <ShoppingCart className="w-3 h-3 me-1" />
                           {reorderingItems.has(itemKey) ? "Ordering..." : "Create PO"}
                         </Button>
                       </TableCell>

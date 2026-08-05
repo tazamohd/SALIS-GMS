@@ -2,7 +2,7 @@ import { db } from './db';
 import {
   garages, branches, users, customerProfiles, technicianProfiles,
   vehicles, jobCards, appointments, spareParts, sparePartInventories,
-  invoices, payments, estimates, serviceReminders, maintenanceSchedules,
+  invoices, payments, estimates, estimateItems, serviceReminders, maintenanceSchedules,
   vehicleServiceHistory, purchaseOrders, taskAssignments, commissionRules,
   commissions, employeeAttendance, shiftTemplates, shiftAssignments,
   performanceReviews, trainings, employeeTrainings, stockAlerts,
@@ -389,6 +389,9 @@ async function seed() {
     const createdInvoices = [];
     for (let i = 0; i < 12; i++) {
       const jobCard = createdJobCards[i];
+      // job_cards.customer_id is nullable but invoices.customer_id is NOT NULL,
+      // so an unassigned job card would fail the insert at runtime.
+      if (!jobCard?.customerId) continue;
       const status = invoiceStatuses[Math.floor(Math.random() * invoiceStatuses.length)];
       const subtotal = parseFloat(jobCard.totalCost || '500');
       const tax = subtotal * 0.08;
@@ -405,10 +408,10 @@ async function seed() {
         totalAmount: total.toFixed(2),
         paidAmount: status === 'paid' ? total.toFixed(2) : '0.00',
         balanceAmount: status === 'paid' ? '0.00' : total.toFixed(2),
-        issueDate: new Date(Date.now() - (12 - i) * 24 * 60 * 60 * 1000),
+        invoiceDate: new Date(Date.now() - (12 - i) * 24 * 60 * 60 * 1000),
         dueDate: new Date(Date.now() + (i - 2) * 24 * 60 * 60 * 1000),
-        paidDate: status === 'paid' ? new Date() : null,
-        paymentMethod: status === 'paid' ? ['card', 'cash', 'bank_transfer'][i % 3] : null,
+        // invoices has paidAt, not paidDate, and no paymentMethod column.
+        paidAt: status === 'paid' ? new Date() : null,
         notes: i % 2 === 0 ? '10% discount applied for loyal customer' : null,
         createdBy: userId,
       }).returning();
@@ -439,7 +442,7 @@ async function seed() {
       const tax = subtotal * 0.08;
       const total = subtotal + tax;
       
-      await db.insert(estimates).values({
+      const [estimate] = await db.insert(estimates).values({
         estimateNumber: `EST-${timestamp}-${String(i).padStart(4, '0')}`,
         garageId,
         customerId: vehicle.customerId,
@@ -451,15 +454,31 @@ async function seed() {
         taxAmount: tax.toFixed(2),
         totalAmount: total.toFixed(2),
         validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        lineItems: [
-          { description: 'Labor', quantity: 2, unitPrice: (subtotal * 0.6).toFixed(2), total: (subtotal * 0.6).toFixed(2) },
-          { description: 'Parts', quantity: 1, unitPrice: (subtotal * 0.4).toFixed(2), total: (subtotal * 0.4).toFixed(2) },
-        ],
         createdBy: userId,
         approvedAt: status === 'approved' ? new Date() : null,
-        approvedBy: status === 'approved' ? vehicle.customerId : null,
         notes: i % 2 === 0 ? 'Price includes warranty on parts' : null,
-      });
+      }).returning();
+
+      // Line items live in estimate_items, not a JSON column on estimates.
+      // estimates also has no approvedBy column — approvedAt records the event.
+      await db.insert(estimateItems).values([
+        {
+          estimateId: estimate.id,
+          itemType: 'labor',
+          description: 'Labor',
+          quantity: "2",
+          unitPrice: (subtotal * 0.6).toFixed(2),
+          lineTotal: (subtotal * 0.6).toFixed(2),
+        },
+        {
+          estimateId: estimate.id,
+          itemType: 'part',
+          description: 'Parts',
+          quantity: "1",
+          unitPrice: (subtotal * 0.4).toFixed(2),
+          lineTotal: (subtotal * 0.4).toFixed(2),
+        },
+      ]);
     }
 
     console.log('✅ Created 10 estimates');
@@ -473,8 +492,8 @@ async function seed() {
         description: 'Regular oil and filter change',
         intervalType: 'mileage',
         intervalMileage: 5000,
-        lastServiceMileage: vehicle.mileage - 3000,
-        nextDueMileage: vehicle.mileage + 2000,
+        lastServiceMileage: (vehicle.mileage ?? 0) - 3000,
+        nextDueMileage: (vehicle.mileage ?? 0) + 2000,
         isActive: true,
       });
       
@@ -486,9 +505,9 @@ async function seed() {
         intervalMileage: 7500,
         intervalMonths: 6,
         lastServiceDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-        lastServiceMileage: vehicle.mileage - 5000,
+        lastServiceMileage: (vehicle.mileage ?? 0) - 5000,
         nextDueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-        nextDueMileage: vehicle.mileage + 2500,
+        nextDueMileage: (vehicle.mileage ?? 0) + 2500,
         isActive: true,
       });
     }
@@ -503,7 +522,7 @@ async function seed() {
         reminderType: 'mileage',
         reminderTitle: 'Upcoming Oil Change',
         reminderMessage: `Your ${vehicle.make} ${vehicle.model} is due for an oil change soon.`,
-        triggerMileage: vehicle.mileage + 500,
+        triggerMileage: (vehicle.mileage ?? 0) + 500,
         advanceMiles: 500,
         status: 'pending',
         isActive: true,
@@ -678,12 +697,14 @@ async function seed() {
 
     for (const inv of lowStockParts) {
       await db.insert(stockAlerts).values({
-        sparePartInventoryId: inv.id,
+        // stock_alerts references spare_part_id + garage_id; it has no
+        // spare_part_inventory_id, no severity and no status column.
+        sparePartId: inv.sparePartId,
+        garageId,
         alertType: 'low_stock',
-        currentStock: inv.stockQuantity,
-        threshold: inv.minThreshold,
-        severity: 'high',
-        status: 'active',
+        currentQuantity: inv.stockQuantity ?? 0,
+        threshold: inv.minThreshold ?? 0,
+        alertStatus: 'active',
       });
     }
 
@@ -723,7 +744,7 @@ async function seed() {
         jobCardId: jobCard.id,
         taskName: taskNames[i % taskNames.length],
         taskType,
-        description: `Complete ${taskNames[i % taskNames.length].toLowerCase()} for ${jobCard.vehicleInfo.make} ${jobCard.vehicleInfo.model}`,
+        description: `Complete ${taskNames[i % taskNames.length].toLowerCase()} for ${(jobCard.vehicleInfo as any)?.make} ${(jobCard.vehicleInfo as any)?.model}`,
         assignedTo: tech.id,
         assignedBy: userId,
         userType: 'technician',
@@ -731,7 +752,6 @@ async function seed() {
         priority: taskPriorities[Math.floor(Math.random() * taskPriorities.length)],
         estimatedMinutes: Math.floor(Math.random() * 180 + 30),
         actualMinutes: status === 'completed' ? Math.floor(Math.random() * 180 + 30) : null,
-        dueDate,
         startedAt: status !== 'assigned' ? new Date(Date.now() - (13 - i) * 24 * 60 * 60 * 1000) : null,
         completedAt: status === 'completed' ? new Date(Date.now() - (12 - i) * 24 * 60 * 60 * 1000) : null,
         notes: i % 3 === 0 ? 'Customer waiting - high priority' : null,

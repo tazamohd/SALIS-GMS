@@ -34,10 +34,7 @@ export default function DigitalSignage() {
       displayType: string;
       resolution: string;
     }) => {
-      return await apiRequest("/api/signage/displays", {
-        method: "POST",
-        body: JSON.stringify(displayData),
-      });
+      return await apiRequest('POST', "/api/signage/displays", displayData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/signage/displays"] });

@@ -209,7 +209,7 @@ export default function PurchaseAgentTracking() {
                 placeholder="Search orders..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search"
               />
             </div>
@@ -247,8 +247,8 @@ export default function PurchaseAgentTracking() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">${order.totalAmount}</p>
+                      <div className="text-end">
+                        <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">SAR {order.totalAmount}</p>
                         {order.expectedDeliveryDate && (
                           <p className="text-sm text-[#64748B] flex items-center justify-end gap-1">
                             <MapPin className="h-3 w-3" />
@@ -256,7 +256,7 @@ export default function PurchaseAgentTracking() {
                             {daysUntil !== null && (
                               <Badge
                                 variant={daysUntil < 0 ? "destructive" : daysUntil <= 3 ? "secondary" : "outline"}
-                                className="ml-2"
+                                className="ms-2"
                               >
                                 {daysUntil < 0
                                   ? `${Math.abs(daysUntil)} days overdue`

@@ -265,7 +265,7 @@ export default function AssetsManagement() {
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-asset">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('assets.addAsset', 'Add Asset')}
                 </Button>
               </DialogTrigger>
@@ -436,7 +436,7 @@ export default function AssetsManagement() {
                 placeholder={t('assets.searchAssets', 'Search assets...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-assets"
               />
             </div>
@@ -453,7 +453,7 @@ export default function AssetsManagement() {
               </SelectContent>
             </Select>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-assets">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('common.export', 'Export')}
             </Button>
           </div>
@@ -498,7 +498,7 @@ export default function AssetsManagement() {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7]">
-                      <CheckCircle className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-3 w-3 me-1" />
                       {t('common.active', 'Active')}
                     </Badge>
                   </TableCell>

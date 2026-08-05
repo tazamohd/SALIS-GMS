@@ -80,7 +80,7 @@ export function PageHeader({
                   )}
                   data-testid={action.testId || `page-header-action-${index}`}
                 >
-                  {action.icon && <action.icon className="mr-2 h-4 w-4" />}
+                  {action.icon && <action.icon className="me-2 h-4 w-4" />}
                   {action.label}
                 </Button>
               )

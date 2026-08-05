@@ -29,7 +29,7 @@ describe('Spare part read route extraction (Wave J)', () => {
   it('preserves spare part list pagination, garage scoping, and detail lookup', () => {
     expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-parts['"],\s*isAuthenticated/);
     expect(sparePartRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(sparePartRoutesSource).toMatch(/const gid = \(garageId as string\) \|\| \(req\.user as any\)\?\.garageId/);
+    expect(sparePartRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garageId as string\)/);
     expect(sparePartRoutesSource).toMatch(/storage\.getSparePartsPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
     expect(sparePartRoutesSource).toMatch(/storage\.countSpareParts\(gid\)/);
     expect(sparePartRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
@@ -41,8 +41,8 @@ describe('Spare part read route extraction (Wave J)', () => {
   it('preserves spare part inventory read validation and storage lookup', () => {
     expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-part-inventories['"],\s*isAuthenticated/);
     expect(sparePartRoutesSource).toMatch(/const \{ garage_id,\s*spare_part_id \} = req\.query/);
-    expect(sparePartRoutesSource).toMatch(/if \(!garage_id\)/);
+    expect(sparePartRoutesSource).toMatch(/if \(!gid\)/);
     expect(sparePartRoutesSource).toMatch(/garage_id is required/);
-    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartInventories\(\s*garage_id as string,\s*spare_part_id as string,\s*\)/);
+    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartInventories\(\s*gid,\s*spare_part_id as string,\s*\)/);
   });
 });

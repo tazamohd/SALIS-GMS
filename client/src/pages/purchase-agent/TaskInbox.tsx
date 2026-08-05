@@ -181,13 +181,13 @@ export default function TaskInbox() {
                   placeholder="Search tasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-tasks"
                 />
               </div>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                 <SelectTrigger className="w-32 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-priority-filter">
-                  <Filter className="h-4 w-4 mr-2" />
+                  <Filter className="h-4 w-4 me-2" />
                   <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -261,7 +261,7 @@ export default function TaskInbox() {
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-2 ml-4">
+                      <div className="flex flex-col gap-2 ms-4">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
@@ -271,7 +271,7 @@ export default function TaskInbox() {
                               onClick={() => setSelectedTask(task)}
                               data-testid={`button-view-task-${task.id}`}
                             >
-                              <Eye className="h-4 w-4 mr-1" />
+                              <Eye className="h-4 w-4 me-1" />
                               View
                             </Button>
                           </DialogTrigger>

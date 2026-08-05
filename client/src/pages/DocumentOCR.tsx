@@ -51,7 +51,7 @@ export default function DocumentOCR() {
 
   const uploadMutation = useMutation({
     mutationFn: async (data: { documentType: string; fileName: string }) => {
-      return await apiRequest("/api/ai/ocr-documents/upload", "POST", data);
+      return await apiRequest("POST", "/api/ai/ocr-documents/upload", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
@@ -72,7 +72,7 @@ export default function DocumentOCR() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return await apiRequest(`/api/ai/ocr-documents/${id}`, "PATCH", data);
+      return await apiRequest("PATCH", `/api/ai/ocr-documents/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
@@ -298,7 +298,7 @@ export default function DocumentOCR() {
                   data-testid="button-edit-data"
                   className="border-[#E2E8F0] dark:border-[#232A36]"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 me-2" />
                   {t('common.edit', 'Edit')}
                 </Button>
               )}
@@ -350,11 +350,11 @@ export default function DocumentOCR() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setEditMode(false)} data-testid="button-cancel-edit" className="border-[#E2E8F0] dark:border-[#232A36]">
-                      <X className="h-4 w-4 mr-2" />
+                      <X className="h-4 w-4 me-2" />
                       {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button onClick={handleSaveEdits} disabled={updateMutation.isPending} data-testid="button-save-edit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4 me-2" />
                       {updateMutation.isPending ? t('documentOCR.saving', 'Saving...') : t('documentOCR.saveChanges', 'Save Changes')}
                     </Button>
                   </DialogFooter>
@@ -369,7 +369,7 @@ export default function DocumentOCR() {
                     <div>
                       <Label className="text-[#64748B]">{t('documentOCR.totalAmount', 'Total Amount')}</Label>
                       <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">
-                        {editedData.total ? `$${editedData.total}` : t('common.notAvailable', 'N/A')}
+                        {editedData.total ? `SAR ${editedData.total}` : t('common.notAvailable', 'N/A')}
                       </p>
                     </div>
                   </div>

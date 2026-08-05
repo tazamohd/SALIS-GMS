@@ -84,8 +84,8 @@ export function MediaUpload({
 
         await apiRequest('POST', '/api/media-attachments', mediaData);
 
-        queryClient.invalidateQueries({ 
-          queryKey: ['/api/media-attachments', relatedType, relatedId] 
+        queryClient.invalidateQueries({
+          queryKey: [`/api/media-attachments/${relatedType}/${relatedId}`]
         });
 
         toast({
@@ -200,7 +200,7 @@ export function MediaUpload({
         <div className="flex justify-end gap-2">
           {onCancel && (
             <Button variant="outline" onClick={onCancel} data-testid="button-cancel-upload">
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 me-2" />
               Cancel
             </Button>
           )}
@@ -210,7 +210,7 @@ export function MediaUpload({
             className="bg-salis-black hover:bg-salis-gray text-white"
             data-testid="button-upload"
           >
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="w-4 h-4 me-2" />
             {isUploading ? "Uploading..." : "Upload"}
           </Button>
         </div>

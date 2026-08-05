@@ -90,7 +90,7 @@ export default function ServiceTemplates() {
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return await apiRequest("/api/service-templates", "POST", {
+      return await apiRequest("POST", "/api/service-templates", {
         ...data,
         taskSteps: data.taskSteps,
         requiredSkills: data.requiredSkills || [],
@@ -119,7 +119,7 @@ export default function ServiceTemplates() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/service-templates/${id}`, "DELETE");
+      return await apiRequest("DELETE", `/api/service-templates/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -196,7 +196,7 @@ export default function ServiceTemplates() {
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogTrigger asChild>
           <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-create-template">
-            <Plus className="mr-2 h-4 w-4" /> {t('serviceTemplates.createTemplate', 'Create Template')}
+            <Plus className="me-2 h-4 w-4" /> {t('serviceTemplates.createTemplate', 'Create Template')}
           </Button>
         </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
@@ -318,7 +318,7 @@ export default function ServiceTemplates() {
                   <div className="flex justify-between items-center">
                     <FormLabel className="text-[#0B1F3B] dark:text-white">{t('serviceTemplates.taskSteps', 'Task Steps')}</FormLabel>
                     <Button type="button" variant="outline" size="sm" onClick={addTaskStep} className="border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10" data-testid="button-add-step">
-                      <Plus className="h-3 w-3 mr-1" /> {t('serviceTemplates.addStep', 'Add Step')}
+                      <Plus className="h-3 w-3 me-1" /> {t('serviceTemplates.addStep', 'Add Step')}
                     </Button>
                   </div>
                   {taskSteps.map((step, index) => (
@@ -439,17 +439,17 @@ export default function ServiceTemplates() {
                     </div>
                     <div className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4 text-[#0A5ED7]" />
-                      <span>${template.standardCost || 0}</span>
+                      <span>SAR {template.standardCost || 0}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {template.isActive ? (
                       <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
+                        <CheckCircle className="h-3 w-3 me-1" /> {t('common.active', 'Active')}
                       </Badge>
                     ) : (
                       <Badge className="bg-[#64748B]/10 text-[#64748B]">
-                        <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
+                        <XCircle className="h-3 w-3 me-1" /> {t('common.inactive', 'Inactive')}
                       </Badge>
                     )}
                   </div>
@@ -501,7 +501,7 @@ export default function ServiceTemplates() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2 text-[#0B1F3B] dark:text-white">{t('serviceTemplates.standardCost', 'Standard Cost')}</h4>
-                  <p className="text-sm text-[#64748B]">${selectedTemplate.standardCost || 0}</p>
+                  <p className="text-sm text-[#64748B]">SAR {selectedTemplate.standardCost || 0}</p>
                 </div>
               </div>
               <div>

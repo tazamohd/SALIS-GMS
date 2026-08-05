@@ -122,7 +122,7 @@ export function ESignature({ onSave, onCancel, title, description }: ESignatureP
             disabled={isEmpty}
             data-testid="button-clear"
           >
-            <RotateCcw className="h-4 w-4 mr-2" />
+            <RotateCcw className="h-4 w-4 me-2" />
             Clear
           </Button>
 
@@ -132,7 +132,7 @@ export function ESignature({ onSave, onCancel, title, description }: ESignatureP
               onClick={onCancel}
               data-testid="button-cancel"
             >
-              <X className="h-4 w-4 mr-2" />
+              <X className="h-4 w-4 me-2" />
               Cancel
             </Button>
             <Button
@@ -140,7 +140,7 @@ export function ESignature({ onSave, onCancel, title, description }: ESignatureP
               disabled={isEmpty}
               data-testid="button-save-signature"
             >
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="h-4 w-4 me-2" />
               Save Signature
             </Button>
           </div>

@@ -132,12 +132,12 @@ export function CustomerVehicles() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-right">
+                              <div className="text-end">
                                 <p className="text-sm text-[#64748B]">
                                   {job.completedAt ? format(new Date(job.completedAt), 'PPP') : 'N/A'}
                                 </p>
                                 {job.totalCost && (
-                                  <p className="font-medium text-[#0B1F3B] dark:text-white">${Number(job.totalCost).toFixed(2)}</p>
+                                  <p className="font-medium text-[#0B1F3B] dark:text-white">SAR {Number(job.totalCost).toFixed(2)}</p>
                                 )}
                               </div>
                             </div>

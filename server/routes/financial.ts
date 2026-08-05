@@ -11,6 +11,7 @@ import {
   sparePartInventories, spareParts, users, suppliers, jobCards,
 } from '../../shared/schema';
 import { eq, and, gte, lte, sql, count, sum, desc, asc, inArray } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -39,7 +40,7 @@ function requireGarageId(req: Request, res: Response): string | null {
 
 // ─── GET /api/financial/general-ledger ────────────────────────────────────
 
-router.get('/financial/general-ledger', async (req: Request, res: Response) => {
+router.get('/financial/general-ledger', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -260,7 +261,7 @@ router.get('/financial/general-ledger', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/balance-sheet ─────────────────────────────────────
 
-router.get('/financial/balance-sheet', async (req: Request, res: Response) => {
+router.get('/financial/balance-sheet', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -392,7 +393,7 @@ router.get('/financial/balance-sheet', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/income-statement ──────────────────────────────────
 
-router.get('/financial/income-statement', async (req: Request, res: Response) => {
+router.get('/financial/income-statement', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -509,7 +510,7 @@ router.get('/financial/income-statement', async (req: Request, res: Response) =>
 
 // ─── GET /api/financial/trial-balance ─────────────────────────────────────
 
-router.get('/financial/trial-balance', async (req: Request, res: Response) => {
+router.get('/financial/trial-balance', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -597,7 +598,7 @@ router.get('/financial/trial-balance', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/cash-flow ─────────────────────────────────────────
 
-router.get('/financial/cash-flow', async (req: Request, res: Response) => {
+router.get('/financial/cash-flow', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -692,6 +693,10 @@ router.get('/financial/cash-flow', async (req: Request, res: Response) => {
 
     res.json({
       period: { startDate, endDate },
+      // Top-level totals are the endpoint's contract (financial.test.ts);
+      // `operating` keeps the per-method/per-source detail.
+      inflows: Math.round(totalInflows * 100) / 100,
+      outflows: Math.round(totalOutflows * 100) / 100,
       operating: {
         inflows: {
           customerPayments: Math.round(totalInflows * 100) / 100,
@@ -713,7 +718,7 @@ router.get('/financial/cash-flow', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/accounts-receivable ───────────────────────────────
 
-router.get('/financial/accounts-receivable', async (req: Request, res: Response) => {
+router.get('/financial/accounts-receivable', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -818,7 +823,7 @@ router.get('/financial/accounts-receivable', async (req: Request, res: Response)
 
 // ─── GET /api/financial/accounts-payable ──────────────────────────────────
 
-router.get('/financial/accounts-payable', async (req: Request, res: Response) => {
+router.get('/financial/accounts-payable', isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;

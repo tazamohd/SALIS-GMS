@@ -216,12 +216,12 @@ export default function DataBackup() {
               >
                 {isCreating ? (
                   <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    <RefreshCw className="me-2 h-4 w-4 animate-spin" />
                     Creating Backup...
                   </>
                 ) : (
                   <>
-                    <Database className="mr-2 h-4 w-4" />
+                    <Database className="me-2 h-4 w-4" />
                     Create Backup Now
                   </>
                 )}
@@ -247,7 +247,7 @@ export default function DataBackup() {
                 onClick={() => refetchBackups()}
                 className="border-[#E2E8F0] dark:border-[#232A36]"
               >
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 me-2" />
                 Refresh
               </Button>
             </CardHeader>
@@ -270,7 +270,7 @@ export default function DataBackup() {
                         <TableHead className="text-[#64748B]">Type</TableHead>
                         <TableHead className="text-[#64748B]">Records</TableHead>
                         <TableHead className="text-[#64748B]">Size</TableHead>
-                        <TableHead className="text-[#64748B] text-right">Download</TableHead>
+                        <TableHead className="text-[#64748B] text-end">Download</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -287,13 +287,13 @@ export default function DataBackup() {
                           </TableCell>
                           <TableCell>
                             <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                              <CheckCircle className="w-3 h-3 mr-1" />
+                              <CheckCircle className="w-3 h-3 me-1" />
                               {backup.type}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-[#64748B]">{backup.totalRecords.toLocaleString()}</TableCell>
                           <TableCell className="text-[#64748B]">{formatFileSize(backup.size)}</TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-end">
                             <Button
                               variant="outline"
                               size="sm"
@@ -352,7 +352,7 @@ export default function DataBackup() {
                         className="flex-1 border-[#E2E8F0] dark:border-[#232A36]"
                         onClick={() => downloadFile(`/api/export/csv/${et.id}`)}
                       >
-                        <FileSpreadsheet className="h-4 w-4 mr-1" />
+                        <FileSpreadsheet className="h-4 w-4 me-1" />
                         CSV
                       </Button>
                       <Button
@@ -361,7 +361,7 @@ export default function DataBackup() {
                         className="flex-1 border-[#E2E8F0] dark:border-[#232A36]"
                         onClick={() => downloadFile(`/api/backup/export/${et.id}`)}
                       >
-                        <FileText className="h-4 w-4 mr-1" />
+                        <FileText className="h-4 w-4 me-1" />
                         JSON
                       </Button>
                     </div>
@@ -407,7 +407,7 @@ export default function DataBackup() {
                       className="border-[#E2E8F0] dark:border-[#232A36]"
                       onClick={() => window.open(`/api/export/report/${rt.id}`, '_blank')}
                     >
-                      <Printer className="h-4 w-4 mr-1" />
+                      <Printer className="h-4 w-4 me-1" />
                       Generate Report
                     </Button>
                   </div>

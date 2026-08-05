@@ -179,7 +179,7 @@ export default function PurchaseAgentInventory() {
               </div>
               <Link href="/purchase-agent/orders">
                 <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-create-bulk-order">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  <ShoppingCart className="h-4 w-4 me-2" />
                   Create Bulk Order
                 </Button>
               </Link>
@@ -233,13 +233,13 @@ export default function PurchaseAgentInventory() {
                   placeholder="Search parts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search"
                 />
               </div>
               <Select value={stockFilter} onValueChange={setStockFilter}>
                 <SelectTrigger className="w-44 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-stock-filter">
-                  <Filter className="h-4 w-4 mr-2" />
+                  <Filter className="h-4 w-4 me-2" />
                   <SelectValue placeholder="Stock Level" />
                 </SelectTrigger>
                 <SelectContent>

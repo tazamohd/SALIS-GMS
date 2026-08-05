@@ -182,7 +182,7 @@ export default function GeneralLedger() {
               <CardDescription className="text-[#64748B]">{t('accounting.accountSummariesDescription', 'Overview of all accounts with balances')}</CardDescription>
             </div>
             <Button variant="outline" size="sm" data-testid="button-export-summary">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('common.export', 'Export')}
             </Button>
           </div>
@@ -194,9 +194,9 @@ export default function GeneralLedger() {
                 <TableHead>{t('accounting.accountCode', 'Account Code')}</TableHead>
                 <TableHead>{t('accounting.accountName', 'Account Name')}</TableHead>
                 <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead className="text-right">{t('accounting.totalDebits', 'Total Debits')}</TableHead>
-                <TableHead className="text-right">{t('accounting.totalCredits', 'Total Credits')}</TableHead>
-                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-end">{t('accounting.totalDebits', 'Total Debits')}</TableHead>
+                <TableHead className="text-end">{t('accounting.totalCredits', 'Total Credits')}</TableHead>
+                <TableHead className="text-end">{t('accounting.balance', 'Balance')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -209,13 +209,13 @@ export default function GeneralLedger() {
                       {account.type}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right text-green-600">
+                  <TableCell className="text-end text-green-600">
                     {account.debitTotal.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right text-red-600">
+                  <TableCell className="text-end text-red-600">
                     {account.creditTotal.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-bold">
+                  <TableCell className="text-end font-bold">
                     {account.balance.toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -234,30 +234,30 @@ export default function GeneralLedger() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/journal-entries">
               <Button variant="outline" className="w-full justify-start" data-testid="link-journal-entries">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('nav.journal_entries', 'Journal Entries')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/trial-balance">
               <Button variant="outline" className="w-full justify-start" data-testid="link-trial-balance">
-                <BarChart3 className="h-4 w-4 mr-2" />
+                <BarChart3 className="h-4 w-4 me-2" />
                 {t('nav.trial_balance', 'Trial Balance')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/chart-of-accounts">
               <Button variant="outline" className="w-full justify-start" data-testid="link-chart-of-accounts">
-                <BookOpen className="h-4 w-4 mr-2" />
+                <BookOpen className="h-4 w-4 me-2" />
                 {t('nav.chart_of_accounts', 'Chart of Accounts')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('nav.income_statement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>
@@ -275,7 +275,7 @@ export default function GeneralLedger() {
             placeholder={t('accounting.searchTransactions', 'Search transactions...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-transactions"
           />
         </div>
@@ -318,9 +318,9 @@ export default function GeneralLedger() {
                 <TableHead>{t('accounting.reference', 'Reference')}</TableHead>
                 <TableHead>{t('accounting.account', 'Account')}</TableHead>
                 <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right">{t('accounting.debit', 'Debit')}</TableHead>
-                <TableHead className="text-right">{t('accounting.credit', 'Credit')}</TableHead>
-                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-end">{t('accounting.debit', 'Debit')}</TableHead>
+                <TableHead className="text-end">{t('accounting.credit', 'Credit')}</TableHead>
+                <TableHead className="text-end">{t('accounting.balance', 'Balance')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -343,13 +343,13 @@ export default function GeneralLedger() {
                   <TableCell className="max-w-[300px] truncate">
                     {entry.description}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-green-600">
+                  <TableCell className="text-end font-mono text-green-600">
                     {entry.debit > 0 ? entry.debit.toLocaleString() : "-"}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-red-600">
+                  <TableCell className="text-end font-mono text-red-600">
                     {entry.credit > 0 ? entry.credit.toLocaleString() : "-"}
                   </TableCell>
-                  <TableCell className="text-right font-mono font-bold">
+                  <TableCell className="text-end font-mono font-bold">
                     {entry.balance.toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -383,17 +383,17 @@ export default function GeneralLedger() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t('accounting.searchAccounts', 'Search accounts...')}
-            className="pl-10"
+            className="ps-10"
             data-testid="input-search-accounts"
           />
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-filter-accounts">
-            <Filter className="h-4 w-4 mr-2" />
+            <Filter className="h-4 w-4 me-2" />
             {t('common.filter', 'Filter')}
           </Button>
           <Button variant="outline" data-testid="button-export-accounts">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
         </div>

@@ -65,7 +65,7 @@ export function FormPage({
                     className="bg-white/80 dark:bg-white/10 backdrop-blur-xl border-purple-200 dark:border-white/20 hover:bg-purple-50 dark:hover:bg-white/20 text-purple-700 dark:text-white"
                     data-testid="button-cancel"
                   >
-                    <X className="mr-2 h-4 w-4" />
+                    <X className="me-2 h-4 w-4" />
                     {cancelLabel}
                   </Button>
                 )}
@@ -77,7 +77,7 @@ export function FormPage({
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl shadow-purple-500/25 flex-1 sm:flex-initial"
                     data-testid="button-submit"
                   >
-                    <Save className="mr-2 h-4 w-4" />
+                    <Save className="me-2 h-4 w-4" />
                     {isSubmitting ? "Saving..." : submitLabel}
                   </Button>
                 )}

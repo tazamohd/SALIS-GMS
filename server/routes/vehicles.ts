@@ -9,7 +9,10 @@ router.get('/vehicles', isAuthenticated, async (req, res) => {
   try {
     const { garageId } = req.query;
     const pagination = parsePagination(req);
-    const gid = (garageId as string) || (req.user as any)?.garageId;
+    // Session garage wins; the query param is only a fallback for
+    // garageless (platform admin) sessions — the reverse order was a
+    // cross-tenant read.
+    const gid = (req.user as any)?.garageId || (garageId as string);
     const [data, total] = await Promise.all([
       storage.getVehiclesPaginated(gid, pagination.limit, pagination.offset),
       storage.countVehicles(gid),

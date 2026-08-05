@@ -299,7 +299,7 @@ export function Estimates() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
           data-testid="button-create-estimate"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t("estimates.createEstimate", "Create Estimate")}
         </Button>
       </div>
@@ -463,7 +463,7 @@ function EstimateRow({
               {customerName} {estimate.title ? `- ${estimate.title}` : ""}
             </p>
           </div>
-          <div className="text-right shrink-0">
+          <div className="text-end shrink-0">
             <p className="font-bold text-sm text-[#0B1F3B] dark:text-white" data-testid={`text-amount-${estimate.id}`}>
               SAR {parseFloat(estimate.totalAmount || "0").toLocaleString("en", { minimumFractionDigits: 2 })}
             </p>
@@ -494,9 +494,9 @@ function EstimateRow({
               <>
                 <div className="grid grid-cols-[1fr,auto,auto,auto] gap-2 text-xs font-medium text-[#64748B] px-2">
                   <span>Description</span>
-                  <span className="text-right w-16">Qty</span>
-                  <span className="text-right w-24">Unit Price</span>
-                  <span className="text-right w-24">Total</span>
+                  <span className="text-end w-16">Qty</span>
+                  <span className="text-end w-24">Unit Price</span>
+                  <span className="text-end w-24">Total</span>
                 </div>
                 {items.map((item) => (
                   <div key={item.id} className="grid grid-cols-[1fr,auto,auto,auto] gap-2 items-center px-2 py-1.5 rounded bg-background" data-testid={`estimate-item-${item.id}`}>
@@ -504,9 +504,9 @@ function EstimateRow({
                       <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">{item.description}</p>
                       <p className="text-xs text-[#64748B] capitalize">{item.itemType}</p>
                     </div>
-                    <span className="text-sm text-right w-16">{item.quantity}</span>
-                    <span className="text-sm text-right w-24">SAR {parseFloat(item.unitPrice).toFixed(2)}</span>
-                    <span className="text-sm font-medium text-right w-24">SAR {parseFloat(item.lineTotal).toFixed(2)}</span>
+                    <span className="text-sm text-end w-16">{item.quantity}</span>
+                    <span className="text-sm text-end w-24">SAR {parseFloat(item.unitPrice).toFixed(2)}</span>
+                    <span className="text-sm font-medium text-end w-24">SAR {parseFloat(item.lineTotal).toFixed(2)}</span>
                   </div>
                 ))}
                 <div className="border-t pt-2 space-y-1 px-2">
@@ -537,18 +537,18 @@ function EstimateRow({
                   size="sm"
                   onClick={() => onStatusChange(nextStatus)}
                 >
-                  <ArrowRight className="w-3 h-3 mr-1" />
+                  <ArrowRight className="w-3 h-3 me-1" />
                   Mark as {STATUS_CONFIG[nextStatus]?.label || nextStatus}
                 </Button>
               ))}
               {canConvert && (
                 <>
                   <Button size="sm" variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50" onClick={onConvertJobCard} data-testid={`button-convert-jobcard-${estimate.id}`}>
-                    <Wrench className="w-3 h-3 mr-1" />
+                    <Wrench className="w-3 h-3 me-1" />
                     Convert to Job Card
                   </Button>
                   <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50" onClick={onConvertInvoice} data-testid={`button-convert-invoice-${estimate.id}`}>
-                    <FileText className="w-3 h-3 mr-1" />
+                    <FileText className="w-3 h-3 me-1" />
                     Convert to Invoice
                   </Button>
                 </>
@@ -1070,18 +1070,18 @@ function EstimateViewDialog({
                 size="sm"
                 onClick={() => onStatusChange(nextStatus)}
               >
-                <ArrowRight className="w-3 h-3 mr-1" />
+                <ArrowRight className="w-3 h-3 me-1" />
                 Mark as {STATUS_CONFIG[nextStatus]?.label || nextStatus}
               </Button>
             ))}
             {canConvert && (
               <>
                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={onConvertJobCard} data-testid="button-convert-to-job-card">
-                  <Wrench className="w-4 h-4 mr-1" />
+                  <Wrench className="w-4 h-4 me-1" />
                   Convert to Job Card
                 </Button>
                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={onConvertInvoice} data-testid="button-convert-to-invoice">
-                  <FileText className="w-4 h-4 mr-1" />
+                  <FileText className="w-4 h-4 me-1" />
                   Convert to Invoice
                 </Button>
               </>
@@ -1094,11 +1094,11 @@ function EstimateViewDialog({
             )}
             <div className="flex-1" />
             <Button variant="outline" size="sm" onClick={onEdit} data-testid="button-edit-estimate">
-              <Edit className="w-4 h-4 mr-1" />
+              <Edit className="w-4 h-4 me-1" />
               Edit
             </Button>
             <Button variant="destructive" size="sm" onClick={onDelete} data-testid="button-delete-estimate">
-              <Trash2 className="w-4 h-4 mr-1" />
+              <Trash2 className="w-4 h-4 me-1" />
               Delete
             </Button>
           </div>

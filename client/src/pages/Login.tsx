@@ -109,7 +109,7 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     data-testid="input-email"
-                    className="pl-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
+                    className="ps-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     data-testid="input-password"
-                    className="pl-10 pr-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
+                    className="ps-10 pe-10 h-12 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20"
                   />
                   <button
                     type="button"
@@ -149,22 +149,39 @@ export default function Login() {
               >
                 {loginMutation.isPending ? t('auth.signingIn', 'Signing in...') : t('auth.signIn', 'Sign In')}
               </Button>
+              {/* Forgot-password entry point is hidden until a real reset
+                  backend exists: there is no /api/auth/forgot-password route and
+                  the OTP step accepts any code, so shipping the link would be a
+                  fake, misleading flow (audit 3.5/3.8). Re-enable once the
+                  email-token reset backend is implemented. */}
               <p className="text-center text-sm font-poppins text-[#64748B] dark:text-[#9BA4B0] pt-2">
                 {t('auth.dontHaveAccount', "Don't have an account?")}{" "}
-                <Link 
-                  href="/register" 
-                  className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold" 
+                <Link
+                  href="/register"
+                  className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold"
                   data-testid="link-register"
                 >
                   {t('auth.register', 'Register')}
                 </Link>
               </p>
+              <div className="flex items-center justify-center gap-3 text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0]">
+                <Link href="/marketplace" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-marketplace">Browse marketplace</Link>
+                <span>·</span>
+                <Link href="/customer-signup" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-customer-signup">Customer sign up</Link>
+                <span>·</span>
+                <Link href="/provider-signup" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-provider-signup">List your business</Link>
+              </div>
             </form>
           </CardContent>
         </Card>
 
         {/* Demo quick access (only renders when the server has demo mode on) */}
-        <DemoQuickPick />
+        <DemoQuickPick
+          onFillCredentials={(demoEmail, demoPassword) => {
+            setEmail(demoEmail);
+            setPassword(demoPassword);
+          }}
+        />
       </div>
     </div>
   );
@@ -181,10 +198,16 @@ type DemoAccount = {
 
 type DemoAccountsResponse = {
   enabled: boolean;
+  /** Shared demo password (demo mode only) so the form can be pre-filled. */
+  password?: string;
   accounts?: DemoAccount[];
 };
 
-function DemoQuickPick() {
+function DemoQuickPick({
+  onFillCredentials,
+}: {
+  onFillCredentials: (email: string, password: string) => void;
+}) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -230,7 +253,7 @@ function DemoQuickPick() {
       <div
         role="group"
         aria-label={t("auth.demoAccounts", "Demo accounts")}
-        className="flex flex-col gap-2"
+        className="grid grid-cols-3 gap-1.5"
       >
         {accounts.map((acc) => {
           const isActive = demoLogin.isPending && demoLogin.variables === acc.roleKey;
@@ -246,30 +269,25 @@ function DemoQuickPick() {
                 role: label,
                 email: acc.email,
               })}
-              onClick={() => demoLogin.mutate(acc.roleKey)}
+              onClick={() => {
+                // Show the credentials in the form (so manual Sign In also
+                // works), then sign in with one click.
+                onFillCredentials(acc.email, data?.password ?? "");
+                demoLogin.mutate(acc.roleKey);
+              }}
               data-testid={`demo-login-${acc.roleKey.toLowerCase()}`}
-              className="flex flex-col items-start justify-center gap-0.5 h-auto py-2.5 px-3 text-left font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
-              title={acc.email}
+              className="h-auto min-h-[2.75rem] w-full min-w-0 flex flex-col items-center justify-center gap-0 whitespace-normal break-words py-1.5 px-1.5 text-center font-poppins border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF] disabled:opacity-60"
+              title={acc.description ? `${acc.email} — ${acc.description}` : acc.email}
             >
-              <span className="flex w-full items-center justify-between gap-2">
-                <span className="text-sm font-semibold">{label}</span>
-                {isActive && (
-                  <span className="text-[10px] font-normal text-[#64748B] dark:text-[#9BA4B0]">
-                    {t("auth.signingIn", "Signing in...")}
-                  </span>
-                )}
+              <span className="text-[11px] font-semibold leading-tight">
+                {isActive ? t("auth.signingIn", "Signing in...") : label}
               </span>
-              {acc.description && (
-                <span className="text-[11px] font-normal text-[#64748B] dark:text-[#9BA4B0] normal-case">
-                  {acc.description}
-                </span>
-              )}
             </Button>
           );
         })}
       </div>
       <p className="mt-3 text-[10px] font-poppins text-[#94A3B8] dark:text-[#6B7280] text-center">
-        {t("auth.demoOneClickNote", "Demo only · one-click sign-in, no password needed")}
+        {t("auth.demoOneClickNote", "Demo only · click a role to fill its credentials and sign in")}
       </p>
     </div>
   );

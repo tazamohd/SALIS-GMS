@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { isAuthenticated } from '../auth';
+import { isAuthenticated, hashPassword } from '../auth';
 import { requireRole, requireManagerOrAbove } from '../middleware/requireRole';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
@@ -16,7 +16,7 @@ const router = Router();
 
 // GET /api/hr/employees — List employees
 router.get('/hr/employees', isAuthenticated, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   const { department, status, search, limit = '50', offset = '0' } = req.query;
   try {
     const limitNum = Math.min(Math.max(Number(limit) || 50, 1), 500);
@@ -25,26 +25,26 @@ router.get('/hr/employees', isAuthenticated, async (req, res) => {
     const departmentStr = department ? String(department) : null;
 
     // Parameterised filter fragments — values are bound, not interpolated.
-    const whereClause = sql`WHERE u."garageId" = ${garageId}
+    const whereClause = sql`WHERE u.garage_id = ${garageId}
       ${departmentStr ? sql`AND u.role = ${departmentStr}` : sql``}
-      ${status === 'active' ? sql`AND u."isActive" = true` : sql``}
-      ${status === 'inactive' ? sql`AND u."isActive" = false` : sql``}
-      ${searchPattern ? sql`AND (u."fullName" ILIKE ${searchPattern} OR u.email ILIKE ${searchPattern})` : sql``}`;
+      ${status === 'active' ? sql`AND u.is_active = true` : sql``}
+      ${status === 'inactive' ? sql`AND u.is_active = false` : sql``}
+      ${searchPattern ? sql`AND (u.full_name ILIKE ${searchPattern} OR u.email ILIKE ${searchPattern})` : sql``}`;
 
     const employees = await db.execute(sql`
-      SELECT u.id, u."fullName" as name, u.email, u.phone,
-        u.role as department, u."userType" as position,
-        u."isActive" as "isActive", u."createdAt" as "hireDate",
-        u."nationalId" as "nationalId",
-        u."profileImageUrl" as "profileImage",
-        COALESCE(tp."hourlyRate", '0') as "hourlyRate",
+      SELECT u.id, u.full_name as name, u.email, u.phone,
+        u.role as department, u.user_type as position,
+        u.is_active as "isActive", u.created_at as "hireDate",
+        u.national_id as "nationalId",
+        u.profile_image_url as "profileImage",
+        COALESCE(tp.hourly_rate, '0') as "hourlyRate",
         COALESCE(tp.level, 'junior') as level,
         COALESCE(tp.speciality, '') as speciality,
-        tp."yearsOfExperience" as "yearsOfExperience"
+        tp.years_of_experience as "yearsOfExperience"
       FROM users u
-      LEFT JOIN technician_profiles tp ON tp."userId" = u.id
+      LEFT JOIN technician_profiles tp ON tp.user_id = u.id
       ${whereClause}
-      ORDER BY u."fullName" ASC
+      ORDER BY u.full_name ASC
       LIMIT ${limitNum} OFFSET ${offsetNum}
     `);
 
@@ -67,24 +67,25 @@ router.get('/hr/employees', isAuthenticated, async (req, res) => {
 });
 
 // GET /api/hr/employees/:id — Employee detail
-router.get('/hr/employees/:id', isAuthenticated, async (req, res) => {
+router.get('/hr/employees/:id', isAuthenticated, requireManagerOrAbove, async (req, res) => {
   const { id } = req.params;
+  const garageId = (req as any).user.garageId;
   try {
     const result = await db.execute(sql`
-      SELECT u.id, u."fullName" as name, u.email, u.phone,
-        u.role as department, u."userType" as position,
-        u."isActive", u."createdAt" as "hireDate",
-        u."nationalId", u."profileImageUrl" as "profileImage",
-        u."firstName", u."lastName",
-        COALESCE(tp."hourlyRate", '0') as "hourlyRate",
+      SELECT u.id, u.full_name as name, u.email, u.phone,
+        u.role as department, u.user_type as position,
+        u.is_active as "isActive", u.created_at as "hireDate",
+        u.national_id as "nationalId", u.profile_image_url as "profileImage",
+        u.first_name as "firstName", u.last_name as "lastName",
+        COALESCE(tp.hourly_rate, '0') as "hourlyRate",
         COALESCE(tp.level, 'junior') as level,
         COALESCE(tp.speciality, '') as speciality,
-        tp."yearsOfExperience",
+        tp.years_of_experience as "yearsOfExperience",
         tp.certifications, tp.qualifications, tp.skills,
-        tp."maxConcurrentJobs"
+        tp.max_concurrent_jobs as "maxConcurrentJobs"
       FROM users u
-      LEFT JOIN technician_profiles tp ON tp."userId" = u.id
-      WHERE u.id = ${id}
+      LEFT JOIN technician_profiles tp ON tp.user_id = u.id
+      WHERE u.id = ${id} AND u.garage_id = ${garageId}
     `);
 
     if (!result.rows || result.rows.length === 0) {
@@ -116,7 +117,7 @@ router.get('/hr/employees/:id', isAuthenticated, async (req, res) => {
 
 // POST /api/hr/employees — Add new employee (HR/admin only)
 router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   const { fullName, email, phone, role, nationalId, password } = req.body;
 
   if (!fullName || !email) {
@@ -124,11 +125,12 @@ router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req,
   }
 
   try {
+    const passwordHash = await hashPassword(password || 'changeme123');
     const result = await db.execute(sql`
-      INSERT INTO users (id, "fullName", email, phone, role, "nationalId", password, "garageId", "isActive", "createdAt", "updatedAt")
+      INSERT INTO users (id, full_name, email, phone, role, national_id, password, garage_id, is_active, created_at, updated_at)
       VALUES (gen_random_uuid(), ${fullName}, ${email}, ${phone || null}, ${role || 'ADVISOR'},
-              ${nationalId || null}, ${password || 'changeme123'}, ${garageId}, true, NOW(), NOW())
-      RETURNING id, "fullName" as name, email, phone, role as department, "isActive", "createdAt" as "hireDate"
+              ${nationalId || null}, ${passwordHash}, ${garageId}, true, NOW(), NOW())
+      RETURNING id, full_name as name, email, phone, role as department, is_active as "isActive", created_at as "hireDate"
     `);
     res.status(201).json(result.rows?.[0] || {});
   } catch (err: any) {
@@ -144,16 +146,16 @@ router.post('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req,
 
 // GET /api/hr/attendance — Attendance records
 router.get('/hr/attendance', isAuthenticated, async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   const { date, employeeId, limit = '50', offset = '0' } = req.query;
   try {
     // Use the users table with createdAt as reference for demo attendance data
     const employees = await db.execute(sql`
-      SELECT u.id, u."fullName" as name, u.role as department,
-        u."isActive", u."createdAt"
+      SELECT u.id, u.full_name as name, u.role as department,
+        u.is_active as "isActive", u.created_at
       FROM users u
-      WHERE u."garageId" = ${garageId} AND u."isActive" = true
-      ORDER BY u."fullName" ASC
+      WHERE u.garage_id = ${garageId} AND u.is_active = true
+      ORDER BY u.full_name ASC
       LIMIT ${Number(limit)} OFFSET ${Number(offset)}
     `);
 
@@ -300,17 +302,17 @@ router.patch('/hr/leave-requests/:id', isAuthenticated, requireManagerOrAbove, a
 
 // GET /api/hr/payroll/summary — Monthly payroll summary (manager+ — salary data)
 router.get('/hr/payroll/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+  const garageId = (req as any).user.garageId;
   const { month, year } = req.query;
 
   try {
     const employees = await db.execute(sql`
-      SELECT u.id, u."fullName" as name, u."nationalId",
-        u."createdAt" as "hireDate", u."isActive",
-        COALESCE(tp."hourlyRate", '0') as "hourlyRate"
+      SELECT u.id, u.full_name as name, u.national_id as "nationalId",
+        u.created_at as "hireDate", u.is_active as "isActive",
+        COALESCE(tp.hourly_rate, '0') as "hourlyRate"
       FROM users u
-      LEFT JOIN technician_profiles tp ON tp."userId" = u.id
-      WHERE u."garageId" = ${garageId} AND u."isActive" = true
+      LEFT JOIN technician_profiles tp ON tp.user_id = u.id
+      WHERE u.garage_id = ${garageId} AND u.is_active = true
     `);
 
     let totalBaseSalary = 0;
@@ -389,17 +391,18 @@ router.get('/hr/payroll/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGE
 // GET /api/hr/payroll/slip/:employeeId — Individual pay slip (manager+/accountant)
 router.get('/hr/payroll/slip/:employeeId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   const { employeeId } = req.params;
+  const garageId = (req as any).user.garageId;
   const { month, year } = req.query;
 
   try {
     const result = await db.execute(sql`
-      SELECT u.id, u."fullName" as name, u.email, u."nationalId",
-        u.role as department, u."createdAt" as "hireDate",
-        COALESCE(tp."hourlyRate", '0') as "hourlyRate",
+      SELECT u.id, u.full_name as name, u.email, u.national_id as "nationalId",
+        u.role as department, u.created_at as "hireDate",
+        COALESCE(tp.hourly_rate, '0') as "hourlyRate",
         COALESCE(tp.level, 'junior') as level
       FROM users u
-      LEFT JOIN technician_profiles tp ON tp."userId" = u.id
-      WHERE u.id = ${employeeId}
+      LEFT JOIN technician_profiles tp ON tp.user_id = u.id
+      WHERE u.id = ${employeeId} AND u.garage_id = ${garageId}
     `);
 
     if (!result.rows || result.rows.length === 0) {

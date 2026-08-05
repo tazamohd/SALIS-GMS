@@ -33,7 +33,7 @@ export default function DigitalVehicleWalkaround() {
 
   const createWalkaround = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/digital-walkaround", "POST", data);
+      return await apiRequest("POST", "/api/digital-walkaround", data);
     },
     onSuccess: () => {
       toast({ title: t('vehicles.walkaroundCreated', 'Walkaround created'), description: t('vehicles.vehicleInspectionSavedSuccessfully', 'Vehicle inspection saved successfully.') });
@@ -100,7 +100,7 @@ export default function DigitalVehicleWalkaround() {
             data-testid="button-create-walkaround" 
             className="mb-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {t('vehicles.newWalkaround', 'New Walkaround')}
           </Button>
         </DialogTrigger>
@@ -229,7 +229,7 @@ export default function DigitalVehicleWalkaround() {
                 data-testid="button-create-first"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C1] hover:to-[#0AA3E8] text-white border-0"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('vehicles.createFirstWalkaround', 'Create First Walkaround')}
               </Button>
             </div>
@@ -260,7 +260,7 @@ export default function DigitalVehicleWalkaround() {
                         {getWalkaroundTypeBadge(walkaround.walkaroundType)}
                         {walkaround.signedAt && (
                           <Badge className="bg-emerald-500/10 text-emerald-600 border-0">
-                            <CheckCircle className="h-3 w-3 mr-1" /> {t('vehicles.signed', 'Signed')}
+                            <CheckCircle className="h-3 w-3 me-1" /> {t('vehicles.signed', 'Signed')}
                           </Badge>
                         )}
                       </div>

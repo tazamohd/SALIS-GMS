@@ -86,7 +86,7 @@ export function AddVehicleDialog({ customerId, garageId }: AddVehicleDialogProps
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" data-testid="button-add-vehicle">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Add Vehicle
         </Button>
       </DialogTrigger>

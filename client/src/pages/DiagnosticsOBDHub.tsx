@@ -39,12 +39,12 @@ export default function DiagnosticsOBDHub() {
   });
 
   const createDeviceMutation = useMutation({
-    mutationFn: (data: InsertObdDevice) => apiRequest("/api/obd-devices", "POST", data),
+    mutationFn: (data: InsertObdDevice) => apiRequest("POST", "/api/obd-devices", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-devices"] }); setShowDeviceDialog(false); toast({ title: t('diagnosticsOBD.deviceRegistered', 'Device registered') }); },
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: (data: InsertObdSession) => apiRequest("/api/obd-sessions", "POST", data),
+    mutationFn: (data: InsertObdSession) => apiRequest("POST", "/api/obd-sessions", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-sessions"] }); setShowSessionDialog(false); toast({ title: t('diagnosticsOBD.sessionStarted', 'Session started') }); },
   });
 
@@ -99,7 +99,7 @@ export default function DiagnosticsOBDHub() {
           data-testid="button-add-device"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('diagnosticsOBD.registerDevice', 'Register Device')}
         </Button>
       </div>
@@ -146,7 +146,7 @@ export default function DiagnosticsOBDHub() {
           data-testid="button-start-session"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('diagnosticsOBD.startSession', 'Start Session')}
         </Button>
       </div>

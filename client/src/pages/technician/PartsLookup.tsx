@@ -44,7 +44,7 @@ export default function TechnicianPartsLookup() {
               placeholder="Search parts by name, SKU, or category..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+              className="ps-10 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             />
           </div>
         </CardContent>

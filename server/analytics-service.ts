@@ -38,8 +38,8 @@ export async function generateBusinessIntelligenceReport(
   const revenueData = await db.execute(sql`
     SELECT 
       COUNT(*) as total_jobs,
-      COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as total_revenue,
-      COALESCE(AVG(CAST(total_amount AS DECIMAL)), 0) as avg_job_value,
+      COALESCE(SUM(CAST(total_cost AS DECIMAL)), 0) as total_revenue,
+      COALESCE(AVG(CAST(total_cost AS DECIMAL)), 0) as avg_job_value,
       COUNT(DISTINCT customer_id) as unique_customers
     FROM ${jobCards}
     WHERE garage_id = ${garageId}
@@ -52,7 +52,7 @@ export async function generateBusinessIntelligenceReport(
     SELECT 
       COUNT(*) as total_invoices,
       COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as total_invoiced,
-      COALESCE(SUM(CAST(amount_paid AS DECIMAL)), 0) as total_collected
+      COALESCE(SUM(CAST(paid_amount AS DECIMAL)), 0) as total_collected
     FROM ${invoices}
     WHERE garage_id = ${garageId}
       AND created_at >= ${start}
@@ -64,7 +64,7 @@ export async function generateBusinessIntelligenceReport(
     SELECT 
       service_type,
       COUNT(*) as service_count,
-      COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as revenue
+      COALESCE(SUM(CAST(total_cost AS DECIMAL)), 0) as revenue
     FROM ${jobCards}
     WHERE garage_id = ${garageId}
       AND created_at >= ${start}
@@ -97,22 +97,30 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
   try {
   if (groupBy === 'service') {
     const result = await db.execute(sql`
-      SELECT 
-        service_type,
+      WITH job_cost AS (
+        SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
+        FROM invoice_items ii
+        JOIN invoices i ON i.id = ii.invoice_id
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
+        GROUP BY i.job_card_id
+      )
+      SELECT
+        jc.service_type as service_type,
         COUNT(*) as job_count,
-        COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as total_revenue,
-        COALESCE(SUM(CAST(parts_cost AS DECIMAL)), 0) as parts_cost,
-        COALESCE(SUM(CAST(labor_cost AS DECIMAL)), 0) as labor_cost,
-        COALESCE(SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL)), 0) as gross_profit,
-        CASE 
-          WHEN SUM(CAST(total_amount AS DECIMAL)) > 0 
-          THEN ((SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL))) / SUM(CAST(total_amount AS DECIMAL))) * 100
-          ELSE 0 
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) as total_revenue,
+        COALESCE(SUM(c.known_cost), 0) as parts_cost,
+        0 as labor_cost,
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) - COALESCE(SUM(c.known_cost), 0) as gross_profit,
+        CASE
+          WHEN SUM(CAST(jc.total_cost AS DECIMAL)) > 0
+          THEN ((SUM(CAST(jc.total_cost AS DECIMAL)) - COALESCE(SUM(c.known_cost), 0)) / SUM(CAST(jc.total_cost AS DECIMAL))) * 100
+          ELSE 0
         END as profit_margin_percent
-      FROM ${jobCards}
-      WHERE garage_id = ${garageId}
-        AND service_type IS NOT NULL
-      GROUP BY service_type
+      FROM job_cards jc
+      LEFT JOIN job_cost c ON c.job_card_id = jc.id
+      WHERE jc.garage_id = ${garageId}
+        AND jc.service_type IS NOT NULL
+      GROUP BY jc.service_type
       ORDER BY gross_profit DESC
     `);
     return result.rows;
@@ -120,22 +128,30 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
 
   if (groupBy === 'technician') {
     const result = await db.execute(sql`
-      SELECT 
-        assigned_to as technician_id,
+      WITH job_cost AS (
+        SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
+        FROM invoice_items ii
+        JOIN invoices i ON i.id = ii.invoice_id
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
+        GROUP BY i.job_card_id
+      )
+      SELECT
+        jc.assigned_to as technician_id,
         COUNT(*) as job_count,
-        COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as total_revenue,
-        COALESCE(SUM(CAST(parts_cost AS DECIMAL)), 0) as parts_cost,
-        COALESCE(SUM(CAST(labor_cost AS DECIMAL)), 0) as labor_cost,
-        COALESCE(SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL)), 0) as gross_profit,
-        CASE 
-          WHEN SUM(CAST(total_amount AS DECIMAL)) > 0 
-          THEN ((SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL))) / SUM(CAST(total_amount AS DECIMAL))) * 100
-          ELSE 0 
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) as total_revenue,
+        COALESCE(SUM(c.known_cost), 0) as parts_cost,
+        0 as labor_cost,
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) - COALESCE(SUM(c.known_cost), 0) as gross_profit,
+        CASE
+          WHEN SUM(CAST(jc.total_cost AS DECIMAL)) > 0
+          THEN ((SUM(CAST(jc.total_cost AS DECIMAL)) - COALESCE(SUM(c.known_cost), 0)) / SUM(CAST(jc.total_cost AS DECIMAL))) * 100
+          ELSE 0
         END as profit_margin_percent
-      FROM ${jobCards}
-      WHERE garage_id = ${garageId}
-        AND assigned_to IS NOT NULL
-      GROUP BY assigned_to
+      FROM job_cards jc
+      LEFT JOIN job_cost c ON c.job_card_id = jc.id
+      WHERE jc.garage_id = ${garageId}
+        AND jc.assigned_to IS NOT NULL
+      GROUP BY jc.assigned_to
       ORDER BY gross_profit DESC
     `);
     return result.rows;
@@ -143,24 +159,32 @@ export async function analyzeProfitMargins(garageId: string, groupBy: 'service' 
 
   // groupBy customer
   const result = await db.execute(sql`
-    SELECT 
-      customer_id,
-      COUNT(*) as job_count,
-      COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as total_revenue,
-      COALESCE(SUM(CAST(parts_cost AS DECIMAL)), 0) as parts_cost,
-      COALESCE(SUM(CAST(labor_cost AS DECIMAL)), 0) as labor_cost,
-      COALESCE(SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL)), 0) as gross_profit,
-      CASE 
-        WHEN SUM(CAST(total_amount AS DECIMAL)) > 0 
-        THEN ((SUM(CAST(total_amount AS DECIMAL)) - SUM(CAST(parts_cost AS DECIMAL)) - SUM(CAST(labor_cost AS DECIMAL))) / SUM(CAST(total_amount AS DECIMAL))) * 100
-        ELSE 0 
-      END as profit_margin_percent
-    FROM ${jobCards}
-    WHERE garage_id = ${garageId}
-      AND customer_id IS NOT NULL
-    GROUP BY customer_id
-    ORDER BY gross_profit DESC
-    LIMIT ${limit}
+    WITH job_cost AS (
+        SELECT i.job_card_id, SUM(CAST(ii.unit_cost AS DECIMAL) * ii.quantity) AS known_cost
+        FROM invoice_items ii
+        JOIN invoices i ON i.id = ii.invoice_id
+        WHERE i.garage_id = ${garageId} AND i.job_card_id IS NOT NULL AND ii.unit_cost IS NOT NULL AND i.status != 'cancelled'
+        GROUP BY i.job_card_id
+      )
+      SELECT
+        jc.customer_id as customer_id,
+        COUNT(*) as job_count,
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) as total_revenue,
+        COALESCE(SUM(c.known_cost), 0) as parts_cost,
+        0 as labor_cost,
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) - COALESCE(SUM(c.known_cost), 0) as gross_profit,
+        CASE
+          WHEN SUM(CAST(jc.total_cost AS DECIMAL)) > 0
+          THEN ((SUM(CAST(jc.total_cost AS DECIMAL)) - COALESCE(SUM(c.known_cost), 0)) / SUM(CAST(jc.total_cost AS DECIMAL))) * 100
+          ELSE 0
+        END as profit_margin_percent
+      FROM job_cards jc
+      LEFT JOIN job_cost c ON c.job_card_id = jc.id
+      WHERE jc.garage_id = ${garageId}
+        AND jc.customer_id IS NOT NULL
+      GROUP BY jc.customer_id
+      ORDER BY gross_profit DESC
+      LIMIT ${limit}
   `);
     return result.rows;
   } catch (error) {
@@ -177,7 +201,7 @@ export async function analyzeCustomerLTV(garageId: string, limit: number = 100) 
       SELECT 
         jc.customer_id,
         COUNT(DISTINCT jc.id) as total_jobs,
-        COALESCE(SUM(CAST(jc.total_amount AS DECIMAL)), 0) as total_spent,
+        COALESCE(SUM(CAST(jc.total_cost AS DECIMAL)), 0) as total_spent,
         MIN(jc.created_at) as first_visit,
         MAX(jc.created_at) as last_visit,
         EXTRACT(EPOCH FROM (MAX(jc.created_at) - MIN(jc.created_at))) / 86400 as customer_age_days
@@ -227,13 +251,13 @@ export async function generateBusinessHeatMaps(garageId: string, mapType: 'time'
     // Time-based demand (hour of day + day of week)
     const result = await db.execute(sql`
       SELECT 
-        EXTRACT(DOW FROM scheduled_date) as day_of_week,
-        EXTRACT(HOUR FROM scheduled_date) as hour_of_day,
+        EXTRACT(DOW FROM appointment_date) as day_of_week,
+        EXTRACT(HOUR FROM appointment_date) as hour_of_day,
         COUNT(*) as appointment_count,
-        AVG(CAST(estimated_duration AS INTEGER)) as avg_duration
+        AVG(CAST(duration AS INTEGER)) as avg_duration
       FROM ${appointmentsTable}
       WHERE garage_id = ${garageId}
-        AND scheduled_date >= NOW() - INTERVAL '90 days'
+        AND appointment_date >= NOW() - INTERVAL '90 days'
       GROUP BY day_of_week, hour_of_day
       ORDER BY day_of_week, hour_of_day
     `);
@@ -247,7 +271,7 @@ export async function generateBusinessHeatMaps(garageId: string, mapType: 'time'
         service_type,
         DATE_TRUNC('week', created_at) as week,
         COUNT(*) as job_count,
-        AVG(CAST(total_amount AS DECIMAL)) as avg_revenue
+        AVG(CAST(total_cost AS DECIMAL)) as avg_revenue
       FROM ${jobCards}
       WHERE garage_id = ${garageId}
         AND created_at >= NOW() - INTERVAL '90 days'
@@ -296,7 +320,7 @@ export async function getRealtimeKPIs(garageId: string) {
       COUNT(*) as jobs_today,
       COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_today,
       COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
-      COALESCE(SUM(CAST(total_amount AS DECIMAL)), 0) as revenue_today
+      COALESCE(SUM(CAST(total_cost AS DECIMAL)), 0) as revenue_today
     FROM ${jobCards}
     WHERE garage_id = ${garageId}
       AND created_at >= ${today}
@@ -316,7 +340,7 @@ export async function getRealtimeKPIs(garageId: string) {
     SELECT COUNT(*) as appointments_today
     FROM ${appointmentsTable}
     WHERE garage_id = ${garageId}
-      AND DATE(scheduled_date) = DATE(${today})
+      AND DATE(appointment_date) = DATE(${today})
   `);
 
     return {

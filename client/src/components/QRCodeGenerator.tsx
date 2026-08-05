@@ -31,13 +31,13 @@ export function QRCodeGenerator({
     setIsGenerating(true);
 
     try {
-      const qrCode = await apiRequest('POST', '/api/qr-codes/generate', {
+      const qrCode = await (await apiRequest('POST', '/api/qr-codes/generate', {
         appointmentId,
         customerId,
         vehicleId,
         tokenType,
         expiresInHours,
-      });
+      })).json();
 
       setGeneratedQR(qrCode);
       
@@ -192,7 +192,7 @@ export function QRCodeGenerator({
                   className="flex-1"
                   data-testid="button-download-qr"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 me-2" />
                   Download
                 </Button>
                 <Button
@@ -201,7 +201,7 @@ export function QRCodeGenerator({
                   className="flex-1"
                   data-testid="button-print-qr"
                 >
-                  <Mail className="w-4 h-4 mr-2" />
+                  <Mail className="w-4 h-4 me-2" />
                   Print
                 </Button>
               </div>

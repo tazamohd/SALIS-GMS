@@ -181,11 +181,11 @@ export default function WorkshopCalendar() {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setIsDragMode(!isDragMode)} className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-toggle-drag">
-              <GripVertical className="w-4 h-4 mr-2" />
+              <GripVertical className="w-4 h-4 me-2" />
               {isDragMode ? t('workshopCalendar.exitDragMode', 'Exit Drag Mode') : t('workshopCalendar.enableDrag', 'Enable Drag')}
             </Button>
             <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-new-appointment">
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {t('workshopCalendar.newAppointment', 'New Appointment')}
             </Button>
           </div>

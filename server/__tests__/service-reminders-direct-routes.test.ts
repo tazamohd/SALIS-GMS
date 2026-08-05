@@ -22,7 +22,7 @@ describe('Direct service reminder read route extraction (Wave J)', () => {
     expect(legacyRoutesSource).toMatch(/app\.patch\(['"]\/api\/service-reminders\/:id\/status['"]/);
     expect(legacyRoutesSource).toMatch(/storage\.updateServiceReminderStatus\(req\.params\.id,\s*status\)/);
     expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/service-reminders\/generate['"]/);
-    expect(legacyRoutesSource).toMatch(/storage\.generateAutoServiceReminders\(\)/);
+    expect(legacyRoutesSource).toMatch(/storage\.generateAutoServiceReminders\(req\.user\?\.garageId\)/);
   });
 
   it('preserves due reminder garage scoping', () => {

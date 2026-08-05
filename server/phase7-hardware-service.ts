@@ -331,6 +331,21 @@ export async function createCameraRecording(data: {
   }
 }
 
+/** Single recording by id, for playback. */
+export async function getRecordingPlayback(id: string) {
+  try {
+    const [recording] = await db
+      .select()
+      .from(cameraRecordings)
+      .where(eq(cameraRecordings.id, id));
+
+    return recording ?? null;
+  } catch (error) {
+    console.error('Error fetching camera recording:', error);
+    return null;
+  }
+}
+
 export async function getCameraRecordings(cameraId: string, limit: number = 50) {
   try {
     const recordings = await db

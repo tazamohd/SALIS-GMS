@@ -90,7 +90,7 @@ export default function DeliveryTracking() {
     const { className, label, icon: Icon } = config[status] || config.pending;
     return (
       <Badge className={className}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {label}
       </Badge>
     );
@@ -163,7 +163,7 @@ export default function DeliveryTracking() {
                 placeholder="Search by order or tracking #..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-72 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 w-72 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-deliveries"
               />
             </div>
@@ -266,7 +266,7 @@ export default function DeliveryTracking() {
                               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
                               data-testid={`button-track-live-${delivery.id}`}
                             >
-                              <Radio className="h-4 w-4 mr-1 animate-pulse" />
+                              <Radio className="h-4 w-4 me-1 animate-pulse" />
                               Track Live
                             </Button>
                           </Link>
@@ -280,7 +280,7 @@ export default function DeliveryTracking() {
                               onClick={() => setSelectedDelivery(delivery)}
                               data-testid={`button-view-delivery-${delivery.id}`}
                             >
-                              <Eye className="h-4 w-4 mr-1" />
+                              <Eye className="h-4 w-4 me-1" />
                               Details
                             </Button>
                           </DialogTrigger>
@@ -295,7 +295,7 @@ export default function DeliveryTracking() {
                                   <p className="text-sm text-[#64748B]">Status</p>
                                   {getStatusBadge(delivery.status)}
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                   <p className="text-sm text-[#64748B]">
                                     {delivery.status === "delivered" ? "Delivered At" : "Expected At"}
                                   </p>
@@ -335,7 +335,7 @@ export default function DeliveryTracking() {
                                   <table className="w-full text-sm">
                                     <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                                       <tr>
-                                        <th className="px-3 py-2 text-left text-[#0B1F3B] dark:text-white">Part Name</th>
+                                        <th className="px-3 py-2 text-start text-[#0B1F3B] dark:text-white">Part Name</th>
                                         <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Quantity</th>
                                       </tr>
                                     </thead>

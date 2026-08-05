@@ -21,6 +21,7 @@ import {
   getProviderForMethod,
 } from '../services/payments/registry';
 import type { GatewayId, PaymentMethodType } from '../services/payments/types';
+import { verifyGatewayWebhook } from '../services/payments/webhook-verify';
 import { logger } from '../logger';
 
 const router = Router();
@@ -138,6 +139,17 @@ router.post('/payments/webhook/:gateway', async (req: any, res) => {
   const provider = getProviderById(gateway);
   if (!provider) return res.status(404).json({ message: 'Unknown gateway' });
 
+  // SECURITY (deep-audit blocker B8): fail-closed signature verification. The
+  // webhook is public (server-to-server), so a forged 'completed' event must be
+  // rejected. Never settle an invoice from an unverified/unverifiable callback.
+  const rawForVerify = req.rawBody || JSON.stringify(req.body || {});
+  const verified = verifyGatewayWebhook(gateway, { headers: req.headers, rawBody: rawForVerify });
+  if (!verified.ok) {
+    logger.warn('payment webhook rejected (unverified signature)', { gateway, reason: verified.reason });
+    // 200 so the gateway stops retrying, but we do NOT settle anything.
+    return res.status(200).json({ received: true, verified: false });
+  }
+
   try {
     const result = await provider.handleWebhook({
       headers: req.headers,
@@ -196,33 +208,18 @@ async function recordCompletedPayment(opts: {
   transactionId?: string;
   createdBy?: string;
 }): Promise<void> {
-  const invoice = await storage.getInvoice(opts.invoiceId);
-  if (!invoice) return;
-
-  const amount = opts.amount ?? Number((invoice as any).balanceAmount ?? (invoice as any).totalAmount ?? 0);
-
-  await storage.createPayment({
+  // Atomic, exactly-once settlement (B9): the invoice is locked FOR UPDATE and
+  // the partial unique index on (gateway, gateway_transaction_id) guarantees a
+  // retried webhook cannot double-credit.
+  await storage.settleGatewayPayment({
     invoiceId: opts.invoiceId,
-    amount: Number(amount).toFixed(2),
-    paymentMethod: opts.methodType || 'card',
+    amount: opts.amount,
+    currency: opts.currency,
     gateway: opts.gateway,
-    methodType: opts.methodType || null,
-    status: 'completed',
-    currency: opts.currency || 'SAR',
-    gatewayTransactionId: opts.transactionId || null,
-    createdBy: opts.createdBy || (invoice as any).createdBy || null,
-  } as any);
-
-  const prevPaid = parseFloat((invoice as any).paidAmount || '0');
-  const total = parseFloat((invoice as any).totalAmount || '0');
-  const newPaid = prevPaid + Number(amount);
-  const balance = Math.max(total - newPaid, 0);
-  await storage.updateInvoice(opts.invoiceId, {
-    paidAmount: newPaid.toFixed(2),
-    balanceAmount: balance.toFixed(2),
-    status: balance <= 0 ? 'paid' : (invoice as any).status,
-    paidAt: balance <= 0 ? new Date() : (invoice as any).paidAt,
-  } as any);
+    methodType: opts.methodType,
+    transactionId: opts.transactionId,
+    createdBy: opts.createdBy,
+  });
 }
 
 export default router;

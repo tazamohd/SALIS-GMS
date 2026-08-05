@@ -13,6 +13,7 @@ export default function TechnicianTimeClock() {
 
   const { data: timeEntries } = useQuery<any[]>({
     queryKey: ["/api/technicians", user?.id, "time-clock"],
+    queryFn: () => fetch(`/api/technicians/${user!.id}/time-clock`, { credentials: 'include' }).then((r) => r.json()),
     enabled: !!user?.id,
   });
 
@@ -74,7 +75,7 @@ export default function TechnicianTimeClock() {
                   className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white px-8"
                   data-testid="button-clock-in"
                 >
-                  <LogIn className="h-5 w-5 mr-2" />
+                  <LogIn className="h-5 w-5 me-2" />
                   Clock In
                 </Button>
               ) : (
@@ -84,7 +85,7 @@ export default function TechnicianTimeClock() {
                   className="bg-red-600 hover:bg-red-700 text-white px-8"
                   data-testid="button-clock-out"
                 >
-                  <LogOut className="h-5 w-5 mr-2" />
+                  <LogOut className="h-5 w-5 me-2" />
                   Clock Out
                 </Button>
               )}
@@ -121,7 +122,7 @@ export default function TechnicianTimeClock() {
                       {entry.clockIn} - {entry.clockOut}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       {entry.totalHours} hrs
                     </p>

@@ -21,7 +21,7 @@ export default function PartsAutoReorder() {
 
   const checkReordersMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/auto-reorder/check", "POST", {});
+      return apiRequest("POST", "/api/auto-reorder/check", {}).then((r) => r.json());
     },
     onSuccess: (data: any) => {
       toast({ title: t('partsAutoReorder.checkComplete', 'Auto-Reorder Check Complete'), description: `${data.triggered || 0} ${t('partsAutoReorder.ordersTriggered', 'orders triggered')}` });
@@ -91,7 +91,7 @@ export default function PartsAutoReorder() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#64748B]">{t('partsAutoReorder.totalSaved', 'Total Saved')}</p>
-                <h3 className="text-2xl font-bold mt-2 text-purple-600 dark:text-purple-400" data-testid="text-total-saved">$0</h3>
+                <h3 className="text-2xl font-bold mt-2 text-purple-600 dark:text-purple-400" data-testid="text-total-saved">SAR 0</h3>
               </div>
               <DollarSign className="h-12 w-12 text-purple-600 dark:text-purple-400" />
             </div>

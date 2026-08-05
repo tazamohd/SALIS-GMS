@@ -15,7 +15,7 @@
  * here is scoped via resolveGarageScope (same pattern as the modular routes).
  */
 import { Router, type Request, type Response, type NextFunction } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -25,6 +25,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { documents } from "@shared/schema";
 import { storage } from "../storage";
+import { isAuthenticated } from "../auth";
 import { resolveGarageScope, isCrossGarageRole } from "../middleware/garageScope";
 import { logger } from "../logger";
 
@@ -93,7 +94,11 @@ const uploadsLimiter = rateLimit({
   limit: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => (req as Request & { user?: { id?: string } }).user?.id || req.ip || "anon",
+  // ipKeyGenerator collapses IPv6 addresses to their /56 so a single v6
+  // host can't rotate through addresses to dodge the limit (ERR_ERL_KEY_GEN_IPV6).
+  keyGenerator: (req: Request) =>
+    (req as Request & { user?: { id?: string } }).user?.id ||
+    (req.ip ? ipKeyGenerator(req.ip) : "anon"),
   message: { error: "Too many uploads — try again later" },
 });
 
@@ -203,6 +208,10 @@ function removeQuietly(filePath: string | undefined): void {
 
 router.post(
   "/uploads",
+  // No global auth-by-default exists on this app — the guard has to be
+  // explicit or anonymous callers reach multer and get a 403/400 instead
+  // of the 401 the contract expects.
+  isAuthenticated,
   uploadsLimiter,
   upload.single("file"),
   handleUploadErrors,
@@ -225,9 +234,9 @@ router.post(
         });
       }
 
-      const user = (req as Request & {
-        user?: { id?: string; fullName?: string; email?: string };
-      }).user ?? {};
+      // req.user is typed globally in server/auth.ts. The previous local cast
+      // fell back to `{}`, which widened the union and hid id/fullName/email.
+      const user = req.user;
       const garageId = resolveGarageScope(req);
       if (!garageId) {
         removeQuietly(file.path);
@@ -253,7 +262,7 @@ router.post(
           fileSize: file.size,
           mimeType: file.mimetype,
           tags,
-          uploadedBy: user.id ?? null,
+          uploadedBy: user?.id ?? null,
           status: "active",
         })
         .returning();
@@ -267,7 +276,7 @@ router.post(
           type: ext,
           category: parsed.data.category,
           size: file.size,
-          uploadedBy: user.fullName || user.email || "System User",
+          uploadedBy: user?.fullName || user?.email || "System User",
           tags: [...tags, `file:${doc.id}`],
           description: parsed.data.description,
         });
@@ -299,7 +308,7 @@ router.post(
 
 // ── GET /api/uploads/:id ─────────────────────────────────────────────────────
 
-router.get("/uploads/:id", async (req: Request, res: Response) => {
+router.get("/uploads/:id", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const idCheck = idParamSchema.safeParse(req.params.id);
     if (!idCheck.success) {

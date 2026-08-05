@@ -5,6 +5,9 @@ import path from "path";
 import fs from "fs";
 import { setupAuth } from "../auth";
 import { loadUserPermissions } from "../rbac-middleware";
+import { requireAuthByDefault } from "../middleware/defaultAuth";
+import { enforceGarageScopeOnQuery, enforceTenantOnBody } from "../middleware/garageScope";
+import { generateCsrfToken, csrfTokenRoute, enforceCsrf } from "../middleware/csrf";
 import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
@@ -30,6 +33,7 @@ import serviceChatRoutes from "./service-chat";
 import jobCardRoutes from "./job-cards";
 import serviceBayRoutes from "./service-bays";
 import gamificationRoutes from "./gamification";
+import dashboardRoutes from "./dashboard";
 import dashboardWidgetRoutes from "./dashboard-widgets";
 import assignmentRoutes from "./assignments";
 import availabilityRoutes from "./availability";
@@ -51,6 +55,47 @@ import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
 import deliveryRoutes from "./deliveries";
 import schedulingRoutes from "./scheduling";
+import aiInsightsRoutes from "./ai-insights";
+import apiDocsRoutes from "./api-docs";
+import autoReorderRoutes from './auto-reorder';
+import commandCenterRoutes from "./command-center";
+import crmRoutes from "./crm";
+import customerPortalRoutes from "./customer-portal";
+import docsRoutes from "./docs";
+import exportRoutes from "./export";
+import featureFlagRoutes from "./feature-flags";
+import financialRoutes from "./financial";
+import franchiseRoutes from "./franchise";
+import inventoryManagementRoutes from "./inventory-management";
+import saudiRoutes from "./saudi";
+import smsCampaignRoutes from "./sms-campaigns";
+import { subscriptionsRoutes } from "./subscriptions";
+import supplierPortalRoutes from "./supplier-portal";
+import warrantyRoutes from "./warranty";
+import whatsappRoutes from "./whatsapp";
+import backupRoutes from "./backup";
+import currencyRoutes from "./currency";
+import demoRoutes from "./demo";
+import documentsRoutes from "./documents";
+import fleetAccountRoutes from "./fleet";
+import gatePassRoutes from "./gate-pass.routes";
+import gmbSyncRoutes from "./gmb-sync.routes";
+import hrPayrollRoutes from "./hr-payroll";
+import kioskRoutes from "./kiosk";
+import paymentsGatewayRoutes from "./payments-gateway.routes";
+import qualityControlRoutes from "./quality-control";
+import quickActionsRoutes from "./quick-actions.routes";
+import taxConfigRoutes from "./tax-config.routes";
+import trainingLmsRoutes from "./training-lms.routes";
+import uploadRoutes from "./uploads";
+import { aiPredictionsRoutes } from "./ai-predictions";
+import { aiRepairGuideRoutes } from "./ai-repair-guide";
+import { analyticsPerformanceRoutes } from "./analytics-performance";
+import { forecastingDemandRoutes } from "./forecasting-demand";
+import { mobileDevicesRoutes } from "./mobile-devices";
+import { obdDiagnosticsRoutes } from "./obd-diagnostics";
+import { productivityRoutes } from "./productivity";
+import { smartContractsRoutes } from "./smart-contracts";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -62,6 +107,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.use("/public", express.static(publicPath));
   }
   
+  // Liveness/readiness probe for compose healthchecks and load balancers:
+  // 200 with a live DB ping, 503 when the database is unreachable.
+  app.get("/api/health", async (_req, res) => {
+    try {
+      const { db } = await import("../db");
+      const { sql } = await import("drizzle-orm");
+      await db.execute(sql`SELECT 1`);
+      res.json({ ok: true });
+    } catch {
+      res.status(503).json({ ok: false });
+    }
+  });
+
   // Public API routes (no auth required) - mounted at /api/public
   app.use("/api/public", publicRoutes);
   // Public system routes and AI discovery/CORS middleware
@@ -106,6 +164,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // ── Security floor (mounted immediately after auth is available) ──────────
+  // Previously written but never wired in (deep-audit blocker B1). Order:
+  //  1. seed a per-session CSRF token + expose it at /api/csrf-token,
+  //  2. default-deny: any /api route not in the PUBLIC_ROUTES allowlist now
+  //     requires an authenticated session (401 otherwise),
+  //  3. force ?garage_id to the caller's session garage for ordinary staff
+  //     (closes the client-supplied cross-tenant class in one place).
+  //  4. CSRF enforcement on mutating requests (request-time gated: ON in
+  //     production / CSRF_ENFORCE=true, OFF in dev+test by default). The client
+  //     apiRequest wrapper fetches /api/csrf-token and sends X-CSRF-Token;
+  //     webhooks / sessionless public entry points are exempt inside the
+  //     middleware.
+  app.use(generateCsrfToken);
+  app.get("/api/csrf-token", csrfTokenRoute);
+  app.use(enforceCsrf);
+  app.use(requireAuthByDefault);
+  app.use(enforceGarageScopeOnQuery);
+  app.use(enforceTenantOnBody);
+  console.log("✅ Security floor mounted (default-deny auth + tenant scope + CSRF)");
 
   // Wire RBAC: load user permissions on every authenticated request
   // This populates req.userPermissions for use by requirePermission() in handlers
@@ -179,6 +257,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Gamification Routes Loaded");
 
   // Dashboard widget read routes
+  // Dashboard KPI/trends/activity routes — existed unmounted; the
+  // garage-scope suite specifies them.
+  app.use("/api", dashboardRoutes);
   app.use("/api", dashboardWidgetRoutes);
   console.log("Dashboard Widget Routes Loaded");
 
@@ -286,6 +367,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Chatbot routes
   app.use("/api", chatbotRoutes);
   console.log("AI Chatbot Routes Loaded");
+
+  // Completed half-real page routes. These routers existed but were never
+  // mounted, so their endpoints 404ed; the completed-pages test suites
+  // specify them as live, auth-gated routes.
+  app.use("/api", aiPredictionsRoutes);
+  app.use("/api", aiRepairGuideRoutes);
+  app.use("/api", analyticsPerformanceRoutes);
+  app.use("/api", forecastingDemandRoutes);
+  app.use("/api", mobileDevicesRoutes);
+  app.use("/api", obdDiagnosticsRoutes);
+  app.use("/api", productivityRoutes);
+  app.use("/api", smartContractsRoutes);
+  console.log("Completed-Pages Routes Loaded");
+
+  // These routers also existed without a mount — every endpoint below 404ed
+  // into the SPA catch-all while its integration suite specified it as live.
+  app.use("/api", autoReorderRoutes);
+  app.use("/api", backupRoutes);
+  app.use("/api", currencyRoutes);
+  app.use("/api", demoRoutes);
+  app.use("/api", documentsRoutes);
+  app.use("/api", fleetAccountRoutes);
+  app.use("/api", gatePassRoutes);
+  app.use("/api", gmbSyncRoutes);
+  app.use("/api", hrPayrollRoutes);
+  app.use("/api", kioskRoutes);
+  app.use("/api", paymentsGatewayRoutes);
+  // quality-control declares bare /inspections etc.; its public path is /api/qc.
+  app.use("/api/qc", qualityControlRoutes);
+  app.use("/api", quickActionsRoutes);
+  app.use("/api", taxConfigRoutes);
+  app.use("/api", trainingLmsRoutes);
+  app.use("/api", uploadRoutes);
+  console.log("Module Routes Loaded (auto-reorder, backup, currency, demo, documents, fleet, gate-pass, gmb-sync, hr, kiosk, payments, qc, quick-actions, tax, training, uploads)");
+
+  // Feature routers the client already calls but which were never mounted —
+  // financial statements, CRM, warranty, messaging campaigns, Saudi
+  // compliance, portals, subscriptions, inventory overview, exports, flags,
+  // franchise, command center, AI insights and API docs. Every route carries
+  // isAuthenticated (added when these were wired up; most shipped with none).
+  app.use("/api", aiInsightsRoutes);
+  app.use("/api", apiDocsRoutes);
+  app.use("/api", commandCenterRoutes);
+  app.use("/api", crmRoutes);
+  app.use("/api", customerPortalRoutes);
+  app.use("/api", docsRoutes);
+  app.use("/api", exportRoutes);
+  app.use("/api", featureFlagRoutes);
+  app.use("/api", financialRoutes);
+  app.use("/api", franchiseRoutes);
+  app.use("/api", inventoryManagementRoutes);
+  app.use("/api", saudiRoutes);
+  app.use("/api", smsCampaignRoutes);
+  app.use("/api", subscriptionsRoutes);
+  app.use("/api", supplierPortalRoutes);
+  app.use("/api", warrantyRoutes);
+  app.use("/api", whatsappRoutes);
+  console.log("Feature Routes Loaded (ai-insights, api-docs, command-center, crm, customer-portal, docs, export, feature-flags, financial, franchise, inventory-mgmt, saudi, sms, subscriptions, supplier-portal, warranty, whatsapp)");
 
   // Load legacy routes (they will skip setupAuth since it's already done)
   const server = await registerLegacyRoutes(app);

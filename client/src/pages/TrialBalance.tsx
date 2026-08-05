@@ -115,15 +115,15 @@ export default function TrialBalance() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-refresh">
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 me-2" />
             {t('common.refresh', 'Refresh')}
           </Button>
           <Button variant="outline" data-testid="button-print">
-            <Printer className="h-4 w-4 mr-2" />
+            <Printer className="h-4 w-4 me-2" />
             {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
         </div>
@@ -203,8 +203,8 @@ export default function TrialBalance() {
                 <TableHead>{t('accounting.accountCode', 'Account Code')}</TableHead>
                 <TableHead>{t('accounting.accountName', 'Account Name')}</TableHead>
                 <TableHead>{t('common.type', 'Type')}</TableHead>
-                <TableHead className="text-right">{t('accounting.debitSAR', 'Debit (SAR)')}</TableHead>
-                <TableHead className="text-right">{t('accounting.creditSAR', 'Credit (SAR)')}</TableHead>
+                <TableHead className="text-end">{t('accounting.debitSAR', 'Debit (SAR)')}</TableHead>
+                <TableHead className="text-end">{t('accounting.creditSAR', 'Credit (SAR)')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -217,22 +217,22 @@ export default function TrialBalance() {
                       {account.type}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     {account.debit > 0 ? account.debit.toLocaleString() : "-"}
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-end font-mono">
                     {account.credit > 0 ? account.credit.toLocaleString() : "-"}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted/50 font-bold">
-                <TableCell colSpan={3} className="text-right">
+                <TableCell colSpan={3} className="text-end">
                   {t('accounting.totals', 'TOTALS')}
                 </TableCell>
-                <TableCell className="text-right font-mono text-green-600">
+                <TableCell className="text-end font-mono text-green-600">
                   {totalDebit.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-red-600">
+                <TableCell className="text-end font-mono text-red-600">
                   {totalCredit.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -354,30 +354,30 @@ export default function TrialBalance() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
-                <BookOpen className="h-4 w-4 mr-2" />
+                <BookOpen className="h-4 w-4 me-2" />
                 {t('nav.general_ledger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('nav.income_statement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/balance-sheet">
               <Button variant="outline" className="w-full justify-start" data-testid="link-balance-sheet">
-                <Scale className="h-4 w-4 mr-2" />
+                <Scale className="h-4 w-4 me-2" />
                 {t('nav.balance_sheet', 'Balance Sheet')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/journal-entries">
               <Button variant="outline" className="w-full justify-start" data-testid="link-journal-entries">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('nav.journal_entries', 'Journal Entries')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>
@@ -421,7 +421,7 @@ export default function TrialBalance() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">{item.period}</CardTitle>
                 <Badge variant="outline" className="text-green-600 border-[#E2E8F0] dark:border-[#232A36]">
-                  <CheckCircle className="h-3 w-3 mr-1" />
+                  <CheckCircle className="h-3 w-3 me-1" />
                   {item.status}
                 </Badge>
               </div>
@@ -439,7 +439,7 @@ export default function TrialBalance() {
                 </div>
               </div>
               <Button variant="outline" className="w-full mt-4 border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-view-history-${index}`}>
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="h-4 w-4 me-2" />
                 {t('common.viewDetails', 'View Details')}
               </Button>
             </CardContent>

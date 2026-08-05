@@ -57,6 +57,7 @@ import {
   type LoanerReservation,
   type User,
 } from "@shared/schema";
+import { vehicleMakes } from "@shared/vehicleCatalogs";
 import { useAuth } from "@/hooks/useAuth";
 import { TabsPageLayout } from "@/components/layouts";
 
@@ -360,7 +361,7 @@ export default function LoanerVehicles() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-loaner"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.addLoanerVehicle', 'Add Loaner Vehicle')}
         </Button>
       </div>
@@ -407,8 +408,8 @@ export default function LoanerVehicles() {
                   <TableCell>
                     {getLoanerStatusBadge(loaner.status ?? "available", loaner.id)}
                   </TableCell>
-                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.dailyRate ?? "0.00"}</TableCell>
-                  <TableCell className="text-[#0B1F3B] dark:text-white">${loaner.depositAmount ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">SAR {loaner.dailyRate ?? "0.00"}</TableCell>
+                  <TableCell className="text-[#0B1F3B] dark:text-white">SAR {loaner.depositAmount ?? "0.00"}</TableCell>
                   <TableCell className="text-[#0B1F3B] dark:text-white">
                     {loaner.lastServiceDate
                       ? format(new Date(loaner.lastServiceDate), "MMM dd, yyyy")
@@ -457,7 +458,7 @@ export default function LoanerVehicles() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-reservation"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.createReservation', 'Create Reservation')}
         </Button>
       </div>
@@ -515,8 +516,8 @@ export default function LoanerVehicles() {
                     <TableCell>
                       {getReservationStatusBadge(reservation.status ?? "reserved", reservation.id)}
                     </TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.depositPaid ?? "0.00"}</TableCell>
-                    <TableCell className="text-[#0B1F3B] dark:text-white">${reservation.totalCost ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {reservation.depositPaid ?? "0.00"}</TableCell>
+                    <TableCell className="text-[#0B1F3B] dark:text-white">SAR {reservation.totalCost ?? "0.00"}</TableCell>
                     <TableCell>
                       {reservation.damageReported ? (
                         <Badge className="bg-[#F97316] text-white">{t('common.yes', 'Yes')}</Badge>
@@ -597,7 +598,20 @@ export default function LoanerVehicles() {
                     <FormItem>
                       <FormLabel className="text-[#0B1F3B] dark:text-white">{t('vehicles.make', 'Make')}</FormLabel>
                       <FormControl>
-                        <Input {...field} className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="input-make" />
+                        <select
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          ref={field.ref}
+                          data-testid="input-make"
+                          className="w-full h-10 rounded-md px-3 bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                        >
+                          <option value="">{t('vehicles.selectMake', 'Select make')}</option>
+                          {vehicleMakes.map((m) => (
+                            <option key={m.id} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

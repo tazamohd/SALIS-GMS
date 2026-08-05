@@ -477,15 +477,15 @@ function AccountTreeNode({ account, level = 0 }: AccountTreeNodeProps) {
           
           <span className="flex-1 text-sm">
             {account.nameAr}
-            <span className="text-muted-foreground ml-2">({account.nameEn})</span>
+            <span className="text-muted-foreground ms-2">({account.nameEn})</span>
           </span>
 
           <Badge variant="outline" className={getTypeColor(account.type)}>
             {getTypeIcon(account.type)}
-            <span className="ml-1 capitalize">{account.type}</span>
+            <span className="ms-1 capitalize">{account.type}</span>
           </Badge>
 
-          <span className={`font-mono text-sm font-medium w-32 text-right ${
+          <span className={`font-mono text-sm font-medium w-32 text-end ${
             account.balance >= 0 ? "text-green-600" : "text-red-600"
           }`}>
             SAR {Math.abs(account.balance).toLocaleString()}
@@ -641,17 +641,17 @@ export default function ChartOfAccounts() {
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-expand-all">
-                <ChevronDown className="h-4 w-4 mr-1" />
+                <ChevronDown className="h-4 w-4 me-1" />
                 {t('common.expandAll', 'Expand All')}
               </Button>
               <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-collapse-all">
-                <ChevronRight className="h-4 w-4 mr-1" />
+                <ChevronRight className="h-4 w-4 me-1" />
                 {t('common.collapseAll', 'Collapse All')}
               </Button>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-account">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 me-2" />
                     {t('accounting.addAccount', 'Add Account')}
                   </Button>
                 </DialogTrigger>
@@ -922,7 +922,7 @@ export default function ChartOfAccounts() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
                 <Input
                   placeholder={t('accounting.searchAccounts', 'Search accounts...')}
-                  className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   data-testid="input-search-accounts"
@@ -930,7 +930,7 @@ export default function ChartOfAccounts() {
               </div>
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-type">
-                  <Filter className="h-4 w-4 mr-2" />
+                  <Filter className="h-4 w-4 me-2" />
                   <SelectValue placeholder={t('accounting.filterByType', 'Filter by type')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -943,7 +943,7 @@ export default function ChartOfAccounts() {
                 </SelectContent>
               </Select>
               <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export">
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 me-2" />
                 {t('common.export', 'Export')}
               </Button>
             </div>
@@ -959,9 +959,9 @@ export default function ChartOfAccounts() {
                 <TableHead>{t('common.type', 'Type')}</TableHead>
                 <TableHead>{t('accounting.nature', 'Nature')}</TableHead>
                 <TableHead>{t('accounting.level', 'Level')}</TableHead>
-                <TableHead className="text-right">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-end">{t('accounting.balance', 'Balance')}</TableHead>
                 <TableHead>{t('common.status', 'Status')}</TableHead>
-                <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+                <TableHead className="text-end">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -973,7 +973,7 @@ export default function ChartOfAccounts() {
                   <TableCell>
                     <Badge variant="outline" className={getTypeColor(account.type)}>
                       {getTypeIcon(account.type)}
-                      <span className="ml-1 capitalize">{account.type}</span>
+                      <span className="ms-1 capitalize">{account.type}</span>
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -982,7 +982,7 @@ export default function ChartOfAccounts() {
                     </Badge>
                   </TableCell>
                   <TableCell>{account.level}</TableCell>
-                  <TableCell className={`text-right font-mono ${account.balance >= 0 ? "text-green-600" : "text-red-600"}`}>
+                  <TableCell className={`text-end font-mono ${account.balance >= 0 ? "text-green-600" : "text-red-600"}`}>
                     SAR {Math.abs(account.balance).toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -990,7 +990,7 @@ export default function ChartOfAccounts() {
                       {account.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" data-testid={`button-edit-${account.code}`}>
                         <Edit className="h-4 w-4" />

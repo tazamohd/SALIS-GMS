@@ -258,13 +258,13 @@ export function Dashboard() {
             <div className="flex flex-wrap gap-3">
               <Button className="relative group overflow-hidden bg-white dark:bg-[#151A23] backdrop-blur-xl border border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] shadow-lg" asChild>
                 <Link href="/job-cards">
-                  <FileText className="w-4 h-4 mr-2 relative z-10" />
+                  <FileText className="w-4 h-4 me-2 relative z-10" />
                   <span className="relative z-10">{t('dashboard.newJobCard', 'New Job Card')}</span>
                 </Link>
               </Button>
               <Button className="relative group overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-xl shadow-[#0A5ED7]/25" asChild>
                 <Link href="/vehicles">
-                  <Car className="w-4 h-4 mr-2" />
+                  <Car className="w-4 h-4 me-2" />
                   {t('dashboard.addVehicle', 'Add Vehicle')}
                 </Link>
               </Button>
@@ -287,7 +287,7 @@ export function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-3xl font-black text-[#0B1F3B] dark:text-white font-montserrat">
-                      ${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      SAR {totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                     </h3>
                     <div className="flex items-center gap-2">
                       <TrendIndicator change={trends?.revenue?.change ?? 0} />
@@ -458,9 +458,9 @@ export function Dashboard() {
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v/1000}k`} />
+                      <YAxis tick={{ fill: '#64748B', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `SAR ${v/1000}k`} />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                        formatter={(value: number) => [`SAR ${value.toLocaleString()}`, 'Revenue']}
                         contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                         labelStyle={{ color: '#0B1F3B' }}
                       />
@@ -570,7 +570,7 @@ export function Dashboard() {
                 <Button className="bg-[#0A5ED7]/10 hover:bg-[#0A5ED7]/20 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30" variant="outline" size="sm" asChild>
                   <Link href="/job-cards">
                     {t('common.viewAll', 'View All')}
-                    <ArrowUpRight className="w-4 h-4 ml-2" />
+                    <ArrowUpRight className="w-4 h-4 ms-2" />
                   </Link>
                 </Button>
               </div>
@@ -580,13 +580,13 @@ export function Dashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.id', 'ID')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.service', 'Service')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.customer', 'Customer')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.vehicle', 'Vehicle')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.status', 'Status')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.priority', 'Priority')}</th>
-                    <th className="text-left py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.actions', 'Action')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.id', 'ID')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.service', 'Service')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.customer', 'Customer')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.vehicle', 'Vehicle')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.status', 'Status')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('table.priority', 'Priority')}</th>
+                    <th className="text-start py-4 px-6 text-[#64748B] dark:text-[#9BA4B0] text-xs font-semibold uppercase tracking-wider">{t('common.actions', 'Action')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -737,7 +737,7 @@ export function Dashboard() {
                 <Activity className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-xl font-bold text-[#0B1F3B] dark:text-white">{t('dashboard.recentActivity', 'Recent Activity')}</h3>
-              <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30 ml-auto">{t('dashboard.live', 'Live')}</Badge>
+              <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] dark:text-[#0BB3FF] border-[#0A5ED7]/30 ms-auto">{t('dashboard.live', 'Live')}</Badge>
             </div>
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
               {(!recentActivity?.activities || recentActivity.activities.length === 0) ? (
@@ -791,7 +791,7 @@ export function Dashboard() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
                 {[
-                  { label: "Today's Revenue", value: `$${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
+                  { label: "Today's Revenue", value: `SAR ${summary.todayRevenue.toLocaleString()}`, color: 'text-emerald-600 dark:text-emerald-400' },
                   { label: 'Jobs In Progress', value: summary.jobsInProgress, color: 'text-[#0A5ED7] dark:text-[#0BB3FF]' },
                   { label: 'Appointments', value: summary.appointmentsToday, color: 'text-[#0BB3FF]' },
                   { label: 'Pending Invoices', value: summary.pendingInvoices, color: 'text-[#F97316]' },

@@ -244,7 +244,7 @@ export default function ClientVehicles() {
 
                       <Link href="/client/appointments">
                         <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid={`button-book-${vehicle.id}`}>
-                          <Calendar className="h-4 w-4 mr-2" />
+                          <Calendar className="h-4 w-4 me-2" />
                           Book Service
                         </Button>
                       </Link>
@@ -358,7 +358,7 @@ function VehicleDetailView({
 
   return (
     <ScrollArea className="max-h-[70vh]">
-      <div className="space-y-6 pr-4">
+      <div className="space-y-6 pe-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
             <Wrench className="h-6 w-6 mx-auto mb-2 text-[#0A5ED7]" />
@@ -377,7 +377,7 @@ function VehicleDetailView({
           </div>
           <div className="p-4 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117] text-center">
             <DollarSign className="h-6 w-6 mx-auto mb-2 text-[#F97316]" />
-            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">${totalSpending.toFixed(0)}</div>
+            <div className="text-2xl font-bold text-[#0B1F3B] dark:text-white">SAR {totalSpending.toFixed(0)}</div>
             <p className="text-xs text-[#64748B]">Total Spent</p>
           </div>
         </div>

@@ -44,6 +44,12 @@ export async function setupVite(app: Express, server: Server) {
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
+    // Never serve the SPA shell for API paths — return a real 404 so missing
+    // endpoints surface as errors instead of a 200 HTML "false success".
+    if (url.startsWith("/api")) {
+      return res.status(404).json({ message: `No route: ${req.method} ${url}` });
+    }
+
     try {
       const clientTemplate = path.resolve(
         import.meta.dirname,
@@ -79,7 +85,10 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  app.use("*", (req, res) => {
+    if (req.originalUrl.startsWith("/api")) {
+      return res.status(404).json({ message: `No route: ${req.method} ${req.originalUrl}` });
+    }
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

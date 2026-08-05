@@ -25,7 +25,7 @@ export default function PartsMarketplace() {
 
   const createOrder = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/marketplace/orders", "POST", data);
+      return await apiRequest("POST", "/api/marketplace/orders", data);
     },
     onSuccess: () => {
       toast({ title: t('inventory.orderPlaced', 'Order placed'), description: t('inventory.partsOrderSubmitted', 'Your parts order has been submitted.') });
@@ -169,7 +169,7 @@ export default function PartsMarketplace() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('inventory.totalSpent', 'Total Spent')}</p>
-              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">${stats.totalSpent.toLocaleString()}</h3>
+              <h3 className="text-2xl font-bold mt-2 text-gray-900 dark:text-white">SAR {stats.totalSpent.toLocaleString()}</h3>
             </div>
             <DollarSign className="h-12 w-12 text-purple-600" />
           </div>
@@ -329,8 +329,8 @@ export default function PartsMarketplace() {
                       )}
                     </div>
                   </div>
-                  <div className="text-right ml-4">
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">${result.price}</p>
+                  <div className="text-end ms-4">
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">SAR {result.price}</p>
                     <Button size="sm" className="mt-2" onClick={() => {
                       createOrder.mutate({
                         marketplace: result.marketplace,
@@ -340,7 +340,7 @@ export default function PartsMarketplace() {
                         unitPrice: result.price
                       });
                     }} data-testid={`button-order-${index}`}>
-                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      <ShoppingCart className="h-3 w-3 me-1" />
                       Order
                     </Button>
                   </div>

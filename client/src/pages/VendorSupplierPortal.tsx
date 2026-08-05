@@ -151,7 +151,7 @@ export default function VendorSupplierPortal() {
   });
 
   const { data: priceComparison = [] } = useQuery<SupplierPriceList[]>({
-    queryKey: ["/api/supplier-price-lists/compare", priceComparePartId],
+    queryKey: [`/api/supplier-price-lists/compare/${priceComparePartId}`],
     enabled: !!priceComparePartId,
   });
 
@@ -181,7 +181,7 @@ export default function VendorSupplierPortal() {
       partName: "",
       partNumber: "",
       unitPrice: "",
-      currency: "USD",
+      currency: "SAR",
       minimumOrderQuantity: "1",
       leadTimeDays: "",
       availability: "in_stock",
@@ -442,7 +442,7 @@ export default function VendorSupplierPortal() {
       partName: priceList.partName,
       partNumber: priceList.partNumber ?? "",
       unitPrice: priceList.unitPrice,
-      currency: priceList.currency ?? "USD",
+      currency: priceList.currency ?? "SAR",
       minimumOrderQuantity: priceList.minimumOrderQuantity?.toString() ?? "1",
       leadTimeDays: priceList.leadTimeDays?.toString() ?? "",
       availability: priceList.availability ?? "in_stock",
@@ -539,7 +539,7 @@ export default function VendorSupplierPortal() {
             data-testid="tab-suppliers"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white text-[#0B1F3B] dark:text-white"
           >
-            <Store className="h-4 w-4 mr-2" />
+            <Store className="h-4 w-4 me-2" />
             {t('vendor.suppliers', 'Suppliers')}
           </TabsTrigger>
           <TabsTrigger
@@ -547,7 +547,7 @@ export default function VendorSupplierPortal() {
             data-testid="tab-price-lists"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white text-[#0B1F3B] dark:text-white"
           >
-            <DollarSign className="h-4 w-4 mr-2" />
+            <DollarSign className="h-4 w-4 me-2" />
             {t('vendor.priceLists', 'Price Lists')}
           </TabsTrigger>
           <TabsTrigger
@@ -555,7 +555,7 @@ export default function VendorSupplierPortal() {
             data-testid="tab-performance"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white text-[#0B1F3B] dark:text-white"
           >
-            <TrendingUp className="h-4 w-4 mr-2" />
+            <TrendingUp className="h-4 w-4 me-2" />
             {t('vendor.performance', 'Performance')}
           </TabsTrigger>
           <TabsTrigger
@@ -563,7 +563,7 @@ export default function VendorSupplierPortal() {
             data-testid="tab-reorder"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white text-[#0B1F3B] dark:text-white"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 me-2" />
             {t('vendor.reorderRules', 'Reorder Rules')}
           </TabsTrigger>
         </TabsList>
@@ -579,7 +579,7 @@ export default function VendorSupplierPortal() {
               data-testid="button-create-supplier"
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('vendor.addSupplier', 'Add Supplier')}
             </Button>
           </div>
@@ -599,7 +599,7 @@ export default function VendorSupplierPortal() {
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('auth.phone', 'Phone')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.city', 'City')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-[#151A23]">
@@ -636,7 +636,7 @@ export default function VendorSupplierPortal() {
                           {supplier.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="text-end space-x-2">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -693,7 +693,7 @@ export default function VendorSupplierPortal() {
                 data-testid="button-create-price-list"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('vendor.addPriceEntry', 'Add Price Entry')}
               </Button>
             </div>
@@ -751,7 +751,7 @@ export default function VendorSupplierPortal() {
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.minOrder', 'Min Order')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.leadTime', 'Lead Time')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.availability', 'Availability')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-[#151A23]">
@@ -789,7 +789,7 @@ export default function VendorSupplierPortal() {
                             {priceList.availability}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
+                        <TableCell className="text-end space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -829,7 +829,7 @@ export default function VendorSupplierPortal() {
               data-testid="button-create-performance"
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('vendor.addPerformanceRecord', 'Add Performance Record')}
             </Button>
           </div>
@@ -850,7 +850,7 @@ export default function VendorSupplierPortal() {
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.onTimePercent', 'On-Time %')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.qualityScore', 'Quality Score')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.rating', 'Rating')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-[#151A23]">
@@ -885,10 +885,10 @@ export default function VendorSupplierPortal() {
                             <span className="font-poppins font-medium text-[#0B1F3B] dark:text-white">
                               {perf.overallRating || "—"}
                             </span>
-                            <span className="text-[#64748B] ml-1">/5.0</span>
+                            <span className="text-[#64748B] ms-1">/5.0</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
+                        <TableCell className="text-end space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -928,7 +928,7 @@ export default function VendorSupplierPortal() {
               data-testid="button-create-reorder"
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('vendor.addReorderRule', 'Add Reorder Rule')}
             </Button>
           </div>
@@ -949,7 +949,7 @@ export default function VendorSupplierPortal() {
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.supplier', 'Supplier')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.leadTime', 'Lead Time')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat">{t('vendor.autoEnabled', 'Auto Enabled')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white font-montserrat text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white dark:bg-[#151A23]">
@@ -992,7 +992,7 @@ export default function VendorSupplierPortal() {
                             {reorder.isAutoReorderEnabled ? t('common.enabled', 'Enabled') : t('common.disabled', 'Disabled')}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
+                        <TableCell className="text-end space-x-2">
                           <Button
                             variant="ghost"
                             size="sm"

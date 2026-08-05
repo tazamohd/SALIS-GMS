@@ -189,7 +189,7 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black" data-testid="button-create-estimate">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Create Estimate
         </Button>
       </DialogTrigger>
@@ -402,7 +402,7 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold">${(item.quantity * item.unitPrice).toFixed(2)}</p>
+                        <p className="font-semibold">SAR {(item.quantity * item.unitPrice).toFixed(2)}</p>
                         <Button
                           type="button"
                           variant="ghost"
@@ -422,19 +422,19 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
                 <div className="mt-4 pt-4 border-t">
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-semibold" data-testid="text-subtotal">${subtotal.toFixed(2)}</span>
+                    <span className="font-semibold" data-testid="text-subtotal">SAR {subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-600">Tax ({taxRate}%):</span>
-                    <span className="font-semibold" data-testid="text-tax">${taxAmount.toFixed(2)}</span>
+                    <span className="font-semibold" data-testid="text-tax">SAR {taxAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span className="text-gray-600">Discount:</span>
-                    <span className="font-semibold" data-testid="text-discount">${discountAmount.toFixed(2)}</span>
+                    <span className="font-semibold" data-testid="text-discount">SAR {discountAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
                     <span>Total:</span>
-                    <span data-testid="text-total">${total.toFixed(2)}</span>
+                    <span data-testid="text-total">SAR {total.toFixed(2)}</span>
                   </div>
                 </div>
               )}

@@ -27,6 +27,27 @@ router.get('/api/health', async (_req, res) => {
   }
 });
 
+// Liveness: the process is up and the event loop responds. No dependencies —
+// a container orchestrator uses this to decide whether to restart the pod, so
+// it must never touch the database (a slow DB must not trigger a kill).
+router.get('/api/health/live', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// Readiness: the process can serve traffic (DB reachable). A load balancer
+// uses this to decide whether to route requests; 503 pulls the pod out of
+// rotation without restarting it.
+async function readiness(_req: any, res: any) {
+  try {
+    await db.execute(sql`SELECT 1`);
+    res.json({ status: 'ready', timestamp: new Date().toISOString() });
+  } catch (error: any) {
+    res.status(503).json({ status: 'not-ready', error: error?.message || 'db unreachable' });
+  }
+}
+router.get('/api/health/ready', readiness);
+router.get('/api/ready', readiness);
+
 router.use((req, res, next) => {
   const allowedOrigins = [
     'https://chat.openai.com',

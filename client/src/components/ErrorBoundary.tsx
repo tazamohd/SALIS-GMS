@@ -61,7 +61,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
                 </button>
 
                 {showDetails && (
-                  <div className="mt-3 rounded-md bg-muted p-3 text-left">
+                  <div className="mt-3 rounded-md bg-muted p-3 text-start">
                     <p className="text-xs font-mono text-destructive break-all">
                       {error.message}
                     </p>

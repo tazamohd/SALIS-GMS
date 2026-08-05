@@ -196,6 +196,20 @@ export async function createDigitalWalkaround(data: {
   }
 }
 
+export async function getDigitalWalkaround(id: string) {
+  try {
+    const [walkaround] = await db
+      .select()
+      .from(digitalWalkarounds)
+      .where(eq(digitalWalkarounds.id, id));
+
+    return walkaround ?? null;
+  } catch (error) {
+    console.error('Error fetching digital walkaround:', error);
+    return null;
+  }
+}
+
 export async function getWalkaroundsByJobCard(jobCardId: string) {
   try {
     const walkarounds = await db

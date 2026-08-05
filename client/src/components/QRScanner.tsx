@@ -36,9 +36,9 @@ export function QRScanner({
     setScanResult(null);
 
     try {
-      const result: any = await apiRequest('POST', '/api/qr-codes/scan', {
+      const result: any = await (await apiRequest('POST', '/api/qr-codes/scan', {
         qrCodeData: qrCodeData.trim(),
-      });
+      })).json();
 
       setScanResult(result);
 
@@ -231,7 +231,7 @@ export function QRScanner({
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
                   data-testid="button-check-in"
                 >
-                  <Check className="w-4 h-4 mr-2" />
+                  <Check className="w-4 h-4 me-2" />
                   Check In Customer
                 </Button>
               )}

@@ -60,7 +60,7 @@ export function FilterBar({
               placeholder={searchPlaceholder}
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] focus:ring-[#0A5ED7] focus:border-[#0A5ED7]"
+              className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] focus:ring-[#0A5ED7] focus:border-[#0A5ED7]"
               data-testid="filter-search-input"
               aria-label="Search"
             />
@@ -101,7 +101,7 @@ export function FilterBar({
             className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0A5ED7] dark:text-[#0BB3FF] whitespace-nowrap focus-visible:ring-[#0A5ED7]"
             data-testid="filter-clear-button"
           >
-            <X className="mr-2 h-4 w-4" />
+            <X className="me-2 h-4 w-4" />
             Clear Filters
           </Button>
         )}

@@ -10,13 +10,16 @@
     <meta name="apple-mobile-web-app-title" content="Garage Pro">
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/icon-192.png">
-  <style>
-      @import url("https://fonts.googleapis.com/css?family=Poppins:500,var(--display-large-semibold-font-weight),400");
-    </style></head>
+    <title>SALIS AUTO — Garage Management</title>
+    <!-- Fonts load async (media swap) so an unreachable font host can
+         never block rendering; system fonts are the fallback. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap">
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>

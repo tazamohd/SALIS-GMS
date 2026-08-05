@@ -201,7 +201,7 @@ export default function LicensePlateRecognition() {
                     </h3>
                     <p className="text-sm text-[#64748B]">{log.customerName || t('licensePlate.unknown', 'Unknown')}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-sm text-[#64748B]">
                       {t('licensePlate.entryTime', 'Entry')}: {log.entryTime ? new Date(log.entryTime).toLocaleTimeString() : ""}
                     </p>

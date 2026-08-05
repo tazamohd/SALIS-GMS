@@ -288,7 +288,7 @@ export default function ServiceBayDashboard() {
             className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
             data-testid="button-refresh-bays"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 text-[#0A5ED7] ${loadingBays ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 me-2 text-[#0A5ED7] ${loadingBays ? 'animate-spin' : ''}`} />
             {t('common.refresh', 'Refresh')}
           </Button>
         </div>

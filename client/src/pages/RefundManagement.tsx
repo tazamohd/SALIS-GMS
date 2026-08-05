@@ -138,7 +138,7 @@ export default function RefundManagement() {
     const Icon = config.icon;
     return (
       <Badge variant={config.variant} className={config.className}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {status}
       </Badge>
     );
@@ -166,7 +166,7 @@ export default function RefundManagement() {
         <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => refundForm.reset()} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" data-testid="button-create-refund">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('payments.refunds.createRefund', 'Create Refund')}
               </Button>
             </DialogTrigger>
@@ -346,7 +346,7 @@ export default function RefundManagement() {
                             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                             data-testid={`button-approve-refund-${refund.id}`}
                           >
-                            <CheckCircle className="h-4 w-4 mr-1" />
+                            <CheckCircle className="h-4 w-4 me-1" />
                             {t('payments.refunds.approve', 'Approve')}
                           </Button>
                         )}
@@ -358,7 +358,7 @@ export default function RefundManagement() {
                             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                             data-testid={`button-process-refund-${refund.id}`}
                           >
-                            <DollarSign className="h-4 w-4 mr-1" />
+                            <DollarSign className="h-4 w-4 me-1" />
                             {t('payments.refunds.process', 'Process')}
                           </Button>
                         )}

@@ -105,10 +105,9 @@ export default function Calendar() {
   });
 
   const { data: calendarEvents = [] } = useQuery<any[]>({
-    queryKey: ['/api/calendar-events', selectedGarageId, {
-      startDate: startOfMonth(date).toISOString(),
-      endDate: endOfMonth(date).toISOString(),
-    }],
+    queryKey: [
+      `/api/calendar-events/${selectedGarageId}?startDate=${encodeURIComponent(startOfMonth(date).toISOString())}&endDate=${encodeURIComponent(endOfMonth(date).toISOString())}`,
+    ],
     enabled: !!selectedGarageId,
   });
 

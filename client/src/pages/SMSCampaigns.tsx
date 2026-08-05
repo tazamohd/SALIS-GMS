@@ -154,15 +154,15 @@ function CampaignsTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                  <th className="text-left py-3 px-4 font-medium text-[#64748B]">Campaign</th>
-                  <th className="text-left py-3 px-4 font-medium text-[#64748B]">Audience</th>
-                  <th className="text-left py-3 px-4 font-medium text-[#64748B]">Status</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Sent</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Delivered</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Delivery Rate</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Clicked</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Cost</th>
-                  <th className="text-right py-3 px-4 font-medium text-[#64748B]">Actions</th>
+                  <th className="text-start py-3 px-4 font-medium text-[#64748B]">Campaign</th>
+                  <th className="text-start py-3 px-4 font-medium text-[#64748B]">Audience</th>
+                  <th className="text-start py-3 px-4 font-medium text-[#64748B]">Status</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Sent</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Delivered</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Delivery Rate</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Clicked</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Cost</th>
+                  <th className="text-end py-3 px-4 font-medium text-[#64748B]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,16 +182,16 @@ function CampaignsTab() {
                       </div>
                     </td>
                     <td className="py-3 px-4">{statusBadge(c.status)}</td>
-                    <td className="py-3 px-4 text-right text-[#0B1F3B] dark:text-white">{c.sentCount.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-[#0B1F3B] dark:text-white">{c.deliveredCount.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-end text-[#0B1F3B] dark:text-white">{c.sentCount.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-end text-[#0B1F3B] dark:text-white">{c.deliveredCount.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-end">
                       <span className={c.deliveryRate >= 95 ? "text-green-600" : c.deliveryRate >= 90 ? "text-yellow-600" : "text-red-600"}>
                         {c.deliveryRate}%
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right text-[#0B1F3B] dark:text-white">{c.clickedCount.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-[#0B1F3B] dark:text-white">SAR {c.totalCost.toFixed(2)}</td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-end text-[#0B1F3B] dark:text-white">{c.clickedCount.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-end text-[#0B1F3B] dark:text-white">SAR {c.totalCost.toFixed(2)}</td>
+                    <td className="py-3 px-4 text-end">
                       <div className="flex items-center justify-end gap-2">
                         {(c.status === "draft" || c.status === "scheduled") && (
                           <Button
@@ -201,13 +201,13 @@ function CampaignsTab() {
                             disabled={sendMutation.isPending}
                             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                           >
-                            <Send className="h-3.5 w-3.5 mr-1" />
+                            <Send className="h-3.5 w-3.5 me-1" />
                             Send
                           </Button>
                         )}
                         {c.status === "sending" && (
                           <Button size="sm" variant="outline">
-                            <Pause className="h-3.5 w-3.5 mr-1" />
+                            <Pause className="h-3.5 w-3.5 me-1" />
                             Pause
                           </Button>
                         )}
@@ -371,7 +371,7 @@ function CreateCampaignTab() {
             disabled={!name || !templateId || !audienceFilter || createMutation.isPending}
             className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {createMutation.isPending ? "Creating..." : "Create Campaign"}
           </Button>
         </CardContent>
@@ -483,7 +483,7 @@ function TemplatesTab() {
                     </div>
                   </div>
                   <Button size="sm" variant="outline">
-                    <Eye className="h-3.5 w-3.5 mr-1" />
+                    <Eye className="h-3.5 w-3.5 me-1" />
                     Edit
                   </Button>
                 </div>
@@ -499,7 +499,7 @@ function TemplatesTab() {
                     <FileText className="h-3 w-3" />
                     {template.charCount} chars
                     {template.charCount > 160 && (
-                      <span className="text-yellow-600 ml-1">
+                      <span className="text-yellow-600 ms-1">
                         ({Math.ceil(template.charCount / 153)} segments)
                       </span>
                     )}
@@ -712,7 +712,7 @@ function AnalyticsTab() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-sm font-medium text-green-600">{campaign.clickRate}% click</p>
                     <p className="text-xs text-[#64748B]">{campaign.deliveryRate}% delivered</p>
                   </div>

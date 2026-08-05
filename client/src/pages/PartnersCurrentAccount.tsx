@@ -213,22 +213,22 @@ export default function PartnersCurrentAccount() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('partners.partner', 'Partner')}</TableHead>
-                    <TableHead className="text-right">{t('partners.openingBalance', 'Opening Balance')}</TableHead>
-                    <TableHead className="text-right">{t('partners.credits', 'Credits')}</TableHead>
-                    <TableHead className="text-right">{t('partners.debits', 'Debits')}</TableHead>
-                    <TableHead className="text-right">{t('partners.currentBalance', 'Current Balance')}</TableHead>
-                    <TableHead className="text-right">{t('partners.ownershipPercent', 'Ownership %')}</TableHead>
+                    <TableHead className="text-end">{t('partners.openingBalance', 'Opening Balance')}</TableHead>
+                    <TableHead className="text-end">{t('partners.credits', 'Credits')}</TableHead>
+                    <TableHead className="text-end">{t('partners.debits', 'Debits')}</TableHead>
+                    <TableHead className="text-end">{t('partners.currentBalance', 'Current Balance')}</TableHead>
+                    <TableHead className="text-end">{t('partners.ownershipPercent', 'Ownership %')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {partners.map((partner) => (
                     <TableRow key={partner.id} data-testid={`row-partner-${partner.id}`}>
                       <TableCell className="font-medium">{partner.name}</TableCell>
-                      <TableCell className="text-right font-montserrat">SAR {partner.openingBalance.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat text-green-600">+SAR {partner.credits.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat text-red-600">-SAR {partner.debits.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat font-bold">SAR {partner.currentBalance.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-montserrat">{partner.ownership}%</TableCell>
+                      <TableCell className="text-end font-montserrat">SAR {partner.openingBalance.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-montserrat text-green-600">+SAR {partner.credits.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-montserrat text-red-600">-SAR {partner.debits.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-montserrat font-bold">SAR {partner.currentBalance.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-montserrat">{partner.ownership}%</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -249,7 +249,7 @@ export default function PartnersCurrentAccount() {
             <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-transaction">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('partners.addTransaction', 'Add Transaction')}
                 </Button>
               </DialogTrigger>
@@ -365,7 +365,7 @@ export default function PartnersCurrentAccount() {
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('partners.partner', 'Partner')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -376,15 +376,15 @@ export default function PartnersCurrentAccount() {
                       <TableCell>
                         <Badge className={transaction.type === "Credit" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"}>
                           {transaction.type === "Credit" ? (
-                            <ArrowDownRight className="h-3 w-3 mr-1" />
+                            <ArrowDownRight className="h-3 w-3 me-1" />
                           ) : (
-                            <ArrowUpRight className="h-3 w-3 mr-1" />
+                            <ArrowUpRight className="h-3 w-3 me-1" />
                           )}
                           {transaction.type === "Credit" ? t('partners.credit', 'Credit') : t('partners.debit', 'Debit')}
                         </Badge>
                       </TableCell>
                       <TableCell>{transaction.description}</TableCell>
-                      <TableCell className={`text-right font-montserrat font-bold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
+                      <TableCell className={`text-end font-montserrat font-bold ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`}>
                         {transaction.amount > 0 ? "+" : ""}SAR {Math.abs(transaction.amount).toLocaleString()}
                       </TableCell>
                     </TableRow>
@@ -407,7 +407,7 @@ export default function PartnersCurrentAccount() {
             <Dialog open={isWithdrawalDialogOpen} onOpenChange={setIsWithdrawalDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-withdrawal">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('partners.newWithdrawal', 'New Withdrawal')}
                 </Button>
               </DialogTrigger>

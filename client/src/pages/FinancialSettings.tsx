@@ -250,7 +250,7 @@ export default function FinancialSettings() {
         <Dialog open={taxDialogOpen} onOpenChange={setTaxDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { setEditingTax(null); taxForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-tax">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('financial.addTax', 'Add Tax')}
             </Button>
           </DialogTrigger>
@@ -384,7 +384,7 @@ export default function FinancialSettings() {
         <Dialog open={discountDialogOpen} onOpenChange={setDiscountDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { setEditingDiscount(null); discountForm.reset({ garageId: selectedGarageId }); }} data-testid="button-add-discount">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('financial.addDiscount', 'Add Discount')}
             </Button>
           </DialogTrigger>
@@ -492,9 +492,9 @@ export default function FinancialSettings() {
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
-                                  <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-from">
+                                  <Button variant="outline" className={cn("ps-3 text-start font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-from">
                                     {field.value ? format(field.value, "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>
@@ -515,9 +515,9 @@ export default function FinancialSettings() {
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
-                                  <Button variant="outline" className={cn("pl-3 text-left font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-to">
+                                  <Button variant="outline" className={cn("ps-3 text-start font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-to">
                                     {field.value ? format(field.value, "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>
@@ -642,12 +642,12 @@ export default function FinancialSettings() {
                       <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-discount-name-${discount.id}`}>{discount.name}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="border-[#0A5ED7] text-[#0A5ED7] dark:border-[#0BB3FF] dark:text-[#0BB3FF]" data-testid={`badge-discount-type-${discount.id}`}>
-                          {discount.discountType === "percentage" ? <Percent className="h-3 w-3 mr-1" /> : <DollarSign className="h-3 w-3 mr-1" />}
+                          {discount.discountType === "percentage" ? <Percent className="h-3 w-3 me-1" /> : <DollarSign className="h-3 w-3 me-1" />}
                           {discount.discountType === "percentage" ? t('financial.percentage', 'Percentage') : t('financial.fixedAmount', 'Fixed Amount')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white" data-testid={`text-discount-value-${discount.id}`}>
-                        {discount.discountType === "percentage" ? `${discount.discountValue}%` : `$${discount.discountValue}`}
+                        {discount.discountType === "percentage" ? `${discount.discountValue}%` : `SAR ${discount.discountValue}`}
                       </TableCell>
                       <TableCell className="text-sm text-[#64748B]" data-testid={`text-discount-period-${discount.id}`}>
                         {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}

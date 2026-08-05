@@ -191,7 +191,7 @@ export default function VehicleHistory() {
           className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
           data-testid={`button-view-${row.id}`}
         >
-          <FileText className="w-4 h-4 mr-1 text-[#0A5ED7]" />
+          <FileText className="w-4 h-4 me-1 text-[#0A5ED7]" />
           {t('common.view', 'View')}
         </Button>
       ),

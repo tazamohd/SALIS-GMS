@@ -132,7 +132,7 @@ function SortableWidget({ widget, onToggle, onDelete }: {
             <h4 className="font-medium text-[#0B1F3B] dark:text-white">{widget.title}</h4>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary" className="text-xs bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B]">
-                <SourceIcon className="h-3 w-3 mr-1" />
+                <SourceIcon className="h-3 w-3 me-1" />
                 {widget.dataSource}
               </Badge>
               <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">
@@ -197,10 +197,7 @@ export default function DashboardWidgets() {
 
   const createWidgetMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/dashboard/widgets', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/dashboard/widgets', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -222,10 +219,7 @@ export default function DashboardWidgets() {
 
   const updateWidgetMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('PATCH', `/api/dashboard/widgets/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -234,9 +228,7 @@ export default function DashboardWidgets() {
 
   const deleteWidgetMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/dashboard/widgets/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -256,10 +248,7 @@ export default function DashboardWidgets() {
 
   const updatePositionsMutation = useMutation({
     mutationFn: async (positions: { id: string; position: any }[]) => {
-      return apiRequest('/api/dashboard/widgets/positions', {
-        method: 'PATCH',
-        body: JSON.stringify({ positions }),
-      });
+      return apiRequest('PATCH', '/api/dashboard/widgets/positions', { positions });
     },
     onSuccess: () => {
       toast({
@@ -383,7 +372,7 @@ export default function DashboardWidgets() {
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-add-widget">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 me-2" />
                     {t('dashboard.addWidget', 'Add Widget')}
                   </Button>
                 </DialogTrigger>
@@ -476,7 +465,7 @@ export default function DashboardWidgets() {
                       disabled={createWidgetMutation.isPending}
                       data-testid="button-save-widget"
                     >
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4 me-2" />
                       Save Widget
                     </Button>
                   </DialogFooter>

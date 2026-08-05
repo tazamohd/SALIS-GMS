@@ -82,7 +82,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: <span className="font-bold">${parseFloat(entry.value).toFixed(2)}</span>
+            {entry.name}: <span className="font-bold">SAR {parseFloat(entry.value).toFixed(2)}</span>
           </p>
         ))}
       </div>
@@ -99,7 +99,7 @@ function SummaryTab() {
   const metrics = [
     {
       title: "Total Revenue",
-      value: `$${(summary?.totalRevenue || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+      value: `SAR ${(summary?.totalRevenue || 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: "text-green-600",
       bg: "bg-green-50 dark:bg-green-900/20",
@@ -277,7 +277,7 @@ function TechnicianTab() {
                       </div>
                     </TableCell>
                     <TableCell>{parseFloat(tech.avgHours).toFixed(1)}h</TableCell>
-                    <TableCell>${parseFloat(tech.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
+                    <TableCell>SAR {parseFloat(tech.totalRevenue).toLocaleString("en-US", { minimumFractionDigits: 2 })}</TableCell>
                     <TableCell className="w-[150px]">
                       <Progress value={(total / maxJobs) * 100} className="h-2" />
                     </TableCell>
@@ -341,8 +341,8 @@ function InventoryTab() {
                     <TableCell>{item.category}</TableCell>
                     <TableCell>{item.stockQuantity}</TableCell>
                     <TableCell>{item.minQuantity}</TableCell>
-                    <TableCell>${parseFloat(item.costPrice).toFixed(2)}</TableCell>
-                    <TableCell>${parseFloat(item.sellingPrice).toFixed(2)}</TableCell>
+                    <TableCell>SAR {parseFloat(item.costPrice).toFixed(2)}</TableCell>
+                    <TableCell>SAR {parseFloat(item.sellingPrice).toFixed(2)}</TableCell>
                     <TableCell>
                       <Badge variant={config.variant}>{config.label}</Badge>
                     </TableCell>
@@ -394,7 +394,7 @@ function CustomerTab() {
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.totalVisits}</TableCell>
                   <TableCell>
-                    ${parseFloat(customer.totalSpent).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    SAR {parseFloat(customer.totalSpent).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </TableCell>
                   <TableCell>
                     {customer.lastVisit
@@ -420,11 +420,27 @@ function CustomerTab() {
 export default function AdvancedReports() {
   const { toast } = useToast();
 
-  const handleExport = () => {
-    toast({
-      title: "Export Coming Soon",
-      description: "Report export functionality will be available in a future update.",
-    });
+  // Streams the garage-scoped CSV from the real export endpoint.
+  const handleExport = async () => {
+    try {
+      const res = await fetch("/api/export/csv/financial-summary", { credentials: "include" });
+      if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `financial-summary-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      toast({
+        title: "Export failed",
+        description: err?.message?.includes("403")
+          ? "Exports require an admin account."
+          : "Could not generate the export. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -439,7 +455,7 @@ export default function AdvancedReports() {
           </p>
         </div>
         <Button onClick={handleExport} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4 me-2" />
           Export
         </Button>
       </div>

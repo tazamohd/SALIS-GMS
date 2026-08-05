@@ -153,13 +153,13 @@ export default function VehicleHealthMonitoring() {
                     <p className="text-[#64748B]">/100</p>
                   </div>
                   <p className="text-sm text-[#0A5ED7] mt-1" data-testid="text-health-trend">
-                    <TrendingUp className="w-4 h-4 inline mr-1" />
+                    <TrendingUp className="w-4 h-4 inline me-1" />
                     {t('vehicleHealth.fromLastWeek', '+3 from last week')}
                   </p>
                 </div>
               </div>
               
-              <div className="text-right space-y-2">
+              <div className="text-end space-y-2">
                 <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-0" data-testid="badge-health-status">
                   {t('common.healthy', 'Healthy')}
                 </Badge>

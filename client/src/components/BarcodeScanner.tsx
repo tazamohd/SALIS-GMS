@@ -167,7 +167,7 @@ export function BarcodeScanner({ open, onClose, onScan }: BarcodeScannerProps) {
               className="flex-1"
               data-testid="button-close-scanner"
             >
-              <X className="mr-2 h-4 w-4" />
+              <X className="me-2 h-4 w-4" />
               Close
             </Button>
           </div>

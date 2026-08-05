@@ -159,7 +159,7 @@ export default function AccountsReceivable() {
               placeholder={t('accounting.searchCustomersOrInvoices', 'Search customers or invoices...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-search"
             />
           </div>
@@ -178,13 +178,13 @@ export default function AccountsReceivable() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-record-payment">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('accounting.recordPayment', 'Record Payment')}
               </Button>
             </DialogTrigger>
@@ -321,9 +321,9 @@ export default function AccountsReceivable() {
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.customer', 'Customer')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.invoice', 'Invoice')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.dueDate', 'Due Date')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.original', 'Original')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.paid', 'Paid')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.original', 'Original')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.paid', 'Paid')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.balance', 'Balance')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
@@ -350,13 +350,13 @@ export default function AccountsReceivable() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">
+                  <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">
                     {ar.originalAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-green-600 dark:text-green-400">
+                  <TableCell className="text-end font-mono text-green-600 dark:text-green-400">
                     {ar.paidAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono font-bold text-[#0B1F3B] dark:text-white">
+                  <TableCell className="text-end font-mono font-bold text-[#0B1F3B] dark:text-white">
                     {ar.balanceDue.toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -482,30 +482,30 @@ export default function AccountsReceivable() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/invoices">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-invoices">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('accounting.invoices', 'Invoices')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/customers">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-customers">
-                <Users className="h-4 w-4 mr-2" />
+                <Users className="h-4 w-4 me-2" />
                 {t('accounting.customers', 'Customers')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('accounting.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/accounts-payable">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-accounts-payable">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('accounting.accountsPayable', 'Accounts Payable')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>

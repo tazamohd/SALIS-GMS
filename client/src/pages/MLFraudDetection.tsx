@@ -23,7 +23,7 @@ export default function MLFraudDetection() {
     id: c.id,
     type: c.flagReason || t('mlFraud.suspiciousActivity', 'Suspicious Activity'),
     risk: c.riskScore > 70 ? 'high' : c.riskScore > 40 ? 'medium' : 'low',
-    amount: `$${c.transactionAmount || 0}`,
+    amount: `SAR ${c.transactionAmount || 0}`,
     status: c.status || 'pending',
     detected: new Date(c.detectedAt).toRelativeTimeString?.() || t('mlFraud.recently', 'Recently'),
   })) : [
@@ -114,7 +114,7 @@ export default function MLFraudDetection() {
                         {t('mlFraud.detected', 'Detected')} {fraudCase.detected}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="text-2xl font-bold text-red-600">{fraudCase.amount}</p>
                     </div>
                   </div>

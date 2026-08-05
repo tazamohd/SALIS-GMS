@@ -101,7 +101,7 @@ export default function DroneInspection() {
             </div>
 
             <Button className="w-full mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-new-flight">
-              <Plane className="mr-2 h-4 w-4" />
+              <Plane className="me-2 h-4 w-4" />
               {t('drone.planNewFlight', 'Plan New Flight')}
             </Button>
           </CardContent>

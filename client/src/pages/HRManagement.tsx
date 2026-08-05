@@ -253,7 +253,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-employee">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('hr.addEmployee', 'Add Employee')}
                 </Button>
               </DialogTrigger>
@@ -273,7 +273,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder={t('hr.searchEmployees', 'Search employees...')}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 data-testid="input-search-employees"
@@ -301,7 +301,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
                   <TableHead className="text-[#64748B]">{t('hr.position', 'Position')}</TableHead>
                   <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
                   <TableHead className="text-[#64748B]">{t('hr.hireDate', 'Hire Date')}</TableHead>
-                  <TableHead className="text-right text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
+                  <TableHead className="text-end text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -329,7 +329,7 @@ function EmployeesTab({ garageId }: { garageId: string }) {
                       </Badge>
                     </TableCell>
                     <TableCell>{format(new Date(emp.hireDate), "MMM dd, yyyy")}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="icon" data-testid={`button-view-${emp.id}`}>
                           <Eye className="h-4 w-4" />
@@ -484,23 +484,23 @@ function AttendanceTab({ garageId }: { garageId: string }) {
         <CardContent className="flex flex-wrap gap-2">
           {!isClockedIn ? (
             <Button onClick={() => setIsClockedIn(true)} data-testid="button-clock-in">
-              <Play className="h-4 w-4 mr-2" />
+              <Play className="h-4 w-4 me-2" />
               {t('hr.clockIn', 'Clock In')}
             </Button>
           ) : (
             <>
               <Button onClick={() => setIsClockedIn(false)} variant="destructive" data-testid="button-clock-out">
-                <StopCircle className="h-4 w-4 mr-2" />
+                <StopCircle className="h-4 w-4 me-2" />
                 {t('hr.clockOut', 'Clock Out')}
               </Button>
               {!isOnBreak ? (
                 <Button onClick={() => setIsOnBreak(true)} variant="outline" data-testid="button-start-break">
-                  <Pause className="h-4 w-4 mr-2" />
+                  <Pause className="h-4 w-4 me-2" />
                   {t('hr.startBreak', 'Start Break')}
                 </Button>
               ) : (
                 <Button onClick={() => setIsOnBreak(false)} variant="outline" data-testid="button-end-break">
-                  <Play className="h-4 w-4 mr-2" />
+                  <Play className="h-4 w-4 me-2" />
                   {t('hr.endBreak', 'End Break')}
                 </Button>
               )}
@@ -633,7 +633,7 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
             <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
               <DialogTrigger asChild>
                 <Button data-testid="button-request-leave">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('hr.requestLeave', 'Request Leave')}
                 </Button>
               </DialogTrigger>
@@ -688,7 +688,7 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
                   <TableHead>{t('hr.dates', 'Dates')}</TableHead>
                   <TableHead>{t('hr.days', 'Days')}</TableHead>
                   <TableHead>{t('common.status', 'Status')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions', 'Actions')}</TableHead>
+                  <TableHead className="text-end">{t('common.actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -703,7 +703,7 @@ function LeaveManagementTab({ garageId }: { garageId: string }) {
                         {request.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       {request.status === "pending" && (
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="sm" className="text-green-600">
@@ -793,7 +793,7 @@ function PayrollTab({ garageId }: { garageId: string }) {
               <CardDescription>{t('hr.currentMonthPayroll', 'Current month payroll overview')}</CardDescription>
             </div>
             <Button data-testid="button-run-payroll">
-              <Play className="h-4 w-4 mr-2" />
+              <Play className="h-4 w-4 me-2" />
               {t('hr.runPayroll', 'Run Payroll')}
             </Button>
           </div>
@@ -875,7 +875,7 @@ function PerformanceTab({ garageId }: { garageId: string }) {
               <CardDescription>{t('hr.employeePerformanceTracking', 'Track employee performance and goals')}</CardDescription>
             </div>
             <Button data-testid="button-create-review">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('hr.createReview', 'Create Review')}
             </Button>
           </div>
@@ -957,7 +957,7 @@ function TrainingTab({ garageId }: { garageId: string }) {
               <CardDescription>{t('hr.availableCourses', 'Available courses and certifications')}</CardDescription>
             </div>
             <Button data-testid="button-add-training">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('hr.addProgram', 'Add Program')}
             </Button>
           </div>
@@ -1075,7 +1075,7 @@ function RecruitmentTab({ garageId }: { garageId: string }) {
               <Dialog open={showPostDialog} onOpenChange={setShowPostDialog}>
                 <DialogTrigger asChild>
                   <Button data-testid="button-create-posting">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 me-2" />
                     {t('hr.newPosting', 'New Posting')}
                   </Button>
                 </DialogTrigger>
@@ -1236,7 +1236,7 @@ function BenefitsTab({ garageId }: { garageId: string }) {
               <CardDescription>{t('hr.availableBenefits', 'Available employee benefits')}</CardDescription>
             </div>
             <Button data-testid="button-add-benefit">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('hr.addPlan', 'Add Plan')}
             </Button>
           </div>
@@ -1333,7 +1333,7 @@ function OrganizationTab({ garageId }: { garageId: string }) {
               <CardDescription>{t('hr.organizationalStructure', 'Organizational structure')}</CardDescription>
             </div>
             <Button data-testid="button-add-department">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('hr.addDepartment', 'Add Department')}
             </Button>
           </div>
@@ -1515,7 +1515,7 @@ function SelfServiceTab({ garageId }: { garageId: string }) {
               <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
                 <DialogTrigger asChild>
                   <Button data-testid="button-new-request">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 me-2" />
                     {t('hr.newRequest', 'New Request')}
                   </Button>
                 </DialogTrigger>

@@ -384,7 +384,7 @@ export default function MarketingAutomation() {
             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white"
             data-testid="button-create-campaign"
           >
-            <Mail className="mr-2 h-4 w-4" />
+            <Mail className="me-2 h-4 w-4" />
             {t('marketing.createCampaign', 'Create Campaign')}
           </Button>
         }

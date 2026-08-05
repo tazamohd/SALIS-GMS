@@ -30,6 +30,16 @@ export function requirePlan(min: PlanId): RequestHandler {
           upgrade: { required: min, current: plan },
         });
       }
+      // Expired trial (past_due): baseline STARTER features keep working so
+      // the garage is never locked out of its data, but paid-tier features
+      // stay gated until a plan is chosen.
+      if (sub.status === "past_due" && min !== "STARTER") {
+        return res.status(402).json({
+          message: "Your trial has ended — choose a plan to keep using this feature",
+          subscription: { plan, status: sub.status },
+          upgrade: { required: min, current: plan },
+        });
+      }
       if (!meetsMinPlan(plan, min)) {
         return res.status(402).json({
           message: `This feature requires the ${min} plan or higher`,

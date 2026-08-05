@@ -45,7 +45,7 @@ export default function LiveServiceTracking() {
   const postUpdateMutation = useMutation({
     mutationFn: async (data: typeof updateForm) => {
       if (!selectedJobCard) throw new Error(t('liveTracking.noJobCardSelected', 'No job card selected'));
-      return await apiRequest(`/api/service-tracking/${selectedJobCard}/update`, "POST", data);
+      return await apiRequest("POST", `/api/service-tracking/${selectedJobCard}/update`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/service-tracking", selectedJobCard] });

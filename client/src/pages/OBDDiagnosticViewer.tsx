@@ -121,7 +121,7 @@ export default function OBDDiagnosticViewer() {
                           <Badge className={severityClass(dtc.severity)}>
                             {/* visible severity label — avoids color-only indicator */}
                             <span className="font-mono">{dtc.code}</span>
-                            <span className="ml-1 uppercase text-[10px] tracking-wide">{t(`obd.severity.${dtc.severity}`, dtc.severity)}</span>
+                            <span className="ms-1 uppercase text-[10px] tracking-wide">{t(`obd.severity.${dtc.severity}`, dtc.severity)}</span>
                           </Badge>
                           <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#64748B]">{dtc.status}</Badge>
                         </div>
@@ -237,7 +237,7 @@ export default function OBDDiagnosticViewer() {
                 </Select>
               </div>
               <Button disabled={!selectedVehicle} data-testid="button-scan" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90">
-                <Activity className="mr-2 h-4 w-4" />
+                <Activity className="me-2 h-4 w-4" />
                 {t('obd.startScan', 'Refresh Scan')}
               </Button>
             </div>

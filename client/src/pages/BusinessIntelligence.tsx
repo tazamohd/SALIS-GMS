@@ -92,13 +92,13 @@ export default function BusinessIntelligence() {
   const metrics = [
     {
       label: t('analytics.avgCustomerLifetimeValue', 'Avg. Customer Lifetime Value'),
-      value: `$${avgLifetimeValue.toFixed(2)}`,
+      value: `SAR ${avgLifetimeValue.toFixed(2)}`,
       icon: DollarSign,
       color: "text-[#0B1F3B] dark:text-white",
     },
     {
       label: t('analytics.customerAcquisitionCost', 'Customer Acquisition Cost'),
-      value: `$${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
+      value: `SAR ${(acquisitionCost?.acquisitionCost || 0).toFixed(2)}`,
       icon: Users,
       color: "text-[#0B1F3B] dark:text-white",
     },
@@ -338,7 +338,7 @@ export default function BusinessIntelligence() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                     ${customer.lifetimeValue.toFixed(2)}
                   </p>
@@ -374,7 +374,7 @@ export default function BusinessIntelligence() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-8 text-right">
+                <div className="flex gap-8 text-end">
                   <div>
                     <p className="text-sm text-[#64748B]">{t('analytics.utilization', 'Utilization')}</p>
                     <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.utilizationRate.toFixed(1)}%</p>

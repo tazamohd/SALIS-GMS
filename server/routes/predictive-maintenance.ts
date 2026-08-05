@@ -1,18 +1,19 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
 import { predictMaintenance, getMaintenanceStats } from '../services/predictive-maintenance';
 
 const router = Router();
 
-router.get('/predictive-maintenance/predictions', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+router.get('/predictive-maintenance/predictions', isAuthenticated, async (req, res) => {
+  const garageId = (req as any).user.garageId;
   try {
     const predictions = await predictMaintenance(garageId);
     res.json({ predictions });
   } catch (e) { res.json({ predictions: [] }); }
 });
 
-router.get('/predictive-maintenance/stats', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+router.get('/predictive-maintenance/stats', isAuthenticated, async (req, res) => {
+  const garageId = (req as any).user.garageId;
   try {
     const stats = await getMaintenanceStats(garageId);
     res.json(stats);

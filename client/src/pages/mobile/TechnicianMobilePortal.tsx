@@ -94,7 +94,7 @@ export default function TechnicianMobilePortal() {
   const [, forceUpdate] = useState({});
 
   const { data: technicianProfile } = useQuery<TechnicianProfile>({
-    queryKey: ['/api/technician-profiles', currentUser?.id],
+    queryKey: [`/api/technician-profiles/${currentUser?.id}`],
     enabled: !!currentUser?.id,
   });
 
@@ -385,51 +385,51 @@ export default function TechnicianMobilePortal() {
           <ScrollArea className="w-full whitespace-nowrap">
             <TabsList className="inline-flex w-max bg-white dark:bg-[#151A23] rounded-xl shadow-lg border border-[#E2E8F0] dark:border-[#232A36] p-1">
               <TabsTrigger value="home" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Home className="h-3.5 w-3.5 mr-1" />
+                <Home className="h-3.5 w-3.5 me-1" />
                 Home
               </TabsTrigger>
               <TabsTrigger value="jobs" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Wrench className="h-3.5 w-3.5 mr-1" />
+                <Wrench className="h-3.5 w-3.5 me-1" />
                 Jobs
               </TabsTrigger>
               <TabsTrigger value="attendance" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Scan className="h-3.5 w-3.5 mr-1" />
+                <Scan className="h-3.5 w-3.5 me-1" />
                 Clock
               </TabsTrigger>
               <TabsTrigger value="salary" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <DollarSign className="h-3.5 w-3.5 mr-1" />
+                <DollarSign className="h-3.5 w-3.5 me-1" />
                 Pay
               </TabsTrigger>
               <TabsTrigger value="vacation" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Palmtree className="h-3.5 w-3.5 mr-1" />
+                <Palmtree className="h-3.5 w-3.5 me-1" />
                 Leave
               </TabsTrigger>
               <TabsTrigger value="training" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <BookOpen className="h-3.5 w-3.5 mr-1" />
+                <BookOpen className="h-3.5 w-3.5 me-1" />
                 Learn
               </TabsTrigger>
               <TabsTrigger value="skills" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Award className="h-3.5 w-3.5 mr-1" />
+                <Award className="h-3.5 w-3.5 me-1" />
                 Skills
               </TabsTrigger>
               <TabsTrigger value="fieldJobs" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <MapPin className="h-3.5 w-3.5 mr-1" />
+                <MapPin className="h-3.5 w-3.5 me-1" />
                 Field
               </TabsTrigger>
               <TabsTrigger value="partTime" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Briefcase className="h-3.5 w-3.5 mr-1" />
+                <Briefcase className="h-3.5 w-3.5 me-1" />
                 Extra
               </TabsTrigger>
               <TabsTrigger value="loan" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <CreditCard className="h-3.5 w-3.5 mr-1" />
+                <CreditCard className="h-3.5 w-3.5 me-1" />
                 Loan
               </TabsTrigger>
               <TabsTrigger value="contact" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Phone className="h-3.5 w-3.5 mr-1" />
+                <Phone className="h-3.5 w-3.5 me-1" />
                 HR
               </TabsTrigger>
               <TabsTrigger value="schedule" className="text-xs px-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0A5ED7] data-[state=active]:to-[#0BB3FF] data-[state=active]:text-white">
-                <Calendar className="h-3.5 w-3.5 mr-1" />
+                <Calendar className="h-3.5 w-3.5 me-1" />
                 Calendar
               </TabsTrigger>
             </TabsList>
@@ -577,7 +577,7 @@ export default function TechnicianMobilePortal() {
                               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                               data-testid={`button-complete-${job.id}`}
                             >
-                              <CheckCircle className="h-4 w-4 mr-1" />
+                              <CheckCircle className="h-4 w-4 me-1" />
                               Done
                             </Button>
                           </div>
@@ -629,7 +629,7 @@ export default function TechnicianMobilePortal() {
                       
                       {job.priority === 'urgent' && (
                         <Badge className={`${getStatusColor('urgent')} mb-2`}>
-                          <AlertCircle className="h-3 w-3 mr-1" />
+                          <AlertCircle className="h-3 w-3 me-1" />
                           Urgent
                         </Badge>
                       )}
@@ -645,7 +645,7 @@ export default function TechnicianMobilePortal() {
                           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                           data-testid={`button-start-${job.id}`}
                         >
-                          <Play className="h-4 w-4 mr-1" />
+                          <Play className="h-4 w-4 me-1" />
                           Start Job
                         </Button>
                       </div>
@@ -692,7 +692,7 @@ export default function TechnicianMobilePortal() {
                         className="w-full bg-[#F97316] hover:bg-[#F97316]/90 text-white"
                         data-testid="button-clock-out"
                       >
-                        <Clock className="h-4 w-4 mr-2" />
+                        <Clock className="h-4 w-4 me-2" />
                         Clock Out
                       </Button>
                     </div>
@@ -705,12 +705,12 @@ export default function TechnicianMobilePortal() {
                     >
                       {isClockingIn ? (
                         <>
-                          <Scan className="h-4 w-4 mr-2 animate-pulse" />
+                          <Scan className="h-4 w-4 me-2 animate-pulse" />
                           Verifying Face...
                         </>
                       ) : (
                         <>
-                          <Scan className="h-4 w-4 mr-2" />
+                          <Scan className="h-4 w-4 me-2" />
                           Clock In with Face ID
                         </>
                       )}
@@ -804,7 +804,7 @@ export default function TechnicianMobilePortal() {
                   className="w-full border-[#0A5ED7] text-[#0A5ED7]"
                   data-testid="button-request-loan"
                 >
-                  <CreditCard className="h-4 w-4 mr-2" />
+                  <CreditCard className="h-4 w-4 me-2" />
                   Request Loan
                 </Button>
               </CardContent>
@@ -840,7 +840,7 @@ export default function TechnicianMobilePortal() {
                   className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   data-testid="button-request-vacation"
                 >
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send className="h-4 w-4 me-2" />
                   Request Leave
                 </Button>
 
@@ -1022,7 +1022,7 @@ export default function TechnicianMobilePortal() {
                   onClick={() => setShowLoanDialog(true)}
                   className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                 >
-                  <CreditCard className="h-4 w-4 mr-2" />
+                  <CreditCard className="h-4 w-4 me-2" />
                   Request Loan
                 </Button>
 
@@ -1409,7 +1409,7 @@ export default function TechnicianMobilePortal() {
                             </p>
                             <p className="text-xs text-[#6B7280]">{history.completedDate}</p>
                           </div>
-                          <div className="text-right">
+                          <div className="text-end">
                             <p className="text-sm font-bold text-[#0A5ED7]">{history.jobsCompleted} jobs</p>
                             <p className="text-xs text-[#6B7280]">★ {history.rating}</p>
                           </div>

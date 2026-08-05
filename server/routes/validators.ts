@@ -79,11 +79,16 @@ export const updateTechnicianProfileSchema = z.object({
 export const updateJobCardSchema = z.object({
   title: z.string().max(200).optional(),
   description: z.string().max(5000).optional(),
-  status: z.enum(['open', 'in_progress', 'awaiting_parts', 'completed', 'cancelled', 'on_hold']).optional(),
-  priority: z.enum(['low', 'normal', 'high', 'urgent']).optional(),
+  // Enum aligned with the values create/seed actually produce (`pending`,
+  // `medium`) so the PUT path accepts real job cards, and the status-change
+  // timestamps the client sends are allowed instead of rejected by .strict().
+  status: z.enum(['pending', 'open', 'in_progress', 'awaiting_parts', 'completed', 'cancelled', 'on_hold']).optional(),
+  priority: z.enum(['low', 'normal', 'medium', 'high', 'urgent']).optional(),
   estimatedHours: z.number().positive().max(500).optional(),
   actualHours: z.number().nonnegative().max(500).optional(),
   notes: z.string().max(5000).optional(),
+  startedAt: z.coerce.date().optional(),
+  completedAt: z.coerce.date().optional(),
 }).strict();
 
 export const updateCustomerSchema = z.object({
@@ -314,4 +319,27 @@ export const chatbotConversationSchema = z.object({
   customerId: z.string().min(1).max(100).optional(),
   sessionId: z.string().min(1).max(100).optional(),
   context: z.string().max(1000).optional(),
+}).strict();
+
+// Saudi Tax (ZATCA Phase 2 / Fatoora e-invoicing)
+// A Saudi VAT registration number is exactly 15 digits and always begins with 3.
+const zatcaVatNumber = z
+  .string()
+  .regex(/^3\d{14}$/, 'VAT registration number must be 15 digits starting with 3');
+
+export const zatcaInvoiceSchema = z.object({
+  sellerName: z.string().min(1).max(300),
+  vatRegistrationNumber: zatcaVatNumber,
+  timestamp: z.string().datetime(),
+  // Zero is valid — a free service still clears through FATOORA.
+  totalWithVAT: z.number().nonnegative(),
+  vatAmount: z.number().nonnegative(),
+}).strict();
+
+export const zatcaComplianceCheckSchema = z.object({
+  sellerName: z.string().min(1).max(300),
+  vatRegistrationNumber: zatcaVatNumber,
+  timestamp: z.string().datetime(),
+  invoiceTotal: z.number().nonnegative(),
+  vatAmount: z.number().nonnegative(),
 }).strict();

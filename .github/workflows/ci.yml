@@ -1,0 +1,133 @@
+name: CI
+
+# Runs on every PR and on pushes to the main integration branches.
+# The build-and-test job is the hard merge gate. The audit / ruflo jobs are
+# advisory to start (continue-on-error) so CI isn't red on day one from the
+# pre-existing dependency CVEs — flip them to blocking once `npm audit fix`
+# has cleared the criticals.
+on:
+  pull_request:
+  push:
+    branches: [clean-source, main, master]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Keep npm ci from fetching browser binaries (Puppeteer/Playwright) in CI.
+  PUPPETEER_SKIP_DOWNLOAD: "true"
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+  # CI-only dummy secret so server/config.ts's env validation passes during
+  # migrate/build. NOT a real credential and never used against real data.
+  SESSION_SECRET: "ci-only-dummy-session-secret-not-a-real-value-0000"
+
+jobs:
+  build-and-test:
+    name: typecheck · test · build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: salis_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # globalSetup wipes + `drizzle-kit push`es the schema into this DB.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/salis_test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/salis_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Type-check
+        run: npm run typecheck
+      - name: Test (vitest against Postgres)
+        run: npm test
+      - name: Production build
+        run: npm run build
+
+  migrations:
+    name: migrations apply cleanly
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: salis_migrate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/salis_migrate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Full migration chain must apply on a fresh DB, and re-running is a no-op.
+      - name: Apply migrations
+        run: npm run db:migrate
+      - name: Re-run migrations (idempotency)
+        run: npm run db:migrate
+
+  security-audit:
+    name: dependency CVE audit (blocking on critical)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # HARD GATE: fail the build on any production critical CVE. The critical
+      # backlog (jspdf/jspdf-autotable/basic-ftp) has been cleared, so this is
+      # now a real merge gate — a new critical prod dependency breaks CI.
+      - name: npm audit (production, blocking on critical)
+        run: npm audit --omit=dev --audit-level=critical
+      # Full production report + ruflo scans stay advisory (high/moderate
+      # backlog is still being worked down) — informational, never blocking.
+      - name: npm audit full report (advisory)
+        run: npm audit --omit=dev || true
+      - name: ruflo security scan (secrets + CVE + AIDefence)
+        run: |
+          npx -y ruflo@latest security secrets || true
+          npx -y ruflo@latest security scan || true
+
+  change-risk:
+    name: ruflo change-risk (PR advisory)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the base ref for diff analysis
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Score the change risk of this PR's diff against its base branch.
+      - name: ruflo analyze diff (risk + classification)
+        run: npx -y ruflo@latest analyze diff "origin/${{ github.base_ref }}..HEAD" --risk --classify || true

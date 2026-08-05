@@ -55,7 +55,7 @@ export default function EnvironmentalCompliance() {
   const metrics = [
     { label: t('environmental.totalThisMonth', 'Total This Month'), value: stats.totalDisposals, icon: Leaf, color: "text-green-600" },
     { label: t('environmental.complianceRate', 'Compliance Rate'), value: `${stats.complianceRate}%`, icon: Droplet, color: "text-[#0A5ED7]" },
-    { label: t('environmental.disposalCosts', 'Disposal Costs'), value: `$${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-[#F97316]" },
+    { label: t('environmental.disposalCosts', 'Disposal Costs'), value: `SAR ${Math.round(stats.thisMonthCost)}`, icon: Battery, color: "text-[#F97316]" },
     { label: t('environmental.recyclingRate', 'Recycling Rate'), value: `${stats.recyclingRate}%`, icon: Recycle, color: "text-purple-600" },
   ];
 
@@ -109,8 +109,8 @@ export default function EnvironmentalCompliance() {
                       {record.quantity} {record.unit} • {record.disposalCompany}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">${record.cost || 0}</p>
+                  <div className="text-end">
+                    <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {record.cost || 0}</p>
                     <p className="text-sm text-[#64748B]">{new Date(record.recordDate).toLocaleDateString()}</p>
                   </div>
                 </div>
