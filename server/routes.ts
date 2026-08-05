@@ -12231,7 +12231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================================================
 
   // Franchise Groups
-  app.post("/api/franchise-groups", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-groups", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseGroupSchema.parse(req.body);
       const group = await storage.createFranchiseGroup(validatedData);
@@ -12242,7 +12242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-groups", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-groups", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const groups = await storage.getFranchiseGroups();
       res.json(groups);
@@ -12252,7 +12252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const group = await storage.getFranchiseGroupById(id);
@@ -12266,7 +12266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseGroup(id, req.body);
@@ -12277,7 +12277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/franchise-groups/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/franchise-groups/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFranchiseGroup(id);
@@ -12289,7 +12289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Franchise Contracts
-  app.post("/api/franchise-contracts", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-contracts", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseContractSchema.parse(req.body);
       const contract = await storage.createFranchiseContract(validatedData);
@@ -12300,7 +12300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-contracts", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-contracts", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { franchiseGroupId } = req.query;
       const contracts = await storage.getFranchiseContracts(franchiseGroupId as string | undefined);
@@ -12311,7 +12311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const contract = await storage.getFranchiseContractById(id);
@@ -12325,7 +12325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseContract(id, req.body);
@@ -12336,7 +12336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/franchise-contracts/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/franchise-contracts/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFranchiseContract(id);
@@ -12348,7 +12348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Franchise KPIs
-  app.post("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+  app.post("/api/franchise-kpis", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertFranchiseKpiSchema.parse(req.body);
       const kpi = await storage.createFranchiseKpi(validatedData);
@@ -12359,7 +12359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-kpis", isAuthenticated, async (req: any, res) => {
+  app.get("/api/franchise-kpis", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const { branchId, month } = req.query;
       if (!branchId) {
@@ -12375,7 +12375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/franchise-kpis/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const kpi = await storage.getFranchiseKpiById(id);
@@ -12389,7 +12389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/franchise-kpis/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/franchise-kpis/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFranchiseKpi(id, req.body);
@@ -12401,7 +12401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Revenue Sharing Rules
-  app.post("/api/revenue-sharing-rules", isAuthenticated, async (req: any, res) => {
+  app.post("/api/revenue-sharing-rules", isAuthenticated, requirePlatformAdmin, async (req: any, res) => {
     try {
       const validatedData = insertRevenueSharingRuleSchema.parse(req.body);
       const rule = await storage.createRevenueSharingRule(validatedData);
@@ -12412,7 +12412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/revenue-sharing-rules", isAuthenticated, async (req, res) => {
+  app.get("/api/revenue-sharing-rules", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { franchiseGroupId } = req.query;
       if (!franchiseGroupId) {
@@ -12426,7 +12426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const rule = await storage.getRevenueSharingRuleById(id);
@@ -12440,7 +12440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateRevenueSharingRule(id, req.body);
@@ -12451,7 +12451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/revenue-sharing-rules/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/revenue-sharing-rules/:id", isAuthenticated, requirePlatformAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteRevenueSharingRule(id);
