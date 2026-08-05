@@ -91,6 +91,12 @@ jobs:
         run: npm run db:migrate
       - name: Re-run migrations (idempotency)
         run: npm run db:migrate
+      # The schema must not drift ahead of the committed migrations: fail if
+      # `drizzle-kit generate` would produce a new migration (i.e. shared/schema.ts
+      # changed without a matching migration). Guards against the meta falling
+      # silently behind the schema again.
+      - name: Check migration drift
+        run: npm run db:check-drift
 
   security-audit:
     name: dependency CVE audit (blocking on critical)
