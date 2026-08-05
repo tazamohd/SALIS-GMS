@@ -29,10 +29,14 @@ router.get('/reports/revenue', isAuthenticated, requireFinancialRole, async (req
   const { groupBy = 'month' } = req.query;
   try {
     const dateFormat = groupBy === 'day' ? 'YYYY-MM-DD' : groupBy === 'week' ? 'IYYY-IW' : 'YYYY-MM';
+    // Revenue is VAT-EXCLUSIVE net sales (total minus output VAT) so it agrees
+    // with the P&L / journal definition (server/routes/financial.ts: revenue =
+    // total - tax). Output VAT is a liability, not revenue, and is reported
+    // separately as `tax`. Recognition basis is cash (status = 'paid').
     const revenue = await db.execute(sql`
       SELECT TO_CHAR(i.invoice_date, ${dateFormat}) as period,
         COUNT(i.id) as "invoiceCount",
-        COALESCE(SUM(CAST(i.total_amount AS numeric)), 0) as revenue,
+        COALESCE(SUM(CAST(i.total_amount AS numeric) - CAST(i.tax_amount AS numeric)), 0) as revenue,
         COALESCE(SUM(CAST(i.tax_amount AS numeric)), 0) as tax
       FROM invoices i
       WHERE i.garage_id = ${garageId} AND i.status = 'paid'
@@ -113,7 +117,8 @@ router.get('/reports/summary', isAuthenticated, requireFinancialRole, async (req
   if (!garageId) return;
   try {
     const [revenue, jobs, customers, inventory] = await Promise.all([
-      db.execute(sql`SELECT COALESCE(SUM(CAST(total_amount AS numeric)), 0) as total FROM invoices WHERE garage_id = ${garageId} AND status = 'paid'`),
+      // VAT-exclusive net revenue, consistent with /reports/revenue and the P&L.
+      db.execute(sql`SELECT COALESCE(SUM(CAST(total_amount AS numeric) - CAST(tax_amount AS numeric)), 0) as total FROM invoices WHERE garage_id = ${garageId} AND status = 'paid'`),
       db.execute(sql`SELECT COUNT(*) as total, COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed FROM job_cards WHERE garage_id = ${garageId}`),
       db.execute(sql`SELECT COUNT(*) as total FROM users WHERE garage_id = ${garageId} AND role = 'customer'`),
       db.execute(sql`SELECT COUNT(*) as total, COUNT(CASE WHEN stock_quantity <= min_threshold THEN 1 END) as "lowStock" FROM spare_part_inventories WHERE garage_id = ${garageId}`),
