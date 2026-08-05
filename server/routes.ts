@@ -21801,7 +21801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/provider/bookings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/provider/bookings/:id', isAuthenticated, requireResourceOwnership({ table: 'marketplace_bookings', tenantColumn: 'provider_id' }), async (req: any, res) => {
     try {
       const providerId = req.user?.garageId;
       if (!providerId) return res.status(403).json({ message: "No provider account associated" });
