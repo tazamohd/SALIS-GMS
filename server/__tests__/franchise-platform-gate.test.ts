@@ -10,14 +10,18 @@ import { describe, it, expect, beforeAll } from "vitest";
 import type { Express } from "express";
 import type supertest from "supertest";
 import { createTestApp } from "./setup";
-import { loginAsAdmin } from "./helpers";
+import { createSecondGarageAdmin } from "./helpers";
 
 let app: Express;
 let admin: supertest.Agent;
 
 beforeAll(async () => {
   app = (await createTestApp()).app;
-  admin = (await loginAsAdmin(app)).agent;
+  // Use a dedicated garage ADMIN (distinct email/garage), NOT the shared
+  // TEST_ADMIN that platform-admin-access.test.ts elevates to PLATFORM_ADMIN —
+  // passport re-reads the user every request, so a shared admin can be
+  // concurrently promoted mid-test and wrongly pass requirePlatformAdmin.
+  admin = (await createSecondGarageAdmin(app)).agent;
 });
 
 describe("franchise routes are platform-admin only", () => {

@@ -12,12 +12,23 @@ let db: NodePgDatabase<typeof schema>;
 
 const isNeon = process.env.DATABASE_URL.includes('neon.tech');
 
+// Cap how long any single statement may run so a pathological query (an
+// unbounded scan, a lock wait) cannot pin a pooled connection indefinitely and
+// starve the pool under load. Tunable via PG_STATEMENT_TIMEOUT_MS.
+const STATEMENT_TIMEOUT_MS = Number(process.env.PG_STATEMENT_TIMEOUT_MS) || 30000;
+
 if (isNeon) {
   const { Pool: NeonPool, neonConfig } = await import('@neondatabase/serverless');
   const { drizzle } = await import('drizzle-orm/neon-serverless');
   const ws = await import('ws');
   neonConfig.webSocketConstructor = ws.default;
-  pool = new NeonPool({ connectionString: process.env.DATABASE_URL });
+  pool = new NeonPool({
+    connectionString: process.env.DATABASE_URL,
+    max: Number(process.env.PG_POOL_MAX) || 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    statement_timeout: STATEMENT_TIMEOUT_MS,
+  });
   db = drizzle({ client: pool, schema });
 } else {
   // `pg` is CommonJS. Destructuring `Pool` off the dynamic-import namespace
@@ -30,6 +41,7 @@ if (isNeon) {
     max: Number(process.env.PG_POOL_MAX) || 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
+    statement_timeout: STATEMENT_TIMEOUT_MS,
   });
   db = drizzle({ client: pool, schema });
 }
