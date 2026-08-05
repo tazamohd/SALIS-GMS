@@ -9327,7 +9327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const conversation = await storage.getChatConversation(id);
@@ -9384,7 +9384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Messages
-  app.get('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id/messages', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { limit } = req.query;
@@ -9401,7 +9401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/messages', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9432,7 +9432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/chat/messages/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { content } = req.body;
@@ -9445,7 +9445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/messages/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/messages/:id', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteChatMessage(id);
@@ -9457,7 +9457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Participants
-  app.get('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/conversations/:id/participants', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const participants = await storage.getChatParticipants(id);
@@ -9468,7 +9468,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/participants', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/participants', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { userId, role } = req.body;
@@ -9486,7 +9486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/conversations/:id/read', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/conversations/:id/read', isAuthenticated, requireResourceOwnership({ table: 'chat_conversations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9677,7 +9677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Attachments
-  app.post('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/messages/:id/attachments', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9728,7 +9728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/messages/:id/attachments', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/messages/:id/attachments', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const attachments = await storage.getChatAttachments(id);
@@ -9751,7 +9751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Chat Reactions
-  app.post('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.post('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9790,7 +9790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9819,7 +9819,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/chat/messages/:id/reactions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/chat/messages/:id/reactions', isAuthenticated, requireResourceOwnership({ table: 'chat_messages', parent: { table: 'chat_conversations', fk: 'conversation_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const reactions = await storage.getMessageReactions(id);
@@ -11695,7 +11695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       const campaign = await storage.getMarketingCampaignById(id);
@@ -11709,7 +11709,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateMarketingCampaign(id, req.body);
@@ -11720,7 +11720,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/marketing-campaigns/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/marketing-campaigns/:id", isAuthenticated, requireResourceOwnership({ table: 'marketing_campaigns' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteMarketingCampaign(id);
@@ -12174,7 +12174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateDocument(id, req.body);
@@ -12209,7 +12209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/documents/:documentId/access-logs", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:documentId/access-logs", isAuthenticated, requireResourceOwnership({ table: 'documents', idParam: 'documentId' }), async (req, res) => {
     try {
       const { documentId } = req.params;
       const logs = await storage.getDocumentAccessLogs(documentId);
