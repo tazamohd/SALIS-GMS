@@ -157,15 +157,19 @@ export function getDemoRole(roleKey: string): DemoRoleSpec | undefined {
 /**
  * Whether demo access (seeding + one-click demo login) is enabled.
  *
- * Explicit `DEMO_MODE` wins; otherwise demo access is on in any non-production
- * environment and off in production. This gates BOTH the public demo endpoints
+ * Explicit `DEMO_MODE` wins; otherwise demo access auto-enables ONLY in an
+ * explicit local development run. This gates BOTH the public demo endpoints
  * and is the default guard for the seed script.
  */
 export function isDemoModeEnabled(): boolean {
   const flag = String(process.env.DEMO_MODE || "").toLowerCase();
   if (flag === "true" || flag === "1") return true;
   if (flag === "false" || flag === "0") return false;
-  return process.env.NODE_ENV !== "production";
+  // No explicit flag: auto-enable ONLY in an explicit local development run.
+  // Any other environment (production, staging, preview, or an unset NODE_ENV)
+  // must opt in via DEMO_MODE — never infer demo access, and never enable
+  // one-click passwordless login, merely from "not production" (audit 3.1).
+  return process.env.NODE_ENV === "development";
 }
 
 /**

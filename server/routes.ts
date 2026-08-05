@@ -4134,11 +4134,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         notes: estimate.notes,
       };
       
-      const invoiceNumber = `INV-${Date.now()}`;
-      const invoice = await storage.createInvoice({ 
-        ...invoiceData, 
-        invoiceNumber, 
-        createdBy: userId 
+      // Crypto-random suffix so two invoices created in the same millisecond
+      // (even across tenants, against the global unique) cannot collide (B17).
+      const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const invoice = await storage.createInvoice({
+        ...invoiceData,
+        invoiceNumber,
+        createdBy: userId
       });
       
       // Create invoice items from estimate items

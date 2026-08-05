@@ -161,8 +161,17 @@ export async function setupAuth(app: Express) {
   });
 }
 
-// Feature flag for auth bypass during development
+// Feature flag for auth bypass during development.
+// Fail closed: this flag disables authentication entirely, so it must never be
+// reachable in production. Hard-fail at startup rather than silently honoring
+// it if it is somehow set in a production build (audit 3.1, medium).
 const AUTH_BYPASS_ENABLED = process.env.AUTH_BYPASS === 'true';
+if (AUTH_BYPASS_ENABLED && process.env.NODE_ENV === 'production') {
+  throw new Error(
+    "AUTH_BYPASS=true is set in a production environment. This disables all " +
+    "authentication and must never be enabled in production. Unset AUTH_BYPASS.",
+  );
+}
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
