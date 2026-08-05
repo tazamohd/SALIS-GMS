@@ -40,6 +40,7 @@ import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import { randomBytes } from "crypto";
 import { verifyBusiness } from "./services/verification/businessVerification";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
+import { requireResourceOwnership } from "./middleware/resourceOwnership";
 import passport from "passport";
 import { emailService } from "./services/emailService";
 import { smsService } from "./services/smsService";
@@ -10488,7 +10489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       const fleetGroup = await storage.getFleetGroup(req.params.id);
       if (!fleetGroup) {
@@ -10501,7 +10502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       const fleetGroup = await storage.updateFleetGroup(req.params.id, req.body);
       res.json(fleetGroup);
@@ -10511,7 +10512,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/groups/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/groups/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups' }), async (req, res) => {
     try {
       await storage.deleteFleetGroup(req.params.id);
       res.status(204).send();
@@ -10532,7 +10533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/vehicles/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/vehicles/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const fleetVehicles = await storage.getFleetVehiclesByGroup(req.params.fleetGroupId);
       res.json(fleetVehicles);
@@ -10542,7 +10543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const fleetVehicle = await storage.getFleetVehicle(req.params.id);
       if (!fleetVehicle) {
@@ -10555,7 +10556,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const fleetVehicle = await storage.updateFleetVehicle(req.params.id, req.body);
       res.json(fleetVehicle);
@@ -10565,7 +10566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_vehicles', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetVehicle(req.params.id);
       res.status(204).send();
@@ -10589,7 +10590,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/contracts/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/contracts/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const contracts = await storage.getFleetContractsByGroup(req.params.fleetGroupId);
       res.json(contracts);
@@ -10599,7 +10600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const contract = await storage.getFleetContract(req.params.id);
       if (!contract) {
@@ -10612,7 +10613,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const contract = await storage.updateFleetContract(req.params.id, req.body);
       res.json(contract);
@@ -10622,7 +10623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/contracts/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/contracts/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_contracts', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetContract(req.params.id);
       res.status(204).send();
@@ -10781,7 +10782,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       const tier = await storage.getFleetPricingTier(req.params.id);
       if (!tier) {
@@ -10794,7 +10795,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       const tier = await storage.updateFleetPricingTier(req.params.id, req.body);
       res.json(tier);
@@ -10804,7 +10805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/pricing-tiers/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/pricing-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_pricing_tiers' }), async (req, res) => {
     try {
       await storage.deleteFleetPricingTier(req.params.id);
       res.status(204).send();
@@ -10825,7 +10826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/maintenance-schedules/group/:fleetGroupId', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/maintenance-schedules/group/:fleetGroupId', isAuthenticated, requireResourceOwnership({ table: 'fleet_groups', idParam: 'fleetGroupId' }), async (req, res) => {
     try {
       const schedules = await storage.getFleetMaintenanceSchedulesByGroup(req.params.fleetGroupId);
       res.json(schedules);
@@ -10835,7 +10836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const schedule = await storage.getFleetMaintenanceSchedule(req.params.id);
       if (!schedule) {
@@ -10848,7 +10849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       const schedule = await storage.updateFleetMaintenanceSchedule(req.params.id, req.body);
       res.json(schedule);
@@ -10858,7 +10859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/fleet/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/fleet/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_maintenance_schedules', parent: { table: 'fleet_groups', fk: 'fleet_group_id' } }), async (req, res) => {
     try {
       await storage.deleteFleetMaintenanceSchedule(req.params.id);
       res.status(204).send();
@@ -11864,7 +11865,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-accounts/:id", isAuthenticated, requireResourceOwnership({ table: 'customer_loyalty_accounts', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const account = await storage.getLoyaltyAccountById(id);
@@ -11878,7 +11879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-accounts/customer/:customerId", isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const account = await storage.getLoyaltyAccountByCustomer(customerId);
@@ -11889,7 +11890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-accounts/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-accounts/:id", isAuthenticated, requireResourceOwnership({ table: 'customer_loyalty_accounts', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyAccount(id, req.body);
@@ -20115,7 +20116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/loyalty-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_tiers' }), async (req: any, res) => {
     try {
       const tier = await storage.updateLoyaltyTier(req.params.id, req.body);
       res.json(tier);
@@ -20125,7 +20126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/loyalty-tiers/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/loyalty-tiers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_tiers' }), async (req: any, res) => {
     try {
       await storage.deleteLoyaltyTier(req.params.id);
       res.status(204).send();
@@ -20179,7 +20180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, async (req: any, res) => {
+  app.post('/api/loyalty-accounts/:id/add-points', isAuthenticated, requireResourceOwnership({ table: 'loyalty_accounts' }), async (req: any, res) => {
     try {
       const { points } = req.body;
       const account = await storage.addLoyaltyPoints(req.params.id, points);
@@ -20190,7 +20191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/loyalty-accounts/:id/redeem-points', isAuthenticated, async (req: any, res) => {
+  app.post('/api/loyalty-accounts/:id/redeem-points', isAuthenticated, requireResourceOwnership({ table: 'loyalty_accounts' }), async (req: any, res) => {
     try {
       const { points } = req.body;
       const account = await storage.redeemLoyaltyPoints(req.params.id, points);
@@ -20214,7 +20215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       const offer = await storage.getLoyaltyOffer(req.params.id);
       if (!offer) return res.status(404).json({ message: "Offer not found" });
@@ -20235,7 +20236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       const offer = await storage.updateLoyaltyOffer(req.params.id, req.body);
       res.json(offer);
@@ -20245,7 +20246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/loyalty-offers/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/loyalty-offers/:id', isAuthenticated, requireResourceOwnership({ table: 'loyalty_offers' }), async (req: any, res) => {
     try {
       await storage.deleteLoyaltyOffer(req.params.id);
       res.status(204).send();
