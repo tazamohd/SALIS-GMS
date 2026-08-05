@@ -11254,7 +11254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const template = await storage.getInspectionTemplateById(id);
@@ -11268,7 +11268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertInspectionTemplateSchema.partial().parse(req.body);
@@ -11280,7 +11280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/inspection-templates/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/inspection-templates/:id", isAuthenticated, requireResourceOwnership({ table: 'inspection_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteInspectionTemplate(id);
@@ -11324,7 +11324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
       const inspection = await storage.getVehicleInspectionById(id);
@@ -11338,7 +11338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertVehicleInspectionSchema.partial().parse(req.body);
@@ -11351,7 +11351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/vehicle-inspections/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/vehicle-inspections/:id", isAuthenticated, requireResourceOwnership({ table: 'vehicle_inspections' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteVehicleInspection(id, (req as any).user?.garageId);
@@ -11464,7 +11464,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const truck = await storage.getTowTruckById(id);
@@ -11478,7 +11478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertTowTruckSchema.partial().parse(req.body);
@@ -11490,7 +11490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/tow-trucks/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/tow-trucks/:id", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTowTruck(id);
@@ -11501,7 +11501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/tow-trucks/:id/location", isAuthenticated, async (req, res) => {
+  app.patch("/api/tow-trucks/:id/location", isAuthenticated, requireResourceOwnership({ table: 'tow_trucks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const { latitude, longitude } = req.body;
