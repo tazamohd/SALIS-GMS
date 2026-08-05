@@ -329,7 +329,7 @@ export default function PartsMarketplace() {
                       )}
                     </div>
                   </div>
-                  <div className="text-right ml-4">
+                  <div className="text-end ms-4">
                     <p className="text-lg font-bold text-gray-900 dark:text-white">SAR {result.price}</p>
                     <Button size="sm" className="mt-2" onClick={() => {
                       createOrder.mutate({
@@ -340,7 +340,7 @@ export default function PartsMarketplace() {
                         unitPrice: result.price
                       });
                     }} data-testid={`button-order-${index}`}>
-                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      <ShoppingCart className="h-3 w-3 me-1" />
                       Order
                     </Button>
                   </div>

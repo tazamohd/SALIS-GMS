@@ -68,7 +68,7 @@ export default function TechnicianJobDocumentation() {
                 <button
                   key={job.id}
                   onClick={() => setSelectedJobId(job.id)}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all text-start ${
                     selectedJobId === job.id
                       ? "border-[#0A5ED7] bg-blue-50 dark:bg-blue-900/20"
                       : "border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]/50"
@@ -144,7 +144,7 @@ export default function TechnicianJobDocumentation() {
             </div>
 
             <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" size="lg" data-testid="button-capture-photo">
-              <Camera className="h-5 w-5 mr-2" />
+              <Camera className="h-5 w-5 me-2" />
               Capture with Camera
             </Button>
           </CardContent>

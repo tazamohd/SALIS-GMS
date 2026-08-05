@@ -243,7 +243,7 @@ export default function ContractManagement() {
                       disabled={triggerRenewalMutation.isPending}
                       data-testid={`button-trigger-renewal-${contract.id}`}
                     >
-                      <RefreshCcw className="h-3 w-3 mr-1" />
+                      <RefreshCcw className="h-3 w-3 me-1" />
                       {t('payments.contracts.initiateRenewal', 'Initiate Renewal')}
                     </Button>
                   </div>
@@ -354,7 +354,7 @@ export default function ContractManagement() {
                             </span>
                           </div>
                         </div>
-                        <div className="text-right space-y-2">
+                        <div className="text-end space-y-2">
                           <div className="text-sm font-medium text-[#0B1F3B] dark:text-white">
                             {t('payments.contracts.utilization', 'Utilization')}: {utilizationPercentage.toFixed(1)}%
                           </div>
@@ -531,7 +531,7 @@ function ContractUtilizationDetail({ contract }: { contract: any }) {
                       {format(new Date(u.serviceDate), "MMM dd, yyyy")}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-medium">SAR {parseFloat(u.totalCost || "0").toLocaleString()}</p>
                     {u.isCoveredByContract && (
                       <Badge variant="outline" className="text-xs">Covered</Badge>
@@ -669,7 +669,7 @@ function ContractSLADetail({ contract }: { contract: any }) {
                     )}
                   </div>
                   {metric.penaltyApplied && parseFloat(metric.penaltyApplied) > 0 && (
-                    <div className="text-right">
+                    <div className="text-end">
                       <div className="text-sm font-medium text-orange-500">
                         -${parseFloat(metric.penaltyApplied).toLocaleString()}
                       </div>
@@ -759,7 +759,7 @@ function ContractRenewalsTab({ contracts, onAcceptRenewal }: {
                       onClick={() => onAcceptRenewal({ renewalId: renewal.id, contractId: renewal.contract.id })}
                       data-testid={`button-accept-renewal-${renewal.id}`}
                     >
-                      <CheckCircle className="mr-1 h-4 w-4" />
+                      <CheckCircle className="me-1 h-4 w-4" />
                       Accept
                     </Button>
                     <Button size="sm" variant="outline" data-testid={`button-negotiate-renewal-${renewal.id}`}>

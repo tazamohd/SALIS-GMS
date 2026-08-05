@@ -398,14 +398,14 @@ export default function Interactive3DParts() {
                     placeholder={t("interactive3d.searchParts", "Search parts...")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]"
+                    className="ps-10 bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]"
                     data-testid="input-search-parts"
                   />
                 </div>
                 
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="bg-[#E6E9ED] dark:bg-[#0E1117] border-[#C9D1DA] dark:border-[#232A36]" data-testid="select-category">
-                    <Filter className="h-4 w-4 mr-2 text-[#6B7280]" />
+                    <Filter className="h-4 w-4 me-2 text-[#6B7280]" />
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -418,7 +418,7 @@ export default function Interactive3DParts() {
                   </SelectContent>
                 </Select>
 
-                <div className="max-h-[400px] overflow-y-auto space-y-2 pr-1">
+                <div className="max-h-[400px] overflow-y-auto space-y-2 pe-1">
                   {isLoading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
@@ -438,7 +438,7 @@ export default function Interactive3DParts() {
                             setSelectedPart(part);
                             resetView();
                           }}
-                          className={`w-full p-3 rounded-lg border transition-all text-left ${
+                          className={`w-full p-3 rounded-lg border transition-all text-start ${
                             selectedPart?.id === part.id
                               ? "border-[#0A5ED7] bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10"
                               : "border-[#C9D1DA] dark:border-[#232A36] hover:border-[#0A5ED7]/50 hover:bg-[#E6E9ED] dark:hover:bg-[#1A1F2A]"
@@ -506,7 +506,7 @@ export default function Interactive3DParts() {
                       className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
                       data-testid="button-order-part"
                     >
-                      <ShoppingCart className="h-4 w-4 mr-1" />
+                      <ShoppingCart className="h-4 w-4 me-1" />
                       {t("interactive3d.order", "Order")}
                     </Button>
                   </div>
@@ -860,7 +860,7 @@ export default function Interactive3DParts() {
               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
               data-testid="button-add-to-cart"
             >
-              <ShoppingCart className="h-4 w-4 mr-2" />
+              <ShoppingCart className="h-4 w-4 me-2" />
               {t("interactive3d.addToCart", "Add to Cart")}
             </Button>
           </div>

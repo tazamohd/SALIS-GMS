@@ -111,7 +111,7 @@ export default function TechnicianLeaderboards() {
                           </div>
                         </div>
 
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm text-[#64748B] mb-1">{t('leaderboards.efficiency', 'Efficiency')}</p>
                           <div className="flex items-center gap-2">
                             <Progress value={tech.efficiency} className="w-24" />

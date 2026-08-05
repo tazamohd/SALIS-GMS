@@ -80,7 +80,7 @@ export function AddCustomerNoteDialog({ customerId }: AddCustomerNoteDialogProps
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" data-testid="button-add-note">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Add Note
         </Button>
       </DialogTrigger>

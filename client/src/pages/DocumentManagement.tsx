@@ -305,15 +305,15 @@ export default function DocumentManagement() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-white dark:bg-[#151A23] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="all" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
-            <Files className="h-4 w-4 mr-2" />
+            <Files className="h-4 w-4 me-2" />
             All Documents
           </TabsTrigger>
           <TabsTrigger value="upload" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
-            <Upload className="h-4 w-4 mr-2" />
+            <Upload className="h-4 w-4 me-2" />
             Upload
           </TabsTrigger>
           <TabsTrigger value="categories" className="data-[state=active]:bg-[#0A5ED7] data-[state=active]:text-white">
-            <FolderOpen className="h-4 w-4 mr-2" />
+            <FolderOpen className="h-4 w-4 me-2" />
             Categories
           </TabsTrigger>
         </TabsList>
@@ -336,7 +336,7 @@ export default function DocumentManagement() {
                       placeholder="Search documents..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                      className="ps-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                     />
                   </div>
                   <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -372,7 +372,7 @@ export default function DocumentManagement() {
                         <TableHead className="text-[#64748B] font-semibold">Size</TableHead>
                         <TableHead className="text-[#64748B] font-semibold">Uploaded By</TableHead>
                         <TableHead className="text-[#64748B] font-semibold">Date</TableHead>
-                        <TableHead className="text-[#64748B] font-semibold text-right">Actions</TableHead>
+                        <TableHead className="text-[#64748B] font-semibold text-end">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -419,7 +419,7 @@ export default function DocumentManagement() {
                           <TableCell className="text-[#64748B]">
                             {format(new Date(doc.date), "MMM dd, yyyy")}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-end">
                             <div className="flex items-center justify-end gap-1">
                               <Button
                                 variant="ghost"
@@ -613,7 +613,7 @@ export default function DocumentManagement() {
                   disabled={uploadMutation.isPending}
                   className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white px-8"
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="h-4 w-4 me-2" />
                   {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
                 </Button>
               </div>

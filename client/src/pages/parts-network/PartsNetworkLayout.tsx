@@ -152,9 +152,9 @@ export default function PartsNetworkLayout({ children, title, description }: Par
                       data-testid={`nav-${item.href.split("/").pop()}`}
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="flex-1 text-left">{item.title}</span>
+                      <span className="flex-1 text-start">{item.title}</span>
                       {item.href === "/parts-network/notifications" && unreadCount?.count ? (
-                        <Badge variant="destructive" className="ml-auto">
+                        <Badge variant="destructive" className="ms-auto">
                           {unreadCount.count}
                         </Badge>
                       ) : null}

@@ -334,7 +334,7 @@ function GaragesTab() {
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-            <Input placeholder={t("platformAdmin.searchGarages", "Search garages...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
+            <Input placeholder={t("platformAdmin.searchGarages", "Search garages...")} value={search} onChange={e => setSearch(e.target.value)} className="ps-9 w-64 h-9" />
           </div>
           <Select value={planFilter} onValueChange={setPlanFilter}>
             <SelectTrigger className="w-36 h-9">
@@ -349,7 +349,7 @@ function GaragesTab() {
           </Select>
         </div>
         <Button onClick={() => setDialogOpen(true)} className="h-9 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t("platformAdmin.newGarage", "New Garage")}
         </Button>
       </div>
@@ -405,8 +405,8 @@ function GaragesTab() {
                     onClick={() => statusMutation.mutate({ id: garage.id, status: garage.is_active ? "suspended" : "active" })}
                   >
                     {garage.is_active
-                      ? <><XCircle className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.suspend", "Suspend")}</>
-                      : <><CheckCircle className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.activate", "Activate")}</>}
+                      ? <><XCircle className="h-3.5 w-3.5 me-1" /> {t("platformAdmin.suspend", "Suspend")}</>
+                      : <><CheckCircle className="h-3.5 w-3.5 me-1" /> {t("platformAdmin.activate", "Activate")}</>}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -541,7 +541,7 @@ function SuppliersTab() {
       <div className="flex gap-3 items-center justify-between">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-          <Input placeholder={t("platformAdmin.searchSuppliers", "Search suppliers or garages...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-72 h-9" />
+          <Input placeholder={t("platformAdmin.searchSuppliers", "Search suppliers or garages...")} value={search} onChange={e => setSearch(e.target.value)} className="ps-9 w-72 h-9" />
         </div>
         <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">
           {t("platformAdmin.suppliersNote", "Read-only oversight of every garage's procurement suppliers. Platform-level parts vendors onboard via the marketplace.")}
@@ -663,7 +663,7 @@ function SupportTab() {
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-            <Input placeholder={t("platformAdmin.searchTickets", "Search tickets...")} value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-64 h-9" />
+            <Input placeholder={t("platformAdmin.searchTickets", "Search tickets...")} value={search} onChange={e => setSearch(e.target.value)} className="ps-9 w-64 h-9" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-36 h-9">
@@ -725,7 +725,7 @@ function SupportTab() {
                 <TableCell>
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-[#0A5ED7]"
                     onClick={() => { setSelectedTicket(ticket); setNewStatus(ticket.status); }}>
-                    <Eye className="h-3.5 w-3.5 mr-1" /> {t("platformAdmin.view", "View")}
+                    <Eye className="h-3.5 w-3.5 me-1" /> {t("platformAdmin.view", "View")}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -933,7 +933,7 @@ function RBACTab() {
                     <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{role.description}</p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-sm font-bold text-[#0F172A] dark:text-white">{role.users.toLocaleString()}</p>
                   <p className="text-xs text-[#64748B] dark:text-[#9BA4B0]">{t("platformAdmin.users", "users")}</p>
                 </div>
@@ -1097,7 +1097,7 @@ function ApprovalsTab() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Building2 className="h-5 w-5 text-[#0A5ED7]" /> {t("platformAdmin.providerApplications", "Provider applications")}
-            <Badge variant="outline" className="ml-2">{apps.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
+            <Badge variant="outline" className="ms-2">{apps.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
           </CardTitle>
           <CardDescription>{t("platformAdmin.applicationsNote", "Garages, parts stores and insurers awaiting review (verified ones auto-approve).")}</CardDescription>
         </CardHeader>
@@ -1109,7 +1109,7 @@ function ApprovalsTab() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("platformAdmin.business", "Business")}</TableHead><TableHead>{t("myOfferings.type", "Type")}</TableHead><TableHead>{t("platformAdmin.taxCr", "Tax / CR")}</TableHead>
-                  <TableHead>{t("platformAdmin.verification", "Verification")}</TableHead><TableHead className="text-right">{t("providerBookings.action", "Action")}</TableHead>
+                  <TableHead>{t("platformAdmin.verification", "Verification")}</TableHead><TableHead className="text-end">{t("providerBookings.action", "Action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1122,13 +1122,13 @@ function ApprovalsTab() {
                     <TableCell><Badge variant="outline">{a.providerType}</Badge></TableCell>
                     <TableCell className="text-xs">{a.taxNumber}<br />{a.commercialRegistration}</TableCell>
                     <TableCell><span className={`text-xs px-2 py-1 rounded ${badge(a.verificationStatus)}`}>{a.verificationStatus}</span></TableCell>
-                    <TableCell className="text-right space-x-2">
+                    <TableCell className="text-end space-x-2">
                       <Button size="sm" data-testid={`approve-app-${a.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/approve`, invalidate: ["/api/platform-admin/garage-applications"] })}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.approve", "Approve")}</Button>
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 me-1" />{t("platformAdmin.approve", "Approve")}</Button>
                       <Button size="sm" variant="outline" data-testid={`reject-app-${a.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/garage-applications/${a.id}/reject`, invalidate: ["/api/platform-admin/garage-applications"] })}
-                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.reject", "Reject")}</Button>
+                        className="h-8"><XCircle className="h-3.5 w-3.5 me-1" />{t("platformAdmin.reject", "Reject")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1143,7 +1143,7 @@ function ApprovalsTab() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-[#0A5ED7]" /> {t("platformAdmin.subscriptionRequests", "Subscription requests")}
-            <Badge variant="outline" className="ml-2">{subs.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
+            <Badge variant="outline" className="ms-2">{subs.data?.length ?? 0} {t("platformAdmin.pending", "pending")}</Badge>
           </CardTitle>
           <CardDescription>{t("platformAdmin.subRequestsNote", "Garages requesting a plan change.")}</CardDescription>
         </CardHeader>
@@ -1153,20 +1153,20 @@ function ApprovalsTab() {
           : (
             <Table>
               <TableHeader>
-                <TableRow><TableHead>{t("platformAdmin.garage", "Garage")}</TableHead><TableHead>{t("platformAdmin.change", "Change")}</TableHead><TableHead className="text-right">{t("providerBookings.action", "Action")}</TableHead></TableRow>
+                <TableRow><TableHead>{t("platformAdmin.garage", "Garage")}</TableHead><TableHead>{t("platformAdmin.change", "Change")}</TableHead><TableHead className="text-end">{t("providerBookings.action", "Action")}</TableHead></TableRow>
               </TableHeader>
               <TableBody>
                 {subs.data!.map((s) => (
                   <TableRow key={s.id} data-testid={`sub-row-${s.id}`}>
                     <TableCell className="text-xs font-mono">{s.garageId.slice(0, 8)}…</TableCell>
                     <TableCell>{s.currentPlan ?? "—"} → <span className="font-semibold">{s.requestedPlan}</span></TableCell>
-                    <TableCell className="text-right space-x-2">
+                    <TableCell className="text-end space-x-2">
                       <Button size="sm" data-testid={`approve-sub-${s.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/approve`, invalidate: ["/api/platform-admin/subscription-requests"] })}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.approve", "Approve")}</Button>
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 me-1" />{t("platformAdmin.approve", "Approve")}</Button>
                       <Button size="sm" variant="outline" data-testid={`reject-sub-${s.id}`}
                         onClick={() => act.mutate({ url: `/api/platform-admin/subscription-requests/${s.id}/reject`, invalidate: ["/api/platform-admin/subscription-requests"] })}
-                        className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />{t("platformAdmin.reject", "Reject")}</Button>
+                        className="h-8"><XCircle className="h-3.5 w-3.5 me-1" />{t("platformAdmin.reject", "Reject")}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1279,7 +1279,7 @@ function PlatformBillingTab() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] text-left text-[#64748B]">
+                  <tr className="border-b border-[#E2E8F0] dark:border-[#232A36] text-start text-[#64748B]">
                     <th className="py-2 px-2 font-medium">{t("platformAdmin.garage", "Garage")}</th>
                     <th className="py-2 px-2 font-medium">{t("providerSignup.plan", "Plan")}</th>
                     <th className="py-2 px-2 font-medium">{t("common.status", "Status")}</th>

@@ -150,7 +150,7 @@ function CustomersTab() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search by name, email or phone..."
-          className="pl-9"
+          className="ps-9"
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
         />
@@ -166,7 +166,7 @@ function CustomersTab() {
                 <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead className="text-center">Visits</TableHead>
-                <TableHead className="text-right">Total Spent</TableHead>
+                <TableHead className="text-end">Total Spent</TableHead>
                 <TableHead>Loyalty Tier</TableHead>
                 <TableHead>Last Visit</TableHead>
               </TableRow>
@@ -195,7 +195,7 @@ function CustomersTab() {
                     <TableCell>{c.phone || "-"}</TableCell>
                     <TableCell>{c.email || "-"}</TableCell>
                     <TableCell className="text-center">{c.visitCount}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(Number(c.totalSpend))}</TableCell>
+                    <TableCell className="text-end">{formatCurrency(Number(c.totalSpend))}</TableCell>
                     <TableCell>
                       <Badge className={TIER_COLORS[c.loyaltyTier] || ""}>
                         {c.loyaltyTier}
@@ -469,7 +469,7 @@ function LoyaltyTab() {
       {/* Award points button */}
       <div className="flex justify-end">
         <Button onClick={() => setAwardOpen(true)}>
-          <Gift className="h-4 w-4 mr-2" /> Award Points
+          <Gift className="h-4 w-4 me-2" /> Award Points
         </Button>
       </div>
 
@@ -695,7 +695,7 @@ function RetentionTab() {
                 <TableHead>Email</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead className="text-center">Visits</TableHead>
-                <TableHead className="text-right">Total Spent</TableHead>
+                <TableHead className="text-end">Total Spent</TableHead>
                 <TableHead>Last Visit</TableHead>
               </TableRow>
             </TableHeader>
@@ -719,7 +719,7 @@ function RetentionTab() {
                     <TableCell>{c.email || "-"}</TableCell>
                     <TableCell>{c.phone || "-"}</TableCell>
                     <TableCell className="text-center">{c.visitCount}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(Number(c.totalSpend))}</TableCell>
+                    <TableCell className="text-end">{formatCurrency(Number(c.totalSpend))}</TableCell>
                     <TableCell>{formatDate(c.lastVisit)}</TableCell>
                   </TableRow>
                 ))
@@ -798,8 +798,8 @@ function CampaignsTab() {
                 <TableHead className="text-center">Sent</TableHead>
                 <TableHead className="text-center">Opened</TableHead>
                 <TableHead className="text-center">Converted</TableHead>
-                <TableHead className="text-right">Revenue</TableHead>
-                <TableHead className="text-right">ROI %</TableHead>
+                <TableHead className="text-end">Revenue</TableHead>
+                <TableHead className="text-end">ROI %</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -827,8 +827,8 @@ function CampaignsTab() {
                     <TableCell className="text-center">{c.sent}</TableCell>
                     <TableCell className="text-center">{c.opened}</TableCell>
                     <TableCell className="text-center">{c.converted}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(c.revenue)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">{formatCurrency(c.revenue)}</TableCell>
+                    <TableCell className="text-end">
                       {c.roi > 0 ? (
                         <span className="text-green-600 font-medium">{c.roi}%</span>
                       ) : (

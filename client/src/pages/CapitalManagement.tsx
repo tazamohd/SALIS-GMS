@@ -226,7 +226,7 @@ export default function CapitalManagement() {
             <Dialog open={isContributionDialogOpen} onOpenChange={setIsContributionDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-contribution">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('capital.addContribution', 'Add Contribution')}
                 </Button>
               </DialogTrigger>
@@ -351,9 +351,9 @@ export default function CapitalManagement() {
                   <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareholder', 'Shareholder')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.shares', 'Shares')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.ownershipPercent', 'Ownership %')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.contribution', 'Contribution')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.shares', 'Shares')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.ownershipPercent', 'Ownership %')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.contribution', 'Contribution')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -364,9 +364,9 @@ export default function CapitalManagement() {
                       <TableCell>
                         <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">{shareholder.type}</Badge>
                       </TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{shareholder.shares.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{shareholder.percentage}%</TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">SAR {shareholder.contribution.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{shareholder.shares.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{shareholder.percentage}%</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">SAR {shareholder.contribution.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge className="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200">
                           {t('common.active', 'Active')}
@@ -392,7 +392,7 @@ export default function CapitalManagement() {
             <Dialog open={isStructureDialogOpen} onOpenChange={setIsStructureDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-share-class">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('capital.addShareClass', 'Add Share Class')}
                 </Button>
               </DialogTrigger>
@@ -493,10 +493,10 @@ export default function CapitalManagement() {
                 <TableHeader>
                   <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36] bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareClass', 'Share Class')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.authorized', 'Authorized')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.issued', 'Issued')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.available', 'Available')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('capital.parValue', 'Par Value')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.authorized', 'Authorized')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.issued', 'Issued')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.available', 'Available')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('capital.parValue', 'Par Value')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.votingRights', 'Voting Rights')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -504,10 +504,10 @@ export default function CapitalManagement() {
                   {shareClasses.map((sc) => (
                     <TableRow key={sc.id} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-share-class-${sc.id}`}>
                       <TableCell className="font-medium text-[#0B1F3B] dark:text-white">{sc.class}</TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{sc.authorized.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{sc.issued.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-mono text-green-600 dark:text-green-400">{(sc.authorized - sc.issued).toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">SAR {sc.parValue}</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{sc.authorized.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{sc.issued.toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-mono text-green-600 dark:text-green-400">{(sc.authorized - sc.issued).toLocaleString()}</TableCell>
+                      <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">SAR {sc.parValue}</TableCell>
                       <TableCell className="text-[#64748B]">{sc.votingRights}</TableCell>
                     </TableRow>
                   ))}
@@ -533,7 +533,7 @@ export default function CapitalManagement() {
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.date', 'Date')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.type', 'Type')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.shareholder', 'Shareholder')}</TableHead>
-                    <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
+                    <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('common.amount', 'Amount')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('capital.method', 'Method')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -545,7 +545,7 @@ export default function CapitalManagement() {
                         <Badge className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">{tx.type}</Badge>
                       </TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white">{tx.shareholder}</TableCell>
-                      <TableCell className="text-right font-mono font-bold text-green-600 dark:text-green-400">
+                      <TableCell className="text-end font-mono font-bold text-green-600 dark:text-green-400">
                         SAR {tx.amount.toLocaleString()}
                       </TableCell>
                       <TableCell className="text-[#64748B]">{tx.method}</TableCell>
@@ -565,30 +565,30 @@ export default function CapitalManagement() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Link href="/equity-management">
                   <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-equity">
-                    <Wallet className="h-4 w-4 mr-2" />
+                    <Wallet className="h-4 w-4 me-2" />
                     {t('capital.equity', 'Equity')}
-                    <ExternalLink className="h-3 w-3 ml-auto" />
+                    <ExternalLink className="h-3 w-3 ms-auto" />
                   </Button>
                 </Link>
                 <Link href="/retained-earnings">
                   <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-retained-earnings">
-                    <TrendingUp className="h-4 w-4 mr-2" />
+                    <TrendingUp className="h-4 w-4 me-2" />
                     {t('capital.retainedEarnings', 'Retained Earnings')}
-                    <ExternalLink className="h-3 w-3 ml-auto" />
+                    <ExternalLink className="h-3 w-3 ms-auto" />
                   </Button>
                 </Link>
                 <Link href="/balance-sheet">
                   <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-balance-sheet">
-                    <FileText className="h-4 w-4 mr-2" />
+                    <FileText className="h-4 w-4 me-2" />
                     {t('capital.balanceSheet', 'Balance Sheet')}
-                    <ExternalLink className="h-3 w-3 ml-auto" />
+                    <ExternalLink className="h-3 w-3 ms-auto" />
                   </Button>
                 </Link>
                 <Link href="/general-ledger">
                   <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
-                    <FileText className="h-4 w-4 mr-2" />
+                    <FileText className="h-4 w-4 me-2" />
                     {t('capital.generalLedger', 'General Ledger')}
-                    <ExternalLink className="h-3 w-3 ml-auto" />
+                    <ExternalLink className="h-3 w-3 ms-auto" />
                   </Button>
                 </Link>
               </div>

@@ -232,12 +232,12 @@ export default function ServiceHistory() {
 
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-gradient-to-r hover:from-[#0A5ED7]/5 hover:to-[#0BB3FF]/5" data-testid={`button-view-${job.id}`}>
-                          <FileText className="h-4 w-4 mr-2" />
+                          <FileText className="h-4 w-4 me-2" />
                           View Details
                         </Button>
                         {invoice && (
                           <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-gradient-to-r hover:from-[#0A5ED7]/5 hover:to-[#0BB3FF]/5" data-testid={`button-invoice-${job.id}`}>
-                            <Download className="h-4 w-4 mr-2" />
+                            <Download className="h-4 w-4 me-2" />
                             Download Invoice
                           </Button>
                         )}

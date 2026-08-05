@@ -106,7 +106,7 @@ export default function WearableIntegration() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="text-right">
+                      <div className="text-end">
                         <div className="flex items-center gap-2 mb-1">
                           <Battery className="w-4 h-4 text-[#64748B]" />
                           <span className="text-sm font-medium text-[#0B1F3B] dark:text-white">{device.battery}%</span>
@@ -121,7 +121,7 @@ export default function WearableIntegration() {
                 ))}
               </div>
               <Button className="w-full mt-4 border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" variant="outline" data-testid="button-add-device">
-                <Wifi className="w-4 h-4 mr-2" />
+                <Wifi className="w-4 h-4 me-2" />
                 {t('wearable.addNewDevice', 'Add New Device')}
               </Button>
             </CardContent>

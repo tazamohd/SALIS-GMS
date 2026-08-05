@@ -175,7 +175,7 @@ export function CreateInvoiceDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-invoice">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Create Invoice
         </Button>
       </DialogTrigger>

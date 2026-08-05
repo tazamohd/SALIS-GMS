@@ -156,7 +156,7 @@ export default function PayrollManagement() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
           data-testid="button-add-employee"
         >
-          <Users className="mr-2 h-4 w-4" />
+          <Users className="me-2 h-4 w-4" />
           {t('payroll.addEmployee', 'Add Employee')}
         </Button>
       </div>
@@ -213,7 +213,7 @@ export default function PayrollManagement() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
           data-testid="button-create-period"
         >
-          <Calendar className="mr-2 h-4 w-4" />
+          <Calendar className="me-2 h-4 w-4" />
           {t('payroll.createPayPeriod', 'Create Pay Period')}
         </Button>
       </div>
@@ -277,7 +277,7 @@ export default function PayrollManagement() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white disabled:opacity-50"
           data-testid="button-create-run"
         >
-          <PlayCircle className="mr-2 h-4 w-4" />
+          <PlayCircle className="me-2 h-4 w-4" />
           {t('payroll.createRun', 'Create Run')}
         </Button>
       </div>

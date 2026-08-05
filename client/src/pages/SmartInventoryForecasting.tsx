@@ -187,7 +187,7 @@ export default function SmartInventoryForecasting() {
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="button-refresh-forecast">
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw className="w-4 h-4 me-2" />
               {t('common.refresh', 'Refresh')}
             </Button>
           </div>

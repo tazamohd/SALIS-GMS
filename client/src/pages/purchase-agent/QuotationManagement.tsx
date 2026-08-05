@@ -159,7 +159,7 @@ export default function QuotationManagement() {
           </p>
         </div>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-new-quotation-request">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           New Request
         </Button>
       </div>
@@ -198,7 +198,7 @@ export default function QuotationManagement() {
                 placeholder="Search requests..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-requests"
               />
             </div>
@@ -274,7 +274,7 @@ export default function QuotationManagement() {
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-2 ml-4">
+                      <div className="flex flex-col gap-2 ms-4">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
@@ -284,7 +284,7 @@ export default function QuotationManagement() {
                               onClick={() => setSelectedRequest(request)}
                               data-testid={`button-view-request-${request.id}`}
                             >
-                              <Eye className="h-4 w-4 mr-1" />
+                              <Eye className="h-4 w-4 me-1" />
                               View
                             </Button>
                           </DialogTrigger>
@@ -342,7 +342,7 @@ export default function QuotationManagement() {
                                                   </Label>
                                                   {quotation.isRecommended && (
                                                     <Badge className="bg-green-500">
-                                                      <Star className="h-3 w-3 mr-1" />
+                                                      <Star className="h-3 w-3 me-1" />
                                                       Recommended
                                                     </Badge>
                                                   )}
@@ -351,7 +351,7 @@ export default function QuotationManagement() {
                                                     <span className="text-sm text-[#64748B]">{quotation.supplierRating}</span>
                                                   </div>
                                                 </div>
-                                                <div className="text-right">
+                                                <div className="text-end">
                                                   <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">
                                                     {quotation.totalPrice} {quotation.currency}
                                                   </p>
@@ -380,9 +380,9 @@ export default function QuotationManagement() {
                                                 <table className="w-full text-sm">
                                                   <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                                                     <tr>
-                                                      <th className="px-3 py-2 text-left text-[#0B1F3B] dark:text-white">Part</th>
+                                                      <th className="px-3 py-2 text-start text-[#0B1F3B] dark:text-white">Part</th>
                                                       <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Qty</th>
-                                                      <th className="px-3 py-2 text-right text-[#0B1F3B] dark:text-white">Unit Price</th>
+                                                      <th className="px-3 py-2 text-end text-[#0B1F3B] dark:text-white">Unit Price</th>
                                                       <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Availability</th>
                                                       <th className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">Lead Time</th>
                                                     </tr>
@@ -395,7 +395,7 @@ export default function QuotationManagement() {
                                                           <p className="text-xs text-[#64748B]">{item.partNumber}</p>
                                                         </td>
                                                         <td className="px-3 py-2 text-center text-[#0B1F3B] dark:text-white">{item.quantity}</td>
-                                                        <td className="px-3 py-2 text-right font-medium text-[#0B1F3B] dark:text-white">{item.unitPrice} SAR</td>
+                                                        <td className="px-3 py-2 text-end font-medium text-[#0B1F3B] dark:text-white">{item.unitPrice} SAR</td>
                                                         <td className="px-3 py-2 text-center">
                                                           {getAvailabilityBadge(item.availability)}
                                                         </td>
@@ -424,7 +424,7 @@ export default function QuotationManagement() {
                                         onClick={() => selectedQuotation && handleSelectQuotation(selectedQuotation)}
                                         data-testid="button-confirm-selection"
                                       >
-                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        <CheckCircle className="h-4 w-4 me-2" />
                                         Confirm Selection & Create Order
                                       </Button>
                                     </div>

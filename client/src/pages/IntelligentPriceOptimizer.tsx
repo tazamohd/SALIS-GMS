@@ -246,7 +246,7 @@ export default function IntelligentPriceOptimizer() {
               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               data-testid="button-optimize-price"
             >
-              <Target className="w-4 h-4 mr-2" />
+              <Target className="w-4 h-4 me-2" />
               {t('priceOptimizer.runAIOptimization', 'Run AI Optimization')}
             </Button>
           </CardContent>

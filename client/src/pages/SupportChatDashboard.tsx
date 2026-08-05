@@ -344,12 +344,12 @@ export default function SupportChatDashboard() {
           <div className="flex items-center gap-2">
             {isConnected ? (
               <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30" data-testid="badge-connection-status">
-                <span className="w-2 h-2 rounded-full bg-[#0A5ED7] animate-pulse mr-2" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-[#0A5ED7] animate-pulse me-2" aria-hidden="true" />
                 {t('supportDashboard.connected', 'Connected')}
               </Badge>
             ) : (
               <Badge className="bg-[#0B1F3B]/10 text-[#0B1F3B] dark:text-white/60 border-[#0B1F3B]/30" data-testid="badge-connection-status">
-                <span className="w-2 h-2 rounded-full bg-[#0B1F3B] dark:bg-white/60 mr-2" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-[#0B1F3B] dark:bg-white/60 me-2" aria-hidden="true" />
                 {t('supportDashboard.disconnected', 'Disconnected')}
               </Badge>
             )}
@@ -361,7 +361,7 @@ export default function SupportChatDashboard() {
               data-testid="button-refresh-tickets"
               aria-label={t('common.refresh', 'Refresh')}
             >
-              <RefreshCw className="w-4 h-4 mr-2" aria-hidden="true" />
+              <RefreshCw className="w-4 h-4 me-2" aria-hidden="true" />
               {t('common.refresh', 'Refresh')}
             </Button>
           </div>
@@ -369,8 +369,8 @@ export default function SupportChatDashboard() {
 
         <div className="grid grid-cols-4 gap-4 mb-6">
           <Card className="relative overflow-hidden bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0" data-testid="card-stat-total">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" aria-hidden="true" />
-            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8" aria-hidden="true" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -me-10 -mt-10" aria-hidden="true" />
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ms-8 -mb-8" aria-hidden="true" />
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -383,7 +383,7 @@ export default function SupportChatDashboard() {
           </Card>
 
           <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30" data-testid="card-stat-open">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0A5ED7]/5 rounded-full -mr-10 -mt-10" aria-hidden="true" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0A5ED7]/5 rounded-full -me-10 -mt-10" aria-hidden="true" />
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -396,7 +396,7 @@ export default function SupportChatDashboard() {
           </Card>
 
           <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#0BB3FF]/20 dark:border-[#0BB3FF]/30" data-testid="card-stat-progress">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0BB3FF]/5 rounded-full -mr-10 -mt-10" aria-hidden="true" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0BB3FF]/5 rounded-full -me-10 -mt-10" aria-hidden="true" />
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -409,7 +409,7 @@ export default function SupportChatDashboard() {
           </Card>
 
           <Card className="relative overflow-hidden bg-white dark:bg-[#151A23] border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30" data-testid="card-stat-resolved">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0A5ED7]/5 rounded-full -mr-10 -mt-10" aria-hidden="true" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-[#0A5ED7]/5 rounded-full -me-10 -mt-10" aria-hidden="true" />
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -487,7 +487,7 @@ export default function SupportChatDashboard() {
                         <button
                           key={ticket.id}
                           onClick={() => setSelectedTicketId(ticket.id)}
-                          className={`w-full p-4 text-left hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0A5ED7]/10 transition-colors ${
+                          className={`w-full p-4 text-start hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0A5ED7]/10 transition-colors ${
                             selectedTicketId === ticket.id ? 'bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10 border-l-2 border-[#0A5ED7]' : ''
                           }`}
                           data-testid={`button-ticket-${ticket.id}`}
@@ -585,9 +585,9 @@ export default function SupportChatDashboard() {
                             }
                           >
                             {assignTicketMutation.isPending ? (
-                              <Loader2 className="w-3 h-3 mr-1 animate-spin" aria-hidden="true" />
+                              <Loader2 className="w-3 h-3 me-1 animate-spin" aria-hidden="true" />
                             ) : (
-                              <UserPlus className="w-3 h-3 mr-1" aria-hidden="true" />
+                              <UserPlus className="w-3 h-3 me-1" aria-hidden="true" />
                             )}
                             {selectedTicket.assignedTo === user.id 
                               ? t('supportDashboard.assignedToYou', 'Assigned to You')
@@ -623,7 +623,7 @@ export default function SupportChatDashboard() {
                             >
                               <div className={`max-w-[70%] ${isOwn ? 'order-2' : 'order-1'}`}>
                                 {!isOwn && (
-                                  <p className="text-xs text-[#0B1F3B]/60 dark:text-white/60 mb-1 ml-1">
+                                  <p className="text-xs text-[#0B1F3B]/60 dark:text-white/60 mb-1 ms-1">
                                     {getSenderName(msg.senderId)}
                                   </p>
                                 )}
@@ -680,9 +680,9 @@ export default function SupportChatDashboard() {
                         aria-label={t('supportDashboard.sendResponse', 'Send response')}
                       >
                         {sendMessageMutation.isPending ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                          <Loader2 className="w-4 h-4 me-2 animate-spin" aria-hidden="true" />
                         ) : (
-                          <Send className="w-4 h-4 mr-2" aria-hidden="true" />
+                          <Send className="w-4 h-4 me-2" aria-hidden="true" />
                         )}
                         {t('common.send', 'Send')}
                       </Button>

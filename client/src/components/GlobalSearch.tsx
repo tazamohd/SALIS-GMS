@@ -109,14 +109,14 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
         <div className="flex items-center gap-2 mb-2 px-2">
           {getModuleIcon(module)}
           <h3 className="text-sm font-semibold">{getModuleLabel(module)}</h3>
-          <Badge variant="secondary" className="ml-auto">{items.length}</Badge>
+          <Badge variant="secondary" className="ms-auto">{items.length}</Badge>
         </div>
         <div className="space-y-1">
           {items.map((item: any, index: number) => (
             <button
               key={index}
               onClick={() => navigateToItem(module, item)}
-              className="w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors"
+              className="w-full text-start px-3 py-2 rounded-md hover:bg-accent transition-colors"
               data-testid={`search-result-${module}-${index}`}
             >
               <div className="font-medium text-sm">
@@ -159,7 +159,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search across all modules..."
-            className="pl-9 pr-9"
+            className="ps-9 pe-9"
             autoFocus
             data-testid="input-global-search"
           />
@@ -176,7 +176,7 @@ export function GlobalSearch({ garageId, open, onOpenChange }: GlobalSearchProps
           )}
         </div>
 
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[400px] pe-4">
           {query.length < 2 && (
             <div className="text-center text-muted-foreground py-8">
               Type at least 2 characters to search

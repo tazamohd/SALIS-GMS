@@ -126,11 +126,11 @@ export default function ReviewChat() {
       <Tabs defaultValue="chat" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-[#E2E8F0] dark:bg-[#232A36]">
           <TabsTrigger value="chat" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23] data-[state=active]:text-[#0B1F3B] dark:data-[state=active]:text-white" data-testid="tab-chat">
-            <MessageSquare className="h-4 w-4 mr-2" />
+            <MessageSquare className="h-4 w-4 me-2" />
             Live Chat
           </TabsTrigger>
           <TabsTrigger value="reviews" className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#151A23] data-[state=active]:text-[#0B1F3B] dark:data-[state=active]:text-white" data-testid="tab-reviews">
-            <Star className="h-4 w-4 mr-2" />
+            <Star className="h-4 w-4 me-2" />
             Reviews
           </TabsTrigger>
         </TabsList>
@@ -159,7 +159,7 @@ export default function ReviewChat() {
                       <button
                         key={job.id}
                         onClick={() => setSelectedJob(job.id)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        className={`w-full text-start p-3 rounded-lg border transition-colors ${
                           selectedJob === job.id 
                             ? "bg-gradient-to-r from-[#0A5ED7]/10 to-[#0BB3FF]/10 border-[#0A5ED7]" 
                             : "border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
@@ -191,7 +191,7 @@ export default function ReviewChat() {
               <CardContent>
                 {selectedJob ? (
                   <div className="space-y-4">
-                    <ScrollArea className="h-96 pr-4">
+                    <ScrollArea className="h-96 pe-4">
                       <div className="space-y-4">
                         {Array.isArray(chatMessages) && chatMessages.length > 0 ? (
                           chatMessages.map((msg: any) => (
@@ -322,7 +322,7 @@ export default function ReviewChat() {
                       className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                       data-testid="button-submit-review"
                     >
-                      <ThumbsUp className="h-4 w-4 mr-2" />
+                      <ThumbsUp className="h-4 w-4 me-2" />
                       {submitReviewMutation.isPending ? "Submitting..." : "Submit Review"}
                     </Button>
                   </div>

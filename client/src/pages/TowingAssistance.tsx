@@ -334,7 +334,7 @@ export default function TowingAssistance() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           data-testid="button-create-request"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('towingAssistance.createRequest', 'Create Request')}
         </Button>
       </div>
@@ -426,7 +426,7 @@ export default function TowingAssistance() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
           data-testid="button-create-truck"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('towingAssistance.addTruck', 'Add Truck')}
         </Button>
       </div>

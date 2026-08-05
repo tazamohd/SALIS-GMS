@@ -27,18 +27,22 @@ beforeAll(async () => {
 describe("franchise routes are platform-admin only", () => {
   it("a garage ADMIN is denied (403) on franchise reads and writes", async () => {
     const someId = "00000000-0000-0000-0000-000000000000";
-    const denied = [
-      admin.get("/api/franchise-groups"),
-      admin.get(`/api/franchise-groups/${someId}`),
-      admin.post("/api/franchise-groups").send({ name: "x" }),
-      admin.patch(`/api/franchise-groups/${someId}`).send({ name: "x" }),
-      admin.delete(`/api/franchise-groups/${someId}`),
-      admin.get("/api/franchise-contracts"),
-      admin.get("/api/franchise-kpis"),
-      admin.get("/api/revenue-sharing-rules"),
-      admin.delete(`/api/revenue-sharing-rules/${someId}`),
+    // Issue the probes sequentially — firing them all at once through supertest
+    // against one ephemeral server can reset a connection under CI load
+    // (ECONNRESET); the guard itself is what we're asserting, not concurrency.
+    const probes: Array<() => Promise<{ status: number }>> = [
+      () => admin.get("/api/franchise-groups"),
+      () => admin.get(`/api/franchise-groups/${someId}`),
+      () => admin.post("/api/franchise-groups").send({ name: "x" }),
+      () => admin.patch(`/api/franchise-groups/${someId}`).send({ name: "x" }),
+      () => admin.delete(`/api/franchise-groups/${someId}`),
+      () => admin.get("/api/franchise-contracts"),
+      () => admin.get("/api/franchise-kpis"),
+      () => admin.get("/api/revenue-sharing-rules"),
+      () => admin.delete(`/api/revenue-sharing-rules/${someId}`),
     ];
-    for (const r of await Promise.all(denied)) {
+    for (const probe of probes) {
+      const r = await probe();
       expect(r.status).toBe(403);
     }
   });

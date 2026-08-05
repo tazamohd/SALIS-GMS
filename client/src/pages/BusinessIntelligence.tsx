@@ -338,7 +338,7 @@ export default function BusinessIntelligence() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                     ${customer.lifetimeValue.toFixed(2)}
                   </p>
@@ -374,7 +374,7 @@ export default function BusinessIntelligence() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-8 text-right">
+                <div className="flex gap-8 text-end">
                   <div>
                     <p className="text-sm text-[#64748B]">{t('analytics.utilization', 'Utilization')}</p>
                     <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">{tech.utilizationRate.toFixed(1)}%</p>

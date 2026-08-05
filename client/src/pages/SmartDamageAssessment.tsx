@@ -160,7 +160,7 @@ export default function SmartDamageAssessment() {
               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
               data-testid="button-upload-image"
             >
-              <Upload className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4 me-2" />
               {selectedImage ? t('smartDamage.uploadDifferentImage', 'Upload Different Image') : t('smartDamage.selectImage', 'Select Image')}
             </Button>
           </CardContent>
@@ -215,7 +215,7 @@ export default function SmartDamageAssessment() {
 
             {detections.length > 0 && (
               <Button className="w-full mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-generate-estimate">
-                <DollarSign className="w-4 h-4 mr-2" />
+                <DollarSign className="w-4 h-4 me-2" />
                 {t('smartDamage.generateFullEstimate', 'Generate Full Estimate')}
               </Button>
             )}
@@ -261,7 +261,7 @@ export default function SmartDamageAssessment() {
                                 {detection.location}
                               </p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-end">
                               <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white" data-testid={`text-detection-cost-${idx}`}>
                                 ${detection.estimatedCost}
                               </p>
@@ -317,7 +317,7 @@ export default function SmartDamageAssessment() {
           {detections.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 dark:from-emerald-500/10 dark:to-emerald-500/5 relative overflow-hidden" data-testid="card-average-confidence">
-                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-emerald-500/10 -mr-10 -mt-10" />
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-emerald-500/10 -me-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
@@ -332,7 +332,7 @@ export default function SmartDamageAssessment() {
               </Card>
 
               <Card className="border-[#0A5ED7]/20 bg-gradient-to-br from-[#0A5ED7]/5 to-[#0BB3FF]/10 dark:from-[#0A5ED7]/10 dark:to-[#0BB3FF]/5 relative overflow-hidden" data-testid="card-labor-parts">
-                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#0A5ED7]/10 -mr-10 -mt-10" />
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#0A5ED7]/10 -me-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <DollarSign className="w-8 h-8 text-[#0A5ED7]" />
@@ -347,7 +347,7 @@ export default function SmartDamageAssessment() {
               </Card>
 
               <Card className="border-[#F97316]/20 bg-gradient-to-br from-[#F97316]/5 to-[#F97316]/10 dark:from-[#F97316]/10 dark:to-[#F97316]/5 relative overflow-hidden" data-testid="card-priority-items">
-                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#F97316]/10 -mr-10 -mt-10" />
+                <div className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#F97316]/10 -me-10 -mt-10" />
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="w-8 h-8 text-[#F97316]" />

@@ -172,7 +172,7 @@ export default function StaffPerformanceReview() {
                     <p className="text-sm text-[#64748B]">{performer.role}</p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{performer.score}</p>
                   <p className="text-sm text-[#64748B]">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
                 </div>

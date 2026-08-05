@@ -182,7 +182,7 @@ export default function VehicleStorage() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white font-poppins"
           data-testid="button-create-assignment"
         >
-          <Car className="mr-2 h-4 w-4" />
+          <Car className="me-2 h-4 w-4" />
           {t('vehicles.assignVehicle', 'Assign Vehicle')}
         </Button>
       </div>

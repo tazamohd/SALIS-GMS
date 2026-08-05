@@ -455,7 +455,7 @@ export default function AdvancedReports() {
           </p>
         </div>
         <Button onClick={handleExport} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="h-4 w-4 me-2" />
           Export
         </Button>
       </div>

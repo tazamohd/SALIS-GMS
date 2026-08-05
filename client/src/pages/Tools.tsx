@@ -191,11 +191,11 @@ export default function Tools() {
                   <div className="flex items-center gap-2">
                     {tool.isActive ? (
                       <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800">
-                        <CheckCircle className="h-3 w-3 mr-1" /> {t('common.active', 'Active')}
+                        <CheckCircle className="h-3 w-3 me-1" /> {t('common.active', 'Active')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-[#E2E8F0] dark:border-[#232A36]">
-                        <XCircle className="h-3 w-3 mr-1" /> {t('common.inactive', 'Inactive')}
+                        <XCircle className="h-3 w-3 me-1" /> {t('common.inactive', 'Inactive')}
                       </Badge>
                     )}
                     {tool.isGlobal && (
@@ -386,11 +386,11 @@ export default function Tools() {
                 <div className="flex gap-2">
                   {selectedTool.isActive ? (
                     <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800">
-                      <CheckCircle className="h-3 w-3 mr-1" /> Active
+                      <CheckCircle className="h-3 w-3 me-1" /> Active
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B] border-[#E2E8F0] dark:border-[#232A36]">
-                      <XCircle className="h-3 w-3 mr-1" /> Inactive
+                      <XCircle className="h-3 w-3 me-1" /> Inactive
                     </Badge>
                   )}
                   {selectedTool.isGlobal && (

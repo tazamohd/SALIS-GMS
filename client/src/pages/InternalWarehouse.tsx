@@ -246,7 +246,7 @@ export default function InternalWarehouse() {
               placeholder={t('inventory.searchLocations', 'Search locations...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-64"
+              className="ps-10 w-64"
               data-testid="input-search-locations"
             />
           </div>
@@ -265,7 +265,7 @@ export default function InternalWarehouse() {
           </Select>
         </div>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" onClick={() => setIsLocationDialogOpen(true)} data-testid="button-add-location">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('inventory.addLocation', 'Add Location')}
         </Button>
       </div>
@@ -396,7 +396,7 @@ export default function InternalWarehouse() {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('inventory.warehouseZones', 'Warehouse Zones')}</h3>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" onClick={() => setIsZoneDialogOpen(true)} data-testid="button-add-zone">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('inventory.addZone', 'Add Zone')}
         </Button>
       </div>
@@ -458,7 +458,7 @@ export default function InternalWarehouse() {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white">Stock Transfers</h3>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" onClick={() => setIsTransferDialogOpen(true)} data-testid="button-new-transfer">
-          <ArrowRightLeft className="h-4 w-4 mr-2" />
+          <ArrowRightLeft className="h-4 w-4 me-2" />
           New Transfer
         </Button>
       </div>
@@ -502,7 +502,7 @@ export default function InternalWarehouse() {
                     <TableCell className="text-[#64748B]">{transfer.reason}</TableCell>
                     <TableCell>
                       <Badge className={transfer.status === "completed" ? "bg-green-600 text-white" : "bg-[#64748B] text-white"}>
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                        <CheckCircle className="h-3 w-3 me-1" />
                         {transfer.status}
                       </Badge>
                     </TableCell>

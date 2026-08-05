@@ -208,7 +208,7 @@ export default function ProfitAnalysis() {
                       {t('analytics.revenue', 'Revenue')}: ${service.revenue.toLocaleString()} | {t('analytics.cost', 'Cost')}: ${service.cost.toLocaleString()}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${service.profit.toLocaleString()}
                     </p>
@@ -249,7 +249,7 @@ export default function ProfitAnalysis() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${tech.revenue.toLocaleString()}
                     </p>
@@ -290,7 +290,7 @@ export default function ProfitAnalysis() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-bold text-lg text-[#0B1F3B] dark:text-white">
                       ${customer.revenue.toLocaleString()}
                     </p>

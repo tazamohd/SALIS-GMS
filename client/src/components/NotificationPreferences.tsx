@@ -169,7 +169,7 @@ export function NotificationPreferences() {
               disabled={saveMutation.isPending}
               data-testid="button-save-preferences"
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 me-2" />
               {saveMutation.isPending ? 'Saving...' : 'Save Preferences'}
             </Button>
           </div>

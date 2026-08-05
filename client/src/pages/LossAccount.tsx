@@ -225,7 +225,7 @@ export default function LossAccount() {
           </Select>
         </div>
         <Button onClick={() => setIsLossDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-add-loss">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('lossAccount.recordLoss', 'Record Loss')}
         </Button>
       </div>
@@ -324,7 +324,7 @@ export default function LossAccount() {
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium text-[#0B1F3B] dark:text-white">{t('lossAccount.lossEntries', 'Loss Entries')}</h3>
         <Button onClick={() => setIsLossDialogOpen(true)} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#0aa0e6] text-white" data-testid="button-new-entry">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('lossAccount.newEntry', 'New Entry')}
         </Button>
       </div>
@@ -347,8 +347,8 @@ export default function LossAccount() {
                 <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
                 <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
                 <TableHead className="text-[#64748B]">{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
-                <TableHead className="text-right text-[#64748B]">{t('lossAccount.recovered', 'Recovered')}</TableHead>
+                <TableHead className="text-end text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                <TableHead className="text-end text-[#64748B]">{t('lossAccount.recovered', 'Recovered')}</TableHead>
                 <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
                 <TableHead className="text-[#64748B]">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
@@ -366,10 +366,10 @@ export default function LossAccount() {
                       </div>
                     </TableCell>
                     <TableCell className="max-w-xs truncate text-[#0B1F3B] dark:text-white">{entry.description}</TableCell>
-                    <TableCell className="text-right font-medium text-[#F97316]">
+                    <TableCell className="text-end font-medium text-[#F97316]">
                       {entry.currency} {parseFloat(entry.amount).toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right font-medium text-[#0A5ED7]">
+                    <TableCell className="text-end font-medium text-[#0A5ED7]">
                       {entry.currency} {parseFloat(entry.recoveredAmount || "0").toLocaleString()}
                     </TableCell>
                     <TableCell>
@@ -428,7 +428,7 @@ export default function LossAccount() {
                   <TableHead className="text-[#64748B]">{t('common.date', 'Date')}</TableHead>
                   <TableHead className="text-[#64748B]">{t('common.type', 'Type')}</TableHead>
                   <TableHead className="text-[#64748B]">{t('common.description', 'Description')}</TableHead>
-                  <TableHead className="text-right text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
+                  <TableHead className="text-end text-[#64748B]">{t('common.amount', 'Amount')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -439,7 +439,7 @@ export default function LossAccount() {
                       <TableCell className="text-[#0B1F3B] dark:text-white">{format(new Date(entry.lossDate), "dd/MM/yyyy")}</TableCell>
                       <TableCell className="capitalize text-[#0B1F3B] dark:text-white">{entry.lossType.replace("_", " ")}</TableCell>
                       <TableCell className="text-[#0B1F3B] dark:text-white">{entry.description}</TableCell>
-                      <TableCell className="text-right font-medium text-[#F97316]">
+                      <TableCell className="text-end font-medium text-[#F97316]">
                         {entry.currency} {parseFloat(entry.amount).toLocaleString()}
                       </TableCell>
                     </TableRow>
@@ -471,7 +471,7 @@ export default function LossAccount() {
                         style={{ width: `${(amount / totalLosses) * 100}%` }}
                       />
                     </div>
-                    <span className="font-medium w-24 text-right text-[#0B1F3B] dark:text-white">SAR {amount.toLocaleString()}</span>
+                    <span className="font-medium w-24 text-end text-[#0B1F3B] dark:text-white">SAR {amount.toLocaleString()}</span>
                   </div>
                 </div>
               ))}
@@ -503,11 +503,11 @@ export default function LossAccount() {
         <CardContent>
           <div className="flex gap-4">
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-pdf">
-              <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+              <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
               {t('lossAccount.exportPDF', 'Export PDF')}
             </Button>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export-excel">
-              <BarChart3 className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+              <BarChart3 className="h-4 w-4 me-2 text-[#0A5ED7]" />
               {t('lossAccount.exportExcel', 'Export Excel')}
             </Button>
           </div>

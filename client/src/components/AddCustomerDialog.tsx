@@ -108,7 +108,7 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button data-testid="button-add-customer">
-          <UserPlus className="w-4 h-4 mr-2" />
+          <UserPlus className="w-4 h-4 me-2" />
           Add Customer
         </Button>
       </DialogTrigger>
@@ -353,12 +353,12 @@ export function AddCustomerDialog({ defaultGarageId }: AddCustomerDialogProps) {
               >
                 {createCustomerMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 me-2 animate-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <UserPlus className="w-4 h-4 mr-2" />
+                    <UserPlus className="w-4 h-4 me-2" />
                     Create Customer
                   </>
                 )}

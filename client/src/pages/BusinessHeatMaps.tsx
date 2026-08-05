@@ -149,7 +149,7 @@ export default function BusinessHeatMaps() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="p-2 text-left text-sm font-semibold text-[#0B1F3B] dark:text-white">{t('heatmaps.hour', 'Hour')}</th>
+                    <th className="p-2 text-start text-sm font-semibold text-[#0B1F3B] dark:text-white">{t('heatmaps.hour', 'Hour')}</th>
                     {days.map(day => (
                       <th key={day} className="p-2 text-center text-sm font-semibold text-[#0B1F3B] dark:text-white">
                         {day}
@@ -260,7 +260,7 @@ export default function BusinessHeatMaps() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="p-2 text-left text-sm font-semibold text-[#0B1F3B] dark:text-white">{t('heatmaps.technician', 'Technician')}</th>
+                    <th className="p-2 text-start text-sm font-semibold text-[#0B1F3B] dark:text-white">{t('heatmaps.technician', 'Technician')}</th>
                     {days.map(day => (
                       <th key={day} className="p-2 text-center text-sm font-semibold text-[#0B1F3B] dark:text-white">
                         {day}

@@ -211,7 +211,7 @@ export default function ExpenseTracking() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white font-poppins"
           data-testid="button-create-category"
         >
-          <FolderPlus className="mr-2 h-4 w-4" />
+          <FolderPlus className="me-2 h-4 w-4" />
           {t('payments.expenses.createCategory', 'Create Category')}
         </Button>
       </div>
@@ -244,7 +244,7 @@ export default function ExpenseTracking() {
                           {category.description || "No description"}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         {category.budgetLimit && (
                           <div>
                             <p className="text-sm text-salis-gray dark:text-salis-gray-light font-poppins">{t('payments.expenses.budgetLimit', 'Budget Limit')}</p>

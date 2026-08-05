@@ -508,24 +508,24 @@ export default function FranchiseManagement() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.revenueSAR', 'Revenue (SAR)')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.totalJobsLabel', 'Total Jobs')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.completedLabel', 'Completed')}</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-500 w-48">{t('franchise.completionRate', 'Completion Rate')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.revenueSAR', 'Revenue (SAR)')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.totalJobsLabel', 'Total Jobs')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.completedLabel', 'Completed')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500 w-48">{t('franchise.completionRate', 'Completion Rate')}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {performance.map((row, idx) => (
                         <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1A1F2E]">
                           <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{row.location}</td>
-                          <td className="py-3 px-4 text-right font-semibold text-[#0A5ED7]">{Number(row.revenue || 0).toLocaleString()}</td>
-                          <td className="py-3 px-4 text-right">{Number(row.jobs || 0)}</td>
-                          <td className="py-3 px-4 text-right">{Number(row.completed || 0)}</td>
+                          <td className="py-3 px-4 text-end font-semibold text-[#0A5ED7]">{Number(row.revenue || 0).toLocaleString()}</td>
+                          <td className="py-3 px-4 text-end">{Number(row.jobs || 0)}</td>
+                          <td className="py-3 px-4 text-end">{Number(row.completed || 0)}</td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-3">
                               <Progress value={Number(row.completionRate || 0)} className="h-2 flex-1" />
-                              <span className="text-xs font-medium w-10 text-right">{Number(row.completionRate || 0)}%</span>
+                              <span className="text-xs font-medium w-10 text-end">{Number(row.completionRate || 0)}%</span>
                             </div>
                           </td>
                         </tr>
@@ -562,13 +562,13 @@ export default function FranchiseManagement() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.partName', 'Part Name')}</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.partNumber', 'Part Number')}</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.stock', 'Stock')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.minQty', 'Min Qty')}</th>
-                        <th className="text-right py-3 px-4 font-medium text-gray-500">{t('franchise.priceSAR', 'Price (SAR)')}</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-500">{t('common.status', 'Status')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500">{t('franchise.partName', 'Part Name')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500">{t('franchise.partNumber', 'Part Number')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500">{t('franchise.location', 'Location')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.stock', 'Stock')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.minQty', 'Min Qty')}</th>
+                        <th className="text-end py-3 px-4 font-medium text-gray-500">{t('franchise.priceSAR', 'Price (SAR)')}</th>
+                        <th className="text-start py-3 px-4 font-medium text-gray-500">{t('common.status', 'Status')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -579,9 +579,9 @@ export default function FranchiseManagement() {
                             <td className="py-3 px-4 font-medium text-gray-900 dark:text-white">{item.partName}</td>
                             <td className="py-3 px-4 text-gray-500">{item.partNumber}</td>
                             <td className="py-3 px-4">{item.location}</td>
-                            <td className="py-3 px-4 text-right font-semibold">{Number(item.stockQuantity)}</td>
-                            <td className="py-3 px-4 text-right">{Number(item.minQuantity)}</td>
-                            <td className="py-3 px-4 text-right">{Number(item.sellingPrice || 0).toLocaleString()}</td>
+                            <td className="py-3 px-4 text-end font-semibold">{Number(item.stockQuantity)}</td>
+                            <td className="py-3 px-4 text-end">{Number(item.minQuantity)}</td>
+                            <td className="py-3 px-4 text-end">{Number(item.sellingPrice || 0).toLocaleString()}</td>
                             <td className="py-3 px-4">
                               <Badge variant={isLow ? "destructive" : "default"}>{isLow ? t('franchise.lowStock', 'Low Stock') : t('franchise.inStock', 'In Stock')}</Badge>
                             </td>
@@ -606,7 +606,7 @@ export default function FranchiseManagement() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseGroups', 'Franchise Groups')}</h2>
             <Button onClick={() => { setEditingGroup(null); groupForm.reset(); setShowGroupDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-group">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('franchise.addFranchiseGroup', 'Add Franchise Group')}
             </Button>
           </div>
@@ -619,7 +619,7 @@ export default function FranchiseManagement() {
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.name', 'Name')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.headquarters', 'Headquarters')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -656,7 +656,7 @@ export default function FranchiseManagement() {
                             <Badge variant="secondary" data-testid="status-inactive">{t('common.inactive', 'Inactive')}</Badge>
                           )}
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
+                        <TableCell className="text-end space-x-2">
                           <Button variant="ghost" size="sm" onClick={() => handleEditGroup(group)} data-testid={`button-edit-${group.id}`}>
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -683,7 +683,7 @@ export default function FranchiseManagement() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseContracts', 'Franchise Contracts')}</h2>
             <Button onClick={() => { setEditingContract(null); contractForm.reset(); setShowContractDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-contract">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('franchise.addContract', 'Add Contract')}
             </Button>
           </div>
@@ -697,7 +697,7 @@ export default function FranchiseManagement() {
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.period', 'Period')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('franchise.fees', 'Fees')}</TableHead>
                     <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
-                    <TableHead className="text-[#0B1F3B] dark:text-white text-right">{t('common.actions', 'Actions')}</TableHead>
+                    <TableHead className="text-[#0B1F3B] dark:text-white text-end">{t('common.actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -725,7 +725,7 @@ export default function FranchiseManagement() {
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(contract.status || "active")}</TableCell>
-                        <TableCell className="text-right space-x-2">
+                        <TableCell className="text-end space-x-2">
                           <Button variant="ghost" size="sm" onClick={() => handleEditContract(contract)} data-testid={`button-edit-${contract.id}`}>
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -749,7 +749,7 @@ export default function FranchiseManagement() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.franchiseKpis', 'Franchise KPIs')}</h2>
             <Button onClick={() => { setEditingKpi(null); kpiForm.reset(); setShowKpiDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-kpi">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('franchise.addKpiReport', 'Add KPI Report')}
             </Button>
           </div>
@@ -775,7 +775,7 @@ export default function FranchiseManagement() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('franchise.revenueSharingRules', 'Revenue Sharing Rules')}</h2>
             <Button onClick={() => { setEditingRule(null); ruleForm.reset(); setShowRuleDialog(true); }} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-add-rule">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('franchise.addRevenueRule', 'Add Revenue Rule')}
             </Button>
           </div>

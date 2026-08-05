@@ -323,7 +323,7 @@ export function CustomerChatWidget() {
                         <button
                           key={ticket.id}
                           onClick={() => setActiveConversationId(ticket.conversationId)}
-                          className="w-full p-2 rounded-lg border border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30 hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0A5ED7]/10 transition-colors text-left bg-white dark:bg-[#151A23]"
+                          className="w-full p-2 rounded-lg border border-[#0A5ED7]/20 dark:border-[#0A5ED7]/30 hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0A5ED7]/10 transition-colors text-start bg-white dark:bg-[#151A23]"
                           data-testid={`button-ticket-${ticket.id}`}
                         >
                           <div className="flex items-center justify-between">
@@ -348,9 +348,9 @@ export function CustomerChatWidget() {
                   data-testid="button-start-chat"
                 >
                   {createTicketMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
+                    <Loader2 className="w-4 h-4 me-2 animate-spin" aria-hidden="true" />
                   ) : (
-                    <MessageCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+                    <MessageCircle className="w-4 h-4 me-2" aria-hidden="true" />
                   )}
                   {createTicketMutation.isPending 
                     ? t('supportChat.starting', 'Starting...')

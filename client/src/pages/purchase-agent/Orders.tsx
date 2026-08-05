@@ -141,7 +141,7 @@ export default function PurchaseAgentOrders() {
           </p>
         </div>
         <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-create-order">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           Create Order
         </Button>
       </div>
@@ -183,13 +183,13 @@ export default function PurchaseAgentOrders() {
                   placeholder="Search orders..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search"
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
-                  <Filter className="h-4 w-4 mr-2" />
+                  <Filter className="h-4 w-4 me-2" />
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -202,7 +202,7 @@ export default function PurchaseAgentOrders() {
               </Select>
             </div>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               Export
             </Button>
           </div>
@@ -223,7 +223,7 @@ export default function PurchaseAgentOrders() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Date</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Total</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
-                  <TableHead className="text-right text-[#0B1F3B] dark:text-white">Actions</TableHead>
+                  <TableHead className="text-end text-[#0B1F3B] dark:text-white">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -238,7 +238,7 @@ export default function PurchaseAgentOrders() {
                     </TableCell>
                     <TableCell className="font-semibold text-[#0B1F3B] dark:text-white">SAR {order.totalAmount}</TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"

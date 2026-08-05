@@ -89,7 +89,7 @@ export default function PartsSupplyNetwork() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.networkPartners', 'Network Partners')}</h2>
             <Button onClick={() => { partnerForm.reset(); setShowPartnerDialog(true); }} data-testid="button-add-partner">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('inventory.addPartner', 'Add Partner')}
             </Button>
           </div>
@@ -134,7 +134,7 @@ export default function PartsSupplyNetwork() {
           <div className="flex justify-between items-center">
             <h2 className="font-montserrat font-semibold text-lg text-gray-900 dark:text-white">{t('inventory.fulfillmentOrders', 'Fulfillment Orders')}</h2>
             <Button onClick={() => { orderForm.reset(); setShowOrderDialog(true); }} data-testid="button-add-order">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('inventory.createOrder', 'Create Order')}
             </Button>
           </div>

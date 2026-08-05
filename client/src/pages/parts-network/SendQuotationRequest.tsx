@@ -209,7 +209,7 @@ export default function SendQuotationRequest() {
                           <Input
                             {...field}
                             placeholder="مثال: طقم فحمات فرامل أمامي"
-                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-right text-[#0B1F3B] dark:text-white"
+                            className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-end text-[#0B1F3B] dark:text-white"
                             dir="rtl"
                             data-testid="input-part-name-ar"
                           />
@@ -258,7 +258,7 @@ export default function SendQuotationRequest() {
                           <button
                             type="button"
                             onClick={() => removeAlternativeBrand(brand)}
-                            className="ml-1 hover:text-red-500"
+                            className="ms-1 hover:text-red-500"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -266,7 +266,7 @@ export default function SendQuotationRequest() {
                       ))}
                       <Select onValueChange={addAlternativeBrand}>
                         <SelectTrigger className="w-32 h-7 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-sm">
-                          <Plus className="h-3 w-3 mr-1" />
+                          <Plus className="h-3 w-3 me-1" />
                           Add
                         </SelectTrigger>
                         <SelectContent>
@@ -510,7 +510,7 @@ export default function SendQuotationRequest() {
                       "Sending..."
                     ) : (
                       <>
-                        <Send className="mr-2 h-4 w-4" />
+                        <Send className="me-2 h-4 w-4" />
                         Send Request
                       </>
                     )}

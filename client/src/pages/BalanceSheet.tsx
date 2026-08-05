@@ -99,11 +99,11 @@ export default function BalanceSheet() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-print">
-            <Printer className="h-4 w-4 mr-2" />
+            <Printer className="h-4 w-4 me-2" />
             {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
         </div>
@@ -121,7 +121,7 @@ export default function BalanceSheet() {
           <Badge variant={isBalanced ? "default" : "destructive"} className="w-fit mx-auto">
             {isBalanced ? (
               <>
-                <CheckCircle className="h-3 w-3 mr-1" />
+                <CheckCircle className="h-3 w-3 me-1" />
                 {t('accounting.balanced', 'Balanced')}
               </>
             ) : (
@@ -135,8 +135,8 @@ export default function BalanceSheet() {
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[100px]">{t('accounting.code', 'Code')}</TableHead>
                 <TableHead>{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right">{t('accounting.currentPeriod', 'Current Period')}</TableHead>
-                <TableHead className="text-right">{t('accounting.previousPeriod', 'Previous Period')}</TableHead>
+                <TableHead className="text-end">{t('accounting.currentPeriod', 'Current Period')}</TableHead>
+                <TableHead className="text-end">{t('accounting.previousPeriod', 'Previous Period')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -146,57 +146,57 @@ export default function BalanceSheet() {
                 </TableCell>
               </TableRow>
               <TableRow className="bg-blue-50/50 dark:bg-blue-900/10">
-                <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 pl-6">
+                <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 ps-6">
                   {t('accounting.currentAssets', 'Current Assets')}
                 </TableCell>
               </TableRow>
               {currentAssets.map((item) => (
                 <TableRow key={item.code} data-testid={`row-asset-${item.code}`}>
-                  <TableCell className="font-mono text-sm pl-10">{item.code}</TableCell>
-                  <TableCell className={item.amount < 0 ? "pl-8" : ""}>
+                  <TableCell className="font-mono text-sm ps-10">{item.code}</TableCell>
+                  <TableCell className={item.amount < 0 ? "ps-8" : ""}>
                     {item.name}
                   </TableCell>
-                  <TableCell className={`text-right font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
+                  <TableCell className={`text-end font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
                     {item.amount < 0 ? `(${Math.abs(item.amount).toLocaleString()})` : item.amount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount < 0 ? `(${Math.abs(item.previousAmount).toLocaleString()})` : item.previousAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">{t('accounting.totalCurrentAssets', 'Total Current Assets')}</TableCell>
-                <TableCell className="text-right font-mono">{totalCurrentAssets.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="ps-6">{t('accounting.totalCurrentAssets', 'Total Current Assets')}</TableCell>
+                <TableCell className="text-end font-mono">{totalCurrentAssets.toLocaleString()}</TableCell>
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {currentAssets.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-blue-50/50 dark:bg-blue-900/10">
-                <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 pl-6">
+                <TableCell colSpan={4} className="font-semibold text-blue-600 dark:text-blue-300 ps-6">
                   {t('accounting.nonCurrentAssets', 'Non-Current Assets')}
                 </TableCell>
               </TableRow>
               {nonCurrentAssets.map((item) => (
                 <TableRow key={item.code} data-testid={`row-asset-${item.code}`}>
-                  <TableCell className="font-mono text-sm pl-10">{item.code}</TableCell>
-                  <TableCell className={item.amount < 0 ? "pl-8" : ""}>
+                  <TableCell className="font-mono text-sm ps-10">{item.code}</TableCell>
+                  <TableCell className={item.amount < 0 ? "ps-8" : ""}>
                     {item.name}
                   </TableCell>
-                  <TableCell className={`text-right font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
+                  <TableCell className={`text-end font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
                     {item.amount < 0 ? `(${Math.abs(item.amount).toLocaleString()})` : item.amount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount < 0 ? `(${Math.abs(item.previousAmount).toLocaleString()})` : item.previousAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">{t('accounting.totalNonCurrentAssets', 'Total Non-Current Assets')}</TableCell>
-                <TableCell className="text-right font-mono">{totalNonCurrentAssets.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="ps-6">{t('accounting.totalNonCurrentAssets', 'Total Non-Current Assets')}</TableCell>
+                <TableCell className="text-end font-mono">{totalNonCurrentAssets.toLocaleString()}</TableCell>
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {nonCurrentAssets.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -204,10 +204,10 @@ export default function BalanceSheet() {
               <TableRow className="bg-blue-100 dark:bg-blue-900/40 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('accounting.totalAssets', 'TOTAL ASSETS')}</TableCell>
-                <TableCell className="text-right font-mono text-blue-700 dark:text-blue-300">
+                <TableCell className="text-end font-mono text-blue-700 dark:text-blue-300">
                   {t('common.sar', 'SAR')} {totalAssets.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {t('common.sar', 'SAR')} {previousTotalAssets.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -218,49 +218,49 @@ export default function BalanceSheet() {
                 </TableCell>
               </TableRow>
               <TableRow className="bg-red-50/50 dark:bg-red-900/10">
-                <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 pl-6">
+                <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 ps-6">
                   {t('accounting.currentLiabilities', 'Current Liabilities')}
                 </TableCell>
               </TableRow>
               {currentLiabilities.map((item) => (
                 <TableRow key={item.code} data-testid={`row-liability-${item.code}`}>
-                  <TableCell className="font-mono text-sm pl-10">{item.code}</TableCell>
+                  <TableCell className="font-mono text-sm ps-10">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">{item.amount.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono">{item.amount.toLocaleString()}</TableCell>
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">{t('accounting.totalCurrentLiabilities', 'Total Current Liabilities')}</TableCell>
-                <TableCell className="text-right font-mono">{totalCurrentLiabilities.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="ps-6">{t('accounting.totalCurrentLiabilities', 'Total Current Liabilities')}</TableCell>
+                <TableCell className="text-end font-mono">{totalCurrentLiabilities.toLocaleString()}</TableCell>
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {currentLiabilities.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-red-50/50 dark:bg-red-900/10">
-                <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 pl-6">
+                <TableCell colSpan={4} className="font-semibold text-red-600 dark:text-red-300 ps-6">
                   {t('accounting.nonCurrentLiabilities', 'Non-Current Liabilities')}
                 </TableCell>
               </TableRow>
               {nonCurrentLiabilities.map((item) => (
                 <TableRow key={item.code} data-testid={`row-liability-${item.code}`}>
-                  <TableCell className="font-mono text-sm pl-10">{item.code}</TableCell>
+                  <TableCell className="font-mono text-sm ps-10">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right font-mono">{item.amount.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono">{item.amount.toLocaleString()}</TableCell>
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted/30 font-semibold">
                 <TableCell></TableCell>
-                <TableCell className="pl-6">{t('accounting.totalNonCurrentLiabilities', 'Total Non-Current Liabilities')}</TableCell>
-                <TableCell className="text-right font-mono">{totalNonCurrentLiabilities.toLocaleString()}</TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="ps-6">{t('accounting.totalNonCurrentLiabilities', 'Total Non-Current Liabilities')}</TableCell>
+                <TableCell className="text-end font-mono">{totalNonCurrentLiabilities.toLocaleString()}</TableCell>
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {nonCurrentLiabilities.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -268,10 +268,10 @@ export default function BalanceSheet() {
               <TableRow className="bg-red-100 dark:bg-red-900/40 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('accounting.totalLiabilities', 'TOTAL LIABILITIES')}</TableCell>
-                <TableCell className="text-right font-mono text-red-700 dark:text-red-300">
+                <TableCell className="text-end font-mono text-red-700 dark:text-red-300">
                   {t('common.sar', 'SAR')} {totalLiabilities.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {t('common.sar', 'SAR')} {[...currentLiabilities, ...nonCurrentLiabilities].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -283,12 +283,12 @@ export default function BalanceSheet() {
               </TableRow>
               {equity.map((item) => (
                 <TableRow key={item.code} data-testid={`row-equity-${item.code}`}>
-                  <TableCell className="font-mono text-sm pl-10">{item.code}</TableCell>
+                  <TableCell className="font-mono text-sm ps-10">{item.code}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell className={`text-right font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
+                  <TableCell className={`text-end font-mono ${item.amount < 0 ? "text-red-600" : ""}`}>
                     {item.amount < 0 ? `(${Math.abs(item.amount).toLocaleString()})` : item.amount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-end font-mono text-muted-foreground">
                     {item.previousAmount < 0 ? `(${Math.abs(item.previousAmount).toLocaleString()})` : item.previousAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
@@ -296,10 +296,10 @@ export default function BalanceSheet() {
               <TableRow className="bg-purple-100 dark:bg-purple-900/40 font-bold">
                 <TableCell></TableCell>
                 <TableCell>{t('accounting.totalEquity', 'TOTAL EQUITY')}</TableCell>
-                <TableCell className="text-right font-mono text-purple-700 dark:text-purple-300">
+                <TableCell className="text-end font-mono text-purple-700 dark:text-purple-300">
                   {t('common.sar', 'SAR')} {totalEquity.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {t('common.sar', 'SAR')} {equity.reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -307,10 +307,10 @@ export default function BalanceSheet() {
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
                 <TableCell></TableCell>
                 <TableCell>{t('accounting.totalLiabilitiesAndEquity', 'TOTAL LIABILITIES & EQUITY')}</TableCell>
-                <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
+                <TableCell className="text-end font-mono text-green-700 dark:text-green-300">
                   {t('common.sar', 'SAR')} {totalLiabilitiesAndEquity.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground">
+                <TableCell className="text-end font-mono text-muted-foreground">
                   {t('common.sar', 'SAR')} {[...currentLiabilities, ...nonCurrentLiabilities, ...equity].reduce((sum, item) => sum + item.previousAmount, 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -455,30 +455,30 @@ export default function BalanceSheet() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('accounting.incomeStatement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/cash-flow-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-cash-flow">
-                <BarChart3 className="h-4 w-4 mr-2" />
+                <BarChart3 className="h-4 w-4 me-2" />
                 {t('accounting.cashFlow', 'Cash Flow')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/equity-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-equity">
-                <Wallet className="h-4 w-4 mr-2" />
+                <Wallet className="h-4 w-4 me-2" />
                 {t('accounting.equityManagement', 'Equity Management')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/assets-management">
               <Button variant="outline" className="w-full justify-start" data-testid="link-assets">
-                <Building2 className="h-4 w-4 mr-2" />
+                <Building2 className="h-4 w-4 me-2" />
                 {t('accounting.assetsManagement', 'Assets Management')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>

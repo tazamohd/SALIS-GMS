@@ -361,7 +361,7 @@ export default function LoanerVehicles() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-loaner"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.addLoanerVehicle', 'Add Loaner Vehicle')}
         </Button>
       </div>
@@ -458,7 +458,7 @@ export default function LoanerVehicles() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90"
           data-testid="button-create-reservation"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.createReservation', 'Create Reservation')}
         </Button>
       </div>

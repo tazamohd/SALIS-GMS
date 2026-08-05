@@ -111,7 +111,7 @@ export function AddPaymentDialog({ invoice }: AddPaymentDialogProps) {
           disabled={!canAddPayment}
           data-testid="button-add-payment"
         >
-          <DollarSign className="w-4 h-4 mr-2" />
+          <DollarSign className="w-4 h-4 me-2" />
           Add Payment
         </Button>
       </DialogTrigger>

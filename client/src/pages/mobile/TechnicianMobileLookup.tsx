@@ -41,7 +41,7 @@ export default function TechnicianMobileLookup() {
               placeholder="Search by part name, number, or SKU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white placeholder:text-[#64748B]"
               data-testid="input-search-parts"
             />
           </div>
@@ -53,7 +53,7 @@ export default function TechnicianMobileLookup() {
             }}
             data-testid="button-scan-barcode"
           >
-            <QrCode className="h-4 w-4 mr-2" />
+            <QrCode className="h-4 w-4 me-2" />
             Scan Barcode
           </Button>
         </CardContent>

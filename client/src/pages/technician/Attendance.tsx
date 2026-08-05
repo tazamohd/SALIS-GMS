@@ -253,7 +253,7 @@ export default function TechnicianAttendance() {
               className="w-full border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="button-refresh-location"
             >
-              <Navigation className="h-4 w-4 mr-2" />
+              <Navigation className="h-4 w-4 me-2" />
               Refresh Location
             </Button>
           </CardContent>
@@ -288,7 +288,7 @@ export default function TechnicianAttendance() {
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                 data-testid="button-check-in"
               >
-                <LogIn className="h-4 w-4 mr-2" />
+                <LogIn className="h-4 w-4 me-2" />
                 Check In
               </Button>
               <Button
@@ -297,7 +297,7 @@ export default function TechnicianAttendance() {
                 variant="destructive"
                 data-testid="button-check-out"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4 me-2" />
                 Check Out
               </Button>
             </div>

@@ -248,7 +248,7 @@ export default function SalesGuide() {
           placeholder={t('salesGuide.searchProcesses', 'Search processes...')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+          className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
           data-testid="input-search-process"
         />
       </div>
@@ -274,7 +274,7 @@ export default function SalesGuide() {
                         <Icon className="h-5 w-5 text-[#0A5ED7]" />
                         {process.title}
                       </CardTitle>
-                      <CardDescription className="text-right font-arabic text-[#64748B]">{process.titleAr}</CardDescription>
+                      <CardDescription className="text-end font-arabic text-[#64748B]">{process.titleAr}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -321,7 +321,7 @@ export default function SalesGuide() {
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-5 w-5 text-[#0A5ED7]" />
-                <div className="text-left">
+                <div className="text-start">
                   <p className="font-medium text-[#0B1F3B] dark:text-white">{script.scenario}</p>
                   <p className="text-sm text-[#64748B]">{script.scenarioAr}</p>
                 </div>
@@ -341,10 +341,10 @@ export default function SalesGuide() {
                   <h4 className="font-medium mb-3 text-[#0B1F3B] dark:text-white">{t('salesGuide.commonObjections', 'Common Objections & Responses')}</h4>
                   <div className="space-y-3">
                     {script.objections.map((obj, i) => (
-                      <div key={i} className="border-l-4 border-[#E2E8F0] dark:border-[#232A36] pl-4">
+                      <div key={i} className="border-l-4 border-[#E2E8F0] dark:border-[#232A36] ps-4">
                         <p className="font-medium text-[#F97316]">❝ {obj.objection}</p>
                         <p className="mt-1 text-green-600 dark:text-green-400">
-                          <ArrowRight className="h-4 w-4 inline mr-1" />
+                          <ArrowRight className="h-4 w-4 inline me-1" />
                           {obj.response}
                         </p>
                       </div>
@@ -432,19 +432,19 @@ export default function SalesGuide() {
           <CardContent>
             <div className="space-y-2">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-pricing-guide">
-                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.servicePricingGuide', 'Service Pricing Guide')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-comparison-chart">
-                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.packageComparisonChart', 'Package Comparison Chart')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-warranty-info">
-                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.warrantyInformation', 'Warranty Information')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-promotions">
-                <FileText className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <FileText className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.currentPromotions', 'Current Promotions')}
               </Button>
             </div>
@@ -459,19 +459,19 @@ export default function SalesGuide() {
           <CardContent>
             <div className="space-y-2">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-greeting">
-                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <PlayCircle className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.customerGreetingTechniques', 'Customer Greeting Techniques')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-objections">
-                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <PlayCircle className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.handlingPriceObjections', 'Handling Price Objections')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-upselling">
-                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <PlayCircle className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.effectiveUpselling', 'Effective Upselling')}
               </Button>
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-video-closing">
-                <PlayCircle className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+                <PlayCircle className="h-4 w-4 me-2 text-[#0A5ED7]" />
                 {t('salesGuide.closingTechniques', 'Closing Techniques')}
               </Button>
             </div>
@@ -487,11 +487,11 @@ export default function SalesGuide() {
         <CardContent>
           <div className="flex gap-4">
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-call-support">
-              <Phone className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+              <Phone className="h-4 w-4 me-2 text-[#0A5ED7]" />
               {t('salesGuide.callSalesManager', 'Call Sales Manager')}
             </Button>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-email-support">
-              <Mail className="h-4 w-4 mr-2 text-[#0A5ED7]" />
+              <Mail className="h-4 w-4 me-2 text-[#0A5ED7]" />
               {t('salesGuide.emailSupport', 'Email Support')}
             </Button>
           </div>

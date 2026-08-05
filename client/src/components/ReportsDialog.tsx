@@ -269,7 +269,7 @@ export function ReportsDialog({ open, onOpenChange }: ReportsDialogProps) {
             className="flex-1"
             data-testid="button-export-txt"
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 me-2" />
             Export as TXT
           </Button>
           <Button
@@ -278,7 +278,7 @@ export function ReportsDialog({ open, onOpenChange }: ReportsDialogProps) {
             className="flex-1"
             data-testid="button-export-json"
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 me-2" />
             Export as JSON
           </Button>
         </div>

@@ -213,7 +213,7 @@ export function PurchaseOrders() {
               {po.status === 'draft' && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'sent')}>
-                    <Send className="w-4 h-4 mr-2" />
+                    <Send className="w-4 h-4 me-2" />
                     {t('inventory.sendToSupplier', 'Send to Supplier')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -222,7 +222,7 @@ export function PurchaseOrders() {
               {po.status === 'sent' && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'confirmed')}>
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <CheckCircle className="w-4 h-4 me-2" />
                     {t('inventory.markAsConfirmed', 'Mark as Confirmed')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -231,11 +231,11 @@ export function PurchaseOrders() {
               {po.status === 'confirmed' && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'partial')}>
-                    <PackageIcon className="w-4 h-4 mr-2" />
+                    <PackageIcon className="w-4 h-4 me-2" />
                     {t('inventory.markAsPartiallyReceived', 'Mark as Partially Received')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <CheckCircle className="w-4 h-4 me-2" />
                     {t('inventory.markAsFullyReceived', 'Mark as Fully Received')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -244,7 +244,7 @@ export function PurchaseOrders() {
               {po.status === 'partial' && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'received')}>
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <CheckCircle className="w-4 h-4 me-2" />
                     {t('inventory.markAsFullyReceived', 'Mark as Fully Received')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -253,7 +253,7 @@ export function PurchaseOrders() {
               {['draft', 'sent'].includes(po.status) && (
                 <>
                   <DropdownMenuItem onClick={() => handleStatusChange(po, 'cancelled')}>
-                    <XCircle className="w-4 h-4 mr-2" />
+                    <XCircle className="w-4 h-4 me-2" />
                     {t('inventory.cancelOrder', 'Cancel Order')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -264,7 +264,7 @@ export function PurchaseOrders() {
                   onClick={() => handleDelete(po)}
                   className="text-[#F97316]"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4 me-2" />
                   {t('common.delete', 'Delete')}
                 </DropdownMenuItem>
               )}

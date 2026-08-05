@@ -597,7 +597,7 @@ function SendMessageTab() {
                 onChange={(e) => {
                   setCustomerSearch(e.target.value);
                 }}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-customer-search"
               />
             </div>
@@ -707,7 +707,7 @@ function SendMessageTab() {
             disabled={!selectedTemplateId || !customerPhone || !customerName || sendMutation.isPending}
             data-testid="button-send-message"
           >
-            <Send className="h-4 w-4 mr-2" />
+            <Send className="h-4 w-4 me-2" />
             {sendMutation.isPending
               ? t("whatsapp.sending", "Sending...")
               : t("whatsapp.sendWhatsApp", "Send WhatsApp Message")}

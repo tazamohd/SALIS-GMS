@@ -238,7 +238,7 @@ export default function PublicTracking() {
                             <h4 className="font-semibold text-[#0B1F3B] dark:text-white">
                               {event.title}
                             </h4>
-                            <span className="text-sm text-[#64748B] ml-4">
+                            <span className="text-sm text-[#64748B] ms-4">
                               {format(new Date(event.createdAt), 'PPp')}
                             </span>
                           </div>

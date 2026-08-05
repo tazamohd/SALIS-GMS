@@ -333,7 +333,7 @@ export default function Vehicles() {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
           data-testid="button-add-vehicle"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {t('vehicles.addVehicle', 'Add Vehicle')}
         </Button>
       </DialogTrigger>
@@ -400,7 +400,7 @@ export default function Vehicles() {
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <>
-                          <ScanLine className="w-4 h-4 mr-1" />
+                          <ScanLine className="w-4 h-4 me-1" />
                           {t('vehicles.decodeVin', 'Decode')}
                         </>
                       )}
@@ -757,7 +757,7 @@ export default function Vehicles() {
                   className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
                   data-testid="button-attach-vehicle-registration"
                 >
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload className="w-4 h-4 me-2" />
                   {t('vehicles.vehicleRegistration', 'Vehicle Registration')}
                 </Button>
                 <Button
@@ -766,7 +766,7 @@ export default function Vehicles() {
                   className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
                   data-testid="button-attach-insurance"
                 >
-                  <Upload className="w-4 h-4 mr-2" />
+                  <Upload className="w-4 h-4 me-2" />
                   {t('vehicles.insuranceDoc', 'Insurance Document')}
                 </Button>
                 <Button
@@ -775,7 +775,7 @@ export default function Vehicles() {
                   className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
                   data-testid="button-attach-id-photo"
                 >
-                  <Camera className="w-4 h-4 mr-2" />
+                  <Camera className="w-4 h-4 me-2" />
                   {t('vehicles.idPhoto', 'ID Photo')}
                 </Button>
                 <Button
@@ -784,7 +784,7 @@ export default function Vehicles() {
                   className="justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#64748B] hover:bg-[#0A5ED7]/10 hover:text-[#0A5ED7] hover:border-[#0A5ED7]"
                   data-testid="button-attach-vehicle-photo"
                 >
-                  <Camera className="w-4 h-4 mr-2" />
+                  <Camera className="w-4 h-4 me-2" />
                   {t('vehicles.vehiclePhotos', 'Vehicle Photos')}
                 </Button>
               </div>
@@ -874,7 +874,7 @@ export default function Vehicles() {
               placeholder={t('vehicles.searchVehicles', 'Search vehicles...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-transparent border-0 focus:ring-0 text-[#0B1F3B] dark:text-white"
+              className="ps-10 bg-transparent border-0 focus:ring-0 text-[#0B1F3B] dark:text-white"
               data-testid="input-search-vehicles"
             />
           </div>
@@ -967,7 +967,7 @@ export default function Vehicles() {
                         className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-edit-vehicle-${vehicle.id}`}
                       >
-                        <Edit className="w-4 h-4 mr-1" />
+                        <Edit className="w-4 h-4 me-1" />
                         {t('common.edit', 'Edit')}
                       </Button>
                       <Button
@@ -977,7 +977,7 @@ export default function Vehicles() {
                         className="flex-1 border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
                         data-testid={`button-delete-vehicle-${vehicle.id}`}
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
+                        <Trash2 className="w-4 h-4 me-1" />
                         {t('common.delete', 'Delete')}
                       </Button>
                     </div>

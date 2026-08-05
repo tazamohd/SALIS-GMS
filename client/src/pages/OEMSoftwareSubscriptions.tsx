@@ -109,7 +109,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-catalog"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addVendor', 'Add Vendor')}
         </Button>
       </div>
@@ -154,7 +154,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-product"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addProduct', 'Add Product')}
         </Button>
       </div>
@@ -201,7 +201,7 @@ export default function OEMSoftwareSubscriptions() {
           data-testid="button-add-license"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('oem.addLicense', 'Add License')}
         </Button>
       </div>

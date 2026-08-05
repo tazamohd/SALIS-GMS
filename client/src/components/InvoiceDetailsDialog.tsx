@@ -236,11 +236,11 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
                 <table className="w-full">
                   <thead className="bg-neon-blue/20/30">
                     <tr>
-                      <th className="text-left p-3 text-sm font-medium text-soft-white/70">Type</th>
-                      <th className="text-left p-3 text-sm font-medium text-soft-white/70">Description</th>
-                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Quantity</th>
-                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Unit Price</th>
-                      <th className="text-right p-3 text-sm font-medium text-soft-white/70">Total</th>
+                      <th className="text-start p-3 text-sm font-medium text-soft-white/70">Type</th>
+                      <th className="text-start p-3 text-sm font-medium text-soft-white/70">Description</th>
+                      <th className="text-end p-3 text-sm font-medium text-soft-white/70">Quantity</th>
+                      <th className="text-end p-3 text-sm font-medium text-soft-white/70">Unit Price</th>
+                      <th className="text-end p-3 text-sm font-medium text-soft-white/70">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -248,9 +248,9 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
                       <tr key={item.id} className="border-t border-neon-blue/30" data-testid={`invoice-item-${item.id}`}>
                         <td className="p-3 capitalize text-soft-white">{item.itemType}</td>
                         <td className="p-3 text-soft-white">{item.description}</td>
-                        <td className="p-3 text-right text-soft-white">{item.quantity}</td>
-                        <td className="p-3 text-right text-soft-white">SAR {parseFloat(item.unitPrice).toFixed(2)}</td>
-                        <td className="p-3 text-right font-medium text-soft-white">
+                        <td className="p-3 text-end text-soft-white">{item.quantity}</td>
+                        <td className="p-3 text-end text-soft-white">SAR {parseFloat(item.unitPrice).toFixed(2)}</td>
+                        <td className="p-3 text-end font-medium text-soft-white">
                           ${parseFloat(item.lineTotal).toFixed(2)}
                         </td>
                       </tr>
@@ -330,7 +330,7 @@ export function InvoiceDetailsDialog({ invoice: propInvoice, invoiceId, customer
                   onClick={() => setDeleteDialogOpen(true)}
                   data-testid="button-delete-invoice"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4 me-2" />
                   Delete Invoice
                 </Button>
               </div>

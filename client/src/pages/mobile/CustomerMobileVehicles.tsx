@@ -33,7 +33,7 @@ export default function CustomerMobileVehicles() {
         </div>
         <Link href="/vehicles">
           <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6]" data-testid="button-add-vehicle">
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 me-1" />
             Add
           </Button>
         </Link>
@@ -84,7 +84,7 @@ export default function CustomerMobileVehicles() {
                     className="w-full border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`button-book-${vehicle.id}`}
                   >
-                    <Calendar className="h-4 w-4 mr-1" />
+                    <Calendar className="h-4 w-4 me-1" />
                     Book Service
                   </Button>
                 </Link>
@@ -95,7 +95,7 @@ export default function CustomerMobileVehicles() {
                     className="w-full border-[#E2E8F0] dark:border-[#232A36]"
                     data-testid={`button-history-${vehicle.id}`}
                   >
-                    <Wrench className="h-4 w-4 mr-1" />
+                    <Wrench className="h-4 w-4 me-1" />
                     History
                   </Button>
                 </Link>
@@ -114,7 +114,7 @@ export default function CustomerMobileVehicles() {
               </p>
               <Link href="/vehicles">
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952c0] hover:to-[#09a0e6]">
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Plus className="h-4 w-4 me-1" />
                   Add Vehicle
                 </Button>
               </Link>

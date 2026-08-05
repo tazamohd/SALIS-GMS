@@ -298,7 +298,7 @@ export default function DocumentOCR() {
                   data-testid="button-edit-data"
                   className="border-[#E2E8F0] dark:border-[#232A36]"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 me-2" />
                   {t('common.edit', 'Edit')}
                 </Button>
               )}
@@ -350,11 +350,11 @@ export default function DocumentOCR() {
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setEditMode(false)} data-testid="button-cancel-edit" className="border-[#E2E8F0] dark:border-[#232A36]">
-                      <X className="h-4 w-4 mr-2" />
+                      <X className="h-4 w-4 me-2" />
                       {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button onClick={handleSaveEdits} disabled={updateMutation.isPending} data-testid="button-save-edit" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white">
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4 me-2" />
                       {updateMutation.isPending ? t('documentOCR.saving', 'Saving...') : t('documentOCR.saveChanges', 'Save Changes')}
                     </Button>
                   </DialogFooter>

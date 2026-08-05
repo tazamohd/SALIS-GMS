@@ -158,14 +158,14 @@ export default function MyRequests() {
             placeholder="Search by part name, number, or request ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
         <div className="flex gap-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-status-filter">
-              <Filter className="h-4 w-4 mr-2" />
+              <Filter className="h-4 w-4 me-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -179,7 +179,7 @@ export default function MyRequests() {
           </Select>
           <Link href="/parts-network/send-request">
             <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="btn-new-request">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               New Request
             </Button>
           </Link>
@@ -200,7 +200,7 @@ export default function MyRequests() {
               </p>
               <Link href="/parts-network/send-request">
                 <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   Send Request
                 </Button>
               </Link>
@@ -268,12 +268,12 @@ export default function MyRequests() {
                     <div className="flex gap-2 mt-2">
                       <Link href={`/parts-network/requests/${request.id}`}>
                         <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]" data-testid={`btn-view-${request.id}`}>
-                          <Eye className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4 me-1" />
                           View
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7]" data-testid={`btn-messages-${request.id}`}>
-                        <MessageSquare className="h-4 w-4 mr-1" />
+                        <MessageSquare className="h-4 w-4 me-1" />
                         Messages
                       </Button>
                     </div>

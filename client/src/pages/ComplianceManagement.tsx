@@ -228,7 +228,7 @@ export default function ComplianceManagement() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-schedule-audit"
             >
-              <ClipboardCheck className="mr-2 h-4 w-4" />
+              <ClipboardCheck className="me-2 h-4 w-4" />
               {t('compliance.scheduleAudit', 'Schedule Audit')}
             </Button>
           </div>
@@ -295,7 +295,7 @@ export default function ComplianceManagement() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-create-task"
             >
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="me-2 h-4 w-4" />
               {t('compliance.createTask', 'Create Task')}
             </Button>
           </div>

@@ -97,7 +97,7 @@ export default function PaymentTracking() {
     const { className, label, icon: Icon } = config[status] || config.pending;
     return (
       <Badge className={className}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {label}
       </Badge>
     );
@@ -159,12 +159,12 @@ export default function PaymentTracking() {
                   placeholder="Search payments..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-9 w-64 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-payments"
                 />
               </div>
               <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-payments">
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 me-2" />
                 Export
               </Button>
             </div>
@@ -185,10 +185,10 @@ export default function PaymentTracking() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                      <th className="text-left py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Order</th>
-                      <th className="text-left py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Supplier</th>
-                      <th className="text-left py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Invoice</th>
-                      <th className="text-right py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Amount</th>
+                      <th className="text-start py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Order</th>
+                      <th className="text-start py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Supplier</th>
+                      <th className="text-start py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Invoice</th>
+                      <th className="text-end py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Amount</th>
                       <th className="text-center py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Due Date</th>
                       <th className="text-center py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Status</th>
                       <th className="text-center py-3 px-4 font-medium text-[#0B1F3B] dark:text-white">Actions</th>
@@ -218,7 +218,7 @@ export default function PaymentTracking() {
                           <td className="py-3 px-4">
                             <span className="font-mono text-sm text-[#0B1F3B] dark:text-white">{payment.invoiceNumber}</span>
                           </td>
-                          <td className="py-3 px-4 text-right">
+                          <td className="py-3 px-4 text-end">
                             <span className="font-semibold text-[#0B1F3B] dark:text-white">{payment.amount.toLocaleString()} {payment.currency}</span>
                           </td>
                           <td className="py-3 px-4 text-center">
@@ -321,12 +321,12 @@ export default function PaymentTracking() {
                                   <div className="flex justify-end gap-2 pt-4">
                                     {payment.status === "overdue" && (
                                       <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-send-reminder">
-                                        <Send className="h-4 w-4 mr-2" />
+                                        <Send className="h-4 w-4 me-2" />
                                         Send Reminder
                                       </Button>
                                     )}
                                     <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-download-invoice">
-                                      <Download className="h-4 w-4 mr-2" />
+                                      <Download className="h-4 w-4 me-2" />
                                       Download Invoice
                                     </Button>
                                   </div>

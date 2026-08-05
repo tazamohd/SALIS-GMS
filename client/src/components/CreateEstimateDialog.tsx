@@ -189,7 +189,7 @@ export function CreateEstimateDialog({ open: controlledOpen, onOpenChange }: Cre
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-gray-800 dark:bg-gray-200 hover:bg-gray-900 dark:hover:bg-gray-300 text-white dark:text-black" data-testid="button-create-estimate">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Create Estimate
         </Button>
       </DialogTrigger>

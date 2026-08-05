@@ -164,7 +164,7 @@ export function CreatePurchaseOrderDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700" data-testid="button-create-po">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Create Purchase Order
         </Button>
       </DialogTrigger>
@@ -306,7 +306,7 @@ export function CreatePurchaseOrderDialog() {
                     <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded" data-testid={`item-row-${index}`}>
                       <div className="flex-1">
                         <span className="font-medium">{item.partName}</span>
-                        {item.partNumber && <span className="text-sm text-gray-500 ml-2">({item.partNumber})</span>}
+                        {item.partNumber && <span className="text-sm text-gray-500 ms-2">({item.partNumber})</span>}
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm">Qty: {item.quantity}</span>

@@ -44,7 +44,7 @@ export default function NotFound() {
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952C0] hover:to-[#0AA3EE] text-white shadow-lg shadow-[#0A5ED7]/25"
               >
                 <Link href="/">
-                  <Home className="mr-2 h-4 w-4" />
+                  <Home className="me-2 h-4 w-4" />
                   {t('common.home', 'Go Home')}
                 </Link>
               </Button>
@@ -53,7 +53,7 @@ export default function NotFound() {
                 onClick={() => window.history.back()}
                 className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0] hover:bg-gray-50 dark:hover:bg-[#1a2030]"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="me-2 h-4 w-4" />
                 {t('common.goBack', 'Go Back')}
               </Button>
             </div>

@@ -110,7 +110,7 @@ export default function Marketplace() {
               onChange={(e) => setQ(e.target.value)}
               placeholder={t("marketplace.searchPlaceholder", "Search a service (e.g. brakes) or a business name…")}
               data-testid="input-search"
-              className="pl-9 h-11 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+              className="ps-9 h-11 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             />
           </div>
           <div className="flex gap-1 flex-wrap">
@@ -123,7 +123,7 @@ export default function Marketplace() {
                 data-testid={`filter-${ty.id || "all"}`}
                 className={type === ty.id ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""}
               >
-                <ty.icon className="h-3.5 w-3.5 mr-1" />{t(ty.key, ty.label)}
+                <ty.icon className="h-3.5 w-3.5 me-1" />{t(ty.key, ty.label)}
               </Button>
             ))}
           </div>
@@ -139,7 +139,7 @@ export default function Marketplace() {
                   key={s.id}
                   onClick={() => setSelected(s.providerId)}
                   data-testid={`service-hit-${s.id}`}
-                  className="text-left p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition"
+                  className="text-start p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] transition"
                 >
                   <div className="font-medium text-[#0B1F3B] dark:text-white">{s.name}</div>
                   <div className="text-xs text-[#64748B]">{s.category} · {t("marketplace.offeredBy", "offered by")} {s.providerName}{s.providerCity ? ` · ${s.providerCity}` : ""}</div>
@@ -162,7 +162,7 @@ export default function Marketplace() {
                   key={p.id}
                   onClick={() => setSelected(p.id)}
                   data-testid={`provider-card-${p.id}`}
-                  className="text-left"
+                  className="text-start"
                 >
                   <Card className="h-full border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] hover:shadow-lg transition">
                     <CardContent className="p-5">
@@ -374,7 +374,7 @@ function OrderForm({ providerId, products, onDone }: { providerId: string; produ
             type="number" min={0} max={999} value={qty[p.id] ?? 0}
             onChange={(e) => setQty((q) => ({ ...q, [p.id]: Math.max(0, parseInt(e.target.value || "0", 10)) }))}
             data-testid={`order-qty-${p.id}`}
-            className="w-16 h-8 rounded-md px-2 text-right bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]"
+            className="w-16 h-8 rounded-md px-2 text-end bg-white dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]"
           />
         </div>
       ))}

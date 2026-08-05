@@ -111,7 +111,7 @@ export default function PredictiveDiagnostics() {
     const Icon = variant.icon;
     return (
       <Badge className={variant.className}>
-        <Icon className="w-3 h-3 mr-1" />
+        <Icon className="w-3 h-3 me-1" />
         {variant.label}
       </Badge>
     );
@@ -301,12 +301,12 @@ export default function PredictiveDiagnostics() {
             >
               {predictMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   {t('predictiveDiagnostics.analyzing', 'Analyzing...')}
                 </>
               ) : (
                 <>
-                  <Brain className="w-4 h-4 mr-2" />
+                  <Brain className="w-4 h-4 me-2" />
                   {t('predictiveDiagnostics.generateAIPrediction', 'Generate AI Prediction')}
                 </>
               )}

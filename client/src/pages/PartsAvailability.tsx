@@ -104,12 +104,12 @@ export function PartsAvailability() {
 
   const getStatusBadge = (status: string, quantity: number) => {
     if (status === 'backordered' || quantity === 0) {
-      return <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-0" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 mr-1" />{t('partsAvailability.outOfStock', 'Out of Stock')}</Badge>;
+      return <Badge className="bg-red-500/10 text-red-700 dark:text-red-400 border-0" data-testid={`badge-status-${status}`}><XCircle className="w-3 h-3 me-1" />{t('partsAvailability.outOfStock', 'Out of Stock')}</Badge>;
     }
     if (quantity < 5) {
-      return <Badge className="bg-[#F97316]/10 text-[#F97316] border-0" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 mr-1" />{t('partsAvailability.lowStock', 'Low Stock')}</Badge>;
+      return <Badge className="bg-[#F97316]/10 text-[#F97316] border-0" data-testid="badge-status-low"><AlertCircle className="w-3 h-3 me-1" />{t('partsAvailability.lowStock', 'Low Stock')}</Badge>;
     }
-    return <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 mr-1" />{t('partsAvailability.inStock', 'In Stock')}</Badge>;
+    return <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-0" data-testid="badge-status-available"><CheckCircle className="w-3 h-3 me-1" />{t('partsAvailability.inStock', 'In Stock')}</Badge>;
   };
 
   return (
@@ -142,7 +142,7 @@ export function PartsAvailability() {
               data-testid="input-search-parts"
             />
             <Button onClick={handleSearch} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-search">
-              <Search className="w-4 h-4 mr-2" />
+              <Search className="w-4 h-4 me-2" />
               {t('common.search', 'Search')}
             </Button>
           </div>
@@ -193,21 +193,21 @@ export function PartsAvailability() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center text-sm">
-                  <Package className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <Package className="w-4 h-4 me-2 text-[#64748B]" />
                   <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-quantity-${item.id}`}>
                     <strong>{t('partsAvailability.quantity', 'Quantity')}:</strong> {item.quantityAvailable || 0} {t('partsAvailability.units', 'units')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
-                  <DollarSign className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <DollarSign className="w-4 h-4 me-2 text-[#64748B]" />
                   <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-price-${item.id}`}>
                     <strong>{t('partsAvailability.price', 'Price')}:</strong> {item.pricePerUnit ? `${item.pricePerUnit} ${item.currency}` : t('common.na', 'N/A')}
                   </span>
                 </div>
                 
                 <div className="flex items-center text-sm">
-                  <Clock className="w-4 h-4 mr-2 text-[#64748B]" />
+                  <Clock className="w-4 h-4 me-2 text-[#64748B]" />
                   <span className="text-[#0B1F3B] dark:text-white" data-testid={`text-lead-time-${item.id}`}>
                     <strong>{t('partsAvailability.leadTime', 'Lead Time')}:</strong> {item.leadTimeDays ? `${item.leadTimeDays} ${t('partsAvailability.days', 'days')}` : t('common.na', 'N/A')}
                   </span>

@@ -197,7 +197,7 @@ export default function TechnicianDashboard() {
                     </p>
                     {job.scheduledDate && (
                       <p className="text-xs text-[#64748B] mt-1">
-                        <Clock className="h-3 w-3 inline mr-1" />
+                        <Clock className="h-3 w-3 inline me-1" />
                         {format(new Date(job.scheduledDate), "h:mm a")}
                       </p>
                     )}

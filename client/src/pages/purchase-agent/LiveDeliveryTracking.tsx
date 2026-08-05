@@ -146,7 +146,7 @@ export default function LiveDeliveryTracking() {
           </div>
         </div>
         <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" onClick={handleRefresh} data-testid="button-refresh">
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <RefreshCw className="h-4 w-4 me-2" />
           Refresh
         </Button>
       </div>
@@ -169,7 +169,7 @@ export default function LiveDeliveryTracking() {
           </div>
           <div className="mt-4">
             <Progress value={progress} className="h-3" />
-            <p className="text-xs text-[#64748B] mt-2 text-right">Last updated: {lastUpdate}</p>
+            <p className="text-xs text-[#64748B] mt-2 text-end">Last updated: {lastUpdate}</p>
           </div>
         </CardContent>
       </Card>
@@ -188,7 +188,7 @@ export default function LiveDeliveryTracking() {
               <div className="relative">
                 {delivery.stages.map((stage, index) => (
                   <div key={stage.stage} className="flex items-start mb-8 last:mb-0" data-testid={`stage-${stage.stage}`}>
-                    <div className="relative flex flex-col items-center mr-4">
+                    <div className="relative flex flex-col items-center me-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                         stage.completed 
                           ? "bg-green-100 dark:bg-green-900/30" 
@@ -282,11 +282,11 @@ export default function LiveDeliveryTracking() {
               </div>
               <div className="flex gap-2">
                 <Button className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-call-driver">
-                  <Phone className="h-4 w-4 mr-2" />
+                  <Phone className="h-4 w-4 me-2" />
                   Call
                 </Button>
                 <Button className="flex-1 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-message-driver">
-                  <MessageSquare className="h-4 w-4 mr-2" />
+                  <MessageSquare className="h-4 w-4 me-2" />
                   Message
                 </Button>
               </div>
@@ -351,7 +351,7 @@ export default function LiveDeliveryTracking() {
                 </div>
               </div>
               <Button className="w-full mt-4 border-[#E2E8F0] dark:border-[#232A36]" variant="outline" data-testid="button-notify-storekeeper">
-                <Phone className="h-4 w-4 mr-2" />
+                <Phone className="h-4 w-4 me-2" />
                 Notify Store Keeper
               </Button>
             </CardContent>

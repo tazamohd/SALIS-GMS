@@ -73,7 +73,7 @@ export default function ProviderBookings() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("marketplace.service", "Service")}</TableHead><TableHead>{t("marketplace.vehicle", "Vehicle")}</TableHead><TableHead>{t("myBookings.preferred", "Preferred")}</TableHead>
-                    <TableHead>{t("common.status", "Status")}</TableHead><TableHead className="text-right">{t("providerBookings.action", "Action")}</TableHead>
+                    <TableHead>{t("common.status", "Status")}</TableHead><TableHead className="text-end">{t("providerBookings.action", "Action")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -86,11 +86,11 @@ export default function ProviderBookings() {
                       </TableCell>
                       <TableCell className="text-xs">{b.preferredDate ? new Date(b.preferredDate).toLocaleString() : "—"}</TableCell>
                       <TableCell><span className={`text-xs px-2 py-0.5 rounded ${STATUS_STYLE[b.status] ?? ""}`}>{b.status}</span></TableCell>
-                      <TableCell className="text-right space-x-1">
+                      <TableCell className="text-end space-x-1">
                         {b.status === "requested" && (
                           <>
-                            <Button size="sm" data-testid={`accept-${b.id}`} onClick={() => act.mutate({ id: b.id, status: "accepted" })} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 mr-1" />{t("myBookings.accept", "Accept")}</Button>
-                            <Button size="sm" variant="outline" data-testid={`decline-${b.id}`} onClick={() => act.mutate({ id: b.id, status: "declined" })} className="h-8"><XCircle className="h-3.5 w-3.5 mr-1" />{t("providerBookings.decline", "Decline")}</Button>
+                            <Button size="sm" data-testid={`accept-${b.id}`} onClick={() => act.mutate({ id: b.id, status: "accepted" })} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8"><CheckCircle className="h-3.5 w-3.5 me-1" />{t("myBookings.accept", "Accept")}</Button>
+                            <Button size="sm" variant="outline" data-testid={`decline-${b.id}`} onClick={() => act.mutate({ id: b.id, status: "declined" })} className="h-8"><XCircle className="h-3.5 w-3.5 me-1" />{t("providerBookings.decline", "Decline")}</Button>
                           </>
                         )}
                         {b.status === "accepted" && (
@@ -114,7 +114,7 @@ export default function ProviderBookings() {
             {orders.data!.map((o: any) => (
               <div key={o.id} className="p-3 rounded-lg border border-[#E2E8F0] dark:border-[#232A36] flex items-start justify-between gap-3" data-testid={`porder-${o.id}`}>
                 <div>
-                  <div className="font-medium text-sm text-[#0B1F3B] dark:text-white">{o.totalAmount} {o.currency} <span className={`ml-2 text-xs px-2 py-0.5 rounded ${STATUS_STYLE[o.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{o.status}</span></div>
+                  <div className="font-medium text-sm text-[#0B1F3B] dark:text-white">{o.totalAmount} {o.currency} <span className={`ms-2 text-xs px-2 py-0.5 rounded ${STATUS_STYLE[o.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{o.status}</span></div>
                   <div className="text-xs text-[#64748B]">{(o.items ?? []).map((i: any) => `${i.quantity}× ${i.name}`).join(", ")}</div>
                   {o.notes && <div className="text-xs text-[#94A3B8]">{t("marketplace.customer", "Customer")}: {o.notes}</div>}
                 </div>
@@ -158,7 +158,7 @@ function QuoteRow({ quote, onRespond }: { quote: any; onRespond: (status: string
       <div>
         <div className="font-medium text-sm text-[#0B1F3B] dark:text-white">
           {quote.planName ?? t("providerBookings.generalQuote", "General quote")}
-          <span className={`ml-2 text-xs px-2 py-0.5 rounded ${STATUS_STYLE[quote.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{quote.status}</span>
+          <span className={`ms-2 text-xs px-2 py-0.5 rounded ${STATUS_STYLE[quote.status] ?? "text-slate-500 bg-slate-50 dark:bg-slate-800/40"}`}>{quote.status}</span>
         </div>
         {(quote.vehicleMake || quote.vehicleModel) && (
           <div className="text-xs text-[#64748B]">{[quote.vehicleYear, quote.vehicleMake, quote.vehicleModel].filter(Boolean).join(" ")}</div>

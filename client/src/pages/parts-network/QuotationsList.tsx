@@ -191,7 +191,7 @@ export default function QuotationsList() {
             placeholder="Search quotations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
@@ -202,7 +202,7 @@ export default function QuotationsList() {
             className={sortBy === "price" ? "bg-[#0A5ED7] text-white" : "border-[#E2E8F0] dark:border-[#232A36]"}
             data-testid="btn-sort-price"
           >
-            <ArrowUpDown className="h-4 w-4 mr-2" />
+            <ArrowUpDown className="h-4 w-4 me-2" />
             Price
           </Button>
           <Button
@@ -211,7 +211,7 @@ export default function QuotationsList() {
             className={sortBy === "rating" ? "bg-[#0A5ED7] text-white" : "border-[#E2E8F0] dark:border-[#232A36]"}
             data-testid="btn-sort-rating"
           >
-            <Star className="h-4 w-4 mr-2" />
+            <Star className="h-4 w-4 me-2" />
             Rating
           </Button>
           <Button
@@ -220,7 +220,7 @@ export default function QuotationsList() {
             className={sortBy === "date" ? "bg-[#0A5ED7] text-white" : "border-[#E2E8F0] dark:border-[#232A36]"}
             data-testid="btn-sort-date"
           >
-            <Clock className="h-4 w-4 mr-2" />
+            <Clock className="h-4 w-4 me-2" />
             Date
           </Button>
         </div>
@@ -279,7 +279,7 @@ export default function QuotationsList() {
                             {quote.unitPrice} <span className="text-sm text-[#64748B]">{quote.currency}</span>
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-xs text-[#64748B]">Total</p>
                           <p className="text-xl font-bold text-green-500">
                             {quote.totalPrice} {quote.currency}
@@ -330,7 +330,7 @@ export default function QuotationsList() {
                             className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                             data-testid={`btn-select-${quote.id}`}
                           >
-                            <CheckCircle className="h-4 w-4 mr-2" />
+                            <CheckCircle className="h-4 w-4 me-2" />
                             Select
                           </Button>
                           <Button 

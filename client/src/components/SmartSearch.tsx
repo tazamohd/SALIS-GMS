@@ -119,7 +119,7 @@ export function SmartSearch({ className, placeholder }: SmartSearchProps) {
           onFocus={() => query.length >= 2 && setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t("common.smartSearch", "Search customers, vehicles, parts...")}
-          className="pl-10 pr-10 h-10 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#64748B] dark:placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20 font-poppins text-sm"
+          className="ps-10 pe-10 h-10 bg-[#F8FAFC] dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0F172A] dark:text-[#E6EAF0] placeholder:text-[#64748B] dark:placeholder:text-[#9BA4B0] focus:border-[#0A5ED7] dark:focus:border-[#0BB3FF] focus:ring-[#0A5ED7]/20 dark:focus:ring-[#0BB3FF]/20 font-poppins text-sm"
           data-testid="input-smart-search"
         />
         {query && (
@@ -139,7 +139,7 @@ export function SmartSearch({ className, placeholder }: SmartSearchProps) {
           {isLoading ? (
             <div className="p-6 flex items-center justify-center">
               <Loader2 className="w-5 h-5 text-[#0A5ED7] dark:text-[#0BB3FF] animate-spin" />
-              <span className="ml-2 text-[#64748B] dark:text-[#9BA4B0] text-sm">{t("common.searching", "Searching...")}</span>
+              <span className="ms-2 text-[#64748B] dark:text-[#9BA4B0] text-sm">{t("common.searching", "Searching...")}</span>
             </div>
           ) : results.length === 0 ? (
             <div className="p-6 text-center">
@@ -162,7 +162,7 @@ export function SmartSearch({ className, placeholder }: SmartSearchProps) {
                     onClick={() => handleSelect(result)}
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={cn(
-                      "w-full px-4 py-3 flex items-center gap-3 transition-colors text-left",
+                      "w-full px-4 py-3 flex items-center gap-3 transition-colors text-start",
                       index === selectedIndex
                         ? "bg-[#0A5ED7]/5 dark:bg-[#0BB3FF]/10"
                         : "hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"

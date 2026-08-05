@@ -110,7 +110,7 @@ export default function ServiceReminders() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-add-reminder">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('serviceReminders.addReminder', 'Add Reminder')}
             </Button>
           </DialogTrigger>

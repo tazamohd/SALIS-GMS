@@ -294,11 +294,11 @@ export default function CurrencySettings() {
                       <TableHead className="w-[60px]">Flag</TableHead>
                       <TableHead>Code</TableHead>
                       <TableHead>Currency</TableHead>
-                      <TableHead className="text-right">Buy Rate</TableHead>
-                      <TableHead className="text-right">Sell Rate</TableHead>
-                      <TableHead className="text-right">Mid Rate</TableHead>
-                      <TableHead className="text-right">1 Unit = SAR</TableHead>
-                      <TableHead className="text-right">Last Updated</TableHead>
+                      <TableHead className="text-end">Buy Rate</TableHead>
+                      <TableHead className="text-end">Sell Rate</TableHead>
+                      <TableHead className="text-end">Mid Rate</TableHead>
+                      <TableHead className="text-end">1 Unit = SAR</TableHead>
+                      <TableHead className="text-end">Last Updated</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -307,15 +307,15 @@ export default function CurrencySettings() {
                         <TableCell className="text-xl">{rate.flag}</TableCell>
                         <TableCell className="font-mono font-semibold">{rate.code}</TableCell>
                         <TableCell>{rate.name}</TableCell>
-                        <TableCell className="text-right font-mono">{formatNumber(rate.buyRate, 4)}</TableCell>
-                        <TableCell className="text-right font-mono">{formatNumber(rate.sellRate, 4)}</TableCell>
-                        <TableCell className="text-right font-mono">{formatNumber(rate.midRate, 4)}</TableCell>
-                        <TableCell className="text-right font-mono font-semibold">
+                        <TableCell className="text-end font-mono">{formatNumber(rate.buyRate, 4)}</TableCell>
+                        <TableCell className="text-end font-mono">{formatNumber(rate.sellRate, 4)}</TableCell>
+                        <TableCell className="text-end font-mono">{formatNumber(rate.midRate, 4)}</TableCell>
+                        <TableCell className="text-end font-mono font-semibold">
                           {rate.code === "SAR"
                             ? "1.0000"
                             : formatNumber(1 / rate.midRate, 4)}
                         </TableCell>
-                        <TableCell className="text-right text-xs text-muted-foreground">
+                        <TableCell className="text-end text-xs text-muted-foreground">
                           {formatDate(rate.lastUpdated)}
                         </TableCell>
                       </TableRow>
@@ -406,9 +406,9 @@ export default function CurrencySettings() {
                   disabled={convertMutation.isPending || !convertAmount || parseFloat(convertAmount) <= 0}
                 >
                   {convertMutation.isPending ? (
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    <RefreshCw className="me-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <ArrowRightLeft className="mr-2 h-4 w-4" />
+                    <ArrowRightLeft className="me-2 h-4 w-4" />
                   )}
                   Convert
                 </Button>
@@ -535,9 +535,9 @@ export default function CurrencySettings() {
                     disabled={saveSettingsMutation.isPending}
                   >
                     {saveSettingsMutation.isPending ? (
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      <RefreshCw className="me-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="me-2 h-4 w-4" />
                     )}
                     Save Settings
                   </Button>
@@ -604,9 +604,9 @@ export default function CurrencySettings() {
                         <TableHead>Type</TableHead>
                         <TableHead>Customer</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead className="text-right">Original Amount</TableHead>
-                        <TableHead className="text-right">Rate</TableHead>
-                        <TableHead className="text-right">SAR Equivalent</TableHead>
+                        <TableHead className="text-end">Original Amount</TableHead>
+                        <TableHead className="text-end">Rate</TableHead>
+                        <TableHead className="text-end">SAR Equivalent</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -617,11 +617,11 @@ export default function CurrencySettings() {
                           <TableCell>{txTypeBadge(tx.type)}</TableCell>
                           <TableCell className="max-w-[140px] truncate">{tx.customerName}</TableCell>
                           <TableCell className="max-w-[200px] truncate">{tx.description}</TableCell>
-                          <TableCell className="text-right font-mono whitespace-nowrap">
+                          <TableCell className="text-end font-mono whitespace-nowrap">
                             {formatNumber(tx.originalAmount)} {tx.originalCurrency}
                           </TableCell>
-                          <TableCell className="text-right font-mono text-xs">{formatNumber(tx.rateUsed, 4)}</TableCell>
-                          <TableCell className="text-right font-mono font-semibold whitespace-nowrap">
+                          <TableCell className="text-end font-mono text-xs">{formatNumber(tx.rateUsed, 4)}</TableCell>
+                          <TableCell className="text-end font-mono font-semibold whitespace-nowrap">
                             {formatNumber(tx.sarEquivalent)} SAR
                           </TableCell>
                         </TableRow>

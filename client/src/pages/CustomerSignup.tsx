@@ -34,7 +34,7 @@ export default function CustomerSignup() {
     },
   });
 
-  const inputCls = "pl-10 h-12 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0]";
+  const inputCls = "ps-10 h-12 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-[#E6EAF0]";
   const canSubmit = form.email && form.password.length >= 8;
 
   return (

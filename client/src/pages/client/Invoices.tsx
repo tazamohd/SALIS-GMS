@@ -165,11 +165,11 @@ export default function ClientInvoices() {
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid={`button-pay-${invoice.id}`}>
-                      <CreditCard className="h-4 w-4 mr-2" />
+                      <CreditCard className="h-4 w-4 me-2" />
                       {t('nav.pay_now', 'Pay Now')}
                     </Button>
                     <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid={`button-download-${invoice.id}`}>
-                      <Download className="h-4 w-4 mr-2" />
+                      <Download className="h-4 w-4 me-2" />
                       {t('nav.download', 'Download')}
                     </Button>
                   </div>
@@ -224,7 +224,7 @@ export default function ClientInvoices() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                             ${parseFloat(invoice.totalAmount || "0").toFixed(2)}
                           </div>

@@ -255,7 +255,7 @@ export default function CustomerReviewsRatings() {
                       }}
                       data-testid={`button-respond-${review.id || index}`}
                     >
-                      <MessageCircle className="h-4 w-4 mr-2" />
+                      <MessageCircle className="h-4 w-4 me-2" />
                       {t('customers.reviews.respondToReview', 'Respond to Review')}
                     </Button>
                   )}

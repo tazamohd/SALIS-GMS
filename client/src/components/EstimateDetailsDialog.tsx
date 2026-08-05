@@ -311,7 +311,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                     className="bg-blue-600 hover:bg-blue-700"
                     data-testid="button-convert-to-job-card"
                   >
-                    <Wrench className="w-4 h-4 mr-2" />
+                    <Wrench className="w-4 h-4 me-2" />
                     {convertToJobCardMutation.isPending ? "Converting..." : "Convert to Job Card"}
                   </Button>
                   <Button
@@ -320,7 +320,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                     className="bg-green-600 hover:bg-green-700"
                     data-testid="button-convert-to-invoice"
                   >
-                    <FileText className="w-4 h-4 mr-2" />
+                    <FileText className="w-4 h-4 me-2" />
                     {convertToInvoiceMutation.isPending ? "Converting..." : "Convert to Invoice"}
                   </Button>
                 </>
@@ -330,7 +330,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
                 onClick={() => setDeleteDialogOpen(true)}
                 data-testid="button-delete-estimate"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4 me-2" />
                 Delete
               </Button>
             </div>

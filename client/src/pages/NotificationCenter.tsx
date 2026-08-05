@@ -234,7 +234,7 @@ export default function NotificationCenter() {
             <TabsTrigger value="unread">
               Unread
               {unreadCount > 0 && (
-                <Badge variant="destructive" className="ml-2 h-5 min-w-[20px] px-1.5 text-xs">
+                <Badge variant="destructive" className="ms-2 h-5 min-w-[20px] px-1.5 text-xs">
                   {unreadCount}
                 </Badge>
               )}
@@ -263,7 +263,7 @@ export default function NotificationCenter() {
                 onClick={() => markAllReadMutation.mutate()}
                 disabled={unreadCount === 0}
               >
-                <CheckCircle className="w-4 h-4 mr-1" />
+                <CheckCircle className="w-4 h-4 me-1" />
                 Mark All Read
               </Button>
 
@@ -272,7 +272,7 @@ export default function NotificationCenter() {
                 size="sm"
                 onClick={() => seedMutation.mutate()}
               >
-                <Sparkles className="w-4 h-4 mr-1" />
+                <Sparkles className="w-4 h-4 me-1" />
                 Seed Demo
               </Button>
             </div>

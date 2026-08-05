@@ -353,7 +353,7 @@ export default function WarrantyManagement() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
               data-testid="button-create-warranty"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               Add Warranty
             </Button>
           </div>
@@ -369,7 +369,7 @@ export default function WarrantyManagement() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Start Date</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">End Date</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -401,7 +401,7 @@ export default function WarrantyManagement() {
                         {warranty.endDate ? format(new Date(warranty.endDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
                       <TableCell>{getStatusBadge(warranty)}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="outline"
@@ -447,7 +447,7 @@ export default function WarrantyManagement() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Coverage</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Provider</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Expired On</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -475,7 +475,7 @@ export default function WarrantyManagement() {
                       <TableCell className="text-[#64748B]" data-testid={`text-expired-warranty-end-date-${warranty.id}`}>
                         {warranty.endDate ? format(new Date(warranty.endDate), "MMM dd, yyyy") : "—"}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button
                           variant="outline"
                           size="sm"
@@ -508,7 +508,7 @@ export default function WarrantyManagement() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
               data-testid="button-create-claim"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               Submit Claim
             </Button>
           </div>
@@ -523,7 +523,7 @@ export default function WarrantyManagement() {
                   <TableHead className="text-[#0B1F3B] dark:text-white">Claim Date</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Amount</TableHead>
                   <TableHead className="text-[#0B1F3B] dark:text-white">Status</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white text-right">Actions</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -558,7 +558,7 @@ export default function WarrantyManagement() {
                         ${item.claim.claimAmount?.toLocaleString() || "—"}
                       </TableCell>
                       <TableCell>{getClaimStatusBadge(item.claim.status || "submitted", item.claim.id)}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="outline"

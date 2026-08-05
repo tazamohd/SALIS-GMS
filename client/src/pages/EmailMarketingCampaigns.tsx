@@ -111,7 +111,7 @@ export default function EmailMarketingCampaigns() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogTrigger asChild>
           <Button data-testid="button-create-campaign" className="mb-6 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             {t('emailMarketing.createCampaign', 'Create Campaign')}
           </Button>
         </DialogTrigger>
@@ -197,7 +197,7 @@ export default function EmailMarketingCampaigns() {
                 <div className="flex gap-2">
                   {campaign.status === "draft" && (
                     <Button size="sm" onClick={() => sendCampaign.mutate(campaign.id)} data-testid={`button-send-${campaign.id}`} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
-                      <Send className="h-4 w-4 mr-2" />
+                      <Send className="h-4 w-4 me-2" />
                       {t('emailMarketing.send', 'Send')}
                     </Button>
                   )}

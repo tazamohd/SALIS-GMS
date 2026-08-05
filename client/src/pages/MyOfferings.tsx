@@ -66,7 +66,7 @@ export default function MyOfferings() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button data-testid="button-add-offering" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"><Plus className="h-4 w-4 mr-1" />{t("myOfferings.addOffering", "Add offering")}</Button>
+            <Button data-testid="button-add-offering" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"><Plus className="h-4 w-4 me-1" />{t("myOfferings.addOffering", "Add offering")}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>{t("myOfferings.addAnOffering", "Add an offering")}</DialogTitle></DialogHeader>

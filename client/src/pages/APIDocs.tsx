@@ -232,7 +232,7 @@ export default function APIDocs() {
                 placeholder="Search endpoints by path, description, or module..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#1E293B]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#1E293B]"
               />
             </div>
 
@@ -311,7 +311,7 @@ export default function APIDocs() {
                   {/* Module Header */}
                   <button
                     onClick={() => toggleModule(moduleName)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors text-left"
+                    className="w-full flex items-center justify-between p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/50 transition-colors text-start"
                   >
                     <div className="flex items-center gap-3">
                       <Code2 className="h-4 w-4 text-[#0A5ED7]" />

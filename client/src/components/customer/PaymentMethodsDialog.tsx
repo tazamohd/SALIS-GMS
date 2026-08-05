@@ -104,7 +104,7 @@ export function PaymentMethodsDialog({
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8 text-[#64748B]">
-              <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading methods…
+              <Loader2 className="h-5 w-5 animate-spin me-2" /> Loading methods…
             </div>
           ) : methods.length === 0 ? (
             <p className="py-6 text-center text-sm text-[#64748B]">
@@ -131,7 +131,7 @@ export function PaymentMethodsDialog({
                           data-testid={`button-paymethod-${m.id}`}
                         >
                           {initiate.isPending && initiate.variables === m.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <Loader2 className="h-4 w-4 animate-spin me-2" />
                           ) : null}
                           {m.label}
                         </Button>

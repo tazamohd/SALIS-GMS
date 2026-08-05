@@ -470,7 +470,7 @@ export default function Chat() {
               <Dialog open={showSupportDialog} onOpenChange={setShowSupportDialog}>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="ghost" className="text-[#0A5ED7] dark:text-[#0BB3FF]" data-testid="button-new-ticket">
-                    <Ticket className="h-4 w-4 mr-1" />
+                    <Ticket className="h-4 w-4 me-1" />
                     {t('chat.newTicket', 'New Ticket')}
                   </Button>
                 </DialogTrigger>
@@ -555,7 +555,7 @@ export default function Chat() {
                 placeholder={t('chat.searchConversations', 'Search conversations...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-conversations"
               />
             </div>
@@ -612,7 +612,7 @@ export default function Chat() {
                     key={conversation.id}
                     onClick={() => setSelectedConversationId(conversation.id)}
                     className={cn(
-                      "w-full p-3 rounded-lg text-left transition-colors mb-1",
+                      "w-full p-3 rounded-lg text-start transition-colors mb-1",
                       selectedConversationId === conversation.id
                         ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                         : "hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117] text-[#0B1F3B] dark:text-white"

@@ -136,11 +136,11 @@ export default function CustomReportBuilder() {
 
         <div className="pt-4 border-t border-[#E2E8F0] dark:border-[#232A36] space-y-2">
           <Button className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90" data-testid="button-save-report">
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="h-4 w-4 me-2" />
             {t('reportBuilder.saveReport', 'Save Report')}
           </Button>
           <Button variant="outline" className="w-full border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-clear-report">
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash2 className="h-4 w-4 me-2" />
             {t('common.clear', 'Clear')}
           </Button>
         </div>
@@ -158,11 +158,11 @@ export default function CustomReportBuilder() {
           </span>
           <div className="flex gap-2">
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-pdf">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="h-4 w-4 me-2" />
               {t('reportBuilder.exportPDF', 'Export PDF')}
             </Button>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-excel">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('reportBuilder.exportExcel', 'Export Excel')}
             </Button>
           </div>
@@ -200,7 +200,7 @@ export default function CustomReportBuilder() {
                   <thead className="bg-[#F8FAFC] dark:bg-[#0E1117]">
                     <tr>
                       {selectedFields.map(field => (
-                        <th key={field} className="px-4 py-3 text-left text-sm font-semibold text-[#0B1F3B] dark:text-white">
+                        <th key={field} className="px-4 py-3 text-start text-sm font-semibold text-[#0B1F3B] dark:text-white">
                           {field}
                         </th>
                       ))}

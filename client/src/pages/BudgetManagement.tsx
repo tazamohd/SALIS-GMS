@@ -202,7 +202,7 @@ export default function BudgetManagement() {
     };
     return (
       <Badge className={style.className}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {statusLabels[status] || status}
       </Badge>
     );
@@ -355,30 +355,30 @@ export default function BudgetManagement() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/cost-centers">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-cost-centers">
-                <Target className="h-4 w-4 mr-2" />
+                <Target className="h-4 w-4 me-2" />
                 {t('budget.costCenters', 'Cost Centers')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/expenses-management">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-expenses">
-                <DollarSign className="h-4 w-4 mr-2" />
+                <DollarSign className="h-4 w-4 me-2" />
                 {t('budget.expenses', 'Expenses')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-income">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('budget.incomeStatement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-ledger">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('budget.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>
@@ -418,13 +418,13 @@ export default function BudgetManagement() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-create-budget">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('budget.createBudget', 'Create Budget')}
               </Button>
             </DialogTrigger>
@@ -577,9 +577,9 @@ export default function BudgetManagement() {
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.budgetName', 'Budget Name')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.category', 'Category')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.period', 'Period')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.budget', 'Budget')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.actual', 'Actual')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('budget.remaining', 'Remaining')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('budget.budget', 'Budget')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('budget.actual', 'Actual')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('budget.remaining', 'Remaining')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('budget.utilization', 'Utilization')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
@@ -593,9 +593,9 @@ export default function BudgetManagement() {
                     <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white">{budget.category}</Badge>
                   </TableCell>
                   <TableCell className="text-[#64748B]">{budget.period}</TableCell>
-                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{budget.budgetAmount.toLocaleString()}</TableCell>
-                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">{budget.actualSpend.toLocaleString()}</TableCell>
-                  <TableCell className={`text-right font-mono font-bold ${budget.remainingBudget >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                  <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{budget.budgetAmount.toLocaleString()}</TableCell>
+                  <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">{budget.actualSpend.toLocaleString()}</TableCell>
+                  <TableCell className={`text-end font-mono font-bold ${budget.remainingBudget >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                     {budget.remainingBudget >= 0 ? budget.remainingBudget.toLocaleString() : `(${Math.abs(budget.remainingBudget).toLocaleString()})`}
                   </TableCell>
                   <TableCell>

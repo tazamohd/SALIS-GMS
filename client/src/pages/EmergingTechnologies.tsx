@@ -290,7 +290,7 @@ export default function EmergingTechnologies() {
     >
       <div className="flex items-center gap-3 mb-6">
         <Badge variant="outline" className="text-green-600 border-green-600">
-          <CheckCircle2 className="w-4 h-4 mr-1" />
+          <CheckCircle2 className="w-4 h-4 me-1" />
           {t('emergingTech.modulesActive', '12 Modules Active')}
         </Badge>
       </div>

@@ -185,7 +185,7 @@ export default function SmartPartsRecommendations() {
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 data-testid="button-generate-recommendation"
               >
-                <Brain className="mr-2 h-4 w-4" />
+                <Brain className="me-2 h-4 w-4" />
                 {t('smartParts.generateRecommendation', 'Generate Recommendation')}
               </Button>
             </DialogTrigger>
@@ -296,11 +296,11 @@ export default function SmartPartsRecommendations() {
                           </Badge>
                           {part.inStock ? (
                             <Badge className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                              <CheckCircle className="h-3 w-3 mr-1" /> In Stock ({part.stockQuantity})
+                              <CheckCircle className="h-3 w-3 me-1" /> In Stock ({part.stockQuantity})
                             </Badge>
                           ) : (
                             <Badge className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
-                              <AlertCircle className="h-3 w-3 mr-1" /> Out of Stock
+                              <AlertCircle className="h-3 w-3 me-1" /> Out of Stock
                             </Badge>
                           )}
                         </div>
@@ -311,7 +311,7 @@ export default function SmartPartsRecommendations() {
                           {part.reason}
                         </p>
                       </div>
-                      <div className="text-right ml-4">
+                      <div className="text-end ms-4">
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
                           ${part.estimatedPrice.toFixed(2)}
                         </p>
@@ -365,7 +365,7 @@ export default function SmartPartsRecommendations() {
                         onClick={() => handleAddToCart(part)}
                         data-testid={`button-add-cart-${idx}`}
                       >
-                        <ShoppingCart className="mr-1 h-3 w-3" />
+                        <ShoppingCart className="me-1 h-3 w-3" />
                         Add to Cart
                       </Button>
                       <Button
@@ -374,7 +374,7 @@ export default function SmartPartsRecommendations() {
                         onClick={() => handleCreatePO(part)}
                         data-testid={`button-create-po-${idx}`}
                       >
-                        <FileText className="mr-1 h-3 w-3" />
+                        <FileText className="me-1 h-3 w-3" />
                         Create PO
                       </Button>
                     </div>
@@ -504,7 +504,7 @@ export default function SmartPartsRecommendations() {
                                     </p>
                                   )}
                                 </div>
-                                <div className="text-right">
+                                <div className="text-end">
                                   <p className="font-medium text-gray-900 dark:text-white">
                                     ${parseFloat(part.price || part.cost || 0).toFixed(2)}
                                   </p>
@@ -529,7 +529,7 @@ export default function SmartPartsRecommendations() {
                           size="sm"
                           data-testid={`button-apply-${recommendation.id}`}
                         >
-                          <CheckCircle className="mr-2 h-4 w-4" />
+                          <CheckCircle className="me-2 h-4 w-4" />
                           {t('smartParts.applyToJobCard', 'Apply to Job Card')}
                         </Button>
                       )}

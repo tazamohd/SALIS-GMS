@@ -196,7 +196,7 @@ export default function AccountingIntegration() {
                       className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                       data-testid="button-sync-now"
                     >
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <RefreshCw className="h-4 w-4 me-2" />
                       {t('accounting.syncNow', 'Sync Now')}
                     </Button>
                   </div>
@@ -210,7 +210,7 @@ export default function AccountingIntegration() {
                   className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
                   data-testid="button-connect"
                 >
-                  <Link2 className="h-4 w-4 mr-2" />
+                  <Link2 className="h-4 w-4 me-2" />
                   {t('accounting.connect', 'Connect')} {selectedProvider}
                 </Button>
               </div>
@@ -229,7 +229,7 @@ export default function AccountingIntegration() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-[#0B1F3B] dark:text-white">{t('accounting.syncHistory', 'Sync History')}</CardTitle>
               <Button size="sm" onClick={() => syncMutation.mutate("all")} className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" data-testid="button-refresh-history">
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 me-2" />
                 {t('common.refresh', 'Refresh')}
               </Button>
             </div>
@@ -254,7 +254,7 @@ export default function AccountingIntegration() {
                       )}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">{item.count} {t('accounting.records', 'records')}</p>
                     <Badge variant={item.status === "synced" ? "default" : "destructive"} className={item.status === "synced" ? "bg-green-600 text-white mt-1" : "mt-1"}>
                       {t(`accounting.status.${item.status}`, item.status)}

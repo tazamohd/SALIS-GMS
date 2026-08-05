@@ -219,16 +219,16 @@ export default function IoTDashboard() {
       <Tabs defaultValue="sensors" className="space-y-6">
         <TabsList className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36]">
           <TabsTrigger value="sensors" data-testid="tab-sensors">
-            <Zap className="h-4 w-4 mr-2" />
+            <Zap className="h-4 w-4 me-2" />
             {t('iot.sensorList', 'Sensor List')} ({sensors.length})
           </TabsTrigger>
           <TabsTrigger value="alerts" data-testid="tab-alerts">
-            <AlertTriangle className="h-4 w-4 mr-2" />
+            <AlertTriangle className="h-4 w-4 me-2" />
             {t('iot.alerts', 'Alerts')} ({activeAlerts.length})
           </TabsTrigger>
           {selectedVehicleId && (
             <TabsTrigger value="live" data-testid="tab-live">
-              <Activity className="h-4 w-4 mr-2" />
+              <Activity className="h-4 w-4 me-2" />
               {t('iot.liveMonitoring', 'Live Monitoring')}
             </TabsTrigger>
           )}
@@ -255,7 +255,7 @@ export default function IoTDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                      <tr className="text-left">
+                      <tr className="text-start">
                         <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.sensorId', 'Sensor ID')}</th>
                         <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.type', 'Type')}</th>
                         <th className="pb-3 text-[#0B1F3B] dark:text-white">{t('iot.vehicle', 'Vehicle')}</th>
@@ -399,9 +399,9 @@ export default function IoTDashboard() {
                   {Object.entries(effectiveReadings).map(([sensorType, reading]) => (
                     <div key={sensorType} className="flex justify-between items-center p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36]">
                       <span className="font-medium capitalize text-[#0B1F3B] dark:text-white">{sensorType.replace(/_/g, ' ')}</span>
-                      <div className="text-right">
+                      <div className="text-end">
                         <span className="text-lg font-bold text-[#0B1F3B] dark:text-white">{reading.value.toFixed(2)}</span>
-                        {reading.unit && <span className="text-sm text-[#64748B] ml-1">{reading.unit}</span>}
+                        {reading.unit && <span className="text-sm text-[#64748B] ms-1">{reading.unit}</span>}
                         <div className="text-xs text-[#64748B]">
                           {new Date(reading.timestamp).toLocaleTimeString()}
                         </div>

@@ -109,7 +109,7 @@ export default function TechnicianMobileHome() {
                 </p>
                 <p className="text-xs text-[#64748B]">{job.serviceType}</p>
               </div>
-              <div className="text-right">
+              <div className="text-end">
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   job.status === "in_progress" 
                     ? "bg-[#0A5ED7]/10 text-[#0A5ED7] border border-[#0A5ED7]" 

@@ -236,7 +236,7 @@ export default function FleetManagement() {
           onClick={() => setIsCreateDialogOpen(true)}
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="me-2 h-4 w-4" />
           New Fleet Account
         </Button>
       </div>
@@ -332,10 +332,10 @@ export default function FleetManagement() {
                 <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Make / Model</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Fleet Account</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Status</TableHead>
-                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Mileage</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-end">Mileage</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Last Service</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Next Service Due</TableHead>
-                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Avg Monthly Cost</TableHead>
+                <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-end">Avg Monthly Cost</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -347,7 +347,7 @@ export default function FleetManagement() {
                   </TableCell>
                   <TableCell className="text-[#64748B]">{v.companyName}</TableCell>
                   <TableCell>{getStatusBadge(v.status)}</TableCell>
-                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">{v.mileage.toLocaleString()} km</TableCell>
+                  <TableCell className="text-end text-[#0B1F3B] dark:text-white">{v.mileage.toLocaleString()} km</TableCell>
                   <TableCell>
                     <div>
                       <span className="text-[#0B1F3B] dark:text-white text-sm">{formatDate(v.lastServiceDate)}</span>
@@ -362,7 +362,7 @@ export default function FleetManagement() {
                       <span className="text-xs text-[#64748B]">{v.nextServiceType}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(v.avgMonthlyCost)}</TableCell>
+                  <TableCell className="text-end text-[#0B1F3B] dark:text-white">{formatCurrency(v.avgMonthlyCost)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -595,18 +595,18 @@ export default function FleetManagement() {
               <TableHeader>
                 <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                   <TableHead className="text-[#0B1F3B] dark:text-white font-semibold">Company</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Vehicles</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Total Revenue</TableHead>
-                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-right">Avg Cost / Vehicle</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-end">Vehicles</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-end">Total Revenue</TableHead>
+                  <TableHead className="text-[#0B1F3B] dark:text-white font-semibold text-end">Avg Cost / Vehicle</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {revenuePerAccount.map((row) => (
                   <TableRow key={row.accountId} className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                     <TableCell className="text-[#0B1F3B] dark:text-white font-medium">{row.companyName}</TableCell>
-                    <TableCell className="text-right text-[#64748B]">{row.vehicleCount}</TableCell>
-                    <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(row.totalRevenue)}</TableCell>
-                    <TableCell className="text-right text-[#0B1F3B] dark:text-white">{formatCurrency(row.avgCostPerVehicle)}</TableCell>
+                    <TableCell className="text-end text-[#64748B]">{row.vehicleCount}</TableCell>
+                    <TableCell className="text-end text-[#0B1F3B] dark:text-white">{formatCurrency(row.totalRevenue)}</TableCell>
+                    <TableCell className="text-end text-[#0B1F3B] dark:text-white">{formatCurrency(row.avgCostPerVehicle)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

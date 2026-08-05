@@ -154,7 +154,7 @@ export default function AIScheduling() {
           data-testid="button-run-optimization"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
         >
-          <Zap className="h-4 w-4 mr-2" />
+          <Zap className="h-4 w-4 me-2" />
           {optimizeMutation.isPending ? t('aiScheduling.optimizing', 'Optimizing...') : t('aiScheduling.runOptimization', 'Run Optimization')}
         </Button>
       </div>
@@ -167,7 +167,7 @@ export default function AIScheduling() {
               <CheckCircle2 className="h-5 w-5 text-green-500" />
               {t('aiScheduling.optimizationResults', 'Optimization Results')}
               {displayResult?.report && (
-                <Badge variant="outline" className="ml-2">
+                <Badge variant="outline" className="ms-2">
                   Avg Score: {displayResult.report.averageScore}%
                 </Badge>
               )}
@@ -208,8 +208,8 @@ export default function AIScheduling() {
                         ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 ml-4">
-                      <div className="text-right">
+                    <div className="flex items-center gap-3 ms-4">
+                      <div className="text-end">
                         <div className={`text-lg font-bold ${getScoreColor(assignment.score)}`}>
                           {assignment.score}%
                         </div>

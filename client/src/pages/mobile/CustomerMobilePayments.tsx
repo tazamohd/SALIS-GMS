@@ -86,7 +86,7 @@ export default function CustomerMobilePayments() {
                         {new Date(invoice.invoiceDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="text-lg font-bold text-[#F97316]">
                         ${Number(invoice.totalAmount).toFixed(2)}
                       </p>
@@ -148,7 +148,7 @@ export default function CustomerMobilePayments() {
                       {new Date(invoice.invoiceDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">
                       ${Number(invoice.totalAmount).toFixed(2)}
                     </p>

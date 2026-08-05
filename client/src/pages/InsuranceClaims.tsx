@@ -162,7 +162,7 @@ export default function InsuranceClaims() {
                       Policy: {claim.policyNumber} • {new Date(claim.incidentDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {Number(claim.claimAmount || 0).toLocaleString()}</p>
                     {claim.approvedAmount && (
                       <p className="text-sm text-[#0BB3FF]">{t('payments.insurance.approved', 'Approved')}: SAR {Number(claim.approvedAmount).toLocaleString()}</p>

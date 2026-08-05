@@ -132,7 +132,7 @@ export function CustomerVehicles() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-right">
+                              <div className="text-end">
                                 <p className="text-sm text-[#64748B]">
                                   {job.completedAt ? format(new Date(job.completedAt), 'PPP') : 'N/A'}
                                 </p>

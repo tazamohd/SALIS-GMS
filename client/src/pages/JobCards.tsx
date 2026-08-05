@@ -241,7 +241,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.garage', 'Garage')}</Label>
                 <Select value={filterGarageId} onValueChange={setFilterGarageId}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-garage">
-                    <Building2 className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Building2 className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,7 +258,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</Label>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-status">
-                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Filter className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,7 +275,7 @@ export function JobCards() {
                 <Label className="text-[#0B1F3B] dark:text-white">{t('jobCards.priority', 'Priority')}</Label>
                 <Select value={filterPriority} onValueChange={setFilterPriority}>
                   <SelectTrigger className="bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-filter-priority">
-                    <Filter className="w-4 h-4 mr-2 text-[#0A5ED7]" />
+                    <Filter className="w-4 h-4 me-2 text-[#0A5ED7]" />
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -315,7 +315,7 @@ export function JobCards() {
               onClick={() => setIsCreateOpen(true)}
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {t('jobCards.create', 'Create Job Card')}
             </Button>
           </div>
@@ -387,7 +387,7 @@ export function JobCards() {
                         className="flex-1 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                         data-testid={`button-view-details-${jobCard.id}`}
                       >
-                        <Eye className="w-4 h-4 mr-1" />
+                        <Eye className="w-4 h-4 me-1" />
                         {t('common.details', 'Details')}
                       </Button>
                       {jobCard.status !== 'completed' && jobCard.status !== 'cancelled' && (

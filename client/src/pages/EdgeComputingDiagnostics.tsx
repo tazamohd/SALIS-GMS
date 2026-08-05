@@ -126,7 +126,7 @@ export default function EdgeComputingDiagnostics() {
 
           <div className="mt-6 flex gap-3">
             <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white" data-testid="button-start-diagnostic">
-              <Activity className="mr-2 h-4 w-4" />
+              <Activity className="me-2 h-4 w-4" />
               {t('edge.startDiagnostic', 'Start New Diagnostic')}
             </Button>
             <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid="button-export-data">

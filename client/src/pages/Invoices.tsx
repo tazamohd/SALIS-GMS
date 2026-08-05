@@ -260,9 +260,9 @@ export function Invoices() {
             ))}
           </SelectContent>
         </Select>
-        <div className="ml-auto">
+        <div className="ms-auto">
           <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {t("invoices.newInvoice", "Create Invoice")}
           </Button>
         </div>
@@ -286,12 +286,12 @@ export function Invoices() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.invoiceNumber", "Invoice #")}</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.customer", "Customer")}</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">{t("common.date", "Date")}</th>
-                  <th className="p-3 text-left font-medium text-[#64748B]">{t("invoices.dueDate", "Due Date")}</th>
-                  <th className="p-3 text-right font-medium text-[#64748B]">{t("invoices.total", "Total")}</th>
-                  <th className="p-3 text-right font-medium text-[#64748B]">{t("invoices.balance", "Balance")}</th>
+                  <th className="p-3 text-start font-medium text-[#64748B]">{t("invoices.invoiceNumber", "Invoice #")}</th>
+                  <th className="p-3 text-start font-medium text-[#64748B]">{t("invoices.customer", "Customer")}</th>
+                  <th className="p-3 text-start font-medium text-[#64748B]">{t("common.date", "Date")}</th>
+                  <th className="p-3 text-start font-medium text-[#64748B]">{t("invoices.dueDate", "Due Date")}</th>
+                  <th className="p-3 text-end font-medium text-[#64748B]">{t("invoices.total", "Total")}</th>
+                  <th className="p-3 text-end font-medium text-[#64748B]">{t("invoices.balance", "Balance")}</th>
                   <th className="p-3 text-center font-medium text-[#64748B]">{t("common.status", "Status")}</th>
                   <th className="p-3 text-center font-medium text-[#64748B]">{t("common.actions", "Actions")}</th>
                 </tr>
@@ -394,8 +394,8 @@ function InvoiceRow({
         <td className="p-3 text-[#64748B] dark:text-gray-300">{customerName}</td>
         <td className="p-3 text-[#64748B] dark:text-gray-300">{new Date(invoice.invoiceDate).toLocaleDateString()}</td>
         <td className="p-3 text-[#64748B] dark:text-gray-300">{new Date(invoice.dueDate).toLocaleDateString()}</td>
-        <td className="p-3 text-right font-semibold text-[#0B1F3B] dark:text-white">{formatSAR(invoice.totalAmount)}</td>
-        <td className="p-3 text-right font-semibold text-[#0B1F3B] dark:text-white">{formatSAR(invoice.balanceAmount)}</td>
+        <td className="p-3 text-end font-semibold text-[#0B1F3B] dark:text-white">{formatSAR(invoice.totalAmount)}</td>
+        <td className="p-3 text-end font-semibold text-[#0B1F3B] dark:text-white">{formatSAR(invoice.balanceAmount)}</td>
         <td className="p-3 text-center">
           <StatusBadgeInline status={invoice.status} />
         </td>
@@ -457,21 +457,21 @@ function InvoiceRow({
                   <table className="w-full mt-2 text-sm">
                     <thead>
                       <tr className="border-b dark:border-gray-600">
-                        <th className="text-left py-1 pr-3 font-medium text-[#64748B]">Type</th>
-                        <th className="text-left py-1 pr-3 font-medium text-[#64748B]">Description</th>
-                        <th className="text-right py-1 pr-3 font-medium text-[#64748B]">Qty</th>
-                        <th className="text-right py-1 pr-3 font-medium text-[#64748B]">Unit Price</th>
-                        <th className="text-right py-1 font-medium text-[#64748B]">Total</th>
+                        <th className="text-start py-1 pe-3 font-medium text-[#64748B]">Type</th>
+                        <th className="text-start py-1 pe-3 font-medium text-[#64748B]">Description</th>
+                        <th className="text-end py-1 pe-3 font-medium text-[#64748B]">Qty</th>
+                        <th className="text-end py-1 pe-3 font-medium text-[#64748B]">Unit Price</th>
+                        <th className="text-end py-1 font-medium text-[#64748B]">Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {expandedItems.map((item) => (
                         <tr key={item.id} className="border-b dark:border-gray-700 last:border-0">
-                          <td className="py-1 pr-3 capitalize">{item.itemType}</td>
-                          <td className="py-1 pr-3">{item.description}</td>
-                          <td className="py-1 pr-3 text-right">{item.quantity}</td>
-                          <td className="py-1 pr-3 text-right">{formatSAR(item.unitPrice)}</td>
-                          <td className="py-1 text-right font-medium">{formatSAR(item.lineTotal)}</td>
+                          <td className="py-1 pe-3 capitalize">{item.itemType}</td>
+                          <td className="py-1 pe-3">{item.description}</td>
+                          <td className="py-1 pe-3 text-end">{item.quantity}</td>
+                          <td className="py-1 pe-3 text-end">{formatSAR(item.unitPrice)}</td>
+                          <td className="py-1 text-end font-medium">{formatSAR(item.lineTotal)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -765,11 +765,11 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
                 <table className="w-full text-sm min-w-[400px]">
                   <thead className="bg-gray-50 dark:bg-gray-800">
                     <tr>
-                      <th className="p-2 text-left text-xs font-medium text-[#64748B]">Type</th>
-                      <th className="p-2 text-left text-xs font-medium text-[#64748B]">Description</th>
-                      <th className="p-2 text-right text-xs font-medium text-[#64748B]">Qty</th>
-                      <th className="p-2 text-right text-xs font-medium text-[#64748B]">Unit Price</th>
-                      <th className="p-2 text-right text-xs font-medium text-[#64748B]">Line Total</th>
+                      <th className="p-2 text-start text-xs font-medium text-[#64748B]">Type</th>
+                      <th className="p-2 text-start text-xs font-medium text-[#64748B]">Description</th>
+                      <th className="p-2 text-end text-xs font-medium text-[#64748B]">Qty</th>
+                      <th className="p-2 text-end text-xs font-medium text-[#64748B]">Unit Price</th>
+                      <th className="p-2 text-end text-xs font-medium text-[#64748B]">Line Total</th>
                       <th className="p-2 w-8"></th>
                     </tr>
                   </thead>
@@ -778,9 +778,9 @@ function InvoiceFormDialog({ open, onOpenChange, garages, customers, toast, invo
                       <tr key={idx}>
                         <td className="p-2 capitalize">{item.itemType}</td>
                         <td className="p-2">{item.description}</td>
-                        <td className="p-2 text-right">{item.quantity}</td>
-                        <td className="p-2 text-right">{formatSAR(item.unitPrice)}</td>
-                        <td className="p-2 text-right font-medium">{formatSAR(item.quantity * item.unitPrice)}</td>
+                        <td className="p-2 text-end">{item.quantity}</td>
+                        <td className="p-2 text-end">{formatSAR(item.unitPrice)}</td>
+                        <td className="p-2 text-end font-medium">{formatSAR(item.quantity * item.unitPrice)}</td>
                         <td className="p-2">
                           <Button variant="ghost" size="sm" onClick={() => removeItem(idx)} className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
                             <X className="w-3 h-3" />

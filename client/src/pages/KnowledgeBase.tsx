@@ -290,13 +290,13 @@ export default function KnowledgeBase() {
       content: (
         <>
           <div className="flex justify-between items-center mb-4">
-            <div className="relative max-w-md flex-1 mr-4">
+            <div className="relative max-w-md flex-1 me-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
               <Input
                 placeholder={t('knowledgeBase.searchDocuments', 'Search documents...')}
                 value={documentSearchQuery}
                 onChange={(e) => setDocumentSearchQuery(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-documents"
               />
             </div>
@@ -305,7 +305,7 @@ export default function KnowledgeBase() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-add-document"
             >
-              <FilePlus className="mr-2 h-4 w-4" />
+              <FilePlus className="me-2 h-4 w-4" />
               {t('knowledgeBase.addDocument', 'Add Document')}
             </Button>
           </div>
@@ -336,7 +336,7 @@ export default function KnowledgeBase() {
                       <TableHead className="text-[#64748B]">{t('knowledgeBase.size', 'Size')}</TableHead>
                       <TableHead className="text-[#64748B]">{t('knowledgeBase.uploaded', 'Uploaded')}</TableHead>
                       <TableHead className="text-[#64748B]">{t('common.status', 'Status')}</TableHead>
-                      <TableHead className="text-[#64748B] text-right">{t('common.actions', 'Actions')}</TableHead>
+                      <TableHead className="text-[#64748B] text-end">{t('common.actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -384,7 +384,7 @@ export default function KnowledgeBase() {
                               {doc.status || t('common.active', 'Active')}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-end">
                             <div className="flex justify-end gap-2">
                               {doc.fileUrl && (
                                 <Button
@@ -432,7 +432,7 @@ export default function KnowledgeBase() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"
               data-testid="button-create-category"
             >
-              <FolderPlus className="mr-2 h-4 w-4" />
+              <FolderPlus className="me-2 h-4 w-4" />
               {t('knowledgeBase.createCategory', 'Create Category')}
             </Button>
           </div>
@@ -494,7 +494,7 @@ export default function KnowledgeBase() {
                 placeholder={t('knowledgeBase.searchArticles', 'Search articles...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search"
               />
             </div>

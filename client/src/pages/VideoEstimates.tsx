@@ -82,7 +82,7 @@ export default function VideoEstimates() {
               onClick={() => window.open(row.videoUrl, "_blank")}
               data-testid={`button-play-${row.id}`}
             >
-              <Play className="h-3 w-3 mr-1" />
+              <Play className="h-3 w-3 me-1" />
               {t('videoEstimates.watch', 'Watch')}
             </Button>
           )}
@@ -93,7 +93,7 @@ export default function VideoEstimates() {
               onClick={() => approveEstimate.mutate(row.id)}
               data-testid={`button-approve-${row.id}`}
             >
-              <CheckCircle className="h-3 w-3 mr-1" />
+              <CheckCircle className="h-3 w-3 me-1" />
               {t('videoEstimates.approve', 'Approve')}
             </Button>
           )}

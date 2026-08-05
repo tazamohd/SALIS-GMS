@@ -178,7 +178,7 @@ export function DataTable<T extends Record<string, any>>({
               className="bg-white dark:bg-[#151A23] hover:bg-[#0A5ED7]/5 dark:hover:bg-[#0BB3FF]/10 text-[#0F172A] dark:text-[#E6EAF0] border-[#E2E8F0] dark:border-[#232A36] disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A5ED7] focus-visible:ring-offset-2"
               data-testid="pagination-previous"
             >
-              <ChevronLeft className="w-4 h-4 mr-1" />
+              <ChevronLeft className="w-4 h-4 me-1" />
               Prev
             </Button>
             
@@ -214,7 +214,7 @@ export function DataTable<T extends Record<string, any>>({
               data-testid="pagination-next"
             >
               Next
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <ChevronRight className="w-4 h-4 ms-1" />
             </Button>
           </div>
         )}

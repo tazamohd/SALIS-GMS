@@ -256,7 +256,7 @@ export default function ClientDashboard() {
             </div>
             <Link href="/client/appointments">
               <Button variant="ghost" size="sm" className="text-[#0A5ED7] hover:text-[#0BB3FF]" data-testid="button-view-all-services">
-                View All <ChevronRight className="h-4 w-4 ml-1" />
+                View All <ChevronRight className="h-4 w-4 ms-1" />
               </Button>
             </Link>
           </CardHeader>
@@ -323,7 +323,7 @@ export default function ClientDashboard() {
             </div>
             <Link href="/client/reminders">
               <Button variant="ghost" size="sm" className="text-[#0A5ED7] hover:text-[#0BB3FF]" data-testid="button-view-all-reminders">
-                View All <ChevronRight className="h-4 w-4 ml-1" />
+                View All <ChevronRight className="h-4 w-4 ms-1" />
               </Button>
             </Link>
           </CardHeader>
@@ -395,7 +395,7 @@ export default function ClientDashboard() {
           </div>
           <Link href="/client/invoices">
             <Button variant="ghost" size="sm" className="text-[#0A5ED7] hover:text-[#0BB3FF]" data-testid="button-view-all-invoices">
-              View All <ChevronRight className="h-4 w-4 ml-1" />
+              View All <ChevronRight className="h-4 w-4 ms-1" />
             </Button>
           </Link>
         </CardHeader>

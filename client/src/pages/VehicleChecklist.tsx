@@ -209,7 +209,7 @@ export default function VehicleChecklist() {
               className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white shadow-lg"
               data-testid="button-new-checklist"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {t('vehicles.newChecklist', 'New Checklist')}
             </Button>
           </DialogTrigger>
@@ -271,7 +271,7 @@ export default function VehicleChecklist() {
                 placeholder={t('vehicles.searchByPlateVehicleTechnician', 'Search by plate, vehicle, or technician...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+                className="ps-10 font-poppins bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
                 data-testid="input-search-checklist"
               />
             </div>
@@ -368,7 +368,7 @@ export default function VehicleChecklist() {
                       className="h-8 px-3 border-[#0A5ED7] text-[#0A5ED7] hover:bg-[#0A5ED7]/10"
                       data-testid="button-print-checklist"
                     >
-                      <Printer className="w-4 h-4 mr-1" />
+                      <Printer className="w-4 h-4 me-1" />
                       {t('common.print', 'Print')}
                     </Button>
                     <Button
@@ -376,7 +376,7 @@ export default function VehicleChecklist() {
                       className="h-8 px-3 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a0e6] text-white"
                       data-testid="button-save-checklist"
                     >
-                      <Save className="w-4 h-4 mr-1" />
+                      <Save className="w-4 h-4 me-1" />
                       {t('common.save', 'Save')}
                     </Button>
                   </div>

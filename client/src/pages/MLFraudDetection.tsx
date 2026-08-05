@@ -114,7 +114,7 @@ export default function MLFraudDetection() {
                         {t('mlFraud.detected', 'Detected')} {fraudCase.detected}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="text-2xl font-bold text-red-600">{fraudCase.amount}</p>
                     </div>
                   </div>

@@ -146,7 +146,7 @@ export default function ISOQualityManagement() {
                       <h3 className="font-semibold text-[#0B1F3B] dark:text-white">{checklist.name}</h3>
                       <p className="text-sm text-[#64748B]">{checklist.itemCount || 0} {t('quality.items', 'items')} • {checklist.category?.replace("_", " ")}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-end">
                       <p className="font-semibold text-[#0B1F3B] dark:text-white">{checklist.completionRate || 0}%</p>
                       <p className="text-sm text-[#64748B]">{t('quality.completion', 'Completion')}</p>
                     </div>

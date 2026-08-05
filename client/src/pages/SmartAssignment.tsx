@@ -242,7 +242,7 @@ export function SmartAssignment() {
                         className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                         data-testid={`button-assign-${rec.technicianId}`}
                       >
-                        <CheckCircle className="h-4 w-4 mr-2" />
+                        <CheckCircle className="h-4 w-4 me-2" />
                         {assignMutation.isPending ? t('smartAssignment.assigning', 'Assigning...') : t('smartAssignment.assignToJob', 'Assign to Job')}
                       </Button>
                     </CardContent>

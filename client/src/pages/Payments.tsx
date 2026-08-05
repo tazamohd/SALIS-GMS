@@ -114,7 +114,7 @@ function RecordPaymentDialog({ invoices }: { invoices: Invoice[] }) {
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
           data-testid="button-record-payment"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('payments.recordPayment', 'Record Payment')}
         </Button>
       </DialogTrigger>
@@ -342,7 +342,7 @@ export default function Payments() {
       label: t('common.status', 'Status'),
       render: () => (
         <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-          <CheckCircle className="h-3 w-3 mr-1" />
+          <CheckCircle className="h-3 w-3 me-1" />
           {t('common.completed', 'Completed')}
         </Badge>
       ),
@@ -375,7 +375,7 @@ export default function Payments() {
           data-testid={`button-receipt-${payment.id}`}
           onClick={() => exportPaymentReceiptToPDF(payment)}
         >
-          <Download className="h-4 w-4 mr-1" />
+          <Download className="h-4 w-4 me-1" />
           {t('payments.receipt', 'Receipt')}
         </Button>
       ),

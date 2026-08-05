@@ -137,7 +137,7 @@ export function JobCardsList() {
                     onClick={() => handleAssignTask(jobCard)}
                     data-testid={`button-assign-task-${jobCard.id}`}
                   >
-                    <User className="w-3 h-3 mr-1" />
+                    <User className="w-3 h-3 me-1" />
                     Assign Task
                   </Button>
                   <Button variant="outline" size="sm" data-testid={`button-view-${jobCard.id}`}>

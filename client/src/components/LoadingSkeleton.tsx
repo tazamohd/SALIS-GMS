@@ -30,7 +30,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
           <Skeleton className="h-4 w-8" />
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-20 ml-auto" />
+          <Skeleton className="h-4 w-20 ms-auto" />
           <Skeleton className="h-4 w-16" />
         </div>
         {/* Table rows */}
@@ -42,7 +42,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
             <Skeleton className="h-4 w-8" />
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20 ml-auto" />
+            <Skeleton className="h-4 w-20 ms-auto" />
             <Skeleton className="h-4 w-16" />
           </div>
         ))}

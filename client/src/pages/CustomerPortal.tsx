@@ -417,7 +417,7 @@ export default function CustomerPortal() {
                   onClick={() => setSelectedVehicleForHistory(vehicle.id)}
                   data-testid={`btn-history-${vehicle.id}`}
                 >
-                  <History className="w-4 h-4 mr-2" />
+                  <History className="w-4 h-4 me-2" />
                   View Service History
                 </Button>
               </div>
@@ -707,7 +707,7 @@ export default function CustomerPortal() {
                       Due: {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : 'N/A'}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-xl font-bold text-[#0B1F3B] dark:text-white">
                       SAR {Number(inv.totalAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </p>
@@ -731,7 +731,7 @@ export default function CustomerPortal() {
                       }
                       data-testid={`btn-pay-${inv.id}`}
                     >
-                      <CreditCard className="w-4 h-4 mr-2" />
+                      <CreditCard className="w-4 h-4 me-2" />
                       Pay Now
                     </Button>
                   </>
@@ -786,7 +786,7 @@ export default function CustomerPortal() {
 
             <div className="space-y-6">
               {serviceHistory.map((record: any, index: number) => (
-                <div key={record.id} className="relative pl-12" data-testid={`history-${record.id}`}>
+                <div key={record.id} className="relative ps-12" data-testid={`history-${record.id}`}>
                   {/* Timeline dot */}
                   <div className={`absolute left-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                     record.status === 'completed'

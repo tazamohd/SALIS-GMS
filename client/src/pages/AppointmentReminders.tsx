@@ -396,7 +396,7 @@ export default function AppointmentReminders() {
                           {t('reminders.scheduledTime', 'Scheduled')}: {new Date(noShow.scheduledTime).toLocaleString()}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-sm text-gray-600 dark:text-gray-400">{t('reminders.estLoss', 'Est. Loss')}</p>
                         <p className="text-lg font-bold text-red-600">
                           ${Number(noShow.estimatedRevenueLoss || 0).toFixed(2)}

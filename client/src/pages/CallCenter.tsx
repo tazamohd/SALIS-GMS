@@ -336,7 +336,7 @@ export default function CallCenter() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <Badge className={getStatusColor(session.status)}>
                       {session.status}
                     </Badge>

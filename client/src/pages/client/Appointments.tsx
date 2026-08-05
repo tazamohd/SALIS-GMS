@@ -143,7 +143,7 @@ export default function ClientAppointments() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white" data-testid="button-book-new">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               Book Appointment
             </Button>
           </DialogTrigger>
@@ -193,7 +193,7 @@ export default function ClientAppointments() {
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full pl-3 text-left font-normal bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]",
+                                "w-full ps-3 text-start font-normal bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]",
                                 !field.value && "text-[#64748B]"
                               )}
                               data-testid="button-select-date"
@@ -203,7 +203,7 @@ export default function ClientAppointments() {
                               ) : (
                                 <span>{t('nav.pick_a_date', 'Pick a date')}</span>
                               )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>

@@ -127,7 +127,7 @@ export default function PurchaseAgentReports() {
         <div className="flex items-center gap-2">
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger className="w-40 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-date-range">
-              <Calendar className="h-4 w-4 mr-2" />
+              <Calendar className="h-4 w-4 me-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -198,15 +198,15 @@ export default function PurchaseAgentReports() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview" data-testid="tab-overview">
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-4 w-4 me-2" />
             Overview
           </TabsTrigger>
           <TabsTrigger value="suppliers" data-testid="tab-suppliers">
-            <Users className="h-4 w-4 mr-2" />
+            <Users className="h-4 w-4 me-2" />
             Suppliers
           </TabsTrigger>
           <TabsTrigger value="reports" data-testid="tab-reports">
-            <FileText className="h-4 w-4 mr-2" />
+            <FileText className="h-4 w-4 me-2" />
             Reports
           </TabsTrigger>
         </TabsList>
@@ -274,7 +274,7 @@ export default function PurchaseAgentReports() {
                             </p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {supplier.totalSpend.toLocaleString()}</p>
                           {supplier.rating && (
                             <Badge variant="outline" className="text-xs border-[#E2E8F0] dark:border-[#232A36]">

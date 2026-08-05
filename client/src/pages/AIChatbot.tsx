@@ -267,7 +267,7 @@ export default function AIChatbot() {
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                className="w-full justify-start text-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.bookAppointmentMessage', 'I want to book an appointment'))}
                 data-testid="button-book-appointment"
               >
@@ -275,7 +275,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                className="w-full justify-start text-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.checkStatusMessage', 'Check my vehicle status'))}
                 data-testid="button-check-status"
               >
@@ -283,7 +283,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                className="w-full justify-start text-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.getQuoteMessage', 'Get a quote for service'))}
                 data-testid="button-get-quote"
               >
@@ -291,7 +291,7 @@ export default function AIChatbot() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-left border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
+                className="w-full justify-start text-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#0A5ED7]/10 hover:border-[#0A5ED7]"
                 onClick={() => setMessageInput(t('aiChatbot.viewHistoryMessage', 'View my service history'))}
                 data-testid="button-service-history"
               >
@@ -345,7 +345,7 @@ export default function AIChatbot() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="border-b border-[#E2E8F0] dark:border-[#232A36]">
-                  <tr className="text-left text-sm font-semibold text-[#64748B] font-['Poppins']">
+                  <tr className="text-start text-sm font-semibold text-[#64748B] font-['Poppins']">
                     <th className="pb-3">{t('aiChatbot.session', 'Session')}</th>
                     <th className="pb-3">{t('common.status', 'Status')}</th>
                     <th className="pb-3">{t('aiChatbot.handler', 'Handler')}</th>

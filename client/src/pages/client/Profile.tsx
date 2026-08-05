@@ -198,7 +198,7 @@ export default function ClientProfile() {
                   className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                   data-testid="button-save-profile"
                 >
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-4 w-4 me-2" />
                   {updateMutation.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </form>

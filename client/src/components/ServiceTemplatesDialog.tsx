@@ -134,7 +134,7 @@ export function ServiceTemplatesDialog({ open, onOpenChange }: ServiceTemplatesD
         <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <strong>Total Templates:</strong> {templates.length} | 
-            <strong className="ml-2">Active:</strong> {templates.filter(t => t.isActive).length}
+            <strong className="ms-2">Active:</strong> {templates.filter(t => t.isActive).length}
           </p>
         </div>
       </DialogContent>

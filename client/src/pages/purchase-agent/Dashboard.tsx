@@ -218,7 +218,7 @@ export default function PurchaseAgentDashboard() {
                         </p>
                         <p className="text-sm text-[#64748B]">{part?.sku}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="font-semibold text-red-600">
                           {inv.stockQuantity} in stock
                         </p>

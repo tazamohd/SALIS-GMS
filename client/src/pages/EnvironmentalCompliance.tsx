@@ -109,7 +109,7 @@ export default function EnvironmentalCompliance() {
                       {record.quantity} {record.unit} • {record.disposalCompany}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-semibold text-[#0B1F3B] dark:text-white">SAR {record.cost || 0}</p>
                     <p className="text-sm text-[#64748B]">{new Date(record.recordDate).toLocaleDateString()}</p>
                   </div>

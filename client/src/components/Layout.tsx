@@ -353,8 +353,8 @@ export function Layout({ children }: LayoutProps) {
                       className="w-full"
                       data-testid={`nav-group-${groupLabel.toLowerCase().replace(/\s+/g, "-")}`}
                     >
-                      <div className="flex items-center justify-start gap-2 pl-2 pr-2 py-2 rounded-md hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors group">
-                        <span className="font-poppins font-extrabold text-[13px] uppercase text-[#0F172A] dark:text-[#C8D6E8] tracking-wider leading-tight text-left whitespace-nowrap">
+                      <div className="flex items-center justify-start gap-2 ps-2 pe-2 py-2 rounded-md hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 transition-colors group">
+                        <span className="font-poppins font-extrabold text-[13px] uppercase text-[#0F172A] dark:text-[#C8D6E8] tracking-wider leading-tight text-start whitespace-nowrap">
                           {groupLabel}
                         </span>
                         <div className="flex-1" />
@@ -375,7 +375,7 @@ export function Layout({ children }: LayoutProps) {
                           <Link key={item.path} href={item.path}>
                             <div
                               onClick={() => setMobileMenuOpen(false)}
-                              className={`flex items-center gap-2 pl-6 pr-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
+                              className={`flex items-center gap-2 ps-6 pe-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
                                 isActive
                                   ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white shadow-md"
                                   : "text-[#0F172A] dark:text-[#E6EAF0] hover:bg-[#0A5ED7]/10 dark:hover:bg-[#0BB3FF]/10 hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]"
@@ -407,7 +407,7 @@ export function Layout({ children }: LayoutProps) {
               className="w-full justify-start text-[#F97316] hover:text-white hover:bg-[#F97316] dark:hover:bg-[#F97316] h-8 transition-colors"
               data-testid="button-logout"
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="w-4 h-4 me-2" />
               <span className="font-poppins font-medium text-xs">
                 {t("common.logout")}
               </span>
@@ -416,7 +416,7 @@ export function Layout({ children }: LayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col lg:ml-0">
+        <div className="flex-1 flex flex-col lg:ms-0">
           {/* Header - Brand Design */}
           <header className="h-14 bg-white dark:bg-[#0B1F3B] border-b border-[#E2E8F0] dark:border-[#232A36] px-4 sm:px-6 flex items-center gap-3 shadow-sm">
             {/* Mobile Menu Toggle */}

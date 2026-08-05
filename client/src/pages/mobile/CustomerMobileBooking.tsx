@@ -168,7 +168,7 @@ export default function CustomerMobileBooking() {
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-date"
                 />
               </div>

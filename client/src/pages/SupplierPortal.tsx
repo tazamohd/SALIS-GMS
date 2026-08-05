@@ -81,7 +81,7 @@ function StarRating({ rating }: { rating: number }) {
           className={`h-4 w-4 ${i <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
         />
       ))}
-      <span className="ml-1 text-sm font-medium">{rating.toFixed(1)}</span>
+      <span className="ms-1 text-sm font-medium">{rating.toFixed(1)}</span>
     </div>
   );
 }
@@ -154,11 +154,11 @@ function SuppliersTab() {
             placeholder="Search suppliers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <Button onClick={() => setShowAddDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Supplier
+          <Plus className="me-2 h-4 w-4" /> Add Supplier
         </Button>
       </div>
 
@@ -302,7 +302,7 @@ function OrdersTab() {
             placeholder="Search PO # or supplier..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <div className="flex gap-1">
@@ -331,7 +331,7 @@ function OrdersTab() {
                   <TableHead>PO #</TableHead>
                   <TableHead>Supplier</TableHead>
                   <TableHead>Items</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-end">Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Expected Delivery</TableHead>
                   <TableHead>Tracking</TableHead>
@@ -347,12 +347,12 @@ function OrdersTab() {
                         <span className="text-sm">
                           {order.items.map((it: any) => it.partName).join(", ")}
                         </span>
-                        <span className="text-xs text-muted-foreground ml-1">
+                        <span className="text-xs text-muted-foreground ms-1">
                           ({order.items.reduce((s: number, it: any) => s + it.quantity, 0)} items)
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-medium">{formatCurrencyDecimal(order.total)}</TableCell>
+                    <TableCell className="text-end font-medium">{formatCurrencyDecimal(order.total)}</TableCell>
                     <TableCell><StatusBadge status={order.status} /></TableCell>
                     <TableCell>
                       <div className="text-sm">{order.expectedDelivery}</div>

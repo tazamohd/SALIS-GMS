@@ -155,7 +155,7 @@ export default function AccountsPayable() {
               placeholder={t('accounting.searchVendorsOrInvoices', 'Search vendors or invoices...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
               data-testid="input-search"
             />
           </div>
@@ -174,13 +174,13 @@ export default function AccountsPayable() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90" data-testid="button-make-payment">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('accounting.makePayment', 'Make Payment')}
               </Button>
             </DialogTrigger>
@@ -318,9 +318,9 @@ export default function AccountsPayable() {
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.invoice', 'Invoice')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.dueDate', 'Due Date')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('accounting.terms', 'Terms')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.original', 'Original')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.paid', 'Paid')}</TableHead>
-                <TableHead className="text-right text-[#0B1F3B] dark:text-white">{t('accounting.balance', 'Balance')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.original', 'Original')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.paid', 'Paid')}</TableHead>
+                <TableHead className="text-end text-[#0B1F3B] dark:text-white">{t('accounting.balance', 'Balance')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.status', 'Status')}</TableHead>
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
@@ -353,13 +353,13 @@ export default function AccountsPayable() {
                   <TableCell className="text-sm text-[#64748B]">
                     {ap.paymentTerms}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">
+                  <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">
                     {ap.originalAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-green-600 dark:text-green-400">
+                  <TableCell className="text-end font-mono text-green-600 dark:text-green-400">
                     {ap.paidAmount.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono font-bold text-[#0B1F3B] dark:text-white">
+                  <TableCell className="text-end font-mono font-bold text-[#0B1F3B] dark:text-white">
                     {ap.balanceDue.toLocaleString()}
                   </TableCell>
                   <TableCell>
@@ -481,30 +481,30 @@ export default function AccountsPayable() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/vendor-supplier-portal">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-vendors">
-                <Building2 className="h-4 w-4 mr-2" />
+                <Building2 className="h-4 w-4 me-2" />
                 {t('accounting.vendors', 'Vendors')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('accounting.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/accounts-receivable">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-accounts-receivable">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('accounting.accountsReceivable', 'Accounts Receivable')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/cash-flow-statement">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-cash-flow">
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-4 w-4 me-2" />
                 {t('accounting.cashFlow', 'Cash Flow')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>

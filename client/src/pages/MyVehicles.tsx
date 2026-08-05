@@ -134,7 +134,7 @@ export default function MyVehicles() {
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-add-vehicle" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"><Plus className="h-4 w-4 mr-1" /> {t("myVehicles.addVehicle", "Add vehicle")}</Button>
+              <Button data-testid="button-add-vehicle" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white"><Plus className="h-4 w-4 me-1" /> {t("myVehicles.addVehicle", "Add vehicle")}</Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>{t("myVehicles.addAVehicle", "Add a vehicle")}</DialogTitle></DialogHeader>
@@ -146,10 +146,10 @@ export default function MyVehicles() {
                     <Input className={inputCls} value={form.vin} onChange={(e) => set("vin", e.target.value)} data-testid="input-vin" placeholder={t("myVehicles.vinPlaceholder", "17-character VIN")} />
                   </div>
                   <Button type="button" variant="outline" onClick={() => decodeVin.mutate()} disabled={form.vin.trim().length !== 17 || decodeVin.isPending} data-testid="button-decode-vin">
-                    <Search className="h-4 w-4 mr-1" />{decodeVin.isPending ? t("myVehicles.decoding", "Decoding…") : t("myVehicles.decodeVin", "Decode VIN")}
+                    <Search className="h-4 w-4 me-1" />{decodeVin.isPending ? t("myVehicles.decoding", "Decoding…") : t("myVehicles.decodeVin", "Decode VIN")}
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => handleScan("license")} data-testid="button-scan-license"><ScanLine className="h-4 w-4 mr-1" />{t("myVehicles.scanLicense", "Scan license")}</Button>
-                  <Button type="button" variant="outline" onClick={() => handleScan("insurance")} data-testid="button-scan-insurance"><ShieldCheck className="h-4 w-4 mr-1" />{t("myVehicles.scanInsurance", "Scan insurance")}</Button>
+                  <Button type="button" variant="outline" onClick={() => handleScan("license")} data-testid="button-scan-license"><ScanLine className="h-4 w-4 me-1" />{t("myVehicles.scanLicense", "Scan license")}</Button>
+                  <Button type="button" variant="outline" onClick={() => handleScan("insurance")} data-testid="button-scan-insurance"><ShieldCheck className="h-4 w-4 me-1" />{t("myVehicles.scanInsurance", "Scan insurance")}</Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

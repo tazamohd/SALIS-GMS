@@ -149,7 +149,7 @@ export function CustomerDashboard() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-bold text-[#0B1F3B] dark:text-white" data-testid={`text-invoice-amount-${inv.id}`}>SAR {Number(inv.balanceAmount).toFixed(2)}</p>
                     <Link href="/portal/invoices">
                       <Button size="sm" className="mt-2 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white border-0 hover:opacity-90" data-testid={`button-pay-invoice-${inv.id}`}>

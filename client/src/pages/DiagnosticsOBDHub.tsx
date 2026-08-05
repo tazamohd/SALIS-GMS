@@ -99,7 +99,7 @@ export default function DiagnosticsOBDHub() {
           data-testid="button-add-device"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('diagnosticsOBD.registerDevice', 'Register Device')}
         </Button>
       </div>
@@ -146,7 +146,7 @@ export default function DiagnosticsOBDHub() {
           data-testid="button-start-session"
           className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white hover:opacity-90"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('diagnosticsOBD.startSession', 'Start Session')}
         </Button>
       </div>

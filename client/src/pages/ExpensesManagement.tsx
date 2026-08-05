@@ -406,7 +406,7 @@ export default function ExpensesManagement() {
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button data-testid="button-add-expense">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('payments.expenses.addExpense', 'Add Expense')}
                 </Button>
               </DialogTrigger>
@@ -568,7 +568,7 @@ export default function ExpensesManagement() {
                 placeholder={t('payments.expenses.searchExpenses', 'Search expenses...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="ps-10"
                 data-testid="input-search-expenses"
               />
             </div>
@@ -587,7 +587,7 @@ export default function ExpensesManagement() {
               </SelectContent>
             </Select>
             <Button variant="outline" data-testid="button-export-expenses">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-4 w-4 me-2" />
               {t('common.export', 'Export')}
             </Button>
           </div>
@@ -628,9 +628,9 @@ export default function ExpensesManagement() {
                   <TableCell>
                     <Badge variant={expense.status === "Paid" ? "default" : "secondary"}>
                       {expense.status === "Paid" ? (
-                        <CheckCircle className="h-3 w-3 mr-1" />
+                        <CheckCircle className="h-3 w-3 me-1" />
                       ) : (
-                        <Clock className="h-3 w-3 mr-1" />
+                        <Clock className="h-3 w-3 me-1" />
                       )}
                       {t(`payments.expenses.status.${expense.status.toLowerCase()}`, expense.status)}
                     </Badge>

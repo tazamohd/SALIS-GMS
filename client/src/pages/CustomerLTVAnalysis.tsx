@@ -236,7 +236,7 @@ export default function CustomerLTVAnalysis() {
               placeholder={t('customers.searchPlaceholder', 'Search customers...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+              className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
               data-testid="input-search-customers"
             />
           </div>
@@ -272,7 +272,7 @@ export default function CustomerLTVAnalysis() {
                   </div>
                 </div>
               </div>
-              <div className="text-right ml-4">
+              <div className="text-end ms-4">
                 <p className="text-lg font-bold text-[#0B1F3B] dark:text-white">
                   SAR {customer.predictedLTV.toLocaleString()}
                 </p>

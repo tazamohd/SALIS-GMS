@@ -875,7 +875,7 @@ export function Reports() {
       />
       <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
         <SelectTrigger className="w-[200px]" data-testid="select-garage-filter">
-          <Building2 className="w-4 h-4 mr-2" />
+          <Building2 className="w-4 h-4 me-2" />
           <SelectValue placeholder={t('analytics.allGarages', 'All Garages')} />
         </SelectTrigger>
         <SelectContent>

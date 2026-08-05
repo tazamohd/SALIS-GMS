@@ -69,7 +69,7 @@ export default function VINDecoder() {
                 disabled={vin.length !== 17 || decodeMutation.isPending}
                 data-testid="button-decode-vin"
               >
-                <Search className="h-4 w-4 mr-2" />
+                <Search className="h-4 w-4 me-2" />
                 {decodeMutation.isPending ? t('vinDecoder.decoding', 'Decoding...') : t('vinDecoder.decodeVin', 'Decode VIN')}
               </Button>
 
@@ -77,14 +77,14 @@ export default function VINDecoder() {
                 <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-2">{t('vinDecoder.sampleVins', 'Sample VINs')}</h3>
                 <div className="space-y-2">
                   <button
-                    className="w-full text-left p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
+                    className="w-full text-start p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
                     onClick={() => setVin("1HGBH41JXMN109186")}
                     data-testid="sample-vin-1"
                   >
                     1HGBH41JXMN109186
                   </button>
                   <button
-                    className="w-full text-left p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
+                    className="w-full text-start p-2 text-sm bg-[#F8FAFC] dark:bg-[#0E1117] rounded border border-[#E2E8F0] dark:border-[#232A36] hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] font-mono text-[#0B1F3B] dark:text-white transition-colors"
                     onClick={() => setVin("5UXWX7C5*BA")}
                     data-testid="sample-vin-2"
                   >
@@ -113,7 +113,7 @@ export default function VINDecoder() {
                   <CardTitle className="flex items-center justify-between text-[#0B1F3B] dark:text-white">
                     <span>{t('vinDecoder.vehicleInformation', 'Vehicle Information')}</span>
                     <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-0">
-                      <CheckCircle className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-3 w-3 me-1" />
                       {t('vinDecoder.decoded', 'Decoded')}
                     </Badge>
                   </CardTitle>

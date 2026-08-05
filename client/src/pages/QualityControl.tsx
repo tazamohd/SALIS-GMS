@@ -116,13 +116,13 @@ interface QCDefect {
 function getResultBadge(result: string) {
   switch (result) {
     case "pass":
-      return <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100"><CheckCircle className="w-3 h-3 mr-1" />Pass</Badge>;
+      return <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100"><CheckCircle className="w-3 h-3 me-1" />Pass</Badge>;
     case "fail":
-      return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-100"><XCircle className="w-3 h-3 mr-1" />Fail</Badge>;
+      return <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-100"><XCircle className="w-3 h-3 me-1" />Fail</Badge>;
     case "conditional":
-      return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 hover:bg-yellow-100"><AlertTriangle className="w-3 h-3 mr-1" />Conditional</Badge>;
+      return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 hover:bg-yellow-100"><AlertTriangle className="w-3 h-3 me-1" />Conditional</Badge>;
     case "pending":
-      return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+      return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100"><Clock className="w-3 h-3 me-1" />Pending</Badge>;
     default:
       return <Badge variant="secondary">{result}</Badge>;
   }
@@ -539,7 +539,7 @@ export default function QualityControl() {
                           </div>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                          <div className="ml-8 mt-2 mb-4 space-y-2">
+                          <div className="ms-8 mt-2 mb-4 space-y-2">
                             {checklist.items.map((item) => (
                               <div
                                 key={item.id}

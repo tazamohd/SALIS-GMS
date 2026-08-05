@@ -160,7 +160,7 @@ export default function Subscriptions() {
                     disabled={resumeMutation.isPending}
                     data-testid="button-resume"
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
+                    <RefreshCw className="w-4 h-4 me-2" />
                     Resume
                   </Button>
                 ) : currentPlan !== "STARTER" ? (
@@ -171,7 +171,7 @@ export default function Subscriptions() {
                     disabled={cancelMutation.isPending}
                     data-testid="button-cancel"
                   >
-                    <XCircle className="w-4 h-4 mr-2" />
+                    <XCircle className="w-4 h-4 me-2" />
                     Cancel at period end
                   </Button>
                 ) : null}
@@ -353,7 +353,7 @@ function PlanCard({
             <>Switching…</>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-4 h-4 me-2" />
               Switch to {plan.name}
             </>
           )}

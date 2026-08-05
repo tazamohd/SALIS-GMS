@@ -39,7 +39,7 @@ export function EmptyState({
               className="btn-touch focus-visible-ring"
               data-testid={`empty-state-action-${index}`}
             >
-              {action.icon && <action.icon className="mr-2 h-4 w-4" />}
+              {action.icon && <action.icon className="me-2 h-4 w-4" />}
               {action.label}
             </Button>
           ))}

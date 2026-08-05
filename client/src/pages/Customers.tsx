@@ -241,7 +241,7 @@ export function Customers() {
           customRender: (
             <Select value={selectedGarageId} onValueChange={setSelectedGarageId}>
               <SelectTrigger className="w-[200px] bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]" data-testid="select-garage-filter">
-                <Building2 className="w-4 h-4 mr-2" />
+                <Building2 className="w-4 h-4 me-2" />
                 <SelectValue placeholder="All Garages" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-[#151A23]">
@@ -314,7 +314,7 @@ export function Customers() {
                   placeholder={t('customers.searchPlaceholder', 'Search customers...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                  className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                   data-testid="input-search-customers"
                 />
               </div>
@@ -397,13 +397,13 @@ export function Customers() {
                     <div className="flex flex-col gap-2 items-end">
                       {outstandingJobs.length > 0 && (
                         <Badge className="bg-[#0A5ED7]/10 text-[#0A5ED7] border-[#0A5ED7]/30">
-                          <AlertCircle className="w-3 h-3 mr-1" />
+                          <AlertCircle className="w-3 h-3 me-1" />
                           {outstandingJobs.length} {t('customers.activeJobs', 'Active Jobs')}
                         </Badge>
                       )}
                       {unpaidInvoices.length > 0 && (
                         <Badge className="bg-[#F97316]/10 text-[#F97316] border-[#F97316]/30">
-                          <DollarSign className="w-3 h-3 mr-1" />
+                          <DollarSign className="w-3 h-3 me-1" />
                           {unpaidInvoices.length} {t('customers.unpaid', 'Unpaid')}
                         </Badge>
                       )}
@@ -461,19 +461,19 @@ export function Customers() {
               <Tabs defaultValue="vehicles" className="space-y-4" data-testid="tabs-customer-history">
                 <TabsList className="bg-white dark:bg-[#151A23]">
                   <TabsTrigger value="vehicles" data-testid="tab-vehicles">
-                    <Car className="w-4 h-4 mr-2" />
+                    <Car className="w-4 h-4 me-2" />
                     {t('customers.tabs.vehicles', 'Vehicles')}
                   </TabsTrigger>
                   <TabsTrigger value="jobs" data-testid="tab-jobs">
-                    <ClipboardList className="w-4 h-4 mr-2" />
+                    <ClipboardList className="w-4 h-4 me-2" />
                     {t('customers.tabs.jobHistory', 'Job History')}
                   </TabsTrigger>
                   <TabsTrigger value="invoices" data-testid="tab-invoices">
-                    <FileText className="w-4 h-4 mr-2" />
+                    <FileText className="w-4 h-4 me-2" />
                     {t('customers.tabs.invoicesPayments', 'Invoices & Payments')}
                   </TabsTrigger>
                   <TabsTrigger value="notes" data-testid="tab-notes">
-                    <MessageSquare className="w-4 h-4 mr-2" />
+                    <MessageSquare className="w-4 h-4 me-2" />
                     {t('customers.tabs.notes', 'Notes')}
                   </TabsTrigger>
                 </TabsList>
@@ -606,9 +606,9 @@ export function Customers() {
                                         'bg-[#64748B]/10 dark:bg-[#64748B]/20 border-[#64748B]/30 text-[#64748B]'
                                       }
                                     >
-                                      {job.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1" />}
-                                      {job.status === 'in_progress' && <Clock className="w-3 h-3 mr-1" />}
-                                      {job.status === 'cancelled' && <XCircle className="w-3 h-3 mr-1" />}
+                                      {job.status === 'completed' && <CheckCircle className="w-3 h-3 me-1" />}
+                                      {job.status === 'in_progress' && <Clock className="w-3 h-3 me-1" />}
+                                      {job.status === 'cancelled' && <XCircle className="w-3 h-3 me-1" />}
                                       {job.status}
                                     </Badge>
                                   </div>
@@ -626,7 +626,7 @@ export function Customers() {
                                         className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90 text-white"
                                         data-testid={`button-view-job-details-${job.id}`}
                                       >
-                                        <Eye className="w-4 h-4 mr-2" />
+                                        <Eye className="w-4 h-4 me-2" />
                                         {t('common.viewFullDetails', 'View Full Details')}
                                       </Button>
                                     </JobCardDetailsDialog>
@@ -707,7 +707,7 @@ export function Customers() {
                                           className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-gradient-to-r hover:from-[#0A5ED7] hover:to-[#0BB3FF] hover:text-white hover:border-transparent"
                                           data-testid={`button-view-invoice-${invoice.id}`}
                                         >
-                                          <Eye className="w-3 h-3 mr-2" />
+                                          <Eye className="w-3 h-3 me-2" />
                                           {t('common.view', 'View')}
                                         </Button>
                                       </InvoiceDetailsDialog>
@@ -723,7 +723,7 @@ export function Customers() {
                                             disabled={sendReminderMutation.isPending}
                                             data-testid={`button-send-reminder-${invoice.id}`}
                                           >
-                                            <Send className="w-3 h-3 mr-2" />
+                                            <Send className="w-3 h-3 me-2" />
                                             {t('customers.sendReminder', 'Send Reminder')}
                                           </Button>
                                         ) : null
@@ -742,7 +742,7 @@ export function Customers() {
                   <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36] mt-4">
                     <CardHeader>
                       <CardTitle className="font-['Poppins',Helvetica] font-semibold text-lg text-[#0B1F3B] dark:text-white">
-                        <DollarSign className="w-5 h-5 inline-block mr-2 text-[#0A5ED7]" />
+                        <DollarSign className="w-5 h-5 inline-block me-2 text-[#0A5ED7]" />
                         {t('customers.paymentHistory', 'Payment History')} ({(customerPayments ?? []).length} {t('common.total', 'total')})
                       </CardTitle>
                     </CardHeader>

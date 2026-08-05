@@ -189,11 +189,11 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="text-left p-3 text-sm font-medium text-gray-600">Part Name</th>
-                      <th className="text-left p-3 text-sm font-medium text-gray-600">Part Number</th>
-                      <th className="text-right p-3 text-sm font-medium text-gray-600">Quantity</th>
-                      <th className="text-right p-3 text-sm font-medium text-gray-600">Unit Price</th>
-                      <th className="text-right p-3 text-sm font-medium text-gray-600">Total</th>
+                      <th className="text-start p-3 text-sm font-medium text-gray-600">Part Name</th>
+                      <th className="text-start p-3 text-sm font-medium text-gray-600">Part Number</th>
+                      <th className="text-end p-3 text-sm font-medium text-gray-600">Quantity</th>
+                      <th className="text-end p-3 text-sm font-medium text-gray-600">Unit Price</th>
+                      <th className="text-end p-3 text-sm font-medium text-gray-600">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -201,9 +201,9 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                       <tr key={item.id} className="border-t" data-testid={`po-item-${item.id}`}>
                         <td className="p-3">{item.partName}</td>
                         <td className="p-3 text-gray-600">{item.partNumber || "-"}</td>
-                        <td className="p-3 text-right">{item.quantity}</td>
-                        <td className="p-3 text-right">SAR {parseFloat(item.unitPrice).toFixed(2)}</td>
-                        <td className="p-3 text-right font-medium">
+                        <td className="p-3 text-end">{item.quantity}</td>
+                        <td className="p-3 text-end">SAR {parseFloat(item.unitPrice).toFixed(2)}</td>
+                        <td className="p-3 text-end font-medium">
                           ${parseFloat(item.lineTotal).toFixed(2)}
                         </td>
                       </tr>
@@ -240,7 +240,7 @@ export function PurchaseOrderDetailsDialog({ purchaseOrder, supplier }: Purchase
                 onClick={() => setDeleteDialogOpen(true)}
                 data-testid="button-delete-po"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4 me-2" />
                 Delete Purchase Order
               </Button>
               <Button variant="outline" onClick={() => setOpen(false)} data-testid="button-close-po-details">

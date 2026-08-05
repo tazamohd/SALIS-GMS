@@ -112,7 +112,7 @@ export default function TechnicianMyJobs() {
                 placeholder="Search by job number or service type..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-jobs"
               />
             </div>
@@ -173,7 +173,7 @@ export default function TechnicianMyJobs() {
                     <div className="space-y-2 text-sm">
                       {job.scheduledDate && (
                         <p className="text-[#64748B]">
-                          <Clock className="h-4 w-4 inline mr-2" />
+                          <Clock className="h-4 w-4 inline me-2" />
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
@@ -188,7 +188,7 @@ export default function TechnicianMyJobs() {
                       className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90"
                       data-testid={`button-start-${job.id}`}
                     >
-                      <PlayCircle className="h-4 w-4 mr-2" />
+                      <PlayCircle className="h-4 w-4 me-2" />
                       Start Job
                     </Button>
                   </div>
@@ -227,7 +227,7 @@ export default function TechnicianMyJobs() {
                     <div className="space-y-2 text-sm">
                       {job.scheduledDate && (
                         <p className="text-[#64748B]">
-                          <Clock className="h-4 w-4 inline mr-2" />
+                          <Clock className="h-4 w-4 inline me-2" />
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
@@ -242,7 +242,7 @@ export default function TechnicianMyJobs() {
                       className="bg-green-600 hover:bg-green-700"
                       data-testid={`button-complete-${job.id}`}
                     >
-                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <CheckCircle className="h-4 w-4 me-2" />
                       Mark Complete
                     </Button>
                   </div>

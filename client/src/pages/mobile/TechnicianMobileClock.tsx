@@ -108,7 +108,7 @@ export default function TechnicianMobileClock() {
                 disabled={clockMutation.isPending}
                 data-testid="button-clock-out"
               >
-                <LogOut className="h-5 w-5 mr-2" />
+                <LogOut className="h-5 w-5 me-2" />
                 Clock Out
               </Button>
             </div>
@@ -124,7 +124,7 @@ export default function TechnicianMobileClock() {
                 disabled={clockMutation.isPending}
                 data-testid="button-clock-in"
               >
-                <LogIn className="h-5 w-5 mr-2" />
+                <LogIn className="h-5 w-5 me-2" />
                 Clock In
               </Button>
             </div>

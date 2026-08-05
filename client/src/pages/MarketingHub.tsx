@@ -212,7 +212,7 @@ export default function MarketingHub() {
                     </div>
                     <div className="flex items-center gap-3">
                       {account.status === "connected" && (
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm font-medium text-[#0B1F3B] dark:text-white">SAR {account.spend.toLocaleString()}</p>
                           <Progress value={spendPercent} className="w-20 h-1" />
                         </div>
@@ -229,7 +229,7 @@ export default function MarketingHub() {
               onClick={() => setIsConnectDialogOpen(true)}
               data-testid="button-connect-platform"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('marketing.connectNewPlatform', 'Connect New Platform')}
             </Button>
           </CardContent>
@@ -336,7 +336,7 @@ export default function MarketingHub() {
           <p className="text-sm text-[#64748B]">{t('marketing.managePlatformConnections', 'Manage your advertising platform connections')}</p>
         </div>
         <Button onClick={() => setIsConnectDialogOpen(true)} data-testid="button-add-account" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('marketing.addAccount', 'Add Account')}
         </Button>
       </div>
@@ -376,12 +376,12 @@ export default function MarketingHub() {
                         data-testid={`button-connect-${platform.id}`}
                         className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]"
                       >
-                        <LinkIcon className="h-4 w-4 mr-2" />
+                        <LinkIcon className="h-4 w-4 me-2" />
                         {t('marketing.connect', 'Connect')}
                       </Button>
                     ) : (
                       <Button variant="outline" size="sm" data-testid={`button-manage-${platform.id}`} className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
-                        <Settings className="h-4 w-4 mr-2" />
+                        <Settings className="h-4 w-4 me-2" />
                         {t('marketing.manage', 'Manage')}
                       </Button>
                     )}
@@ -427,7 +427,7 @@ export default function MarketingHub() {
           <p className="text-sm text-[#64748B]">{t('marketing.manageCampaignsAcrossPlatforms', 'Manage campaigns across all platforms')}</p>
         </div>
         <Button data-testid="button-create-campaign" className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('marketing.createCampaign', 'Create Campaign')}
         </Button>
       </div>
@@ -597,11 +597,11 @@ export default function MarketingHub() {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
-                    <Archive className="h-4 w-4 mr-2" />
+                    <Archive className="h-4 w-4 me-2" />
                     {t('marketing.archive', 'Archive')}
                   </Button>
                   <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
-                    <Tag className="h-4 w-4 mr-2" />
+                    <Tag className="h-4 w-4 me-2" />
                     {t('marketing.tag', 'Tag')}
                   </Button>
                 </div>
@@ -696,7 +696,7 @@ export default function MarketingHub() {
                           </span>
                           {!comment.hasReplied && (
                             <Button size="sm" variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]">
-                              <Reply className="h-3 w-3 mr-1" />
+                              <Reply className="h-3 w-3 me-1" />
                               {t('marketing.reply', 'Reply')}
                             </Button>
                           )}

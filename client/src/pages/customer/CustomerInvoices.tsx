@@ -190,7 +190,7 @@ export function CustomerInvoices() {
                         onClick={() => handlePayInvoice(inv)}
                         data-testid={`button-pay-invoice-${inv.id}`}
                       >
-                        <CreditCard className="h-4 w-4 mr-2" />
+                        <CreditCard className="h-4 w-4 me-2" />
                         {`Pay SAR ${Number(inv.balanceAmount).toFixed(2)}`}
                       </Button>
                     )}
@@ -209,7 +209,7 @@ export function CustomerInvoices() {
                       className="border-[#E2E8F0] dark:border-[#232A36]"
                       data-testid={`button-download-invoice-${inv.id}`}
                     >
-                      <FileText className="h-4 w-4 mr-2" />
+                      <FileText className="h-4 w-4 me-2" />
                       {downloadingId === inv.id ? 'Generating…' : 'Download PDF'}
                     </Button>
                   </div>

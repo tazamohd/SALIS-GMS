@@ -219,7 +219,7 @@ export default function JournalEntries() {
     const Icon = style.icon;
     return (
       <Badge className={style.className}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {status}
       </Badge>
     );
@@ -239,7 +239,7 @@ export default function JournalEntries() {
               placeholder={t('accounting.searchEntries', 'Search entries...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="ps-10"
               data-testid="input-search-entries"
             />
           </div>
@@ -257,13 +257,13 @@ export default function JournalEntries() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" data-testid="button-export-entries">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-new-entry">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 {t('accounting.newEntry', 'New Entry')}
               </Button>
             </DialogTrigger>
@@ -417,8 +417,8 @@ export default function JournalEntries() {
                 <TableHead>{t('common.date', 'Date')}</TableHead>
                 <TableHead>{t('common.description', 'Description')}</TableHead>
                 <TableHead>{t('accounting.reference', 'Reference')}</TableHead>
-                <TableHead className="text-right">{t('accounting.debit', 'Debit')}</TableHead>
-                <TableHead className="text-right">{t('accounting.credit', 'Credit')}</TableHead>
+                <TableHead className="text-end">{t('accounting.debit', 'Debit')}</TableHead>
+                <TableHead className="text-end">{t('accounting.credit', 'Credit')}</TableHead>
                 <TableHead>{t('common.status', 'Status')}</TableHead>
                 <TableHead>{t('common.actions', 'Actions')}</TableHead>
               </TableRow>
@@ -432,10 +432,10 @@ export default function JournalEntries() {
                   <TableCell>
                     <Badge variant="outline">{entry.reference}</Badge>
                   </TableCell>
-                  <TableCell className="text-right font-mono text-green-600">
+                  <TableCell className="text-end font-mono text-green-600">
                     {entry.totalDebit.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-red-600">
+                  <TableCell className="text-end font-mono text-red-600">
                     {entry.totalCredit.toLocaleString()}
                   </TableCell>
                   <TableCell>{getStatusBadge(entry.status)}</TableCell>
@@ -537,7 +537,7 @@ export default function JournalEntries() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="font-mono font-bold text-[#0B1F3B] dark:text-white">SAR {entry.totalDebit.toLocaleString()}</p>
                     <p className="text-xs text-[#64748B]">{entry.createdAt}</p>
                   </div>
@@ -558,30 +558,30 @@ export default function JournalEntries() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start" data-testid="link-general-ledger">
-                <BookOpen className="h-4 w-4 mr-2" />
+                <BookOpen className="h-4 w-4 me-2" />
                 {t('nav.general_ledger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/chart-of-accounts">
               <Button variant="outline" className="w-full justify-start" data-testid="link-chart-of-accounts">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('nav.chart_of_accounts', 'Chart of Accounts')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/trial-balance">
               <Button variant="outline" className="w-full justify-start" data-testid="link-trial-balance">
-                <ArrowUpRight className="h-4 w-4 mr-2" />
+                <ArrowUpRight className="h-4 w-4 me-2" />
                 {t('nav.trial_balance', 'Trial Balance')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start" data-testid="link-income-statement">
-                <ArrowDownRight className="h-4 w-4 mr-2" />
+                <ArrowDownRight className="h-4 w-4 me-2" />
                 {t('nav.income_statement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>
@@ -600,7 +600,7 @@ export default function JournalEntries() {
           </p>
         </div>
         <Button data-testid="button-create-template">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {t('accounting.createTemplate', 'Create Template')}
         </Button>
       </div>

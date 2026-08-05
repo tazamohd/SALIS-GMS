@@ -223,7 +223,7 @@ export default function SpareParts() {
             placeholder={t('inventory.searchByNameSku', 'Search by name, SKU, or brand...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-3 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
+            className="ps-3 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white"
             data-testid="input-search"
           />
         </div>
@@ -293,7 +293,7 @@ export default function SpareParts() {
                 data-testid="button-create-first"
                 className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {t('inventory.addSparePart', 'Add Spare Part')}
               </Button>
             )}
@@ -336,7 +336,7 @@ export default function SpareParts() {
                           setIsDetailsOpen(true);
                         }}
                       >
-                        <Edit className="mr-2 h-4 w-4" />
+                        <Edit className="me-2 h-4 w-4" />
                         {t('common.view', 'View Details')}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
@@ -347,7 +347,7 @@ export default function SpareParts() {
                         }}
                         data-testid={`button-delete-${part.id}`}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="me-2 h-4 w-4" />
                         {t('common.delete', 'Delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -691,7 +691,7 @@ export default function SpareParts() {
                   className="border-[#F97316] text-[#F97316] hover:bg-[#F97316]/10"
                   data-testid="button-details-delete"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="me-2 h-4 w-4" />
                   {t('common.delete', 'Delete')}
                 </Button>
               </div>

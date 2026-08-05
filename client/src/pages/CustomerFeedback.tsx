@@ -78,7 +78,7 @@ function SentimentBadge({ sentiment, score }: { sentiment: string; score?: numbe
       <Icon className="h-3 w-3" />
       {label}
       {score !== undefined && (
-        <span className="ml-1 text-xs opacity-75">({(score * 100).toFixed(0)}%)</span>
+        <span className="ms-1 text-xs opacity-75">({(score * 100).toFixed(0)}%)</span>
       )}
     </Badge>
   );
@@ -347,7 +347,7 @@ export default function CustomerFeedback() {
       <div className="flex gap-2 mb-6">
         {actions.map((action: any, idx) => (
           <Button key={idx} onClick={action.onClick} variant={action.variant} disabled={action.disabled} data-testid={`action-${idx}`}>
-            <action.icon className="h-4 w-4 mr-2" />
+            <action.icon className="h-4 w-4 me-2" />
             {action.label}
           </Button>
         ))}
@@ -447,7 +447,7 @@ export default function CustomerFeedback() {
               <CardDescription>{t('customers.feedback.latestSubmissions', 'Latest customer feedback submissions')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[400px] pr-4">
+              <ScrollArea className="h-[400px] pe-4">
                 <div className="space-y-4">
                   {filteredFeedback.slice(0, 10).map((item: any) => (
                     <FeedbackCard 
@@ -486,7 +486,7 @@ export default function CustomerFeedback() {
                 placeholder={t('customers.feedback.searchPlaceholder', 'Search by customer name or comment...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+                className="ps-9 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
                 data-testid="input-search-feedback"
               />
             </div>
@@ -528,7 +528,7 @@ export default function CustomerFeedback() {
                 size="sm"
                 data-testid="button-analyze-all"
               >
-                <Brain className="h-4 w-4 mr-2" />
+                <Brain className="h-4 w-4 me-2" />
                 {analyzeAllMutation.isPending ? t('customers.feedback.analyzing', 'Analyzing...') : t('customers.feedback.analyzeAllUnprocessed', 'Analyze All Unprocessed')}
               </Button>
             </CardHeader>
@@ -579,7 +579,7 @@ export default function CustomerFeedback() {
                       {items.slice(0, 3).map((item: any) => (
                         <div 
                           key={item.feedback.id} 
-                          className="ml-5 p-3 bg-white dark:bg-salis-gray-dark/50 rounded-lg border border-gray-200 dark:border-gray-700"
+                          className="ms-5 p-3 bg-white dark:bg-salis-gray-dark/50 rounded-lg border border-gray-200 dark:border-gray-700"
                         >
                           <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                             "{item.feedback.comments}"
@@ -688,7 +688,7 @@ export default function CustomerFeedback() {
               disabled={!responseText.trim() || respondMutation.isPending || !selectedFeedback?.feedback?.id}
               data-testid="button-send-response"
             >
-              <Send className="h-4 w-4 mr-2" />
+              <Send className="h-4 w-4 me-2" />
               {respondMutation.isPending ? t('customers.feedback.sending', 'Sending...') : t('customers.feedback.sendResponse', 'Send Response')}
             </Button>
           </DialogFooter>
@@ -730,7 +730,7 @@ export default function CustomerFeedback() {
               disabled={!flagReason || flagMutation.isPending || !selectedFeedback?.feedback?.id}
               data-testid="button-confirm-flag"
             >
-              <Flag className="h-4 w-4 mr-2" />
+              <Flag className="h-4 w-4 me-2" />
               {flagMutation.isPending ? t('customers.feedback.flagging', 'Flagging...') : t('customers.feedback.flagFeedbackButton', 'Flag Feedback')}
             </Button>
           </DialogFooter>
@@ -834,7 +834,7 @@ function FeedbackCard({
                 className="h-7 px-2"
                 data-testid={`button-analyze-${f.id}`}
               >
-                <Brain className="h-3.5 w-3.5 mr-1" />
+                <Brain className="h-3.5 w-3.5 me-1" />
                 Analyze
               </Button>
             )}
@@ -846,7 +846,7 @@ function FeedbackCard({
                 className="h-7 px-2"
                 data-testid={`button-respond-${f.id}`}
               >
-                <Send className="h-3.5 w-3.5 mr-1" />
+                <Send className="h-3.5 w-3.5 me-1" />
                 Respond
               </Button>
             )}
@@ -858,7 +858,7 @@ function FeedbackCard({
                 className="h-7 px-2"
                 data-testid={`button-unflag-${f.id}`}
               >
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle className="h-3.5 w-3.5 me-1" />
                 Unflag
               </Button>
             ) : (
@@ -869,7 +869,7 @@ function FeedbackCard({
                 className="h-7 px-2 text-yellow-600 hover:text-yellow-700"
                 data-testid={`button-flag-${f.id}`}
               >
-                <Flag className="h-3.5 w-3.5 mr-1" />
+                <Flag className="h-3.5 w-3.5 me-1" />
                 Flag
               </Button>
             )}

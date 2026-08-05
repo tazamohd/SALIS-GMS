@@ -20,7 +20,7 @@ export function ErrorState({
       <p className="text-muted-foreground text-center mb-4 max-w-md">{message}</p>
       {retry && (
         <Button onClick={retry} variant="outline" size="sm">
-          <RefreshCw className="mr-2 h-4 w-4" />
+          <RefreshCw className="me-2 h-4 w-4" />
           Try Again
         </Button>
       )}

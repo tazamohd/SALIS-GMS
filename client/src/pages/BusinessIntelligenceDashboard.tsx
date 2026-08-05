@@ -333,7 +333,7 @@ export default function BusinessIntelligenceDashboard() {
                   className="mt-4 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90"
                   data-testid="button-create-first-report"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 me-2" />
                   {t('bi.createFirstReport', 'Create Your First Report')}
                 </Button>
               </div>
@@ -358,7 +358,7 @@ export default function BusinessIntelligenceDashboard() {
                         </Badge>
                         {report.schedule && report.schedule !== "manual" && (
                           <Badge variant="outline" className="border-[#E2E8F0] dark:border-[#232A36]">
-                            <Calendar className="h-3 w-3 mr-1" />
+                            <Calendar className="h-3 w-3 me-1" />
                             {report.schedule}
                           </Badge>
                         )}
@@ -373,7 +373,7 @@ export default function BusinessIntelligenceDashboard() {
                         className="border-[#E2E8F0] dark:border-[#232A36]"
                         data-testid={`button-run-${report.id}`}
                       >
-                        <Play className="h-4 w-4 mr-2" />
+                        <Play className="h-4 w-4 me-2" />
                         {t('bi.run', 'Run')}
                       </Button>
                       <Button
@@ -425,7 +425,7 @@ export default function BusinessIntelligenceDashboard() {
                 >
                   <p className="font-medium text-[#0B1F3B] dark:text-white">{widget}</p>
                   <Button variant="outline" size="sm" className="mt-2 border-[#E2E8F0] dark:border-[#232A36]">
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 me-2" />
                     {t('bi.addWidget', 'Add Widget')}
                   </Button>
                 </div>

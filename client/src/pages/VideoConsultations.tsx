@@ -160,7 +160,7 @@ export default function VideoConsultations() {
                 onClick={() => startMeeting.mutate(row.id)}
                 data-testid={`button-start-${row.id}`}
               >
-                <PlayCircle className="h-3 w-3 mr-1" />
+                <PlayCircle className="h-3 w-3 me-1" />
                 {t('common.start', 'Start')}
               </Button>
               <Button

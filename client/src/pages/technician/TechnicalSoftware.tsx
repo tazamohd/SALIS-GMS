@@ -304,7 +304,7 @@ export default function TechnicalSoftware() {
             placeholder="Search software, tools, or brands..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
+            className="ps-10 bg-white dark:bg-[#0E1117] border-[#E2E8F0] dark:border-[#232A36]"
             data-testid="input-search-software"
           />
         </div>
@@ -371,7 +371,7 @@ export default function TechnicalSoftware() {
 
                   <div className="flex gap-2 pt-2">
                     <Button className="flex-1 bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:opacity-90" size="sm" data-testid={`button-launch-${software.id}`}>
-                      <ExternalLink className="h-4 w-4 mr-2" />
+                      <ExternalLink className="h-4 w-4 me-2" />
                       Launch
                     </Button>
                     <Button variant="outline" size="sm" className="border-[#E2E8F0] dark:border-[#232A36]" data-testid={`button-info-${software.id}`}>

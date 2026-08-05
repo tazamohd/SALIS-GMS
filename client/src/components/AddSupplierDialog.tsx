@@ -85,7 +85,7 @@ export function AddSupplierDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" data-testid="button-add-supplier">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Add Supplier
         </Button>
       </DialogTrigger>

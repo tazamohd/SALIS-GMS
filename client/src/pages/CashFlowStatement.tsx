@@ -107,11 +107,11 @@ export default function CashFlowStatement() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-print">
-            <Printer className="h-4 w-4 mr-2" />
+            <Printer className="h-4 w-4 me-2" />
             {t('common.print', 'Print')}
           </Button>
           <Button variant="outline" className="border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white" data-testid="button-export">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4 me-2" />
             {t('common.export', 'Export')}
           </Button>
         </div>
@@ -132,7 +132,7 @@ export default function CashFlowStatement() {
             <TableHeader>
               <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <TableHead className="text-[#0B1F3B] dark:text-white">{t('common.description', 'Description')}</TableHead>
-                <TableHead className="text-right w-[200px] text-[#0B1F3B] dark:text-white">{t('accounting.amountSARHeader', 'Amount (SAR)')}</TableHead>
+                <TableHead className="text-end w-[200px] text-[#0B1F3B] dark:text-white">{t('accounting.amountSARHeader', 'Amount (SAR)')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,17 +147,17 @@ export default function CashFlowStatement() {
                   className={`border-b border-[#E2E8F0] dark:border-[#232A36] ${item.isHeader ? "bg-[#F8FAFC] dark:bg-[#0E1117]" : ""}`}
                   data-testid={`row-operating-${index}`}
                 >
-                  <TableCell className={`text-[#0B1F3B] dark:text-white ${item.isHeader ? "font-semibold pl-6" : "pl-10"}`}>
+                  <TableCell className={`text-[#0B1F3B] dark:text-white ${item.isHeader ? "font-semibold ps-6" : "ps-10"}`}>
                     {item.description}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     {getAmountDisplay(item.amount, item.isHeader)}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell className="pl-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromOperating', 'Net Cash from Operating Activities')}</TableCell>
-                <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
+                <TableCell className="ps-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromOperating', 'Net Cash from Operating Activities')}</TableCell>
+                <TableCell className="text-end font-mono text-green-700 dark:text-green-300">
                   {netOperatingCash.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -169,15 +169,15 @@ export default function CashFlowStatement() {
               </TableRow>
               {investingActivities.map((item, index) => (
                 <TableRow key={index} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-investing-${index}`}>
-                  <TableCell className="pl-10 text-[#0B1F3B] dark:text-white">{item.description}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="ps-10 text-[#0B1F3B] dark:text-white">{item.description}</TableCell>
+                  <TableCell className="text-end">
                     {getAmountDisplay(item.amount)}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-blue-100 dark:bg-blue-900/40 font-bold border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell className="pl-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromInvesting', 'Net Cash from Investing Activities')}</TableCell>
-                <TableCell className={`text-right font-mono ${netInvestingCash >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                <TableCell className="ps-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromInvesting', 'Net Cash from Investing Activities')}</TableCell>
+                <TableCell className={`text-end font-mono ${netInvestingCash >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                   {netInvestingCash >= 0 ? netInvestingCash.toLocaleString() : `(${Math.abs(netInvestingCash).toLocaleString()})`}
                 </TableCell>
               </TableRow>
@@ -189,36 +189,36 @@ export default function CashFlowStatement() {
               </TableRow>
               {financingActivities.map((item, index) => (
                 <TableRow key={index} className="border-b border-[#E2E8F0] dark:border-[#232A36]" data-testid={`row-financing-${index}`}>
-                  <TableCell className="pl-10 text-[#0B1F3B] dark:text-white">{item.description}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="ps-10 text-[#0B1F3B] dark:text-white">{item.description}</TableCell>
+                  <TableCell className="text-end">
                     {getAmountDisplay(item.amount)}
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-purple-100 dark:bg-purple-900/40 font-bold border-b border-[#E2E8F0] dark:border-[#232A36]">
-                <TableCell className="pl-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromFinancing', 'Net Cash from Financing Activities')}</TableCell>
-                <TableCell className={`text-right font-mono ${netFinancingCash >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                <TableCell className="ps-6 text-[#0B1F3B] dark:text-white">{t('accounting.netCashFromFinancing', 'Net Cash from Financing Activities')}</TableCell>
+                <TableCell className={`text-end font-mono ${netFinancingCash >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                   {netFinancingCash >= 0 ? netFinancingCash.toLocaleString() : `(${Math.abs(netFinancingCash).toLocaleString()})`}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-[#F8FAFC] dark:bg-[#0E1117] font-bold border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <TableCell className="text-[#0B1F3B] dark:text-white">{t('accounting.netChangeInCash', 'Net Change in Cash')}</TableCell>
-                <TableCell className={`text-right font-mono ${netCashChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                <TableCell className={`text-end font-mono ${netCashChange >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                   {netCashChange >= 0 ? netCashChange.toLocaleString() : `(${Math.abs(netCashChange).toLocaleString()})`}
                 </TableCell>
               </TableRow>
 
               <TableRow className="border-b border-[#E2E8F0] dark:border-[#232A36]">
                 <TableCell className="text-[#0B1F3B] dark:text-white">{t('accounting.beginningCashBalance', 'Beginning Cash Balance')}</TableCell>
-                <TableCell className="text-right font-mono text-[#0B1F3B] dark:text-white">
+                <TableCell className="text-end font-mono text-[#0B1F3B] dark:text-white">
                   {beginningCash.toLocaleString()}
                 </TableCell>
               </TableRow>
 
               <TableRow className="bg-green-100 dark:bg-green-900/40 font-bold text-lg">
                 <TableCell className="text-[#0B1F3B] dark:text-white">{t('accounting.endingCashBalance', 'ENDING CASH BALANCE')}</TableCell>
-                <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
+                <TableCell className="text-end font-mono text-green-700 dark:text-green-300">
                   {t('common.sar', 'SAR')} {endingCash.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -380,30 +380,30 @@ export default function CashFlowStatement() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link href="/income-statement">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-income-statement">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="h-4 w-4 me-2" />
                 {t('accounting.incomeStatement', 'Income Statement')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/balance-sheet">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-balance-sheet">
-                <Scale className="h-4 w-4 mr-2" />
+                <Scale className="h-4 w-4 me-2" />
                 {t('accounting.balanceSheet', 'Balance Sheet')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/bank-account-management">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-bank-accounts">
-                <Banknote className="h-4 w-4 mr-2" />
+                <Banknote className="h-4 w-4 me-2" />
                 {t('accounting.bankAccounts', 'Bank Accounts')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
             <Link href="/general-ledger">
               <Button variant="outline" className="w-full justify-start border-[#E2E8F0] dark:border-[#232A36] text-[#0B1F3B] dark:text-white hover:bg-[#F8FAFC] dark:hover:bg-[#0E1117]" data-testid="link-general-ledger">
-                <FileText className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 me-2" />
                 {t('accounting.generalLedger', 'General Ledger')}
-                <ExternalLink className="h-3 w-3 ml-auto" />
+                <ExternalLink className="h-3 w-3 ms-auto" />
               </Button>
             </Link>
           </div>

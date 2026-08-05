@@ -216,7 +216,7 @@ export default function VoiceCommands() {
                 variant="outline"
                 className="text-[#64748B] dark:text-[#64748B] justify-start border-[#E2E8F0] dark:border-[#232A36]"
               >
-                <Mic className="h-3 w-3 mr-2" />
+                <Mic className="h-3 w-3 me-2" />
                 "{cmd}"
               </Badge>
             ))}
