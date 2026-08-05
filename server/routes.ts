@@ -4327,14 +4327,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Notification routes - Module 21
   app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
     try {
-      const { recipient_id, garage_id, status, type } = req.query;
-      const userId = req.user?.id || 'default-user';
-      
-      // If no recipient_id specified, use current user
-      const recipientId = recipient_id || userId;
-      
+      const { garage_id, status, type } = req.query;
+      const userId = req.user?.id;
+
+      // Always the session user's own notifications — a client-supplied
+      // recipient_id previously let anyone read another user's notifications
+      // (which carry customer/appointment/invoice PII) across garages.
       const notifications = await storage.getNotifications(
-        recipientId as string,
+        userId as string,
         garage_id as string | undefined,
         status as string | undefined,
         type as string | undefined
@@ -8424,26 +8424,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Data Import
-  app.post('/api/import', isAuthenticated, async (req: any, res) => {
+  app.post('/api/import', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
-      const { garageId, module, data, conflictResolution = 'skip' } = req.body;
+      const { module, data, conflictResolution = 'skip' } = req.body;
       const userId = req.user?.id || 'default-user';
-      
+      // Tenant comes from the session, never the request body — a staff user
+      // cannot import into another garage.
+      const garageId = req.user?.garageId;
+
       if (!garageId) {
-        return res.status(400).json({ message: "Garage ID is required" });
+        return res.status(400).json({ message: "No garage associated with your account" });
       }
-      
+
       if (!module || !data || !Array.isArray(data)) {
         return res.status(400).json({ message: "Invalid import data" });
       }
-      
+      // Bound the batch so a huge array can't block the event loop / hammer the DB.
+      if (data.length > 1000) {
+        return res.status(400).json({ message: "Import batch too large (max 1000 rows)" });
+      }
+
       const results = { imported: 0, skipped: 0, errors: [] as any[] };
-      
+
       for (const item of data) {
         try {
           switch (module) {
             case 'customers':
-              await storage.createUser({ ...item, garageId, createdBy: userId });
+              // Force customer identity — never let an import body set role/
+              // userType/isActive and mint an ADMIN (privilege escalation).
+              await storage.createUser({
+                ...item,
+                role: 'CUSTOMER',
+                userType: 'customer',
+                isActive: true,
+                garageId,
+                createdBy: userId,
+              });
               results.imported++;
               break;
             case 'vehicles':

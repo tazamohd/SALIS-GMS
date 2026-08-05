@@ -57,8 +57,15 @@ export function enforceGarageScopeOnQuery(req: Request, _res: Response, next: Ne
   const role = String(user.role || "").toUpperCase();
   const isCustomer = user.userType === "customer" || role === "CUSTOMER";
   if (!CROSS_GARAGE_ROLES.has(role) && !isCustomer && user.garageId) {
-    if (req.query && "garage_id" in req.query) (req.query as any).garage_id = user.garageId;
-    if (req.query && "garageId" in req.query) (req.query as any).garageId = user.garageId;
+    // Pin the tenant on reads by INJECTING the session garage, not merely
+    // overwriting when the client happened to send the key. A handler that
+    // reads req.query.garage_id and forgets a `|| req.user.garageId` fallback
+    // (e.g. the /api/reports/* suite) would otherwise return ALL tenants' data
+    // when the param is simply omitted. Injecting closes that whole class.
+    if (req.query) {
+      (req.query as any).garage_id = user.garageId;
+      (req.query as any).garageId = user.garageId;
+    }
   }
   next();
 }
