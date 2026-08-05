@@ -80,7 +80,10 @@ export interface ZATCAPhase2Invoice {
 
 /** Clearance API response */
 export interface ClearanceResponse {
-  status: 'CLEARED' | 'REJECTED' | 'REPORTED' | 'ERROR';
+  // NOT_CONFIGURED: no CSID onboarded, so no real clearance was obtained. It is
+  // deliberately distinct from CLEARED so no caller can mistake a development
+  // stub for an authority-cleared invoice (fail closed — audit 3.6).
+  status: 'CLEARED' | 'REJECTED' | 'REPORTED' | 'ERROR' | 'NOT_CONFIGURED';
   clearanceId?: string;
   invoiceHash?: string;
   qrCode?: string;
@@ -320,18 +323,20 @@ export async function submitToClearance(
       };
     }
 
-    // No CSID configured — prepared/stub response for development.
-    console.log('[ZATCA Phase 2] Clearance prepared (no CSID — stub):', {
+    // No CSID configured: the UBL invoice is prepared/signed locally, but no
+    // real clearance was obtained. Return NOT_CONFIGURED — NOT CLEARED — so the
+    // caller does not stamp the invoice as authority-cleared or enter it into
+    // the PIH hash chain. Fail closed: fabricating a CLEARED status here (the
+    // old CLR-STUB behavior) would report invoices as cleared to ZATCA when
+    // they were never submitted. Configure ZATCA_CSID to go live.
+    console.log('[ZATCA Phase 2] UBL prepared but NOT cleared (no CSID configured):', {
       endpoint: ZATCA_CLEARANCE_URL,
       invoiceHash: ublInvoice.hash,
     });
     return {
-      status: 'CLEARED',
-      clearanceId: `CLR-STUB-${ublInvoice.hash.substring(0, 8)}`,
+      status: 'NOT_CONFIGURED',
       invoiceHash: ublInvoice.hash,
-      // No qrCode: the caller's locally-generated TLV QR is the real
-      // artifact; fabricating one here would overwrite it with garbage.
-      warnings: ['ZATCA_CSID not configured — this is a development stub, not a real clearance.'],
+      warnings: ['ZATCA_CSID not configured — invoice prepared locally but NOT cleared. This is not a real clearance.'],
       errors: [],
       timestamp: new Date().toISOString(),
     };
