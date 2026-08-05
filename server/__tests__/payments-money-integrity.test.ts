@@ -95,7 +95,15 @@ describe("Payments — atomic balance update (B6)", () => {
 
 describe("Payments — reversal with RBAC (B7)", () => {
   it("denies payment deletion to ordinary staff (403)", async () => {
-    const res = await advisor.delete(`/api/payments/00000000-0000-0000-0000-000000000000`);
+    // Use a real payment in the advisor's own garage so the ownership guard
+    // (H-1) passes and the RBAC check is what rejects the request. (A random
+    // id would now 404 at the ownership guard before RBAC is ever reached.)
+    const id = await makeInvoice("120.00");
+    const pay = await admin.post("/api/payments").send({
+      invoiceId: id, amount: "120.00", paymentMethod: "cash", paymentDate: new Date().toISOString(),
+    });
+    expect([200, 201]).toContain(pay.status);
+    const res = await advisor.delete(`/api/payments/${pay.body.id}`);
     expect(res.status).toBe(403);
   });
 

@@ -1,7 +1,8 @@
 /**
- * B16 tail — HR shift templates are tenant-scoped. The handlers enforce a
- * read-then-check (403 on cross-tenant) and the storage writes are now also
- * garageId-scoped (defense in depth).
+ * B16 tail — HR shift templates are tenant-scoped. The central
+ * requireResourceOwnership guard (H-1) now runs ahead of the handler and
+ * returns 404 for a cross-tenant :id (existence is not disclosed to another
+ * garage); storage writes remain garageId-scoped as defense in depth.
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import type { Express } from "express";
@@ -32,10 +33,10 @@ describe("B16 — HR shift-template writes are tenant-scoped", () => {
     } as any);
 
     const bPatch = await adminB.patch(`/api/hr/shift-templates/${tpl.id}`).send({ name: "Hacked" });
-    expect(bPatch.status).toBe(403);
+    expect(bPatch.status).toBe(404);
 
     const bDel = await adminB.delete(`/api/hr/shift-templates/${tpl.id}`);
-    expect(bDel.status).toBe(403);
+    expect(bDel.status).toBe(404);
 
     const aPatch = await adminA.patch(`/api/hr/shift-templates/${tpl.id}`).send({ name: "Morning Shift" });
     expect(aPatch.status).toBe(200);

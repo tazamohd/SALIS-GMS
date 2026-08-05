@@ -750,7 +750,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Technician routes
   // Job cards assigned to a technician. A technician may only read their own;
   // managers may read any technician in their garage.
-  app.get('/api/technicians/:id/job-cards', isAuthenticated, async (req: any, res) => {
+  app.get('/api/technicians/:id/job-cards', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const role = String(req.user?.role || '').toUpperCase();
@@ -768,7 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Time-clock entries for a technician (own entries; managers any in garage).
-  app.get('/api/technicians/:id/time-clock', isAuthenticated, async (req: any, res) => {
+  app.get('/api/technicians/:id/time-clock', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const role = String(req.user?.role || '').toUpperCase();
@@ -812,7 +812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/technicians/:id', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
+  app.delete('/api/technicians/:id', isAuthenticated, requireResourceOwnership({ table: 'users' }), requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       // Ownership: only delete a technician in the caller's garage. Soft-delete
@@ -877,7 +877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Technician Profile routes
-  app.get('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+  app.get('/api/technician-profiles/:userId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'userId' }), async (req, res) => {
     try {
       const { userId } = req.params;
       const currentUser = (req as any).user;
@@ -917,7 +917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/technician-profiles/:userId', isAuthenticated, async (req, res) => {
+  app.patch('/api/technician-profiles/:userId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'userId' }), async (req, res) => {
     try {
       const { userId } = req.params;
       const currentUser = (req as any).user;
@@ -966,7 +966,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/job-cards/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/job-cards/:id', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req, res) => {
     try {
       const { id } = req.params;
       // Completion runs inventory deduction under a FOR UPDATE row lock, and that
@@ -989,7 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/job-cards/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/job-cards/:id', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req, res) => {
     try {
       const { id } = req.params;
       const newStatus = req.body.status;
@@ -1091,7 +1091,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Job Card Parts routes - Track parts used in a job
-  app.post('/api/job-cards/:jobCardId/parts', isAuthenticated, async (req, res) => {
+  app.post('/api/job-cards/:jobCardId/parts', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
       
@@ -1132,7 +1132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/job-cards/:jobCardId/parts/:partId', isAuthenticated, async (req, res) => {
+  app.delete('/api/job-cards/:jobCardId/parts/:partId', isAuthenticated, requireResourceOwnership({ table: 'job_card_parts', idParam: 'partId', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { partId } = req.params;
       
@@ -1151,7 +1151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Task Assignment routes
-  app.post('/api/job-cards/:jobCardId/tasks', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:jobCardId/tasks', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { jobCardId } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -1168,7 +1168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tasks/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'task_assignments', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedTask = await storage.updateTaskAssignment(id, req.body);
@@ -1181,7 +1181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Dynamic Service Tracking routes - Feature #3
   // Generate public tracking token for a job card
-  app.post('/api/job-cards/:id/tracking/generate', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:id/tracking/generate', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1258,7 +1258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create job tracking event
-  app.post('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+  app.post('/api/job-cards/:id/tracking/events', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1296,7 +1296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get job tracking events
-  app.get('/api/job-cards/:id/tracking/events', isAuthenticated, async (req: any, res) => {
+  app.get('/api/job-cards/:id/tracking/events', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { visibleToCustomer } = req.query;
@@ -1326,7 +1326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update job ETA
-  app.patch('/api/job-cards/:id/eta', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/job-cards/:id/eta', isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       
@@ -1406,7 +1406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // POST clock in/out
-  app.post('/api/technicians/:technicianId/time-clock', isAuthenticated, authorizeTechnician, async (req, res) => {
+  app.post('/api/technicians/:technicianId/time-clock', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), authorizeTechnician, async (req, res) => {
     try {
       const { technicianId } = req.params;
       const entryData = {
@@ -1432,7 +1432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/service-templates/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/service-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const template = await storage.updateServiceTemplate(id, req.body, (req as any).user?.garageId);
@@ -1444,7 +1444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-templates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_templates' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteServiceTemplate(id, (req as any).user?.garageId);
@@ -1493,7 +1493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tool-availability/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tool-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'tool_availability' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedAvailability = await storage.updateToolAvailability(id, req.body);
@@ -1520,7 +1520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/tool-usage/:id', isAuthenticated, async (req, res) => {
+  app.put('/api/tool-usage/:id', isAuthenticated, requireResourceOwnership({ table: 'tool_usage_logs', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updatedUsageLog = await storage.updateToolUsageLog(id, req.body);
@@ -1602,7 +1602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/spare-part-inventories/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/spare-part-inventories/:id', isAuthenticated, requireResourceOwnership({ table: 'spare_part_inventories' }), async (req, res) => {
     try {
       const { insertSparePartInventorySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1661,7 +1661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/appointments/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req, res) => {
     try {
       const { insertAppointmentSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1683,7 +1683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/appointments/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/appointments/:id', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteAppointment(id, (req as any).user?.garageId);
@@ -1694,7 +1694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/appointments/:id/status', isAuthenticated, async (req: any, res) => {
+  app.post('/api/appointments/:id/status', isAuthenticated, requireResourceOwnership({ table: 'appointments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status, reason } = req.body;
@@ -1774,7 +1774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Set/reset a customer's portal password (staff-initiated). Gives customers a
   // working credential — creation alone stores an unusable random hash.
-  app.post('/api/customers/:id/set-password', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
+  app.post('/api/customers/:id/set-password', isAuthenticated, requireResourceOwnership({ table: 'users' }), requireManagerOrAbove, async (req: any, res) => {
     try {
       const { id } = req.params;
       const { password } = req.body;
@@ -1822,7 +1822,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertVehicleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1851,7 +1851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/vehicles/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/vehicles/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { id } = req.params;
       const existing = await storage.getVehicle(id);
@@ -1868,7 +1868,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Vehicle Service History Routes - Module 22 Enhancements
-  app.post('/api/vehicles/:id/service-history', isAuthenticated, async (req: any, res) => {
+  app.post('/api/vehicles/:id/service-history', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req: any, res) => {
     try {
       const { insertVehicleServiceHistorySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1894,7 +1894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-history/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-history/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_service_history', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteServiceHistory(id);
@@ -1906,7 +1906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Maintenance Schedules Routes - Module 22 Enhancements
-  app.post('/api/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, res) => {
+  app.post('/api/vehicles/:id/maintenance-schedules', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1930,7 +1930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'maintenance_schedules', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1951,7 +1951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/maintenance-schedules/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/maintenance-schedules/:id', isAuthenticated, requireResourceOwnership({ table: 'maintenance_schedules', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteMaintenanceSchedule(id);
@@ -1962,7 +1962,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/vehicles/:id/service-reminders', isAuthenticated, async (req, res) => {
+  app.post('/api/vehicles/:id/service-reminders', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
     try {
       const { insertServiceReminderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -1986,7 +1986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminders/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { insertServiceReminderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2007,7 +2007,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-reminders/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-reminders/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteServiceReminder(id);
@@ -2018,7 +2018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/customers/:id/notes', isAuthenticated, async (req: any, res) => {
+  app.post('/api/customers/:id/notes', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req: any, res) => {
     try {
       const { insertCustomerNoteSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2046,7 +2046,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/customer-notes/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/customer-notes/:id', isAuthenticated, requireResourceOwnership({ table: 'customer_notes', parent: { table: 'users', fk: 'customer_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteCustomerNote(id);
@@ -2083,7 +2083,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/suppliers/:id', isAuthenticated, requireResourceOwnership({ table: 'suppliers' }), async (req, res) => {
     try {
       const { insertSupplierSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2105,7 +2105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/suppliers/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/suppliers/:id', isAuthenticated, requireResourceOwnership({ table: 'suppliers' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSupplier(id, (req as any).user?.garageId);
@@ -2134,7 +2134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-price-lists/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_price_list', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -2155,7 +2155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-price-lists/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-price-lists/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_price_list', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSupplierPriceList(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
@@ -2181,7 +2181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const performanceRecord = await storage.getSupplierPerformanceRecord(id, (req as any).user?.garageId);
@@ -2213,7 +2213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -2234,7 +2234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-performance/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-performance/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_performance', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSupplierPerformance(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
@@ -2308,7 +2308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2350,7 +2350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { insertSupplierPartsAvailabilitySchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -2377,7 +2377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-availability/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/supplier-availability/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_parts_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2398,7 +2398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Smart Job Assignment Routes - Feature #6
-  app.post('/api/assignments/recommend/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/assignments/recommend/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { getAIAssignmentRecommendations } = await import("./services/assignmentAI");
       const { jobCardId } = req.params;
@@ -2475,7 +2475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/assignments/rules/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/assignments/rules/:id', isAuthenticated, requireResourceOwnership({ table: 'assignment_rules' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2559,7 +2559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2579,7 +2579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2608,7 +2608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queues/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/queues/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2628,7 +2628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:id/with-members', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:id/with-members', isAuthenticated, requireResourceOwnership({ table: 'call_queues' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2649,7 +2649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Queue Members
-  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/queues/:queueId/members', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members', idParam: 'queueId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallQueueMemberSchema } = await import("@shared/schema");
       const { queueId } = req.params;
@@ -2677,7 +2677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/queues/:queueId/members', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/queues/:queueId/members', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members', idParam: 'queueId' }), async (req: any, res) => {
     try {
       const { queueId } = req.params;
       const { active } = req.query;
@@ -2699,7 +2699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/queue-members/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2721,7 +2721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/queue-members/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/queue-members/:id', isAuthenticated, requireResourceOwnership({ table: 'call_queue_members' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2797,7 +2797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2817,7 +2817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/sessions/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2846,7 +2846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:id/assign', isAuthenticated, requireResourceOwnership({ table: 'call_sessions' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -2882,7 +2882,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Notes
-  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/notes', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallNoteSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2906,7 +2906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:sessionId/notes', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:sessionId/notes', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), async (req: any, res) => {
     try {
       const { sessionId } = req.params;
       const notes = await storage.listCallNotes(sessionId);
@@ -2918,7 +2918,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Call Recordings
-  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.post('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { insertCallRecordingSchema } = await import("@shared/schema");
       const { sessionId } = req.params;
@@ -2940,7 +2940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/call-center/sessions/:sessionId/recordings', isAuthenticated, requireResourceOwnership({ table: 'call_sessions', idParam: 'sessionId' }), async (req: any, res) => {
     try {
       const { sessionId } = req.params;
       const recordings = await storage.listCallRecordings(sessionId);
@@ -2997,7 +2997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.patch('/api/call-center/disposition-codes/:id', isAuthenticated, requireResourceOwnership({ table: 'call_disposition_codes' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -3019,7 +3019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, callCenterLimiter, async (req: any, res) => {
+  app.delete('/api/call-center/disposition-codes/:id', isAuthenticated, requireResourceOwnership({ table: 'call_disposition_codes' }), callCenterLimiter, async (req: any, res) => {
     try {
       const { id } = req.params;
       const userGarageId = req.user?.garageId;
@@ -3162,7 +3162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/purchase-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_orders' }), async (req, res) => {
     try {
       const { insertPurchaseOrderSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -3184,7 +3184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-orders/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-orders/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_orders' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deletePurchaseOrder(id, (req as any).user?.garageId);
@@ -3214,7 +3214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-order-items/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-order-items/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_order_items', parent: { table: 'purchase_orders', fk: 'purchase_order_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deletePurchaseOrderItem(id);
@@ -3243,7 +3243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/purchase-tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_tasks' }), async (req, res) => {
     try {
       const { id } = req.params;
       const task = await storage.updatePurchaseTask(id, req.body, (req as any).user?.garageId);
@@ -3255,7 +3255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/purchase-tasks/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/purchase-tasks/:id', isAuthenticated, requireResourceOwnership({ table: 'purchase_tasks' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deletePurchaseTask(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
@@ -3278,7 +3278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/quotation-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'quotation_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       const request = await storage.updateQuotationRequest(id, req.body, (req as any).user?.garageId);
@@ -3290,7 +3290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/quotation-requests/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/quotation-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'quotation_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteQuotationRequest(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
@@ -3317,7 +3317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-quotations/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-quotations/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_quotations', parent: { table: 'suppliers', fk: 'supplier_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const quotation = await storage.updateSupplierQuotation(id, req.body, (req as any).user?.garageId);
@@ -3341,7 +3341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/supplier-payments/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_payments' }), async (req, res) => {
     try {
       const { id } = req.params;
       const payment = await storage.updateSupplierPayment(id, req.body, (req as any).user?.garageId);
@@ -3353,7 +3353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/supplier-payments/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/supplier-payments/:id', isAuthenticated, requireResourceOwnership({ table: 'supplier_payments' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSupplierPayment(id, (req as any).user?.garageId); // cross-tenant = scoped no-op
@@ -3458,7 +3458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/invoices/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { id } = req.params;
       const invoice = await storage.getInvoice(id);
@@ -3548,7 +3548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Secure invoice creation from job card - server-side calculation only
-  app.post('/api/invoices/from-job/:jobId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/invoices/from-job/:jobId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobId' }), async (req: any, res) => {
     try {
       const { jobCards, taskAssignments, jobCardParts, spareParts, invoices, invoiceItems, saudiTaxCompliance, technicianProfiles } = await import("@shared/schema");
       const { eq, sql } = await import("drizzle-orm");
@@ -3732,7 +3732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/invoices/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { insertInvoiceSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -3777,7 +3777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/invoices/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
+  app.delete('/api/invoices/:id', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteInvoice(id, (req as any).user?.garageId);
@@ -3801,7 +3801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/invoices/:id/items', isAuthenticated, async (req, res) => {
+  app.get('/api/invoices/:id/items', isAuthenticated, requireResourceOwnership({ table: 'invoices' }), async (req, res) => {
     try {
       const { id } = req.params;
       // Parent ownership: items inherit the invoice's garage scope.
@@ -3900,7 +3900,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Reversing a payment moves money — require manager/accountant, scope to the
   // caller's garage, and restore the invoice balance atomically (B7).
-  app.delete('/api/payments/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  app.delete('/api/payments/:id', isAuthenticated, requireResourceOwnership({ table: 'payments', parent: { table: 'invoices', fk: 'invoice_id' } }), requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
     try {
       const { id } = req.params;
       const ok = await storage.reversePayment(id, req.user?.garageId);
@@ -3930,7 +3930,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const estimate = await storage.getEstimate(id);
@@ -3991,7 +3991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { insertEstimateSchema } = await import("@shared/schema");
       const { id } = req.params;
@@ -4013,7 +4013,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/estimates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteEstimate(id, (req as any).user?.garageId);
@@ -4024,7 +4024,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/estimates/:id/items', isAuthenticated, async (req, res) => {
+  app.get('/api/estimates/:id/items', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
       const items = await storage.getEstimateItems(id);
@@ -4036,7 +4036,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Convert estimate to job card
-  app.post('/api/estimates/:id/convert-to-job-card', isAuthenticated, async (req: any, res) => {
+  app.post('/api/estimates/:id/convert-to-job-card', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -4102,7 +4102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Convert estimate to invoice
-  app.post('/api/estimates/:id/convert-to-invoice', isAuthenticated, async (req: any, res) => {
+  app.post('/api/estimates/:id/convert-to-invoice', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -4360,7 +4360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.getNotification(id);
@@ -4392,7 +4392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.updateNotification(id, req.body);
@@ -4403,7 +4403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/notifications/:id/read', isAuthenticated, async (req, res) => {
+  app.patch('/api/notifications/:id/read', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       const notification = await storage.markNotificationAsRead(id);
@@ -4414,7 +4414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/notifications/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/notifications/:id', isAuthenticated, requireResourceOwnership({ table: 'notifications' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteNotification(id);
@@ -4921,7 +4921,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/availability/:id', isAuthenticated, requireResourceOwnership({ table: 'technician_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateTechnicianAvailability(id, req.body);
@@ -4932,7 +4932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/availability/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/availability/:id', isAuthenticated, requireResourceOwnership({ table: 'technician_availability' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTechnicianAvailability(id);
@@ -5022,7 +5022,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/calendar-events/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_events' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateCalendarEvent(id, req.body);
@@ -5033,7 +5033,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/calendar-events/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/calendar-events/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_events' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteCalendarEvent(id);
@@ -5060,7 +5060,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/time-slots/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/time-slots/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), async (req: any, res) => {
     try {
       const { technicianId } = req.params;
       const { date, duration } = req.query;
@@ -5081,7 +5081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/technician-workload/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/technician-workload/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), async (req: any, res) => {
     try {
       const { technicianId } = req.params;
       const { startDate, endDate } = req.query;
@@ -5267,7 +5267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/stock-alerts/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/stock-alerts/:id', isAuthenticated, requireResourceOwnership({ table: 'stock_alerts' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const alert = await storage.updateStockAlert(id, req.body, req.user?.garageId);
@@ -5279,7 +5279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/stock-alerts/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/stock-alerts/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'stock_alerts' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -5318,7 +5318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/reorder-settings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/reorder-settings/:id', isAuthenticated, requireResourceOwnership({ table: 'reorder_settings' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const setting = await storage.updateReorderSetting(id, req.body, req.user?.garageId);
@@ -5501,7 +5501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/payment-plans/:id', isAuthenticated, requireResourceOwnership({ table: 'payment_plans', parent: { table: 'invoices', fk: 'invoice_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const plan = await storage.getPaymentPlan(id, req.user?.garageId);
@@ -5526,7 +5526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/payment-plans/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/payment-plans/:id', isAuthenticated, requireResourceOwnership({ table: 'payment_plans', parent: { table: 'invoices', fk: 'invoice_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const plan = await storage.updatePaymentPlan(id, req.body, req.user?.garageId);
@@ -5681,7 +5681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/tax-configurations/:id', isAuthenticated, requireResourceOwnership({ table: 'tax_configurations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const config = await storage.updateTaxConfiguration(id, req.body, req.user?.garageId);
@@ -5693,7 +5693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/tax-configurations/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/tax-configurations/:id', isAuthenticated, requireResourceOwnership({ table: 'tax_configurations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTaxConfiguration(id, req.user?.garageId); // cross-tenant = scoped no-op
@@ -5848,7 +5848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+  app.put('/api/filter-presets/:id', isAuthenticated, requireResourceOwnership({ table: 'saved_filter_presets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const preset = await storage.updateSavedFilterPreset(id, req.body);
@@ -5859,7 +5859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/filter-presets/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/filter-presets/:id', isAuthenticated, requireResourceOwnership({ table: 'saved_filter_presets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSavedFilterPreset(id);
@@ -5967,7 +5967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/export-jobs/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/export-jobs/:id', isAuthenticated, requireResourceOwnership({ table: 'export_jobs' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const job = await storage.getExportJob(id);
@@ -6154,7 +6154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/attendance/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const record = await storage.getAttendance(req.params.id);
@@ -6194,7 +6194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/attendance/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -6237,7 +6237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/clock-out/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/clock-out/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -6258,7 +6258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/break-start/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/break-start/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -6279,7 +6279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/break-end/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/break-end/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_attendance' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAttendance(req.params.id);
@@ -6313,7 +6313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const template = await storage.getShiftTemplate(req.params.id);
@@ -6353,7 +6353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftTemplate(req.params.id);
@@ -6384,7 +6384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/shift-templates/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/shift-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_templates' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftTemplate(req.params.id);
@@ -6444,7 +6444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/shift-assignments/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_assignments' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftAssignment(req.params.id);
@@ -6475,7 +6475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/shift-assignments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/shift-assignments/:id', isAuthenticated, requireResourceOwnership({ table: 'shift_assignments' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getShiftAssignment(req.params.id);
@@ -6529,7 +6529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/commission-rules/:id', isAuthenticated, requireResourceOwnership({ table: 'commission_rules' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommissionRule(req.params.id);
@@ -6560,7 +6560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/commission-rules/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/commission-rules/:id', isAuthenticated, requireResourceOwnership({ table: 'commission_rules' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommissionRule(req.params.id);
@@ -6620,7 +6620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/commissions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/commissions/:id', isAuthenticated, requireResourceOwnership({ table: 'commissions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getCommission(req.params.id);
@@ -6651,7 +6651,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/calculate-commission/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       
@@ -6690,7 +6690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const review = await storage.getPerformanceReview(req.params.id);
@@ -6730,7 +6730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getPerformanceReview(req.params.id);
@@ -6761,7 +6761,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/performance-reviews/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/performance-reviews/:id', isAuthenticated, requireResourceOwnership({ table: 'performance_reviews' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getPerformanceReview(req.params.id);
@@ -6815,7 +6815,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getTraining(req.params.id);
@@ -6846,7 +6846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getTraining(req.params.id);
@@ -6905,7 +6905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/employee-trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getEmployeeTraining(req.params.id);
@@ -6936,7 +6936,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/employee-trainings/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/employee-trainings/:id', isAuthenticated, requireResourceOwnership({ table: 'employee_trainings' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getEmployeeTraining(req.params.id);
@@ -7005,7 +7005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const estimation = await storage.getAIJobEstimation(req.params.id);
@@ -7025,7 +7025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/job-estimations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIJobEstimation(req.params.id);
@@ -7188,7 +7188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/maintenance-predictions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/maintenance-predictions/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const prediction = await storage.getAIMaintenancePrediction(req.params.id);
@@ -7208,7 +7208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIMaintenancePrediction(req.params.id);
@@ -7356,7 +7356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const recommendation = await storage.getAIPartsRecommendation(req.params.id);
@@ -7376,7 +7376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIPartsRecommendation(req.params.id);
@@ -7451,7 +7451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const optimization = await storage.getAIScheduleOptimization(req.params.id);
@@ -7471,7 +7471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIScheduleOptimization(req.params.id);
@@ -7586,7 +7586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/chat-conversations/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/chat-conversations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const conversation = await storage.getAIChatConversation(req.params.id);
@@ -7606,7 +7606,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, async (req: any, res) => {
+  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getAIChatConversation(req.params.id);
@@ -7777,7 +7777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ai/ocr-documents/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const document = await storage.getOCRDocument(req.params.id);
       if (!document) {
@@ -7790,7 +7790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ai/ocr-documents/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const { extractedData, status } = req.body;
       const document = await storage.updateOCRDocument(req.params.id, {
@@ -8074,7 +8074,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/email/campaigns/:id/send', isAuthenticated, async (req: any, res) => {
+  app.post('/api/email/campaigns/:id/send', isAuthenticated, requireResourceOwnership({ table: 'email_campaigns' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const result = await phase3Service.sendEmailCampaign(id);
@@ -8085,7 +8085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/email/campaigns/:id/track', isAuthenticated, async (req: any, res) => {
+  app.post('/api/email/campaigns/:id/track', isAuthenticated, requireResourceOwnership({ table: 'email_campaigns' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { action } = req.body;
@@ -8159,7 +8159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video/consultations/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/video/consultations/:id/start', isAuthenticated, requireResourceOwnership({ table: 'video_consultations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const result = await phase3Service.startVideoConsultation(id);
@@ -8170,7 +8170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/video/consultations/:id/end', isAuthenticated, async (req: any, res) => {
+  app.post('/api/video/consultations/:id/end', isAuthenticated, requireResourceOwnership({ table: 'video_consultations' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { notes, recordingUrl } = req.body;
@@ -8547,7 +8547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/integrations/connections/:id', isAuthenticated, requireResourceOwnership({ table: 'integration_connections' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getIntegrationConnection(req.params.id);
@@ -8564,7 +8564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/integrations/connections/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/integrations/connections/:id', isAuthenticated, requireResourceOwnership({ table: 'integration_connections' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existing = await storage.getIntegrationConnection(req.params.id);
@@ -9029,7 +9029,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post('/api/security/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+  app.post('/api/security/backups/:id/restore', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const backup = await storage.getBackupJob(id);
@@ -9092,7 +9092,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.patch('/api/security/gdpr/requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/security/gdpr/requests/:id', isAuthenticated, requireResourceOwnership({ table: 'gdpr_data_requests' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { status, processedBy, completedAt, exportUrl } = req.body;
@@ -9147,7 +9147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.patch('/api/security/consents/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/security/consents/:id', isAuthenticated, requireResourceOwnership({ table: 'user_consents', parent: { table: 'users', fk: 'user_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const { granted } = req.body;
@@ -9202,7 +9202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.delete('/api/security/permissions/overrides/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/security/permissions/overrides/:id', isAuthenticated, requireResourceOwnership({ table: 'permission_overrides' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await storage.deletePermissionOverride(id);
@@ -9284,7 +9284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/history/undo/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/history/undo/:id', isAuthenticated, requireResourceOwnership({ table: 'action_history' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const history = await storage.undoAction(id);
@@ -9295,7 +9295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/history/redo/:id', isAuthenticated, async (req: any, res) => {
+  app.post('/api/history/redo/:id', isAuthenticated, requireResourceOwnership({ table: 'action_history' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const history = await storage.redoAction(id);
@@ -9612,7 +9612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/support/tickets/:id/status', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/support/tickets/:id/status', isAuthenticated, requireResourceOwnership({ table: 'support_tickets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -9648,7 +9648,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/support/tickets/:id/assign', isAuthenticated, async (req: any, res) => {
+  app.post('/api/support/tickets/:id/assign', isAuthenticated, requireResourceOwnership({ table: 'support_tickets' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -10415,7 +10415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/customer/:customerId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/customer/:customerId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const tokens = await storage.getQRCodeTokensByCustomer(customerId);
@@ -10426,7 +10426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/appointment/:appointmentId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/appointment/:appointmentId', isAuthenticated, requireResourceOwnership({ table: 'appointments', idParam: 'appointmentId' }), async (req, res) => {
     try {
       const { appointmentId } = req.params;
       const tokens = await storage.getQRCodeTokensByAppointment(appointmentId);
@@ -10437,7 +10437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/scan-logs/:qrCodeId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/scan-logs/:qrCodeId', isAuthenticated, requireResourceOwnership({ table: 'qr_code_tokens', idParam: 'qrCodeId' }), async (req, res) => {
     try {
       const { qrCodeId } = req.params;
       const logs = await storage.getQRScanLogsByToken(qrCodeId);
@@ -10448,7 +10448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/qr-codes/scan-logs/garage/:garageId', isAuthenticated, async (req, res) => {
+  app.get('/api/qr-codes/scan-logs/garage/:garageId', isAuthenticated, requireResourceOwnership({ table: 'qr_scan_logs', idParam: 'garageId', parent: { table: 'qr_code_tokens', fk: 'qr_code_id' } }), async (req, res) => {
     try {
       const { garageId } = req.params;
       const { limit } = req.query;
@@ -11397,7 +11397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       const request = await storage.getTowingRequestById(id);
@@ -11411,7 +11411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertTowingRequestSchema.partial().parse(req.body);
@@ -11423,7 +11423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/towing-requests/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/towing-requests/:id", isAuthenticated, requireResourceOwnership({ table: 'towing_requests' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteTowingRequest(id);
@@ -11626,7 +11626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const reservation = await storage.getLoanerReservationById(id);
@@ -11640,7 +11640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const data = insertLoanerReservationSchema.partial().parse(req.body);
@@ -11652,7 +11652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loaner-reservations/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loaner-reservations/:id", isAuthenticated, requireResourceOwnership({ table: 'loaner_reservations', parent: { table: 'loaner_vehicles', fk: 'loaner_vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoanerReservation(id);
@@ -11753,7 +11753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/campaign-recipients/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/campaign-recipients/:id", isAuthenticated, requireResourceOwnership({ table: 'campaign_recipients', parent: { table: 'marketing_campaigns', fk: 'campaign_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateCampaignRecipient(id, req.body);
@@ -11804,7 +11804,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       const program = await storage.getLoyaltyProgramById(id);
@@ -11818,7 +11818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyProgram(id, req.body);
@@ -11829,7 +11829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loyalty-programs/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loyalty-programs/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoyaltyProgram(id);
@@ -11948,7 +11948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-programs/:programId/rewards", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-programs/:programId/rewards", isAuthenticated, requireResourceOwnership({ table: 'loyalty_program', idParam: 'programId' }), async (req, res) => {
     try {
       const { programId } = req.params;
       const { isActive } = req.query;
@@ -11962,7 +11962,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const reward = await storage.getLoyaltyRewardById(id);
@@ -11976,7 +11976,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateLoyaltyReward(id, req.body);
@@ -11987,7 +11987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/loyalty-rewards/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/loyalty-rewards/:id", isAuthenticated, requireResourceOwnership({ table: 'loyalty_rewards', parent: { table: 'loyalty_program', fk: 'program_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteLoyaltyReward(id);
@@ -12160,7 +12160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       const document = await storage.getDocumentById(id);
@@ -12185,7 +12185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/documents/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/documents/:id", isAuthenticated, requireResourceOwnership({ table: 'documents' }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteDocument(id);
@@ -12708,7 +12708,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/timezone-rules/:id", isAuthenticated, requireResourceOwnership({ table: 'timezone_rules', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const rule = await storage.getTimezoneRuleById(id);
@@ -12722,7 +12722,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/timezone-rules/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/timezone-rules/:id", isAuthenticated, requireResourceOwnership({ table: 'timezone_rules', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateTimezoneRule(id, req.body);
@@ -12826,7 +12826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const order = await storage.getFulfillmentOrderById(id);
@@ -12840,7 +12840,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateFulfillmentOrder(id, req.body);
@@ -12851,7 +12851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/fulfillment-orders/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/fulfillment-orders/:id", isAuthenticated, requireResourceOwnership({ table: 'fulfillment_orders', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteFulfillmentOrder(id);
@@ -12971,7 +12971,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const device = await storage.getObdDeviceById(id);
@@ -12985,7 +12985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateObdDevice(id, req.body);
@@ -12996,7 +12996,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/obd-devices/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/obd-devices/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_devices', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteObdDevice(id);
@@ -13033,7 +13033,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/device-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'device_assignments', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const assignment = await storage.getDeviceAssignmentById(id);
@@ -13047,7 +13047,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/device-assignments/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/device-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'device_assignments', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateDeviceAssignment(id, req.body);
@@ -13085,7 +13085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/obd-sessions/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_sessions', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const session = await storage.getObdSessionById(id);
@@ -13099,7 +13099,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/obd-sessions/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/obd-sessions/:id", isAuthenticated, requireResourceOwnership({ table: 'obd_sessions', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateObdSession(id, req.body);
@@ -13294,7 +13294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const license = await storage.getSubscriptionLicenseById(id);
@@ -13308,7 +13308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateSubscriptionLicense(id, req.body);
@@ -13319,7 +13319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/subscription-licenses/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deleteSubscriptionLicense(id);
@@ -13380,7 +13380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/entitlement-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'entitlement_assignments', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const assignment = await storage.getEntitlementAssignmentById(id);
@@ -13394,7 +13394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/entitlement-assignments/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/entitlement-assignments/:id", isAuthenticated, requireResourceOwnership({ table: 'entitlement_assignments', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const updated = await storage.updateEntitlementAssignment(id, req.body);
@@ -14224,7 +14224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update job card status (mobile)
-  app.patch("/api/mobile/technician/jobs/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/mobile/technician/jobs/:id", isAuthenticated, requireResourceOwnership({ table: 'job_cards' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
@@ -14552,7 +14552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==========================================
 
   // Live Service Tracking
-  app.get('/api/service-tracking/:jobCardId', isAuthenticated, async (req, res) => {
+  app.get('/api/service-tracking/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
       // The service exports this as getJobCardTimeline.
@@ -14564,7 +14564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/service-tracking/:jobCardId/update', isAuthenticated, async (req: any, res) => {
+  app.post('/api/service-tracking/:jobCardId/update', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const { jobCardId } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -14625,7 +14625,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/video-estimates/customer/:customerId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req: any, res) => {
     try {
       const { customerId } = req.params;
       // Ownership: the customer must belong to the caller's garage, else any
@@ -14686,7 +14686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/digital-walkaround/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/digital-walkaround/:id', isAuthenticated, requireResourceOwnership({ table: 'digital_walkarounds', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const walkaround = await phase4Service.getDigitalWalkaround(id);
@@ -14744,7 +14744,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/reviews/:id/respond', isAuthenticated, async (req: any, res) => {
+  app.post('/api/reviews/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'customer_reviews' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const userId = req.user?.id || 'default-user';
@@ -14929,7 +14929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/payroll/calculate/:periodId', isAuthenticated, requireManagerOrAbove, async (req, res) => {
+  app.post('/api/payroll/calculate/:periodId', isAuthenticated, requireResourceOwnership({ table: 'pay_periods', idParam: 'periodId' }), requireManagerOrAbove, async (req, res) => {
     try {
       const { periodId } = req.params;
       const payrollEntries = await phase5Service.calculatePayroll(periodId);
@@ -15229,7 +15229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/insurance/claims/:id/status', isAuthenticated, async (req, res) => {
+  app.patch('/api/insurance/claims/:id/status', isAuthenticated, requireResourceOwnership({ table: 'insurance_claims' }), async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -15368,7 +15368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/signage/displays/:displayId/active-content', isAuthenticated, async (req, res) => {
+  app.get('/api/signage/displays/:displayId/active-content', isAuthenticated, requireResourceOwnership({ table: 'signage_displays', idParam: 'displayId' }), async (req, res) => {
     try {
       const { displayId } = req.params;
       const content = await phase7Service.getActiveContentForDisplay(displayId);
@@ -15481,7 +15481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/security/recordings/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/security/recordings/:id', isAuthenticated, requireResourceOwnership({ table: 'camera_recordings', parent: { table: 'security_cameras', fk: 'camera_id' } }), async (req, res) => {
     try {
       const { id } = req.params;
       const recording = await phase7Service.getRecordingPlayback(id);
@@ -17492,7 +17492,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/payroll/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'payroll_employees' }), async (req, res) => {
     try {
       const employee = await storage.updatePayrollEmployee(req.params.id, req.body);
       res.json({ data: employee });
@@ -17501,7 +17501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/payroll/employees/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/payroll/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'payroll_employees' }), async (req, res) => {
     try {
       await storage.deletePayrollEmployee(req.params.id);
       res.json({ success: true });
@@ -17532,7 +17532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/payroll/runs/:periodId', isAuthenticated, async (req, res) => {
+  app.get('/api/payroll/runs/:periodId', isAuthenticated, requireResourceOwnership({ table: 'pay_periods', idParam: 'periodId' }), async (req, res) => {
     try {
       const runs = await storage.getPayrollRuns(req.params.periodId);
       res.json({ data: runs });
@@ -17599,7 +17599,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/expenses/:id/approve', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/expenses/:id/approve', isAuthenticated, requireResourceOwnership({ table: 'expenses' }), async (req: any, res) => {
     try {
       const expense = await storage.approveExpense(req.params.id, req.user?.id);
       res.json({ data: expense });
@@ -17608,7 +17608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/expenses/:id/reject', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/expenses/:id/reject', isAuthenticated, requireResourceOwnership({ table: 'expenses' }), async (req: any, res) => {
     try {
       const expense = await storage.rejectExpense(req.params.id, req.user?.id);
       res.json({ data: expense });
@@ -17640,7 +17640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/towing-jobs/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/towing-jobs/:id', isAuthenticated, requireResourceOwnership({ table: 'towing_jobs' }), async (req, res) => {
     try {
       const job = await storage.updateTowingJob(req.params.id, req.body);
       res.json({ data: job });
@@ -17739,7 +17739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, requireResourceOwnership({ table: 'telematics_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const alert = await storage.resolveTelematicsAlert(req.params.id, req.user?.id);
       res.json({ data: alert });
@@ -17851,7 +17851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/gmb/posts/:id/publish', isAuthenticated, async (req, res) => {
+  app.patch('/api/gmb/posts/:id/publish', isAuthenticated, requireResourceOwnership({ table: 'gmb_posts', parent: { table: 'google_business_profiles', fk: 'profile_id' } }), async (req, res) => {
     try {
       const post = await storage.publishGmbPost(req.params.id);
       res.json({ data: post });
@@ -17873,7 +17873,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/gmb/reviews/:id/respond', isAuthenticated, async (req, res) => {
+  app.patch('/api/gmb/reviews/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'gmb_reviews', parent: { table: 'google_business_profiles', fk: 'profile_id' } }), async (req, res) => {
     try {
       const review = await storage.respondToGmbReview(req.params.id, req.body.responseText);
       res.json({ data: review });
@@ -17949,7 +17949,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, async (req, res) => {
+  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, requireResourceOwnership({ table: 'compliance_tasks' }), async (req, res) => {
     try {
       const task = await storage.completeComplianceTask(req.params.id);
       res.json({ data: task });
@@ -17961,7 +17961,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== CLIENT PORTAL - CUSTOMER-SCOPED ROUTES ====================
   
   // Service Reminders - Customer-scoped
-  app.post('/api/customers/:customerId/service-reminders', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/service-reminders', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const { insertServiceReminderSchema } = await import("@shared/schema");
@@ -17985,7 +17985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Chat Messages - Customer-scoped by job card
-  app.post('/api/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
+  app.post('/api/job-cards/:jobCardId/chat', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
     try {
       const { jobCardId } = req.params;
       const validationResult = insertServiceChatMessageSchema.safeParse({
@@ -18008,7 +18008,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Reviews - Customer-scoped
-  app.post('/api/customers/:customerId/reviews', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/reviews', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const validationResult = insertServiceReviewSchema.safeParse({
@@ -18031,7 +18031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Service Signatures - Customer-scoped
-  app.post('/api/customers/:customerId/signatures', isAuthenticated, async (req, res) => {
+  app.post('/api/customers/:customerId/signatures', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
     try {
       const { customerId } = req.params;
       const validationResult = insertServiceSignatureSchema.safeParse({
@@ -18079,7 +18079,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single sensor (with ownership check)
-  app.get('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const sensor = await storage.getIotSensor(req.params.id);
@@ -18124,7 +18124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update sensor (with validation and ownership check)
-  app.patch('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const updateSchema = insertIoTSensorSchema.partial().omit({ vehicleId: true });
@@ -18153,7 +18153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete sensor (with ownership check)
-  app.delete('/api/iot/sensors/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/iot/sensors/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const existingSensor = await storage.getIotSensor(req.params.id);
@@ -18197,7 +18197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get sensor readings (with ownership check and date validation)
-  app.get('/api/iot/sensors/:id/readings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/sensors/:id/readings', isAuthenticated, requireResourceOwnership({ table: 'iot_sensors', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const { startDate, endDate } = req.query;
@@ -18238,7 +18238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get vehicle anomalies (with ownership check)
-  app.get('/api/iot/vehicles/:vehicleId/anomalies', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/vehicles/:vehicleId/anomalies', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const vehicle = await storage.getVehicle(req.params.vehicleId);
@@ -18285,7 +18285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single alert (with ownership check)
-  app.get('/api/iot/alerts/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/alerts/:id', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const alert = await storage.getIotAlert(req.params.id);
@@ -18307,7 +18307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Acknowledge alert (with ownership check)
-  app.post('/api/iot/alerts/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.post('/api/iot/alerts/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const alert = await storage.getIotAlert(req.params.id);
@@ -18363,7 +18363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get latest sensor readings per vehicle
-  app.get('/api/iot/vehicles/:vehicleId/latest-readings', isAuthenticated, async (req: any, res) => {
+  app.get('/api/iot/vehicles/:vehicleId/latest-readings', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const vehicle = await storage.getVehicle(req.params.vehicleId);
@@ -18390,7 +18390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Resolve alert (with ownership check and validation)
-  app.post('/api/iot/alerts/:id/resolve', isAuthenticated, async (req: any, res) => {
+  app.post('/api/iot/alerts/:id/resolve', isAuthenticated, requireResourceOwnership({ table: 'iot_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
       const { resolution, jobCardId } = req.body;
@@ -18549,7 +18549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update geofence zone (with ownership check)
-  app.patch('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/fleet/geofences/:id', isAuthenticated, requireResourceOwnership({ table: 'geofence_zones' }), async (req: any, res) => {
     try {
       const zone = await storage.getGeofenceZone(req.params.id);
       if (!zone) {
@@ -18569,7 +18569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete geofence zone (with ownership check)
-  app.delete('/api/fleet/geofences/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/fleet/geofences/:id', isAuthenticated, requireResourceOwnership({ table: 'geofence_zones' }), async (req: any, res) => {
     try {
       const zone = await storage.getGeofenceZone(req.params.id);
       if (!zone) {
@@ -18672,7 +18672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get route with checkpoints (with ownership check)
-  app.get('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/fleet/routes/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_routes' }), async (req: any, res) => {
     try {
       const route = await storage.getFleetRoute(req.params.id);
       if (!route) {
@@ -18692,7 +18692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update route status (with ownership check)
-  app.patch('/api/fleet/routes/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/fleet/routes/:id', isAuthenticated, requireResourceOwnership({ table: 'fleet_routes' }), async (req: any, res) => {
     try {
       const route = await storage.getFleetRoute(req.params.id);
       if (!route) {
@@ -18844,7 +18844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback for a job card
-  app.get('/api/feedback/job-card/:jobCardId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/job-card/:jobCardId', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackByJobCard(req.params.jobCardId);
       res.json(feedback);
@@ -18855,7 +18855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback for a technician
-  app.get('/api/feedback/technician/:technicianId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/technician/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', idParam: 'technicianId', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackByTechnician(req.params.technicianId);
       const summary = await storage.getTechnicianFeedbackSummary(req.params.technicianId);
@@ -18900,7 +18900,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get feedback by ID
-  app.get('/api/feedback/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/feedback/:id', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackById(req.params.id);
       if (!feedback) {
@@ -18914,7 +18914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Respond to feedback
-  app.post('/api/feedback/:id/respond', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/respond', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const { response } = req.body;
       if (!response) {
@@ -18929,7 +18929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Flag feedback
-  app.post('/api/feedback/:id/flag', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/flag', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const { reason } = req.body;
       if (!reason) {
@@ -18944,7 +18944,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Unflag feedback
-  app.post('/api/feedback/:id/unflag', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/unflag', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const updated = await storage.unflagFeedback(req.params.id);
       res.json(updated);
@@ -18955,7 +18955,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Analyze sentiment using OpenAI
-  app.post('/api/feedback/:id/analyze-sentiment', isAuthenticated, async (req: any, res) => {
+  app.post('/api/feedback/:id/analyze-sentiment', isAuthenticated, requireResourceOwnership({ table: 'service_feedback', parent: { table: 'job_cards', fk: 'job_card_id' } }), async (req: any, res) => {
     try {
       const feedback = await storage.getServiceFeedbackById(req.params.id);
       if (!feedback) {
@@ -19054,7 +19054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // Get maintenance recommendations for a vehicle
-  app.get('/api/maintenance/recommendations/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/maintenance/recommendations/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const recommendations = await storage.getMaintenanceRecommendations(req.params.vehicleId);
       res.json(recommendations);
@@ -19065,7 +19065,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Acknowledge recommendation
-  app.patch('/api/maintenance/recommendations/:id/acknowledge', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/maintenance/recommendations/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'maintenance_recommendations', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
     try {
       const recommendation = await storage.acknowledgeMaintenanceRecommendation(req.params.id);
       res.json(recommendation);
@@ -19080,7 +19080,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================================
 
   // Get telematic device for vehicle
-  app.get('/api/telematics/device/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/telematics/device/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const device = await storage.getTelematicsDeviceByVehicle(req.params.vehicleId);
       if (!device) {
@@ -19094,7 +19094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get latest telematics readings
-  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
     try {
       const { streamType, hours = 24 } = req.query;
       const readings = await storage.getTelematicsReadings(
@@ -19134,7 +19134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update widget
-  app.patch('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/dashboard/widgets/:id', isAuthenticated, requireResourceOwnership({ table: 'dashboard_widgets' }), async (req: any, res) => {
     try {
       const widget = await storage.updateDashboardWidget(req.params.id, req.body);
       res.json(widget);
@@ -19156,7 +19156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete widget
-  app.delete('/api/dashboard/widgets/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/dashboard/widgets/:id', isAuthenticated, requireResourceOwnership({ table: 'dashboard_widgets' }), async (req: any, res) => {
     try {
       await storage.deleteDashboardWidget(req.params.id);
       res.json({ success: true });
@@ -19247,7 +19247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single backup by ID
-  app.get('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/backups/:id', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const backup = await storage.getBackupJob(req.params.id);
       if (!backup) {
@@ -19261,7 +19261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete backup
-  app.delete('/api/backups/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/backups/:id', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       await storage.deleteBackupJob(req.params.id);
       res.json({ success: true });
@@ -19272,7 +19272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Restore from backup
-  app.post('/api/backups/:id/restore', isAuthenticated, async (req: any, res) => {
+  app.post('/api/backups/:id/restore', isAuthenticated, requireResourceOwnership({ table: 'backup_jobs' }), async (req: any, res) => {
     try {
       const backup = await storage.getBackupJob(req.params.id);
       if (!backup) {
@@ -19351,7 +19351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/departments/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_departments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrDepartments)
@@ -19368,7 +19368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/departments/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/departments/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_departments' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrDepartments).where(eq(hrDepartments.id, id));
@@ -19407,7 +19407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/positions/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_positions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrPositions)
@@ -19424,7 +19424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/positions/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/positions/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_positions' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrPositions).where(eq(hrPositions.id, id));
@@ -19449,7 +19449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [employee] = await db.select().from(hrEmployeeProfiles)
@@ -19478,7 +19478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrEmployeeProfiles)
@@ -19495,7 +19495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/hr/employees/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       await db.delete(hrEmployeeProfiles).where(eq(hrEmployeeProfiles.id, id));
@@ -19535,7 +19535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Leave Balances
-  app.get('/api/hr/leave-balances/:employeeId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/leave-balances/:employeeId', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles', idParam: 'employeeId' }), async (req: any, res) => {
     try {
       const { employeeId } = req.params;
       const balances = await db.select().from(hrLeaveBalances)
@@ -19562,7 +19562,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/leave-balances/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/leave-balances/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_leave_balances', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrLeaveBalances)
@@ -19614,7 +19614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/leave-requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/leave-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_leave_requests', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -19675,7 +19675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/job-postings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/job-postings/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_job_postings' }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -19733,7 +19733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/candidates/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/candidates/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_candidates', parent: { table: 'hr_job_postings', fk: 'job_posting_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const [updated] = await db.update(hrCandidates)
@@ -19779,7 +19779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Benefit Enrollments
-  app.get('/api/hr/benefit-enrollments/:employeeId', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/benefit-enrollments/:employeeId', isAuthenticated, requireResourceOwnership({ table: 'hr_employee_profiles', idParam: 'employeeId' }), async (req: any, res) => {
     try {
       const { employeeId } = req.params;
       const enrollments = await db.select().from(hrBenefitEnrollments)
@@ -19927,7 +19927,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/hr/self-service-requests/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/hr/self-service-requests/:id', isAuthenticated, requireResourceOwnership({ table: 'hr_self_service_requests', parent: { table: 'hr_employee_profiles', fk: 'employee_id' } }), async (req: any, res) => {
     try {
       const { id } = req.params;
       const updateData: any = { ...req.body, updatedAt: new Date() };
@@ -20284,7 +20284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/workshop-resources/:id', isAuthenticated, requireResourceOwnership({ table: 'workshop_resources' }), async (req: any, res) => {
     try {
       const resource = await storage.updateWorkshopResource(req.params.id, req.body);
       res.json(resource);
@@ -20294,7 +20294,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/workshop-resources/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/workshop-resources/:id', isAuthenticated, requireResourceOwnership({ table: 'workshop_resources' }), async (req: any, res) => {
     try {
       await storage.deleteWorkshopResource(req.params.id);
       res.status(204).send();
@@ -20396,7 +20396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.get('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       const instruction = await storage.getArWorkInstruction(req.params.id);
       if (!instruction) return res.status(404).json({ message: "Instruction not found" });
@@ -20417,7 +20417,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       const instruction = await storage.updateArWorkInstruction(req.params.id, req.body);
       res.json(instruction);
@@ -20427,7 +20427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/ar-instructions/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/ar-instructions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_work_instructions' }), async (req: any, res) => {
     try {
       await storage.deleteArWorkInstruction(req.params.id);
       res.status(204).send();
@@ -20461,7 +20461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-sessions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-sessions/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_session_logs' }), async (req: any, res) => {
     try {
       const session = await storage.updateArSessionLog(req.params.id, req.body);
       res.json(session);
@@ -20495,7 +20495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/ar-devices/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_device_pairings' }), async (req: any, res) => {
     try {
       const device = await storage.updateArDevicePairing(req.params.id, req.body);
       res.json(device);
@@ -20505,7 +20505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/ar-devices/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/ar-devices/:id', isAuthenticated, requireResourceOwnership({ table: 'ar_device_pairings' }), async (req: any, res) => {
     try {
       await storage.deleteArDevicePairing(req.params.id);
       res.status(204).send();
@@ -20618,7 +20618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update market pricing data
-  app.patch('/api/dynamic-pricing/market-data/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/dynamic-pricing/market-data/:id', isAuthenticated, requireResourceOwnership({ table: 'market_pricing_data' }), async (req, res) => {
     try {
       const data = await storage.updateMarketPricingData(req.params.id, req.body);
       res.json(data);
@@ -20629,7 +20629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete market pricing data
-  app.delete('/api/dynamic-pricing/market-data/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/market-data/:id', isAuthenticated, requireResourceOwnership({ table: 'market_pricing_data' }), async (req, res) => {
     try {
       await storage.deleteMarketPricingData(req.params.id);
       res.json({ success: true });
@@ -20664,7 +20664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update vehicle pricing factor
-  app.patch('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_pricing_factors' }), async (req, res) => {
     try {
       const data = await storage.updateVehiclePricingFactor(req.params.id, req.body);
       res.json(data);
@@ -20675,7 +20675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete vehicle pricing factor
-  app.delete('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/vehicle-factors/:id', isAuthenticated, requireResourceOwnership({ table: 'vehicle_pricing_factors' }), async (req, res) => {
     try {
       await storage.deleteVehiclePricingFactor(req.params.id);
       res.json({ success: true });
@@ -20705,7 +20705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get single pricing suggestion
-  app.get('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req, res) => {
     try {
       const data = await storage.getDynamicPricingSuggestion(req.params.id);
       if (!data) {
@@ -20731,7 +20731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update pricing suggestion (accept/reject)
-  app.patch('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req: any, res) => {
     try {
       const updateData: any = { ...req.body };
       if (req.body.status === 'accepted') {
@@ -20747,7 +20747,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete pricing suggestion
-  app.delete('/api/dynamic-pricing/suggestions/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/dynamic-pricing/suggestions/:id', isAuthenticated, requireResourceOwnership({ table: 'dynamic_pricing_suggestions' }), async (req, res) => {
     try {
       await storage.deleteDynamicPricingSuggestion(req.params.id);
       res.json({ success: true });
@@ -20866,7 +20866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== Service Reminders API ====================
 
-  app.patch('/api/service-reminders/:id/status', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminders/:id/status', isAuthenticated, requireResourceOwnership({ table: 'service_reminders', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req, res) => {
     try {
       const { status } = req.body;
       if (!['pending', 'sent', 'acknowledged', 'completed', 'snoozed'].includes(status)) {
@@ -20903,7 +20903,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+  app.patch('/api/service-reminder-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminder_templates' }), async (req, res) => {
     try {
       const template = await storage.updateServiceReminderTemplate(req.params.id, req.body);
       res.json(template);
@@ -20913,7 +20913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/service-reminder-templates/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/service-reminder-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_reminder_templates' }), async (req, res) => {
     try {
       await storage.deleteServiceReminderTemplate(req.params.id);
       res.json({ success: true });
@@ -20950,7 +20950,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/push-subscriptions/:id', isAuthenticated, async (req, res) => {
+  app.delete('/api/push-subscriptions/:id', isAuthenticated, requireResourceOwnership({ table: 'push_subscriptions', parent: { table: 'users', fk: 'user_id' } }), async (req, res) => {
     try {
       await storage.deletePushSubscription(req.params.id);
       res.json({ success: true });
@@ -20990,7 +20990,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/push-notifications/:id/read', isAuthenticated, async (req, res) => {
+  app.patch('/api/push-notifications/:id/read', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
       const notification = await storage.markPushNotificationAsRead(req.params.id);
       res.json(notification);
@@ -21000,7 +21000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/push-notifications/:id/clicked', isAuthenticated, async (req, res) => {
+  app.patch('/api/push-notifications/:id/clicked', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
       const notification = await storage.markNotificationAsClicked(req.params.id);
       res.json(notification);
@@ -21010,7 +21010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/push-notifications/:id/send', isAuthenticated, async (req, res) => {
+  app.post('/api/push-notifications/:id/send', isAuthenticated, requireResourceOwnership({ table: 'push_notifications' }), async (req, res) => {
     try {
       const notification = await storage.sendPushNotification(req.params.id);
       res.json(notification);
@@ -21894,7 +21894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/provider/offerings/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
     try {
       const providerId = req.user?.garageId;
       if (!providerId) return res.status(403).json({ message: "No provider account associated" });
@@ -21910,7 +21910,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/provider/offerings/:id', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
     try {
       const providerId = req.user?.garageId;
       if (!providerId) return res.status(403).json({ message: "No provider account associated" });
@@ -22091,7 +22091,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/provider/orders/:id', isAuthenticated, async (req: any, res) => {
+  app.patch('/api/provider/orders/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_orders', tenantColumn: 'provider_id' }), async (req: any, res) => {
     try {
       const providerId = req.user?.garageId;
       if (!providerId) return res.status(403).json({ message: "No provider account associated" });
