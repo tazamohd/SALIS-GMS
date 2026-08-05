@@ -15,6 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "db:push": "drizzle-kit push",
     "db:migrate": "tsx server/scripts/migrate.ts",
+    "db:check-drift": "bash scripts/check-migration-drift.sh",
+    "db:baseline-stamp": "tsx server/scripts/baseline-stamp.ts",
     "db:seed:demo": "tsx server/seed-demo.ts"
   },
   "dependencies": {
