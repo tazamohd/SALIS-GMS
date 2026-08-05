@@ -40,6 +40,19 @@ function ident(name: string): string {
   return name;
 }
 
+/** A join hop from a child table up to a table nearer the tenant root. */
+export interface ParentHop {
+  table: string;
+  /** FK column on the child pointing at this table's PK. */
+  fk: string;
+  /** This table's PK column. Default "id". */
+  parentIdColumn?: string;
+  /** This table's tenant column (used when there is no further hop). Default "garage_id". */
+  tenantColumn?: string;
+  /** A further hop up, when this table also lacks a tenant column. */
+  parent?: ParentHop;
+}
+
 export interface OwnershipConfig {
   /** The table the :id addresses, e.g. "refunds". */
   table: string;
@@ -47,15 +60,31 @@ export interface OwnershipConfig {
   idParam?: string;
   /** Tenant column on `table` when it has one directly. Default "garage_id". */
   tenantColumn?: string;
-  /** For child tables with no garage_id: scope through a parent's tenant. */
-  parent?: {
-    table: string;
-    /** FK column on the child pointing at the parent's PK. */
-    fk: string;
-    /** Parent's PK column. Default "id". */
-    parentIdColumn?: string;
-    /** Parent's tenant column. Default "garage_id". */
-    tenantColumn?: string;
+  /**
+   * Two-or-more tenant columns on `table` that each hold a garage id; the row
+   * is visible when ANY of them matches the caller's garage (e.g. an inventory
+   * transfer's from_garage_id / to_garage_id — both parties may see it).
+   */
+  tenantColumns?: string[];
+  /** For child tables with no garage_id: scope through a parent's tenant (1+ hops). */
+  parent?: ParentHop;
+}
+
+interface NormHop {
+  table: string;
+  fk: string;
+  parentIdColumn: string;
+  tenantColumn: string;
+  parent?: NormHop;
+}
+
+function normHop(h: ParentHop): NormHop {
+  return {
+    table: ident(h.table),
+    fk: ident(h.fk),
+    parentIdColumn: ident(h.parentIdColumn ?? "id"),
+    tenantColumn: ident(h.tenantColumn ?? "garage_id"),
+    parent: h.parent ? normHop(h.parent) : undefined,
   };
 }
 
@@ -63,14 +92,8 @@ export function requireResourceOwnership(config: OwnershipConfig): RequestHandle
   const table = ident(config.table);
   const idParam = config.idParam ?? "id";
   const tenantColumn = ident(config.tenantColumn ?? "garage_id");
-  const parent = config.parent
-    ? {
-        table: ident(config.parent.table),
-        fk: ident(config.parent.fk),
-        parentIdColumn: ident(config.parent.parentIdColumn ?? "id"),
-        tenantColumn: ident(config.parent.tenantColumn ?? "garage_id"),
-      }
-    : undefined;
+  const tenantColumns = config.tenantColumns?.map(ident);
+  const parent = config.parent ? normHop(config.parent) : undefined;
 
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = (req as any).user || {};
@@ -86,14 +109,35 @@ export function requireResourceOwnership(config: OwnershipConfig): RequestHandle
     if (!id) return next();
 
     try {
-      const q = parent
-        ? sql`SELECT 1 FROM ${sql.raw(table)} t
-               JOIN ${sql.raw(parent.table)} p ON t.${sql.raw(parent.fk)} = p.${sql.raw(parent.parentIdColumn)}
-               WHERE t.id = ${id} AND p.${sql.raw(parent.tenantColumn)} = ${garageId}
-               LIMIT 1`
-        : sql`SELECT 1 FROM ${sql.raw(table)}
-               WHERE id = ${id} AND ${sql.raw(tenantColumn)} = ${garageId}
-               LIMIT 1`;
+      let q;
+      if (parent) {
+        // Walk the parent chain, aliasing each join level a0, a1, ...; the
+        // tenant predicate lands on the last hop (the one nearest the root).
+        const joins: any[] = [];
+        let childAlias = "t";
+        let hop: NormHop | undefined = parent;
+        let level = 0;
+        let tenantPred = sql``;
+        while (hop) {
+          const alias = `a${level}`;
+          joins.push(
+            sql` JOIN ${sql.raw(hop.table)} ${sql.raw(alias)} ON ${sql.raw(childAlias)}.${sql.raw(hop.fk)} = ${sql.raw(alias)}.${sql.raw(hop.parentIdColumn)}`,
+          );
+          if (!hop.parent) {
+            tenantPred = sql`${sql.raw(alias)}.${sql.raw(hop.tenantColumn)} = ${garageId}`;
+          }
+          childAlias = alias;
+          hop = hop.parent;
+          level++;
+        }
+        q = sql`SELECT 1 FROM ${sql.raw(table)} t${sql.join(joins, sql``)} WHERE t.id = ${id} AND ${tenantPred} LIMIT 1`;
+      } else if (tenantColumns && tenantColumns.length) {
+        // Dual (or multi) tenant column: the row is owned if ANY column matches.
+        const ors = tenantColumns.map((c) => sql`${sql.raw(c)} = ${garageId}`);
+        q = sql`SELECT 1 FROM ${sql.raw(table)} WHERE id = ${id} AND (${sql.join(ors, sql` OR `)}) LIMIT 1`;
+      } else {
+        q = sql`SELECT 1 FROM ${sql.raw(table)} WHERE id = ${id} AND ${sql.raw(tenantColumn)} = ${garageId} LIMIT 1`;
+      }
       const result = await db.execute(q);
       if (result.rows.length === 0) {
         res.status(404).json({ message: "Not found" });
