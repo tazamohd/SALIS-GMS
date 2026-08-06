@@ -48,14 +48,15 @@ export default defineConfig({
       ],
       thresholds: {
         // Ratchet gate over executed code (storage.ts/routes.ts excluded).
-        // Set a few points below the measured baseline (lines 37.4 / stmts 36.3
-        // / funcs 19.6 / branches 24.3) so run-to-run variance doesn't false-fail,
-        // while a real regression drops CI. Raise these as coverage improves —
-        // never lower them.
-        lines: 34,
-        statements: 33,
-        functions: 17,
-        branches: 21,
+        // Tightened now that CI is stable (run #145 green on clean-source) to
+        // sit ~1 point below the measured baseline (lines 37.4 / stmts 36.3 /
+        // funcs 19.6 / branches 24.3) — a small margin keeps run-to-run
+        // variance from false-failing while a real regression drops CI. Raise
+        // these as coverage improves — never lower them.
+        lines: 36,
+        statements: 35,
+        functions: 19,
+        branches: 23,
       },
     },
     projects: [
