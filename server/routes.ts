@@ -5568,7 +5568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Refunds
-  app.get('/api/refunds', isAuthenticated, async (req: any, res) => {
+  app.get('/api/refunds', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const { garageId: garageIdParam, status } = req.query;
       // Session garage wins; ?garageId honored only for garage-less principals.
@@ -19438,7 +19438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Employee Profiles
-  app.get('/api/hr/employees', isAuthenticated, async (req: any, res) => {
+  app.get('/api/hr/employees', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const garageId = req.user?.garageId;
       const employees = await db.select().from(hrEmployeeProfiles)
@@ -19466,7 +19466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/hr/employees', isAuthenticated, async (req: any, res) => {
+  app.post('/api/hr/employees', isAuthenticated, requireManagerOrAbove, async (req: any, res) => {
     try {
       const validation = insertHrEmployeeProfileSchema.safeParse(req.body);
       if (!validation.success) {
