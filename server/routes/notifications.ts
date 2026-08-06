@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { getNotifications, markAsRead, markAllAsRead, getUnreadCount, deleteNotification, createNotification, getPreferences, updatePreferences } from '../services/notification-center';
 import { validate } from '../middleware/validate';
 import { notificationPreferencesSchema } from '../schemas/validation';
 
 const router = Router();
 
-router.get('/notifications', isAuthenticated, async (req, res) => {
+router.get('/notifications', isAuthenticated, asyncHandler(async (req, res) => {
   const userId = (req as any).user.id;
   const { unreadOnly, category, limit } = req.query;
   const notifs = await getNotifications(userId, {
@@ -16,28 +17,28 @@ router.get('/notifications', isAuthenticated, async (req, res) => {
   });
   const unreadCount = await getUnreadCount(userId);
   res.json({ notifications: notifs, unreadCount });
-});
+}));
 
-router.get('/notifications/unread-count', isAuthenticated, async (req, res) => {
+router.get('/notifications/unread-count', isAuthenticated, asyncHandler(async (req, res) => {
   const userId = (req as any).user.id;
   res.json({ count: await getUnreadCount(userId) });
-});
+}));
 
-router.post('/notifications/:id/read', isAuthenticated, async (req, res) => {
+router.post('/notifications/:id/read', isAuthenticated, asyncHandler(async (req, res) => {
   await markAsRead(req.params.id);
   res.json({ success: true });
-});
+}));
 
-router.post('/notifications/read-all', isAuthenticated, async (req, res) => {
+router.post('/notifications/read-all', isAuthenticated, asyncHandler(async (req, res) => {
   const userId = (req as any).user.id;
   const count = await markAllAsRead(userId);
   res.json({ success: true, markedCount: count });
-});
+}));
 
-router.delete('/notifications/:id', isAuthenticated, async (req, res) => {
+router.delete('/notifications/:id', isAuthenticated, asyncHandler(async (req, res) => {
   await deleteNotification(req.params.id);
   res.json({ success: true });
-});
+}));
 
 router.get('/notifications/preferences', isAuthenticated, (req, res) => {
   const userId = (req as any).user.id;
@@ -51,7 +52,7 @@ router.put('/notifications/preferences', isAuthenticated, validate(notificationP
 });
 
 // Demo: seed some notifications
-router.post('/notifications/seed', isAuthenticated, async (req, res) => {
+router.post('/notifications/seed', isAuthenticated, asyncHandler(async (req, res) => {
   const userId = (req as any).user.id;
   const garageId = (req as any).user.garageId;
   const demos = [
@@ -65,6 +66,6 @@ router.post('/notifications/seed', isAuthenticated, async (req, res) => {
     await createNotification({ userId, garageId, ...d });
   }
   res.json({ success: true, count: demos.length });
-});
+}));
 
 export default router;
