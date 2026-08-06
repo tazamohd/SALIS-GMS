@@ -84,7 +84,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   converted: { label: "Converted", color: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
 };
 
-const SAR = (v: number) => `SAR ${v.toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const SAR = (v?: number | null) => `SAR ${(Number(v) || 0).toLocaleString("en-SA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 function emptyLineItem(): { type: "labor" | "parts"; description: string; quantity: number; unitPrice: number } {
   return { type: "parts", description: "", quantity: 1, unitPrice: 0 };

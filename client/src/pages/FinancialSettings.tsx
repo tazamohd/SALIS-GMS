@@ -20,7 +20,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const taxConfigSchema = z.object({
@@ -493,7 +493,7 @@ export default function FinancialSettings() {
                               <PopoverTrigger asChild>
                                 <FormControl>
                                   <Button variant="outline" className={cn("ps-3 text-start font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-from">
-                                    {field.value ? format(field.value, "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
+                                    {field.value && isValid(new Date(field.value)) ? format(new Date(field.value), "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
                                     <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                                   </Button>
                                 </FormControl>
@@ -516,7 +516,7 @@ export default function FinancialSettings() {
                               <PopoverTrigger asChild>
                                 <FormControl>
                                   <Button variant="outline" className={cn("ps-3 text-start font-normal", !field.value && "text-gray-900 dark:text-white/60")} data-testid="button-discount-valid-to">
-                                    {field.value ? format(field.value, "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
+                                    {field.value && isValid(new Date(field.value)) ? format(new Date(field.value), "PPP") : <span>{t('financial.pickADate', 'Pick a date')}</span>}
                                     <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
                                   </Button>
                                 </FormControl>
@@ -650,7 +650,7 @@ export default function FinancialSettings() {
                         {discount.discountType === "percentage" ? `${discount.discountValue}%` : `SAR ${discount.discountValue}`}
                       </TableCell>
                       <TableCell className="text-sm text-[#64748B]" data-testid={`text-discount-period-${discount.id}`}>
-                        {format(new Date(discount.validFrom), "MMM dd")} - {format(new Date(discount.validTo), "MMM dd, yyyy")}
+                        {isValid(new Date(discount.validFrom)) ? format(new Date(discount.validFrom), "MMM dd") : "—"} - {isValid(new Date(discount.validTo)) ? format(new Date(discount.validTo), "MMM dd, yyyy") : "—"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={discount.isActive ? "default" : "secondary"} className={discount.isActive ? "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] text-white" : ""} data-testid={`badge-discount-status-${discount.id}`}>

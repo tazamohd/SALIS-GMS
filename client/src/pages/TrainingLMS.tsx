@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { asArray } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -60,14 +61,17 @@ export default function TrainingLMS() {
 
   const { data: modules = [], isLoading: modulesLoading } = useQuery<any[]>({
     queryKey: ["/api/training/modules"],
+    select: asArray,
   });
 
   const { data: certifications = [], isLoading: certificationsLoading } = useQuery<any[]>({
     queryKey: ["/api/training/certifications"],
+    select: asArray,
   });
 
   const { data: attempts = [], isLoading: attemptsLoading } = useQuery<any[]>({
     queryKey: ["/api/training/attempts"],
+    select: asArray,
   });
 
   const moduleForm = useForm<ModuleFormData>({

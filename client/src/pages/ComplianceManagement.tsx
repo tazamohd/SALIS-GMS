@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { asArray } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -61,14 +62,17 @@ export default function ComplianceManagement() {
 
   const { data: policies = [], isLoading: policiesLoading } = useQuery<any[]>({
     queryKey: ["/api/compliance/policies"],
+    select: asArray,
   });
 
   const { data: audits = [], isLoading: auditsLoading } = useQuery<any[]>({
     queryKey: ["/api/compliance/audits"],
+    select: asArray,
   });
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery<any[]>({
     queryKey: ["/api/compliance/tasks"],
+    select: asArray,
   });
 
   const policyForm = useForm<PolicyFormData>({

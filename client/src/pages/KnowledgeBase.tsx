@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { asArray } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -98,18 +99,22 @@ export default function KnowledgeBase() {
 
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<any[]>({
     queryKey: ["/api/knowledge-base/categories"],
+    select: asArray,
   });
 
   const { data: articles = [], isLoading: articlesLoading } = useQuery<any[]>({
     queryKey: ["/api/knowledge-base/articles"],
+    select: asArray,
   });
 
   const { data: documents = [], isLoading: documentsLoading } = useQuery<any[]>({
     queryKey: ["/api/documents"],
+    select: asArray,
   });
 
   const { data: documentCategories = [] } = useQuery<any[]>({
     queryKey: ["/api/document-categories"],
+    select: asArray,
   });
 
   const categoryForm = useForm<CategoryFormData>({
