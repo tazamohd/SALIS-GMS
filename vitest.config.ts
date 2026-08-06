@@ -18,6 +18,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'json-summary', 'lcov'],
       reportsDirectory: './coverage',
+      // Report on files the tests actually execute. The all-files pass (default
+      // when `include` is set) makes the v8 provider parse every matching file —
+      // including untested client .tsx — and rolldown fails on their JSX
+      // (`Parse failed` in remapCoverage), which crashed the whole coverage run
+      // and is why the gate below sat at 0. With `all: false` coverage reflects
+      // exercised code and the run is stable, so the thresholds can be enforced.
+      all: false,
       include: [
         'server/**/*.ts',
         'shared/**/*.ts',
@@ -40,13 +47,15 @@ export default defineConfig({
         'server/phase*-service.ts',
       ],
       thresholds: {
-        // Wave B baseline. The codebase has near-zero existing tests.
-        // Set to actual current level so CI doesn't block on this gate.
-        // Wave I (coverage backfill) will raise these incrementally.
-        lines: 0,
-        functions: 0,
-        branches: 0,
-        statements: 0,
+        // Ratchet gate over executed code (storage.ts/routes.ts excluded).
+        // Set a few points below the measured baseline (lines 37.4 / stmts 36.3
+        // / funcs 19.6 / branches 24.3) so run-to-run variance doesn't false-fail,
+        // while a real regression drops CI. Raise these as coverage improves —
+        // never lower them.
+        lines: 34,
+        statements: 33,
+        functions: 17,
+        branches: 21,
       },
     },
     projects: [

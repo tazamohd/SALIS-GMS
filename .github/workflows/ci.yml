@@ -55,8 +55,8 @@ jobs:
         run: npm ci
       - name: Type-check
         run: npm run typecheck
-      - name: Test (vitest against Postgres)
-        run: npm test
+      - name: Test + coverage gate (vitest against Postgres)
+        run: npm run test:coverage
       - name: Production build
         run: npm run build
 
