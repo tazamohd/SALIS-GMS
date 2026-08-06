@@ -2275,6 +2275,14 @@ export class DatabaseStorage implements IStorage {
       const bcrypt = await import('bcrypt');
       data.password = await bcrypt.hash(data.password, 10);
     }
+    // Defense-in-depth (audit H-1): the users.role column defaults to ADVISOR
+    // (a staff role), so any createUser that omits role silently mints a
+    // staff-level account. Floor an unspecified role to the non-privileged
+    // CUSTOMER instead — staff-creating callers always pass an explicit role.
+    if (data.role == null || data.role === '') {
+      data.role = 'CUSTOMER';
+      if (data.userType == null || data.userType === '') data.userType = 'customer';
+    }
     const [user] = await db.insert(users).values(data).returning();
     return user;
   }
