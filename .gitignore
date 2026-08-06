@@ -77,3 +77,6 @@ server/routes/payments.routes.ts
 # Local Claude agent config (you opted to keep this out of git; the .gitignore
 # note above intends settings.json to be versioned — re-add if the team wants it)
 .claude/settings.json
+
+# Test coverage output
+coverage/
