@@ -17,7 +17,13 @@ describe('Pagination coverage expansion (Wave E)', () => {
   const sparePartRoutesPath = path.resolve(process.cwd(), 'server/routes/spare-parts.ts');
   const supplierRoutesPath = path.resolve(process.cwd(), 'server/routes/suppliers.ts');
   const vehicleRoutesPath = path.resolve(process.cwd(), 'server/routes/vehicles.ts');
-  const customerRoutesPath = path.resolve(process.cwd(), 'server/routes/customers.ts');
+  // Phase E: customer reads moved into the layered module; the data-layer
+  // bindings now live in the repository.
+  const customerModuleIndexPath = path.resolve(process.cwd(), 'server/modules/customers/index.ts');
+  const customerRepositoryPath = path.resolve(
+    process.cwd(),
+    'server/modules/customers/repositories/customer.repository.ts',
+  );
   const storagePath = path.resolve(process.cwd(), 'server/storage.ts');
   const routesSource = fs.readFileSync(routesPath, 'utf-8');
   const systemRoutesSource = fs.readFileSync(systemRoutesPath, 'utf-8');
@@ -25,7 +31,8 @@ describe('Pagination coverage expansion (Wave E)', () => {
   const sparePartRoutesSource = fs.readFileSync(sparePartRoutesPath, 'utf-8');
   const supplierRoutesSource = fs.readFileSync(supplierRoutesPath, 'utf-8');
   const vehicleRoutesSource = fs.readFileSync(vehicleRoutesPath, 'utf-8');
-  const customerRoutesSource = fs.readFileSync(customerRoutesPath, 'utf-8');
+  const customerModuleIndexSource = fs.readFileSync(customerModuleIndexPath, 'utf-8');
+  const customerRepositorySource = fs.readFileSync(customerRepositoryPath, 'utf-8');
   const storageSource = fs.readFileSync(storagePath, 'utf-8');
 
   const handlerFor = (source: string, marker: string, nextPrefix: string) => {
@@ -103,17 +110,17 @@ describe('Pagination coverage expansion (Wave E)', () => {
       expect(handler).toMatch(/storage\.countVehicles\(/);
     });
 
-    it('/api/customers uses getCustomersPaginated', () => {
-      const handler = handlerFor(customerRoutesSource, "router.get('/customers'", 'router.');
-      expect(handler).toMatch(/storage\.getCustomersPaginated\(/);
-      expect(handler).toMatch(/storage\.countCustomers\(/);
-      expect(handler).toMatch(/storage\.searchCustomers\(/);
+    it('/api/customers uses getCustomersPaginated (via the module repository)', () => {
+      expect(customerModuleIndexSource).toMatch(/router\.get\(\s*['"]\/customers['"],\s*isAuthenticated/);
+      expect(customerRepositorySource).toMatch(/storage\.getCustomersPaginated\(/);
+      expect(customerRepositorySource).toMatch(/storage\.countCustomers\(/);
+      expect(customerRepositorySource).toMatch(/storage\.searchCustomers\(/);
     });
   });
 
   describe('Health check endpoint', () => {
     it('defines /api/health route', () => {
-      expect(systemRoutesSource).toMatch(/router\.get\(['"]\/api\/health['"]\s*,/);
+      expect(systemRoutesSource).toMatch(/router\.get\(\s*['"]\/api\/health['"]\s*,/);
     });
 
     it('does not require auth (no isAuthenticated middleware)', () => {

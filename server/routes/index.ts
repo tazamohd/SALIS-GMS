@@ -29,7 +29,7 @@ import appointmentRoutes from "./appointments";
 import toolRoutes from "./tools";
 import vehicleMaintenanceRoutes from "./vehicle-maintenance";
 import supplierRoutes from "./suppliers";
-import customerRoutes from "./customers";
+import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
 import jobCardRoutes from "./job-cards";
 import serviceBayRoutes from "./service-bays";
