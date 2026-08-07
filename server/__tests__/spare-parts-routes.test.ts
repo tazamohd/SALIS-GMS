@@ -2,13 +2,24 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Spare part read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const sparePartRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/spare-parts.ts'), 'utf-8');
+/**
+ * Source-contract tests for the spare-part (inventory items) read surface.
+ * Phase E migrated the extracted router into a layered module
+ * (`server/modules/inventory`); assertions target the module's
+ * controller/service/repository. Behavioral coverage lives in
+ * `server/modules/inventory/__tests__/spare-part.service.test.ts`.
+ */
+describe('Spare part read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/inventory/index.ts');
+  const controllerSource = read('server/modules/inventory/controllers/spare-part.controller.ts');
+  const serviceSource = read('server/modules/inventory/services/spare-part.service.ts');
+  const repositorySource = read('server/modules/inventory/repositories/spare-part.repository.ts');
 
-  it('mounts the extracted spare part router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import sparePartRoutes from ['"]\.\/spare-parts['"]/);
+  it('mounts the inventory module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import sparePartRoutes from ['"]\.\.\/modules\/inventory['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*sparePartRoutes\)/);
   });
 
@@ -27,22 +38,21 @@ describe('Spare part read route extraction (Wave J)', () => {
   });
 
   it('preserves spare part list pagination, garage scoping, and detail lookup', () => {
-    expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-parts['"],\s*isAuthenticated/);
-    expect(sparePartRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(sparePartRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garageId as string\)/);
-    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartsPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
-    expect(sparePartRoutesSource).toMatch(/storage\.countSpareParts\(gid\)/);
-    expect(sparePartRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
-    expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-parts\/:id['"],\s*isAuthenticated/);
-    expect(sparePartRoutesSource).toMatch(/storage\.getSparePart\(id\)/);
-    expect(sparePartRoutesSource).toMatch(/Spare part not found/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/spare-parts['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/spare-parts\/:id['"],\s*isAuthenticated/);
+    expect(controllerSource).toMatch(/parsePagination\(req\)/);
+    expect(controllerSource).toMatch(/sendPaginated\(res,\s*rows,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+    // Session garage takes precedence over ?garageId (tenant isolation).
+    expect(serviceSource).toMatch(/auth\.garageId \?\? garageIdParam/);
+    expect(serviceSource).toMatch(/Spare part not found/);
+    expect(repositorySource).toMatch(/storage\.getSparePartsPaginated\(/);
+    expect(repositorySource).toMatch(/storage\.countSpareParts\(/);
+    expect(repositorySource).toMatch(/storage\.getSparePart\(/);
   });
 
   it('preserves spare part inventory read validation and storage lookup', () => {
-    expect(sparePartRoutesSource).toMatch(/router\.get\(['"]\/spare-part-inventories['"],\s*isAuthenticated/);
-    expect(sparePartRoutesSource).toMatch(/const \{ garage_id,\s*spare_part_id \} = req\.query/);
-    expect(sparePartRoutesSource).toMatch(/if \(!gid\)/);
-    expect(sparePartRoutesSource).toMatch(/garage_id is required/);
-    expect(sparePartRoutesSource).toMatch(/storage\.getSparePartInventories\(\s*gid,\s*spare_part_id as string,\s*\)/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/spare-part-inventories['"],\s*isAuthenticated/);
+    expect(serviceSource).toMatch(/garage_id is required/);
+    expect(repositorySource).toMatch(/storage\.getSparePartInventories\(/);
   });
 });

@@ -21,6 +21,16 @@ import type { IInvoiceRepository } from '../../modules/invoices/repositories/inv
 import type { InvoiceService } from '../../modules/invoices/services/invoice.service';
 import type { IPaymentRepository } from '../../modules/payments/repositories/payment.repository';
 import type { PaymentService } from '../../modules/payments/services/payment.service';
+import type { ISparePartRepository } from '../../modules/inventory/repositories/spare-part.repository';
+import type { SparePartService } from '../../modules/inventory/services/spare-part.service';
+import type { IInventoryDashboardRepository } from '../../modules/inventory/repositories/inventory-dashboard.repository';
+import type { InventoryDashboardService } from '../../modules/inventory/services/inventory-dashboard.service';
+import type { IStockAlertRepository } from '../../modules/inventory/repositories/stock-alert.repository';
+import type { StockAlertService } from '../../modules/inventory/services/stock-alert.service';
+import type { IInventoryAuditRepository } from '../../modules/inventory/repositories/inventory-audit.repository';
+import type { InventoryAuditService } from '../../modules/inventory/services/inventory-audit.service';
+import type { IInventoryTransferRepository } from '../../modules/inventory/repositories/inventory-transfer.repository';
+import type { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -39,3 +49,19 @@ export const INVOICE_REPOSITORY = token<IInvoiceRepository>('InvoiceRepository')
 export const INVOICE_SERVICE = token<InvoiceService>('InvoiceService');
 export const PAYMENT_REPOSITORY = token<IPaymentRepository>('PaymentRepository');
 export const PAYMENT_SERVICE = token<PaymentService>('PaymentService');
+export const SPARE_PART_REPOSITORY = token<ISparePartRepository>('SparePartRepository');
+export const SPARE_PART_SERVICE = token<SparePartService>('SparePartService');
+export const INVENTORY_DASHBOARD_REPOSITORY = token<IInventoryDashboardRepository>(
+  'InventoryDashboardRepository',
+);
+export const INVENTORY_DASHBOARD_SERVICE = token<InventoryDashboardService>(
+  'InventoryDashboardService',
+);
+export const STOCK_ALERT_REPOSITORY = token<IStockAlertRepository>('StockAlertRepository');
+export const STOCK_ALERT_SERVICE = token<StockAlertService>('StockAlertService');
+export const INVENTORY_AUDIT_REPOSITORY = token<IInventoryAuditRepository>('InventoryAuditRepository');
+export const INVENTORY_AUDIT_SERVICE = token<InventoryAuditService>('InventoryAuditService');
+export const INVENTORY_TRANSFER_REPOSITORY = token<IInventoryTransferRepository>(
+  'InventoryTransferRepository',
+);
+export const INVENTORY_TRANSFER_SERVICE = token<InventoryTransferService>('InventoryTransferService');
