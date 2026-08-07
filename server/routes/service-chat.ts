@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/job-cards/:jobCardId/chat', isAuthenticated, async (req, res) => {
+router.get('/job-cards/:jobCardId/chat', isAuthenticated, requireResourceOwnership({ table: 'job_cards', idParam: 'jobCardId' }), async (req, res) => {
   try {
     const { jobCardId } = req.params;
     const messages = await storage.getServiceChatMessages(jobCardId);

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
@@ -15,7 +16,7 @@ router.get('/service-reminders/due', isAuthenticated, async (req: any, res) => {
   }
 });
 
-router.get('/service-reminders/vehicle/:vehicleId', isAuthenticated, async (req, res) => {
+router.get('/service-reminders/vehicle/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req, res) => {
   try {
     const reminders = await storage.getServiceRemindersByVehicle(req.params.vehicleId);
     res.json(reminders);
@@ -25,7 +26,7 @@ router.get('/service-reminders/vehicle/:vehicleId', isAuthenticated, async (req,
   }
 });
 
-router.get('/service-reminders/customer/:customerId', isAuthenticated, async (req, res) => {
+router.get('/service-reminders/customer/:customerId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'customerId' }), async (req, res) => {
   try {
     const reminders = await storage.getServiceRemindersByCustomer(req.params.customerId);
     res.json(reminders);

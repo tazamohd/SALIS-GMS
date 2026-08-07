@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
@@ -28,7 +29,7 @@ router.get('/service-templates', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/service-templates/:id', isAuthenticated, async (req, res) => {
+router.get('/service-templates/:id', isAuthenticated, requireResourceOwnership({ table: 'service_templates' }), async (req, res) => {
   try {
     const { id } = req.params;
     const template = await storage.getServiceTemplate(id);
