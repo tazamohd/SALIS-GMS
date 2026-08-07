@@ -2,13 +2,22 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Garage and role route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const garageRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/garages.ts'), 'utf-8');
+/**
+ * Source-contract tests for the garage + role read surface. Phase E migrated the
+ * extracted router into a layered module (`server/modules/garage`); assertions
+ * target the module's controller/service/repository. Behavioral coverage lives
+ * in `server/modules/garage/__tests__/garage.service.test.ts`.
+ */
+describe('Garage and role route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/garage/index.ts');
+  const controllerSource = read('server/modules/garage/controllers/garage.controller.ts');
+  const repositorySource = read('server/modules/garage/repositories/garage.repository.ts');
 
-  it('mounts the extracted garage router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import garageRoutes from ['"]\.\/garages['"]/);
+  it('mounts the garage module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import garageRoutes from ['"]\.\.\/modules\/garage['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*garageRoutes\)/);
   });
 
@@ -20,24 +29,25 @@ describe('Garage and role route extraction (Wave J)', () => {
     expect(legacyRoutesSource).not.toMatch(/app\.get\(['"]\/api\/user\/:id\/roles['"]/);
   });
 
-  it('preserves all extracted route paths and authentication middleware', () => {
+  it('preserves all extracted route paths, authentication, and RBAC middleware', () => {
     const routePatterns = [
-      /router\.get\(['"]\/garages['"],\s*isAuthenticated/,
-      /router\.get\(['"]\/garages\/:id['"],\s*isAuthenticated/,
-      /router\.get\(['"]\/garages\/:id\/branches['"],\s*isAuthenticated/,
-      /router\.get\(['"]\/roles['"],\s*isAuthenticated/,
-      /router\.get\(['"]\/user\/:id\/roles['"],\s*isAuthenticated/,
+      /router\.get\(\s*['"]\/garages['"],\s*isAuthenticated/,
+      /router\.get\(\s*['"]\/garages\/:id['"],\s*isAuthenticated/,
+      /router\.get\(\s*['"]\/garages\/:id\/branches['"],\s*isAuthenticated/,
+      /router\.get\(\s*['"]\/roles['"],\s*isAuthenticated,\s*requireManagerOrAbove/,
+      /router\.get\(\s*['"]\/user\/:id\/roles['"],\s*isAuthenticated/,
     ];
-
     for (const pattern of routePatterns) {
-      expect(garageRoutesSource).toMatch(pattern);
+      expect(moduleIndexSource).toMatch(pattern);
     }
+    // The /user/:id/roles ownership guard is preserved.
+    expect(moduleIndexSource).toMatch(/requireResourceOwnership\(\{\s*table:\s*['"]users['"]\s*\}\)/);
   });
 
-  it('keeps pagination behavior for garage listings', () => {
-    expect(garageRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(garageRoutesSource).toMatch(/storage\.getGaragesPaginated\(pagination\.limit,\s*pagination\.offset\)/);
-    expect(garageRoutesSource).toMatch(/storage\.countGarages\(\)/);
-    expect(garageRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+  it('keeps pagination behavior for garage listings (via the module)', () => {
+    expect(controllerSource).toMatch(/parsePagination\(req\)/);
+    expect(controllerSource).toMatch(/sendPaginated\(res,\s*rows,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+    expect(repositorySource).toMatch(/storage\.getGaragesPaginated\(/);
+    expect(repositorySource).toMatch(/storage\.countGarages\(\)/);
   });
 });

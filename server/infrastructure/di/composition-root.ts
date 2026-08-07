@@ -14,6 +14,10 @@ import {
   CUSTOMER_SERVICE,
   VEHICLE_REPOSITORY,
   VEHICLE_SERVICE,
+  APPOINTMENT_REPOSITORY,
+  APPOINTMENT_SERVICE,
+  GARAGE_REPOSITORY,
+  GARAGE_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -21,6 +25,10 @@ import { CustomerService } from '../../modules/customers/services/customer.servi
 import { registerCustomerEventHandlers } from '../../modules/customers/events/customer.handlers';
 import { VehicleRepository } from '../../modules/vehicles/repositories/vehicle.repository';
 import { VehicleService } from '../../modules/vehicles/services/vehicle.service';
+import { AppointmentRepository } from '../../modules/appointments/repositories/appointment.repository';
+import { AppointmentService } from '../../modules/appointments/services/appointment.service';
+import { GarageRepository } from '../../modules/garage/repositories/garage.repository';
+import { GarageService } from '../../modules/garage/services/garage.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -63,6 +71,15 @@ export function getAppContainer(): Container {
 
   c.register(VEHICLE_REPOSITORY, () => new VehicleRepository());
   c.register(VEHICLE_SERVICE, (ctx) => new VehicleService(ctx.resolve(VEHICLE_REPOSITORY)));
+
+  c.register(APPOINTMENT_REPOSITORY, () => new AppointmentRepository());
+  c.register(
+    APPOINTMENT_SERVICE,
+    (ctx) => new AppointmentService(ctx.resolve(APPOINTMENT_REPOSITORY)),
+  );
+
+  c.register(GARAGE_REPOSITORY, () => new GarageRepository());
+  c.register(GARAGE_SERVICE, (ctx) => new GarageService(ctx.resolve(GARAGE_REPOSITORY)));
 
   container = c;
   return c;

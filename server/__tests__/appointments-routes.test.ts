@@ -2,13 +2,23 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Appointment read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const appointmentRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/appointments.ts'), 'utf-8');
+/**
+ * Source-contract tests for the appointment read surface. Phase E migrated the
+ * extracted router into a layered module (`server/modules/appointments`);
+ * assertions target the module's controller/service/repository. Behavioral
+ * coverage lives in `server/modules/appointments/__tests__/appointment.service.test.ts`.
+ */
+describe('Appointment read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/appointments/index.ts');
+  const controllerSource = read('server/modules/appointments/controllers/appointment.controller.ts');
+  const serviceSource = read('server/modules/appointments/services/appointment.service.ts');
+  const repositorySource = read('server/modules/appointments/repositories/appointment.repository.ts');
 
-  it('mounts the extracted appointment router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import appointmentRoutes from ['"]\.\/appointments['"]/);
+  it('mounts the appointment module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import appointmentRoutes from ['"]\.\.\/modules\/appointments['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*appointmentRoutes\)/);
   });
 
@@ -25,14 +35,15 @@ describe('Appointment read route extraction (Wave J)', () => {
   });
 
   it('preserves appointment list pagination, garage scoping, and detail lookup', () => {
-    expect(appointmentRoutesSource).toMatch(/router\.get\(['"]\/appointments['"],\s*isAuthenticated/);
-    expect(appointmentRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(appointmentRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
-    expect(appointmentRoutesSource).toMatch(/storage\.getAppointmentsPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
-    expect(appointmentRoutesSource).toMatch(/storage\.countAppointments\(gid\)/);
-    expect(appointmentRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
-    expect(appointmentRoutesSource).toMatch(/router\.get\(['"]\/appointments\/:id['"],\s*isAuthenticated/);
-    expect(appointmentRoutesSource).toMatch(/storage\.getAppointment\(id\)/);
-    expect(appointmentRoutesSource).toMatch(/Appointment not found/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/appointments['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/appointments\/:id['"],\s*isAuthenticated/);
+    expect(controllerSource).toMatch(/parsePagination\(req\)/);
+    expect(controllerSource).toMatch(/sendPaginated\(res,\s*rows,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+    // Session garage takes precedence over ?garage_id (tenant isolation).
+    expect(serviceSource).toMatch(/auth\.garageId \?\? garageIdParam/);
+    expect(serviceSource).toMatch(/Appointment not found/);
+    expect(repositorySource).toMatch(/storage\.getAppointmentsPaginated\(/);
+    expect(repositorySource).toMatch(/storage\.countAppointments\(/);
+    expect(repositorySource).toMatch(/storage\.getAppointment\(/);
   });
 });

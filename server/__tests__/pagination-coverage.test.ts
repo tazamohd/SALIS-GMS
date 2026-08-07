@@ -13,7 +13,13 @@ import path from 'path';
 describe('Pagination coverage expansion (Wave E)', () => {
   const routesPath = path.resolve(process.cwd(), 'server/routes.ts');
   const systemRoutesPath = path.resolve(process.cwd(), 'server/routes/system.ts');
-  const appointmentRoutesPath = path.resolve(process.cwd(), 'server/routes/appointments.ts');
+  // Phase E: appointment reads moved into the layered module; the data-layer
+  // bindings now live in the repository.
+  const appointmentModuleIndexPath = path.resolve(process.cwd(), 'server/modules/appointments/index.ts');
+  const appointmentRepositoryPath = path.resolve(
+    process.cwd(),
+    'server/modules/appointments/repositories/appointment.repository.ts',
+  );
   const sparePartRoutesPath = path.resolve(process.cwd(), 'server/routes/spare-parts.ts');
   const supplierRoutesPath = path.resolve(process.cwd(), 'server/routes/suppliers.ts');
   // Phase E: vehicle reads moved into the layered module; the data-layer
@@ -33,7 +39,8 @@ describe('Pagination coverage expansion (Wave E)', () => {
   const storagePath = path.resolve(process.cwd(), 'server/storage.ts');
   const routesSource = fs.readFileSync(routesPath, 'utf-8');
   const systemRoutesSource = fs.readFileSync(systemRoutesPath, 'utf-8');
-  const appointmentRoutesSource = fs.readFileSync(appointmentRoutesPath, 'utf-8');
+  const appointmentModuleIndexSource = fs.readFileSync(appointmentModuleIndexPath, 'utf-8');
+  const appointmentRepositorySource = fs.readFileSync(appointmentRepositoryPath, 'utf-8');
   const sparePartRoutesSource = fs.readFileSync(sparePartRoutesPath, 'utf-8');
   const supplierRoutesSource = fs.readFileSync(supplierRoutesPath, 'utf-8');
   const vehicleModuleIndexSource = fs.readFileSync(vehicleModuleIndexPath, 'utf-8');
@@ -92,11 +99,10 @@ describe('Pagination coverage expansion (Wave E)', () => {
   });
 
   describe('Route handlers use paginated methods', () => {
-    it('/api/appointments uses getAppointmentsPaginated', () => {
-      const handler = handlerFor(appointmentRoutesSource, "router.get('/appointments'", 'router.');
-      expect(handler).toMatch(/storage\.getAppointmentsPaginated\(/);
-      expect(handler).toMatch(/storage\.countAppointments\(/);
-      expect(handler).not.toMatch(/storage\.getAppointments\(\s*$/m);
+    it('/api/appointments uses getAppointmentsPaginated (via the module repository)', () => {
+      expect(appointmentModuleIndexSource).toMatch(/router\.get\(\s*['"]\/appointments['"],\s*isAuthenticated/);
+      expect(appointmentRepositorySource).toMatch(/storage\.getAppointmentsPaginated\(/);
+      expect(appointmentRepositorySource).toMatch(/storage\.countAppointments\(/);
     });
 
     it('/api/spare-parts uses getSparePartsPaginated', () => {

@@ -82,7 +82,7 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
 
 1. customers ✅ (reference)
 2. vehicles ✅ (list + `/vehicles/:id/*` maintenance reads; `requireResourceOwnership` preserved)
-3. garage / appointments
+3. garage ✅ (garages list/detail/branches + role catalog; `requireManagerOrAbove` / `requireResourceOwnership` preserved) · appointments ✅ (tenant-pinned list + by-id 404)
 4. jobcards → estimates → invoices → payments (the write-heavy, event-rich core;
    this is where `InvoiceCreated → InventoryReserved → StockUpdated →
    AccountingPosted → CustomerNotified` is wired through the event bus, E6/E7)
