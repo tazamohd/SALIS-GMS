@@ -70,7 +70,7 @@ Respond naturally and conversationally.`;
     return assistantMessage;
   } catch (error) {
     console.error("Error generating chatbot response:", error);
-    throw new Error("Failed to generate chatbot response");
+    throw new Error("Failed to generate chatbot response", { cause: error });
   }
 }
 
@@ -150,6 +150,6 @@ Provide a JSON response:
     return JSON.parse(content);
   } catch (error) {
     console.error("Error diagnosing problem:", error);
-    throw new Error("Failed to diagnose problem");
+    throw new Error("Failed to diagnose problem", { cause: error });
   }
 }

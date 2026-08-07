@@ -47,7 +47,7 @@ export async function createComplianceRecord(data: {
     return record;
   } catch (error) {
     console.error('Error creating compliance record:', error);
-    throw new Error('Failed to create compliance record');
+    throw new Error('Failed to create compliance record', { cause: error });
   }
 }
 
@@ -118,7 +118,7 @@ export async function createQualityChecklist(data: {
     return checklist;
   } catch (error) {
     console.error('Error creating quality checklist:', error);
-    throw new Error('Failed to create quality checklist');
+    throw new Error('Failed to create quality checklist', { cause: error });
   }
 }
 
@@ -161,7 +161,7 @@ export async function createNonConformance(data: {
     return nc;
   } catch (error) {
     console.error('Error creating non-conformance:', error);
-    throw new Error('Failed to create non-conformance');
+    throw new Error('Failed to create non-conformance', { cause: error });
   }
 }
 
@@ -224,7 +224,7 @@ export async function createCorrectiveAction(data: {
     return action;
   } catch (error) {
     console.error('Error creating corrective action:', error);
-    throw new Error('Failed to create corrective action');
+    throw new Error('Failed to create corrective action', { cause: error });
   }
 }
 
@@ -258,7 +258,7 @@ export async function createSafetyIncident(data: {
     return incident;
   } catch (error) {
     console.error('Error creating safety incident:', error);
-    throw new Error('Failed to create safety incident');
+    throw new Error('Failed to create safety incident', { cause: error });
   }
 }
 
@@ -317,7 +317,7 @@ export async function createIncidentInvestigation(data: {
     return investigation;
   } catch (error) {
     console.error('Error creating incident investigation:', error);
-    throw new Error('Failed to create incident investigation');
+    throw new Error('Failed to create incident investigation', { cause: error });
   }
 }
 
@@ -392,7 +392,7 @@ export async function createInsuranceClaim(data: {
     return claim;
   } catch (error) {
     console.error('Error creating insurance claim:', error);
-    throw new Error('Failed to create insurance claim');
+    throw new Error('Failed to create insurance claim', { cause: error });
   }
 }
 
@@ -450,7 +450,7 @@ export async function updateClaimStatus(claimId: string, status: string, approve
     return claim;
   } catch (error) {
     console.error('Error updating claim status:', error);
-    throw new Error('Failed to update claim status');
+    throw new Error('Failed to update claim status', { cause: error });
   }
 }
 

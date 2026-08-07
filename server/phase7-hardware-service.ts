@@ -45,7 +45,7 @@ export async function recordBarcodeScan(data: {
     return scan;
   } catch (error) {
     console.error('Error recording barcode scan:', error);
-    throw new Error('Failed to record barcode scan');
+    throw new Error('Failed to record barcode scan', { cause: error });
   }
 }
 
@@ -109,7 +109,7 @@ export async function createSignageDisplay(data: {
     return display;
   } catch (error) {
     console.error('Error creating signage display:', error);
-    throw new Error('Failed to create signage display');
+    throw new Error('Failed to create signage display', { cause: error });
   }
 }
 
@@ -149,7 +149,7 @@ export async function createSignageContent(data: {
     return content;
   } catch (error) {
     console.error('Error creating signage content:', error);
-    throw new Error('Failed to create signage content');
+    throw new Error('Failed to create signage content', { cause: error });
   }
 }
 
@@ -198,7 +198,7 @@ export async function startKioskSession(garageId: string, kioskId: string) {
     return session;
   } catch (error) {
     console.error('Error starting kiosk session:', error);
-    throw new Error('Failed to start kiosk session');
+    throw new Error('Failed to start kiosk session', { cause: error });
   }
 }
 
@@ -234,7 +234,7 @@ export async function completeKioskCheckIn(data: {
     return checkIn;
   } catch (error) {
     console.error('Error completing kiosk check-in:', error);
-    throw new Error('Failed to complete kiosk check-in');
+    throw new Error('Failed to complete kiosk check-in', { cause: error });
   }
 }
 
@@ -289,7 +289,7 @@ export async function createSecurityCamera(data: {
     return camera;
   } catch (error) {
     console.error('Error creating security camera:', error);
-    throw new Error('Failed to create security camera');
+    throw new Error('Failed to create security camera', { cause: error });
   }
 }
 
@@ -327,7 +327,7 @@ export async function createCameraRecording(data: {
     return recording;
   } catch (error) {
     console.error('Error creating camera recording:', error);
-    throw new Error('Failed to create camera recording');
+    throw new Error('Failed to create camera recording', { cause: error });
   }
 }
 
@@ -445,7 +445,7 @@ export async function recordLicensePlateScan(data: {
     return scan;
   } catch (error) {
     console.error('Error recording license plate scan:', error);
-    throw new Error('Failed to record license plate scan');
+    throw new Error('Failed to record license plate scan', { cause: error });
   }
 }
 

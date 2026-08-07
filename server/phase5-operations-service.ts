@@ -63,7 +63,7 @@ export async function createSchedulingOptimization(data: {
     return optimization;
   } catch (error) {
     console.error('Error creating scheduling optimization:', error);
-    throw new Error('Failed to create scheduling optimization');
+    throw new Error('Failed to create scheduling optimization', { cause: error });
   }
 }
 
@@ -191,7 +191,7 @@ export async function runSchedulingOptimization(garageId: string) {
     return optimization;
   } catch (error) {
     console.error('Error running scheduling optimization:', error);
-    throw new Error('Failed to run scheduling optimization');
+    throw new Error('Failed to run scheduling optimization', { cause: error });
   }
 }
 
@@ -230,7 +230,7 @@ export async function createAutoReorderRule(data: {
     return rule;
   } catch (error) {
     console.error('Error creating auto-reorder rule:', error);
-    throw new Error('Failed to create auto-reorder rule');
+    throw new Error('Failed to create auto-reorder rule', { cause: error });
   }
 }
 
@@ -366,7 +366,7 @@ export async function createRoutingOptimization(data: {
     return route;
   } catch (error) {
     console.error('Error creating routing optimization:', error);
-    throw new Error('Failed to create routing optimization');
+    throw new Error('Failed to create routing optimization', { cause: error });
   }
 }
 
@@ -425,7 +425,7 @@ export async function clockIn(employeeId: string, garageId: string, location?: s
     return entry;
   } catch (error) {
     console.error('Error clocking in:', error);
-    throw new Error('Failed to clock in');
+    throw new Error('Failed to clock in', { cause: error });
   }
 }
 
@@ -463,7 +463,7 @@ export async function clockOut(entryId: string, breakDuration: number = 0) {
     return updated;
   } catch (error) {
     console.error('Error clocking out:', error);
-    throw new Error('Failed to clock out');
+    throw new Error('Failed to clock out', { cause: error });
   }
 }
 
@@ -620,7 +620,7 @@ export async function createCalibrationRecord(data: {
     return record;
   } catch (error) {
     console.error('Error creating calibration record:', error);
-    throw new Error('Failed to create calibration record');
+    throw new Error('Failed to create calibration record', { cause: error });
   }
 }
 

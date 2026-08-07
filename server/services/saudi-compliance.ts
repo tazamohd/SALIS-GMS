@@ -81,7 +81,7 @@ export function calculateEndOfService(
   const yearsOfService = (now.getTime() - startDate.getTime()) / msPerYear;
 
   // Calculate full benefit
-  let fullBenefit = 0;
+  let fullBenefit: number;
   if (yearsOfService <= 5) {
     fullBenefit = (lastSalary / 2) * yearsOfService;
   } else {

@@ -97,7 +97,7 @@ Consider factors like:
     return prediction;
   } catch (error) {
     console.error("Error generating predictive diagnostic:", error);
-    throw new Error("Failed to generate diagnostic prediction");
+    throw new Error("Failed to generate diagnostic prediction", { cause: error });
   }
 }
 

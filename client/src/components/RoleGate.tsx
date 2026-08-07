@@ -21,7 +21,7 @@ export function RoleGate({
 }: RoleGateProps) {
   const { hasPermission, hasAnyPermission, hasAllPermissions, getRoleDisplayName } = usePermissions();
 
-  let hasAccess = false;
+  let hasAccess: boolean;
 
   if (permission) {
     hasAccess = hasPermission(module, permission);
