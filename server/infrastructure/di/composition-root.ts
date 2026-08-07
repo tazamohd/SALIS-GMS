@@ -58,6 +58,8 @@ import {
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
   FLEET_TRACKING_SERVICE,
+  HR_REPOSITORY,
+  HR_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -112,6 +114,8 @@ import { FleetManagementRepository } from '../../modules/fleet-management/reposi
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
 import { FleetTrackingService } from '../../modules/fleet-tracking/services/fleet-tracking.service';
+import { HrRepository } from '../../modules/hr/repositories/hr.repository';
+import { HrService } from '../../modules/hr/services/hr.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -259,6 +263,9 @@ export function getAppContainer(): Container {
     FLEET_TRACKING_SERVICE,
     (ctx) => new FleetTrackingService(ctx.resolve(FLEET_TRACKING_REPOSITORY)),
   );
+
+  c.register(HR_REPOSITORY, () => new HrRepository());
+  c.register(HR_SERVICE, (ctx) => new HrService(ctx.resolve(HR_REPOSITORY)));
 
   container = c;
   return c;

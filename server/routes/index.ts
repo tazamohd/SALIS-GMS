@@ -85,7 +85,7 @@ import documentsRoutes from "./documents";
 import fleetAccountRoutes from "../modules/fleet";
 import gatePassRoutes from "./gate-pass.routes";
 import gmbSyncRoutes from "./gmb-sync.routes";
-import hrPayrollRoutes from "./hr-payroll";
+import hrPayrollRoutes from "../modules/hr";
 import kioskRoutes from "./kiosk";
 import paymentsGatewayRoutes from "./payments-gateway.routes";
 import qualityControlRoutes from "./quality-control";
