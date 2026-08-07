@@ -13,7 +13,7 @@ import { authRoutes } from "./auth";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
 import partsRecommendationsRoutes from "./parts-recommendations";
-import reportsRoutes from "./reports";
+import reportsRoutes from "../modules/reports";
 import notificationCenterRoutes from "./notifications";
 import auditRoutes from "./audit";
 import chatbotRoutes from "./chatbot";
