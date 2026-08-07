@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { validate } from '../middleware/validate';
+import { createWarrantyContractSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -152,7 +154,7 @@ router.get('/warranty/contracts', isAuthenticated, (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/warranty/contracts — Create new contract
 // ---------------------------------------------------------------------------
-router.post('/warranty/contracts', isAuthenticated, (req, res) => {
+router.post('/warranty/contracts', isAuthenticated, validate(createWarrantyContractSchema), (req, res) => {
   const {
     customerId, customerName, vehicleId, vehicleName, licensePlate,
     planType, coverageType, coverageAmount, startDate, endDate, monthlyPremium,

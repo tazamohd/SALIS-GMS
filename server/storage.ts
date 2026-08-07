@@ -1043,7 +1043,8 @@ export interface IStorage {
   createPerformanceSnapshot(data: InsertAgentPerformanceSnapshot): Promise<AgentPerformanceSnapshot>;
   listAgentPerformance(garageId: string, agentId?: string, dateRange?: {start: Date, end: Date}): Promise<AgentPerformanceSnapshot[]>;
   
-  getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]>;
+  getPurchaseOrders(garageId?: string, status?: string, opts?: { limit?: number; offset?: number }): Promise<PurchaseOrder[]>;
+  countPurchaseOrders(garageId?: string, status?: string): Promise<number>;
   getPurchaseOrder(id: string): Promise<PurchaseOrder | undefined>;
   createPurchaseOrder(data: InsertPurchaseOrder): Promise<PurchaseOrder>;
   updatePurchaseOrder(id: string, data: Partial<PurchaseOrder>): Promise<PurchaseOrder>;
@@ -1055,7 +1056,8 @@ export interface IStorage {
   createPurchaseOrderWithItems(poData: InsertPurchaseOrder, items: Omit<InsertPurchaseOrderItem, 'purchaseOrderId'>[]): Promise<PurchaseOrder>;
   
   // Purchase Agent - Task Inbox
-  getPurchaseTasks(garageId?: string, status?: string, priority?: string): Promise<PurchaseTask[]>;
+  getPurchaseTasks(garageId?: string, status?: string, priority?: string, opts?: { limit?: number; offset?: number }): Promise<PurchaseTask[]>;
+  countPurchaseTasks(garageId?: string, status?: string, priority?: string): Promise<number>;
   getPurchaseTask(id: string): Promise<PurchaseTask | undefined>;
   createPurchaseTask(data: InsertPurchaseTask): Promise<PurchaseTask>;
   updatePurchaseTask(id: string, data: Partial<PurchaseTask>, garageId?: string): Promise<PurchaseTask>;
@@ -1079,7 +1081,8 @@ export interface IStorage {
   deleteQuotationItem(id: string): Promise<void>;
   
   // Purchase Agent - Payment Tracking
-  getSupplierPayments(garageId?: string, status?: string): Promise<SupplierPayment[]>;
+  getSupplierPayments(garageId?: string, status?: string, opts?: { limit?: number; offset?: number }): Promise<SupplierPayment[]>;
+  countSupplierPayments(garageId?: string, status?: string): Promise<number>;
   getSupplierPayment(id: string): Promise<SupplierPayment | undefined>;
   createSupplierPayment(data: InsertSupplierPayment): Promise<SupplierPayment>;
   updateSupplierPayment(id: string, data: Partial<SupplierPayment>, garageId?: string): Promise<SupplierPayment>;
@@ -1491,7 +1494,8 @@ export interface IStorage {
   getUnreadMessageCount(userId: string, conversationId?: string): Promise<number>;
   
   // Chat Support Enhancements - Support Tickets
-  getSupportTickets(garageId: string, filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}): Promise<any[]>;
+  getSupportTickets(garageId: string, filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}, opts?: { limit?: number; offset?: number }): Promise<any[]>;
+  countSupportTickets(garageId: string, filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}): Promise<number>;
   getSupportTicket(id: string): Promise<any | undefined>;
   getSupportTicketByConversation(conversationId: string): Promise<any | undefined>;
   createSupportTicket(data: any): Promise<any>;
@@ -3893,24 +3897,44 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(agentPerformanceSnapshots.intervalStart));
   }
 
-  async getPurchaseOrders(garageId?: string, status?: string): Promise<PurchaseOrder[]> {
+  async getPurchaseOrders(garageId?: string, status?: string, opts?: { limit?: number; offset?: number }): Promise<PurchaseOrder[]> {
     const conditions = [];
-    
+
     if (garageId) {
       conditions.push(eq(purchaseOrders.garageId, garageId));
     }
-    
+
     if (status) {
       conditions.push(eq(purchaseOrders.status, status));
     }
-    
+
     if (conditions.length > 0) {
+      if (typeof opts?.limit === 'number') {
+        return await db.select().from(purchaseOrders)
+          .where(and(...conditions))
+          .orderBy(desc(purchaseOrders.createdAt))
+          .limit(opts.limit).offset(opts.offset ?? 0);
+      }
       return await db.select().from(purchaseOrders)
         .where(and(...conditions))
         .orderBy(desc(purchaseOrders.createdAt));
     }
-    
+
+    if (typeof opts?.limit === 'number') {
+      return await db.select().from(purchaseOrders)
+        .orderBy(desc(purchaseOrders.createdAt))
+        .limit(opts.limit).offset(opts.offset ?? 0);
+    }
     return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
+  }
+
+  async countPurchaseOrders(garageId?: string, status?: string): Promise<number> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(purchaseOrders.garageId, garageId));
+    if (status) conditions.push(eq(purchaseOrders.status, status));
+    const rows = await db.select({ c: sql`count(*)` }).from(purchaseOrders)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    return Number(rows[0].c);
   }
 
   async getPurchaseOrder(id: string, garageId?: string): Promise<PurchaseOrder | undefined> {
@@ -3983,17 +4007,38 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Purchase Agent - Task Inbox
-  async getPurchaseTasks(garageId?: string, status?: string, priority?: string): Promise<PurchaseTask[]> {
+  async getPurchaseTasks(garageId?: string, status?: string, priority?: string, opts?: { limit?: number; offset?: number }): Promise<PurchaseTask[]> {
     const conditions = [];
     if (garageId) conditions.push(eq(purchaseTasks.garageId, garageId));
     if (status) conditions.push(eq(purchaseTasks.status, status));
     if (priority) conditions.push(eq(purchaseTasks.priority, priority));
     if (conditions.length > 0) {
+      if (typeof opts?.limit === 'number') {
+        return await db.select().from(purchaseTasks)
+          .where(and(...conditions))
+          .orderBy(desc(purchaseTasks.createdAt))
+          .limit(opts.limit).offset(opts.offset ?? 0);
+      }
       return await db.select().from(purchaseTasks)
         .where(and(...conditions))
         .orderBy(desc(purchaseTasks.createdAt));
     }
+    if (typeof opts?.limit === 'number') {
+      return await db.select().from(purchaseTasks)
+        .orderBy(desc(purchaseTasks.createdAt))
+        .limit(opts.limit).offset(opts.offset ?? 0);
+    }
     return await db.select().from(purchaseTasks).orderBy(desc(purchaseTasks.createdAt));
+  }
+
+  async countPurchaseTasks(garageId?: string, status?: string, priority?: string): Promise<number> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(purchaseTasks.garageId, garageId));
+    if (status) conditions.push(eq(purchaseTasks.status, status));
+    if (priority) conditions.push(eq(purchaseTasks.priority, priority));
+    const rows = await db.select({ c: sql`count(*)` }).from(purchaseTasks)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    return Number(rows[0].c);
   }
 
   async getPurchaseTask(id: string, garageId?: string): Promise<PurchaseTask | undefined> {
@@ -4129,16 +4174,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Purchase Agent - Payment Tracking
-  async getSupplierPayments(garageId?: string, status?: string): Promise<SupplierPayment[]> {
+  async getSupplierPayments(garageId?: string, status?: string, opts?: { limit?: number; offset?: number }): Promise<SupplierPayment[]> {
     const conditions = [];
     if (garageId) conditions.push(eq(supplierPayments.garageId, garageId));
     if (status) conditions.push(eq(supplierPayments.status, status));
     if (conditions.length > 0) {
+      if (typeof opts?.limit === 'number') {
+        return await db.select().from(supplierPayments)
+          .where(and(...conditions))
+          .orderBy(desc(supplierPayments.createdAt))
+          .limit(opts.limit).offset(opts.offset ?? 0);
+      }
       return await db.select().from(supplierPayments)
         .where(and(...conditions))
         .orderBy(desc(supplierPayments.createdAt));
     }
+    if (typeof opts?.limit === 'number') {
+      return await db.select().from(supplierPayments)
+        .orderBy(desc(supplierPayments.createdAt))
+        .limit(opts.limit).offset(opts.offset ?? 0);
+    }
     return await db.select().from(supplierPayments).orderBy(desc(supplierPayments.createdAt));
+  }
+
+  async countSupplierPayments(garageId?: string, status?: string): Promise<number> {
+    const conditions = [];
+    if (garageId) conditions.push(eq(supplierPayments.garageId, garageId));
+    if (status) conditions.push(eq(supplierPayments.status, status));
+    const rows = await db.select({ c: sql`count(*)` }).from(supplierPayments)
+      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    return Number(rows[0].c);
   }
 
   async getSupplierPayment(id: string, garageId?: string): Promise<SupplierPayment | undefined> {
@@ -8145,11 +8210,12 @@ export class DatabaseStorage implements IStorage {
 
   // Chat Support Enhancements - Support Tickets
   async getSupportTickets(
-    garageId: string, 
-    filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}
+    garageId: string,
+    filters?: {status?: string, priority?: string, assignedTo?: string, category?: string},
+    opts?: { limit?: number; offset?: number }
   ): Promise<SupportTicket[]> {
     const conditions = [eq(supportTickets.garageId, garageId)];
-    
+
     if (filters?.status) {
       conditions.push(eq(supportTickets.status, filters.status));
     }
@@ -8162,10 +8228,38 @@ export class DatabaseStorage implements IStorage {
     if (filters?.category) {
       conditions.push(eq(supportTickets.category, filters.category));
     }
-    
+
+    if (typeof opts?.limit === 'number') {
+      return await db.select().from(supportTickets)
+        .where(and(...conditions))
+        .orderBy(desc(supportTickets.createdAt))
+        .limit(opts.limit).offset(opts.offset ?? 0);
+    }
     return await db.select().from(supportTickets)
       .where(and(...conditions))
       .orderBy(desc(supportTickets.createdAt));
+  }
+
+  async countSupportTickets(
+    garageId: string,
+    filters?: {status?: string, priority?: string, assignedTo?: string, category?: string}
+  ): Promise<number> {
+    const conditions = [eq(supportTickets.garageId, garageId)];
+    if (filters?.status) {
+      conditions.push(eq(supportTickets.status, filters.status));
+    }
+    if (filters?.priority) {
+      conditions.push(eq(supportTickets.priority, filters.priority));
+    }
+    if (filters?.assignedTo) {
+      conditions.push(eq(supportTickets.assignedTo, filters.assignedTo));
+    }
+    if (filters?.category) {
+      conditions.push(eq(supportTickets.category, filters.category));
+    }
+    const rows = await db.select({ c: sql`count(*)` }).from(supportTickets)
+      .where(and(...conditions));
+    return Number(rows[0].c);
   }
 
   async getSupportTicket(id: string, garageId?: string): Promise<SupportTicket | undefined> {

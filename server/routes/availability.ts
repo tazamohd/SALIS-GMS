@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/availability/technician/:technicianId', isAuthenticated, async (req, res) => {
+router.get('/availability/technician/:technicianId', isAuthenticated, requireResourceOwnership({ table: 'users', idParam: 'technicianId' }), async (req, res) => {
   try {
     const { technicianId } = req.params;
     const { startDate, endDate } = req.query;

@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
 
 // Registered before the :garageId matcher, which would otherwise capture
 // /calendar-events/detail/<id> and 400 on missing dates.
-router.get('/calendar-events/detail/:id', isAuthenticated, async (req, res) => {
+router.get('/calendar-events/detail/:id', isAuthenticated, requireResourceOwnership({ table: 'calendar_events' }), async (req, res) => {
   try {
     const { id } = req.params;
     const event = await storage.getCalendarEvent(id);

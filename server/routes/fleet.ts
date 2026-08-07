@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
 import { resolveGarageScope } from '../middleware/garageScope';
+import { validate } from '../middleware/validate';
+import { createFleetAccountSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -87,7 +89,7 @@ router.get('/fleet/accounts/:id', isAuthenticated, async (req, res) => {
 });
 
 // POST /api/fleet/accounts — Create fleet account
-router.post('/fleet/accounts', isAuthenticated, async (req, res) => {
+router.post('/fleet/accounts', isAuthenticated, validate(createFleetAccountSchema), async (req, res) => {
   const { companyName, contactPerson, contactEmail, contactPhone, discountPercentage, paymentTerms, notes } = req.body;
   if (!companyName) {
     return res.status(400).json({ message: 'companyName is required' });
