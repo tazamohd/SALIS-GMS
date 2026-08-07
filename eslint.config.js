@@ -78,4 +78,26 @@ export default [
       'no-restricted-syntax': 'off',
     },
   },
+  // Architecture governance (Phase E14): controllers and services in the modular
+  // architecture must not reach the data layer directly — they go through a
+  // repository. `scripts/check-architecture.mjs` is the authoritative CI guard
+  // (including cross-module repository imports); these rules surface the same
+  // violations at edit time.
+  {
+    files: ['server/modules/**/controllers/**/*.ts', 'server/modules/**/services/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/storage', '**/storage.js', '**/storage.ts', '**/db', '**/db.js', '**/db.ts'],
+              message:
+                'Controllers/services must not access the data layer directly. Use a repository (Phase E4).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

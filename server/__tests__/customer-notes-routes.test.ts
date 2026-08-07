@@ -2,13 +2,22 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Customer notes read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const customerRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/customers.ts'), 'utf-8');
+/**
+ * Source-contract tests for the customer notes read route. Phase E moved the
+ * read into `server/modules/customers`; assertions target the module's route
+ * surface and repository binding. Mutating note handlers remain in the legacy
+ * monolith until those write paths are migrated.
+ */
+describe('Customer notes read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/customers/index.ts');
+  const controllerSource = read('server/modules/customers/controllers/customer.controller.ts');
+  const repositorySource = read('server/modules/customers/repositories/customer.repository.ts');
 
-  it('mounts the extracted customer router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import customerRoutes from ['"]\.\/customers['"]/);
+  it('mounts the customer module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import customerRoutes from ['"]\.\.\/modules\/customers['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*customerRoutes\)/);
   });
 
@@ -21,11 +30,9 @@ describe('Customer notes read route extraction (Wave J)', () => {
     expect(legacyRoutesSource).toMatch(/app\.delete\(['"]\/api\/customer-notes\/:id['"]/);
   });
 
-  it('preserves customer note lookup behavior and failure response', () => {
-    expect(customerRoutesSource).toMatch(/router\.get\(['"]\/customers\/:id\/notes['"],\s*isAuthenticated/);
-    expect(customerRoutesSource).toMatch(/const \{ id \} = req\.params/);
-    expect(customerRoutesSource).toMatch(/storage\.getCustomerNotes\(id\)/);
-    expect(customerRoutesSource).toMatch(/res\.json\(notes\)/);
-    expect(customerRoutesSource).toMatch(/Failed to fetch customer notes/);
+  it('preserves customer note lookup behavior', () => {
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/customers\/:id\/notes['"],\s*isAuthenticated/);
+    expect(controllerSource).toMatch(/service\.notes\(req\.params\.id,\s*authOf\(req\)\)/);
+    expect(repositorySource).toMatch(/storage\.getCustomerNotes\(/);
   });
 });

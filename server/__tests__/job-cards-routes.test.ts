@@ -2,13 +2,24 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Job card read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const jobCardRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/job-cards.ts'), 'utf-8');
+/**
+ * Source-contract tests for the job card read surface. Phase E migrated the
+ * extracted router into a layered module (`server/modules/jobcards`); assertions
+ * target the module's controller/service/repository. The `/parts` Drizzle query
+ * (previously inlined in the route) now lives in the repository. Behavioral
+ * coverage lives in `server/modules/jobcards/__tests__/jobcard.service.test.ts`.
+ */
+describe('Job card read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/jobcards/index.ts');
+  const controllerSource = read('server/modules/jobcards/controllers/jobcard.controller.ts');
+  const serviceSource = read('server/modules/jobcards/services/jobcard.service.ts');
+  const repositorySource = read('server/modules/jobcards/repositories/jobcard.repository.ts');
 
-  it('mounts the extracted job card router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import jobCardRoutes from ['"]\.\/job-cards['"]/);
+  it('mounts the job card module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import jobCardRoutes from ['"]\.\.\/modules\/jobcards['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*jobCardRoutes\)/);
   });
 
@@ -31,25 +42,26 @@ describe('Job card read route extraction (Wave J)', () => {
   });
 
   it('preserves job card list pagination and garage/assignment scoping', () => {
-    expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards['"],\s*isAuthenticated/);
-    expect(jobCardRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(jobCardRoutesSource).toMatch(/const \{ garage_id,\s*assigned_to \} = req\.query/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/job-cards['"],\s*isAuthenticated/);
+    expect(controllerSource).toMatch(/parsePagination\(req\)/);
+    expect(controllerSource).toMatch(/req\.query\.assigned_to/);
     // Session garage takes precedence over ?garage_id (tenant isolation).
-    expect(jobCardRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
-    expect(jobCardRoutesSource).toMatch(/const assignedTo = assigned_to as string \| undefined/);
-    expect(jobCardRoutesSource).toMatch(/storage\.getJobCardsPaginated\(gid,\s*assignedTo,\s*pagination\.limit,\s*pagination\.offset\)/);
-    expect(jobCardRoutesSource).toMatch(/storage\.countJobCards\(gid,\s*assignedTo\)/);
-    expect(jobCardRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+    expect(serviceSource).toMatch(/auth\.garageId \?\? garageIdParam/);
+    expect(repositorySource).toMatch(/storage\.getJobCardsPaginated\(/);
+    expect(repositorySource).toMatch(/storage\.countJobCards\(/);
+    expect(controllerSource).toMatch(/sendPaginated\(res,\s*rows,\s*total,\s*pagination,\s*pagination\.explicit\)/);
   });
 
   it('preserves job card detail, details, parts, and task reads', () => {
-    expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards\/:id['"],\s*isAuthenticated/);
-    expect(jobCardRoutesSource).toMatch(/storage\.getJobCard\(id\)/);
-    expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards\/:id\/details['"],\s*isAuthenticated/);
-    expect(jobCardRoutesSource).toMatch(/storage\.getJobCardWithDetails\(id\)/);
-    expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards\/:jobCardId\/parts['"],\s*isAuthenticated/);
-    expect(jobCardRoutesSource).toMatch(/db\.select\(\)\.from\(jobCardParts\)\.where\(eq\(jobCardParts\.jobCardId,\s*jobCardId\)\)/);
-    expect(jobCardRoutesSource).toMatch(/router\.get\(['"]\/job-cards\/:jobCardId\/tasks['"],\s*isAuthenticated/);
-    expect(jobCardRoutesSource).toMatch(/storage\.getTaskAssignments\(jobCardId\)/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/job-cards\/:id['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/job-cards\/:id\/details['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/job-cards\/:jobCardId\/parts['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/job-cards\/:jobCardId\/tasks['"],\s*isAuthenticated/);
+    expect(serviceSource).toMatch(/Job card not found/);
+    expect(repositorySource).toMatch(/storage\.getJobCard\(/);
+    expect(repositorySource).toMatch(/storage\.getJobCardWithDetails\(/);
+    // The parts Drizzle query moved into the repository.
+    expect(repositorySource).toMatch(/db\.select\(\)\.from\(jobCardParts\)\.where\(eq\(jobCardParts\.jobCardId,\s*jobCardId\)\)/);
+    expect(repositorySource).toMatch(/storage\.getTaskAssignments\(/);
   });
 });

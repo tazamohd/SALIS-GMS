@@ -2,14 +2,25 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Vehicle maintenance read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const maintenanceRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/vehicle-maintenance.ts'), 'utf-8');
+/**
+ * Source-contract tests for the vehicle maintenance reads. Phase E consolidated
+ * these `/vehicles/:id/*` sub-resources into the vehicles module
+ * (`server/modules/vehicles`), keeping the `requireResourceOwnership` guard.
+ * Assertions target the module's route surface and repository bindings.
+ */
+describe('Vehicle maintenance read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/vehicles/index.ts');
+  const repositorySource = read('server/modules/vehicles/repositories/vehicle.repository.ts');
+  const controllerSource = read('server/modules/vehicles/controllers/vehicle.controller.ts');
 
-  it('mounts the extracted vehicle maintenance router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import vehicleMaintenanceRoutes from ['"]\.\/vehicle-maintenance['"]/);
-    expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*vehicleMaintenanceRoutes\)/);
+  it('mounts the vehicle module (which now owns the maintenance reads)', () => {
+    expect(hybridRoutesSource).toMatch(/import vehicleRoutes from ['"]\.\.\/modules\/vehicles['"]/);
+    expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*vehicleRoutes\)/);
+    // The standalone maintenance router is retired.
+    expect(hybridRoutesSource).not.toMatch(/vehicleMaintenanceRoutes/);
   });
 
   it('removes active read handlers from the legacy monolith', () => {
@@ -28,13 +39,16 @@ describe('Vehicle maintenance read route extraction (Wave J)', () => {
     expect(legacyRoutesSource).toMatch(/app\.delete\(['"]\/api\/service-reminders\/:id['"]/);
   });
 
-  it('preserves extracted route paths, auth, query handling, and storage lookups', () => {
-    expect(maintenanceRoutesSource).toMatch(/router\.get\(['"]\/vehicles\/:id\/service-history['"],\s*isAuthenticated/);
-    expect(maintenanceRoutesSource).toMatch(/storage\.getVehicleServiceHistory\(id\)/);
-    expect(maintenanceRoutesSource).toMatch(/router\.get\(['"]\/vehicles\/:id\/maintenance-schedules['"],\s*isAuthenticated/);
-    expect(maintenanceRoutesSource).toMatch(/storage\.getMaintenanceSchedules\(id\)/);
-    expect(maintenanceRoutesSource).toMatch(/router\.get\(['"]\/vehicles\/:id\/service-reminders['"],\s*isAuthenticated/);
-    expect(maintenanceRoutesSource).toMatch(/const \{ status \} = req\.query/);
-    expect(maintenanceRoutesSource).toMatch(/storage\.getServiceReminders\(id,\s*status as string \| undefined\)/);
+  it('preserves route paths, ownership guard, query handling, and storage lookups', () => {
+    // Sub-resource reads keep the resource-ownership guard.
+    expect(moduleIndexSource).toMatch(/requireResourceOwnership\(\{\s*table:\s*['"]vehicles['"]\s*\}\)/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/vehicles\/:id\/service-history['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/vehicles\/:id\/maintenance-schedules['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/vehicles\/:id\/service-reminders['"],\s*isAuthenticated/);
+    expect(repositorySource).toMatch(/storage\.getVehicleServiceHistory\(/);
+    expect(repositorySource).toMatch(/storage\.getMaintenanceSchedules\(/);
+    expect(repositorySource).toMatch(/storage\.getServiceReminders\(/);
+    // Reminder status filter is still threaded through.
+    expect(controllerSource).toMatch(/req\.query\.status/);
   });
 });

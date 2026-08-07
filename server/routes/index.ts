@@ -19,19 +19,21 @@ import auditRoutes from "./audit";
 import chatbotRoutes from "./chatbot";
 import systemRoutes from "./system";
 import searchRoutes from "./search";
-import garageRoutes from "./garages";
+import garageRoutes from "../modules/garage";
 import technicianRoutes from "./technicians";
 import vinRoutes from "./vin";
 import catalogRoutes from "./catalogs";
 import serviceTemplateRoutes from "./service-templates";
 import sparePartRoutes from "./spare-parts";
-import appointmentRoutes from "./appointments";
+import appointmentRoutes from "../modules/appointments";
 import toolRoutes from "./tools";
-import vehicleMaintenanceRoutes from "./vehicle-maintenance";
 import supplierRoutes from "./suppliers";
-import customerRoutes from "./customers";
+import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
-import jobCardRoutes from "./job-cards";
+import jobCardRoutes from "../modules/jobcards";
+import estimateRoutes from "../modules/estimates";
+import invoiceRoutes from "../modules/invoices";
+import paymentRoutes from "../modules/payments";
 import serviceBayRoutes from "./service-bays";
 import gamificationRoutes from "./gamification";
 import dashboardRoutes from "./dashboard";
@@ -50,7 +52,7 @@ import serviceReminderRoutes from "./service-reminders";
 import serviceReminderTemplateRoutes from "./service-reminder-templates";
 import pushSubscriptionRoutes from "./push-subscriptions";
 import pushNotificationRoutes from "./push-notifications";
-import vehicleRoutes from "./vehicles";
+import vehicleRoutes from "../modules/vehicles";
 import purchaseOrderRoutes from "./purchase-orders";
 import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
@@ -233,10 +235,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", toolRoutes);
   console.log("Tool Routes Loaded");
 
-  // Vehicle maintenance read routes
-  app.use("/api", vehicleMaintenanceRoutes);
-  console.log("Vehicle Maintenance Routes Loaded");
-
   // Supplier read routes
   app.use("/api", supplierRoutes);
   console.log("Supplier Routes Loaded");
@@ -252,6 +250,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Job card read routes
   app.use("/api", jobCardRoutes);
   console.log("Job Card Routes Loaded");
+
+  // Estimates (reads, writes, stats, conversions) — extracted from the monolith
+  app.use("/api", estimateRoutes);
+  console.log("Estimate Routes Loaded");
+
+  // Invoices (reads, writes, from-job generation) — extracted from the monolith
+  app.use("/api", invoiceRoutes);
+  console.log("Invoice Routes Loaded");
+
+  // Payments (list, record, reverse) — extracted from the monolith
+  app.use("/api", paymentRoutes);
+  console.log("Payment Routes Loaded");
 
   // Service bay read routes
   app.use("/api", serviceBayRoutes);
