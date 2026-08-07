@@ -79,7 +79,7 @@ import backupRoutes from "./backup";
 import currencyRoutes from "./currency";
 import demoRoutes from "./demo";
 import documentsRoutes from "./documents";
-import fleetAccountRoutes from "./fleet";
+import fleetAccountRoutes from "../modules/fleet";
 import gatePassRoutes from "./gate-pass.routes";
 import gmbSyncRoutes from "./gmb-sync.routes";
 import hrPayrollRoutes from "./hr-payroll";
