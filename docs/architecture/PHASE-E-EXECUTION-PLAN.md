@@ -91,9 +91,10 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
    184-line server-side `from-job` calculation across 8 tables, status-transition
    workflow, and role-gated delete; `invoice.created` events on every creation
    path — the head of the `InvoiceCreated → …` chain; non-contiguous monolith
-   removal preserving the reconciliation handler) → payments (continue the
-   write-heavy, event-rich core; `InvoiceCreated → InventoryReserved →
-   StockUpdated → AccountingPosted → CustomerNotified` extends from here)
+   removal preserving the reconciliation handler) → payments ✅ (garage-scoped
+   join list, atomic `recordPayment` create and role-gated `reversePayment`
+   delete; `payment.received` / `payment.reversed` events; gateway + supplier
+   payments left as separate domains) — **financial core complete**
 5. inventory / procurement / suppliers
 6. crm / insurance / fleet / marketplace
 7. hr / reports / analytics / ai / platform / administration

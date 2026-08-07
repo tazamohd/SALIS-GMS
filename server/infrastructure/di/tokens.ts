@@ -19,6 +19,8 @@ import type { IEstimateRepository } from '../../modules/estimates/repositories/e
 import type { EstimateService } from '../../modules/estimates/services/estimate.service';
 import type { IInvoiceRepository } from '../../modules/invoices/repositories/invoice.repository';
 import type { InvoiceService } from '../../modules/invoices/services/invoice.service';
+import type { IPaymentRepository } from '../../modules/payments/repositories/payment.repository';
+import type { PaymentService } from '../../modules/payments/services/payment.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -35,3 +37,5 @@ export const ESTIMATE_REPOSITORY = token<IEstimateRepository>('EstimateRepositor
 export const ESTIMATE_SERVICE = token<EstimateService>('EstimateService');
 export const INVOICE_REPOSITORY = token<IInvoiceRepository>('InvoiceRepository');
 export const INVOICE_SERVICE = token<InvoiceService>('InvoiceService');
+export const PAYMENT_REPOSITORY = token<IPaymentRepository>('PaymentRepository');
+export const PAYMENT_SERVICE = token<PaymentService>('PaymentService');

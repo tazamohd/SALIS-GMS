@@ -24,6 +24,8 @@ import {
   ESTIMATE_SERVICE,
   INVOICE_REPOSITORY,
   INVOICE_SERVICE,
+  PAYMENT_REPOSITORY,
+  PAYMENT_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -43,6 +45,9 @@ import { registerEstimateEventHandlers } from '../../modules/estimates/events/es
 import { InvoiceRepository } from '../../modules/invoices/repositories/invoice.repository';
 import { InvoiceService } from '../../modules/invoices/services/invoice.service';
 import { registerInvoiceEventHandlers } from '../../modules/invoices/events/invoice.handlers';
+import { PaymentRepository } from '../../modules/payments/repositories/payment.repository';
+import { PaymentService } from '../../modules/payments/services/payment.service';
+import { registerPaymentEventHandlers } from '../../modules/payments/events/payment.handlers';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -75,6 +80,7 @@ export function getAppContainer(): Container {
     registerCustomerEventHandlers(bus);
     registerEstimateEventHandlers(bus);
     registerInvoiceEventHandlers(bus);
+    registerPaymentEventHandlers(bus);
     return bus;
   });
 
@@ -110,6 +116,12 @@ export function getAppContainer(): Container {
   c.register(
     INVOICE_SERVICE,
     (ctx) => new InvoiceService(ctx.resolve(INVOICE_REPOSITORY), ctx.resolve(EVENT_BUS)),
+  );
+
+  c.register(PAYMENT_REPOSITORY, () => new PaymentRepository());
+  c.register(
+    PAYMENT_SERVICE,
+    (ctx) => new PaymentService(ctx.resolve(PAYMENT_REPOSITORY), ctx.resolve(EVENT_BUS)),
   );
 
   container = c;
