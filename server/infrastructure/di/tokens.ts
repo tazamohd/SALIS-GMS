@@ -17,6 +17,8 @@ import type { IJobCardRepository } from '../../modules/jobcards/repositories/job
 import type { JobCardService } from '../../modules/jobcards/services/jobcard.service';
 import type { IEstimateRepository } from '../../modules/estimates/repositories/estimate.repository';
 import type { EstimateService } from '../../modules/estimates/services/estimate.service';
+import type { IInvoiceRepository } from '../../modules/invoices/repositories/invoice.repository';
+import type { InvoiceService } from '../../modules/invoices/services/invoice.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -31,3 +33,5 @@ export const JOBCARD_REPOSITORY = token<IJobCardRepository>('JobCardRepository')
 export const JOBCARD_SERVICE = token<JobCardService>('JobCardService');
 export const ESTIMATE_REPOSITORY = token<IEstimateRepository>('EstimateRepository');
 export const ESTIMATE_SERVICE = token<EstimateService>('EstimateService');
+export const INVOICE_REPOSITORY = token<IInvoiceRepository>('InvoiceRepository');
+export const INVOICE_SERVICE = token<InvoiceService>('InvoiceService');

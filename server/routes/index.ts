@@ -32,6 +32,7 @@ import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
 import jobCardRoutes from "../modules/jobcards";
 import estimateRoutes from "../modules/estimates";
+import invoiceRoutes from "../modules/invoices";
 import serviceBayRoutes from "./service-bays";
 import gamificationRoutes from "./gamification";
 import dashboardRoutes from "./dashboard";
@@ -252,6 +253,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Estimates (reads, writes, stats, conversions) — extracted from the monolith
   app.use("/api", estimateRoutes);
   console.log("Estimate Routes Loaded");
+
+  // Invoices (reads, writes, from-job generation) — extracted from the monolith
+  app.use("/api", invoiceRoutes);
+  console.log("Invoice Routes Loaded");
 
   // Service bay read routes
   app.use("/api", serviceBayRoutes);

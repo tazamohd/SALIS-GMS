@@ -22,6 +22,8 @@ import {
   JOBCARD_SERVICE,
   ESTIMATE_REPOSITORY,
   ESTIMATE_SERVICE,
+  INVOICE_REPOSITORY,
+  INVOICE_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -38,6 +40,9 @@ import { JobCardService } from '../../modules/jobcards/services/jobcard.service'
 import { EstimateRepository } from '../../modules/estimates/repositories/estimate.repository';
 import { EstimateService } from '../../modules/estimates/services/estimate.service';
 import { registerEstimateEventHandlers } from '../../modules/estimates/events/estimate.handlers';
+import { InvoiceRepository } from '../../modules/invoices/repositories/invoice.repository';
+import { InvoiceService } from '../../modules/invoices/services/invoice.service';
+import { registerInvoiceEventHandlers } from '../../modules/invoices/events/invoice.handlers';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -69,6 +74,7 @@ export function getAppContainer(): Container {
     // Register module event subscribers against the shared bus.
     registerCustomerEventHandlers(bus);
     registerEstimateEventHandlers(bus);
+    registerInvoiceEventHandlers(bus);
     return bus;
   });
 
@@ -98,6 +104,12 @@ export function getAppContainer(): Container {
   c.register(
     ESTIMATE_SERVICE,
     (ctx) => new EstimateService(ctx.resolve(ESTIMATE_REPOSITORY), ctx.resolve(EVENT_BUS)),
+  );
+
+  c.register(INVOICE_REPOSITORY, () => new InvoiceRepository());
+  c.register(
+    INVOICE_SERVICE,
+    (ctx) => new InvoiceService(ctx.resolve(INVOICE_REPOSITORY), ctx.resolve(EVENT_BUS)),
   );
 
   container = c;

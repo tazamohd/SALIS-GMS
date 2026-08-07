@@ -87,7 +87,11 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
    Drizzle query absorbed into the repository) → estimates ✅ (**first monolith
    extraction**: 9 endpoints — reads, writes, stats SQL, and the two conversion
    workflows; `estimate.converted_to_{job_card,invoice}` events wired through the
-   bus — the first write-path events) → invoices → payments (continue the
+   bus — the first write-path events) → invoices ✅ (**8 endpoints** incl. the
+   184-line server-side `from-job` calculation across 8 tables, status-transition
+   workflow, and role-gated delete; `invoice.created` events on every creation
+   path — the head of the `InvoiceCreated → …` chain; non-contiguous monolith
+   removal preserving the reconciliation handler) → payments (continue the
    write-heavy, event-rich core; `InvoiceCreated → InventoryReserved →
    StockUpdated → AccountingPosted → CustomerNotified` extends from here)
 5. inventory / procurement / suppliers
