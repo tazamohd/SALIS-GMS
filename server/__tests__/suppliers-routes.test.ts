@@ -2,13 +2,23 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Supplier read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const supplierRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/suppliers.ts'), 'utf-8');
+/**
+ * Source-contract tests for the supplier read surface. Phase E migrated the
+ * extracted router into a layered module (`server/modules/suppliers`); assertions
+ * target the module's controller/service/repository. Behavioral coverage lives
+ * in `server/modules/suppliers/__tests__/supplier.service.test.ts`.
+ */
+describe('Supplier read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/suppliers/index.ts');
+  const controllerSource = read('server/modules/suppliers/controllers/supplier.controller.ts');
+  const serviceSource = read('server/modules/suppliers/services/supplier.service.ts');
+  const repositorySource = read('server/modules/suppliers/repositories/supplier.repository.ts');
 
-  it('mounts the extracted supplier router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import supplierRoutes from ['"]\.\/suppliers['"]/);
+  it('mounts the supplier module from the hybrid router', () => {
+    expect(hybridRoutesSource).toMatch(/import supplierRoutes from ['"]\.\.\/modules\/suppliers['"]/);
     expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*supplierRoutes\)/);
   });
 
@@ -30,22 +40,22 @@ describe('Supplier read route extraction (Wave J)', () => {
   });
 
   it('preserves supplier list pagination, garage scoping, detail lookup, and price-list reads', () => {
-    expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/suppliers['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/parsePagination\(req\)/);
-    expect(supplierRoutesSource).toMatch(/const gid = \(req\.user as any\)\?\.garageId \|\| \(garage_id as string\)/);
-    expect(supplierRoutesSource).toMatch(/storage\.getSuppliersPaginated\(gid,\s*pagination\.limit,\s*pagination\.offset\)/);
-    expect(supplierRoutesSource).toMatch(/storage\.countSuppliers\(gid\)/);
-    expect(supplierRoutesSource).toMatch(/sendPaginated\(res,\s*data,\s*total,\s*pagination,\s*pagination\.explicit\)/);
-    expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/suppliers\/:id['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/storage\.getSupplier\(id\)/);
-    expect(supplierRoutesSource).toMatch(/Supplier not found/);
-    expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/supplier-price-lists['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/const \{ supplierId,\s*sparePartId \} = req\.query/);
-    expect(supplierRoutesSource).toMatch(/storage\.getSupplierPriceLists\(\s*supplierId as string \| undefined,\s*sparePartId as string \| undefined,\s*\)/);
-    expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/supplier-price-lists\/:id['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/storage\.getSupplierPriceList\(id,/);
-    expect(supplierRoutesSource).toMatch(/Price list not found/);
-    expect(supplierRoutesSource).toMatch(/router\.get\(['"]\/supplier-price-lists\/compare\/:sparePartId['"],\s*isAuthenticated/);
-    expect(supplierRoutesSource).toMatch(/storage\.comparePrices\(sparePartId\)/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/suppliers['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/suppliers\/:id['"],\s*isAuthenticated/);
+    expect(controllerSource).toMatch(/parsePagination\(req\)/);
+    expect(controllerSource).toMatch(/sendPaginated\(res,\s*rows,\s*total,\s*pagination,\s*pagination\.explicit\)/);
+    // Session garage takes precedence over ?garage_id (tenant isolation).
+    expect(serviceSource).toMatch(/auth\.garageId \?\? garageIdParam/);
+    expect(serviceSource).toMatch(/Supplier not found/);
+    expect(serviceSource).toMatch(/Price list not found/);
+    expect(repositorySource).toMatch(/storage\.getSuppliersPaginated\(/);
+    expect(repositorySource).toMatch(/storage\.countSuppliers\(/);
+    expect(repositorySource).toMatch(/storage\.getSupplier\(/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/supplier-price-lists['"],\s*isAuthenticated/);
+    expect(repositorySource).toMatch(/storage\.getSupplierPriceLists\(/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/supplier-price-lists\/:id['"],\s*isAuthenticated/);
+    expect(repositorySource).toMatch(/storage\.getSupplierPriceList\(/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/supplier-price-lists\/compare\/:sparePartId['"],\s*isAuthenticated/);
+    expect(repositorySource).toMatch(/storage\.comparePrices\(/);
   });
 });

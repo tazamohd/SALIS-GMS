@@ -31,6 +31,16 @@ import type { IInventoryAuditRepository } from '../../modules/inventory/reposito
 import type { InventoryAuditService } from '../../modules/inventory/services/inventory-audit.service';
 import type { IInventoryTransferRepository } from '../../modules/inventory/repositories/inventory-transfer.repository';
 import type { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
+import type { ISupplierRepository } from '../../modules/suppliers/repositories/supplier.repository';
+import type { SupplierService } from '../../modules/suppliers/services/supplier.service';
+import type { IPurchaseRepository } from '../../modules/procurement/repositories/purchase.repository';
+import type { PurchaseService } from '../../modules/procurement/services/purchase.service';
+import type { IDeliveryRepository } from '../../modules/procurement/repositories/delivery.repository';
+import type { DeliveryService } from '../../modules/procurement/services/delivery.service';
+import type { IReorderSettingRepository } from '../../modules/procurement/repositories/reorder-setting.repository';
+import type { ReorderSettingService } from '../../modules/procurement/services/reorder-setting.service';
+import type { IPricingHistoryRepository } from '../../modules/procurement/repositories/pricing-history.repository';
+import type { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -65,3 +75,13 @@ export const INVENTORY_TRANSFER_REPOSITORY = token<IInventoryTransferRepository>
   'InventoryTransferRepository',
 );
 export const INVENTORY_TRANSFER_SERVICE = token<InventoryTransferService>('InventoryTransferService');
+export const SUPPLIER_REPOSITORY = token<ISupplierRepository>('SupplierRepository');
+export const SUPPLIER_SERVICE = token<SupplierService>('SupplierService');
+export const PURCHASE_REPOSITORY = token<IPurchaseRepository>('PurchaseRepository');
+export const PURCHASE_SERVICE = token<PurchaseService>('PurchaseService');
+export const DELIVERY_REPOSITORY = token<IDeliveryRepository>('DeliveryRepository');
+export const DELIVERY_SERVICE = token<DeliveryService>('DeliveryService');
+export const REORDER_SETTING_REPOSITORY = token<IReorderSettingRepository>('ReorderSettingRepository');
+export const REORDER_SETTING_SERVICE = token<ReorderSettingService>('ReorderSettingService');
+export const PRICING_HISTORY_REPOSITORY = token<IPricingHistoryRepository>('PricingHistoryRepository');
+export const PRICING_HISTORY_SERVICE = token<PricingHistoryService>('PricingHistoryService');

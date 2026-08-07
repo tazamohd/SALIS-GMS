@@ -2,14 +2,25 @@ import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Delivery read route extraction (Wave J)', () => {
-  const legacyRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes.ts'), 'utf-8');
-  const hybridRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/index.ts'), 'utf-8');
-  const deliveryRoutesSource = fs.readFileSync(path.resolve(process.cwd(), 'server/routes/deliveries.ts'), 'utf-8');
+/**
+ * Source-contract tests for the delivery read surface. Phase E migrated the
+ * extracted router into the procurement module (`server/modules/procurement`);
+ * assertions target the module's controller/service/repository. Behavioral
+ * coverage lives in `server/modules/procurement/__tests__/procurement.service.test.ts`.
+ */
+describe('Delivery read route extraction (Phase E module)', () => {
+  const read = (p: string) => fs.readFileSync(path.resolve(process.cwd(), p), 'utf-8');
+  const legacyRoutesSource = read('server/routes.ts');
+  const hybridRoutesSource = read('server/routes/index.ts');
+  const moduleIndexSource = read('server/modules/procurement/index.ts');
+  const serviceSource = read('server/modules/procurement/services/delivery.service.ts');
+  const repositorySource = read('server/modules/procurement/repositories/delivery.repository.ts');
 
-  it('mounts the extracted delivery router from the hybrid router', () => {
-    expect(hybridRoutesSource).toMatch(/import deliveryRoutes from ['"]\.\/deliveries['"]/);
-    expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*deliveryRoutes\)/);
+  it('mounts the procurement module (which now owns the delivery reads)', () => {
+    expect(hybridRoutesSource).toMatch(/import purchaseOrderRoutes from ['"]\.\.\/modules\/procurement['"]/);
+    expect(hybridRoutesSource).toMatch(/app\.use\(["']\/api["'],\s*purchaseOrderRoutes\)/);
+    // The standalone delivery router is retired.
+    expect(hybridRoutesSource).not.toMatch(/deliveryRoutes/);
   });
 
   it('removes active delivery read handlers from the legacy monolith', () => {
@@ -29,17 +40,17 @@ describe('Delivery read route extraction (Wave J)', () => {
   });
 
   it('preserves delivery list, detail, items, timeline, and live status reads', () => {
-    expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveries\(req\.user\.garageId,\s*status as string\)/);
-    expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDelivery\(req\.params\.id,\s*req\.user\.garageId\)/);
-    expect(deliveryRoutesSource).toMatch(/Delivery not found/);
-    expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/items['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryItems\(req\.params\.id\)/);
-    expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/timeline['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getDeliveryTimeline\(req\.params\.id\)/);
-    expect(deliveryRoutesSource).toMatch(/router\.get\(['"]\/deliveries\/:id\/live['"],\s*isAuthenticated/);
-    expect(deliveryRoutesSource).toMatch(/storage\.getLiveDeliveryStatus\(req\.params\.id\)/);
-    expect(deliveryRoutesSource).toMatch(/Live status not found/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/deliveries['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/deliveries\/:id['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/deliveries\/:id\/items['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/deliveries\/:id\/timeline['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/deliveries\/:id\/live['"],\s*isAuthenticated/);
+    expect(repositorySource).toMatch(/storage\.getDeliveries\(/);
+    expect(repositorySource).toMatch(/storage\.getDelivery\(/);
+    expect(repositorySource).toMatch(/storage\.getDeliveryItems\(/);
+    expect(repositorySource).toMatch(/storage\.getDeliveryTimeline\(/);
+    expect(repositorySource).toMatch(/storage\.getLiveDeliveryStatus\(/);
+    expect(serviceSource).toMatch(/Delivery not found/);
+    expect(serviceSource).toMatch(/Live status not found/);
   });
 });
