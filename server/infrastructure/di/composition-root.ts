@@ -28,6 +28,8 @@ import {
   PAYMENT_SERVICE,
   SPARE_PART_REPOSITORY,
   SPARE_PART_SERVICE,
+  INVENTORY_DASHBOARD_REPOSITORY,
+  INVENTORY_DASHBOARD_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -52,6 +54,8 @@ import { PaymentService } from '../../modules/payments/services/payment.service'
 import { registerPaymentEventHandlers } from '../../modules/payments/events/payment.handlers';
 import { SparePartRepository } from '../../modules/inventory/repositories/spare-part.repository';
 import { SparePartService } from '../../modules/inventory/services/spare-part.service';
+import { InventoryDashboardRepository } from '../../modules/inventory/repositories/inventory-dashboard.repository';
+import { InventoryDashboardService } from '../../modules/inventory/services/inventory-dashboard.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -130,6 +134,12 @@ export function getAppContainer(): Container {
 
   c.register(SPARE_PART_REPOSITORY, () => new SparePartRepository());
   c.register(SPARE_PART_SERVICE, (ctx) => new SparePartService(ctx.resolve(SPARE_PART_REPOSITORY)));
+
+  c.register(INVENTORY_DASHBOARD_REPOSITORY, () => new InventoryDashboardRepository());
+  c.register(
+    INVENTORY_DASHBOARD_SERVICE,
+    (ctx) => new InventoryDashboardService(ctx.resolve(INVENTORY_DASHBOARD_REPOSITORY)),
+  );
 
   container = c;
   return c;

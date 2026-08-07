@@ -69,7 +69,6 @@ import exportRoutes from "./export";
 import featureFlagRoutes from "./feature-flags";
 import financialRoutes from "./financial";
 import franchiseRoutes from "./franchise";
-import inventoryManagementRoutes from "./inventory-management";
 import saudiRoutes from "./saudi";
 import smsCampaignRoutes from "./sms-campaigns";
 import { subscriptionsRoutes } from "./subscriptions";
@@ -432,7 +431,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", featureFlagRoutes);
   app.use("/api", financialRoutes);
   app.use("/api", franchiseRoutes);
-  app.use("/api", inventoryManagementRoutes);
   app.use("/api", saudiRoutes);
   app.use("/api", smsCampaignRoutes);
   app.use("/api", subscriptionsRoutes);

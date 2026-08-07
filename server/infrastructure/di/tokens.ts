@@ -23,6 +23,8 @@ import type { IPaymentRepository } from '../../modules/payments/repositories/pay
 import type { PaymentService } from '../../modules/payments/services/payment.service';
 import type { ISparePartRepository } from '../../modules/inventory/repositories/spare-part.repository';
 import type { SparePartService } from '../../modules/inventory/services/spare-part.service';
+import type { IInventoryDashboardRepository } from '../../modules/inventory/repositories/inventory-dashboard.repository';
+import type { InventoryDashboardService } from '../../modules/inventory/services/inventory-dashboard.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -43,3 +45,9 @@ export const PAYMENT_REPOSITORY = token<IPaymentRepository>('PaymentRepository')
 export const PAYMENT_SERVICE = token<PaymentService>('PaymentService');
 export const SPARE_PART_REPOSITORY = token<ISparePartRepository>('SparePartRepository');
 export const SPARE_PART_SERVICE = token<SparePartService>('SparePartService');
+export const INVENTORY_DASHBOARD_REPOSITORY = token<IInventoryDashboardRepository>(
+  'InventoryDashboardRepository',
+);
+export const INVENTORY_DASHBOARD_SERVICE = token<InventoryDashboardService>(
+  'InventoryDashboardService',
+);

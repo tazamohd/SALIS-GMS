@@ -95,7 +95,7 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
    join list, atomic `recordPayment` create and role-gated `reversePayment`
    delete; `payment.received` / `payment.reversed` events; gateway + supplier
    payments left as separate domains) — **financial core complete**
-5. inventory ✅ (spare-parts items core: list + by-id + per-garage inventories; inventory-management dashboards, stock-alerts, audit-trail, and transfers are further inventory sub-domains, next) / procurement / suppliers
+5. inventory ✅ (items core: spare-parts list/by-id + per-garage inventories; **dashboards**: overview/items/low-stock/reorder/suppliers/turnover/valuation — repository owns all aggregation SQL + PO writes, service owns the analytics math, graceful-degradation defaults preserved; stock-alerts/audit-trail/transfers are further sub-domains, next) / procurement / suppliers
 6. crm / insurance / fleet / marketplace
 7. hr / reports / analytics / ai / platform / administration
 
