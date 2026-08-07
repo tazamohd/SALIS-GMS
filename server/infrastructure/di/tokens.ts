@@ -31,6 +31,8 @@ import type { IInventoryAuditRepository } from '../../modules/inventory/reposito
 import type { InventoryAuditService } from '../../modules/inventory/services/inventory-audit.service';
 import type { IInventoryTransferRepository } from '../../modules/inventory/repositories/inventory-transfer.repository';
 import type { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
+import type { ISupplierRepository } from '../../modules/suppliers/repositories/supplier.repository';
+import type { SupplierService } from '../../modules/suppliers/services/supplier.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -65,3 +67,5 @@ export const INVENTORY_TRANSFER_REPOSITORY = token<IInventoryTransferRepository>
   'InventoryTransferRepository',
 );
 export const INVENTORY_TRANSFER_SERVICE = token<InventoryTransferService>('InventoryTransferService');
+export const SUPPLIER_REPOSITORY = token<ISupplierRepository>('SupplierRepository');
+export const SUPPLIER_SERVICE = token<SupplierService>('SupplierService');

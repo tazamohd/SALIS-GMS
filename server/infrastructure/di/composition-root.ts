@@ -36,6 +36,8 @@ import {
   INVENTORY_AUDIT_SERVICE,
   INVENTORY_TRANSFER_REPOSITORY,
   INVENTORY_TRANSFER_SERVICE,
+  SUPPLIER_REPOSITORY,
+  SUPPLIER_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -68,6 +70,8 @@ import { InventoryAuditRepository } from '../../modules/inventory/repositories/i
 import { InventoryAuditService } from '../../modules/inventory/services/inventory-audit.service';
 import { InventoryTransferRepository } from '../../modules/inventory/repositories/inventory-transfer.repository';
 import { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
+import { SupplierRepository } from '../../modules/suppliers/repositories/supplier.repository';
+import { SupplierService } from '../../modules/suppliers/services/supplier.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -167,6 +171,9 @@ export function getAppContainer(): Container {
     INVENTORY_TRANSFER_SERVICE,
     (ctx) => new InventoryTransferService(ctx.resolve(INVENTORY_TRANSFER_REPOSITORY)),
   );
+
+  c.register(SUPPLIER_REPOSITORY, () => new SupplierRepository());
+  c.register(SUPPLIER_SERVICE, (ctx) => new SupplierService(ctx.resolve(SUPPLIER_REPOSITORY)));
 
   container = c;
   return c;

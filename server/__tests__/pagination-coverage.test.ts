@@ -27,7 +27,13 @@ describe('Pagination coverage expansion (Wave E)', () => {
     process.cwd(),
     'server/modules/inventory/repositories/spare-part.repository.ts',
   );
-  const supplierRoutesPath = path.resolve(process.cwd(), 'server/routes/suppliers.ts');
+  // Phase E: supplier reads moved into the suppliers module; the data-layer
+  // bindings now live in the repository.
+  const supplierModuleIndexPath = path.resolve(process.cwd(), 'server/modules/suppliers/index.ts');
+  const supplierRepositoryPath = path.resolve(
+    process.cwd(),
+    'server/modules/suppliers/repositories/supplier.repository.ts',
+  );
   // Phase E: vehicle reads moved into the layered module; the data-layer
   // bindings now live in the repository.
   const vehicleModuleIndexPath = path.resolve(process.cwd(), 'server/modules/vehicles/index.ts');
@@ -49,7 +55,8 @@ describe('Pagination coverage expansion (Wave E)', () => {
   const appointmentRepositorySource = fs.readFileSync(appointmentRepositoryPath, 'utf-8');
   const sparePartModuleIndexSource = fs.readFileSync(sparePartModuleIndexPath, 'utf-8');
   const sparePartRepositorySource = fs.readFileSync(sparePartRepositoryPath, 'utf-8');
-  const supplierRoutesSource = fs.readFileSync(supplierRoutesPath, 'utf-8');
+  const supplierModuleIndexSource = fs.readFileSync(supplierModuleIndexPath, 'utf-8');
+  const supplierRepositorySource = fs.readFileSync(supplierRepositoryPath, 'utf-8');
   const vehicleModuleIndexSource = fs.readFileSync(vehicleModuleIndexPath, 'utf-8');
   const vehicleRepositorySource = fs.readFileSync(vehicleRepositoryPath, 'utf-8');
   const customerModuleIndexSource = fs.readFileSync(customerModuleIndexPath, 'utf-8');
@@ -118,10 +125,10 @@ describe('Pagination coverage expansion (Wave E)', () => {
       expect(sparePartRepositorySource).toMatch(/storage\.countSpareParts\(/);
     });
 
-    it('/api/suppliers uses getSuppliersPaginated', () => {
-      const handler = handlerFor(supplierRoutesSource, "router.get('/suppliers'", 'router.');
-      expect(handler).toMatch(/storage\.getSuppliersPaginated\(/);
-      expect(handler).toMatch(/storage\.countSuppliers\(/);
+    it('/api/suppliers uses getSuppliersPaginated (via the module repository)', () => {
+      expect(supplierModuleIndexSource).toMatch(/router\.get\(\s*['"]\/suppliers['"],\s*isAuthenticated/);
+      expect(supplierRepositorySource).toMatch(/storage\.getSuppliersPaginated\(/);
+      expect(supplierRepositorySource).toMatch(/storage\.countSuppliers\(/);
     });
 
     it('/api/vehicles uses getVehiclesPaginated (via the module repository)', () => {

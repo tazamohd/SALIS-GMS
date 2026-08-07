@@ -27,7 +27,7 @@ import serviceTemplateRoutes from "./service-templates";
 import sparePartRoutes from "../modules/inventory";
 import appointmentRoutes from "../modules/appointments";
 import toolRoutes from "./tools";
-import supplierRoutes from "./suppliers";
+import supplierRoutes from "../modules/suppliers";
 import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
 import jobCardRoutes from "../modules/jobcards";
