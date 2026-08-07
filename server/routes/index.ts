@@ -68,7 +68,7 @@ import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
 import docsRoutes from "./docs";
 import exportRoutes from "./export";
-import featureFlagRoutes from "./feature-flags";
+import platformRoutes from "../modules/platform";
 import financialRoutes from "./financial";
 import franchiseRoutes from "./franchise";
 import saudiRoutes from "./saudi";
@@ -434,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", customerPortalRoutes);
   app.use("/api", docsRoutes);
   app.use("/api", exportRoutes);
-  app.use("/api", featureFlagRoutes);
+  app.use("/api", platformRoutes);
   app.use("/api", financialRoutes);
   app.use("/api", franchiseRoutes);
   app.use("/api", saudiRoutes);
