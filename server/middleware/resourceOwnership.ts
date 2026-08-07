@@ -144,7 +144,18 @@ export function requireResourceOwnership(config: OwnershipConfig): RequestHandle
         return;
       }
       next();
-    } catch (err) {
+    } catch (err: any) {
+      // A malformed id (e.g. a non-UUID word routed into an `/:id` param, like
+      // `/api/estimates/stats` falling through to `/api/estimates/:id`) cannot
+      // own any row. Postgres raises 22P02 (invalid_text_representation) casting
+      // it to uuid — treat that as not-found, not a server error (audit F4-7).
+      // Drizzle wraps the driver error, so the pg code hides on `err.cause`.
+      const pgCode = err?.code ?? err?.cause?.code;
+      const msg = String(err?.message ?? "") + String(err?.cause?.message ?? "");
+      if (pgCode === "22P02" || /invalid input syntax for type uuid/i.test(msg)) {
+        res.status(404).json({ message: "Not found" });
+        return;
+      }
       console.error(`[resourceOwnership] check failed for ${table}:`, err);
       res.status(500).json({ message: "Authorization check failed" });
     }

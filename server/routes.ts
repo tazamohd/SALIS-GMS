@@ -3935,6 +3935,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // NOTE: must be declared BEFORE '/api/estimates/:id' or the literal "stats"
+  // is captured as :id and the ownership check 500s casting it to uuid (F4-7).
+  app.get('/api/estimates/stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) {
+        return res.json({
+          totalEstimates: 0, conversionRate: 0, avgValue: 0, pendingCount: 0,
+          funnel: { created: 0, sent: 0, approved: 0, converted: 0 }, byStatus: {},
+        });
+      }
+      const agg = await db.execute(sql`
+        SELECT
+          COUNT(*)::int AS total,
+          COUNT(*) FILTER (WHERE status IN ('draft','created'))::int AS created,
+          COUNT(*) FILTER (WHERE status = 'sent')::int AS sent,
+          COUNT(*) FILTER (WHERE status = 'approved')::int AS approved,
+          COUNT(*) FILTER (WHERE status = 'converted')::int AS converted,
+          COUNT(*) FILTER (WHERE status IN ('draft','created','sent','pending'))::int AS pending,
+          COALESCE(AVG(total_amount), 0)::float AS avg_value
+        FROM estimates WHERE garage_id = ${garageId}
+      `);
+      const byStatusRows = await db.execute(sql`
+        SELECT status, COUNT(*)::int AS count FROM estimates
+        WHERE garage_id = ${garageId} GROUP BY status
+      `);
+      const r: any = agg.rows?.[0] || {};
+      const total = Number(r.total || 0);
+      const converted = Number(r.converted || 0);
+      const byStatus: Record<string, number> = {};
+      for (const row of (byStatusRows.rows || []) as any[]) {
+        byStatus[String(row.status ?? 'unknown')] = Number(row.count || 0);
+      }
+      res.json({
+        totalEstimates: total,
+        conversionRate: total > 0 ? Math.round((converted / total) * 1000) / 10 : 0,
+        avgValue: Number(r.avg_value || 0),
+        pendingCount: Number(r.pending || 0),
+        funnel: {
+          created: Number(r.created || 0),
+          sent: Number(r.sent || 0),
+          approved: Number(r.approved || 0),
+          converted,
+        },
+        byStatus,
+      });
+    } catch (error) {
+      console.error("Error computing estimate stats:", error);
+      res.status(500).json({ message: "Failed to compute estimate stats" });
+    }
+  });
+
   app.get('/api/estimates/:id', isAuthenticated, requireResourceOwnership({ table: 'estimates' }), async (req, res) => {
     try {
       const { id } = req.params;
