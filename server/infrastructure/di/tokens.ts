@@ -15,6 +15,8 @@ import type { IGarageRepository } from '../../modules/garage/repositories/garage
 import type { GarageService } from '../../modules/garage/services/garage.service';
 import type { IJobCardRepository } from '../../modules/jobcards/repositories/jobcard.repository';
 import type { JobCardService } from '../../modules/jobcards/services/jobcard.service';
+import type { IEstimateRepository } from '../../modules/estimates/repositories/estimate.repository';
+import type { EstimateService } from '../../modules/estimates/services/estimate.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -27,3 +29,5 @@ export const GARAGE_REPOSITORY = token<IGarageRepository>('GarageRepository');
 export const GARAGE_SERVICE = token<GarageService>('GarageService');
 export const JOBCARD_REPOSITORY = token<IJobCardRepository>('JobCardRepository');
 export const JOBCARD_SERVICE = token<JobCardService>('JobCardService');
+export const ESTIMATE_REPOSITORY = token<IEstimateRepository>('EstimateRepository');
+export const ESTIMATE_SERVICE = token<EstimateService>('EstimateService');

@@ -20,6 +20,8 @@ import {
   GARAGE_SERVICE,
   JOBCARD_REPOSITORY,
   JOBCARD_SERVICE,
+  ESTIMATE_REPOSITORY,
+  ESTIMATE_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -33,6 +35,9 @@ import { GarageRepository } from '../../modules/garage/repositories/garage.repos
 import { GarageService } from '../../modules/garage/services/garage.service';
 import { JobCardRepository } from '../../modules/jobcards/repositories/jobcard.repository';
 import { JobCardService } from '../../modules/jobcards/services/jobcard.service';
+import { EstimateRepository } from '../../modules/estimates/repositories/estimate.repository';
+import { EstimateService } from '../../modules/estimates/services/estimate.service';
+import { registerEstimateEventHandlers } from '../../modules/estimates/events/estimate.handlers';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -63,6 +68,7 @@ export function getAppContainer(): Container {
     const bus = buildEventBus();
     // Register module event subscribers against the shared bus.
     registerCustomerEventHandlers(bus);
+    registerEstimateEventHandlers(bus);
     return bus;
   });
 
@@ -87,6 +93,12 @@ export function getAppContainer(): Container {
 
   c.register(JOBCARD_REPOSITORY, () => new JobCardRepository());
   c.register(JOBCARD_SERVICE, (ctx) => new JobCardService(ctx.resolve(JOBCARD_REPOSITORY)));
+
+  c.register(ESTIMATE_REPOSITORY, () => new EstimateRepository());
+  c.register(
+    ESTIMATE_SERVICE,
+    (ctx) => new EstimateService(ctx.resolve(ESTIMATE_REPOSITORY), ctx.resolve(EVENT_BUS)),
+  );
 
   container = c;
   return c;
