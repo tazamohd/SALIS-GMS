@@ -31,7 +31,7 @@ describe("completeInventoryTransfer — idempotent (B15)", () => {
   beforeAll(async () => {
     const client = new Client({ connectionString: process.env.DATABASE_URL });
     await client.connect();
-    let garageA = "", garageB = "";
+    let garageA!: string, garageB!: string;
     try {
       garageA = (await client.query(`INSERT INTO garages (name,country,city,is_active) VALUES ('B15-A','Saudi Arabia','Riyadh',true) RETURNING id`)).rows[0].id;
       garageB = (await client.query(`INSERT INTO garages (name,country,city,is_active) VALUES ('B15-B','Saudi Arabia','Jeddah',true) RETURNING id`)).rows[0].id;

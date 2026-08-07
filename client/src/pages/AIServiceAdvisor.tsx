@@ -61,7 +61,7 @@ export default function AIServiceAdvisor() {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const recommendations: Recommendation[] = [];
-    let response = "";
+    let response: string;
 
     if (input.toLowerCase().includes("brake") || input.toLowerCase().includes("squeak")) {
       response = t('aiServiceAdvisor.brakeNoiseResponse', "Based on the squeaking noise when braking, I've identified potential issues. Here are my recommendations:");

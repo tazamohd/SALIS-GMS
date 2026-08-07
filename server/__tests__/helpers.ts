@@ -218,7 +218,7 @@ export async function createSecondGarageAdmin(app: Express): Promise<{
 
   const client = new Client({ connectionString: url });
   await client.connect();
-  let garageId = "";
+  let garageId!: string;
   try {
     const r = await client.query(
       `INSERT INTO garages (name, country, city, is_active)

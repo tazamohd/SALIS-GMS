@@ -12,12 +12,12 @@ import {
   GraduationCap,
   Star,
 } from "lucide-react";
-import type { TechnicianProfile } from "@shared/schema";
+import type { TechnicianProfile as TechnicianProfileData } from "@shared/schema";
 
 export default function TechnicianProfile() {
   const { user } = useAuth();
 
-  const { data: profile, isLoading } = useQuery<TechnicianProfile>({
+  const { data: profile, isLoading } = useQuery<TechnicianProfileData>({
     queryKey: [`/api/technician-profiles/${user?.id}`],
     enabled: !!user?.id,
   });

@@ -66,7 +66,7 @@ export async function predictMaintenance(garageId: string): Promise<ServicePredi
 
       const now = new Date();
       let predictedDate: Date;
-      let confidence = 0.7;
+      let confidence: number;
       let urgency: 'low' | 'medium' | 'high' | 'critical' = 'low';
 
       if (lastService?.completedAt) {

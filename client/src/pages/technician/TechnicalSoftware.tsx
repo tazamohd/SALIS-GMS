@@ -23,7 +23,7 @@ import {
   Clock,
 } from "lucide-react";
 
-interface TechnicalSoftware {
+interface SoftwareItem {
   id: number;
   name: string;
   shortName: string;
@@ -37,7 +37,7 @@ interface TechnicalSoftware {
   icon: string;
 }
 
-const softwareList: TechnicalSoftware[] = [
+const softwareList: SoftwareItem[] = [
   {
     id: 1,
     name: "Workshop Information System",
@@ -217,7 +217,7 @@ export default function TechnicalSoftware() {
     return matchesSearch && matchesCategory;
   });
 
-  const getStatusBadge = (status: TechnicalSoftware["status"]) => {
+  const getStatusBadge = (status: SoftwareItem["status"]) => {
     switch (status) {
       case "active":
         return <Badge className="bg-green-600">Active</Badge>;
@@ -228,7 +228,7 @@ export default function TechnicalSoftware() {
     }
   };
 
-  const getCategoryIcon = (category: TechnicalSoftware["category"]) => {
+  const getCategoryIcon = (category: SoftwareItem["category"]) => {
     switch (category) {
       case "diagnostic":
         return <Cpu className="h-5 w-5 text-[#0A5ED7]" />;

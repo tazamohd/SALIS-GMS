@@ -53,7 +53,7 @@ export async function createServiceUpdate(data: {
     return update;
   } catch (error) {
     console.error('Error creating service update:', error);
-    throw new Error('Failed to create service update');
+    throw new Error('Failed to create service update', { cause: error });
   }
 }
 
@@ -111,7 +111,7 @@ export async function createVideoEstimate(data: {
     return estimate;
   } catch (error) {
     console.error('Error creating video estimate:', error);
-    throw new Error('Failed to create video estimate');
+    throw new Error('Failed to create video estimate', { cause: error });
   }
 }
 
@@ -163,7 +163,7 @@ export async function updateVideoEstimateStatus(id: string, status: string) {
     return estimate;
   } catch (error) {
     console.error('Error updating video estimate status:', error);
-    throw new Error('Failed to update video estimate');
+    throw new Error('Failed to update video estimate', { cause: error });
   }
 }
 
@@ -192,7 +192,7 @@ export async function createDigitalWalkaround(data: {
     return walkaround;
   } catch (error) {
     console.error('Error creating digital walkaround:', error);
-    throw new Error('Failed to create digital walkaround');
+    throw new Error('Failed to create digital walkaround', { cause: error });
   }
 }
 
@@ -239,7 +239,7 @@ export async function signWalkaround(id: string, signatureUrl: string) {
     return walkaround;
   } catch (error) {
     console.error('Error signing walkaround:', error);
-    throw new Error('Failed to sign walkaround');
+    throw new Error('Failed to sign walkaround', { cause: error });
   }
 }
 
@@ -270,7 +270,7 @@ export async function createCustomerReview(data: {
     return review;
   } catch (error) {
     console.error('Error creating customer review:', error);
-    throw new Error('Failed to create customer review');
+    throw new Error('Failed to create customer review', { cause: error });
   }
 }
 
@@ -324,7 +324,7 @@ export async function respondToReview(reviewId: string, responseText: string, re
     return review;
   } catch (error) {
     console.error('Error responding to review:', error);
-    throw new Error('Failed to respond to review');
+    throw new Error('Failed to respond to review', { cause: error });
   }
 }
 
@@ -407,7 +407,7 @@ export async function generateReferralCode(customerId: string, programId: string
     return referral;
   } catch (error) {
     console.error('Error generating referral code:', error);
-    throw new Error('Failed to generate referral code');
+    throw new Error('Failed to generate referral code', { cause: error });
   }
 }
 
@@ -495,6 +495,6 @@ export async function completeReferral(referralId: string, purchaseAmount: numbe
     return referral;
   } catch (error) {
     console.error('Error completing referral:', error);
-    throw new Error('Failed to complete referral');
+    throw new Error('Failed to complete referral', { cause: error });
   }
 }
