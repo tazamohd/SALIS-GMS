@@ -53,10 +53,9 @@ import serviceReminderTemplateRoutes from "./service-reminder-templates";
 import pushSubscriptionRoutes from "./push-subscriptions";
 import pushNotificationRoutes from "./push-notifications";
 import vehicleRoutes from "../modules/vehicles";
-import purchaseOrderRoutes from "./purchase-orders";
+import purchaseOrderRoutes from "../modules/procurement";
 import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
-import deliveryRoutes from "./deliveries";
 import schedulingRoutes from "./scheduling";
 import aiInsightsRoutes from "./ai-insights";
 import apiDocsRoutes from "./api-docs";
@@ -350,7 +349,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Supplier Payment Routes Loaded");
 
   // Delivery read routes
-  app.use("/api", deliveryRoutes);
   console.log("Delivery Routes Loaded");
 
   // Scheduling read routes

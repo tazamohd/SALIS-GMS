@@ -38,6 +38,14 @@ import {
   INVENTORY_TRANSFER_SERVICE,
   SUPPLIER_REPOSITORY,
   SUPPLIER_SERVICE,
+  PURCHASE_REPOSITORY,
+  PURCHASE_SERVICE,
+  DELIVERY_REPOSITORY,
+  DELIVERY_SERVICE,
+  REORDER_SETTING_REPOSITORY,
+  REORDER_SETTING_SERVICE,
+  PRICING_HISTORY_REPOSITORY,
+  PRICING_HISTORY_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -72,6 +80,14 @@ import { InventoryTransferRepository } from '../../modules/inventory/repositorie
 import { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
 import { SupplierRepository } from '../../modules/suppliers/repositories/supplier.repository';
 import { SupplierService } from '../../modules/suppliers/services/supplier.service';
+import { PurchaseRepository } from '../../modules/procurement/repositories/purchase.repository';
+import { PurchaseService } from '../../modules/procurement/services/purchase.service';
+import { DeliveryRepository } from '../../modules/procurement/repositories/delivery.repository';
+import { DeliveryService } from '../../modules/procurement/services/delivery.service';
+import { ReorderSettingRepository } from '../../modules/procurement/repositories/reorder-setting.repository';
+import { ReorderSettingService } from '../../modules/procurement/services/reorder-setting.service';
+import { PricingHistoryRepository } from '../../modules/procurement/repositories/pricing-history.repository';
+import { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -174,6 +190,24 @@ export function getAppContainer(): Container {
 
   c.register(SUPPLIER_REPOSITORY, () => new SupplierRepository());
   c.register(SUPPLIER_SERVICE, (ctx) => new SupplierService(ctx.resolve(SUPPLIER_REPOSITORY)));
+
+  c.register(PURCHASE_REPOSITORY, () => new PurchaseRepository());
+  c.register(PURCHASE_SERVICE, (ctx) => new PurchaseService(ctx.resolve(PURCHASE_REPOSITORY)));
+
+  c.register(DELIVERY_REPOSITORY, () => new DeliveryRepository());
+  c.register(DELIVERY_SERVICE, (ctx) => new DeliveryService(ctx.resolve(DELIVERY_REPOSITORY)));
+
+  c.register(REORDER_SETTING_REPOSITORY, () => new ReorderSettingRepository());
+  c.register(
+    REORDER_SETTING_SERVICE,
+    (ctx) => new ReorderSettingService(ctx.resolve(REORDER_SETTING_REPOSITORY)),
+  );
+
+  c.register(PRICING_HISTORY_REPOSITORY, () => new PricingHistoryRepository());
+  c.register(
+    PRICING_HISTORY_SERVICE,
+    (ctx) => new PricingHistoryService(ctx.resolve(PRICING_HISTORY_REPOSITORY)),
+  );
 
   container = c;
   return c;

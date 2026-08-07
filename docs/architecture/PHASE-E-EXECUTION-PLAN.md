@@ -95,7 +95,7 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
    join list, atomic `recordPayment` create and role-gated `reversePayment`
    delete; `payment.received` / `payment.reversed` events; gateway + supplier
    payments left as separate domains) — **financial core complete**
-5. inventory ✅ (items core: spare-parts list/by-id + per-garage inventories; **dashboards**: overview/items/low-stock/reorder/suppliers/turnover/valuation — repository owns all aggregation SQL + PO writes, service owns the analytics math, graceful-degradation defaults preserved; **stock-alerts** (4), **inventory-audit-trail** (2), **inventory-transfers** (6, dual-garage from/to ownership) ✅ — non-contiguous monolith removal keeping reorder-settings/pricing-history) / procurement / **suppliers** ✅ (core: suppliers list/by-id + supplier price lists list/by-id/compare; purchase-orders, deliveries, reorder-settings, pricing-history are adjacent procurement sub-domains, next)
+5. inventory ✅ (items core: spare-parts list/by-id + per-garage inventories; **dashboards**: overview/items/low-stock/reorder/suppliers/turnover/valuation — repository owns all aggregation SQL + PO writes, service owns the analytics math, graceful-degradation defaults preserved; **stock-alerts** (4), **inventory-audit-trail** (2), **inventory-transfers** (6, dual-garage from/to ownership) ✅ — non-contiguous monolith removal keeping reorder-settings/pricing-history) / procurement / **suppliers** ✅ (core: suppliers list/by-id + supplier price lists list/by-id/compare; purchase-orders + purchase-tasks, deliveries, reorder-settings, pricing-history ✅ — extracted into a `procurement` module)
 6. crm / insurance / fleet / marketplace
 7. hr / reports / analytics / ai / platform / administration
 
