@@ -31,16 +31,29 @@ describe('Purchase order and task read route extraction (Phase E module)', () =>
     expect(legacyRoutesSource).not.toMatch(/app\.get\(['"]\/api\/purchase-tasks\/:id\/parts['"]/);
   });
 
-  it('leaves mutating purchase order, item, and task handlers in legacy routes', () => {
-    expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/purchase-orders['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/purchase-orders\/with-items['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.patch\(['"]\/api\/purchase-orders\/:id['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.delete\(['"]\/api\/purchase-orders\/:id['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/purchase-order-items['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.delete\(['"]\/api\/purchase-order-items\/:id['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.post\(['"]\/api\/purchase-tasks['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.patch\(['"]\/api\/purchase-tasks\/:id['"]/);
-    expect(legacyRoutesSource).toMatch(/app\.delete\(['"]\/api\/purchase-tasks\/:id['"]/);
+  it('moves purchase order, item, and task write handlers into the procurement module', () => {
+    // The mutating handlers are retired from the legacy monolith...
+    expect(legacyRoutesSource).not.toMatch(/app\.post\(['"]\/api\/purchase-orders['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.post\(['"]\/api\/purchase-orders\/with-items['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.patch\(['"]\/api\/purchase-orders\/:id['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.delete\(['"]\/api\/purchase-orders\/:id['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.post\(['"]\/api\/purchase-order-items['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.delete\(['"]\/api\/purchase-order-items\/:id['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.post\(['"]\/api\/purchase-tasks['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.patch\(['"]\/api\/purchase-tasks\/:id['"]/);
+    expect(legacyRoutesSource).not.toMatch(/app\.delete\(['"]\/api\/purchase-tasks\/:id['"]/);
+    // ...and now live on the procurement module router.
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/purchase-orders['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/purchase-orders\/with-items['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/purchase-orders\/:id['"]/);
+    expect(moduleIndexSource).toMatch(/router\.delete\(\s*['"]\/purchase-orders\/:id['"]/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/purchase-order-items['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.delete\(\s*['"]\/purchase-order-items\/:id['"]/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/purchase-tasks['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/purchase-tasks\/:id['"]/);
+    expect(moduleIndexSource).toMatch(/router\.delete\(\s*['"]\/purchase-tasks\/:id['"]/);
+    // The parent-scoped ownership guard survives on the item delete.
+    expect(moduleIndexSource).toMatch(/table:\s*['"]purchase_order_items['"],\s*parent:/);
   });
 
   it('preserves purchase order list, detail, and item read behavior', () => {
