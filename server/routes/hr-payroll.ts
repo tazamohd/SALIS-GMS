@@ -14,8 +14,8 @@ const router = Router();
 
 // ---------- EMPLOYEES ----------
 
-// GET /api/hr/employees — List employees
-router.get('/hr/employees', isAuthenticated, async (req, res) => {
+// GET /api/hr/employees — List employees (exposes compensation/PII; managers+ only)
+router.get('/hr/employees', isAuthenticated, requireManagerOrAbove, async (req, res) => {
   const garageId = (req as any).user.garageId;
   const { department, status, search, limit = '50', offset = '0' } = req.query;
   try {

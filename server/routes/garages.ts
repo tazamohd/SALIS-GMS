@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireManagerOrAbove } from '../middleware/requireRole';
 import { storage } from '../storage';
 import { parsePagination, sendPaginated } from './pagination';
 
@@ -44,7 +45,9 @@ router.get('/garages/:id/branches', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/roles', isAuthenticated, async (_req, res) => {
+// The role catalog exposes the RBAC model; restrict to managers/admins (a
+// technician/advisor has no need for it and the audit flagged its exposure).
+router.get('/roles', isAuthenticated, requireManagerOrAbove, async (_req, res) => {
   try {
     const roles = await storage.getRoles();
     res.json(roles);
