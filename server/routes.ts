@@ -20398,45 +20398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Public: browse approved providers (garages today; parts_store/insurance next).
-  app.get('/api/marketplace/providers', async (req, res) => {
-    try {
-      const type = typeof req.query.type === "string" ? req.query.type : undefined;
-      const q = typeof req.query.q === "string" ? req.query.q : undefined;
-      const city = typeof req.query.city === "string" ? req.query.city : undefined;
-      res.json(await storage.listMarketplaceProviders({ type, q, city }));
-    } catch (error) {
-      console.error("Error listing marketplace providers:", error);
-      res.status(500).json({ message: "Failed to load providers" });
-    }
-  });
-
-  // Public: a single provider and the services it presents.
-  app.get('/api/marketplace/providers/:id', async (req, res) => {
-    try {
-      const provider = await storage.getMarketplaceProvider(req.params.id);
-      if (!provider) return res.status(404).json({ message: "Provider not found" });
-      res.json(provider);
-    } catch (error) {
-      console.error("Error loading marketplace provider:", error);
-      res.status(500).json({ message: "Failed to load provider" });
-    }
-  });
-
-  // Public: smart search across providers and the services they offer.
-  // Named /find to avoid the pre-existing authenticated parts-marketplace
-  // /api/marketplace/search (a different feature) registered earlier.
-  app.get('/api/marketplace/find', async (req, res) => {
-    try {
-      const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
-      if (q.length < 2) {
-        return res.status(400).json({ message: "Search query must be at least 2 characters" });
-      }
-      res.json(await storage.searchMarketplace(q));
-    } catch (error) {
-      console.error("Error searching marketplace:", error);
-      res.status(500).json({ message: "Failed to search" });
-    }
-  });
+  // Public marketplace provider-discovery reads (providers, find) migrated to server/modules/marketplace (Phase E).
 
   // ==========================================================================
   // Customer vehicles — a signed-in customer manages their own vehicles.
@@ -20755,14 +20717,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Public: a provider's reviews.
-  app.get('/api/marketplace/providers/:id/reviews', async (req, res) => {
-    try {
-      res.json(await storage.listProviderReviews(req.params.id, 50));
-    } catch (error) {
-      console.error("Error listing reviews:", error);
-      res.status(500).json({ message: "Failed to load reviews" });
-    }
-  });
+  // Public marketplace provider-reviews read migrated to server/modules/marketplace (Phase E).
 
   // A customer reviews a provider they have actually transacted with
   // (completed booking, fulfilled order, or accepted quote). One review per
