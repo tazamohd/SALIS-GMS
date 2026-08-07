@@ -47,8 +47,14 @@ async function loginAsGaragelessUser(expressApp: Express): Promise<supertest.Age
   const client = new Client({ connectionString: url });
   await client.connect();
   try {
+    // Also pin user_type to the matching staff value. Since H-1 (#85),
+    // /api/register floors an omitted role to CUSTOMER + user_type='customer';
+    // leaving user_type='customer' here would make requireStaffByDefault (#79)
+    // treat this garageless session as a customer and 403 it off the staff
+    // surface (incl. /api/login on the reused cookie). This test's intent is a
+    // garageless STAFF session (ADVISOR), so set both columns.
     await client.query(
-      `UPDATE users SET garage_id = NULL, role = 'ADVISOR' WHERE email = $1`,
+      `UPDATE users SET garage_id = NULL, role = 'ADVISOR', user_type = 'advisor' WHERE email = $1`,
       [GARAGELESS_USER.email],
     );
   } finally {

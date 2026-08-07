@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/vehicles/:id/service-history', isAuthenticated, async (req, res) => {
+router.get('/vehicles/:id/service-history', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
   try {
     const { id } = req.params;
     const history = await storage.getVehicleServiceHistory(id);
@@ -15,7 +16,7 @@ router.get('/vehicles/:id/service-history', isAuthenticated, async (req, res) =>
   }
 });
 
-router.get('/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, res) => {
+router.get('/vehicles/:id/maintenance-schedules', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
   try {
     const { id } = req.params;
     const schedules = await storage.getMaintenanceSchedules(id);
@@ -26,7 +27,7 @@ router.get('/vehicles/:id/maintenance-schedules', isAuthenticated, async (req, r
   }
 });
 
-router.get('/vehicles/:id/service-reminders', isAuthenticated, async (req, res) => {
+router.get('/vehicles/:id/service-reminders', isAuthenticated, requireResourceOwnership({ table: 'vehicles' }), async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.query;

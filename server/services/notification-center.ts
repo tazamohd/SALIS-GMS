@@ -115,10 +115,14 @@ export async function getNotifications(userId: string, options?: { unreadOnly?: 
   return result.rows.map(rowToNotification);
 }
 
-export async function markAsRead(notificationId: string): Promise<boolean> {
+export async function markAsRead(notificationId: string, userId?: string): Promise<boolean> {
   await init();
+  // Scope by recipient (audit H-2): a notification is only mark-readable by the
+  // user it belongs to. Without the user_id predicate any authenticated user
+  // could flip another user's notification by guessing its (sequential) id.
   const result = await db.execute(sql`
-    UPDATE app_notifications SET read = true WHERE id = ${Number(notificationId)}
+    UPDATE app_notifications SET read = true
+    WHERE id = ${Number(notificationId)}${userId ? sql` AND user_id = ${userId}` : sql``}
   `);
   return (result.rowCount ?? 0) > 0;
 }
@@ -139,10 +143,12 @@ export async function getUnreadCount(userId: string): Promise<number> {
   return Number(result.rows[0].count);
 }
 
-export async function deleteNotification(notificationId: string): Promise<boolean> {
+export async function deleteNotification(notificationId: string, userId?: string): Promise<boolean> {
   await init();
+  // Scope by recipient (audit H-2): only the owning user may delete it.
   const result = await db.execute(sql`
-    DELETE FROM app_notifications WHERE id = ${Number(notificationId)}
+    DELETE FROM app_notifications
+    WHERE id = ${Number(notificationId)}${userId ? sql` AND user_id = ${userId}` : sql``}
   `);
   return (result.rowCount ?? 0) > 0;
 }
