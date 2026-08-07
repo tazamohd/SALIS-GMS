@@ -21,6 +21,8 @@ import type { IInvoiceRepository } from '../../modules/invoices/repositories/inv
 import type { InvoiceService } from '../../modules/invoices/services/invoice.service';
 import type { IPaymentRepository } from '../../modules/payments/repositories/payment.repository';
 import type { PaymentService } from '../../modules/payments/services/payment.service';
+import type { ISparePartRepository } from '../../modules/inventory/repositories/spare-part.repository';
+import type { SparePartService } from '../../modules/inventory/services/spare-part.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -39,3 +41,5 @@ export const INVOICE_REPOSITORY = token<IInvoiceRepository>('InvoiceRepository')
 export const INVOICE_SERVICE = token<InvoiceService>('InvoiceService');
 export const PAYMENT_REPOSITORY = token<IPaymentRepository>('PaymentRepository');
 export const PAYMENT_SERVICE = token<PaymentService>('PaymentService');
+export const SPARE_PART_REPOSITORY = token<ISparePartRepository>('SparePartRepository');
+export const SPARE_PART_SERVICE = token<SparePartService>('SparePartService');

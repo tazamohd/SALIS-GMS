@@ -20,7 +20,13 @@ describe('Pagination coverage expansion (Wave E)', () => {
     process.cwd(),
     'server/modules/appointments/repositories/appointment.repository.ts',
   );
-  const sparePartRoutesPath = path.resolve(process.cwd(), 'server/routes/spare-parts.ts');
+  // Phase E: spare-part reads moved into the inventory module; the data-layer
+  // bindings now live in the repository.
+  const sparePartModuleIndexPath = path.resolve(process.cwd(), 'server/modules/inventory/index.ts');
+  const sparePartRepositoryPath = path.resolve(
+    process.cwd(),
+    'server/modules/inventory/repositories/spare-part.repository.ts',
+  );
   const supplierRoutesPath = path.resolve(process.cwd(), 'server/routes/suppliers.ts');
   // Phase E: vehicle reads moved into the layered module; the data-layer
   // bindings now live in the repository.
@@ -41,7 +47,8 @@ describe('Pagination coverage expansion (Wave E)', () => {
   const systemRoutesSource = fs.readFileSync(systemRoutesPath, 'utf-8');
   const appointmentModuleIndexSource = fs.readFileSync(appointmentModuleIndexPath, 'utf-8');
   const appointmentRepositorySource = fs.readFileSync(appointmentRepositoryPath, 'utf-8');
-  const sparePartRoutesSource = fs.readFileSync(sparePartRoutesPath, 'utf-8');
+  const sparePartModuleIndexSource = fs.readFileSync(sparePartModuleIndexPath, 'utf-8');
+  const sparePartRepositorySource = fs.readFileSync(sparePartRepositoryPath, 'utf-8');
   const supplierRoutesSource = fs.readFileSync(supplierRoutesPath, 'utf-8');
   const vehicleModuleIndexSource = fs.readFileSync(vehicleModuleIndexPath, 'utf-8');
   const vehicleRepositorySource = fs.readFileSync(vehicleRepositoryPath, 'utf-8');
@@ -105,10 +112,10 @@ describe('Pagination coverage expansion (Wave E)', () => {
       expect(appointmentRepositorySource).toMatch(/storage\.countAppointments\(/);
     });
 
-    it('/api/spare-parts uses getSparePartsPaginated', () => {
-      const handler = handlerFor(sparePartRoutesSource, "router.get('/spare-parts'", 'router.');
-      expect(handler).toMatch(/storage\.getSparePartsPaginated\(/);
-      expect(handler).toMatch(/storage\.countSpareParts\(/);
+    it('/api/spare-parts uses getSparePartsPaginated (via the module repository)', () => {
+      expect(sparePartModuleIndexSource).toMatch(/router\.get\(\s*['"]\/spare-parts['"],\s*isAuthenticated/);
+      expect(sparePartRepositorySource).toMatch(/storage\.getSparePartsPaginated\(/);
+      expect(sparePartRepositorySource).toMatch(/storage\.countSpareParts\(/);
     });
 
     it('/api/suppliers uses getSuppliersPaginated', () => {

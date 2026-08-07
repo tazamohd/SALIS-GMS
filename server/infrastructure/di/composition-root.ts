@@ -26,6 +26,8 @@ import {
   INVOICE_SERVICE,
   PAYMENT_REPOSITORY,
   PAYMENT_SERVICE,
+  SPARE_PART_REPOSITORY,
+  SPARE_PART_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -48,6 +50,8 @@ import { registerInvoiceEventHandlers } from '../../modules/invoices/events/invo
 import { PaymentRepository } from '../../modules/payments/repositories/payment.repository';
 import { PaymentService } from '../../modules/payments/services/payment.service';
 import { registerPaymentEventHandlers } from '../../modules/payments/events/payment.handlers';
+import { SparePartRepository } from '../../modules/inventory/repositories/spare-part.repository';
+import { SparePartService } from '../../modules/inventory/services/spare-part.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -123,6 +127,9 @@ export function getAppContainer(): Container {
     PAYMENT_SERVICE,
     (ctx) => new PaymentService(ctx.resolve(PAYMENT_REPOSITORY), ctx.resolve(EVENT_BUS)),
   );
+
+  c.register(SPARE_PART_REPOSITORY, () => new SparePartRepository());
+  c.register(SPARE_PART_SERVICE, (ctx) => new SparePartService(ctx.resolve(SPARE_PART_REPOSITORY)));
 
   container = c;
   return c;

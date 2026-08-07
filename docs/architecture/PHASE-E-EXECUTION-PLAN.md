@@ -95,7 +95,7 @@ For each domain: **Extract → Compile → Test → Verify parity → Commit.**
    join list, atomic `recordPayment` create and role-gated `reversePayment`
    delete; `payment.received` / `payment.reversed` events; gateway + supplier
    payments left as separate domains) — **financial core complete**
-5. inventory / procurement / suppliers
+5. inventory ✅ (spare-parts items core: list + by-id + per-garage inventories; inventory-management dashboards, stock-alerts, audit-trail, and transfers are further inventory sub-domains, next) / procurement / suppliers
 6. crm / insurance / fleet / marketplace
 7. hr / reports / analytics / ai / platform / administration
 

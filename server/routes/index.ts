@@ -24,7 +24,7 @@ import technicianRoutes from "./technicians";
 import vinRoutes from "./vin";
 import catalogRoutes from "./catalogs";
 import serviceTemplateRoutes from "./service-templates";
-import sparePartRoutes from "./spare-parts";
+import sparePartRoutes from "../modules/inventory";
 import appointmentRoutes from "../modules/appointments";
 import toolRoutes from "./tools";
 import supplierRoutes from "./suppliers";
