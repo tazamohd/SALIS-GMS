@@ -1,4 +1,5 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryCache, QueryFunction } from "@tanstack/react-query";
+import { isUnauthorizedError } from "./authUtils";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -100,6 +101,18 @@ export const getQueryFn: <T>(options: {
   };
 
 export const queryClient = new QueryClient({
+  // Global session-expiry recovery: when any query 401s mid-session the cookie
+  // is no longer valid. Clear the cached user so `isAuthenticated` flips false
+  // and the router renders /login — an in-app transition (no full reload), and
+  // loop-safe: setting null when already null is a no-op, and the /api/user
+  // 401 that fires on a genuinely-logged-out load simply keeps it null.
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof Error && isUnauthorizedError(error)) {
+        queryClient.setQueryData(["/api/user"], null);
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),

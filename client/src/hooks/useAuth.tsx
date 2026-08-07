@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 type AuthContextType = {
@@ -26,6 +26,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
   } = useQuery<User | null, Error>({
     queryKey: ["/api/user"],
+    // Resolve to null on 401 instead of throwing + retaining the stale user.
+    // On session expiry this flips isAuthenticated false so the router shows
+    // /login, rather than stranding the user on an "authenticated" UI whose
+    // every request 401s.
+    queryFn: getQueryFn({ on401: "returnNull" }),
     retry: false,
   });
 
