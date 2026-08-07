@@ -9,6 +9,8 @@ import {
   calculateEndOfService,
   calculateVacationBalance,
 } from '../services/saudi-compliance';
+import { validate } from '../middleware/validate';
+import { createLeaveRequestSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -246,7 +248,7 @@ router.get('/hr/leave-requests', isAuthenticated, async (req, res) => {
 });
 
 // POST /api/hr/leave-requests
-router.post('/hr/leave-requests', isAuthenticated, async (req, res) => {
+router.post('/hr/leave-requests', isAuthenticated, validate(createLeaveRequestSchema), async (req, res) => {
   const { employeeId, employeeName, type, startDate, endDate, reason } = req.body;
   if (!employeeId || !type || !startDate || !endDate) {
     return res.status(400).json({ error: 'employeeId, type, startDate, and endDate are required' });
