@@ -18,6 +18,8 @@ import {
   APPOINTMENT_SERVICE,
   GARAGE_REPOSITORY,
   GARAGE_SERVICE,
+  JOBCARD_REPOSITORY,
+  JOBCARD_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -29,6 +31,8 @@ import { AppointmentRepository } from '../../modules/appointments/repositories/a
 import { AppointmentService } from '../../modules/appointments/services/appointment.service';
 import { GarageRepository } from '../../modules/garage/repositories/garage.repository';
 import { GarageService } from '../../modules/garage/services/garage.service';
+import { JobCardRepository } from '../../modules/jobcards/repositories/jobcard.repository';
+import { JobCardService } from '../../modules/jobcards/services/jobcard.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -80,6 +84,9 @@ export function getAppContainer(): Container {
 
   c.register(GARAGE_REPOSITORY, () => new GarageRepository());
   c.register(GARAGE_SERVICE, (ctx) => new GarageService(ctx.resolve(GARAGE_REPOSITORY)));
+
+  c.register(JOBCARD_REPOSITORY, () => new JobCardRepository());
+  c.register(JOBCARD_SERVICE, (ctx) => new JobCardService(ctx.resolve(JOBCARD_REPOSITORY)));
 
   container = c;
   return c;

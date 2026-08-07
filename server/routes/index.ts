@@ -30,7 +30,7 @@ import toolRoutes from "./tools";
 import supplierRoutes from "./suppliers";
 import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
-import jobCardRoutes from "./job-cards";
+import jobCardRoutes from "../modules/jobcards";
 import serviceBayRoutes from "./service-bays";
 import gamificationRoutes from "./gamification";
 import dashboardRoutes from "./dashboard";

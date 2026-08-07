@@ -13,6 +13,8 @@ import type { IAppointmentRepository } from '../../modules/appointments/reposito
 import type { AppointmentService } from '../../modules/appointments/services/appointment.service';
 import type { IGarageRepository } from '../../modules/garage/repositories/garage.repository';
 import type { GarageService } from '../../modules/garage/services/garage.service';
+import type { IJobCardRepository } from '../../modules/jobcards/repositories/jobcard.repository';
+import type { JobCardService } from '../../modules/jobcards/services/jobcard.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -23,3 +25,5 @@ export const APPOINTMENT_REPOSITORY = token<IAppointmentRepository>('Appointment
 export const APPOINTMENT_SERVICE = token<AppointmentService>('AppointmentService');
 export const GARAGE_REPOSITORY = token<IGarageRepository>('GarageRepository');
 export const GARAGE_SERVICE = token<GarageService>('GarageService');
+export const JOBCARD_REPOSITORY = token<IJobCardRepository>('JobCardRepository');
+export const JOBCARD_SERVICE = token<JobCardService>('JobCardService');
