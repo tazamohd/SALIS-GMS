@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated, hashPassword } from '../auth';
 import { requireRole, requireManagerOrAbove } from '../middleware/requireRole';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { storage } from '../storage';
@@ -202,7 +203,7 @@ router.get('/hr/attendance', isAuthenticated, async (req, res) => {
 });
 
 // POST /api/hr/attendance/clock — Clock in/out
-router.post('/hr/attendance/clock', isAuthenticated, async (req, res) => {
+router.post('/hr/attendance/clock', isAuthenticated, asyncHandler(async (req, res) => {
   const { employeeId, action } = req.body;
   if (!employeeId || !action) {
     return res.status(400).json({ error: 'employeeId and action (in/out) are required' });
@@ -217,7 +218,7 @@ router.post('/hr/attendance/clock', isAuthenticated, async (req, res) => {
     success: true,
     message: `Clock ${action} recorded at ${now.toLocaleTimeString()}`,
   });
-});
+}));
 
 // ---------- LEAVE REQUESTS ----------
 
