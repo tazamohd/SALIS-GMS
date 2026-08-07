@@ -61,7 +61,7 @@ import aiInsightsRoutes from "./ai-insights";
 import apiDocsRoutes from "./api-docs";
 import autoReorderRoutes from './auto-reorder';
 import commandCenterRoutes from "./command-center";
-import crmRoutes from "./crm";
+import crmRoutes from "../modules/crm";
 import customerPortalRoutes from "./customer-portal";
 import docsRoutes from "./docs";
 import exportRoutes from "./export";

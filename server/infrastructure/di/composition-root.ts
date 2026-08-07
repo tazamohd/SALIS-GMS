@@ -46,6 +46,8 @@ import {
   REORDER_SETTING_SERVICE,
   PRICING_HISTORY_REPOSITORY,
   PRICING_HISTORY_SERVICE,
+  CRM_REPOSITORY,
+  CRM_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -88,6 +90,8 @@ import { ReorderSettingRepository } from '../../modules/procurement/repositories
 import { ReorderSettingService } from '../../modules/procurement/services/reorder-setting.service';
 import { PricingHistoryRepository } from '../../modules/procurement/repositories/pricing-history.repository';
 import { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
+import { CrmRepository } from '../../modules/crm/repositories/crm.repository';
+import { CrmService } from '../../modules/crm/services/crm.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -208,6 +212,9 @@ export function getAppContainer(): Container {
     PRICING_HISTORY_SERVICE,
     (ctx) => new PricingHistoryService(ctx.resolve(PRICING_HISTORY_REPOSITORY)),
   );
+
+  c.register(CRM_REPOSITORY, () => new CrmRepository());
+  c.register(CRM_SERVICE, (ctx) => new CrmService(ctx.resolve(CRM_REPOSITORY)));
 
   container = c;
   return c;

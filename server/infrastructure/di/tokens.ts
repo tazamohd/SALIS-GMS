@@ -41,6 +41,8 @@ import type { IReorderSettingRepository } from '../../modules/procurement/reposi
 import type { ReorderSettingService } from '../../modules/procurement/services/reorder-setting.service';
 import type { IPricingHistoryRepository } from '../../modules/procurement/repositories/pricing-history.repository';
 import type { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
+import type { ICrmRepository } from '../../modules/crm/repositories/crm.repository';
+import type { CrmService } from '../../modules/crm/services/crm.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -85,3 +87,5 @@ export const REORDER_SETTING_REPOSITORY = token<IReorderSettingRepository>('Reor
 export const REORDER_SETTING_SERVICE = token<ReorderSettingService>('ReorderSettingService');
 export const PRICING_HISTORY_REPOSITORY = token<IPricingHistoryRepository>('PricingHistoryRepository');
 export const PRICING_HISTORY_SERVICE = token<PricingHistoryService>('PricingHistoryService');
+export const CRM_REPOSITORY = token<ICrmRepository>('CrmRepository');
+export const CRM_SERVICE = token<CrmService>('CrmService');
