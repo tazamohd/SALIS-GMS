@@ -30,6 +30,12 @@ import {
   SPARE_PART_SERVICE,
   INVENTORY_DASHBOARD_REPOSITORY,
   INVENTORY_DASHBOARD_SERVICE,
+  STOCK_ALERT_REPOSITORY,
+  STOCK_ALERT_SERVICE,
+  INVENTORY_AUDIT_REPOSITORY,
+  INVENTORY_AUDIT_SERVICE,
+  INVENTORY_TRANSFER_REPOSITORY,
+  INVENTORY_TRANSFER_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -56,6 +62,12 @@ import { SparePartRepository } from '../../modules/inventory/repositories/spare-
 import { SparePartService } from '../../modules/inventory/services/spare-part.service';
 import { InventoryDashboardRepository } from '../../modules/inventory/repositories/inventory-dashboard.repository';
 import { InventoryDashboardService } from '../../modules/inventory/services/inventory-dashboard.service';
+import { StockAlertRepository } from '../../modules/inventory/repositories/stock-alert.repository';
+import { StockAlertService } from '../../modules/inventory/services/stock-alert.service';
+import { InventoryAuditRepository } from '../../modules/inventory/repositories/inventory-audit.repository';
+import { InventoryAuditService } from '../../modules/inventory/services/inventory-audit.service';
+import { InventoryTransferRepository } from '../../modules/inventory/repositories/inventory-transfer.repository';
+import { InventoryTransferService } from '../../modules/inventory/services/inventory-transfer.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -139,6 +151,21 @@ export function getAppContainer(): Container {
   c.register(
     INVENTORY_DASHBOARD_SERVICE,
     (ctx) => new InventoryDashboardService(ctx.resolve(INVENTORY_DASHBOARD_REPOSITORY)),
+  );
+
+  c.register(STOCK_ALERT_REPOSITORY, () => new StockAlertRepository());
+  c.register(STOCK_ALERT_SERVICE, (ctx) => new StockAlertService(ctx.resolve(STOCK_ALERT_REPOSITORY)));
+
+  c.register(INVENTORY_AUDIT_REPOSITORY, () => new InventoryAuditRepository());
+  c.register(
+    INVENTORY_AUDIT_SERVICE,
+    (ctx) => new InventoryAuditService(ctx.resolve(INVENTORY_AUDIT_REPOSITORY)),
+  );
+
+  c.register(INVENTORY_TRANSFER_REPOSITORY, () => new InventoryTransferRepository());
+  c.register(
+    INVENTORY_TRANSFER_SERVICE,
+    (ctx) => new InventoryTransferService(ctx.resolve(INVENTORY_TRANSFER_REPOSITORY)),
   );
 
   container = c;
