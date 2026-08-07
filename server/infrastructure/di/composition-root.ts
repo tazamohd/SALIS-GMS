@@ -66,6 +66,8 @@ import {
   ANALYTICS_SERVICE,
   AI_REPOSITORY,
   AI_SERVICE,
+  FEATURE_FLAG_REPOSITORY,
+  FEATURE_FLAG_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -128,6 +130,8 @@ import { AnalyticsRepository } from '../../modules/analytics/repositories/analyt
 import { AnalyticsService } from '../../modules/analytics/services/analytics.service';
 import { AiRepository } from '../../modules/ai/repositories/ai.repository';
 import { AiService } from '../../modules/ai/services/ai.service';
+import { FeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
+import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -287,6 +291,9 @@ export function getAppContainer(): Container {
 
   c.register(AI_REPOSITORY, () => new AiRepository());
   c.register(AI_SERVICE, (ctx) => new AiService(ctx.resolve(AI_REPOSITORY)));
+
+  c.register(FEATURE_FLAG_REPOSITORY, () => new FeatureFlagRepository());
+  c.register(FEATURE_FLAG_SERVICE, (ctx) => new FeatureFlagService(ctx.resolve(FEATURE_FLAG_REPOSITORY)));
 
   container = c;
   return c;
