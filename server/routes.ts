@@ -189,8 +189,6 @@ import {
   updateInvoiceSchema,
   createSafetyIncidentSchema,
   updateSafetyIncidentSchema,
-  createInsuranceClaimSchema,
-  updateInsuranceClaimSchema,
   createEnvironmentalRecordSchema,
   updateEnvironmentalRecordSchema,
   createQualityRecordSchema,
@@ -14063,89 +14061,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Insurance Claims
-  app.post('/api/insurance/claims', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-
-      // Use shared validator with strict mode + protected field stripping
-      const validated = validatePatchBody(req, res, createInsuranceClaimSchema);
-      if (!validated.ok) return;
-
-      const claimData = {
-        garageId,
-        claimNumber: validated.data.claimNumber,
-        jobCardId: validated.data.jobCardId,
-        customerId: validated.data.customerId,
-        vehicleId: validated.data.vehicleId,
-        insuranceCompany: validated.data.insuranceCompany,
-        policyNumber: validated.data.policyNumber,
-        claimType: validated.data.claimType,
-        incidentDate: new Date(validated.data.incidentDate),
-        // The service takes amounts as numbers (it stringifies for the
-        // decimal columns), names the contact adjuster_contact, and stores
-        // free text in notes.
-        claimAmount: Number(validated.data.claimAmount) || 0,
-        deductible: validated.data.deductible !== undefined ? Number(validated.data.deductible) || undefined : undefined,
-        adjusterName: validated.data.adjusterName,
-        adjusterContact: validated.data.adjusterPhone,
-        notes: validated.data.description,
-        documents: validated.data.documents,
-      };
-      const claim = await phase6Service.createInsuranceClaim(claimData);
-      res.status(201).json(claim);
-    } catch (error) {
-      console.error("Error creating insurance claim:", error);
-      res.status(500).json({ message: "Failed to create insurance claim" });
-    }
-  });
-
-  app.get('/api/insurance/claims', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { status } = req.query;
-      const claims = await phase6Service.getInsuranceClaims(garageId, status as string);
-      res.json(claims);
-    } catch (error) {
-      console.error("Error fetching insurance claims:", error);
-      res.status(500).json({ message: "Failed to fetch insurance claims" });
-    }
-  });
-
-  app.patch('/api/insurance/claims/:id/status', isAuthenticated, requireResourceOwnership({ table: 'insurance_claims' }), async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      // Use shared validator with strict mode + protected field stripping
-      const validated = validatePatchBody(req, res, updateInsuranceClaimSchema);
-      if (!validated.ok) return;
-
-      // updateClaimStatus's third parameter is the approved amount, not
-      // free-text notes.
-      const claim = await phase6Service.updateClaimStatus(
-        id,
-        validated.data.status!,
-        validated.data.approvedAmount !== undefined ? Number(validated.data.approvedAmount) : undefined
-      );
-      res.json(claim);
-    } catch (error) {
-      console.error("Error updating claim status:", error);
-      res.status(500).json({ message: "Failed to update claim status" });
-    }
-  });
-
-  app.get('/api/insurance/claims/analytics', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      // Closed date range required; default to the trailing year.
-      const to = new Date();
-      const from = new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
-      const analytics = await phase6Service.getClaimsAnalytics(garageId, from, to);
-      res.json(analytics);
-    } catch (error) {
-      console.error("Error fetching claims analytics:", error);
-      res.status(500).json({ message: "Failed to fetch claims analytics" });
-    }
-  });
+  // Insurance-claims handlers migrated to server/modules/insurance (Phase E).
 
   // ==========================================
   // PHASE 7: ADVANCED HARDWARE ROUTES

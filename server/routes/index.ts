@@ -62,6 +62,7 @@ import apiDocsRoutes from "./api-docs";
 import autoReorderRoutes from './auto-reorder';
 import commandCenterRoutes from "./command-center";
 import crmRoutes from "../modules/crm";
+import insuranceRoutes from "../modules/insurance";
 import customerPortalRoutes from "./customer-portal";
 import docsRoutes from "./docs";
 import exportRoutes from "./export";
@@ -423,6 +424,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", apiDocsRoutes);
   app.use("/api", commandCenterRoutes);
   app.use("/api", crmRoutes);
+  // Insurance claims (create, list, status update, analytics) — extracted from the monolith
+  app.use("/api", insuranceRoutes);
   app.use("/api", customerPortalRoutes);
   app.use("/api", docsRoutes);
   app.use("/api", exportRoutes);

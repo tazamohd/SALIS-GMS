@@ -43,6 +43,8 @@ import type { IPricingHistoryRepository } from '../../modules/procurement/reposi
 import type { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
 import type { ICrmRepository } from '../../modules/crm/repositories/crm.repository';
 import type { CrmService } from '../../modules/crm/services/crm.service';
+import type { IInsuranceRepository } from '../../modules/insurance/repositories/insurance.repository';
+import type { InsuranceService } from '../../modules/insurance/services/insurance.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -89,3 +91,5 @@ export const PRICING_HISTORY_REPOSITORY = token<IPricingHistoryRepository>('Pric
 export const PRICING_HISTORY_SERVICE = token<PricingHistoryService>('PricingHistoryService');
 export const CRM_REPOSITORY = token<ICrmRepository>('CrmRepository');
 export const CRM_SERVICE = token<CrmService>('CrmService');
+export const INSURANCE_REPOSITORY = token<IInsuranceRepository>('InsuranceRepository');
+export const INSURANCE_SERVICE = token<InsuranceService>('InsuranceService');

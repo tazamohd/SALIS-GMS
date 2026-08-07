@@ -48,6 +48,8 @@ import {
   PRICING_HISTORY_SERVICE,
   CRM_REPOSITORY,
   CRM_SERVICE,
+  INSURANCE_REPOSITORY,
+  INSURANCE_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -92,6 +94,8 @@ import { PricingHistoryRepository } from '../../modules/procurement/repositories
 import { PricingHistoryService } from '../../modules/procurement/services/pricing-history.service';
 import { CrmRepository } from '../../modules/crm/repositories/crm.repository';
 import { CrmService } from '../../modules/crm/services/crm.service';
+import { InsuranceRepository } from '../../modules/insurance/repositories/insurance.repository';
+import { InsuranceService } from '../../modules/insurance/services/insurance.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -215,6 +219,9 @@ export function getAppContainer(): Container {
 
   c.register(CRM_REPOSITORY, () => new CrmRepository());
   c.register(CRM_SERVICE, (ctx) => new CrmService(ctx.resolve(CRM_REPOSITORY)));
+
+  c.register(INSURANCE_REPOSITORY, () => new InsuranceRepository());
+  c.register(INSURANCE_SERVICE, (ctx) => new InsuranceService(ctx.resolve(INSURANCE_REPOSITORY)));
 
   container = c;
   return c;
