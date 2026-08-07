@@ -64,6 +64,7 @@ import commandCenterRoutes from "./command-center";
 import crmRoutes from "../modules/crm";
 import insuranceRoutes from "../modules/insurance";
 import marketplaceRoutes from "../modules/marketplace";
+import fleetManagementRoutes from "../modules/fleet-management";
 import customerPortalRoutes from "./customer-portal";
 import docsRoutes from "./docs";
 import exportRoutes from "./export";
@@ -429,6 +430,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", insuranceRoutes);
   // Marketplace public provider discovery (providers, find, reviews) — extracted from the monolith
   app.use("/api", marketplaceRoutes);
+  // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
+  app.use("/api", fleetManagementRoutes);
   app.use("/api", customerPortalRoutes);
   app.use("/api", docsRoutes);
   app.use("/api", exportRoutes);
