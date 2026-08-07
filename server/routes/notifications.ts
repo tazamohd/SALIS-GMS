@@ -25,7 +25,9 @@ router.get('/notifications/unread-count', isAuthenticated, asyncHandler(async (r
 }));
 
 router.post('/notifications/:id/read', isAuthenticated, asyncHandler(async (req, res) => {
-  await markAsRead(req.params.id);
+  const userId = (req as any).user.id;
+  const ok = await markAsRead(req.params.id, userId);
+  if (!ok) { res.status(404).json({ message: 'Notification not found' }); return; }
   res.json({ success: true });
 }));
 
@@ -36,7 +38,9 @@ router.post('/notifications/read-all', isAuthenticated, asyncHandler(async (req,
 }));
 
 router.delete('/notifications/:id', isAuthenticated, asyncHandler(async (req, res) => {
-  await deleteNotification(req.params.id);
+  const userId = (req as any).user.id;
+  const ok = await deleteNotification(req.params.id, userId);
+  if (!ok) { res.status(404).json({ message: 'Notification not found' }); return; }
   res.json({ success: true });
 }));
 
