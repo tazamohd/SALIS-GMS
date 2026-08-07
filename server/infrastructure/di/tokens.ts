@@ -47,6 +47,8 @@ import type { IInsuranceRepository } from '../../modules/insurance/repositories/
 import type { InsuranceService } from '../../modules/insurance/services/insurance.service';
 import type { IFleetRepository } from '../../modules/fleet/repositories/fleet.repository';
 import type { FleetService } from '../../modules/fleet/services/fleet.service';
+import type { IMarketplaceRepository } from '../../modules/marketplace/repositories/marketplace.repository';
+import type { MarketplaceService } from '../../modules/marketplace/services/marketplace.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -97,3 +99,5 @@ export const INSURANCE_REPOSITORY = token<IInsuranceRepository>('InsuranceReposi
 export const INSURANCE_SERVICE = token<InsuranceService>('InsuranceService');
 export const FLEET_REPOSITORY = token<IFleetRepository>('FleetRepository');
 export const FLEET_SERVICE = token<FleetService>('FleetService');
+export const MARKETPLACE_REPOSITORY = token<IMarketplaceRepository>('MarketplaceRepository');
+export const MARKETPLACE_SERVICE = token<MarketplaceService>('MarketplaceService');
