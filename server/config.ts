@@ -14,6 +14,58 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
+/**
+ * Assess security-sensitive configuration (production hardening). Pure and
+ * exported so it can be unit-tested without triggering process.exit. `errors`
+ * are fatal in production; `warnings` are always advisory.
+ */
+const WEAK_SECRETS = new Set([
+  'changeme', 'change-me', 'secret', 'password', 'dev', 'development', 'test',
+  'default', 'your-secret-key', 'your-session-secret', 'session-secret', 'supersecret',
+]);
+
+export function assessSecurityConfig(
+  env: NodeJS.ProcessEnv = process.env,
+): { errors: string[]; warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const isProd = env.NODE_ENV === 'production';
+  const secret = env.SESSION_SECRET ?? '';
+
+  if (secret && secret.length < 32) {
+    (isProd ? errors : warnings).push(
+      `SESSION_SECRET is ${secret.length} chars; use at least 32 random characters.`,
+    );
+  }
+  if (secret && WEAK_SECRETS.has(secret.toLowerCase())) {
+    (isProd ? errors : warnings).push(
+      'SESSION_SECRET is a well-known weak/placeholder value; generate a random secret.',
+    );
+  }
+
+  const truthy = (v: string | undefined) => ['1', 'true', 'yes', 'on'].includes(String(v ?? '').toLowerCase());
+  if (isProd && truthy(env.AUTH_BYPASS)) {
+    errors.push('AUTH_BYPASS must not be enabled in production \u2014 it disables authentication.');
+  }
+  if (isProd && String(env.SESSION_COOKIE_SECURE ?? '').toLowerCase() !== 'true') {
+    warnings.push('SESSION_COOKIE_SECURE is not "true"; session cookies should be Secure (HTTPS-only) in production.');
+  }
+  return { errors, warnings };
+}
+
+// Enforce at boot: warn always (quiet in tests), and fail fast in production
+// when a hard error is present so a misconfigured deploy never comes up.
+{
+  const { errors, warnings } = assessSecurityConfig();
+  if (process.env.NODE_ENV !== 'test') {
+    for (const w of warnings) console.warn(`\u26A0\uFE0F  Security: ${w}`);
+  }
+  if (errors.length > 0) {
+    for (const e of errors) console.error(`\u274C Security: ${e}`);
+    if (process.env.NODE_ENV === 'production') process.exit(1);
+  }
+}
+
 // Fallback: allow AI_INTEGRATIONS_OPENAI_API_KEY as alias
 if (!process.env.OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_API_KEY) {
   process.env.OPENAI_API_KEY = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;

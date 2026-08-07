@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
@@ -15,7 +16,7 @@ router.get('/vehicle-tracking', isAuthenticated, async (req: any, res) => {
   }
 });
 
-router.get('/vehicle-tracking/:vehicleId', isAuthenticated, async (req, res) => {
+router.get('/vehicle-tracking/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req, res) => {
   try {
     const data = await storage.getVehicleTrackingByVehicleId(req.params.vehicleId);
     if (!data) {
@@ -28,7 +29,7 @@ router.get('/vehicle-tracking/:vehicleId', isAuthenticated, async (req, res) => 
   }
 });
 
-router.get('/vehicle-tracking/:vehicleId/history', isAuthenticated, async (req, res) => {
+router.get('/vehicle-tracking/:vehicleId/history', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 100;
     const history = await storage.getVehicleTrackingHistory(req.params.vehicleId, limit);

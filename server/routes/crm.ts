@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { isAuthenticated } from '../auth';
+import { validate } from '../middleware/validate';
+import { awardLoyaltyPointsSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -265,7 +267,7 @@ router.get('/crm/loyalty/summary', isAuthenticated, async (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/crm/loyalty/points — Award loyalty points to a customer
 // ---------------------------------------------------------------------------
-router.post('/crm/loyalty/points', isAuthenticated, async (req, res) => {
+router.post('/crm/loyalty/points', isAuthenticated, validate(awardLoyaltyPointsSchema), async (req, res) => {
   try {
     const { customerId, points, reason } = req.body;
 

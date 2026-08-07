@@ -1227,7 +1227,12 @@ export const invoices = pgTable("invoices", {
   id: uuid("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(),
+  // Per-tenant uniqueness (audit data-integrity): invoice_number was GLOBALLY
+  // unique, which is wrong for a multi-tenant system — two garages could not
+  // both issue "INV-001". The composite unique index below scopes uniqueness to
+  // the garage. Loosening a global unique to per-garage never breaks existing
+  // (globally-unique) rows.
+  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull(),
   garageId: uuid("garage_id")
     .notNull()
     .references(() => garages.id),
@@ -1273,7 +1278,13 @@ export const invoices = pgTable("invoices", {
   zatcaClearedAt: timestamp("zatca_cleared_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  // Invoice numbers are unique WITHIN a garage, not globally (see column note).
+  invoiceNumberPerGarage: uniqueIndex("invoices_garage_invoice_number_unique").on(
+    table.garageId,
+    table.invoiceNumber,
+  ),
+}));
 
 export const invoiceItems = pgTable("invoice_items", {
   id: uuid("id")

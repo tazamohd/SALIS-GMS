@@ -28,7 +28,7 @@ describe('Support ticket read route extraction (Wave J)', () => {
     expect(supportTicketRoutesSource).toMatch(/router\.get\(['"]\/support\/tickets['"],\s*isAuthenticated/);
     // B11: no client-supplied garageId fallback — always the session garage.
     expect(supportTicketRoutesSource).not.toMatch(/req\.user\?\.garageId \|\| garageId/);
-    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTickets\(req\.user\.garageId,\s*\{/);
+    expect(supportTicketRoutesSource).toMatch(/storage\.getSupportTickets\(req\.user\.garageId,/);
     expect(supportTicketRoutesSource).toMatch(/assignedTo: assignedTo as string/);
   });
 

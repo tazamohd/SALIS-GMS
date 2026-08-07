@@ -1,21 +1,26 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { parsePagination, sendPaginated } from './pagination';
 
 const router = Router();
 
 router.get('/support/tickets', isAuthenticated, async (req: any, res) => {
   try {
     const { status, priority, assignedTo, category } = req.query;
-
-    const tickets = await storage.getSupportTickets(req.user.garageId, {
+    const filters = {
       status: status as string,
       priority: priority as string,
       assignedTo: assignedTo as string,
       category: category as string,
-    });
-
-    res.json(tickets);
+    };
+    const pg = parsePagination(req);
+    const opts = pg.explicit ? { limit: pg.limit, offset: pg.offset } : undefined;
+    const [data, total] = await Promise.all([
+      storage.getSupportTickets(req.user.garageId, filters, opts),
+      pg.explicit ? storage.countSupportTickets(req.user.garageId, filters) : Promise.resolve(0),
+    ]);
+    sendPaginated(res, data, total, pg, pg.explicit);
   } catch (error) {
     console.error('Error fetching support tickets:', error);
     res.status(500).json({ message: 'Failed to fetch support tickets' });

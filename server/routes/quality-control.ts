@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { requireManagerOrAbove } from '../middleware/requireRole';
 import { storage } from '../storage';
+import { validate } from '../middleware/validate';
+import { createQcInspectionSchema } from '../schemas/validation';
 
 const router = Router();
 
@@ -138,7 +140,7 @@ router.get('/inspections', isAuthenticated, async (req, res) => {
 });
 
 // POST /api/qc/inspections — Create new inspection
-router.post('/inspections', isAuthenticated, async (req, res) => {
+router.post('/inspections', isAuthenticated, validate(createQcInspectionSchema), async (req, res) => {
   const { jobCardRef, vehicleInfo, serviceType, inspector, inspectorId, checklistId, notes } = req.body;
 
   if (!jobCardRef || !vehicleInfo || !serviceType) {
