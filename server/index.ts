@@ -15,6 +15,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes/index";
+import { buildContentSecurityPolicy } from "./csp";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeChatWebSocket } from "./websocket";
 
@@ -24,10 +25,11 @@ const app = express();
 // and express-rate-limit reads the real client IP (not the proxy's).
 app.set("trust proxy", 1);
 
-// Security headers (HSTS, X-Frame-Options, noSniff, etc.). CSP is disabled here
-// because the SPA/Vite manage their own asset origins; enabling helmet's default
-// CSP would break the client. HSTS only takes effect over HTTPS.
-app.use(helmet({ contentSecurityPolicy: false }));
+// Security headers (HSTS, X-Frame-Options, noSniff, …) + a tuned CSP (see
+// server/csp.ts — production locks script-src to same-origin bundles, dev
+// relaxes for Vite HMR; CSP_EXTRA_* env vars extend it for payment gateways;
+// CSP_REPORT_ONLY=true observes without blocking). HSTS only applies over HTTPS.
+app.use(helmet({ contentSecurityPolicy: buildContentSecurityPolicy() }));
 
 // Brute-force / credential-stuffing protection. Strict limiter on the session-
 // creating auth endpoints; generous global limiter as a backstop. Webhooks and

@@ -31,6 +31,21 @@ required variable is missing, and (in production) if a hard security check fails
 | `PORT` | defaults to `5000` |
 | `APP_URL` | public base URL for generated links |
 
+**Content-Security-Policy** (enforced by default; see `server/csp.ts`)
+
+| Var | Purpose |
+|---|---|
+| `CSP_REPORT_ONLY` | `true` = emit `Content-Security-Policy-Report-Only` (observe, don't block) for a staged rollout; default enforces |
+| `CSP_EXTRA_FRAME` | extra `frame-src` origins (e.g. a payment gateway's checkout iframe: `https://checkout.stripe.com`) |
+| `CSP_EXTRA_CONNECT` | extra `connect-src` origins (e.g. `https://api.stripe.com`, a Sentry ingest host) |
+| `CSP_EXTRA_IMG` | extra `img-src` origins (e.g. a CDN) |
+
+> The base policy locks `script-src` to same-origin, sets `frame-ancestors 'none'` /
+> `object-src 'none'`, and allows the SPA's real origins (inline styles, Google Fonts,
+> same-origin WebSocket). **When you enable a payment gateway or any embedded third
+> party, add its origins via the `CSP_EXTRA_*` vars** — otherwise its iframe/API calls
+> are blocked. Validate with `CSP_REPORT_ONLY=true` first if unsure.
+
 **Optional integrations** (features degrade to mock/503 if unset; surfaced at boot):
 `STRIPE_SECRET_KEY`, `OPENAI_API_KEY`, `TWILIO_*`, `GETRESPONSE_API_KEY`, `TECDOC_*`,
 `ZATCA_*`, and payment gateways `MOYASAR_SECRET_KEY` / `HYPERPAY_*` / `TAP_SECRET_KEY` /
