@@ -54,6 +54,8 @@ import {
   FLEET_SERVICE,
   MARKETPLACE_REPOSITORY,
   MARKETPLACE_SERVICE,
+  FLEET_MANAGEMENT_REPOSITORY,
+  FLEET_MANAGEMENT_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -104,6 +106,8 @@ import { FleetRepository } from '../../modules/fleet/repositories/fleet.reposito
 import { FleetService } from '../../modules/fleet/services/fleet.service';
 import { MarketplaceRepository } from '../../modules/marketplace/repositories/marketplace.repository';
 import { MarketplaceService } from '../../modules/marketplace/services/marketplace.service';
+import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
+import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -238,6 +242,12 @@ export function getAppContainer(): Container {
   c.register(
     MARKETPLACE_SERVICE,
     (ctx) => new MarketplaceService(ctx.resolve(MARKETPLACE_REPOSITORY)),
+  );
+
+  c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
+  c.register(
+    FLEET_MANAGEMENT_SERVICE,
+    (ctx) => new FleetManagementService(ctx.resolve(FLEET_MANAGEMENT_REPOSITORY)),
   );
 
   container = c;
