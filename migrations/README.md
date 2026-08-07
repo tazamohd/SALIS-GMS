@@ -4,6 +4,25 @@ This project uses **Drizzle** for schema and migrations. The schema of record is
 [`shared/schema.ts`](../shared/schema.ts); the applied history is the SQL files
 in this folder plus `meta/_journal.json`.
 
+## `0001_performance_indexes.sql` — a note
+
+`0001` adds btree indexes to the tenant (`garage_id`) and foreign-key columns
+that had none (audit DB-C1/DB-C2). It is a **raw-SQL, index-only** migration:
+the indexes are not modelled in `shared/schema.ts`, so its `meta/0001_snapshot.json`
+is intentionally identical to `0000` (drift check stays green — `drizzle-kit
+generate` sees no schema change). Because indexes live only in the migration and
+not in the Drizzle model, **do not use `drizzle-kit push`** against a real
+database (push syncs the DB to `schema.ts` and would drop them) — always apply
+via `npm run db:migrate`, which this project already uses in CI/containers.
+
+The statements use plain `CREATE INDEX IF NOT EXISTS` (the migrator wraps each
+file in a transaction, so `CONCURRENTLY` — which cannot run in a transaction — is
+not used here). On a large production database, building ~840 indexes takes a
+brief write lock per table; if that is unacceptable, apply the same statements
+manually with `CREATE INDEX CONCURRENTLY` during a maintenance window, then
+`server/scripts/baseline-stamp.ts`-style record `0001` as applied so the
+migrator treats it as a no-op.
+
 ## Layout
 
 ```
