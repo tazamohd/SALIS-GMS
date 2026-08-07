@@ -57,6 +57,8 @@ import type { IHrRepository } from '../../modules/hr/repositories/hr.repository'
 import type { HrService } from '../../modules/hr/services/hr.service';
 import type { IReportsRepository } from '../../modules/reports/repositories/reports.repository';
 import type { ReportsService } from '../../modules/reports/services/reports.service';
+import type { IAnalyticsRepository } from '../../modules/analytics/repositories/analytics.repository';
+import type { AnalyticsService } from '../../modules/analytics/services/analytics.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -117,3 +119,5 @@ export const HR_REPOSITORY = token<IHrRepository>('HrRepository');
 export const HR_SERVICE = token<HrService>('HrService');
 export const REPORTS_REPOSITORY = token<IReportsRepository>('ReportsRepository');
 export const REPORTS_SERVICE = token<ReportsService>('ReportsService');
+export const ANALYTICS_REPOSITORY = token<IAnalyticsRepository>('AnalyticsRepository');
+export const ANALYTICS_SERVICE = token<AnalyticsService>('AnalyticsService');
