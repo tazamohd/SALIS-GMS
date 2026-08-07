@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { requireManagerOrAbove } from '../middleware/requireRole';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 import { parsePagination, sendPaginated } from './pagination';
 
@@ -57,7 +58,7 @@ router.get('/roles', isAuthenticated, requireManagerOrAbove, async (_req, res) =
   }
 });
 
-router.get('/user/:id/roles', isAuthenticated, async (req, res) => {
+router.get('/user/:id/roles', isAuthenticated, requireResourceOwnership({ table: 'users' }), async (req, res) => {
   try {
     const { id } = req.params;
     const userRoles = await storage.getUserRoles(id);
