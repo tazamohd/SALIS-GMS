@@ -62,6 +62,8 @@ import {
   HR_SERVICE,
   REPORTS_REPOSITORY,
   REPORTS_SERVICE,
+  ANALYTICS_REPOSITORY,
+  ANALYTICS_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -120,6 +122,8 @@ import { HrRepository } from '../../modules/hr/repositories/hr.repository';
 import { HrService } from '../../modules/hr/services/hr.service';
 import { ReportsRepository } from '../../modules/reports/repositories/reports.repository';
 import { ReportsService } from '../../modules/reports/services/reports.service';
+import { AnalyticsRepository } from '../../modules/analytics/repositories/analytics.repository';
+import { AnalyticsService } from '../../modules/analytics/services/analytics.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -273,6 +277,9 @@ export function getAppContainer(): Container {
 
   c.register(REPORTS_REPOSITORY, () => new ReportsRepository());
   c.register(REPORTS_SERVICE, (ctx) => new ReportsService(ctx.resolve(REPORTS_REPOSITORY)));
+
+  c.register(ANALYTICS_REPOSITORY, () => new AnalyticsRepository());
+  c.register(ANALYTICS_SERVICE, (ctx) => new AnalyticsService(ctx.resolve(ANALYTICS_REPOSITORY)));
 
   container = c;
   return c;

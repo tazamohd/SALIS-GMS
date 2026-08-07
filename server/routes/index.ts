@@ -95,7 +95,7 @@ import trainingLmsRoutes from "./training-lms.routes";
 import uploadRoutes from "./uploads";
 import { aiPredictionsRoutes } from "./ai-predictions";
 import { aiRepairGuideRoutes } from "./ai-repair-guide";
-import { analyticsPerformanceRoutes } from "./analytics-performance";
+import analyticsRoutes from "../modules/analytics";
 import { forecastingDemandRoutes } from "./forecasting-demand";
 import { mobileDevicesRoutes } from "./mobile-devices";
 import { obdDiagnosticsRoutes } from "./obd-diagnostics";
@@ -389,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // specify them as live, auth-gated routes.
   app.use("/api", aiPredictionsRoutes);
   app.use("/api", aiRepairGuideRoutes);
-  app.use("/api", analyticsPerformanceRoutes);
+  app.use("/api", analyticsRoutes);
   app.use("/api", forecastingDemandRoutes);
   app.use("/api", mobileDevicesRoutes);
   app.use("/api", obdDiagnosticsRoutes);
