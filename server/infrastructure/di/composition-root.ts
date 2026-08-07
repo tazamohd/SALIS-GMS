@@ -8,11 +8,19 @@
  */
 
 import { Container } from './container';
-import { EVENT_BUS, CUSTOMER_REPOSITORY, CUSTOMER_SERVICE } from './tokens';
+import {
+  EVENT_BUS,
+  CUSTOMER_REPOSITORY,
+  CUSTOMER_SERVICE,
+  VEHICLE_REPOSITORY,
+  VEHICLE_SERVICE,
+} from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
 import { CustomerService } from '../../modules/customers/services/customer.service';
 import { registerCustomerEventHandlers } from '../../modules/customers/events/customer.handlers';
+import { VehicleRepository } from '../../modules/vehicles/repositories/vehicle.repository';
+import { VehicleService } from '../../modules/vehicles/services/vehicle.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -52,6 +60,9 @@ export function getAppContainer(): Container {
     CUSTOMER_SERVICE,
     (ctx) => new CustomerService(ctx.resolve(CUSTOMER_REPOSITORY), ctx.resolve(EVENT_BUS)),
   );
+
+  c.register(VEHICLE_REPOSITORY, () => new VehicleRepository());
+  c.register(VEHICLE_SERVICE, (ctx) => new VehicleService(ctx.resolve(VEHICLE_REPOSITORY)));
 
   container = c;
   return c;

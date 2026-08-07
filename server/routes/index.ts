@@ -27,7 +27,6 @@ import serviceTemplateRoutes from "./service-templates";
 import sparePartRoutes from "./spare-parts";
 import appointmentRoutes from "./appointments";
 import toolRoutes from "./tools";
-import vehicleMaintenanceRoutes from "./vehicle-maintenance";
 import supplierRoutes from "./suppliers";
 import customerRoutes from "../modules/customers";
 import serviceChatRoutes from "./service-chat";
@@ -50,7 +49,7 @@ import serviceReminderRoutes from "./service-reminders";
 import serviceReminderTemplateRoutes from "./service-reminder-templates";
 import pushSubscriptionRoutes from "./push-subscriptions";
 import pushNotificationRoutes from "./push-notifications";
-import vehicleRoutes from "./vehicles";
+import vehicleRoutes from "../modules/vehicles";
 import purchaseOrderRoutes from "./purchase-orders";
 import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
@@ -232,10 +231,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Tool read routes
   app.use("/api", toolRoutes);
   console.log("Tool Routes Loaded");
-
-  // Vehicle maintenance read routes
-  app.use("/api", vehicleMaintenanceRoutes);
-  console.log("Vehicle Maintenance Routes Loaded");
 
   // Supplier read routes
   app.use("/api", supplierRoutes);
