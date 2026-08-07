@@ -53,13 +53,20 @@ const CSRF_EXEMPT_PATTERNS: RegExp[] = [
 
 /**
  * Whether mutating requests must carry X-CSRF-Token. Read at REQUEST time (not
- * mount time) so tests can toggle it: explicitly via CSRF_ENFORCE=true|false,
- * defaulting to ON in production and OFF in dev/test.
+ * mount time) so tests can toggle it via CSRF_ENFORCE=true|false.
+ *
+ * Fail-safe ON (audit H-3): the previous default enforced ONLY when
+ * NODE_ENV === "production", so any other deployment (staging, "prod"-typo,
+ * unset NODE_ENV) silently ran with CSRF disabled. Default to enforcing
+ * everywhere and carve out only the test runner, whose supertest agents don't
+ * perform the /api/csrf-token round-trip. The browser client already fetches
+ * and sends the token, so real dev/prod traffic is unaffected. Set
+ * CSRF_ENFORCE=false for an explicit local opt-out.
  */
 export function csrfEnforcementEnabled(): boolean {
   const v = process.env.CSRF_ENFORCE;
   if (v !== undefined) return v === "true";
-  return process.env.NODE_ENV === "production";
+  return process.env.NODE_ENV !== "test";
 }
 
 /** Request-time gate around validateCsrfToken (mount this). */

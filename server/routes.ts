@@ -670,11 +670,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const hashedPassword = await hashPassword(password);
+      // Public self-registration must never mint a staff account (audit H-1).
+      // Pin a non-privileged identity; staff are onboarded via garage
+      // applications / admin, not this endpoint.
       const user = await storage.createUser({
         email,
         password: hashedPassword,
         fullName,
         phone,
+        role: 'CUSTOMER',
+        userType: 'customer',
         isActive: true,
       });
 
