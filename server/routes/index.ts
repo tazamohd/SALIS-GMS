@@ -6,6 +6,7 @@ import fs from "fs";
 import { setupAuth } from "../auth";
 import { loadUserPermissions } from "../rbac-middleware";
 import { requireAuthByDefault } from "../middleware/defaultAuth";
+import { requireStaffByDefault } from "../middleware/requireStaff";
 import { enforceGarageScopeOnQuery, enforceTenantOnBody } from "../middleware/garageScope";
 import { generateCsrfToken, csrfTokenRoute, enforceCsrf } from "../middleware/csrf";
 import { authRoutes } from "./auth";
@@ -181,9 +182,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/csrf-token", csrfTokenRoute);
   app.use(enforceCsrf);
   app.use(requireAuthByDefault);
+  // C-1/C-2: after authentication, deny the staff API surface to customer
+  // sessions (they may only reach the customer-facing namespaces). Runs before
+  // tenant scoping because a customer must never reach a garage-scoped handler.
+  app.use(requireStaffByDefault);
   app.use(enforceGarageScopeOnQuery);
   app.use(enforceTenantOnBody);
-  console.log("✅ Security floor mounted (default-deny auth + tenant scope + CSRF)");
+  console.log("✅ Security floor mounted (default-deny auth + staff lockout + tenant scope + CSRF)");
 
   // Wire RBAC: load user permissions on every authenticated request
   // This populates req.userPermissions for use by requirePermission() in handlers
