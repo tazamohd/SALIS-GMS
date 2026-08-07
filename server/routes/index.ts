@@ -65,6 +65,7 @@ import crmRoutes from "../modules/crm";
 import insuranceRoutes from "../modules/insurance";
 import marketplaceRoutes from "../modules/marketplace";
 import fleetManagementRoutes from "../modules/fleet-management";
+import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
 import docsRoutes from "./docs";
 import exportRoutes from "./export";
@@ -432,6 +433,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", marketplaceRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
+  // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith
+  app.use("/api", fleetTrackingRoutes);
   app.use("/api", customerPortalRoutes);
   app.use("/api", docsRoutes);
   app.use("/api", exportRoutes);

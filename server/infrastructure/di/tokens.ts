@@ -51,6 +51,8 @@ import type { IMarketplaceRepository } from '../../modules/marketplace/repositor
 import type { MarketplaceService } from '../../modules/marketplace/services/marketplace.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
+import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
+import type { FleetTrackingService } from '../../modules/fleet-tracking/services/fleet-tracking.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -105,3 +107,5 @@ export const MARKETPLACE_REPOSITORY = token<IMarketplaceRepository>('Marketplace
 export const MARKETPLACE_SERVICE = token<MarketplaceService>('MarketplaceService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
+export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
+export const FLEET_TRACKING_SERVICE = token<FleetTrackingService>('FleetTrackingService');

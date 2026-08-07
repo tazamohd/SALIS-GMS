@@ -33,8 +33,12 @@ describe('Fleet-management extraction (Phase E module)', () => {
     expect(legacyRoutesSource).not.toMatch(/app\.get\(['"]\/api\/fleet\/vehicles\/group\/:fleetGroupId['"]/);
   });
 
-  it('leaves fleet-tracking vehicle-location reads in the monolith', () => {
-    expect(legacyRoutesSource).toMatch(/\/api\/fleet\/vehicles\/:vehicleId\/locations/);
+  it('does not own the fleet-tracking vehicle-location reads (a separate module)', () => {
+    // Fleet-tracking (locations/geofences/routes) is its own module; the
+    // fleet-management module must not register the telemetry reads.
+    const moduleIndexSource = read('server/modules/fleet-management/index.ts');
+    expect(moduleIndexSource).not.toMatch(/\/fleet\/vehicles\/:vehicleId\/locations/);
+    expect(legacyRoutesSource).not.toMatch(/app\.get\(['"]\/api\/fleet\/vehicles\/:vehicleId\/locations['"]/);
   });
 
   it('registers group-scoped list routes before the /:id routes', () => {
