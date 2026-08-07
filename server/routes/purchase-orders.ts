@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { parsePagination, sendPaginated } from './pagination';
 
 const router = Router();
 
@@ -10,8 +11,13 @@ const router = Router();
 router.get('/purchase-orders', isAuthenticated, async (req: any, res) => {
   try {
     const { status } = req.query;
-    const orders = await storage.getPurchaseOrders(req.user.garageId, status as string);
-    res.json(orders);
+    const pg = parsePagination(req);
+    const opts = pg.explicit ? { limit: pg.limit, offset: pg.offset } : undefined;
+    const [data, total] = await Promise.all([
+      storage.getPurchaseOrders(req.user.garageId, status as string, opts),
+      pg.explicit ? storage.countPurchaseOrders(req.user.garageId, status as string) : Promise.resolve(0),
+    ]);
+    sendPaginated(res, data, total, pg, pg.explicit);
   } catch (error) {
     console.error('Error fetching purchase orders:', error);
     res.status(500).json({ message: 'Failed to fetch purchase orders' });
@@ -49,12 +55,13 @@ router.get('/purchase-orders/:id/items', isAuthenticated, async (req: any, res) 
 router.get('/purchase-tasks', isAuthenticated, async (req: any, res) => {
   try {
     const { status, priority } = req.query;
-    const tasks = await storage.getPurchaseTasks(
-      req.user.garageId,
-      status as string,
-      priority as string,
-    );
-    res.json(tasks);
+    const pg = parsePagination(req);
+    const opts = pg.explicit ? { limit: pg.limit, offset: pg.offset } : undefined;
+    const [data, total] = await Promise.all([
+      storage.getPurchaseTasks(req.user.garageId, status as string, priority as string, opts),
+      pg.explicit ? storage.countPurchaseTasks(req.user.garageId, status as string, priority as string) : Promise.resolve(0),
+    ]);
+    sendPaginated(res, data, total, pg, pg.explicit);
   } catch (error) {
     console.error('Error fetching purchase tasks:', error);
     res.status(500).json({ message: 'Failed to fetch purchase tasks' });
