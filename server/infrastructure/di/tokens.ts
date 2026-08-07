@@ -55,6 +55,8 @@ import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repo
 import type { FleetTrackingService } from '../../modules/fleet-tracking/services/fleet-tracking.service';
 import type { IHrRepository } from '../../modules/hr/repositories/hr.repository';
 import type { HrService } from '../../modules/hr/services/hr.service';
+import type { IReportsRepository } from '../../modules/reports/repositories/reports.repository';
+import type { ReportsService } from '../../modules/reports/services/reports.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -113,3 +115,5 @@ export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetT
 export const FLEET_TRACKING_SERVICE = token<FleetTrackingService>('FleetTrackingService');
 export const HR_REPOSITORY = token<IHrRepository>('HrRepository');
 export const HR_SERVICE = token<HrService>('HrService');
+export const REPORTS_REPOSITORY = token<IReportsRepository>('ReportsRepository');
+export const REPORTS_SERVICE = token<ReportsService>('ReportsService');
