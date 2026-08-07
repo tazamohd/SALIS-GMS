@@ -45,6 +45,8 @@ import type { ICrmRepository } from '../../modules/crm/repositories/crm.reposito
 import type { CrmService } from '../../modules/crm/services/crm.service';
 import type { IInsuranceRepository } from '../../modules/insurance/repositories/insurance.repository';
 import type { InsuranceService } from '../../modules/insurance/services/insurance.service';
+import type { IFleetRepository } from '../../modules/fleet/repositories/fleet.repository';
+import type { FleetService } from '../../modules/fleet/services/fleet.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -93,3 +95,5 @@ export const CRM_REPOSITORY = token<ICrmRepository>('CrmRepository');
 export const CRM_SERVICE = token<CrmService>('CrmService');
 export const INSURANCE_REPOSITORY = token<IInsuranceRepository>('InsuranceRepository');
 export const INSURANCE_SERVICE = token<InsuranceService>('InsuranceService');
+export const FLEET_REPOSITORY = token<IFleetRepository>('FleetRepository');
+export const FLEET_SERVICE = token<FleetService>('FleetService');

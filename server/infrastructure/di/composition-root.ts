@@ -50,6 +50,8 @@ import {
   CRM_SERVICE,
   INSURANCE_REPOSITORY,
   INSURANCE_SERVICE,
+  FLEET_REPOSITORY,
+  FLEET_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -96,6 +98,8 @@ import { CrmRepository } from '../../modules/crm/repositories/crm.repository';
 import { CrmService } from '../../modules/crm/services/crm.service';
 import { InsuranceRepository } from '../../modules/insurance/repositories/insurance.repository';
 import { InsuranceService } from '../../modules/insurance/services/insurance.service';
+import { FleetRepository } from '../../modules/fleet/repositories/fleet.repository';
+import { FleetService } from '../../modules/fleet/services/fleet.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -222,6 +226,9 @@ export function getAppContainer(): Container {
 
   c.register(INSURANCE_REPOSITORY, () => new InsuranceRepository());
   c.register(INSURANCE_SERVICE, (ctx) => new InsuranceService(ctx.resolve(INSURANCE_REPOSITORY)));
+
+  c.register(FLEET_REPOSITORY, () => new FleetRepository());
+  c.register(FLEET_SERVICE, (ctx) => new FleetService(ctx.resolve(FLEET_REPOSITORY)));
 
   container = c;
   return c;
