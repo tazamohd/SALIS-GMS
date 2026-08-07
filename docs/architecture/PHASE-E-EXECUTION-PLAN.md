@@ -81,7 +81,7 @@ retired `server/routes/customers.ts`.
 For each domain: **Extract → Compile → Test → Verify parity → Commit.**
 
 1. customers ✅ (reference)
-2. vehicles
+2. vehicles ✅ (list + `/vehicles/:id/*` maintenance reads; `requireResourceOwnership` preserved)
 3. garage / appointments
 4. jobcards → estimates → invoices → payments (the write-heavy, event-rich core;
    this is where `InvoiceCreated → InventoryReserved → StockUpdated →
