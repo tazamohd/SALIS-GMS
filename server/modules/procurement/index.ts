@@ -51,13 +51,52 @@ export function createProcurementModule(deps: ProcurementModuleDeps = {}): Route
   );
   const router = Router();
 
-  // Purchase orders + tasks.
+  // Purchase orders + tasks (reads).
   router.get('/purchase-orders', isAuthenticated, asyncHandler(purchase.listOrders));
   router.get('/purchase-orders/:id', isAuthenticated, asyncHandler(purchase.getOrder));
   router.get('/purchase-orders/:id/items', isAuthenticated, asyncHandler(purchase.orderItems));
   router.get('/purchase-tasks', isAuthenticated, asyncHandler(purchase.listTasks));
   router.get('/purchase-tasks/:id', isAuthenticated, asyncHandler(purchase.getTask));
   router.get('/purchase-tasks/:id/parts', isAuthenticated, asyncHandler(purchase.taskParts));
+
+  // Purchase orders + tasks (writes).
+  router.post('/purchase-orders', isAuthenticated, asyncHandler(purchase.createOrder));
+  router.post('/purchase-orders/with-items', isAuthenticated, asyncHandler(purchase.createOrderWithItems));
+  router.patch(
+    '/purchase-orders/:id',
+    isAuthenticated,
+    requireResourceOwnership({ table: 'purchase_orders' }),
+    asyncHandler(purchase.updateOrder),
+  );
+  router.delete(
+    '/purchase-orders/:id',
+    isAuthenticated,
+    requireResourceOwnership({ table: 'purchase_orders' }),
+    asyncHandler(purchase.deleteOrder),
+  );
+  router.post('/purchase-order-items', isAuthenticated, asyncHandler(purchase.createOrderItem));
+  router.delete(
+    '/purchase-order-items/:id',
+    isAuthenticated,
+    requireResourceOwnership({
+      table: 'purchase_order_items',
+      parent: { table: 'purchase_orders', fk: 'purchase_order_id' },
+    }),
+    asyncHandler(purchase.deleteOrderItem),
+  );
+  router.post('/purchase-tasks', isAuthenticated, asyncHandler(purchase.createTask));
+  router.patch(
+    '/purchase-tasks/:id',
+    isAuthenticated,
+    requireResourceOwnership({ table: 'purchase_tasks' }),
+    asyncHandler(purchase.updateTask),
+  );
+  router.delete(
+    '/purchase-tasks/:id',
+    isAuthenticated,
+    requireResourceOwnership({ table: 'purchase_tasks' }),
+    asyncHandler(purchase.deleteTask),
+  );
 
   // Deliveries.
   router.get('/deliveries', isAuthenticated, asyncHandler(delivery.list));

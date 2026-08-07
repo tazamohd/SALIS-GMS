@@ -47,6 +47,33 @@ describe('PurchaseService', () => {
   it('404s a missing task', async () => {
     await expect(new PurchaseService(repo() as never).getTask('x', 'g1')).rejects.toBeInstanceOf(NotFoundError);
   });
+
+  it('404s an update to a missing order and task with distinct messages', async () => {
+    const s = new PurchaseService(
+      repo({ updateOrder: vi.fn(async () => undefined), updateTask: vi.fn(async () => undefined) }) as never,
+    );
+    await expect(s.updateOrder('x', {}, 'g1')).rejects.toThrow('Purchase order not found');
+    await expect(s.updateTask('x', {}, 'g1')).rejects.toThrow('Purchase task not found');
+  });
+
+  it('creates a task then persists each supplied part against the new task id', async () => {
+    const createTaskPart = vi.fn(async () => ({ id: 'pt1' }));
+    const r = repo({ createTask: vi.fn(async () => ({ id: 't1' })), createTaskPart });
+    const s = new PurchaseService(r as never);
+    const task = await s.createTask({ assignedTo: 'u1' } as never, [{ sparePartId: 'sp1' }, { sparePartId: 'sp2' }]);
+    expect(task).toEqual({ id: 't1' });
+    expect(createTaskPart).toHaveBeenCalledTimes(2);
+    expect(createTaskPart).toHaveBeenCalledWith({ sparePartId: 'sp1', taskId: 't1' });
+  });
+
+  it('creates a task with no parts when parts is absent or not an array', async () => {
+    const createTaskPart = vi.fn();
+    const r = repo({ createTask: vi.fn(async () => ({ id: 't1' })), createTaskPart });
+    const s = new PurchaseService(r as never);
+    await s.createTask({ assignedTo: 'u1' } as never, undefined);
+    await s.createTask({ assignedTo: 'u1' } as never, 'nope');
+    expect(createTaskPart).not.toHaveBeenCalled();
+  });
 });
 
 describe('DeliveryService', () => {

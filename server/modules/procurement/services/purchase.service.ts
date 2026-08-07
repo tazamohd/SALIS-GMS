@@ -62,4 +62,66 @@ export class PurchaseService {
     if (!task) throw new NotFoundError('Task not found', { context: { id } });
     return this.repository.getTaskParts(id);
   }
+
+  // --- Writes ---
+
+  createOrder(data: Parameters<IPurchaseRepository['createOrder']>[0]) {
+    return this.repository.createOrder(data);
+  }
+
+  createOrderWithItems(
+    order: Parameters<IPurchaseRepository['createOrderWithItems']>[0],
+    items: Parameters<IPurchaseRepository['createOrderWithItems']>[1],
+  ) {
+    return this.repository.createOrderWithItems(order, items);
+  }
+
+  async updateOrder(
+    id: string,
+    data: Parameters<IPurchaseRepository['updateOrder']>[1],
+    garageId: string | undefined,
+  ) {
+    const order = await this.repository.updateOrder(id, data, garageId);
+    if (!order) throw new NotFoundError('Purchase order not found', { context: { id } });
+    return order;
+  }
+
+  deleteOrder(id: string, garageId: string | undefined) {
+    return this.repository.deleteOrder(id, garageId);
+  }
+
+  createOrderItem(data: Parameters<IPurchaseRepository['createOrderItem']>[0]) {
+    return this.repository.createOrderItem(data);
+  }
+
+  deleteOrderItem(id: string) {
+    return this.repository.deleteOrderItem(id);
+  }
+
+  async createTask(
+    taskData: Parameters<IPurchaseRepository['createTask']>[0],
+    parts: unknown,
+  ) {
+    const task = await this.repository.createTask(taskData);
+    if (parts && Array.isArray(parts)) {
+      for (const part of parts) {
+        await this.repository.createTaskPart({ ...part, taskId: task.id });
+      }
+    }
+    return task;
+  }
+
+  async updateTask(
+    id: string,
+    data: Parameters<IPurchaseRepository['updateTask']>[1],
+    garageId: string | undefined,
+  ) {
+    const task = await this.repository.updateTask(id, data, garageId);
+    if (!task) throw new NotFoundError('Purchase task not found', { context: { id } });
+    return task;
+  }
+
+  deleteTask(id: string, garageId: string | undefined) {
+    return this.repository.deleteTask(id, garageId);
+  }
 }
