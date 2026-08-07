@@ -3,6 +3,7 @@ import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { isAuthenticated } from '../auth';
 import { validate } from '../middleware/validate';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { technicianClockSchema, technicianJobUpdateSchema, partsRequestSchema } from '../schemas/validation';
 
 const router = Router();
@@ -89,14 +90,14 @@ router.post('/technician/job-update', validate(technicianJobUpdateSchema), async
 });
 
 // POST /api/technician/parts-request - Request parts for a job
-router.post('/technician/parts-request', validate(partsRequestSchema), async (req: any, res) => {
+router.post('/technician/parts-request', validate(partsRequestSchema), asyncHandler(async (req: any, res) => {
   const technicianId = req.user?.id;
   const { jobId, partName, quantity, urgency } = req.body;
   res.json({
     success: true,
     request: { id: `${technicianId}-${jobId}`, jobId, partName, quantity, urgency, status: 'pending', createdAt: new Date().toISOString() }
   });
-});
+}));
 
 // GET /api/technician/stats/:techId - Technician performance stats (own garage only)
 router.get('/technician/stats/:techId', async (req: any, res) => {

@@ -1,14 +1,20 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage';
+import { parsePagination, sendPaginated } from './pagination';
 
 const router = Router();
 
 router.get('/supplier-payments', isAuthenticated, async (req: any, res) => {
   try {
     const { status } = req.query;
-    const payments = await storage.getSupplierPayments(req.user.garageId, status as string);
-    res.json(payments);
+    const pg = parsePagination(req);
+    const opts = pg.explicit ? { limit: pg.limit, offset: pg.offset } : undefined;
+    const [data, total] = await Promise.all([
+      storage.getSupplierPayments(req.user.garageId, status as string, opts),
+      pg.explicit ? storage.countSupplierPayments(req.user.garageId, status as string) : Promise.resolve(0),
+    ]);
+    sendPaginated(res, data, total, pg, pg.explicit);
   } catch (error) {
     console.error('Error fetching supplier payments:', error);
     res.status(500).json({ message: 'Failed to fetch supplier payments' });

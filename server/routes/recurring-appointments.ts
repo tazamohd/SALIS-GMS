@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireResourceOwnership } from '../middleware/resourceOwnership';
 import { storage } from '../storage';
 
 const router = Router();
@@ -15,7 +16,7 @@ router.get('/recurring-appointments/:garageId', isAuthenticated, async (req, res
   }
 });
 
-router.get('/recurring-appointments/detail/:id', isAuthenticated, async (req, res) => {
+router.get('/recurring-appointments/detail/:id', isAuthenticated, requireResourceOwnership({ table: 'recurring_appointments' }), async (req, res) => {
   try {
     const { id } = req.params;
     const appointment = await storage.getRecurringAppointment(id);
