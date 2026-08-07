@@ -57,7 +57,6 @@ import purchaseOrderRoutes from "../modules/procurement";
 import quotationRoutes from "./quotations";
 import supplierPaymentRoutes from "./supplier-payments";
 import schedulingRoutes from "./scheduling";
-import aiInsightsRoutes from "./ai-insights";
 import apiDocsRoutes from "./api-docs";
 import autoReorderRoutes from './auto-reorder';
 import commandCenterRoutes from "./command-center";
@@ -93,8 +92,7 @@ import quickActionsRoutes from "./quick-actions.routes";
 import taxConfigRoutes from "./tax-config.routes";
 import trainingLmsRoutes from "./training-lms.routes";
 import uploadRoutes from "./uploads";
-import { aiPredictionsRoutes } from "./ai-predictions";
-import { aiRepairGuideRoutes } from "./ai-repair-guide";
+import aiRoutes from "../modules/ai";
 import analyticsRoutes from "../modules/analytics";
 import { forecastingDemandRoutes } from "./forecasting-demand";
 import { mobileDevicesRoutes } from "./mobile-devices";
@@ -387,8 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Completed half-real page routes. These routers existed but were never
   // mounted, so their endpoints 404ed; the completed-pages test suites
   // specify them as live, auth-gated routes.
-  app.use("/api", aiPredictionsRoutes);
-  app.use("/api", aiRepairGuideRoutes);
+  app.use("/api", aiRoutes);
   app.use("/api", analyticsRoutes);
   app.use("/api", forecastingDemandRoutes);
   app.use("/api", mobileDevicesRoutes);
@@ -423,7 +420,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // compliance, portals, subscriptions, inventory overview, exports, flags,
   // franchise, command center, AI insights and API docs. Every route carries
   // isAuthenticated (added when these were wired up; most shipped with none).
-  app.use("/api", aiInsightsRoutes);
   app.use("/api", apiDocsRoutes);
   app.use("/api", commandCenterRoutes);
   app.use("/api", crmRoutes);
