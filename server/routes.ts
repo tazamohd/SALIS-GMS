@@ -104,8 +104,6 @@ import {
   insertTowingJobSchema,
   insertStorageFacilitySchema,
   insertVehicleStorageAssignmentSchema,
-  insertTelematicsFeedSchema,
-  insertTelematicsAlertSchema,
   insertArticleCategorySchema,
   insertKnowledgeArticleSchema,
   insertTrainingModuleSchema,
@@ -12415,60 +12413,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ==================== TELEMATICS INTEGRATION ROUTES ====================
-  app.get('/api/telematics/feeds', isAuthenticated, async (req, res) => {
-    try {
-      const feeds = await storage.getTelematicsFeeds(req.query.vehicleId as string, req.query.deviceId as string);
-      res.json({ data: feeds });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/telematics/feeds', isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertTelematicsFeedSchema.parse(req.body);
-      const feed = await storage.createTelematicsFeed(validatedData);
-      res.json({ data: feed });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.get('/api/telematics/alerts', isAuthenticated, async (req, res) => {
-    try {
-      const alerts = await storage.getTelematicsAlerts(req.query.vehicleId as string, req.query.isResolved === 'true');
-      res.json({ data: alerts });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/telematics/alerts', isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertTelematicsAlertSchema.parse(req.body);
-      const alert = await storage.createTelematicsAlert(validatedData);
-      res.json({ data: alert });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.patch('/api/telematics/alerts/:id/resolve', isAuthenticated, requireResourceOwnership({ table: 'telematics_alerts', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
-    try {
-      const alert = await storage.resolveTelematicsAlert(req.params.id, req.user?.id);
-      res.json({ data: alert });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   // ==================== KNOWLEDGE BASE ROUTES ====================
   app.post('/api/knowledge-base/categories', isAuthenticated, async (req: any, res) => {
     try {
@@ -12833,40 +12777,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error acknowledging recommendation:", error);
       res.status(500).json({ message: "Failed to acknowledge recommendation" });
-    }
-  });
-
-  // ========================================
-  // TELEMATICS ROUTES
-  // ========================================
-
-  // Get telematic device for vehicle
-  app.get('/api/telematics/device/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
-    try {
-      const device = await storage.getTelematicsDeviceByVehicle(req.params.vehicleId);
-      if (!device) {
-        return res.status(404).json({ message: "No telematics device found" });
-      }
-      res.json(device);
-    } catch (error: any) {
-      console.error("Error fetching telematics device:", error);
-      res.status(500).json({ message: "Failed to fetch device" });
-    }
-  });
-
-  // Get latest telematics readings
-  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, requireResourceOwnership({ table: 'vehicles', idParam: 'vehicleId' }), async (req: any, res) => {
-    try {
-      const { streamType, hours = 24 } = req.query;
-      const readings = await storage.getTelematicsReadings(
-        req.params.vehicleId,
-        streamType as string,
-        parseInt(hours as string)
-      );
-      res.json(readings);
-    } catch (error: any) {
-      console.error("Error fetching telematics readings:", error);
-      res.status(500).json({ message: "Failed to fetch readings" });
     }
   });
 
