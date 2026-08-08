@@ -13,15 +13,18 @@ import { requirePlan } from '../../middleware/requirePlan';
 import { requireResourceOwnership } from '../../middleware/resourceOwnership';
 import { asyncHandler } from '../../middleware/asyncHandler';
 import { getAppContainer } from '../../infrastructure/di/composition-root';
-import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE } from '../../infrastructure/di/tokens';
+import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE, AI_MAINTENANCE_PREDICTION_SERVICE } from '../../infrastructure/di/tokens';
 import { makeAiController } from './controllers/ai.controller';
 import { makeAiJobEstimationController } from './controllers/ai-job-estimation.controller';
+import { makeAiMaintenancePredictionController } from './controllers/ai-maintenance-prediction.controller';
 import type { AiService } from './services/ai.service';
 import type { AiJobEstimationService } from './services/ai-job-estimation.service';
+import type { AiMaintenancePredictionService } from './services/ai-maintenance-prediction.service';
 
 export interface AiModuleDeps {
   service?: AiService;
   jobEstimationService?: AiJobEstimationService;
+  maintenancePredictionService?: AiMaintenancePredictionService;
 }
 
 export function createAiModule(deps: AiModuleDeps = {}): Router {
@@ -29,6 +32,9 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   const c = makeAiController(deps.service ?? container.resolve(AI_SERVICE));
   const je = makeAiJobEstimationController(
     deps.jobEstimationService ?? container.resolve(AI_JOB_ESTIMATION_SERVICE),
+  );
+  const mp = makeAiMaintenancePredictionController(
+    deps.maintenancePredictionService ?? container.resolve(AI_MAINTENANCE_PREDICTION_SERVICE),
   );
   const router = Router();
 
@@ -49,6 +55,14 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   router.get('/ai/job-estimations', isAuthenticated, asyncHandler(je.list));
   router.get('/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), asyncHandler(je.get));
   router.patch('/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), asyncHandler(je.update));
+
+  // Maintenance predictions (LLM-assisted; per-garage ownership on the :id routes).
+  router.post('/ai/predict-maintenance', isAuthenticated, asyncHandler(mp.predict));
+  router.post('/ai/predictive-diagnostics', isAuthenticated, asyncHandler(mp.diagnose));
+  router.get('/ai/maintenance-predictions', isAuthenticated, asyncHandler(mp.list));
+  router.get('/ai/maintenance-predictions/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), asyncHandler(mp.get));
+  router.post('/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), asyncHandler(mp.acknowledge));
+  router.post('/ai/maintenance-predictions/analyze', isAuthenticated, asyncHandler(mp.analyze));
 
   return router;
 }

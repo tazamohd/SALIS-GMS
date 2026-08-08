@@ -63,4 +63,25 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(jeSvc).not.toMatch(/from '.*\/storage'/);
     expect(jeSvc).not.toMatch(/from '.*\/ai'$/m);
   });
+
+  it('mounts the six maintenance-prediction routes and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/predict-maintenance['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/predictive-diagnostics['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/maintenance-predictions['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/maintenance-predictions\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/maintenance-predictions\/:id\/acknowledge['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/maintenance-predictions\/analyze['"],\s*isAuthenticated/);
+    expect(legacy).not.toMatch(/app\.(post|get)\(['"]\/api\/ai\/(predict-maintenance|predictive-diagnostics|maintenance-predictions)/);
+  });
+
+  it('keeps the maintenance data access (engines + storage) behind its repository', () => {
+    const mpRepo = read('server/modules/ai/repositories/ai-maintenance-prediction.repository.ts');
+    const mpSvc = read('server/modules/ai/services/ai-maintenance-prediction.service.ts');
+    expect(mpRepo).toMatch(/predictMaintenance/);
+    expect(mpRepo).toMatch(/analyzePredictiveMaintenance/);
+    expect(mpRepo).toMatch(/generatePredictiveDiagnostic/);
+    expect(mpSvc).not.toMatch(/from '.*\/storage'/);
+    expect(mpSvc).not.toMatch(/from '.*\/ai-service'/);
+  });
 });

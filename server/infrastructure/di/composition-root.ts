@@ -68,6 +68,8 @@ import {
   AI_SERVICE,
   AI_JOB_ESTIMATION_REPOSITORY,
   AI_JOB_ESTIMATION_SERVICE,
+  AI_MAINTENANCE_PREDICTION_REPOSITORY,
+  AI_MAINTENANCE_PREDICTION_SERVICE,
   FEATURE_FLAG_REPOSITORY,
   FEATURE_FLAG_SERVICE,
   BACKUP_REPOSITORY,
@@ -138,6 +140,8 @@ import { AiRepository } from '../../modules/ai/repositories/ai.repository';
 import { AiService } from '../../modules/ai/services/ai.service';
 import { AiJobEstimationRepository } from '../../modules/ai/repositories/ai-job-estimation.repository';
 import { AiJobEstimationService } from '../../modules/ai/services/ai-job-estimation.service';
+import { AiMaintenancePredictionRepository } from '../../modules/ai/repositories/ai-maintenance-prediction.repository';
+import { AiMaintenancePredictionService } from '../../modules/ai/services/ai-maintenance-prediction.service';
 import { FeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import { BackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -306,6 +310,9 @@ export function getAppContainer(): Container {
 
   c.register(AI_JOB_ESTIMATION_REPOSITORY, () => new AiJobEstimationRepository());
   c.register(AI_JOB_ESTIMATION_SERVICE, (ctx) => new AiJobEstimationService(ctx.resolve(AI_JOB_ESTIMATION_REPOSITORY)));
+
+  c.register(AI_MAINTENANCE_PREDICTION_REPOSITORY, () => new AiMaintenancePredictionRepository());
+  c.register(AI_MAINTENANCE_PREDICTION_SERVICE, (ctx) => new AiMaintenancePredictionService(ctx.resolve(AI_MAINTENANCE_PREDICTION_REPOSITORY)));
 
   c.register(FEATURE_FLAG_REPOSITORY, () => new FeatureFlagRepository());
   c.register(FEATURE_FLAG_SERVICE, (ctx) => new FeatureFlagService(ctx.resolve(FEATURE_FLAG_REPOSITORY)));
