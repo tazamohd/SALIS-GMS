@@ -34,6 +34,8 @@ import {
   sparePartInventories,
   jobCards,
   invoices,
+  accountingConnections,
+  accountingSync,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
@@ -879,11 +881,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // A technician may not have a profile row yet. Return null (200) rather
+      // than 404 so list views (TechnicianManagement) and the technician's own
+      // page render an empty/create state instead of logging an error (#111).
       const profile = await storage.getTechnicianProfile(userId);
-      if (!profile) {
-        return res.status(404).json({ message: "Technician profile not found" });
-      }
-      res.json(profile);
+      res.json(profile ?? null);
     } catch (error) {
       console.error("Error fetching technician profile:", error);
       res.status(500).json({ message: "Failed to fetch technician profile" });
@@ -6710,6 +6712,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error fetching accounting dashboard:", error);
       res.status(500).json({ message: error.message || "Failed to fetch accounting dashboard" });
+    }
+  });
+
+  // Accounting connections for the current garage. Tokens are never returned to
+  // the client (issue #111 — the page queried this endpoint but it was missing).
+  app.get('/api/accounting/connections', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: "No garage associated" });
+      const connections = await db
+        .select({
+          id: accountingConnections.id,
+          provider: accountingConnections.provider,
+          companyId: accountingConnections.companyId,
+          companyName: accountingConnections.companyName,
+          isActive: accountingConnections.isActive,
+          syncSettings: accountingConnections.syncSettings,
+          lastSyncAt: accountingConnections.lastSyncAt,
+          createdAt: accountingConnections.createdAt,
+          updatedAt: accountingConnections.updatedAt,
+        })
+        .from(accountingConnections)
+        .where(eq(accountingConnections.garageId, garageId))
+        .orderBy(desc(accountingConnections.createdAt));
+      res.json(connections);
+    } catch (error: any) {
+      console.error("Error fetching accounting connections:", error);
+      res.status(500).json({ message: "Failed to fetch accounting connections" });
+    }
+  });
+
+  // Recent accounting sync records for the current garage (issue #111).
+  app.get('/api/accounting/sync-history', isAuthenticated, async (req: any, res) => {
+    try {
+      const garageId = req.user?.garageId;
+      if (!garageId) return res.status(403).json({ message: "No garage associated" });
+      const history = await db
+        .select()
+        .from(accountingSync)
+        .where(eq(accountingSync.garageId, garageId))
+        .orderBy(desc(accountingSync.createdAt))
+        .limit(100);
+      res.json(history);
+    } catch (error: any) {
+      console.error("Error fetching accounting sync history:", error);
+      res.status(500).json({ message: "Failed to fetch accounting sync history" });
     }
   });
 
