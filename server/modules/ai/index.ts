@@ -10,19 +10,26 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../../auth';
 import { requirePlan } from '../../middleware/requirePlan';
+import { requireResourceOwnership } from '../../middleware/resourceOwnership';
 import { asyncHandler } from '../../middleware/asyncHandler';
 import { getAppContainer } from '../../infrastructure/di/composition-root';
-import { AI_SERVICE } from '../../infrastructure/di/tokens';
+import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE } from '../../infrastructure/di/tokens';
 import { makeAiController } from './controllers/ai.controller';
+import { makeAiJobEstimationController } from './controllers/ai-job-estimation.controller';
 import type { AiService } from './services/ai.service';
+import type { AiJobEstimationService } from './services/ai-job-estimation.service';
 
 export interface AiModuleDeps {
   service?: AiService;
+  jobEstimationService?: AiJobEstimationService;
 }
 
 export function createAiModule(deps: AiModuleDeps = {}): Router {
-  const service = deps.service ?? getAppContainer().resolve(AI_SERVICE);
-  const c = makeAiController(service);
+  const container = getAppContainer();
+  const c = makeAiController(deps.service ?? container.resolve(AI_SERVICE));
+  const je = makeAiJobEstimationController(
+    deps.jobEstimationService ?? container.resolve(AI_JOB_ESTIMATION_SERVICE),
+  );
   const router = Router();
 
   // Business intelligence (all authenticated users).
@@ -36,6 +43,12 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
 
   // LLM repair guide (ENTERPRISE plan).
   router.post('/ai/repair-guide', isAuthenticated, requirePlan('ENTERPRISE'), asyncHandler(c.repairGuide));
+
+  // Job estimations (LLM-assisted; per-garage ownership on the :id routes).
+  router.post('/ai/estimate-job', isAuthenticated, asyncHandler(je.estimate));
+  router.get('/ai/job-estimations', isAuthenticated, asyncHandler(je.list));
+  router.get('/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), asyncHandler(je.get));
+  router.patch('/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), asyncHandler(je.update));
 
   return router;
 }
