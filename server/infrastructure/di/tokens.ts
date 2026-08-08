@@ -71,6 +71,8 @@ import type { DynamicPricingRepository } from '../../modules/dynamic-pricing/rep
 import type { DynamicPricingService } from '../../modules/dynamic-pricing/services/dynamic-pricing.service';
 import type { FeedbackRepository } from '../../modules/feedback/repositories/feedback.repository';
 import type { FeedbackService } from '../../modules/feedback/services/feedback.service';
+import type { ComplianceRepository } from '../../modules/compliance/repositories/compliance.repository';
+import type { ComplianceService } from '../../modules/compliance/services/compliance.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -175,6 +177,8 @@ export const DYNAMIC_PRICING_REPOSITORY = token<DynamicPricingRepository>('Dynam
 export const DYNAMIC_PRICING_SERVICE = token<DynamicPricingService>('DynamicPricingService');
 export const FEEDBACK_REPOSITORY = token<FeedbackRepository>('FeedbackRepository');
 export const FEEDBACK_SERVICE = token<FeedbackService>('FeedbackService');
+export const COMPLIANCE_REPOSITORY = token<ComplianceRepository>('ComplianceRepository');
+export const COMPLIANCE_SERVICE = token<ComplianceService>('ComplianceService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
