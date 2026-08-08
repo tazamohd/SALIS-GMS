@@ -63,6 +63,8 @@ import type { IAiRepository } from '../../modules/ai/repositories/ai.repository'
 import type { AiService } from '../../modules/ai/services/ai.service';
 import type { IAiJobEstimationRepository } from '../../modules/ai/repositories/ai-job-estimation.repository';
 import type { AiJobEstimationService } from '../../modules/ai/services/ai-job-estimation.service';
+import type { IAiMaintenancePredictionRepository } from '../../modules/ai/repositories/ai-maintenance-prediction.repository';
+import type { AiMaintenancePredictionService } from '../../modules/ai/services/ai-maintenance-prediction.service';
 import type { IFeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import type { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import type { IBackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -135,6 +137,8 @@ export const AI_REPOSITORY = token<IAiRepository>('AiRepository');
 export const AI_SERVICE = token<AiService>('AiService');
 export const AI_JOB_ESTIMATION_REPOSITORY = token<IAiJobEstimationRepository>('AiJobEstimationRepository');
 export const AI_JOB_ESTIMATION_SERVICE = token<AiJobEstimationService>('AiJobEstimationService');
+export const AI_MAINTENANCE_PREDICTION_REPOSITORY = token<IAiMaintenancePredictionRepository>('AiMaintenancePredictionRepository');
+export const AI_MAINTENANCE_PREDICTION_SERVICE = token<AiMaintenancePredictionService>('AiMaintenancePredictionService');
 export const FEATURE_FLAG_REPOSITORY = token<IFeatureFlagRepository>('FeatureFlagRepository');
 export const FEATURE_FLAG_SERVICE = token<FeatureFlagService>('FeatureFlagService');
 export const BACKUP_REPOSITORY = token<IBackupRepository>('BackupRepository');
