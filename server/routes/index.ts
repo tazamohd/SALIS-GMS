@@ -76,6 +76,7 @@ import feedbackRoutes from "../modules/feedback";
 import complianceRoutes from "../modules/compliance";
 import emergingTechRoutes from "../modules/emerging-tech";
 import nextgenRoutes from "../modules/nextgen";
+import telematicsRoutes from "../modules/telematics";
 import fleetManagementRoutes from "../modules/fleet-management";
 import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
@@ -464,6 +465,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", emergingTechRoutes);
   // Next-gen (30 showcase resource pairs + vision analyze-image/quality-checks) — extracted from the monolith
   app.use("/api", nextgenRoutes);
+  // Telematics (integration feeds/alerts + per-vehicle device/readings) — extracted from the monolith
+  app.use("/api", telematicsRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
   // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith
