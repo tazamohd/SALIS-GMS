@@ -61,7 +61,6 @@ import {
   insertPerformanceReviewSchema,
   insertTrainingSchema,
   insertEmployeeTrainingSchema,
-  insertAIJobEstimationSchema,
   insertAIMaintenancePredictionSchema,
   insertAIPartsRecommendationSchema,
   insertAIScheduleOptimizationSchema,
@@ -173,7 +172,7 @@ import Stripe from "stripe";
 // absent (and its banner forbids editing it), so it is loaded lazily inside
 // the PayPal routes — the server boots without credentials and those three
 // endpoints report 503 instead.
-import { estimateJobTime, predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
+import { predictMaintenance, recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
 import { analyzePredictiveMaintenance, generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
 import {
@@ -5841,102 +5840,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Module 32: AI Automation
 
-  // Job Time Estimation Routes
-  app.post('/api/ai/estimate-job', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { serviceType, vehicleId, jobCardId, vehicleMake, vehicleModel, vehicleYear, historicalJobs } = req.body;
-
-      const aiResult = await estimateJobTime({
-        serviceType: serviceType || '',
-        vehicleMake,
-        vehicleModel,
-        vehicleYear,
-        historicalJobs
-      });
-
-      const estimationData = {
-        garageId: userGarageId,
-        serviceType,
-        vehicleId,
-        jobCardId,
-        estimatedHours: aiResult.estimatedHours?.toString(),
-        estimatedCost: aiResult.estimatedCost?.toString(),
-        confidence: aiResult.confidence?.toString(),
-        reasoning: aiResult.reasoning
-      };
-
-      const estimation = await storage.createAIJobEstimation(estimationData);
-      res.json(estimation);
-    } catch (error: any) {
-      console.error("Error creating job estimation:", error);
-      res.status(500).json({ message: "Failed to create job estimation", error: error.message });
-    }
-  });
-
-  app.get('/api/ai/job-estimations', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { vehicleId } = req.query;
-
-      const estimations = await storage.getAIJobEstimations(userGarageId, vehicleId as string);
-      res.json(estimations);
-    } catch (error) {
-      console.error("Error fetching job estimations:", error);
-      res.status(500).json({ message: "Failed to fetch job estimations" });
-    }
-  });
-
-  app.get('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const estimation = await storage.getAIJobEstimation(req.params.id);
-      
-      if (!estimation) {
-        return res.status(404).json({ message: "Job estimation not found" });
-      }
-      
-      if (estimation.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      res.json(estimation);
-    } catch (error) {
-      console.error("Error fetching job estimation:", error);
-      res.status(500).json({ message: "Failed to fetch job estimation" });
-    }
-  });
-
-  app.patch('/api/ai/job-estimations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_job_estimations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const existing = await storage.getAIJobEstimation(req.params.id);
-      
-      if (!existing) {
-        return res.status(404).json({ message: "Job estimation not found" });
-      }
-      
-      if (existing.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      const validated = insertAIJobEstimationSchema.partial().safeParse(req.body);
-      
-      if (!validated.success) {
-        return res.status(400).json(sanitizeZodError(validated.error));
-      }
-      
-      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Cannot change garage" });
-      }
-      
-      const estimation = await storage.updateAIJobEstimation(req.params.id, validated.data);
-      res.json(estimation);
-    } catch (error) {
-      console.error("Error updating job estimation:", error);
-      res.status(500).json({ message: "Failed to update job estimation" });
-    }
-  });
+  // Job Time Estimation Routes — extracted to server/modules/ai
+  // (POST /api/ai/estimate-job, GET/PATCH /api/ai/job-estimations[/:id]).
 
   // Maintenance Prediction Routes
   app.post('/api/ai/predict-maintenance', isAuthenticated, async (req: any, res) => {

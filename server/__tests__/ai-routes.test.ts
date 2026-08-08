@@ -44,4 +44,23 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(serviceSource).not.toMatch(/from '.*\/ai'/);
     expect(serviceSource).not.toMatch(/from '.*\/storage'/);
   });
+
+  it('mounts the job-estimation routes in the ai module and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/estimate-job['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/job-estimations['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/job-estimations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/ai\/job-estimations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    // the four handlers are gone from the monolith
+    expect(legacy).not.toMatch(/app\.(post|get|patch)\(['"]\/api\/ai\/(estimate-job|job-estimations)/);
+  });
+
+  it('keeps the job-estimation data access (LLM + storage) behind its repository', () => {
+    const jeRepo = read('server/modules/ai/repositories/ai-job-estimation.repository.ts');
+    const jeSvc = read('server/modules/ai/services/ai-job-estimation.service.ts');
+    expect(jeRepo).toMatch(/estimateJobTime/);
+    expect(jeRepo).toMatch(/createAIJobEstimation/);
+    expect(jeSvc).not.toMatch(/from '.*\/storage'/);
+    expect(jeSvc).not.toMatch(/from '.*\/ai'$/m);
+  });
 });
