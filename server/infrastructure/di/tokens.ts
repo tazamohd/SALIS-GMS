@@ -61,6 +61,8 @@ import type { IQuotaRepository } from '../../modules/quota/repositories/quota.re
 import type { QuotaService } from '../../modules/quota/services/quota.service';
 import type { CallCenterRepository } from '../../modules/call-center/repositories/call-center.repository';
 import type { CallCenterService } from '../../modules/call-center/services/call-center.service';
+import type { NotificationsRepository } from '../../modules/notifications/repositories/notifications.repository';
+import type { NotificationsService } from '../../modules/notifications/services/notifications.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -155,6 +157,8 @@ export const QUOTA_REPOSITORY = token<IQuotaRepository>('QuotaRepository');
 export const QUOTA_SERVICE = token<QuotaService>('QuotaService');
 export const CALL_CENTER_REPOSITORY = token<CallCenterRepository>('CallCenterRepository');
 export const CALL_CENTER_SERVICE = token<CallCenterService>('CallCenterService');
+export const NOTIFICATIONS_REPOSITORY = token<NotificationsRepository>('NotificationsRepository');
+export const NOTIFICATIONS_SERVICE = token<NotificationsService>('NotificationsService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
