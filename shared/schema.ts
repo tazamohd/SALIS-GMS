@@ -11246,6 +11246,61 @@ export const subscriptions = pgTable("subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// ==========================================================================
+// Internal license management (commercial SaaS entitlements + issuable keys).
+// Complements the SaaS `subscriptions` table: a `license` is a signed,
+// offline-verifiable key that binds a plan + entitlement limits + lifecycle to
+// a garage (SaaS tenant) or ships unbound for reseller/on-prem activation.
+// Limits left null fall back to the plan defaults in `@shared/plans`.
+// ==========================================================================
+export const licenses = pgTable("licenses", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  // The signed, human-distributable key (payload.signature); unique for lookup + revocation.
+  licenseKey: varchar("license_key", { length: 512 }).notNull().unique(),
+  plan: varchar("plan", { length: 20 }).default("STARTER").notNull(), // STARTER | PRO | ENTERPRISE
+  type: varchar("type", { length: 20 }).default("subscription").notNull(), // subscription | perpetual | trial
+  status: varchar("status", { length: 20 }).default("issued").notNull(), // issued | active | suspended | revoked | expired
+  // Entitlement overrides — null means "inherit the plan default" (@shared/plans).
+  maxUsers: integer("max_users"),
+  maxBranches: integer("max_branches"),
+  maxGarages: integer("max_garages"),
+  maxVehicles: integer("max_vehicles"),
+  storageGb: integer("storage_gb"),
+  apiQuotaPerDay: integer("api_quota_per_day"),
+  // Binding: unbound (resale/on-prem stock) until activated to a garage.
+  boundGarageId: uuid("bound_garage_id").references(() => garages.id),
+  issuedTo: varchar("issued_to", { length: 255 }), // reseller/customer label
+  issuedBy: varchar("issued_by").references(() => users.id),
+  // Lifecycle.
+  issuedAt: timestamp("issued_at").defaultNow().notNull(),
+  activatedAt: timestamp("activated_at"),
+  expiresAt: timestamp("expires_at"), // null = perpetual
+  offlineGraceDays: integer("offline_grace_days").default(7).notNull(),
+  lastValidatedAt: timestamp("last_validated_at"),
+  revokedAt: timestamp("revoked_at"),
+  revokedReason: text("revoked_reason"),
+  metadata: jsonb("metadata").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIdx: index("licenses_status_idx").on(table.status),
+  boundGarageIdx: index("licenses_bound_garage_idx").on(table.boundGarageId),
+}));
+
+// Immutable audit trail of every license lifecycle event.
+export const licenseActivations = pgTable("license_activations", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  licenseId: uuid("license_id").notNull().references(() => licenses.id),
+  action: varchar("action", { length: 20 }).notNull(), // activated | deactivated | renewed | revoked | validated
+  garageId: uuid("garage_id").references(() => garages.id),
+  instanceId: varchar("instance_id", { length: 128 }), // on-prem instance fingerprint
+  performedBy: varchar("performed_by").references(() => users.id),
+  details: jsonb("details").default({}).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  licenseIdx: index("license_activations_license_idx").on(table.licenseId),
+}));
+
 // supplier_parts_availability was already declared earlier in this file, so it
 // is deliberately not repeated here despite also originating in migration 0003.
 
@@ -11550,6 +11605,11 @@ export const insertSchedulingOptimizationRunSchema = createInsertSchema(scheduli
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
 export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertLicenseSchema = createInsertSchema(licenses).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertLicenseActivationSchema = createInsertSchema(licenseActivations).omit({ id: true, createdAt: true });
+export type License = typeof licenses.$inferSelect;
+export type InsertLicense = z.infer<typeof insertLicenseSchema>;
+export type LicenseActivation = typeof licenseActivations.$inferSelect;
 
 export type SubscriptionRequest = typeof subscriptionRequests.$inferSelect;
 export type InsertSubscriptionRequest = typeof subscriptionRequests.$inferInsert;

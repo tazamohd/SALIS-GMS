@@ -55,6 +55,8 @@ import type { IProviderRepository } from '../../modules/provider/repositories/pr
 import type { ProviderService } from '../../modules/provider/services/provider.service';
 import type { IAdministrationRepository } from '../../modules/administration/repositories/administration.repository';
 import type { AdministrationService } from '../../modules/administration/services/administration.service';
+import type { ILicensingRepository } from '../../modules/licensing/repositories/licensing.repository';
+import type { LicensingService } from '../../modules/licensing/services/licensing.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -143,6 +145,8 @@ export const PROVIDER_REPOSITORY = token<IProviderRepository>('ProviderRepositor
 export const PROVIDER_SERVICE = token<ProviderService>('ProviderService');
 export const ADMINISTRATION_REPOSITORY = token<IAdministrationRepository>('AdministrationRepository');
 export const ADMINISTRATION_SERVICE = token<AdministrationService>('AdministrationService');
+export const LICENSING_REPOSITORY = token<ILicensingRepository>('LicensingRepository');
+export const LICENSING_SERVICE = token<LicensingService>('LicensingService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
