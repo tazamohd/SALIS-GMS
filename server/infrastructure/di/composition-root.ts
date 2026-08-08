@@ -80,6 +80,8 @@ import {
   COMPLIANCE_SERVICE,
   EMERGING_TECH_REPOSITORY,
   EMERGING_TECH_SERVICE,
+  NEXTGEN_REPOSITORY,
+  NEXTGEN_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -186,6 +188,8 @@ import { ComplianceRepository } from '../../modules/compliance/repositories/comp
 import { ComplianceService } from '../../modules/compliance/services/compliance.service';
 import { EmergingTechRepository } from '../../modules/emerging-tech/repositories/emerging-tech.repository';
 import { EmergingTechService } from '../../modules/emerging-tech/services/emerging-tech.service';
+import { NextGenRepository } from '../../modules/nextgen/repositories/nextgen.repository';
+import { NextGenService } from '../../modules/nextgen/services/nextgen.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -392,6 +396,8 @@ export function getAppContainer(): Container {
   c.register(COMPLIANCE_SERVICE, (ctx) => new ComplianceService(ctx.resolve(COMPLIANCE_REPOSITORY)));
   c.register(EMERGING_TECH_REPOSITORY, () => new EmergingTechRepository());
   c.register(EMERGING_TECH_SERVICE, (ctx) => new EmergingTechService(ctx.resolve(EMERGING_TECH_REPOSITORY)));
+  c.register(NEXTGEN_REPOSITORY, () => new NextGenRepository());
+  c.register(NEXTGEN_SERVICE, (ctx) => new NextGenService(ctx.resolve(NEXTGEN_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
