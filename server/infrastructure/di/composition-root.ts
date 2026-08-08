@@ -72,6 +72,8 @@ import {
   INTEGRATIONS_SERVICE,
   IOT_REPOSITORY,
   IOT_SERVICE,
+  DYNAMIC_PRICING_REPOSITORY,
+  DYNAMIC_PRICING_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -170,6 +172,8 @@ import { IntegrationsRepository } from '../../modules/integrations/repositories/
 import { IntegrationsService } from '../../modules/integrations/services/integrations.service';
 import { IotRepository } from '../../modules/iot/repositories/iot.repository';
 import { IotService } from '../../modules/iot/services/iot.service';
+import { DynamicPricingRepository } from '../../modules/dynamic-pricing/repositories/dynamic-pricing.repository';
+import { DynamicPricingService } from '../../modules/dynamic-pricing/services/dynamic-pricing.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -368,6 +372,8 @@ export function getAppContainer(): Container {
 
   c.register(IOT_REPOSITORY, () => new IotRepository());
   c.register(IOT_SERVICE, (ctx) => new IotService(ctx.resolve(IOT_REPOSITORY)));
+  c.register(DYNAMIC_PRICING_REPOSITORY, () => new DynamicPricingRepository());
+  c.register(DYNAMIC_PRICING_SERVICE, (ctx) => new DynamicPricingService(ctx.resolve(DYNAMIC_PRICING_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
