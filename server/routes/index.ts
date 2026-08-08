@@ -70,6 +70,7 @@ import quotaRoutes from "../modules/quota";
 import callCenterRoutes from "../modules/call-center";
 import notificationsRoutes from "../modules/notifications";
 import integrationsRoutes from "../modules/integrations";
+import iotRoutes from "../modules/iot";
 import fleetManagementRoutes from "../modules/fleet-management";
 import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
@@ -446,6 +447,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", notificationsRoutes);
   // Integrations (connections, sync-logs, google-calendar, gmail, accounting, obd) — extracted from the monolith
   app.use("/api", integrationsRoutes);
+  // IoT (sensors, readings, anomalies, alerts, dashboard) — extracted from the monolith
+  app.use("/api", iotRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
   // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith
