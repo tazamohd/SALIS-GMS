@@ -84,4 +84,22 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(mpSvc).not.toMatch(/from '.*\/storage'/);
     expect(mpSvc).not.toMatch(/from '.*\/ai-service'/);
   });
+
+  it('mounts the four parts-recommendation routes and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/recommend-parts['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/parts-recommendations['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/parts-recommendations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/ai\/parts-recommendations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(legacy).not.toMatch(/app\.(post|get|patch)\(['"]\/api\/ai\/(recommend-parts|parts-recommendations)/);
+  });
+
+  it('keeps the parts data access (LLM + storage) behind its repository', () => {
+    const prRepo = read('server/modules/ai/repositories/ai-parts-recommendation.repository.ts');
+    const prSvc = read('server/modules/ai/services/ai-parts-recommendation.service.ts');
+    expect(prRepo).toMatch(/recommendParts/);
+    expect(prRepo).toMatch(/createAIPartsRecommendation/);
+    expect(prSvc).not.toMatch(/from '.*\/storage'/);
+    expect(prSvc).not.toMatch(/from '.*\/ai'$/m);
+  });
 });

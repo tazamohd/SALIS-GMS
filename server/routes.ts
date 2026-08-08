@@ -62,7 +62,6 @@ import {
   insertTrainingSchema,
   insertEmployeeTrainingSchema,
   insertAIMaintenancePredictionSchema,
-  insertAIPartsRecommendationSchema,
   insertAIScheduleOptimizationSchema,
   insertAIChatConversationSchema,
   insertIntegrationConnectionSchema,
@@ -172,7 +171,7 @@ import Stripe from "stripe";
 // absent (and its banner forbids editing it), so it is loaded lazily inside
 // the PayPal routes — the server boots without credentials and those three
 // endpoints report 503 instead.
-import { recommendParts, optimizeSchedule, chatWithCustomer } from './ai';
+import { optimizeSchedule, chatWithCustomer } from './ai';
 import { generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
 import {
@@ -5847,107 +5846,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // (predict-maintenance, predictive-diagnostics, maintenance-predictions
   // list/detail, :id/acknowledge, and the batch analyze).
 
-  // Parts Recommendation Routes
-  app.post('/api/ai/recommend-parts', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { vehicleId, serviceType, vehicleMake, vehicleModel, vehicleYear, description, jobCardId } = req.body;
-
-      const aiResult = await recommendParts({
-        serviceType,
-        vehicleMake,
-        vehicleModel,
-        vehicleYear,
-        description: description || undefined
-      });
-
-      const recommendationData = {
-        garageId: userGarageId,
-        vehicleId,
-        serviceType,
-        jobCardId,
-        recommendedParts: aiResult.parts,
-        totalEstimatedCost: aiResult.totalEstimatedCost,
-        reasoning: aiResult.reasoning,
-        confidence: aiResult.confidence,
-        status: 'pending'
-      };
-
-      const recommendation = await storage.createAIPartsRecommendation(recommendationData);
-      res.json(recommendation);
-    } catch (error: any) {
-      console.error("Error creating parts recommendation:", error);
-      res.status(500).json({ message: "Failed to create parts recommendation", error: error.message });
-    }
-  });
-
-  app.get('/api/ai/parts-recommendations', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { vehicleId, status } = req.query;
-
-      const recommendations = await storage.getAIPartsRecommendations(
-        userGarageId,
-        vehicleId as string,
-        status as string
-      );
-      res.json(recommendations);
-    } catch (error) {
-      console.error("Error fetching parts recommendations:", error);
-      res.status(500).json({ message: "Failed to fetch parts recommendations" });
-    }
-  });
-
-  app.get('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const recommendation = await storage.getAIPartsRecommendation(req.params.id);
-      
-      if (!recommendation) {
-        return res.status(404).json({ message: "Parts recommendation not found" });
-      }
-      
-      if (recommendation.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      res.json(recommendation);
-    } catch (error) {
-      console.error("Error fetching parts recommendation:", error);
-      res.status(500).json({ message: "Failed to fetch parts recommendation" });
-    }
-  });
-
-  app.patch('/api/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const existing = await storage.getAIPartsRecommendation(req.params.id);
-      
-      if (!existing) {
-        return res.status(404).json({ message: "Parts recommendation not found" });
-      }
-      
-      if (existing.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      const validated = insertAIPartsRecommendationSchema.partial().safeParse(req.body);
-      
-      if (!validated.success) {
-        return res.status(400).json(sanitizeZodError(validated.error));
-      }
-      
-      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Cannot change garage" });
-      }
-      
-      const recommendation = await storage.updateAIPartsRecommendation(req.params.id, validated.data);
-      res.json(recommendation);
-    } catch (error) {
-      console.error("Error updating parts recommendation:", error);
-      res.status(500).json({ message: "Failed to update parts recommendation" });
-    }
-  });
+  // Parts Recommendation Routes — extracted to server/modules/ai
+  // (POST /api/ai/recommend-parts, GET/PATCH /api/ai/parts-recommendations[/:id]).
 
   // Schedule Optimization Routes
   app.post('/api/ai/optimize-schedule', isAuthenticated, async (req: any, res) => {

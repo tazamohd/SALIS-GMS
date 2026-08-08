@@ -13,18 +13,21 @@ import { requirePlan } from '../../middleware/requirePlan';
 import { requireResourceOwnership } from '../../middleware/resourceOwnership';
 import { asyncHandler } from '../../middleware/asyncHandler';
 import { getAppContainer } from '../../infrastructure/di/composition-root';
-import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE, AI_MAINTENANCE_PREDICTION_SERVICE } from '../../infrastructure/di/tokens';
+import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE, AI_MAINTENANCE_PREDICTION_SERVICE, AI_PARTS_RECOMMENDATION_SERVICE } from '../../infrastructure/di/tokens';
 import { makeAiController } from './controllers/ai.controller';
 import { makeAiJobEstimationController } from './controllers/ai-job-estimation.controller';
 import { makeAiMaintenancePredictionController } from './controllers/ai-maintenance-prediction.controller';
+import { makeAiPartsRecommendationController } from './controllers/ai-parts-recommendation.controller';
 import type { AiService } from './services/ai.service';
 import type { AiJobEstimationService } from './services/ai-job-estimation.service';
 import type { AiMaintenancePredictionService } from './services/ai-maintenance-prediction.service';
+import type { AiPartsRecommendationService } from './services/ai-parts-recommendation.service';
 
 export interface AiModuleDeps {
   service?: AiService;
   jobEstimationService?: AiJobEstimationService;
   maintenancePredictionService?: AiMaintenancePredictionService;
+  partsRecommendationService?: AiPartsRecommendationService;
 }
 
 export function createAiModule(deps: AiModuleDeps = {}): Router {
@@ -35,6 +38,9 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   );
   const mp = makeAiMaintenancePredictionController(
     deps.maintenancePredictionService ?? container.resolve(AI_MAINTENANCE_PREDICTION_SERVICE),
+  );
+  const pr = makeAiPartsRecommendationController(
+    deps.partsRecommendationService ?? container.resolve(AI_PARTS_RECOMMENDATION_SERVICE),
   );
   const router = Router();
 
@@ -63,6 +69,12 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   router.get('/ai/maintenance-predictions/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), asyncHandler(mp.get));
   router.post('/ai/maintenance-predictions/:id/acknowledge', isAuthenticated, requireResourceOwnership({ table: 'ai_maintenance_predictions' }), asyncHandler(mp.acknowledge));
   router.post('/ai/maintenance-predictions/analyze', isAuthenticated, asyncHandler(mp.analyze));
+
+  // Parts recommendations (LLM-assisted; per-garage ownership on the :id routes).
+  router.post('/ai/recommend-parts', isAuthenticated, asyncHandler(pr.recommend));
+  router.get('/ai/parts-recommendations', isAuthenticated, asyncHandler(pr.list));
+  router.get('/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), asyncHandler(pr.get));
+  router.patch('/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), asyncHandler(pr.update));
 
   return router;
 }
