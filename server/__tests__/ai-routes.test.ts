@@ -120,4 +120,22 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(soSvc).not.toMatch(/from '.*\/storage'/);
     expect(soSvc).not.toMatch(/from '.*\/ai'$/m);
   });
+
+  it('mounts the four chat routes and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/chat['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/chat-conversations['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/chat-conversations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/chat-conversations\/:id\/handoff['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(legacy).not.toMatch(/app\.(post|get)\(['"]\/api\/ai\/(chat|chat-conversations)/);
+  });
+
+  it('keeps the chat data access (LLM + storage) behind its repository', () => {
+    const chatRepo = read('server/modules/ai/repositories/ai-chat.repository.ts');
+    const chatSvc = read('server/modules/ai/services/ai-chat.service.ts');
+    expect(chatRepo).toMatch(/chatWithCustomer/);
+    expect(chatRepo).toMatch(/createAIChatConversation/);
+    expect(chatSvc).not.toMatch(/from '.*\/storage'/);
+    expect(chatSvc).not.toMatch(/from '.*\/ai'$/m);
+  });
 });

@@ -74,6 +74,8 @@ import {
   AI_PARTS_RECOMMENDATION_SERVICE,
   AI_SCHEDULE_OPTIMIZATION_REPOSITORY,
   AI_SCHEDULE_OPTIMIZATION_SERVICE,
+  AI_CHAT_REPOSITORY,
+  AI_CHAT_SERVICE,
   FEATURE_FLAG_REPOSITORY,
   FEATURE_FLAG_SERVICE,
   BACKUP_REPOSITORY,
@@ -150,6 +152,8 @@ import { AiPartsRecommendationRepository } from '../../modules/ai/repositories/a
 import { AiPartsRecommendationService } from '../../modules/ai/services/ai-parts-recommendation.service';
 import { AiScheduleOptimizationRepository } from '../../modules/ai/repositories/ai-schedule-optimization.repository';
 import { AiScheduleOptimizationService } from '../../modules/ai/services/ai-schedule-optimization.service';
+import { AiChatRepository } from '../../modules/ai/repositories/ai-chat.repository';
+import { AiChatService } from '../../modules/ai/services/ai-chat.service';
 import { FeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import { BackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -327,6 +331,9 @@ export function getAppContainer(): Container {
 
   c.register(AI_SCHEDULE_OPTIMIZATION_REPOSITORY, () => new AiScheduleOptimizationRepository());
   c.register(AI_SCHEDULE_OPTIMIZATION_SERVICE, (ctx) => new AiScheduleOptimizationService(ctx.resolve(AI_SCHEDULE_OPTIMIZATION_REPOSITORY)));
+
+  c.register(AI_CHAT_REPOSITORY, () => new AiChatRepository());
+  c.register(AI_CHAT_SERVICE, (ctx) => new AiChatService(ctx.resolve(AI_CHAT_REPOSITORY)));
 
   c.register(FEATURE_FLAG_REPOSITORY, () => new FeatureFlagRepository());
   c.register(FEATURE_FLAG_SERVICE, (ctx) => new FeatureFlagService(ctx.resolve(FEATURE_FLAG_REPOSITORY)));

@@ -62,8 +62,6 @@ import {
   insertTrainingSchema,
   insertEmployeeTrainingSchema,
   insertAIMaintenancePredictionSchema,
-  insertAIScheduleOptimizationSchema,
-  insertAIChatConversationSchema,
   insertIntegrationConnectionSchema,
   insertIntegrationSyncLogSchema,
   insertAccountingTransactionSchema,
@@ -171,7 +169,6 @@ import Stripe from "stripe";
 // absent (and its banner forbids editing it), so it is loaded lazily inside
 // the PayPal routes — the server boots without credentials and those three
 // endpoints report 503 instead.
-import { chatWithCustomer } from './ai';
 import { generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
 import {
@@ -5853,135 +5850,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // (POST /api/ai/optimize-schedule, GET/PATCH /api/ai/schedule-optimizations[/:id]).
 
   // Chat Bot Routes
-  app.post('/api/ai/chat', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { message, conversationId, garageContext } = req.body;
-
-      if (!message) {
-        return res.status(400).json({ message: "Message is required" });
-      }
-
-      let conversation;
-      let conversationHistory: any[] = [];
-
-      if (conversationId) {
-        conversation = await storage.getAIChatConversation(conversationId);
-        
-        if (!conversation) {
-          return res.status(404).json({ message: "Conversation not found" });
-        }
-        
-        if (conversation.garageId !== userGarageId) {
-          return res.status(403).json({ message: "Access denied" });
-        }
-
-        conversationHistory = conversation.messages || [];
-      } else {
-        const validated = insertAIChatConversationSchema.parse({
-          garageId: userGarageId,
-          customerId: req.body.customerId,
-          messages: [],
-          status: 'active'
-        });
-        
-        conversation = await storage.createAIChatConversation(validated);
-      }
-
-      const aiResult = await chatWithCustomer(
-        message, 
-        conversationHistory,
-        garageContext || { garageName: 'Our Garage' }
-      );
-
-      const updatedMessages = [
-        ...conversationHistory,
-        { role: 'user', content: message, timestamp: new Date().toISOString() },
-        { role: 'assistant', content: aiResult.response, timestamp: new Date().toISOString() }
-      ];
-
-      const updatedConversation = await storage.updateAIChatConversation(conversation.id, {
-        messages: updatedMessages,
-        status: aiResult.shouldHandoff ? 'pending_handoff' : 'active'
-      });
-
-      res.json({
-        conversation: updatedConversation,
-        response: aiResult.response,
-        shouldHandoff: aiResult.shouldHandoff
-      });
-    } catch (error: any) {
-      console.error("Error processing chat:", error);
-      if (error.name === 'ZodError') {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ message: "Failed to process chat" });
-    }
-  });
-
-  app.get('/api/ai/chat-conversations', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { customerId, status } = req.query;
-
-      const conversations = await storage.getAIChatConversations(
-        userGarageId,
-        customerId as string,
-        status as string
-      );
-      res.json(conversations);
-    } catch (error) {
-      console.error("Error fetching chat conversations:", error);
-      res.status(500).json({ message: "Failed to fetch chat conversations" });
-    }
-  });
-
-  app.get('/api/ai/chat-conversations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const conversation = await storage.getAIChatConversation(req.params.id);
-      
-      if (!conversation) {
-        return res.status(404).json({ message: "Conversation not found" });
-      }
-      
-      if (conversation.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      res.json(conversation);
-    } catch (error) {
-      console.error("Error fetching chat conversation:", error);
-      res.status(500).json({ message: "Failed to fetch chat conversation" });
-    }
-  });
-
-  app.post('/api/ai/chat-conversations/:id/handoff', isAuthenticated, requireResourceOwnership({ table: 'ai_chat_conversations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const existing = await storage.getAIChatConversation(req.params.id);
-      
-      if (!existing) {
-        return res.status(404).json({ message: "Conversation not found" });
-      }
-      
-      if (existing.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      const { assignedTo } = req.body;
-
-      const conversation = await storage.updateAIChatConversation(req.params.id, {
-        status: 'handed_off',
-        handoffTo: assignedTo,
-        handoffAt: new Date().toISOString()
-      });
-      res.json(conversation);
-    } catch (error) {
-      console.error("Error handing off conversation:", error);
-      res.status(500).json({ message: "Failed to hand off conversation" });
-    }
-  });
+  // AI Chat Routes — extracted to server/modules/ai
+  // (POST /api/ai/chat, GET /api/ai/chat-conversations[/:id],
+  //  POST /api/ai/chat-conversations/:id/handoff).
 
   // Voice Commands Routes
   app.get('/api/voice-commands', isAuthenticated, async (req: any, res) => {

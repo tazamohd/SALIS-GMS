@@ -69,6 +69,8 @@ import type { IAiPartsRecommendationRepository } from '../../modules/ai/reposito
 import type { AiPartsRecommendationService } from '../../modules/ai/services/ai-parts-recommendation.service';
 import type { IAiScheduleOptimizationRepository } from '../../modules/ai/repositories/ai-schedule-optimization.repository';
 import type { AiScheduleOptimizationService } from '../../modules/ai/services/ai-schedule-optimization.service';
+import type { IAiChatRepository } from '../../modules/ai/repositories/ai-chat.repository';
+import type { AiChatService } from '../../modules/ai/services/ai-chat.service';
 import type { IFeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import type { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import type { IBackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -147,6 +149,8 @@ export const AI_PARTS_RECOMMENDATION_REPOSITORY = token<IAiPartsRecommendationRe
 export const AI_PARTS_RECOMMENDATION_SERVICE = token<AiPartsRecommendationService>('AiPartsRecommendationService');
 export const AI_SCHEDULE_OPTIMIZATION_REPOSITORY = token<IAiScheduleOptimizationRepository>('AiScheduleOptimizationRepository');
 export const AI_SCHEDULE_OPTIMIZATION_SERVICE = token<AiScheduleOptimizationService>('AiScheduleOptimizationService');
+export const AI_CHAT_REPOSITORY = token<IAiChatRepository>('AiChatRepository');
+export const AI_CHAT_SERVICE = token<AiChatService>('AiChatService');
 export const FEATURE_FLAG_REPOSITORY = token<IFeatureFlagRepository>('FeatureFlagRepository');
 export const FEATURE_FLAG_SERVICE = token<FeatureFlagService>('FeatureFlagService');
 export const BACKUP_REPOSITORY = token<IBackupRepository>('BackupRepository');
