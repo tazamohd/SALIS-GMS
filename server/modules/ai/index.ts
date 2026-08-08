@@ -13,21 +13,24 @@ import { requirePlan } from '../../middleware/requirePlan';
 import { requireResourceOwnership } from '../../middleware/resourceOwnership';
 import { asyncHandler } from '../../middleware/asyncHandler';
 import { getAppContainer } from '../../infrastructure/di/composition-root';
-import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE, AI_MAINTENANCE_PREDICTION_SERVICE, AI_PARTS_RECOMMENDATION_SERVICE } from '../../infrastructure/di/tokens';
+import { AI_SERVICE, AI_JOB_ESTIMATION_SERVICE, AI_MAINTENANCE_PREDICTION_SERVICE, AI_PARTS_RECOMMENDATION_SERVICE, AI_SCHEDULE_OPTIMIZATION_SERVICE } from '../../infrastructure/di/tokens';
 import { makeAiController } from './controllers/ai.controller';
 import { makeAiJobEstimationController } from './controllers/ai-job-estimation.controller';
 import { makeAiMaintenancePredictionController } from './controllers/ai-maintenance-prediction.controller';
 import { makeAiPartsRecommendationController } from './controllers/ai-parts-recommendation.controller';
+import { makeAiScheduleOptimizationController } from './controllers/ai-schedule-optimization.controller';
 import type { AiService } from './services/ai.service';
 import type { AiJobEstimationService } from './services/ai-job-estimation.service';
 import type { AiMaintenancePredictionService } from './services/ai-maintenance-prediction.service';
 import type { AiPartsRecommendationService } from './services/ai-parts-recommendation.service';
+import type { AiScheduleOptimizationService } from './services/ai-schedule-optimization.service';
 
 export interface AiModuleDeps {
   service?: AiService;
   jobEstimationService?: AiJobEstimationService;
   maintenancePredictionService?: AiMaintenancePredictionService;
   partsRecommendationService?: AiPartsRecommendationService;
+  scheduleOptimizationService?: AiScheduleOptimizationService;
 }
 
 export function createAiModule(deps: AiModuleDeps = {}): Router {
@@ -41,6 +44,9 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   );
   const pr = makeAiPartsRecommendationController(
     deps.partsRecommendationService ?? container.resolve(AI_PARTS_RECOMMENDATION_SERVICE),
+  );
+  const so = makeAiScheduleOptimizationController(
+    deps.scheduleOptimizationService ?? container.resolve(AI_SCHEDULE_OPTIMIZATION_SERVICE),
   );
   const router = Router();
 
@@ -75,6 +81,12 @@ export function createAiModule(deps: AiModuleDeps = {}): Router {
   router.get('/ai/parts-recommendations', isAuthenticated, asyncHandler(pr.list));
   router.get('/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), asyncHandler(pr.get));
   router.patch('/ai/parts-recommendations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_parts_recommendations' }), asyncHandler(pr.update));
+
+  // Schedule optimizations (LLM-assisted; per-garage ownership on the :id routes).
+  router.post('/ai/optimize-schedule', isAuthenticated, asyncHandler(so.optimize));
+  router.get('/ai/schedule-optimizations', isAuthenticated, asyncHandler(so.list));
+  router.get('/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), asyncHandler(so.get));
+  router.patch('/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), asyncHandler(so.update));
 
   return router;
 }

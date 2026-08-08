@@ -72,6 +72,8 @@ import {
   AI_MAINTENANCE_PREDICTION_SERVICE,
   AI_PARTS_RECOMMENDATION_REPOSITORY,
   AI_PARTS_RECOMMENDATION_SERVICE,
+  AI_SCHEDULE_OPTIMIZATION_REPOSITORY,
+  AI_SCHEDULE_OPTIMIZATION_SERVICE,
   FEATURE_FLAG_REPOSITORY,
   FEATURE_FLAG_SERVICE,
   BACKUP_REPOSITORY,
@@ -146,6 +148,8 @@ import { AiMaintenancePredictionRepository } from '../../modules/ai/repositories
 import { AiMaintenancePredictionService } from '../../modules/ai/services/ai-maintenance-prediction.service';
 import { AiPartsRecommendationRepository } from '../../modules/ai/repositories/ai-parts-recommendation.repository';
 import { AiPartsRecommendationService } from '../../modules/ai/services/ai-parts-recommendation.service';
+import { AiScheduleOptimizationRepository } from '../../modules/ai/repositories/ai-schedule-optimization.repository';
+import { AiScheduleOptimizationService } from '../../modules/ai/services/ai-schedule-optimization.service';
 import { FeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import { BackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -320,6 +324,9 @@ export function getAppContainer(): Container {
 
   c.register(AI_PARTS_RECOMMENDATION_REPOSITORY, () => new AiPartsRecommendationRepository());
   c.register(AI_PARTS_RECOMMENDATION_SERVICE, (ctx) => new AiPartsRecommendationService(ctx.resolve(AI_PARTS_RECOMMENDATION_REPOSITORY)));
+
+  c.register(AI_SCHEDULE_OPTIMIZATION_REPOSITORY, () => new AiScheduleOptimizationRepository());
+  c.register(AI_SCHEDULE_OPTIMIZATION_SERVICE, (ctx) => new AiScheduleOptimizationService(ctx.resolve(AI_SCHEDULE_OPTIMIZATION_REPOSITORY)));
 
   c.register(FEATURE_FLAG_REPOSITORY, () => new FeatureFlagRepository());
   c.register(FEATURE_FLAG_SERVICE, (ctx) => new FeatureFlagService(ctx.resolve(FEATURE_FLAG_REPOSITORY)));

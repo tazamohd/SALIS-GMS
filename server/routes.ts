@@ -171,7 +171,7 @@ import Stripe from "stripe";
 // absent (and its banner forbids editing it), so it is loaded lazily inside
 // the PayPal routes — the server boots without credentials and those three
 // endpoints report 503 instead.
-import { optimizeSchedule, chatWithCustomer } from './ai';
+import { chatWithCustomer } from './ai';
 import { generatePartsRecommendations, streamChatResponse } from './ai-service';
 import { auditLog } from './auditMiddleware';
 import {
@@ -5849,100 +5849,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Parts Recommendation Routes — extracted to server/modules/ai
   // (POST /api/ai/recommend-parts, GET/PATCH /api/ai/parts-recommendations[/:id]).
 
-  // Schedule Optimization Routes
-  app.post('/api/ai/optimize-schedule', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { appointments, technicians } = req.body;
-
-      const aiResult = await optimizeSchedule({
-        appointments: appointments || [],
-        technicians: technicians || []
-      });
-
-      const optimizationData = {
-        garageId: userGarageId,
-        conflicts: aiResult.conflicts,
-        suggestions: aiResult.suggestions,
-        potentialTimeSaved: aiResult.totalPotentialTimeSaved,
-        reasoning: aiResult.reasoning,
-        status: 'pending'
-      };
-
-      const optimization = await storage.createAIScheduleOptimization(optimizationData);
-      res.json(optimization);
-    } catch (error: any) {
-      console.error("Error creating schedule optimization:", error);
-      res.status(500).json({ message: "Failed to create schedule optimization", error: error.message });
-    }
-  });
-
-  app.get('/api/ai/schedule-optimizations', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { status } = req.query;
-
-      const optimizations = await storage.getAIScheduleOptimizations(
-        userGarageId,
-        status as string
-      );
-      res.json(optimizations);
-    } catch (error) {
-      console.error("Error fetching schedule optimizations:", error);
-      res.status(500).json({ message: "Failed to fetch schedule optimizations" });
-    }
-  });
-
-  app.get('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const optimization = await storage.getAIScheduleOptimization(req.params.id);
-      
-      if (!optimization) {
-        return res.status(404).json({ message: "Schedule optimization not found" });
-      }
-      
-      if (optimization.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      res.json(optimization);
-    } catch (error) {
-      console.error("Error fetching schedule optimization:", error);
-      res.status(500).json({ message: "Failed to fetch schedule optimization" });
-    }
-  });
-
-  app.patch('/api/ai/schedule-optimizations/:id', isAuthenticated, requireResourceOwnership({ table: 'ai_schedule_optimizations' }), async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const existing = await storage.getAIScheduleOptimization(req.params.id);
-      
-      if (!existing) {
-        return res.status(404).json({ message: "Schedule optimization not found" });
-      }
-      
-      if (existing.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      const validated = insertAIScheduleOptimizationSchema.partial().safeParse(req.body);
-      
-      if (!validated.success) {
-        return res.status(400).json(sanitizeZodError(validated.error));
-      }
-      
-      if (validated.data.garageId && validated.data.garageId !== userGarageId) {
-        return res.status(403).json({ message: "Cannot change garage" });
-      }
-      
-      const optimization = await storage.updateAIScheduleOptimization(req.params.id, validated.data);
-      res.json(optimization);
-    } catch (error) {
-      console.error("Error updating schedule optimization:", error);
-      res.status(500).json({ message: "Failed to update schedule optimization" });
-    }
-  });
+  // Schedule Optimization Routes — extracted to server/modules/ai
+  // (POST /api/ai/optimize-schedule, GET/PATCH /api/ai/schedule-optimizations[/:id]).
 
   // Chat Bot Routes
   app.post('/api/ai/chat', isAuthenticated, async (req: any, res) => {
