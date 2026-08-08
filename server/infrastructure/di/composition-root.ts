@@ -64,6 +64,8 @@ import {
   LICENSING_SERVICE,
   QUOTA_REPOSITORY,
   QUOTA_SERVICE,
+  CALL_CENTER_REPOSITORY,
+  CALL_CENTER_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -154,6 +156,8 @@ import { LicensingRepository } from '../../modules/licensing/repositories/licens
 import { LicensingService } from '../../modules/licensing/services/licensing.service';
 import { QuotaRepository } from '../../modules/quota/repositories/quota.repository';
 import { QuotaService } from '../../modules/quota/services/quota.service';
+import { CallCenterRepository } from '../../modules/call-center/repositories/call-center.repository';
+import { CallCenterService } from '../../modules/call-center/services/call-center.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -340,6 +344,9 @@ export function getAppContainer(): Container {
 
   c.register(QUOTA_REPOSITORY, () => new QuotaRepository());
   c.register(QUOTA_SERVICE, (ctx) => new QuotaService(ctx.resolve(QUOTA_REPOSITORY)));
+
+  c.register(CALL_CENTER_REPOSITORY, () => new CallCenterRepository());
+  c.register(CALL_CENTER_SERVICE, (ctx) => new CallCenterService(ctx.resolve(CALL_CENTER_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
