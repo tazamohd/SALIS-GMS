@@ -57,6 +57,8 @@ import type { IAdministrationRepository } from '../../modules/administration/rep
 import type { AdministrationService } from '../../modules/administration/services/administration.service';
 import type { ILicensingRepository } from '../../modules/licensing/repositories/licensing.repository';
 import type { LicensingService } from '../../modules/licensing/services/licensing.service';
+import type { IQuotaRepository } from '../../modules/quota/repositories/quota.repository';
+import type { QuotaService } from '../../modules/quota/services/quota.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -147,6 +149,8 @@ export const ADMINISTRATION_REPOSITORY = token<IAdministrationRepository>('Admin
 export const ADMINISTRATION_SERVICE = token<AdministrationService>('AdministrationService');
 export const LICENSING_REPOSITORY = token<ILicensingRepository>('LicensingRepository');
 export const LICENSING_SERVICE = token<LicensingService>('LicensingService');
+export const QUOTA_REPOSITORY = token<IQuotaRepository>('QuotaRepository');
+export const QUOTA_SERVICE = token<QuotaService>('QuotaService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');

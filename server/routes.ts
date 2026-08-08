@@ -39,6 +39,7 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
+import { enforceQuota } from "./modules/quota";
 import { verifyBusiness } from "./services/verification/businessVerification";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
 import { requireResourceOwnership } from "./middleware/resourceOwnership";
@@ -1779,7 +1780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/vehicles', isAuthenticated, async (req, res) => {
+  app.post('/api/vehicles', isAuthenticated, enforceQuota('vehicles'), async (req, res) => {
     try {
       const { insertVehicleSchema } = await import("@shared/schema");
       const validationResult = insertVehicleSchema.safeParse(req.body);
