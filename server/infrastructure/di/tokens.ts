@@ -65,6 +65,8 @@ import type { NotificationsRepository } from '../../modules/notifications/reposi
 import type { NotificationsService } from '../../modules/notifications/services/notifications.service';
 import type { IntegrationsRepository } from '../../modules/integrations/repositories/integrations.repository';
 import type { IntegrationsService } from '../../modules/integrations/services/integrations.service';
+import type { IotRepository } from '../../modules/iot/repositories/iot.repository';
+import type { IotService } from '../../modules/iot/services/iot.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -163,6 +165,8 @@ export const NOTIFICATIONS_REPOSITORY = token<NotificationsRepository>('Notifica
 export const NOTIFICATIONS_SERVICE = token<NotificationsService>('NotificationsService');
 export const INTEGRATIONS_REPOSITORY = token<IntegrationsRepository>('IntegrationsRepository');
 export const INTEGRATIONS_SERVICE = token<IntegrationsService>('IntegrationsService');
+export const IOT_REPOSITORY = token<IotRepository>('IotRepository');
+export const IOT_SERVICE = token<IotService>('IotService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
