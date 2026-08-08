@@ -68,6 +68,7 @@ import administrationRoutes from "../modules/administration";
 import licensingRoutes from "../modules/licensing";
 import quotaRoutes from "../modules/quota";
 import callCenterRoutes from "../modules/call-center";
+import notificationsRoutes from "../modules/notifications";
 import fleetManagementRoutes from "../modules/fleet-management";
 import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
@@ -440,6 +441,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", quotaRoutes);
   // Call center (queues, members, sessions, notes, recordings, disposition codes, performance) — extracted from the monolith
   app.use("/api", callCenterRoutes);
+  // Notifications (in-app CRUD, test, email/SMS triggers, /my/notifications) — extracted from the monolith
+  app.use("/api", notificationsRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
   // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith
