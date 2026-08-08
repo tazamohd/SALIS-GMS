@@ -76,6 +76,8 @@ import {
   AI_SCHEDULE_OPTIMIZATION_SERVICE,
   AI_CHAT_REPOSITORY,
   AI_CHAT_SERVICE,
+  AI_OCR_DOCUMENT_REPOSITORY,
+  AI_OCR_DOCUMENT_SERVICE,
   FEATURE_FLAG_REPOSITORY,
   FEATURE_FLAG_SERVICE,
   BACKUP_REPOSITORY,
@@ -154,6 +156,8 @@ import { AiScheduleOptimizationRepository } from '../../modules/ai/repositories/
 import { AiScheduleOptimizationService } from '../../modules/ai/services/ai-schedule-optimization.service';
 import { AiChatRepository } from '../../modules/ai/repositories/ai-chat.repository';
 import { AiChatService } from '../../modules/ai/services/ai-chat.service';
+import { AiOcrDocumentRepository } from '../../modules/ai/repositories/ai-ocr-document.repository';
+import { AiOcrDocumentService } from '../../modules/ai/services/ai-ocr-document.service';
 import { FeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import { BackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -334,6 +338,9 @@ export function getAppContainer(): Container {
 
   c.register(AI_CHAT_REPOSITORY, () => new AiChatRepository());
   c.register(AI_CHAT_SERVICE, (ctx) => new AiChatService(ctx.resolve(AI_CHAT_REPOSITORY)));
+
+  c.register(AI_OCR_DOCUMENT_REPOSITORY, () => new AiOcrDocumentRepository());
+  c.register(AI_OCR_DOCUMENT_SERVICE, (ctx) => new AiOcrDocumentService(ctx.resolve(AI_OCR_DOCUMENT_REPOSITORY)));
 
   c.register(FEATURE_FLAG_REPOSITORY, () => new FeatureFlagRepository());
   c.register(FEATURE_FLAG_SERVICE, (ctx) => new FeatureFlagService(ctx.resolve(FEATURE_FLAG_REPOSITORY)));
