@@ -65,6 +65,8 @@ import type { IFeatureFlagRepository } from '../../modules/platform/repositories
 import type { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import type { IBackupRepository } from '../../modules/platform/repositories/backup.repository';
 import type { BackupService } from '../../modules/platform/services/backup.service';
+import type { ISubscriptionRepository } from '../../modules/subscriptions/repositories/subscription.repository';
+import type { SubscriptionService } from '../../modules/subscriptions/services/subscription.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -133,3 +135,5 @@ export const FEATURE_FLAG_REPOSITORY = token<IFeatureFlagRepository>('FeatureFla
 export const FEATURE_FLAG_SERVICE = token<FeatureFlagService>('FeatureFlagService');
 export const BACKUP_REPOSITORY = token<IBackupRepository>('BackupRepository');
 export const BACKUP_SERVICE = token<BackupService>('BackupService');
+export const SUBSCRIPTION_REPOSITORY = token<ISubscriptionRepository>('SubscriptionRepository');
+export const SUBSCRIPTION_SERVICE = token<SubscriptionService>('SubscriptionService');

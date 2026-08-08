@@ -70,6 +70,8 @@ import {
   FEATURE_FLAG_SERVICE,
   BACKUP_REPOSITORY,
   BACKUP_SERVICE,
+  SUBSCRIPTION_REPOSITORY,
+  SUBSCRIPTION_SERVICE,
 } from './tokens';
 import { EventBus, type DeadLetter } from '../events/event-bus';
 import { CustomerRepository } from '../../modules/customers/repositories/customer.repository';
@@ -136,6 +138,8 @@ import { FeatureFlagRepository } from '../../modules/platform/repositories/featu
 import { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import { BackupRepository } from '../../modules/platform/repositories/backup.repository';
 import { BackupService } from '../../modules/platform/services/backup.service';
+import { SubscriptionRepository } from '../../modules/subscriptions/repositories/subscription.repository';
+import { SubscriptionService } from '../../modules/subscriptions/services/subscription.service';
 
 function buildEventBus(): EventBus {
   return new EventBus({
@@ -301,6 +305,9 @@ export function getAppContainer(): Container {
 
   c.register(BACKUP_REPOSITORY, () => new BackupRepository());
   c.register(BACKUP_SERVICE, (ctx) => new BackupService(ctx.resolve(BACKUP_REPOSITORY)));
+
+  c.register(SUBSCRIPTION_REPOSITORY, () => new SubscriptionRepository());
+  c.register(SUBSCRIPTION_SERVICE, (ctx) => new SubscriptionService(ctx.resolve(SUBSCRIPTION_REPOSITORY)));
 
   container = c;
   return c;
