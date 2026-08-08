@@ -74,6 +74,7 @@ import iotRoutes from "../modules/iot";
 import dynamicPricingRoutes from "../modules/dynamic-pricing";
 import feedbackRoutes from "../modules/feedback";
 import complianceRoutes from "../modules/compliance";
+import emergingTechRoutes from "../modules/emerging-tech";
 import fleetManagementRoutes from "../modules/fleet-management";
 import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
@@ -458,6 +459,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", feedbackRoutes);
   // Compliance (environmental records + analytics, policies/audits/tasks) — extracted from the monolith
   app.use("/api", complianceRoutes);
+  // Emerging tech (blockchain, AR, IoT, 3D, drones, AI video, digital twins, fraud, biometric, edge, seed) — extracted from the monolith
+  app.use("/api", emergingTechRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
   // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith
