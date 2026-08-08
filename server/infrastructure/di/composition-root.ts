@@ -54,6 +54,8 @@ import {
   FLEET_SERVICE,
   MARKETPLACE_REPOSITORY,
   MARKETPLACE_SERVICE,
+  MARKETPLACE_WRITES_REPOSITORY,
+  MARKETPLACE_WRITES_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -134,6 +136,8 @@ import { FleetRepository } from '../../modules/fleet/repositories/fleet.reposito
 import { FleetService } from '../../modules/fleet/services/fleet.service';
 import { MarketplaceRepository } from '../../modules/marketplace/repositories/marketplace.repository';
 import { MarketplaceService } from '../../modules/marketplace/services/marketplace.service';
+import { MarketplaceWritesRepository } from '../../modules/marketplace/repositories/marketplace-writes.repository';
+import { MarketplaceWritesService } from '../../modules/marketplace/services/marketplace-writes.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -298,6 +302,12 @@ export function getAppContainer(): Container {
   c.register(
     MARKETPLACE_SERVICE,
     (ctx) => new MarketplaceService(ctx.resolve(MARKETPLACE_REPOSITORY)),
+  );
+
+  c.register(MARKETPLACE_WRITES_REPOSITORY, () => new MarketplaceWritesRepository());
+  c.register(
+    MARKETPLACE_WRITES_SERVICE,
+    (ctx) => new MarketplaceWritesService(ctx.resolve(MARKETPLACE_WRITES_REPOSITORY)),
   );
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());

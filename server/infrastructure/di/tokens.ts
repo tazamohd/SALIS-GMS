@@ -49,6 +49,8 @@ import type { IFleetRepository } from '../../modules/fleet/repositories/fleet.re
 import type { FleetService } from '../../modules/fleet/services/fleet.service';
 import type { IMarketplaceRepository } from '../../modules/marketplace/repositories/marketplace.repository';
 import type { MarketplaceService } from '../../modules/marketplace/services/marketplace.service';
+import type { IMarketplaceWritesRepository } from '../../modules/marketplace/repositories/marketplace-writes.repository';
+import type { MarketplaceWritesService } from '../../modules/marketplace/services/marketplace-writes.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -131,6 +133,8 @@ export const FLEET_REPOSITORY = token<IFleetRepository>('FleetRepository');
 export const FLEET_SERVICE = token<FleetService>('FleetService');
 export const MARKETPLACE_REPOSITORY = token<IMarketplaceRepository>('MarketplaceRepository');
 export const MARKETPLACE_SERVICE = token<MarketplaceService>('MarketplaceService');
+export const MARKETPLACE_WRITES_REPOSITORY = token<IMarketplaceWritesRepository>('MarketplaceWritesRepository');
+export const MARKETPLACE_WRITES_SERVICE = token<MarketplaceWritesService>('MarketplaceWritesService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
