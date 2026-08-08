@@ -19019,57 +19019,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Provider side: bookings made TO the caller's garage.
-  app.get('/api/provider/bookings', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const status = typeof req.query.status === "string" ? req.query.status : undefined;
-      res.json(await storage.listProviderBookings(providerId, status));
-    } catch (error) {
-      console.error("Error listing provider bookings:", error);
-      res.status(500).json({ message: "Failed to load bookings" });
-    }
-  });
-
-  app.patch('/api/provider/bookings/:id', isAuthenticated, requireResourceOwnership({ table: 'marketplace_bookings', tenantColumn: 'provider_id' }), async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const status = req.body?.status;
-      if (status && !["accepted", "declined", "completed"].includes(status)) {
-        return res.status(400).json({ message: "status must be accepted, declined or completed" });
-      }
-      const updated = await storage.updateProviderBooking(req.params.id, providerId, {
-        status,
-        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
-      });
-      if (!updated) return res.status(404).json({ message: "Booking not found" });
-
-      // Tell the customer their booking changed state. Best-effort.
-      if (status) {
-        try {
-          const verb = status === "accepted" ? "accepted" : status === "declined" ? "declined" : "marked complete";
-          await storage.createNotification({
-            type: "in-app",
-            category: "appointment",
-            recipientId: updated.customerId,
-            garageId: providerId,
-            title: `Booking ${verb}`,
-            message: `Your booking${updated.serviceName ? ` for ${updated.serviceName}` : ""} was ${verb}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
-            metadata: { bookingId: updated.id, status },
-          } as any);
-        } catch (notifyErr) {
-          console.error("Booking notification (customer) failed:", notifyErr);
-        }
-      }
-
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating provider booking:", error);
-      res.status(500).json({ message: "Failed to update booking" });
-    }
-  });
+  // Provider bookings (list + status patch) migrated to server/modules/provider (Phase E).
 
   // A user's own in-app notifications (customers have no garage, so this is
   // recipient-scoped, unlike the garage-wide /api/notifications).
@@ -19098,94 +19048,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Provider offerings — a provider manages the products/plans/services it
   // presents in the marketplace (scoped to the caller's garage).
   // ==========================================================================
-
-  app.get('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      res.json(await storage.listProviderOfferings(providerId));
-    } catch (error) {
-      console.error("Error listing provider offerings:", error);
-      res.status(500).json({ message: "Failed to load offerings" });
-    }
-  });
-
-  app.post('/api/provider/offerings', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const { insertProviderOfferingSchema } = await import("@shared/schema");
-      const parsed = insertProviderOfferingSchema.safeParse(req.body);
-      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
-      const offering = await storage.createProviderOffering({ ...parsed.data, providerId } as any);
-      res.status(201).json(offering);
-    } catch (error) {
-      console.error("Error creating provider offering:", error);
-      res.status(500).json({ message: "Failed to create offering" });
-    }
-  });
-
-  app.patch('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const { insertProviderOfferingSchema } = await import("@shared/schema");
-      const parsed = insertProviderOfferingSchema.partial().safeParse(req.body);
-      if (!parsed.success) return res.status(400).json(sanitizeZodError(parsed.error));
-      const updated = await storage.updateProviderOffering(req.params.id, providerId, parsed.data as any);
-      if (!updated) return res.status(404).json({ message: "Offering not found" });
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating provider offering:", error);
-      res.status(500).json({ message: "Failed to update offering" });
-    }
-  });
-
-  app.delete('/api/provider/offerings/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_offerings', tenantColumn: 'provider_id' }), async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      await storage.deleteProviderOffering(req.params.id, providerId); // scoped
-      res.json({ message: "Offering removed" });
-    } catch (error) {
-      console.error("Error deleting provider offering:", error);
-      res.status(500).json({ message: "Failed to remove offering" });
-    }
-  });
+  // Provider offerings (list/create/patch/delete) migrated to server/modules/provider (Phase E).
 
   // ==========================================================================
   // Marketplace C3 — provider profile + customer reviews
   // ==========================================================================
-
-  app.get('/api/provider/profile', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const provider = await storage.getMarketplaceProvider(providerId);
-      if (!provider) return res.status(404).json({ message: "Provider not found" });
-      res.json(provider);
-    } catch (error) {
-      console.error("Error loading provider profile:", error);
-      res.status(500).json({ message: "Failed to load profile" });
-    }
-  });
-
-  app.patch('/api/provider/profile', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const allowed: any = {};
-      for (const k of ["description", "phone", "email", "address", "photoUrl", "workingHours"]) {
-        if (typeof req.body?.[k] === "string") allowed[k] = req.body[k];
-      }
-      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
-      const updated = await storage.updateProviderProfile(providerId, allowed);
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating provider profile:", error);
-      res.status(500).json({ message: "Failed to update profile" });
-    }
-  });
+  // Provider profile (get/patch) migrated to server/modules/provider (Phase E).
 
   // Public: a provider's reviews.
   // Public marketplace provider-reviews read migrated to server/modules/marketplace (Phase E).
@@ -19216,16 +19084,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Provider notification failed:", e);
     }
   };
-  const notifyCustomer = async (customerId: string, providerId: string, title: string, message: string, metadata: any) => {
-    try {
-      await storage.createNotification({
-        type: "in-app", category: "general", recipientId: customerId, garageId: providerId,
-        title, message, metadata,
-      } as any);
-    } catch (e) {
-      console.error("Customer notification failed:", e);
-    }
-  };
+  // notifyCustomer moved into server/modules/provider (Phase E — used only by the
+  // provider order/quote responses that were extracted).
 
   app.post('/api/my/orders', isAuthenticated, async (req: any, res) => {
     try {
@@ -19283,41 +19143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/provider/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      res.json(await storage.listProviderOrders(providerId));
-    } catch (error) {
-      console.error("Error listing provider orders:", error);
-      res.status(500).json({ message: "Failed to load orders" });
-    }
-  });
-
-  app.patch('/api/provider/orders/:id', isAuthenticated, requireResourceOwnership({ table: 'provider_orders', tenantColumn: 'provider_id' }), async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const status = req.body?.status;
-      if (status && !["confirmed", "fulfilled", "declined"].includes(status)) {
-        return res.status(400).json({ message: "status must be confirmed, fulfilled or declined" });
-      }
-      const updated = await storage.updateProviderOrder(req.params.id, providerId, {
-        status,
-        providerNotes: typeof req.body?.providerNotes === "string" ? req.body.providerNotes : undefined,
-      });
-      if (!updated) return res.status(404).json({ message: "Order not found" });
-      if (status) {
-        await notifyCustomer(updated.customerId, providerId, `Order ${status}`,
-          `Your order (${updated.totalAmount} ${updated.currency}) is now ${status}.${updated.providerNotes ? ` Note: ${updated.providerNotes}` : ""}`,
-          { orderId: updated.id, status });
-      }
-      res.json(updated);
-    } catch (error) {
-      console.error("Error updating provider order:", error);
-      res.status(500).json({ message: "Failed to update order" });
-    }
-  });
+  // Provider orders (list + status patch) migrated to server/modules/provider (Phase E).
 
   // ==========================================================================
   // Marketplace C2 — insurance-quote requests (customer -> insurer)
@@ -19385,47 +19211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/provider/quotes', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      res.json(await storage.listProviderQuotes(providerId));
-    } catch (error) {
-      console.error("Error listing provider quotes:", error);
-      res.status(500).json({ message: "Failed to load quotes" });
-    }
-  });
-
-  app.post('/api/provider/quotes/:id/respond', isAuthenticated, async (req: any, res) => {
-    try {
-      const providerId = req.user?.garageId;
-      if (!providerId) return res.status(403).json({ message: "No provider account associated" });
-      const { status, quotedPremium, quoteNotes, validUntil } = req.body ?? {};
-      if (!["quoted", "declined"].includes(status)) {
-        return res.status(400).json({ message: "status must be quoted or declined" });
-      }
-      if (status === "quoted" && !(Number(quotedPremium) > 0)) {
-        return res.status(400).json({ message: "quotedPremium is required to quote" });
-      }
-      const updated = await storage.respondInsuranceQuote(req.params.id, providerId, {
-        status,
-        quotedPremium: status === "quoted" ? String(quotedPremium) : undefined,
-        quoteNotes: typeof quoteNotes === "string" ? quoteNotes : undefined,
-        validUntil: validUntil ? new Date(validUntil) : undefined,
-      });
-      if (!updated) return res.status(404).json({ message: "Quote not found" });
-      await notifyCustomer(updated.customerId, providerId,
-        status === "quoted" ? "Your insurance quote is ready" : "Quote request declined",
-        status === "quoted"
-          ? `Premium: ${updated.quotedPremium} ${updated.currency}${updated.quoteNotes ? ` — ${updated.quoteNotes}` : ""}`
-          : `The insurer declined${updated.quoteNotes ? `: ${updated.quoteNotes}` : "."}`,
-        { quoteId: updated.id, status });
-      res.json(updated);
-    } catch (error) {
-      console.error("Error responding to quote:", error);
-      res.status(500).json({ message: "Failed to respond to quote" });
-    }
-  });
+  // Provider quotes (list + respond) migrated to server/modules/provider (Phase E).
 
   // Scan a vehicle registration/license or insurance card and extract fields.
   // Pluggable OCR: when VEHICLE_OCR_PROVIDER is configured a real extractor
