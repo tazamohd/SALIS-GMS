@@ -73,7 +73,7 @@ import financialRoutes from "./financial";
 import franchiseRoutes from "./franchise";
 import saudiRoutes from "./saudi";
 import smsCampaignRoutes from "./sms-campaigns";
-import { subscriptionsRoutes } from "./subscriptions";
+import subscriptionsRoutes from "../modules/subscriptions";
 import supplierPortalRoutes from "./supplier-portal";
 import warrantyRoutes from "./warranty";
 import whatsappRoutes from "./whatsapp";
