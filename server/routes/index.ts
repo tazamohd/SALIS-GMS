@@ -65,6 +65,7 @@ import insuranceRoutes from "../modules/insurance";
 import marketplaceRoutes from "../modules/marketplace";
 import providerRoutes from "../modules/provider";
 import administrationRoutes from "../modules/administration";
+import licensingRoutes from "../modules/licensing";
 import fleetManagementRoutes from "../modules/fleet-management";
 import fleetTrackingRoutes from "../modules/fleet-tracking";
 import customerPortalRoutes from "./customer-portal";
@@ -431,6 +432,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", providerRoutes);
   // Platform administration (stats, garages, suppliers, tickets, system-health, onboarding + subscription-request queues) — extracted from the monolith
   app.use("/api", administrationRoutes);
+  // Internal license management (issue/activate/validate/renew/revoke signed license keys) — new subsystem (Phase D.1)
+  app.use("/api", licensingRoutes);
   // Fleet management (groups, vehicles, contracts, pricing tiers, maintenance schedules) — extracted from the monolith
   app.use("/api", fleetManagementRoutes);
   // Fleet tracking (locations, geofences, geofence-events, routes) — extracted from the monolith

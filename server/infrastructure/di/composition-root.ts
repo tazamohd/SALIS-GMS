@@ -60,6 +60,8 @@ import {
   PROVIDER_SERVICE,
   ADMINISTRATION_REPOSITORY,
   ADMINISTRATION_SERVICE,
+  LICENSING_REPOSITORY,
+  LICENSING_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -146,6 +148,8 @@ import { ProviderRepository } from '../../modules/provider/repositories/provider
 import { ProviderService } from '../../modules/provider/services/provider.service';
 import { AdministrationRepository } from '../../modules/administration/repositories/administration.repository';
 import { AdministrationService } from '../../modules/administration/services/administration.service';
+import { LicensingRepository } from '../../modules/licensing/repositories/licensing.repository';
+import { LicensingService } from '../../modules/licensing/services/licensing.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -326,6 +330,9 @@ export function getAppContainer(): Container {
     ADMINISTRATION_SERVICE,
     (ctx) => new AdministrationService(ctx.resolve(ADMINISTRATION_REPOSITORY)),
   );
+
+  c.register(LICENSING_REPOSITORY, () => new LicensingRepository());
+  c.register(LICENSING_SERVICE, (ctx) => new LicensingService(ctx.resolve(LICENSING_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
