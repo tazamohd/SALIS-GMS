@@ -144,9 +144,6 @@ import {
   insertGoogleBusinessProfileSchema,
   insertGmbPostSchema,
   insertGmbReviewSchema,
-  insertCompliancePolicySchema,
-  insertComplianceAuditSchema,
-  insertComplianceTaskSchema,
   insertServiceSignatureSchema,
   insertServiceChatMessageSchema,
   insertServiceReviewSchema,
@@ -327,21 +324,6 @@ const calibrationRecordSchema = z.object({
 });
 
 // Phase 6: Compliance & Quality
-const complianceRecordSchema = z.object({
-  complianceType: z.enum(['waste-disposal', 'emissions', 'safety-inspection', 'environmental-permit']),
-  recordDate: z.string(),
-  wasteType: z.string().optional(),
-  quantity: z.string().optional(),
-  unit: z.string().optional(),
-  disposalMethod: z.string().optional(),
-  disposalCompany: z.string().optional(),
-  certificationNumber: z.string().optional(),
-  cost: z.string().optional(),
-  regulatoryStandard: z.string().optional(),
-  attachments: z.array(z.string()).optional(),
-  notes: z.string().optional(),
-});
-
 const qualityChecklistSchema = z.object({
   checklistName: z.string(),
   checklistType: z.enum(['pre-delivery', 'quality-audit', 'process-check', 'customer-satisfaction']),
@@ -11125,71 +11107,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 6: COMPLIANCE & QUALITY ROUTES
   // ==========================================
 
-  // Environmental Compliance
-  app.post('/api/compliance/environmental', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      
-      const validated = complianceRecordSchema.parse(req.body);
-      
-      const recordData = {
-        garageId,
-        complianceType: validated.complianceType,
-        recordDate: new Date(validated.recordDate),
-        wasteType: validated.wasteType,
-        quantity: validated.quantity !== undefined ? Number(validated.quantity) || undefined : undefined,
-        unit: validated.unit,
-        disposalMethod: validated.disposalMethod,
-        disposalCompany: validated.disposalCompany,
-        certificationNumber: validated.certificationNumber,
-        // The service takes numbers and stringifies them for the decimal
-        // columns itself.
-        cost: validated.cost !== undefined ? Number(validated.cost) || undefined : undefined,
-        regulatoryStandard: validated.regulatoryStandard,
-        attachments: validated.attachments,
-        notes: validated.notes,
-      };
-      const record = await phase6Service.createComplianceRecord(recordData);
-      res.status(201).json(record);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error creating compliance record:", error);
-      res.status(500).json({ message: "Failed to create compliance record" });
-    }
-  });
-
-  app.get('/api/compliance/environmental', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { complianceType } = req.query;
-      const records = await phase6Service.getComplianceRecords(garageId, complianceType as string);
-      res.json(records);
-    } catch (error) {
-      console.error("Error fetching compliance records:", error);
-      res.status(500).json({ message: "Failed to fetch compliance records" });
-    }
-  });
-
-  app.get('/api/compliance/environmental/analytics', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { startDate, endDate } = req.query;
-      // The service aggregates over a closed date range; default to the
-      // trailing year when the caller doesn't narrow it.
-      const to = endDate ? new Date(endDate as string) : new Date();
-      const from = startDate
-        ? new Date(startDate as string)
-        : new Date(to.getFullYear() - 1, to.getMonth(), to.getDate());
-      const analytics = await phase6Service.getComplianceAnalytics(garageId, from, to);
-      res.json(analytics);
-    } catch (error) {
-      console.error("Error fetching compliance analytics:", error);
-      res.status(500).json({ message: "Failed to fetch compliance analytics" });
-    }
-  });
-
   // ISO 9001 Quality Management
   app.post('/api/quality/checklists', isAuthenticated, async (req: any, res) => {
     try {
@@ -13936,82 +13853,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const review = await storage.respondToGmbReview(req.params.id, req.body.responseText);
       res.json({ data: review });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // ==================== COMPLIANCE MANAGEMENT ROUTES ====================
-  app.get('/api/compliance/policies', isAuthenticated, async (req: any, res) => {
-    try {
-      const policies = await storage.getCompliancePolicies(req.user?.garageId, req.query.status);
-      res.json({ data: policies });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/compliance/policies', isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertCompliancePolicySchema.parse(req.body);
-      const policy = await storage.createCompliancePolicy(validatedData);
-      res.json({ data: policy });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.get('/api/compliance/audits', isAuthenticated, async (req: any, res) => {
-    try {
-      const audits = await storage.getComplianceAudits(req.user?.garageId, req.query.policyId, req.query.status);
-      res.json({ data: audits });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/compliance/audits', isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertComplianceAuditSchema.parse(req.body);
-      const audit = await storage.createComplianceAudit(validatedData);
-      res.json({ data: audit });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.get('/api/compliance/tasks', isAuthenticated, async (req: any, res) => {
-    try {
-      const tasks = await storage.getComplianceTasks(req.user?.garageId, req.query.policyId, req.query.status);
-      res.json({ data: tasks });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post('/api/compliance/tasks', isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertComplianceTaskSchema.parse(req.body);
-      const task = await storage.createComplianceTask(validatedData);
-      res.json({ data: task });
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.patch('/api/compliance/tasks/:id/complete', isAuthenticated, requireResourceOwnership({ table: 'compliance_tasks' }), async (req, res) => {
-    try {
-      const task = await storage.completeComplianceTask(req.params.id);
-      res.json({ data: task });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
