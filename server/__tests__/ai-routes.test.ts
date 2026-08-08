@@ -138,4 +138,26 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(chatSvc).not.toMatch(/from '.*\/storage'/);
     expect(chatSvc).not.toMatch(/from '.*\/ai'$/m);
   });
+
+  it('mounts the four OCR routes (parent-scoped ownership) and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/ocr-documents['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/ocr-documents\/upload['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/ocr-documents\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership\(\{\s*table:\s*'ocr_documents',\s*parent:/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/ai\/ocr-documents\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership\(\{\s*table:\s*'ocr_documents',\s*parent:/);
+    expect(legacy).not.toMatch(/app\.(post|get|patch)\(['"]\/api\/ai\/ocr-documents/);
+  });
+
+  it('completes the /api/ai/* migration: no monolith AI handlers remain', () => {
+    const legacy = read('server/routes.ts');
+    expect(legacy).not.toMatch(/app\.(get|post|put|patch|delete)\(['"]\/api\/ai\//);
+  });
+
+  it('keeps the OCR data access (storage + mock extraction) behind its repository', () => {
+    const ocrRepo = read('server/modules/ai/repositories/ai-ocr-document.repository.ts');
+    const ocrSvc = read('server/modules/ai/services/ai-ocr-document.service.ts');
+    expect(ocrRepo).toMatch(/getOCRDocuments/);
+    expect(ocrRepo).toMatch(/mockExtraction/);
+    expect(ocrSvc).not.toMatch(/from '.*\/storage'/);
+  });
 });

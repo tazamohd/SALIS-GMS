@@ -71,6 +71,8 @@ import type { IAiScheduleOptimizationRepository } from '../../modules/ai/reposit
 import type { AiScheduleOptimizationService } from '../../modules/ai/services/ai-schedule-optimization.service';
 import type { IAiChatRepository } from '../../modules/ai/repositories/ai-chat.repository';
 import type { AiChatService } from '../../modules/ai/services/ai-chat.service';
+import type { IAiOcrDocumentRepository } from '../../modules/ai/repositories/ai-ocr-document.repository';
+import type { AiOcrDocumentService } from '../../modules/ai/services/ai-ocr-document.service';
 import type { IFeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import type { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
 import type { IBackupRepository } from '../../modules/platform/repositories/backup.repository';
@@ -151,6 +153,8 @@ export const AI_SCHEDULE_OPTIMIZATION_REPOSITORY = token<IAiScheduleOptimization
 export const AI_SCHEDULE_OPTIMIZATION_SERVICE = token<AiScheduleOptimizationService>('AiScheduleOptimizationService');
 export const AI_CHAT_REPOSITORY = token<IAiChatRepository>('AiChatRepository');
 export const AI_CHAT_SERVICE = token<AiChatService>('AiChatService');
+export const AI_OCR_DOCUMENT_REPOSITORY = token<IAiOcrDocumentRepository>('AiOcrDocumentRepository');
+export const AI_OCR_DOCUMENT_SERVICE = token<AiOcrDocumentService>('AiOcrDocumentService');
 export const FEATURE_FLAG_REPOSITORY = token<IFeatureFlagRepository>('FeatureFlagRepository');
 export const FEATURE_FLAG_SERVICE = token<FeatureFlagService>('FeatureFlagService');
 export const BACKUP_REPOSITORY = token<IBackupRepository>('BackupRepository');

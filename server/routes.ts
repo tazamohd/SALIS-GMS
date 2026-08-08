@@ -5950,80 +5950,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Phase 1: Document OCR Routes
-  app.get('/api/ai/ocr-documents', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { status } = req.query;
-      
-      const documents = await storage.getOCRDocuments(garageId, status);
-      res.json(documents);
-    } catch (error) {
-      console.error("Error fetching OCR documents:", error);
-      res.status(500).json({ message: "Failed to fetch OCR documents" });
-    }
-  });
-
-  app.post('/api/ai/ocr-documents/upload', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { documentType, fileName } = req.body;
-
-      // In production, would integrate with actual OCR service (e.g., Google Cloud Vision, AWS Textract)
-      // For now, create a placeholder document with mock extraction
-      const documentData = {
-        garageId,
-        documentType: documentType || 'invoice',
-        fileName: fileName || 'document.pdf',
-        status: 'completed',
-        extractedData: {
-          vendor: "Auto Parts Supplier Inc.",
-          date: new Date().toISOString().split('T')[0],
-          invoiceNumber: `INV-${Math.floor(Math.random() * 100000)}`,
-          total: (Math.random() * 1000 + 100).toFixed(2),
-          items: [
-            { description: "Oil Filter", quantity: 2, unitPrice: 15.99, amount: 31.98 },
-            { description: "Air Filter", quantity: 1, unitPrice: 22.50, amount: 22.50 },
-            { description: "Spark Plugs", quantity: 4, unitPrice: 8.75, amount: 35.00 }
-          ],
-          notes: "Automatically extracted via AI OCR"
-        },
-        confidence: 92,
-      };
-
-      const document = await storage.createOCRDocument(documentData);
-      res.json(document);
-    } catch (error) {
-      console.error("Error uploading OCR document:", error);
-      res.status(500).json({ message: "Failed to upload document for OCR" });
-    }
-  });
-
-  app.get('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
-    try {
-      const document = await storage.getOCRDocument(req.params.id);
-      if (!document) {
-        return res.status(404).json({ message: "Document not found" });
-      }
-      res.json(document);
-    } catch (error) {
-      console.error("Error fetching OCR document:", error);
-      res.status(500).json({ message: "Failed to fetch OCR document" });
-    }
-  });
-
-  app.patch('/api/ai/ocr-documents/:id', isAuthenticated, requireResourceOwnership({ table: 'ocr_documents', parent: { table: 'vehicles', fk: 'vehicle_id' } }), async (req: any, res) => {
-    try {
-      const { extractedData, status } = req.body;
-      const document = await storage.updateOCRDocument(req.params.id, {
-        extractedData,
-        status: status || 'approved',
-      });
-      res.json(document);
-    } catch (error) {
-      console.error("Error updating OCR document:", error);
-      res.status(500).json({ message: "Failed to update OCR document" });
-    }
-  });
+  // AI OCR Document Routes — extracted to server/modules/ai
+  // (GET /api/ai/ocr-documents, POST /api/ai/ocr-documents/upload,
+  //  GET/PATCH /api/ai/ocr-documents/:id).
 
   // Phase 2: Advanced Analytics Routes
   // Analytics handlers (/api/analytics/*) migrated to server/modules/analytics (Phase E).
