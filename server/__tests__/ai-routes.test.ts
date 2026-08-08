@@ -102,4 +102,22 @@ describe('AI route consolidation (Phase E module)', () => {
     expect(prSvc).not.toMatch(/from '.*\/storage'/);
     expect(prSvc).not.toMatch(/from '.*\/ai'$/m);
   });
+
+  it('mounts the four schedule-optimization routes and retires the monolith handlers', () => {
+    const legacy = read('server/routes.ts');
+    expect(moduleIndexSource).toMatch(/router\.post\(\s*['"]\/ai\/optimize-schedule['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/schedule-optimizations['"],\s*isAuthenticated/);
+    expect(moduleIndexSource).toMatch(/router\.get\(\s*['"]\/ai\/schedule-optimizations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(moduleIndexSource).toMatch(/router\.patch\(\s*['"]\/ai\/schedule-optimizations\/:id['"],\s*isAuthenticated,\s*requireResourceOwnership/);
+    expect(legacy).not.toMatch(/app\.(post|get|patch)\(['"]\/api\/ai\/(optimize-schedule|schedule-optimizations)/);
+  });
+
+  it('keeps the schedule data access (LLM + storage) behind its repository', () => {
+    const soRepo = read('server/modules/ai/repositories/ai-schedule-optimization.repository.ts');
+    const soSvc = read('server/modules/ai/services/ai-schedule-optimization.service.ts');
+    expect(soRepo).toMatch(/optimizeSchedule/);
+    expect(soRepo).toMatch(/createAIScheduleOptimization/);
+    expect(soSvc).not.toMatch(/from '.*\/storage'/);
+    expect(soSvc).not.toMatch(/from '.*\/ai'$/m);
+  });
 });
