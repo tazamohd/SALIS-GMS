@@ -75,6 +75,8 @@ import type { ComplianceRepository } from '../../modules/compliance/repositories
 import type { ComplianceService } from '../../modules/compliance/services/compliance.service';
 import type { EmergingTechRepository } from '../../modules/emerging-tech/repositories/emerging-tech.repository';
 import type { EmergingTechService } from '../../modules/emerging-tech/services/emerging-tech.service';
+import type { NextGenRepository } from '../../modules/nextgen/repositories/nextgen.repository';
+import type { NextGenService } from '../../modules/nextgen/services/nextgen.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -183,6 +185,8 @@ export const COMPLIANCE_REPOSITORY = token<ComplianceRepository>('ComplianceRepo
 export const COMPLIANCE_SERVICE = token<ComplianceService>('ComplianceService');
 export const EMERGING_TECH_REPOSITORY = token<EmergingTechRepository>('EmergingTechRepository');
 export const EMERGING_TECH_SERVICE = token<EmergingTechService>('EmergingTechService');
+export const NEXTGEN_REPOSITORY = token<NextGenRepository>('NextGenRepository');
+export const NEXTGEN_SERVICE = token<NextGenService>('NextGenService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
