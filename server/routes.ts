@@ -39,7 +39,6 @@ import {
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
-import { randomBytes } from "crypto";
 import { verifyBusiness } from "./services/verification/businessVerification";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
 import { requireResourceOwnership } from "./middleware/resourceOwnership";
@@ -18396,192 +18395,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PLATFORM ADMIN ROUTES
   // ============================================================
 
-  app.get('/api/platform-admin/stats', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      const [totalGarages, activeGarages, totalUsers, plans, tickets, pendingApps, pendingSubs, totalSuppliers, roleRows] = await Promise.all([
-        db.execute(sql`SELECT COUNT(*) as count FROM garages`),
-        db.execute(sql`SELECT COUNT(*) as count FROM garages WHERE is_active = true`),
-        db.execute(sql`SELECT COUNT(*) as count FROM users`),
-        db.execute(sql`SELECT plan, COUNT(*) as count FROM subscriptions WHERE status IN ('active','trialing') GROUP BY plan`),
-        db.execute(sql`SELECT COUNT(*) as count FROM support_tickets WHERE status NOT IN ('resolved','closed')`),
-        db.execute(sql`SELECT COUNT(*) as count FROM garage_applications WHERE status = 'pending'`),
-        db.execute(sql`SELECT COUNT(*) as count FROM subscription_requests WHERE status = 'pending'`),
-        db.execute(sql`SELECT COUNT(*) as count FROM suppliers`),
-        db.execute(sql`SELECT role, COUNT(*) as count FROM users GROUP BY role ORDER BY count DESC`),
-      ]);
-
-      // Real MRR from the subscription plan mix (display prices from the
-      // shared plan catalog — Stripe is the billing source of truth).
-      const { PLANS } = await import("@shared/plans");
-      const priceByPlan = new Map(Object.values(PLANS).map((p: any) => [p.id, p.priceMonthly ?? 0]));
-      let monthlyRevenue = 0;
-      for (const row of plans.rows as any[]) {
-        monthlyRevenue += (priceByPlan.get(row.plan) ?? 0) * Number(row.count);
-      }
-
-      res.json({
-        totalGarages: Number(totalGarages.rows[0]?.count ?? 0),
-        activeGarages: Number(activeGarages.rows[0]?.count ?? 0),
-        totalUsers: Number(totalUsers.rows[0]?.count ?? 0),
-        totalSuppliers: Number(totalSuppliers.rows[0]?.count ?? 0),
-        monthlyRevenue,
-        supportTickets: Number(tickets.rows[0]?.count ?? 0),
-        pendingApplications: Number(pendingApps.rows[0]?.count ?? 0),
-        pendingSubscriptionRequests: Number(pendingSubs.rows[0]?.count ?? 0),
-        // Live subscription plan mix — feeds the overview distribution chart.
-        planMix: (plans.rows as any[]).map((r) => ({ plan: r.plan, count: Number(r.count) })),
-        // Real user counts per role — feeds the RBAC tab.
-        roleCounts: (roleRows.rows as any[]).map((r) => ({ role: r.role, count: Number(r.count) })),
-        // Honest process uptime (seconds), not an invented SLA percentage.
-        uptimeSeconds: Math.round(process.uptime()),
-      });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get('/api/platform-admin/garages', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      const result = await db.execute(sql`
-        SELECT g.*, COUNT(u.id) as user_count
-        FROM garages g
-        LEFT JOIN users u ON u.garage_id = g.id
-        GROUP BY g.id
-        ORDER BY g.created_at DESC
-        LIMIT 100
-      `);
-      res.json(result.rows);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.post('/api/platform-admin/garages', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const { name, ownerName, email, phone, address, city, country, subscriptionPlan, vatNumber, maxBranches } = req.body;
-
-      const existing = await db.execute(sql`SELECT id FROM garages WHERE name = ${name} LIMIT 1`);
-      if (existing.rows.length > 0) {
-        return res.status(400).json({ message: "A garage with this name already exists" });
-      }
-
-      const result = await db.execute(sql`
-        INSERT INTO garages (id, name, address, phone, email, subscription_plan, is_active, created_at)
-        VALUES (
-          gen_random_uuid(), ${name}, ${`${address}, ${city}, ${country}`}, ${phone}, ${email},
-          ${subscriptionPlan ?? 'STARTER'}, true, NOW()
-        )
-        RETURNING *
-      `);
-
-      res.status(201).json(result.rows[0]);
-    } catch (error: any) {
-      console.error('Error creating garage:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.patch('/api/platform-admin/garages/:id/status', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const { status } = req.body;
-      const isActive = status === 'active';
-      await db.execute(sql`UPDATE garages SET is_active = ${isActive} WHERE id = ${req.params.id}`);
-      res.json({ success: true });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Cross-tenant oversight view: every garage's suppliers with the owning
-  // garage joined. Read-only — suppliers are created by each garage in its
-  // own procurement module; platform-level parts vendors live in the
-  // marketplace as parts_store providers.
-  app.get('/api/platform-admin/suppliers', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      const result = await db.execute(sql`
-        SELECT s.id, s.name, s.contact_person, s.email, s.phone, s.country,
-               s.payment_terms, s.is_active, s.created_at, g.name AS garage
-        FROM suppliers s
-        LEFT JOIN garages g ON g.id = s.garage_id
-        ORDER BY s.created_at DESC
-        LIMIT 100
-      `);
-      res.json(result.rows);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get('/api/platform-admin/support-tickets', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      // Cross-garage view for the platform team (real data, garage name joined).
-      const result = await db.execute(sql`
-        SELECT t.id, t.garage_id, g.name AS garage, t.subject, t.priority, t.status,
-               t.category, t.created_at
-        FROM support_tickets t
-        LEFT JOIN garages g ON g.id = t.garage_id
-        ORDER BY t.created_at DESC
-        LIMIT 100`);
-      res.json(result.rows);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.patch('/api/platform-admin/support-tickets/:id', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const allowed: any = {};
-      if (typeof req.body?.status === "string") allowed.status = req.body.status;
-      if (typeof req.body?.priority === "string") allowed.priority = req.body.priority;
-      if (typeof req.body?.assignedTo === "string") allowed.assignedTo = req.body.assignedTo;
-      if (Object.keys(allowed).length === 0) return res.status(400).json({ message: "Nothing to update" });
-      const updated = await storage.updateSupportTicket(req.params.id, allowed);
-      if (!updated) return res.status(404).json({ message: "Ticket not found" });
-      res.json(updated);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get('/api/platform-admin/system-health', requirePlatformAdmin, async (req: any, res) => {
-    // Honest, measured metrics only — no invented SLA numbers. Integrations
-    // report "configured" from their env keys; only the DB is actively pinged.
-    try {
-      const dbStart = Date.now();
-      let dbOk = true;
-      let dbConnections = 0;
-      try {
-        const conns = await db.execute(sql`SELECT COUNT(*) as count FROM pg_stat_activity WHERE datname = current_database()`);
-        dbConnections = Number(conns.rows[0]?.count ?? 0);
-      } catch {
-        dbOk = false;
-      }
-      const dbLatencyMs = Date.now() - dbStart;
-      const mem = process.memoryUsage();
-
-      res.json({
-        uptimeSeconds: Math.round(process.uptime()),
-        dbOk,
-        dbLatencyMs,
-        dbConnections,
-        memoryRssMb: Math.round(mem.rss / 1024 / 1024),
-        memoryHeapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
-        nodeVersion: process.version,
-        integrations: [
-          { name: "PostgreSQL Database", configured: true, operational: dbOk },
-          { name: "Stripe Billing", configured: !!process.env.STRIPE_SECRET_KEY },
-          { name: "Stripe Webhook Signing", configured: !!process.env.STRIPE_WEBHOOK_SECRET },
-          { name: "Wathq CR Registry", configured: !!process.env.WATHQ_API_KEY },
-          { name: "Google Vision OCR", configured: !!process.env.GOOGLE_VISION_API_KEY },
-          { name: "Sentry Error Tracking", configured: !!process.env.SENTRY_DSN },
-          { name: "SMS Provider", configured: !!process.env.SMS_PROVIDER },
-          { name: "WhatsApp Webhook", configured: !!process.env.WHATSAPP_VERIFY_TOKEN },
-        ],
-      });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+  // Platform-admin oversight (stats, garages list/create, garage status,
+  // suppliers, support-tickets list/patch, system-health) migrated to
+  // server/modules/administration (Phase E).
 
   // ==========================================================================
   // Platform SuperAdmin — garage onboarding applications
@@ -18662,55 +18478,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/platform-admin/garage-applications', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      const status = typeof req.query.status === "string" ? req.query.status : undefined;
-      res.json(await storage.listGarageApplications(status));
-    } catch (error: any) {
-      console.error("Error listing garage applications:", error);
-      res.status(500).json({ message: "Failed to list applications" });
-    }
-  });
-
-  app.post('/api/platform-admin/garage-applications/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const app_ = await storage.getGarageApplication(req.params.id);
-      if (!app_) return res.status(404).json({ message: "Application not found" });
-      if (app_.status === "rejected") return res.status(409).json({ message: "Application already rejected" });
-
-      // If the applicant set their own password at signup, provision with it
-      // (they can log in immediately). Otherwise mint a one-time temp password,
-      // hash it for storage, and return the plaintext ONCE for the super admin
-      // to relay (never persisted/logged).
-      let tempPassword: string | undefined;
-      let hashed: string | undefined;
-      if (!app_.ownerPasswordHash) {
-        tempPassword = randomBytes(9).toString("base64url");
-        hashed = await hashPassword(tempPassword);
-      }
-      const result = await storage.approveGarageApplication(req.params.id, req.user.id, { hashedPassword: hashed });
-      res.json({
-        application: result.application,
-        garageId: result.garageId,
-        ownerEmail: app_.email,
-        ...(tempPassword ? { tempPassword } : {}),
-      });
-    } catch (error: any) {
-      console.error("Error approving garage application:", error);
-      res.status(500).json({ message: error.message || "Failed to approve application" });
-    }
-  });
-
-  app.post('/api/platform-admin/garage-applications/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const rejected = await storage.rejectGarageApplication(req.params.id, req.user.id, req.body?.reason);
-      if (!rejected) return res.status(404).json({ message: "Pending application not found" });
-      res.json(rejected);
-    } catch (error: any) {
-      console.error("Error rejecting garage application:", error);
-      res.status(500).json({ message: "Failed to reject application" });
-    }
-  });
+  // Platform-admin garage-application review (list/approve/reject) migrated to
+  // server/modules/administration (Phase E). The public intake POST
+  // /api/garage-applications above stays in the monolith.
 
   // ==========================================================================
   // Platform SuperAdmin — subscription change requests
@@ -18743,38 +18513,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/platform-admin/subscription-requests', requirePlatformAdmin, async (req: any, res) => {
-    try {
-      const status = typeof req.query.status === "string" ? req.query.status : undefined;
-      res.json(await storage.listSubscriptionRequests(status));
-    } catch (error) {
-      console.error("Error listing subscription requests:", error);
-      res.status(500).json({ message: "Failed to list requests" });
-    }
-  });
-
-  app.post('/api/platform-admin/subscription-requests/:id/approve', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const approved = await storage.approveSubscriptionRequest(req.params.id, req.user.id);
-      if (!approved) return res.status(404).json({ message: "Request not found" });
-      res.json(approved);
-    } catch (error: any) {
-      if (/already/.test(error?.message || "")) return res.status(409).json({ message: error.message });
-      console.error("Error approving subscription request:", error);
-      res.status(500).json({ message: "Failed to approve request" });
-    }
-  });
-
-  app.post('/api/platform-admin/subscription-requests/:id/reject', requirePlatformAdmin, auditLog, async (req: any, res) => {
-    try {
-      const rejected = await storage.rejectSubscriptionRequest(req.params.id, req.user.id, req.body?.reason);
-      if (!rejected) return res.status(404).json({ message: "Pending request not found" });
-      res.json(rejected);
-    } catch (error) {
-      console.error("Error rejecting subscription request:", error);
-      res.status(500).json({ message: "Failed to reject request" });
-    }
-  });
+  // Platform-admin subscription-request review (list/approve/reject) migrated to
+  // server/modules/administration (Phase E). The customer-side intake POST
+  // /api/subscription-requests above stays in the monolith.
 
   // ==========================================================================
   // Customer marketplace — platform-wide customer accounts + provider directory
