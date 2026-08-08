@@ -63,6 +63,8 @@ import type { CallCenterRepository } from '../../modules/call-center/repositorie
 import type { CallCenterService } from '../../modules/call-center/services/call-center.service';
 import type { NotificationsRepository } from '../../modules/notifications/repositories/notifications.repository';
 import type { NotificationsService } from '../../modules/notifications/services/notifications.service';
+import type { IntegrationsRepository } from '../../modules/integrations/repositories/integrations.repository';
+import type { IntegrationsService } from '../../modules/integrations/services/integrations.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -159,6 +161,8 @@ export const CALL_CENTER_REPOSITORY = token<CallCenterRepository>('CallCenterRep
 export const CALL_CENTER_SERVICE = token<CallCenterService>('CallCenterService');
 export const NOTIFICATIONS_REPOSITORY = token<NotificationsRepository>('NotificationsRepository');
 export const NOTIFICATIONS_SERVICE = token<NotificationsService>('NotificationsService');
+export const INTEGRATIONS_REPOSITORY = token<IntegrationsRepository>('IntegrationsRepository');
+export const INTEGRATIONS_SERVICE = token<IntegrationsService>('IntegrationsService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');

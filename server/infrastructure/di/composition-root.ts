@@ -68,6 +68,8 @@ import {
   CALL_CENTER_SERVICE,
   NOTIFICATIONS_REPOSITORY,
   NOTIFICATIONS_SERVICE,
+  INTEGRATIONS_REPOSITORY,
+  INTEGRATIONS_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -162,6 +164,8 @@ import { CallCenterRepository } from '../../modules/call-center/repositories/cal
 import { CallCenterService } from '../../modules/call-center/services/call-center.service';
 import { NotificationsRepository } from '../../modules/notifications/repositories/notifications.repository';
 import { NotificationsService } from '../../modules/notifications/services/notifications.service';
+import { IntegrationsRepository } from '../../modules/integrations/repositories/integrations.repository';
+import { IntegrationsService } from '../../modules/integrations/services/integrations.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -354,6 +358,9 @@ export function getAppContainer(): Container {
 
   c.register(NOTIFICATIONS_REPOSITORY, () => new NotificationsRepository());
   c.register(NOTIFICATIONS_SERVICE, (ctx) => new NotificationsService(ctx.resolve(NOTIFICATIONS_REPOSITORY)));
+
+  c.register(INTEGRATIONS_REPOSITORY, () => new IntegrationsRepository());
+  c.register(INTEGRATIONS_SERVICE, (ctx) => new IntegrationsService(ctx.resolve(INTEGRATIONS_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
