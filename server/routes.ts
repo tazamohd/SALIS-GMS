@@ -6168,44 +6168,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // 5. PARTS MARKETPLACE (eBay/Amazon)
-  app.get('/api/marketplace/search', isAuthenticated, async (req: any, res) => {
-    try {
-      const { partNumber, marketplace } = req.query;
-      const results = await phase3Service.searchMarketplaceParts(
-        partNumber as string,
-        marketplace as 'ebay' | 'amazon'
-      );
-      res.json(results);
-    } catch (error: any) {
-      console.error("Error searching marketplace:", error);
-      res.status(500).json({ message: error.message || "Failed to search marketplace" });
-    }
-  });
-
-  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const orderData = {
-        ...req.body,
-        garageId: req.user?.garageId
-      };
-      const order = await phase3Service.placeMarketplaceOrder(orderData);
-      res.status(201).json(order);
-    } catch (error: any) {
-      console.error("Error placing marketplace order:", error);
-      res.status(500).json({ message: error.message || "Failed to place order" });
-    }
-  });
-
-  app.get('/api/marketplace/orders/:id/track', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const tracking = await phase3Service.trackMarketplaceOrder(id);
-      res.json(tracking);
-    } catch (error: any) {
-      console.error("Error tracking order:", error);
-      res.status(500).json({ message: error.message || "Failed to track order" });
-    }
-  });
+  // Authenticated parts marketplace (search, orders, tracking) migrated to
+  // server/modules/marketplace (Phase E).
 
   // 6. STRIPE PAYMENT PROCESSING (with input validation)
   app.post('/api/stripe/create-payment-intent', isAuthenticated, async (req: any, res) => {
@@ -6252,40 +6216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      res.json([]);
-    } catch (error) {
-      console.error("Error fetching marketplace orders:", error);
-      res.status(500).json({ message: "Failed to fetch marketplace orders" });
-    }
-  });
-
-  app.post('/api/marketplace/orders', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const { marketplace, partNumber, partName, quantity, unitPrice } = req.body;
-      
-      const order = {
-        id: Math.random().toString(36).substring(7),
-        garageId,
-        marketplace,
-        partNumber,
-        partName,
-        quantity,
-        unitPrice,
-        totalPrice: quantity * unitPrice,
-        orderStatus: "pending",
-        orderDate: new Date().toISOString(),
-      };
-      
-      res.json(order);
-    } catch (error) {
-      console.error("Error creating marketplace order:", error);
-      res.status(500).json({ message: "Failed to create marketplace order" });
-    }
-  });
+  // Marketplace order listing (stub) migrated to server/modules/marketplace
+  // (Phase E). The dead duplicate POST /api/marketplace/orders that followed it
+  // here (shadowed by the live handler above) was dropped in the extraction.
 
   // Phase 4: Customer Experience Routes
   app.get('/api/service-tracking/active', isAuthenticated, async (req: any, res) => {
@@ -19260,28 +19193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // A customer reviews a provider they have actually transacted with
   // (completed booking, fulfilled order, or accepted quote). One review per
   // provider per customer — resubmitting updates it.
-  app.post('/api/my/reviews', isAuthenticated, async (req: any, res) => {
-    try {
-      const { providerId, rating, comment } = req.body ?? {};
-      const r = Number(rating);
-      if (!providerId || !Number.isInteger(r) || r < 1 || r > 5) {
-        return res.status(400).json({ message: "providerId and a whole-number rating 1–5 are required" });
-      }
-      const provider = await storage.getMarketplaceProvider(providerId);
-      if (!provider) return res.status(404).json({ message: "Provider not found" });
-      if (!(await storage.hasTransactedWith(req.user.id, providerId))) {
-        return res.status(403).json({ message: "You can review a provider after completing a booking, order or quote with them" });
-      }
-      const review = await storage.upsertProviderReview(
-        providerId, req.user.id, r,
-        typeof comment === "string" && comment.trim() ? comment.trim().slice(0, 2000) : undefined,
-      );
-      res.status(201).json(review);
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      res.status(500).json({ message: "Failed to submit review" });
-    }
-  });
+  // Customer review submission migrated to server/modules/marketplace (Phase E).
 
   // ==========================================================================
   // Marketplace C2 — product orders (customer -> parts store)
