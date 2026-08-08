@@ -67,6 +67,8 @@ import type { IntegrationsRepository } from '../../modules/integrations/reposito
 import type { IntegrationsService } from '../../modules/integrations/services/integrations.service';
 import type { IotRepository } from '../../modules/iot/repositories/iot.repository';
 import type { IotService } from '../../modules/iot/services/iot.service';
+import type { DynamicPricingRepository } from '../../modules/dynamic-pricing/repositories/dynamic-pricing.repository';
+import type { DynamicPricingService } from '../../modules/dynamic-pricing/services/dynamic-pricing.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -167,6 +169,8 @@ export const INTEGRATIONS_REPOSITORY = token<IntegrationsRepository>('Integratio
 export const INTEGRATIONS_SERVICE = token<IntegrationsService>('IntegrationsService');
 export const IOT_REPOSITORY = token<IotRepository>('IotRepository');
 export const IOT_SERVICE = token<IotService>('IotService');
+export const DYNAMIC_PRICING_REPOSITORY = token<DynamicPricingRepository>('DynamicPricingRepository');
+export const DYNAMIC_PRICING_SERVICE = token<DynamicPricingService>('DynamicPricingService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
