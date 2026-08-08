@@ -63,6 +63,8 @@ import type { IAiRepository } from '../../modules/ai/repositories/ai.repository'
 import type { AiService } from '../../modules/ai/services/ai.service';
 import type { IFeatureFlagRepository } from '../../modules/platform/repositories/feature-flag.repository';
 import type { FeatureFlagService } from '../../modules/platform/services/feature-flag.service';
+import type { IBackupRepository } from '../../modules/platform/repositories/backup.repository';
+import type { BackupService } from '../../modules/platform/services/backup.service';
 
 export const EVENT_BUS = token<EventBus>('EventBus');
 export const CUSTOMER_REPOSITORY = token<ICustomerRepository>('CustomerRepository');
@@ -129,3 +131,5 @@ export const AI_REPOSITORY = token<IAiRepository>('AiRepository');
 export const AI_SERVICE = token<AiService>('AiService');
 export const FEATURE_FLAG_REPOSITORY = token<IFeatureFlagRepository>('FeatureFlagRepository');
 export const FEATURE_FLAG_SERVICE = token<FeatureFlagService>('FeatureFlagService');
+export const BACKUP_REPOSITORY = token<IBackupRepository>('BackupRepository');
+export const BACKUP_SERVICE = token<BackupService>('BackupService');

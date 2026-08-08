@@ -77,7 +77,6 @@ import { subscriptionsRoutes } from "./subscriptions";
 import supplierPortalRoutes from "./supplier-portal";
 import warrantyRoutes from "./warranty";
 import whatsappRoutes from "./whatsapp";
-import backupRoutes from "./backup";
 import currencyRoutes from "./currency";
 import demoRoutes from "./demo";
 import documentsRoutes from "./documents";
@@ -397,7 +396,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // These routers also existed without a mount — every endpoint below 404ed
   // into the SPA catch-all while its integration suite specified it as live.
   app.use("/api", autoReorderRoutes);
-  app.use("/api", backupRoutes);
   app.use("/api", currencyRoutes);
   app.use("/api", demoRoutes);
   app.use("/api", documentsRoutes);
