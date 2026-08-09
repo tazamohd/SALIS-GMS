@@ -8725,64 +8725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Tax Regions
-  app.post("/api/tax-regions", isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertTaxRegionSchema.parse(req.body);
-      const region = await storage.createTaxRegion(validatedData);
-      res.status(201).json(region);
-    } catch (error: any) {
-      console.error("Error creating tax region:", error);
-      res.status(400).json({ error: error.message || "Failed to create tax region" });
-    }
-  });
-
-  app.get("/api/tax-regions", isAuthenticated, async (req, res) => {
-    try {
-      const { countryCode } = req.query;
-      const regions = await storage.getTaxRegions(countryCode as string | undefined);
-      res.json(regions);
-    } catch (error) {
-      console.error("Error fetching tax regions:", error);
-      res.status(500).json({ error: "Failed to fetch tax regions" });
-    }
-  });
-
-  app.get("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const region = await storage.getTaxRegionById(id);
-      if (!region) {
-        return res.status(404).json({ error: "Tax region not found" });
-      }
-      res.json(region);
-    } catch (error) {
-      console.error("Error fetching tax region:", error);
-      res.status(500).json({ error: "Failed to fetch tax region" });
-    }
-  });
-
-  app.patch("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateTaxRegion(id, req.body);
-      res.json(updated);
-    } catch (error: any) {
-      console.error("Error updating tax region:", error);
-      res.status(400).json({ error: error.message || "Failed to update tax region" });
-    }
-  });
-
-  app.delete("/api/tax-regions/:id", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteTaxRegion(id);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting tax region:", error);
-      res.status(500).json({ error: "Failed to delete tax region" });
-    }
-  });
+  // Tax Regions — extracted to server/modules/tax (registered in server/routes/index.ts)
 
   // Timezone Rules
   app.post("/api/timezone-rules", isAuthenticated, async (req: any, res) => {
