@@ -79,6 +79,8 @@ import type { NextGenRepository } from '../../modules/nextgen/repositories/nextg
 import type { NextGenService } from '../../modules/nextgen/services/nextgen.service';
 import type { TelematicsRepository } from '../../modules/telematics/repositories/telematics.repository';
 import type { TelematicsService } from '../../modules/telematics/services/telematics.service';
+import type { WarrantyRepository } from '../../modules/warranty/repositories/warranty.repository';
+import type { WarrantyService } from '../../modules/warranty/services/warranty.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -191,6 +193,8 @@ export const NEXTGEN_REPOSITORY = token<NextGenRepository>('NextGenRepository');
 export const NEXTGEN_SERVICE = token<NextGenService>('NextGenService');
 export const TELEMATICS_REPOSITORY = token<TelematicsRepository>('TelematicsRepository');
 export const TELEMATICS_SERVICE = token<TelematicsService>('TelematicsService');
+export const WARRANTY_REPOSITORY = token<WarrantyRepository>('WarrantyRepository');
+export const WARRANTY_SERVICE = token<WarrantyService>('WarrantyService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
