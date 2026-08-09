@@ -79,6 +79,8 @@ import type { NextGenRepository } from '../../modules/nextgen/repositories/nextg
 import type { NextGenService } from '../../modules/nextgen/services/nextgen.service';
 import type { TelematicsRepository } from '../../modules/telematics/repositories/telematics.repository';
 import type { TelematicsService } from '../../modules/telematics/services/telematics.service';
+import type { SubscriptionLicenseRepository } from '../../modules/subscription-licenses/repositories/subscription-license.repository';
+import type { SubscriptionLicenseService } from '../../modules/subscription-licenses/services/subscription-license.service';
 import type { IFleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import type { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import type { IFleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -191,6 +193,8 @@ export const NEXTGEN_REPOSITORY = token<NextGenRepository>('NextGenRepository');
 export const NEXTGEN_SERVICE = token<NextGenService>('NextGenService');
 export const TELEMATICS_REPOSITORY = token<TelematicsRepository>('TelematicsRepository');
 export const TELEMATICS_SERVICE = token<TelematicsService>('TelematicsService');
+export const SUBSCRIPTION_LICENSE_REPOSITORY = token<SubscriptionLicenseRepository>('SubscriptionLicenseRepository');
+export const SUBSCRIPTION_LICENSE_SERVICE = token<SubscriptionLicenseService>('SubscriptionLicenseService');
 export const FLEET_MANAGEMENT_REPOSITORY = token<IFleetManagementRepository>('FleetManagementRepository');
 export const FLEET_MANAGEMENT_SERVICE = token<FleetManagementService>('FleetManagementService');
 export const FLEET_TRACKING_REPOSITORY = token<IFleetTrackingRepository>('FleetTrackingRepository');
