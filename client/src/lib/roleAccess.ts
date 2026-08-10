@@ -6,19 +6,28 @@ import type { NavGroup, UserRole } from "@/config/navigation";
 export const roleNavAccess: Record<UserRole, string[]> = {
   PLATFORM_ADMIN: ['*'], // all groups
   ADMIN: ['*'], // all groups
+  // Titles must match the group titles in config/navigation.ts EXACTLY —
+  // filterNavByRole keeps a group only on an exact title match. The abbreviated
+  // 'System' never matched the real 'System & Settings' group, so every
+  // non-admin role silently lost Settings/Profile/Notifications; ACCOUNTANT
+  // additionally lost its core 'Finance & Accounting' and 'Analytics &
+  // Business Intelligence' groups. Per-item role gating is still enforced by
+  // filterNavigationByAccess (pass 1), so listing a group title here only lets
+  // through the items that pass already permits.
   MANAGER: [
     'Overview', 'Operations', 'Customers & Vehicles',
-    'Inventory', 'Team', 'Finance', 'System'
+    'Inventory', 'Team', 'Finance', 'System & Settings'
   ],
   ADVISOR: [
     'Overview', 'Operations', 'Customers & Vehicles',
-    'Inventory', 'System'
+    'Inventory', 'System & Settings'
   ],
   TECHNICIAN: [
-    'Overview', 'Operations', 'Inventory', 'System'
+    'Overview', 'Operations', 'Inventory', 'System & Settings'
   ],
   ACCOUNTANT: [
-    'Overview', 'Finance', 'System'
+    'Overview', 'Finance', 'Finance & Accounting',
+    'Analytics & Business Intelligence', 'System & Settings'
   ],
 };
 
