@@ -7,6 +7,7 @@ import { setupAuth } from "../auth";
 import { loadUserPermissions } from "../rbac-middleware";
 import { requireAuthByDefault } from "../middleware/defaultAuth";
 import { requireStaffByDefault } from "../middleware/requireStaff";
+import { enforceRoutePolicy } from "../middleware/routePolicy";
 import { enforceGarageScopeOnQuery, enforceTenantOnBody } from "../middleware/garageScope";
 import { generateCsrfToken, csrfTokenRoute, enforceCsrf } from "../middleware/csrf";
 import { authRoutes } from "./auth";
@@ -209,6 +210,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // This populates req.userPermissions for use by requirePermission() in handlers
   app.use(loadUserPermissions);
   console.log("✅ RBAC Permission Loader Wired");
+
+  // Per-endpoint role enforcement. The sidebar hides what a role shouldn't see,
+  // but hiding a menu entry is not access control — without this, a technician
+  // could call the payroll API directly. Declared as a table in
+  // `middleware/routePolicy.ts` so the policy is auditable in one place.
+  // Additive: routes absent from the table keep their existing access.
+  app.use("/api", enforceRoutePolicy);
+  console.log("✅ Route role policy enforced");
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
