@@ -103,6 +103,43 @@ export async function loginAsUser(app: Express) {
   return { agent, user: loginRes.body, garageId };
 }
 
+
+/**
+ * Register + log in a user with an arbitrary staff role, so the route-policy
+ * integration test can iterate over the full role matrix without hand-writing
+ * one helper per role. The email is uniquified per call — different roles use
+ * separate accounts inside the same suite.
+ */
+export async function loginAsRole(app: Express, role: string): Promise<{
+  agent: supertest.Agent;
+  user: any;
+  garageId: string;
+}> {
+  const agent = supertest.agent(app);
+  const garageId = getTestGarageId();
+  const token = uniqueToken();
+  const account = {
+    email: `role-${role.toLowerCase()}-${token}@slis.sa`,
+    password: "TestPass123!",
+    fullName: `Test ${role}`,
+    phone: `+9665000${token.slice(-5)}`.slice(0, 15),
+  };
+  await agent.post("/api/register").send(account).expect((res) => {
+    if (res.status !== 200 && res.status !== 400 && res.status !== 500) {
+      throw new Error(`Register (${role}) failed: ${res.status} ${JSON.stringify(res.body)}`);
+    }
+  });
+  await attachUserToGarage(account.email, garageId, role);
+  const loginRes = await agent.post("/api/login").send({
+    email: account.email,
+    password: account.password,
+  });
+  if (loginRes.status !== 200) {
+    throw new Error(`Login (${role}) failed: ${loginRes.status} ${JSON.stringify(loginRes.body)}`);
+  }
+  return { agent, user: loginRes.body, garageId };
+}
+
 export function unauthenticatedAgent(app: Express) {
   return supertest.agent(app);
 }
