@@ -84,6 +84,8 @@ import {
   NEXTGEN_SERVICE,
   TELEMATICS_REPOSITORY,
   TELEMATICS_SERVICE,
+  MARKETING_REPOSITORY,
+  MARKETING_SERVICE,
   FLEET_MANAGEMENT_REPOSITORY,
   FLEET_MANAGEMENT_SERVICE,
   FLEET_TRACKING_REPOSITORY,
@@ -194,6 +196,8 @@ import { NextGenRepository } from '../../modules/nextgen/repositories/nextgen.re
 import { NextGenService } from '../../modules/nextgen/services/nextgen.service';
 import { TelematicsRepository } from '../../modules/telematics/repositories/telematics.repository';
 import { TelematicsService } from '../../modules/telematics/services/telematics.service';
+import { MarketingRepository } from '../../modules/marketing/repositories/marketing.repository';
+import { MarketingService } from '../../modules/marketing/services/marketing.service';
 import { FleetManagementRepository } from '../../modules/fleet-management/repositories/fleet-management.repository';
 import { FleetManagementService } from '../../modules/fleet-management/services/fleet-management.service';
 import { FleetTrackingRepository } from '../../modules/fleet-tracking/repositories/fleet-tracking.repository';
@@ -404,6 +408,8 @@ export function getAppContainer(): Container {
   c.register(NEXTGEN_SERVICE, (ctx) => new NextGenService(ctx.resolve(NEXTGEN_REPOSITORY)));
   c.register(TELEMATICS_REPOSITORY, () => new TelematicsRepository());
   c.register(TELEMATICS_SERVICE, (ctx) => new TelematicsService(ctx.resolve(TELEMATICS_REPOSITORY)));
+  c.register(MARKETING_REPOSITORY, () => new MarketingRepository());
+  c.register(MARKETING_SERVICE, (ctx) => new MarketingService(ctx.resolve(MARKETING_REPOSITORY)));
 
   c.register(FLEET_MANAGEMENT_REPOSITORY, () => new FleetManagementRepository());
   c.register(
