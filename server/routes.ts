@@ -9367,67 +9367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Subscription Licenses
-  app.post("/api/subscription-licenses", isAuthenticated, async (req: any, res) => {
-    try {
-      const validatedData = insertSubscriptionLicenseSchema.parse(req.body);
-      const license = await storage.createSubscriptionLicense(validatedData);
-      res.status(201).json(license);
-    } catch (error: any) {
-      console.error("Error creating subscription license:", error);
-      res.status(400).json({ error: error.message || "Failed to create subscription license" });
-    }
-  });
-
-  app.get("/api/subscription-licenses", isAuthenticated, async (req, res) => {
-    try {
-      const { branchId, status } = req.query;
-      const licenses = await storage.getSubscriptionLicenses(
-        branchId as string | undefined,
-        { status: status as string | undefined }
-      );
-      res.json(licenses);
-    } catch (error) {
-      console.error("Error fetching subscription licenses:", error);
-      res.status(500).json({ error: "Failed to fetch subscription licenses" });
-    }
-  });
-
-  app.get("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
-    try {
-      const { id } = req.params;
-      const license = await storage.getSubscriptionLicenseById(id);
-      if (!license) {
-        return res.status(404).json({ error: "Subscription license not found" });
-      }
-      res.json(license);
-    } catch (error) {
-      console.error("Error fetching subscription license:", error);
-      res.status(500).json({ error: "Failed to fetch subscription license" });
-    }
-  });
-
-  app.patch("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updated = await storage.updateSubscriptionLicense(id, req.body);
-      res.json(updated);
-    } catch (error: any) {
-      console.error("Error updating subscription license:", error);
-      res.status(400).json({ error: error.message || "Failed to update subscription license" });
-    }
-  });
-
-  app.delete("/api/subscription-licenses/:id", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteSubscriptionLicense(id);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting subscription license:", error);
-      res.status(500).json({ error: "Failed to delete subscription license" });
-    }
-  });
+  // Subscription Licenses (CRUD) — extracted to server/modules/subscription-licenses (registered in server/routes/index.ts)
 
   // License Audit Logs
   app.post("/api/license-audit-logs", isAuthenticated, async (req: any, res) => {
@@ -9442,16 +9382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/subscription-licenses/:licenseId/audit-logs", isAuthenticated, requireResourceOwnership({ table: 'subscription_licenses', idParam: 'licenseId', parent: { table: 'branches', fk: 'branch_id' } }), async (req, res) => {
-    try {
-      const { licenseId } = req.params;
-      const logs = await storage.getLicenseAuditLogs(licenseId);
-      res.json(logs);
-    } catch (error) {
-      console.error("Error fetching license audit logs:", error);
-      res.status(500).json({ error: "Failed to fetch license audit logs" });
-    }
-  });
+  // (subscription-license audit-logs GET extracted to server/modules/subscription-licenses)
 
   // Entitlement Assignments
   app.post("/api/entitlement-assignments", isAuthenticated, async (req: any, res) => {
