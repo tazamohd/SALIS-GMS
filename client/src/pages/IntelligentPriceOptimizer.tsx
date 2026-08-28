@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,14 +114,10 @@ export default function IntelligentPriceOptimizer() {
     },
   ];
 
-  return (
-    <AnalyticsPage
-      title={t('nav.intelligent_price_optimizer', 'Intelligent Price Optimizer')}
-      description={t('priceOptimizer.mlPoweredDynamicPricing', 'ML-powered dynamic pricing based on demand, competition, and customer behavior')}
-      icon={Target}
-      sections={sections}
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+  const metricsSection = {
+    title: t('priceOptimizer.keyMetrics', 'Key Metrics'),
+    content: (
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <Card className="border-[#0A5ED7]/30 dark:border-[#0A5ED7]/50 bg-[#0A5ED7]/5 dark:bg-[#0A5ED7]/10" data-testid="card-optimized-price">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -173,17 +168,16 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
       </div>
+    ),
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+  const settingsAndInsightsSection = {
+    title: t('priceOptimizer.optimizationSettings', 'Optimization Settings'),
+    description: t('priceOptimizer.configureAIPricingParameters', 'Configure AI pricing parameters'),
+    content: (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-              <Zap className="w-5 h-5 text-[#F97316]" />
-              {t('priceOptimizer.optimizationSettings', 'Optimization Settings')}
-            </CardTitle>
-            <CardDescription className="text-[#64748B]">{t('priceOptimizer.configureAIPricingParameters', 'Configure AI pricing parameters')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
               <Label className="text-[#0B1F3B] dark:text-white">{t('priceOptimizer.serviceType', 'Service Type')}</Label>
               <Select value={serviceType} onValueChange={setServiceType}>
@@ -241,7 +235,7 @@ export default function IntelligentPriceOptimizer() {
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={handleOptimize}
               className="w-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white"
               data-testid="button-optimize-price"
@@ -316,6 +310,15 @@ export default function IntelligentPriceOptimizer() {
           </CardContent>
         </Card>
       </div>
-    </AnalyticsPage>
+    ),
+  };
+
+  return (
+    <AnalyticsPage
+      title={t('nav.intelligent_price_optimizer', 'Intelligent Price Optimizer')}
+      description={t('priceOptimizer.mlPoweredDynamicPricing', 'ML-powered dynamic pricing based on demand, competition, and customer behavior')}
+      icon={Target}
+      sections={[metricsSection, ...sections, settingsAndInsightsSection]}
+    />
   );
 }

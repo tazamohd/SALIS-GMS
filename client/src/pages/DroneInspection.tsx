@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +11,7 @@ export default function DroneInspection() {
   const { t } = useTranslation();
   const [selectedFlight, setSelectedFlight] = useState<string | null>(null);
   
-  const { data: inspectionsResponse, isLoading } = useQuery({ queryKey: ['/api/nextgen/drone-inspections'] });
+  const { data: inspectionsResponse, isLoading } = useQuery<any>({ queryKey: ['/api/nextgen/drone-inspections'] });
   const inspections = inspectionsResponse?.data || [];
 
   const flights = inspections.length > 0 ? inspections.map((insp: any) => ({
@@ -29,9 +28,9 @@ export default function DroneInspection() {
 
   const metrics = [
     { label: t('drone.totalFlights', 'Total Flights'), value: flights.length, icon: Plane, color: "text-[#0BB3FF]" },
-    { label: t('drone.activeFlights', 'Active Flights'), value: flights.filter(f => f.status === 'in_progress').length, icon: MapPin, color: "text-[#0A5ED7]" },
-    { label: t('drone.totalImages', 'Total Images'), value: flights.reduce((sum, f) => sum + f.images, 0), icon: Camera, color: "text-purple-500" },
-    { label: t('drone.avgBattery', 'Avg Battery'), value: `${Math.round(flights.reduce((sum, f) => sum + f.battery, 0) / flights.length)}%`, icon: Battery, color: "text-emerald-500" },
+    { label: t('drone.activeFlights', 'Active Flights'), value: flights.filter((f: any) => f.status === 'in_progress').length, icon: MapPin, color: "text-[#0A5ED7]" },
+    { label: t('drone.totalImages', 'Total Images'), value: flights.reduce((sum: number, f: any) => sum + f.images, 0), icon: Camera, color: "text-purple-500" },
+    { label: t('drone.avgBattery', 'Avg Battery'), value: `${Math.round(flights.reduce((sum: number, f: any) => sum + f.battery, 0) / flights.length)}%`, icon: Battery, color: "text-emerald-500" },
   ];
 
   if (isLoading) {
@@ -62,7 +61,7 @@ export default function DroneInspection() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {flights.map((flight) => (
+              {flights.map((flight: any) => (
                 <div
                   key={flight.id}
                   className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:shadow-md hover:border-[#0A5ED7] dark:hover:border-[#0BB3FF] transition-all cursor-pointer"
@@ -114,7 +113,7 @@ export default function DroneInspection() {
           <CardContent>
             {selectedFlight ? (
               <div className="space-y-3">
-                {flights.filter(f => f.id === selectedFlight).map((flight) => (
+                {flights.filter((f: any) => f.id === selectedFlight).map((flight: any) => (
                   <div key={flight.id}>
                     <div className="p-3 bg-[#F8FAFC] dark:bg-[#0E1117] rounded-lg border border-[#E2E8F0] dark:border-[#232A36] mb-3">
                       <h4 className="font-semibold text-[#0A5ED7] dark:text-[#0BB3FF] mb-2">
@@ -168,13 +167,13 @@ export default function DroneInspection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
             <ImageIcon className="h-5 w-5 text-purple-500" />
-            {t('drone.capturedMedia', 'Captured Media')} {selectedFlight && `- ${flights.find(f => f.id === selectedFlight)?.location}`}
+            {t('drone.capturedMedia', 'Captured Media')} {selectedFlight && `- ${flights.find((f: any) => f.id === selectedFlight)?.location}`}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {selectedFlight ? (
             <div className="grid grid-cols-4 gap-4">
-              {Array.from({ length: flights.find(f => f.id === selectedFlight)?.images || 8 }).map((_, i) => (
+              {Array.from({ length: flights.find((f: any) => f.id === selectedFlight)?.images || 8 }).map((_, i) => (
                 <div
                   key={i}
                   className="aspect-square bg-gradient-to-br from-[#F8FAFC] to-[#E2E8F0] dark:from-[#232A36] dark:to-[#151A23] rounded-lg flex items-center justify-center hover:shadow-lg transition-shadow cursor-pointer relative border border-[#E2E8F0] dark:border-[#232A36]"

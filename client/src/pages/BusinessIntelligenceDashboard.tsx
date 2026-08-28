@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -57,11 +56,11 @@ export default function BusinessIntelligenceDashboard() {
     schedule: "manual",
   });
 
-  const { data: dashboardMetrics } = useQuery({
+  const { data: dashboardMetrics } = useQuery<any>({
     queryKey: ["/api/analytics/dashboard-metrics", selectedPeriod],
   });
 
-  const { data: customReports = [] } = useQuery({
+  const { data: customReports = [] } = useQuery<any[]>({
     queryKey: ["/api/analytics/custom-reports"],
   });
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StandardPageLayout } from "@/components/layouts";
@@ -277,14 +276,13 @@ export default function EmergingTechnologies() {
       title={t('emergingTech.title', 'Emerging Technologies')}
       description={t('emergingTech.description', 'Cutting-edge innovations for next-generation automotive service management')}
       icon={Zap}
-      secondaryActions={[
+      actions={[
         {
           label: seedMutation.isPending ? t('emergingTech.seeding', 'Seeding...') : t('emergingTech.seedSampleData', 'Seed Sample Data'),
           icon: Database,
           onClick: () => seedMutation.mutate(),
-          variant: "outline",
+          variant: "outline" as const,
           testId: "button-seed-data",
-          disabled: seedMutation.isPending,
         }
       ]}
     >

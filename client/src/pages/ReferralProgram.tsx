@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
+import { StandardTablePage } from "@/components/layouts/StandardTablePage";
+import { Column } from "@/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,14 +59,14 @@ export default function ReferralProgram() {
 
   const columns: Column<any>[] = [
     {
-      header: t('referral.referrer', 'Referrer'),
-      accessorKey: "referrerName",
-      cell: (row) => row.referrerName || t('common.notAvailable', 'N/A'),
+      label: t('referral.referrer', 'Referrer'),
+      key: "referrerName",
+      render: (row: any) => row.referrerName || t('common.notAvailable', 'N/A'),
     },
     {
-      header: t('referral.referralCode', 'Referral Code'),
-      accessorKey: "referralCode",
-      cell: (row) => (
+      label: t('referral.referralCode', 'Referral Code'),
+      key: "referralCode",
+      render: (row: any) => (
         <div className="flex items-center gap-2">
           <code className="bg-[#F8FAFC] dark:bg-[#0E1117] border border-[#E2E8F0] dark:border-[#232A36] px-2 py-1 rounded text-sm text-[#0B1F3B] dark:text-white">
             {row.referralCode || t('common.notAvailable', 'N/A')}
@@ -85,19 +85,19 @@ export default function ReferralProgram() {
       ),
     },
     {
-      header: t('referral.referredCustomer', 'Referred Customer'),
-      accessorKey: "referredCustomerName",
-      cell: (row) => row.referredCustomerName || "-",
+      label: t('referral.referredCustomer', 'Referred Customer'),
+      key: "referredCustomerName",
+      render: (row: any) => row.referredCustomerName || "-",
     },
     {
-      header: t('common.status', 'Status'),
-      accessorKey: "status",
-      cell: (row) => getStatusBadge(row.status),
+      label: t('common.status', 'Status'),
+      key: "status",
+      render: (row: any) => getStatusBadge(row.status),
     },
     {
-      header: t('referral.reward', 'Reward'),
-      accessorKey: "rewardAmount",
-      cell: (row) => row.rewardAmount ? `$${row.rewardAmount}` : "-",
+      label: t('referral.reward', 'Reward'),
+      key: "rewardAmount",
+      render: (row: any) => row.rewardAmount ? `$${row.rewardAmount}` : "-",
     },
   ];
 

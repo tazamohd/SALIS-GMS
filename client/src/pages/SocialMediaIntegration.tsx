@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -30,7 +29,7 @@ export default function SocialMediaIntegration() {
 
   const createPost = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/social/posts", "POST", data);
+      return await apiRequest("POST", "/api/social/posts", data);
     },
     onSuccess: () => {
       toast({ title: t('social.postCreated', 'Post created'), description: t('social.postScheduled', 'Your post has been scheduled.') });

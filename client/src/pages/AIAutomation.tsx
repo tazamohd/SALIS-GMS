@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -48,27 +47,27 @@ export default function AIAutomation() {
   const [chatMessage, setChatMessage] = useState("");
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
-  const { data: estimations = [] } = useQuery({
+  const { data: estimations = [] } = useQuery<any[]>({
     queryKey: ['/api/ai/job-estimations'],
   });
 
-  const { data: predictions = [] } = useQuery({
+  const { data: predictions = [] } = useQuery<any[]>({
     queryKey: ['/api/ai/maintenance-predictions'],
   });
 
-  const { data: recommendations = [] } = useQuery({
+  const { data: recommendations = [] } = useQuery<any[]>({
     queryKey: ['/api/ai/parts-recommendations'],
   });
 
-  const { data: scheduleOpts = [] } = useQuery({
+  const { data: scheduleOpts = [] } = useQuery<any[]>({
     queryKey: ['/api/ai/schedule-optimizations'],
   });
 
-  const { data: conversations = [] } = useQuery({
+  const { data: conversations = [] } = useQuery<any[]>({
     queryKey: ['/api/ai/chat-conversations'],
   });
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: vehicles = [] } = useQuery<any[]>({
     queryKey: ['/api/vehicles'],
   });
 

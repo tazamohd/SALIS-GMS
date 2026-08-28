@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -633,7 +632,7 @@ export default function PartnersCurrentAccount() {
     <div className="p-6 bg-[#F8FAFC] dark:bg-[#0E1117] min-h-screen">
       <TabsPageLayout
         title={t('partners.partnersCurrentAccount', 'Partners Current Account')}
-        subtitle={t('partners.partnersCurrentAccountSubtitle', 'Track partner balances, transactions, and withdrawals')}
+        description={t('partners.partnersCurrentAccountSubtitle', 'Track partner balances, transactions, and withdrawals')}
         tabs={tabs}
       />
     </div>

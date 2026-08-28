@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -197,10 +196,7 @@ export default function DashboardWidgets() {
 
   const createWidgetMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/dashboard/widgets', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('POST', '/api/dashboard/widgets', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -222,10 +218,7 @@ export default function DashboardWidgets() {
 
   const updateWidgetMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return apiRequest('PATCH', `/api/dashboard/widgets/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -234,9 +227,7 @@ export default function DashboardWidgets() {
 
   const deleteWidgetMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/dashboard/widgets/${id}`, {
-        method: 'DELETE',
-      });
+      return apiRequest('DELETE', `/api/dashboard/widgets/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard/widgets'] });
@@ -256,10 +247,7 @@ export default function DashboardWidgets() {
 
   const updatePositionsMutation = useMutation({
     mutationFn: async (positions: { id: string; position: any }[]) => {
-      return apiRequest('/api/dashboard/widgets/positions', {
-        method: 'PATCH',
-        body: JSON.stringify({ positions }),
-      });
+      return apiRequest('PATCH', '/api/dashboard/widgets/positions', { positions });
     },
     onSuccess: () => {
       toast({
