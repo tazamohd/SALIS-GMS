@@ -21,6 +21,17 @@ import {
   Shield,
   UserIcon,
   Database,
+  Wallet,
+  RotateCcw,
+  Landmark,
+  TrendingDown,
+  BookOpen,
+  Calculator,
+  Scale,
+  TrendingUp,
+  DollarSign,
+  ArrowDownLeft,
+  ArrowUpRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -45,9 +56,8 @@ export interface NavGroup {
 }
 
 // ═══════════════════════════════════════════════════════
-// MVP Navigation — 15 core pages only.
-// All other pages remain routable via URL but are hidden
-// from the sidebar until enabled via feature flags.
+// Sidebar navigation configuration.
+// Pages not listed here remain routable via URL.
 // ═══════════════════════════════════════════════════════
 
 export const navigationConfig: NavGroup[] = [
@@ -114,7 +124,28 @@ export const navigationConfig: NavGroup[] = [
     items: [
       { title: "Invoices", href: "/invoices", icon: FileText },
       { title: "Payments", href: "/stripe-payment-processing", icon: CreditCard },
+      { title: "Expenses", href: "/expense-tracking", icon: Wallet },
+      { title: "Refunds", href: "/refund-management", icon: RotateCcw },
+      { title: "Bank Accounts", href: "/bank-account-management", icon: Landmark },
+      { title: "Loss Account", href: "/loss-account", icon: TrendingDown },
       { title: "Reports", href: "/reports", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "Accounting",
+    icon: BookOpen,
+    roles: ['ADMIN', 'MANAGER', 'ACCOUNTANT'],
+    minPlan: 'PRO',
+    items: [
+      { title: "Chart of Accounts", href: "/chart-of-accounts", icon: Calculator },
+      { title: "Journal Entries", href: "/journal-entries", icon: BookOpen },
+      { title: "General Ledger", href: "/general-ledger", icon: FileText },
+      { title: "Trial Balance", href: "/trial-balance", icon: Scale },
+      { title: "Balance Sheet", href: "/balance-sheet", icon: Scale },
+      { title: "Income Statement", href: "/income-statement", icon: TrendingUp },
+      { title: "Cash Flow", href: "/cash-flow-statement", icon: DollarSign },
+      { title: "Accounts Receivable", href: "/accounts-receivable", icon: ArrowUpRight },
+      { title: "Accounts Payable", href: "/accounts-payable", icon: ArrowDownLeft },
     ],
   },
   {
