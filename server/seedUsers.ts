@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { db } from "./db";
 import { users, roles, garages, branches, userRoleBranch } from "@shared/schema";
 import { eq } from "drizzle-orm";

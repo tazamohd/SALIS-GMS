@@ -1,4 +1,4 @@
-// @ts-nocheck — Seed script with dynamic data, will be typed when schema stabilizes
+// Seed script with dynamic data
 /**
  * SALIS AUTO - Unified Comprehensive Data Seed
  * 

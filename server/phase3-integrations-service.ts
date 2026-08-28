@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Phase 3: Enhanced Integrations Service for SALIS AUTO
 // Real implementations for accounting, email, social media, video, and marketplace integrations
 

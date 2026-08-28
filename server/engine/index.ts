@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Engine Module Entry Point
  * Initializes the workflow engine, event bus, and cross-module triggers.

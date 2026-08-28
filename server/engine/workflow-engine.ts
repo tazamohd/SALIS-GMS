@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Workflow Engine
  * Central orchestrator that validates state transitions and fires events.

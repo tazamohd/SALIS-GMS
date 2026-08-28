@@ -1,4 +1,3 @@
-// @ts-nocheck
 // PHASE 7 - ADVANCED HARDWARE BACKEND SERVICE
 // 5 modules with database operations
 

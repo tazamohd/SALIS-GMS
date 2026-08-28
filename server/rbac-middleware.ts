@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - RBAC Middleware
  *

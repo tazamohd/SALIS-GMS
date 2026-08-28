@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - AI Business Intelligence Engine
  * Connects all department data to generate predictions, insights, and recommendations.
