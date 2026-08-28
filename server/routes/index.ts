@@ -69,6 +69,9 @@ import { localizationRoutes } from "./localization";
 import { serviceTemplateRoutes } from "./service-templates";
 import { discountRoutes } from "./discounts";
 import { purchaseOrderRoutes } from "./purchase-orders";
+import { catalogRoutes } from "./catalogs";
+import { refundRoutes } from "./refunds";
+import { inspectionRoutes } from "./inspections";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -287,6 +290,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Discount Routes Loaded");
   app.use("/api", purchaseOrderRoutes);
   console.log("✅ Purchase Order Routes Loaded");
+  app.use("/api", catalogRoutes);
+  console.log("✅ Catalog Routes Loaded");
+  app.use("/api", refundRoutes);
+  console.log("✅ Refund Routes Loaded");
+  app.use("/api", inspectionRoutes);
+  console.log("✅ Inspection Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
