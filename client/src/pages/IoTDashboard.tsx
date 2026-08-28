@@ -60,7 +60,7 @@ export default function IoTDashboard() {
   // WebSocket connection for real-time sensor data
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
+    const ws = new WebSocket(`${protocol}://${window.location.host}/ws/chat`);
     wsRef.current = ws;
 
     ws.onmessage = (e) => {

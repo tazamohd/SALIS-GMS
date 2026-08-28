@@ -78,7 +78,7 @@ export default function DigitalTwinViewer() {
   // WebSocket connection for live sensor updates
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
+    const ws = new WebSocket(`${protocol}://${window.location.host}/ws/chat`);
     wsRef.current = ws;
 
     ws.onmessage = (e) => {

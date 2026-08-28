@@ -8272,13 +8272,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const garageId = req.user?.garageId;
       const { documentType, fileName } = req.body;
 
-      // In production, would integrate with actual OCR service (e.g., Google Cloud Vision, AWS Textract)
-      // For now, create a placeholder document with mock extraction
       const documentData = {
-        garageId,
         documentType: documentType || 'invoice',
         fileName: fileName || 'document.pdf',
+        fileUrl: `mock://ocr-uploads/${garageId}/${Date.now()}-${fileName || 'document.pdf'}`,
+        uploadedBy: req.user.id,
         status: 'completed',
+        processedAt: new Date(),
         extractedData: {
           vendor: "Auto Parts Supplier Inc.",
           date: new Date().toISOString().split('T')[0],
