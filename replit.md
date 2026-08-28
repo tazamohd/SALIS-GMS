@@ -1,7 +1,9 @@
 # SALIS AUTO - Automotive ERP Platform
 
+> **Canonical references**: `docs/ARCHITECTURE.md` (system overview), `CLAUDE.md` (contributor quick-start), `docs/DEPLOYMENT.md` (deploy guide).
+
 ## Overview
-SALIS AUTO is a world-class automotive ERP platform designed for efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform has expanded to **156+ comprehensive modules** across 14 phases, supporting multi-tenant franchise networks, advanced hardware integrations, cutting-edge technologies (AI, blockchain, AR/VR, quantum computing, sustainable energy management), and dedicated mobile web applications. It includes comprehensive compliance and localization features for the Saudi Arabian market (VAT, ZATCA E-Invoicing, Hijri calendar, Zakat, TRN validation, Arabic language, localized exports, SMS).
+SALIS AUTO is a world-class automotive ERP platform designed for efficient garage operations at scale. It offers enterprise-grade features including franchise management, OBD diagnostics integration, OEM software licensing, global multi-currency/multi-language support, and a B2B spare parts supply network. The platform supports multi-tenant franchise networks, advanced hardware integrations, AI features, and dedicated mobile web applications. It includes **250 page components**, **406 database tables** (in `shared/schema.ts`), and **59 modular route files** alongside the monolith `routes.ts`. It includes comprehensive compliance and localization features for the Saudi Arabian market (VAT, ZATCA E-Invoicing, Hijri calendar, Zakat, TRN validation, Arabic language, localized exports, SMS).
 
 ## User Preferences
 - Modern React patterns with hooks
@@ -22,17 +24,17 @@ The application uses a full-stack architecture with clear client-server separati
 
 **Authentication**: Custom email/password authentication with comprehensive role-based access control (RBAC). AuthProvider with React Query manages user state via `/api/user`, `/api/login`, `/api/logout`, and `/api/register` endpoints. Session-based authentication using passport.js LocalStrategy.
 
-**Database**: PostgreSQL with Drizzle ORM, comprising **175+ comprehensive modules with 320+ tables**.
+**Database**: PostgreSQL with Drizzle ORM, comprising **406 tables** defined in `shared/schema.ts`.
 
-**RBAC System**: 24 professional roles, 70 staff users across departments, granular permissions for 156+ resources. Role-based sidebar navigation filtering implemented via `roleNavigationMap` in Layout.tsx. Welcome page at `/welcome` routes users to their role-specific portal (technician → /technician-portal, HR → /hr-management, etc.).
+**RBAC System**: Role-based access control with granular permissions. Role-based sidebar navigation filtering implemented via `roleNavigationMap` in Layout.tsx. Welcome page at `/welcome` routes users to their role-specific portal (technician → /technician-portal, HR → /hr-management, etc.).
 
-**Security Notes (Production)**: AUTH_BYPASS=true is set for development only. Disable for production. HR module queries use optional garage-based filtering - in development mode without garageId, returns all records. Production deployments must enforce garageId for tenant isolation.
+**Security Notes (Production)**: Production deployments must enforce garageId for tenant isolation. All data access is scoped through the storage singleton by `garageId` from `req.user`.
 
 **Real-Time Features**: WebSocket server (`/ws/chat`) for in-app chat support, live notifications, call center real-time updates, and service bay occupancy monitoring with session-based authentication.
 
 **UI/UX Decisions**: The design preserves the Figma aesthetic, ensures responsiveness, and uses a consistent component-based approach with a monochrome design system based on the SALIS AUTO brand. It supports PWA, mobile-responsive navigation, and WCAG 2.1 AA accessibility features, including an offline mode. A pure grayscale design is enforced with distinct light and dark modes. Resizable sidebar with drag handle for user customization.
 
-**Design System & Archetype Wrappers**: A comprehensive UI/UX design system overhaul has been completed across all 150+ application pages using 7 production-ready archetype wrappers: StandardPageLayout (simple pages with header/description), StandardTablePage (data tables), DashboardPage (metrics/cards), FormPage (form-centric), AnalyticsPage (reporting), MobileCardPage (mobile-optimized cards), and TabsPageLayout (multi-tab interfaces).
+**Design System & Archetype Wrappers**: A comprehensive UI/UX design system using 7 production-ready archetype wrappers across application pages: StandardPageLayout (simple pages with header/description), StandardTablePage (data tables), DashboardPage (metrics/cards), FormPage (form-centric), AnalyticsPage (reporting), MobileCardPage (mobile-optimized cards), and TabsPageLayout (multi-tab interfaces).
 
 **Navigation System**: Sidebar navigation completely reorganized into **18 workflow-based groups** that follow natural garage operational sequence: Dashboard & Overview → Customer Intake & Appointments → Vehicle Management → Inspection & Check-In → Diagnostics & Assessment → Service Planning & Scheduling → Parts & Inventory → Service Execution & Operations → Quality & Delivery → Billing & Payments → Analytics & Business Intelligence → Customer Experience & Growth → Team & HR Management → Compliance & Safety → Enterprise & Franchise → Emerging Technologies → AI & Automation Hub → System & Settings.
 

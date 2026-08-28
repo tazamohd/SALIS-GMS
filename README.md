@@ -11,16 +11,17 @@
 
 ## 🌟 Overview
 
-SALIS AUTO is a comprehensive, enterprise-grade automotive ERP platform designed to revolutionize garage and automotive workshop management. The platform provides **104 comprehensive modules** across **8 enterprise phases**, supporting operations from single-location workshops to multi-tenant franchise networks operating globally.
+SALIS AUTO is a comprehensive, enterprise-grade automotive ERP platform designed to revolutionize garage and automotive workshop management. The platform supports operations from single-location workshops to multi-tenant franchise networks.
 
-### 🎯 Key Highlights
+### Key Highlights
 
-- ✅ **Production Ready** - 93.75% complete with 60+ pages
-- ✅ **Saudi Arabia Market Ready** - Full ZATCA compliance
-- ✅ **104 Modules** - Comprehensive feature set
-- ✅ **Zero TypeScript Errors** - Production-quality code
-- ✅ **Real-Time Features** - WebSocket-powered notifications
-- ✅ **AI-Powered** - OpenAI GPT-5 integration
+- **250 pages** — React SPA with wouter routing
+- **406 database tables** — Drizzle ORM + PostgreSQL (`shared/schema.ts`)
+- **59 modular route files** + monolith `routes.ts` (hybrid router)
+- **Saudi Arabia Market Ready** — ZATCA e-invoicing, 15% VAT, Hijri dates, Arabic + English
+- **Real-Time Features** — WebSocket-powered notifications and chat
+- **AI-Powered** — OpenAI integration for diagnostics, repair guides, business intelligence
+- **CI-gated** — tsc, ESLint, build, and vitest run on every PR
 
 ---
 
