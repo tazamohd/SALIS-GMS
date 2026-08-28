@@ -66,6 +66,9 @@ import {
   leaderboardSnapshots,
   mobileDevices,
   subscriptions,
+  bankAccounts,
+  bankTransactions,
+  lossEntries,
   type User,
   type UpsertUser,
   type Garage,
@@ -12109,6 +12112,67 @@ const result = await db
       .update(smartContracts)
       .set(patch)
       .where(and(eq(smartContracts.id, id), eq(smartContracts.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  // ---------- Bank Accounts (Bank Account Management page) ----------
+  async getBankAccounts(garageId: string) {
+    return await db.select().from(bankAccounts).where(eq(bankAccounts.garageId, garageId)).orderBy(desc(bankAccounts.createdAt));
+  }
+
+  async createBankAccount(garageId: string, data: any) {
+    const [row] = await db.insert(bankAccounts).values({ ...data, garageId }).returning();
+    return row;
+  }
+
+  async updateBankAccount(id: string, garageId: string, patch: any) {
+    const [row] = await db
+      .update(bankAccounts)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(and(eq(bankAccounts.id, id), eq(bankAccounts.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  // ---------- Bank Transactions ----------
+  async getBankTransactions(garageId: string, bankAccountId?: string) {
+    const conditions = [eq(bankTransactions.garageId, garageId)];
+    if (bankAccountId) conditions.push(eq(bankTransactions.bankAccountId, bankAccountId));
+    return await db.select().from(bankTransactions).where(and(...conditions)).orderBy(desc(bankTransactions.createdAt));
+  }
+
+  async createBankTransaction(garageId: string, data: any) {
+    const [row] = await db.insert(bankTransactions).values({ ...data, garageId }).returning();
+    // Update the bank account's current balance
+    const account = await db.select().from(bankAccounts)
+      .where(and(eq(bankAccounts.id, data.bankAccountId), eq(bankAccounts.garageId, garageId)));
+    if (account[0]) {
+      const current = parseFloat(account[0].currentBalance ?? "0");
+      const amount = parseFloat(data.amount);
+      const delta = ["deposit", "interest"].includes(data.transactionType) ? amount : -amount;
+      await db.update(bankAccounts)
+        .set({ currentBalance: String(current + delta), updatedAt: new Date() })
+        .where(eq(bankAccounts.id, data.bankAccountId));
+    }
+    return row;
+  }
+
+  // ---------- Loss Entries (Loss Account page) ----------
+  async getLossEntries(garageId: string) {
+    return await db.select().from(lossEntries).where(eq(lossEntries.garageId, garageId)).orderBy(desc(lossEntries.createdAt));
+  }
+
+  async createLossEntry(garageId: string, data: any) {
+    const [row] = await db.insert(lossEntries).values({ ...data, garageId }).returning();
+    return row;
+  }
+
+  async writeOffLossEntry(id: string, garageId: string) {
+    const [row] = await db
+      .update(lossEntries)
+      .set({ status: "written_off", updatedAt: new Date() })
+      .where(and(eq(lossEntries.id, id), eq(lossEntries.garageId, garageId)))
       .returning();
     return row;
   }
