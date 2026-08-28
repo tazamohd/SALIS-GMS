@@ -62,6 +62,7 @@ import { obdDiagnosticsRoutes } from "./obd-diagnostics";
 import { subscriptionsRoutes } from "./subscriptions";
 import { bankAccountRoutes } from "./bank-accounts";
 import { lossEntryRoutes } from "./loss-entries";
+import { jobCardInvoiceRoutes } from "./job-card-invoice";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -266,6 +267,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Bank Account Routes Loaded");
   app.use("/api", lossEntryRoutes);
   console.log("✅ Loss Entry Routes Loaded");
+  app.use("/api", jobCardInvoiceRoutes);
+  console.log("✅ Job Card → Invoice Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
