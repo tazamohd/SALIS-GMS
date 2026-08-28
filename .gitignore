@@ -11,3 +11,23 @@ user_credentials.csv
 .env.*
 *.pem
 *.key
+
+# Screenshot / gallery artifacts (use docs/ for documentation images)
+GUI PRTSCN/
+screenshots/
+ui-screens/
+gallery.html
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# Build / cache
+*.tsbuildinfo
+.cache/
