@@ -166,7 +166,7 @@ export default function VideoConsultations() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => copyMeetingLink(row.meetingUrl)}
+                onClick={() => copyMeetingLink(row.meetingUrl!)}
                 data-testid={`button-copy-${row.id}`}
               >
                 <Copy className="h-3 w-3" />

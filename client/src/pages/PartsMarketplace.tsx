@@ -273,20 +273,21 @@ export default function PartsMarketplace() {
   ];
 
   return (
-    <TabsPageLayout
-      title={t('inventory.partsMarketplace', 'Parts Marketplace')}
-      description={t('inventory.partsMarketplaceDesc', 'Order parts from eBay Motors, Amazon, and RockAuto')}
-      icon={ShoppingCart}
-      primaryAction={{
-        label: t('inventory.placeOrder', 'Place Order'),
-        icon: Plus,
-        onClick: () => setIsOrderDialogOpen(true),
-        testId: "button-place-order",
-      }}
-      headerContent={statsContent}
-      tabs={tabs}
-      defaultTab="all"
-    >
+    <>
+      <TabsPageLayout
+        title={t('inventory.partsMarketplace', 'Parts Marketplace')}
+        description={t('inventory.partsMarketplaceDesc', 'Order parts from eBay Motors, Amazon, and RockAuto')}
+        icon={ShoppingCart}
+        primaryAction={{
+          label: t('inventory.placeOrder', 'Place Order'),
+          icon: Plus,
+          onClick: () => setIsOrderDialogOpen(true),
+          testId: "button-place-order",
+        }}
+        headerContent={statsContent}
+        tabs={tabs}
+        defaultTab="all"
+      />
       <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
@@ -349,6 +350,6 @@ export default function PartsMarketplace() {
           </div>
         </DialogContent>
       </Dialog>
-    </TabsPageLayout>
+    </>
   );
 }
