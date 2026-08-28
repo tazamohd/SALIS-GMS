@@ -1,10 +1,12 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 import { getAuditLog, getAuditStats, seedAuditLog } from '../services/audit-trail';
 
 const router = Router();
 
-router.get('/audit/log', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+router.get('/audit/log', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
+  const garageId = (req as any).user?.garageId;
   const { userId, resource, action, severity, from, to, limit, offset } = req.query;
   const result = await getAuditLog({
     garageId,
@@ -20,13 +22,13 @@ router.get('/audit/log', async (req, res) => {
   res.json(result);
 });
 
-router.get('/audit/stats', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+router.get('/audit/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
+  const garageId = (req as any).user?.garageId;
   res.json(await getAuditStats(garageId));
 });
 
-router.post('/audit/seed', async (req, res) => {
-  const garageId = (req as any).user?.garageId || '1';
+router.post('/audit/seed', isAuthenticated, requireRole(['ADMIN']), async (req, res) => {
+  const garageId = (req as any).user?.garageId;
   await seedAuditLog(garageId);
   res.json({ success: true, message: 'Demo audit entries created' });
 });

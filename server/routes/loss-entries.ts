@@ -1,11 +1,12 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertLossEntrySchema } from "../../shared/schema";
 
 const router = Router();
 
-router.get("/loss-entries", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/loss-entries", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -17,7 +18,7 @@ router.get("/loss-entries", isAuthenticated, async (req: Request, res: Response)
   }
 });
 
-router.post("/loss-entries", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/loss-entries", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = insertLossEntrySchema.safeParse(req.body);
@@ -31,7 +32,7 @@ router.post("/loss-entries", isAuthenticated, async (req: Request, res: Response
   }
 });
 
-router.post("/loss-entries/:id/write-off", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/loss-entries/:id/write-off", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {

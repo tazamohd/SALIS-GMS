@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertBankAccountSchema, insertBankTransactionSchema } from "../../shared/schema";
 import { z } from "zod";
 
@@ -20,7 +21,7 @@ const patchSchema = z.object({
   notes: z.string().nullable().optional(),
 });
 
-router.get("/bank-accounts", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/bank-accounts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -32,7 +33,7 @@ router.get("/bank-accounts", isAuthenticated, async (req: Request, res: Response
   }
 });
 
-router.post("/bank-accounts", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/bank-accounts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = insertBankAccountSchema.safeParse(req.body);
@@ -46,7 +47,7 @@ router.post("/bank-accounts", isAuthenticated, async (req: Request, res: Respons
   }
 });
 
-router.patch("/bank-accounts/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/bank-accounts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = patchSchema.safeParse(req.body);
@@ -61,7 +62,7 @@ router.patch("/bank-accounts/:id", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.get("/bank-transactions", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/bank-transactions", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -74,7 +75,7 @@ router.get("/bank-transactions", isAuthenticated, async (req: Request, res: Resp
   }
 });
 
-router.post("/bank-transactions", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/bank-transactions", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = insertBankTransactionSchema.safeParse(req.body);

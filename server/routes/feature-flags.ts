@@ -2,14 +2,13 @@ import { Router, Request, Response } from "express";
 import { db } from "../db";
 import { featureFlags } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
+import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
 // List all flags for the authenticated user's garage
-router.get("/feature-flags", async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.get("/feature-flags", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = (req.user as any).garageId;
     const flags = await db
@@ -24,10 +23,7 @@ router.get("/feature-flags", async (req: Request, res: Response) => {
 });
 
 // Get a single flag by ID
-router.get("/feature-flags/:id", async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.get("/feature-flags/:id", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const garageId = (req.user as any).garageId;
     const [flag] = await db
@@ -50,10 +46,7 @@ router.get("/feature-flags/:id", async (req: Request, res: Response) => {
 });
 
 // Create a new feature flag
-router.post("/feature-flags", async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.post("/feature-flags", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req.user as any).garageId;
     const { flagName, isEnabled, source } = req.body;
@@ -77,10 +70,7 @@ router.post("/feature-flags", async (req: Request, res: Response) => {
 });
 
 // Update a feature flag
-router.patch("/feature-flags/:id", async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.patch("/feature-flags/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req.user as any).garageId;
     const { isEnabled } = req.body;
@@ -105,10 +95,7 @@ router.patch("/feature-flags/:id", async (req: Request, res: Response) => {
 });
 
 // Delete a feature flag
-router.delete("/feature-flags/:id", async (req: Request, res: Response) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+router.delete("/feature-flags/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req.user as any).garageId;
     const [flag] = await db

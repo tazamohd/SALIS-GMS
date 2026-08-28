@@ -13,6 +13,7 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import {
   ALL_PLAN_IDS,
   CATEGORY_MIN_PLAN,
@@ -66,7 +67,7 @@ router.get("/subscriptions/current", isAuthenticated, async (req, res) => {
 const changeSchema = z.object({
   plan: z.enum(["STARTER", "PRO", "ENTERPRISE"] as [PlanId, ...PlanId[]]),
 });
-router.post("/subscriptions/change-plan", isAuthenticated, async (req, res) => {
+router.post("/subscriptions/change-plan", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const user = u(req);
   if (!user.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = changeSchema.safeParse(req.body);
@@ -105,7 +106,7 @@ router.post("/subscriptions/change-plan", isAuthenticated, async (req, res) => {
 });
 
 // ── Cancel (at period end) ──────────────────────────────────────────────
-router.post("/subscriptions/cancel", isAuthenticated, async (req, res) => {
+router.post("/subscriptions/cancel", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const user = u(req);
   if (!user.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -121,7 +122,7 @@ router.post("/subscriptions/cancel", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/subscriptions/resume", isAuthenticated, async (req, res) => {
+router.post("/subscriptions/resume", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const user = u(req);
   if (!user.garageId) return res.status(403).json({ message: "No garage associated" });
   try {

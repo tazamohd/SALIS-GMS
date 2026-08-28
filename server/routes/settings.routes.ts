@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const router = Router();
  * - POST /api/settings/localization - Update localization settings
  */
 
-router.get("/settings", isAuthenticated, async (req, res) => {
+router.get("/settings", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     res.json({ message: "Settings routes endpoint - to be implemented" });
   } catch (error) {
