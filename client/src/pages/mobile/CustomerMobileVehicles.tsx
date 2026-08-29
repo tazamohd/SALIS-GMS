@@ -64,7 +64,7 @@ export default function CustomerMobileVehicles() {
                 <div>
                   <p className="text-[#64748B] text-xs">Mileage</p>
                   <p className="font-semibold text-[#0B1F3B] dark:text-white">
-                    {vehicle.currentMileage?.toLocaleString() || "N/A"} {vehicle.mileageUnit}
+                    {vehicle.mileage?.toLocaleString() || "N/A"} km
                   </p>
                 </div>
                 <div>

@@ -72,12 +72,12 @@ export default function TechnicianMobileJobs() {
                   <div className="grid grid-cols-2 gap-2 text-xs text-[#64748B] mb-3">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {new Date(job.createdAt).toLocaleDateString()}
+                      {new Date(job.createdAt || Date.now()).toLocaleDateString()}
                     </div>
-                    {job.estimatedCompletionTime && (
+                    {job.estimatedCompletionAt && (
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {job.estimatedCompletionTime}
+                        {new Date(job.estimatedCompletionAt).toLocaleDateString()}
                       </div>
                     )}
                   </div>

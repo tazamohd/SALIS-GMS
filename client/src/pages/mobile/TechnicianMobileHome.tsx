@@ -16,7 +16,7 @@ export default function TechnicianMobileHome() {
 
   const completedToday = jobCards?.data?.filter(
     (job) => job.status === "completed" && 
-      new Date(job.updatedAt).toDateString() === new Date().toDateString()
+      new Date(job.updatedAt || Date.now()).toDateString() === new Date().toDateString()
   )?.length || 0;
 
   const pendingJobs = jobCards?.data?.filter((job) => job.status === "pending")?.length || 0;

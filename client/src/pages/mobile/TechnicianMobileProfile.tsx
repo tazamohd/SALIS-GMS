@@ -17,10 +17,10 @@ export default function TechnicianMobileProfile() {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-              {user?.name?.charAt(0).toUpperCase() || "T"}
+              {user?.fullName?.charAt(0).toUpperCase() || "T"}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{user?.name || "Technician"}</h2>
+              <h2 className="text-xl font-bold">{user?.fullName || "Technician"}</h2>
               <p className="text-sm text-white/80">{user?.email}</p>
               <p className="text-xs text-white/60 mt-1">Technician Portal</p>
             </div>

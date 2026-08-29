@@ -107,7 +107,7 @@ export default function CustomerMobileHome() {
                 <p className="font-semibold text-[#0B1F3B] dark:text-white">{nextAppointment.serviceType}</p>
                 <p className="text-sm text-[#64748B]">
                   {new Date(nextAppointment.appointmentDate).toLocaleDateString()} at{" "}
-                  {nextAppointment.appointmentTime}
+                  {new Date(nextAppointment.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
               <Link href={`/appointments`}>

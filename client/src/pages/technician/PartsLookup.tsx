@@ -16,8 +16,8 @@ export default function TechnicianPartsLookup() {
   const filteredParts = parts?.filter((part) => {
     const searchLower = search.toLowerCase();
     return (
-      part.partName.toLowerCase().includes(searchLower) ||
-      part.partNumber?.toLowerCase().includes(searchLower) ||
+      part.name.toLowerCase().includes(searchLower) ||
+      part.sku?.toLowerCase().includes(searchLower) ||
       part.category?.toLowerCase().includes(searchLower)
     );
   }) || [];
@@ -88,7 +88,7 @@ export default function TechnicianPartsLookup() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg text-[#0B1F3B] dark:text-white">
-                        {part.partName}
+                        {part.name}
                       </CardTitle>
                       {part.category && (
                         <p className="text-sm text-[#64748B] mt-1">
@@ -96,46 +96,37 @@ export default function TechnicianPartsLookup() {
                         </p>
                       )}
                     </div>
-                    {getStockBadge(part.quantityInStock)}
+                    <Badge className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">{part.partType || "generic"}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {part.partNumber && (
+                    {part.sku && (
                       <div className="flex items-center gap-2 text-sm text-[#64748B]">
                         <Hash className="h-4 w-4" />
-                        <span className="font-mono">{part.partNumber}</span>
+                        <span className="font-mono">{part.sku}</span>
                       </div>
                     )}
-                    
+
                     <div className="flex items-center gap-2 text-sm">
                       <Package className="h-4 w-4 text-[#64748B]" />
                       <span className="text-[#0B1F3B] dark:text-white">
-                        {part.quantityInStock} units available
+                        {part.brand || "N/A"}
                       </span>
                     </div>
 
-                    {part.unitPrice && (
+                    {part.manufacturer && (
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-[#64748B]" />
                         <span className="text-[#0B1F3B] dark:text-white font-semibold">
-                          SAR {part.unitPrice}
+                          {part.manufacturer}
                         </span>
                       </div>
                     )}
 
-                    {part.minimumStockLevel && part.quantityInStock < part.minimumStockLevel && (
-                      <div className="flex items-start gap-2 p-2 bg-orange-50 dark:bg-orange-900/20 rounded">
-                        <AlertCircle className="h-4 w-4 text-[#F97316] mt-0.5" />
-                        <p className="text-xs text-[#F97316]">
-                          Below minimum stock level ({part.minimumStockLevel})
-                        </p>
-                      </div>
-                    )}
-
-                    {part.supplier && (
+                    {part.description && (
                       <p className="text-xs text-[#64748B] border-t border-[#E2E8F0] dark:border-[#232A36] pt-2">
-                        Supplier: {part.supplier}
+                        {part.description}
                       </p>
                     )}
                   </div>

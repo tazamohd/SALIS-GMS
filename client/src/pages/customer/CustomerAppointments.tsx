@@ -137,7 +137,7 @@ export function CustomerAppointments() {
                     <p className="text-sm text-[#64748B]">Duration</p>
                     <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white">{apt.duration} minutes</p>
                   </div>
-                  {apt.vehicleInfo && typeof apt.vehicleInfo === 'object' && (
+                  {apt.vehicleInfo != null && typeof apt.vehicleInfo === 'object' && (
                     <div>
                       <p className="text-sm text-[#64748B]">Vehicle</p>
                       <p className="font-medium mt-1 text-[#0B1F3B] dark:text-white">

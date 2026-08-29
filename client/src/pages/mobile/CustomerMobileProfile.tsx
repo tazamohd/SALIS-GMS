@@ -34,10 +34,10 @@ export default function CustomerMobileProfile() {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-              {user?.name?.charAt(0).toUpperCase() || "U"}
+              {user?.fullName?.charAt(0).toUpperCase() || "U"}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{user?.name || "User"}</h2>
+              <h2 className="text-xl font-bold">{user?.fullName || "User"}</h2>
               <p className="text-sm opacity-90">{user?.email}</p>
               <p className="text-xs opacity-75 mt-1">Customer Account</p>
             </div>

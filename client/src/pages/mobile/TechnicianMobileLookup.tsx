@@ -15,9 +15,9 @@ export default function TechnicianMobileLookup() {
   });
 
   const filteredParts = parts?.data?.filter(part =>
-    part.partName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    part.partNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    part.sku?.toLowerCase().includes(searchQuery.toLowerCase())
+    part.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    part.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    part.category?.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
   return (
@@ -79,36 +79,32 @@ export default function TechnicianMobileLookup() {
                       <Package className="h-6 w-6 text-[#0A5ED7]" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{part.partName}</h3>
+                      <h3 className="font-semibold text-[#0B1F3B] dark:text-white mb-1">{part.name}</h3>
                       <div className="grid grid-cols-2 gap-2 text-xs text-[#64748B] mb-2">
-                        <div>
-                          <span className="font-medium">Part #:</span> {part.partNumber || "N/A"}
-                        </div>
                         <div>
                           <span className="font-medium">SKU:</span> {part.sku || "N/A"}
                         </div>
+                        <div>
+                          <span className="font-medium">Category:</span> {part.category || "N/A"}
+                        </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Warehouse className="h-4 w-4 text-[#64748B]" />
-                          <span className={`text-sm font-semibold ${
-                            (part.quantityInStock || 0) > 0 
-                              ? "text-[#0BB3FF]" 
-                              : "text-[#F97316]"
-                          }`}>
-                            {part.quantityInStock || 0} in stock
+                          <span className="text-sm font-semibold text-[#64748B]">
+                            {part.partType || "generic"}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-sm font-semibold text-[#0B1F3B] dark:text-white">
                           <DollarSign className="h-4 w-4" />
-                          {Number(part.unitPrice || 0).toFixed(2)}
+                          {part.brand || "N/A"}
                         </div>
                       </div>
 
-                      {part.location && (
+                      {part.manufacturer && (
                         <p className="text-xs text-[#64748B] mt-2">
-                          📍 {part.location}
+                          {part.manufacturer}
                         </p>
                       )}
                     </div>

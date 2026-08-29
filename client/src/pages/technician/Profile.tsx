@@ -134,7 +134,7 @@ export default function TechnicianProfile() {
           </Card>
         )}
 
-        {profile?.rating && (
+        {profile?.level && (
           <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
@@ -143,10 +143,10 @@ export default function TechnicianProfile() {
                 </div>
                 <div>
                   <p className="text-sm text-[#64748B] mb-1">
-                    Rating
+                    Level
                   </p>
-                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white">
-                    {profile.rating.toFixed(1)} / 5.0
+                  <p className="text-lg font-semibold text-[#0B1F3B] dark:text-white capitalize">
+                    {profile.level}
                   </p>
                 </div>
               </div>

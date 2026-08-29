@@ -175,9 +175,9 @@ export default function TechnicianMyJobs() {
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
-                      {job.estimatedCost && (
+                      {job.estimatedHours && (
                         <p className="text-[#64748B]">
-                          Estimated: SAR {job.estimatedCost}
+                          Estimated: {job.estimatedHours} hours
                         </p>
                       )}
                     </div>
@@ -229,9 +229,9 @@ export default function TechnicianMyJobs() {
                           {format(new Date(job.scheduledDate), "MMM d, yyyy 'at' h:mm a")}
                         </p>
                       )}
-                      {job.actualCost && (
+                      {job.totalCost && (
                         <p className="text-[#64748B]">
-                          Cost: SAR {job.actualCost}
+                          Cost: SAR {job.totalCost}
                         </p>
                       )}
                     </div>
@@ -276,14 +276,14 @@ export default function TechnicianMyJobs() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
-                    {job.completionDate && (
+                    {job.completedAt && (
                       <p className="text-[#64748B]">
-                        Completed: {format(new Date(job.completionDate), "MMM d, yyyy")}
+                        Completed: {format(new Date(job.completedAt), "MMM d, yyyy")}
                       </p>
                     )}
-                    {job.actualCost && (
+                    {job.totalCost && (
                       <p className="text-[#64748B]">
-                        Final Cost: SAR {job.actualCost}
+                        Final Cost: SAR {job.totalCost}
                       </p>
                     )}
                   </div>
