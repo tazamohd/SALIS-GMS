@@ -32,7 +32,7 @@ export default function ReviewChat() {
   });
 
   const { data: chatMessages } = useQuery({
-    queryKey: ["/api/job-cards", selectedJob, "chat"],
+    queryKey: [`/api/job-cards/${selectedJob}/chat`],
     enabled: !!selectedJob,
     refetchInterval: 5000,
   });
@@ -65,7 +65,7 @@ export default function ReviewChat() {
       });
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/job-cards", variables.jobCardId, "chat"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/job-cards/${variables.jobCardId}/chat`] });
       setMessage("");
     },
   });

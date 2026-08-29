@@ -19,7 +19,7 @@ export default function TechnicianDashboard() {
   const { user } = useAuth();
 
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
-    queryKey: ["/api/technicians", user?.id, "job-cards"],
+    queryKey: [`/api/technicians/${user?.id}/job-cards`],
     enabled: !!user?.id,
   });
 

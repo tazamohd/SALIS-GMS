@@ -80,7 +80,7 @@ export default function Tools() {
 
   const createMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      return await apiRequest("/api/tools", "POST", data);
+      return await apiRequest("POST", "/api/tools", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tools"] });

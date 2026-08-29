@@ -26,7 +26,7 @@ export default function CustomerReviewsRatings() {
 
   const respondMutation = useMutation({
     mutationFn: async ({ id, response }: any) => {
-      return await apiRequest(`/api/reviews/${id}/respond`, "POST", { response });
+      return await apiRequest("POST", `/api/reviews/${id}/respond`, { response });
     },
     onSuccess: () => {
       toast({ title: "Response posted", description: "Your response has been published." });

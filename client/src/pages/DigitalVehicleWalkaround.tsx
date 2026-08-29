@@ -33,7 +33,7 @@ export default function DigitalVehicleWalkaround() {
 
   const createWalkaround = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/digital-walkaround", "POST", data);
+      return await apiRequest("POST", "/api/digital-walkaround", data);
     },
     onSuccess: () => {
       toast({ title: t('vehicles.walkaroundCreated', 'Walkaround created'), description: t('vehicles.vehicleInspectionSavedSuccessfully', 'Vehicle inspection saved successfully.') });

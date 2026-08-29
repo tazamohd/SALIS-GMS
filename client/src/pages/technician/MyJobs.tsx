@@ -26,7 +26,7 @@ export default function TechnicianMyJobs() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: jobCards, isLoading } = useQuery<JobCard[]>({
-    queryKey: ["/api/technicians", user?.id, "job-cards"],
+    queryKey: [`/api/technicians/${user?.id}/job-cards`],
     enabled: !!user?.id,
   });
 
@@ -35,7 +35,7 @@ export default function TechnicianMyJobs() {
       return await apiRequest("PATCH", `/api/job-cards/${id}`, { status });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technicians", user?.id, "job-cards"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/technicians/${user?.id}/job-cards`] });
       toast({
         title: "Status Updated",
         description: "Job status has been updated successfully.",

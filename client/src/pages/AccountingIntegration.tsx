@@ -40,7 +40,7 @@ export default function AccountingIntegration() {
 
   const connectMutation = useMutation({
     mutationFn: async (provider: string) => {
-      return await apiRequest("/api/accounting/connect", "POST", { provider });
+      return await apiRequest("POST", "/api/accounting/connect", { provider });
     },
     onSuccess: () => {
       toast({ title: t('accounting.connectionInitiated', 'Connection initiated'), description: t('accounting.completeAuthorization', 'Please complete the authorization process.') });
@@ -50,7 +50,7 @@ export default function AccountingIntegration() {
 
   const syncMutation = useMutation({
     mutationFn: async (syncType: string) => {
-      return await apiRequest("/api/accounting/sync", "POST", { syncType });
+      return await apiRequest("POST", "/api/accounting/sync", { syncType });
     },
     onSuccess: () => {
       toast({ title: t('accounting.syncStarted', 'Sync started'), description: t('accounting.dataSynchronizing', 'Data is being synchronized.') });

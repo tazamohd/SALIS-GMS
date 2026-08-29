@@ -133,7 +133,7 @@ export default function SpareParts() {
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateFormData) => {
-      return await apiRequest("/api/spare-parts", "POST", data);
+      return await apiRequest("POST", "/api/spare-parts", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] });
@@ -155,7 +155,7 @@ export default function SpareParts() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/spare-parts/${id}`, "DELETE");
+      return await apiRequest("DELETE", `/api/spare-parts/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/spare-parts"] });

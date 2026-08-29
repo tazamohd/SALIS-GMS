@@ -51,22 +51,22 @@ export default function GlobalizationLayer() {
   });
 
   const createLocaleMutation = useMutation({
-    mutationFn: (data: InsertLocale) => apiRequest("/api/locales", "POST", data),
+    mutationFn: (data: InsertLocale) => apiRequest("POST", "/api/locales", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/locales"] }); setShowLocaleDialog(false); toast({ title: t('globalization.localeCreated', 'Locale created') }); },
   });
 
   const createTranslationMutation = useMutation({
-    mutationFn: (data: InsertTranslationResource) => apiRequest("/api/translation-resources", "POST", data),
+    mutationFn: (data: InsertTranslationResource) => apiRequest("POST", "/api/translation-resources", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/translation-resources"] }); setShowTranslationDialog(false); toast({ title: t('globalization.translationCreated', 'Translation created') }); },
   });
 
   const createCurrencyMutation = useMutation({
-    mutationFn: (data: InsertCurrencyRate) => apiRequest("/api/currency-rates", "POST", data),
+    mutationFn: (data: InsertCurrencyRate) => apiRequest("POST", "/api/currency-rates", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/currency-rates"] }); setShowCurrencyDialog(false); toast({ title: t('globalization.currencyRateCreated', 'Currency rate created') }); },
   });
 
   const createTaxMutation = useMutation({
-    mutationFn: (data: InsertTaxRegion) => apiRequest("/api/tax-regions", "POST", data),
+    mutationFn: (data: InsertTaxRegion) => apiRequest("POST", "/api/tax-regions", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/tax-regions"] }); setShowTaxDialog(false); toast({ title: t('globalization.taxRegionCreated', 'Tax region created') }); },
   });
 

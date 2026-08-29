@@ -12,7 +12,7 @@ export default function TechnicianTimeClock() {
   const [clockInTime, setClockInTime] = useState<Date | null>(null);
 
   const { data: timeEntries } = useQuery<any[]>({
-    queryKey: ["/api/technicians", user?.id, "time-clock"],
+    queryKey: [`/api/technicians/${user?.id}/time-clock`],
     enabled: !!user?.id,
   });
 

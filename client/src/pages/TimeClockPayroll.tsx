@@ -29,7 +29,7 @@ export default function TimeClockPayroll() {
 
   const clockInMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/timeclock/clock-in", "POST", {
+      return apiRequest("POST", "/api/timeclock/clock-in", {
         timestamp: new Date().toISOString(),
       });
     },
@@ -44,7 +44,7 @@ export default function TimeClockPayroll() {
 
   const clockOutMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/timeclock/clock-out", "POST", {
+      return apiRequest("POST", "/api/timeclock/clock-out", {
         timestamp: new Date().toISOString(),
       });
     },
@@ -59,7 +59,7 @@ export default function TimeClockPayroll() {
 
   const calculatePayrollMutation = useMutation({
     mutationFn: async (periodId: string) => {
-      return apiRequest(`/api/payroll/calculate/${periodId}`, "POST", {});
+      return apiRequest("POST", `/api/payroll/calculate/${periodId}`, {});
     },
     onSuccess: () => {
       toast({ title: t('payroll.calculated', 'Payroll Calculated'), description: t('payroll.calculatedSuccess', 'Payroll has been calculated successfully') });

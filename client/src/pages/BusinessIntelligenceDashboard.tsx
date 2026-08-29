@@ -66,7 +66,7 @@ export default function BusinessIntelligenceDashboard() {
 
   const createReportMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/analytics/custom-reports", "POST", data);
+      return await apiRequest("POST", "/api/analytics/custom-reports", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/custom-reports"] });
@@ -81,7 +81,7 @@ export default function BusinessIntelligenceDashboard() {
 
   const runReportMutation = useMutation({
     mutationFn: async (reportId: string) => {
-      return await apiRequest(`/api/analytics/custom-reports/${reportId}/run`, "POST");
+      return await apiRequest("POST", `/api/analytics/custom-reports/${reportId}/run`);
     },
     onSuccess: () => {
       toast({

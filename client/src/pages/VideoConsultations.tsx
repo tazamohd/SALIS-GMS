@@ -23,7 +23,7 @@ export default function VideoConsultations() {
 
   const createConsultation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/video/consultations", "POST", data);
+      return await apiRequest("POST", "/api/video/consultations", data);
     },
     onSuccess: () => {
       toast({ title: t('videoConsultations.consultationScheduled', 'Consultation scheduled'), description: t('videoConsultations.meetingLinkSent', 'Video meeting link sent to customer.') });
@@ -34,7 +34,7 @@ export default function VideoConsultations() {
 
   const startMeeting = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video/consultations/${id}/start`, "POST", {});
+      return await apiRequest("POST", `/api/video/consultations/${id}/start`, {});
     },
     onSuccess: (data: any) => {
       if (data.meetingUrl) {

@@ -30,7 +30,7 @@ export default function ReferralProgram() {
 
   const createReferral = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/referrals/generate-code", "POST", data);
+      return await apiRequest("POST", "/api/referrals/generate-code", data);
     },
     onSuccess: () => {
       toast({ title: t('referral.codeGenerated', 'Referral code generated'), description: t('referral.codeCreatedSuccessfully', 'Referral code created successfully.') });

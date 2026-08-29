@@ -39,12 +39,12 @@ export default function DiagnosticsOBDHub() {
   });
 
   const createDeviceMutation = useMutation({
-    mutationFn: (data: InsertObdDevice) => apiRequest("/api/obd-devices", "POST", data),
+    mutationFn: (data: InsertObdDevice) => apiRequest("POST", "/api/obd-devices", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-devices"] }); setShowDeviceDialog(false); toast({ title: t('diagnosticsOBD.deviceRegistered', 'Device registered') }); },
   });
 
   const createSessionMutation = useMutation({
-    mutationFn: (data: InsertObdSession) => apiRequest("/api/obd-sessions", "POST", data),
+    mutationFn: (data: InsertObdSession) => apiRequest("POST", "/api/obd-sessions", data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["/api/obd-sessions"] }); setShowSessionDialog(false); toast({ title: t('diagnosticsOBD.sessionStarted', 'Session started') }); },
   });
 

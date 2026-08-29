@@ -33,7 +33,7 @@ export default function VideoEstimates() {
 
   const approveEstimate = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video-estimates/${id}/approve`, "PATCH", {});
+      return await apiRequest("PATCH", `/api/video-estimates/${id}/approve`, {});
     },
     onSuccess: () => {
       toast({ title: t('videoEstimates.estimateApproved', 'Estimate approved'), description: t('videoEstimates.estimateApprovedDesc', 'Video estimate has been approved.') });

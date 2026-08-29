@@ -14,7 +14,7 @@ export default function TechnicianJobDocumentation() {
   const [selectedJobId, setSelectedJobId] = useState<string>("");
 
   const { data: jobCards } = useQuery<JobCard[]>({
-    queryKey: ["/api/technicians", user?.id, "job-cards"],
+    queryKey: [`/api/technicians/${user?.id}/job-cards`],
     enabled: !!user?.id,
   });
 

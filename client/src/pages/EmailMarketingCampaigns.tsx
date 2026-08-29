@@ -24,7 +24,7 @@ export default function EmailMarketingCampaigns() {
 
   const createCampaign = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/email/campaigns", "POST", data);
+      return await apiRequest("POST", "/api/email/campaigns", data);
     },
     onSuccess: () => {
       toast({ title: t('emailMarketing.campaignCreated', 'Campaign created'), description: t('emailMarketing.campaignCreatedSuccess', 'Your email campaign has been created successfully.') });
@@ -35,7 +35,7 @@ export default function EmailMarketingCampaigns() {
 
   const sendCampaign = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/email/campaigns/${id}/send`, "POST", {});
+      return await apiRequest("POST", `/api/email/campaigns/${id}/send`, {});
     },
     onSuccess: () => {
       toast({ title: t('emailMarketing.campaignSent', 'Campaign sent'), description: t('emailMarketing.campaignSending', 'Your email campaign is being sent.') });
