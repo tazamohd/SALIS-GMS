@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { User, Wrench, Award, Clock, Settings, LogOut } from "lucide-react";
 import { Link } from "wouter";
 import type { User as UserType } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TechnicianMobileProfile() {
+  const { logoutMutation } = useAuth();
   const { data: user } = useQuery<UserType>({
     queryKey: ["/api/auth/user"],
   });
@@ -104,7 +106,7 @@ export default function TechnicianMobileProfile() {
         variant="destructive"
         className="w-full bg-[#F97316] hover:bg-[#F97316]/90"
         onClick={() => {
-          window.location.href = "/api/auth/logout";
+          logoutMutation.mutate();
         }}
         data-testid="button-logout"
       >
