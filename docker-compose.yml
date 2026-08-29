@@ -10,7 +10,7 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: slis_gms
+      POSTGRES_DB: salis_gms
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:

@@ -50,20 +50,10 @@ Complete compliance and localization package for the Saudi market:
 
 ## 📚 Documentation
 
-### Core Documentation
-- **[PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)** - Comprehensive project documentation
-- **[SALIS_AUTO_DOCUMENTATION.md](./SALIS_AUTO_DOCUMENTATION.md)** - System documentation
-- **[SALIS_AUTO_COMPLETE_APPLICATION_DESCRIPTION.md](./SALIS_AUTO_COMPLETE_APPLICATION_DESCRIPTION.md)** - Complete application description
-
-### Saudi Arabia Market
-- **[SAUDI_ARABIA_FEATURES.md](./SAUDI_ARABIA_FEATURES.md)** - Complete Saudi features guide
-- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Production deployment guide
-- **[AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md)** - Authentication setup
-
-### Technical Documentation
-- **[replit.md](./replit.md)** - Project memory and architecture
-- **[PLATFORM_STATUS.md](./PLATFORM_STATUS.md)** - Current platform status
-- **[docs/MOBILE_API_REFERENCE.md](./docs/MOBILE_API_REFERENCE.md)** - Mobile API reference
+- **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** — System architecture (read before large changes)
+- **[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)** — Deployment guide (Render, Railway, Docker)
+- **[CLAUDE.md](./CLAUDE.md)** — Developer onboarding and conventions
+- **[.env.example](./.env.example)** — Environment variable reference
 
 ---
 
@@ -71,9 +61,8 @@ Complete compliance and localization package for the Saudi market:
 
 ### Prerequisites
 
-- Node.js 18+ 
-- PostgreSQL database
-- Replit account (for deployment)
+- Node.js 20+
+- PostgreSQL 16+
 
 ### Installation
 
@@ -99,21 +88,12 @@ npm run dev
 ### Required Environment Variables
 
 ```bash
-# Database
-DATABASE_URL=<postgresql-connection-string>
-
-# Authentication
-SESSION_SECRET=<random-secret-key>
-
-# Payment Processing
-STRIPE_SECRET_KEY=<stripe-secret>
-VITE_STRIPE_PUBLIC_KEY=<stripe-public>
-
-# Saudi Market (SMS)
-TWILIO_ACCOUNT_SID=<twilio-sid>
-TWILIO_AUTH_TOKEN=<twilio-token>
-TWILIO_PHONE_NUMBER=<+966-number>
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/salis_gms
+SESSION_SECRET=change-me-to-a-random-64-character-string
 ```
+
+Optional integrations (Stripe, OpenAI, Twilio, ZATCA, etc.) degrade
+gracefully when unconfigured. See `.env.example` for the full list.
 
 ---
 
@@ -146,37 +126,38 @@ TWILIO_PHONE_NUMBER=<+966-number>
 ## 🏗️ Architecture
 
 ### Database Schema
-- **70+ tables** with full relational integrity
-- **100+ database tables** across all phases
-- **saudi_tax_compliance** table for Saudi market
-- PostgreSQL with Drizzle ORM
+- **406 tables** defined in `shared/schema.ts` (single source of truth)
+- PostgreSQL with Drizzle ORM (type-safe queries)
+- Saudi tax compliance, multi-tenant scoping via `garageId`
 
 ### API Endpoints
-- **250+ authenticated REST endpoints**
+- **67+ modular route files** under `server/routes/` + legacy `server/routes.ts`
 - RESTful design with JSON responses
-- Zod validation on all endpoints
-- Session-based authentication
+- Zod validation on inputs
+- Session-based authentication (Passport.js local strategy)
 
 ### File Structure
 ```
-salis-auto/
-├── client/                  # Frontend React app
-│   ├── src/
-│   │   ├── components/      # UI components
-│   │   ├── pages/           # Page components
-│   │   ├── lib/             # Utilities (PDF, Excel exports)
-│   │   └── hooks/           # Custom React hooks
-├── server/                  # Backend Express server
-│   ├── routes.ts            # API routes
-│   ├── storage.ts           # Database interface
-│   ├── smsService.ts        # SMS integration
-│   └── index.ts             # Server entry point
-├── shared/                  # Shared types and schemas
-│   ├── schema.ts            # Database schema
+SALIS-GMS/
+├── client/                  # React SPA (Vite + wouter routing)
+│   └── src/
+│       ├── components/      # Shared UI components (shadcn/ui)
+│       ├── pages/           # ~250 page components
+│       ├── hooks/           # Custom React hooks (useAuth, etc.)
+│       └── lib/             # queryClient, PDF/Excel exports
+├── server/                  # Express API
+│   ├── routes/              # 67+ modular route files
+│   ├── routes.ts            # Legacy monolith (shrinking)
+│   ├── storage.ts           # DatabaseStorage singleton (all DB access)
+│   ├── auth.ts              # Passport local + session config
+│   ├── middleware/           # requireRole, requirePlan
+│   └── services/            # ZATCA, email, AI, etc.
+├── shared/                  # Browser-safe shared code
+│   ├── schema.ts            # 406-table Drizzle schema (source of truth)
 │   ├── vatUtils.ts          # VAT calculations
-│   ├── zatcaUtils.ts        # ZATCA QR codes
-│   └── hijriUtils.ts        # Hijri calendar
-└── docs/                    # Documentation
+│   └── zatcaUtils.ts        # ZATCA QR code generation
+├── docs/                    # Architecture, deployment, ADRs
+└── e2e/                     # Playwright E2E tests
 ```
 
 ---
