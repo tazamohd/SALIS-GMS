@@ -73,6 +73,13 @@ import { catalogRoutes } from "./catalogs";
 import { refundRoutes } from "./refunds";
 import { inspectionRoutes } from "./inspections";
 import { paymentRoutes } from "./payments";
+import { callCenterRoutes } from "./call-center";
+import { securityRoutes } from "./security";
+import { chatRoutes } from "./chat";
+import { dynamicPricingRoutes } from "./dynamic-pricing";
+import { feedbackRoutes } from "./feedback";
+import { complianceRoutes } from "./compliance";
+import { emergingTechRoutes } from "./emerging-tech";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -299,6 +306,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Inspection Routes Loaded");
   app.use("/api", paymentRoutes);
   console.log("✅ Payment Routes Loaded");
+  app.use("/api", callCenterRoutes);
+  console.log("✅ Call Center Routes Loaded");
+  app.use("/api", securityRoutes);
+  console.log("✅ Security Routes Loaded");
+  app.use("/api", chatRoutes);
+  console.log("✅ Chat Routes Loaded");
+  app.use("/api", dynamicPricingRoutes);
+  console.log("✅ Dynamic Pricing Routes Loaded");
+  app.use("/api", feedbackRoutes);
+  console.log("✅ Feedback Routes Loaded");
+  app.use("/api", complianceRoutes);
+  console.log("✅ Compliance Routes Loaded");
+  app.use("/api", emergingTechRoutes);
+  console.log("✅ Emerging Tech Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
