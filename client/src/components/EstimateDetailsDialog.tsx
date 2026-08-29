@@ -303,7 +303,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
             )}
 
             <div className="flex gap-2 pt-4 border-t">
-              {!estimate.convertedToJobCardId && !estimate.convertedToInvoiceId && estimate.status === 'accepted' && (
+              {!estimate.convertedToJobCardId && !estimate.convertedToInvoiceId && (estimate.status === 'approved' || estimate.status === 'accepted') && (
                 <>
                   <Button
                     onClick={() => convertToJobCardMutation.mutate()}

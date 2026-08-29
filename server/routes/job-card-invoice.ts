@@ -22,35 +22,38 @@ router.post("/job-cards/:id/convert-to-invoice", isAuthenticated, async (req: Re
     const taxAmount = Math.round(subtotal * taxRate * 100) / 100;
     const totalAmount = Math.round((subtotal + taxAmount) * 100) / 100;
 
-    const invoiceNumber = `INV-${Date.now()}`;
-    const invoice = await storage.createInvoice({
-      invoiceNumber,
-      garageId: jobCard.garageId,
-      customerId: jobCard.customerId || "",
-      jobCardId: jobCard.id,
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      status: "draft",
-      subtotal: String(subtotal),
-      taxAmount: String(taxAmount),
-      discountAmount: "0.00",
-      totalAmount: String(totalAmount),
-      paidAmount: "0.00",
-      balanceAmount: String(totalAmount),
-      notes: `Invoice generated from Job Card ${jobCard.jobNumber}`,
-      createdBy: user.id,
-    });
-
     const hours = jobCard.actualHours ? parseFloat(String(jobCard.actualHours)) : 0;
     const hoursNote = hours > 0 ? ` (${hours}h labor)` : "";
 
-    await storage.createInvoiceItem({
-      invoiceId: invoice.id,
-      itemType: "service",
-      description: `${jobCard.serviceType || "Service"} — ${jobCard.description || ""}${hoursNote}`.trim(),
-      quantity: 1,
-      unitPrice: totalCost,
-      lineTotal: totalCost,
-    });
+    const invoice = await storage.createInvoiceWithItems(
+      {
+        invoiceNumber: `INV-${Date.now()}`,
+        garageId: jobCard.garageId,
+        customerId: jobCard.customerId || "",
+        jobCardId: jobCard.id,
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        status: "draft",
+        subtotal: String(subtotal),
+        taxAmount: String(taxAmount),
+        discountAmount: "0.00",
+        totalAmount: String(totalAmount),
+        paidAmount: "0.00",
+        balanceAmount: String(totalAmount),
+        notes: `Invoice generated from Job Card ${jobCard.jobNumber}`,
+        createdBy: user.id,
+      },
+      [
+        {
+          itemType: "service",
+          description: `${jobCard.serviceType || "Service"} — ${jobCard.description || ""}${hoursNote}`.trim(),
+          quantity: 1,
+          unitPrice: totalCost,
+          lineTotal: totalCost,
+        },
+      ]
+    );
+
+    await storage.updateJobCard(jobCard.id, { status: "invoiced" });
 
     res.json({ invoice, message: "Job card converted to invoice successfully" });
   } catch (err) {
