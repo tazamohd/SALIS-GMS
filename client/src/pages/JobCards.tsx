@@ -197,7 +197,7 @@ export function JobCards() {
 
   const convertToInvoiceMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest("POST", `/api/job-cards/${id}/convert-to-invoice`);
+      return apiRequest("POST", `/api/invoices/from-job/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ predicate: (query) => {
