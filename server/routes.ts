@@ -712,30 +712,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/login', (req, res, next) => {
-    passport.authenticate('local', (err: any, user: any, info: any) => {
-      if (err) {
-        return res.status(500).json({ message: "Login error" });
-      }
-      if (!user) {
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
-      }
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          return res.status(500).json({ message: "Login failed" });
-        }
-        const { password: _, ...userWithoutPassword } = user;
-        res.json(userWithoutPassword);
-      });
-    })(req, res, next);
-  });
-
-  app.post('/api/logout', (req, res) => {
-    req.logout(() => {
-      res.json({ message: "Logged out successfully" });
-    });
-  });
-
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user;
@@ -3850,23 +3826,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/reports/revenue', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
-    try {
-      const { garage_id, start_date, end_date } = req.query;
-      const startDate = start_date ? new Date(start_date as string) : undefined;
-      const endDate = end_date ? new Date(end_date as string) : undefined;
-      const report = await storage.getRevenueReport(
-        garage_id as string | undefined,
-        startDate,
-        endDate
-      );
-      res.json(report);
-    } catch (error) {
-      console.error("Error fetching revenue report:", error);
-      res.status(500).json({ message: "Failed to fetch revenue report" });
-    }
-  });
-
   app.get('/api/reports/job-cards', isAuthenticated, async (req, res) => {
     try {
       const { garage_id, start_date, end_date } = req.query;
@@ -3892,82 +3851,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching inventory report:", error);
       res.status(500).json({ message: "Failed to fetch inventory report" });
-    }
-  });
-
-  app.get('/api/reports/technician-performance', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
-    try {
-      const { garage_id, start_date, end_date } = req.query;
-      
-      // Validate and parse dates
-      let startDate: Date | undefined;
-      let endDate: Date | undefined;
-      
-      if (start_date) {
-        startDate = new Date(start_date as string);
-        if (isNaN(startDate.getTime())) {
-          return res.status(400).json({ message: "Invalid start_date format" });
-        }
-        // Normalize to start of day
-        startDate.setHours(0, 0, 0, 0);
-      }
-      
-      if (end_date) {
-        endDate = new Date(end_date as string);
-        if (isNaN(endDate.getTime())) {
-          return res.status(400).json({ message: "Invalid end_date format" });
-        }
-        // Normalize to end of day
-        endDate.setHours(23, 59, 59, 999);
-      }
-      
-      const performance = await storage.getTechnicianPerformance(
-        garage_id as string | undefined,
-        startDate,
-        endDate
-      );
-      res.json(performance);
-    } catch (error) {
-      console.error("Error fetching technician performance:", error);
-      res.status(500).json({ message: "Failed to fetch technician performance" });
-    }
-  });
-
-  app.get('/api/reports/customer-analytics', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
-    try {
-      const { garage_id, start_date, end_date } = req.query;
-      
-      // Validate and parse dates
-      let startDate: Date | undefined;
-      let endDate: Date | undefined;
-      
-      if (start_date) {
-        startDate = new Date(start_date as string);
-        if (isNaN(startDate.getTime())) {
-          return res.status(400).json({ message: "Invalid start_date format" });
-        }
-        // Normalize to start of day
-        startDate.setHours(0, 0, 0, 0);
-      }
-      
-      if (end_date) {
-        endDate = new Date(end_date as string);
-        if (isNaN(endDate.getTime())) {
-          return res.status(400).json({ message: "Invalid end_date format" });
-        }
-        // Normalize to end of day
-        endDate.setHours(23, 59, 59, 999);
-      }
-      
-      const analytics = await storage.getCustomerAnalytics(
-        garage_id as string | undefined,
-        startDate,
-        endDate
-      );
-      res.json(analytics);
-    } catch (error) {
-      console.error("Error fetching customer analytics:", error);
-      res.status(500).json({ message: "Failed to fetch customer analytics" });
     }
   });
 
@@ -3998,40 +3881,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Notification routes - Module 21
-  app.get('/api/notifications', isAuthenticated, async (req: any, res) => {
-    try {
-      const { recipient_id, garage_id, status, type } = req.query;
-      const userId = req.user?.id || 'default-user';
-      
-      // If no recipient_id specified, use current user
-      const recipientId = recipient_id || userId;
-      
-      const notifications = await storage.getNotifications(
-        recipientId as string,
-        garage_id as string | undefined,
-        status as string | undefined,
-        type as string | undefined
-      );
-      res.json(notifications);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-      res.status(500).json({ message: "Failed to fetch notifications" });
-    }
-  });
-
-  app.get('/api/notifications/unread-count', isAuthenticated, async (req: any, res) => {
-    try {
-      const { garage_id } = req.query;
-      const userId = req.user?.id || 'default-user';
-      
-      const count = await storage.getUnreadCount(userId, garage_id as string | undefined);
-      res.json({ count });
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
-      res.status(500).json({ message: "Failed to fetch unread count" });
-    }
-  });
-
   app.get('/api/notifications/:id', isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
@@ -4083,17 +3932,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error marking notification as read:", error);
       res.status(500).json({ message: "Failed to mark notification as read" });
-    }
-  });
-
-  app.delete('/api/notifications/:id', isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteNotification(id);
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-      res.status(500).json({ message: "Failed to delete notification" });
     }
   });
 
@@ -5600,25 +5438,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 31: Staff & HR Management
   
   // Employee Attendance Routes
-  app.get('/api/hr/attendance', isAuthenticated, async (req: any, res) => {
-    try {
-      const userGarageId = req.user?.garageId;
-      const { employeeId, startDate, endDate } = req.query;
-
-      const records = await storage.getEmployeeAttendance(
-        userGarageId,
-        employeeId as string,
-        startDate ? new Date(startDate as string) : undefined,
-        endDate ? new Date(endDate as string) : undefined
-      );
-
-      res.json(records);
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
-      res.status(500).json({ message: "Failed to fetch attendance records" });
-    }
-  });
-
   app.get('/api/hr/attendance/:id', isAuthenticated, async (req: any, res) => {
     try {
       const userGarageId = req.user?.garageId;
@@ -8212,23 +8031,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module 35: System Improvements Routes
   
   // User Settings Routes
-  app.get('/api/settings', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user?.id || 'default-user';
-      let settings = await storage.getUserSettings(userId);
-      
-      // Create default settings if none exist
-      if (!settings) {
-        settings = await storage.createUserSettings({ userId });
-      }
-      
-      res.json(settings);
-    } catch (error) {
-      console.error("Error fetching settings:", error);
-      res.status(500).json({ message: "Failed to fetch settings" });
-    }
-  });
-
   app.patch('/api/settings', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user?.id || 'default-user';
@@ -10300,67 +10102,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Documents
-  app.post("/api/documents", isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      const data = { 
-        ...req.body, 
-        garageId: user.garageId,
-        uploadedBy: user.id,
-        status: req.body.status || "active"
-      };
-      const document = await storage.createDocument(data);
-      res.status(201).json(document);
-    } catch (error: any) {
-      console.error("Error creating document:", error);
-      res.status(400).json({ error: error.message || "Failed to create document" });
-    }
-  });
-
-  app.get("/api/documents", isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      const { categoryId, relatedType, relatedId, status } = req.query;
-      const documents = await storage.getDocuments(user.garageId, {
-        categoryId: categoryId as string | undefined,
-        relatedType: relatedType as string | undefined,
-        relatedId: relatedId as string | undefined,
-        status: status as string | undefined,
-      });
-      res.json(documents);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      res.status(500).json({ error: "Failed to fetch documents" });
-    }
-  });
-
-  app.get("/api/documents/expiring", isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      const { daysAhead } = req.query;
-      const days = daysAhead ? parseInt(daysAhead as string) : 30;
-      const documents = await storage.getExpiringDocuments(user.garageId, days);
-      res.json(documents);
-    } catch (error) {
-      console.error("Error fetching expiring documents:", error);
-      res.status(500).json({ error: "Failed to fetch expiring documents" });
-    }
-  });
-
-  app.get("/api/documents/:id", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const document = await storage.getDocumentById(id);
-      if (!document) {
-        return res.status(404).json({ error: "Document not found" });
-      }
-      res.json(document);
-    } catch (error) {
-      console.error("Error fetching document:", error);
-      res.status(500).json({ error: "Failed to fetch document" });
-    }
-  });
-
   app.patch("/api/documents/:id", isAuthenticated, async (req, res) => {
     try {
       const { id } = req.params;
@@ -10369,17 +10110,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error updating document:", error);
       res.status(400).json({ error: error.message || "Failed to update document" });
-    }
-  });
-
-  app.delete("/api/documents/:id", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteDocument(id);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      res.status(500).json({ error: "Failed to delete document" });
     }
   });
 
@@ -13241,30 +12971,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Error creating kiosk session:", error);
       res.status(500).json({ message: "Failed to create kiosk session" });
-    }
-  });
-
-  app.post('/api/kiosk/check-in', isAuthenticated, async (req, res) => {
-    try {
-      const validated = kioskCheckInSchema.parse(req.body);
-      
-      const checkInData = {
-        sessionId: validated.sessionId,
-        customerId: validated.customerId,
-        vehicleId: validated.vehicleId,
-        appointmentId: validated.appointmentId,
-        checkInType: validated.checkInType,
-        signature: validated.signature,
-        additionalNotes: validated.additionalNotes,
-      };
-      const checkIn = await phase7Service.completeKioskCheckIn(checkInData);
-      res.status(201).json(checkIn);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json(sanitizeZodError(error));
-      }
-      console.error("Error completing kiosk check-in:", error);
-      res.status(500).json({ message: "Failed to complete kiosk check-in" });
     }
   });
 
@@ -16687,48 +16393,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Employee Profiles
-  app.get('/api/hr/employees', isAuthenticated, async (req: any, res) => {
-    try {
-      const garageId = req.user?.garageId;
-      const employees = await db.select().from(hrEmployeeProfiles)
-        .where(garageId ? eq(hrEmployeeProfiles.garageId, garageId) : undefined)
-        .orderBy(desc(hrEmployeeProfiles.createdAt));
-      res.json(employees);
-    } catch (error: any) {
-      console.error("Error fetching HR employees:", error);
-      res.status(500).json({ message: "Failed to fetch employees" });
-    }
-  });
-
-  app.get('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const [employee] = await db.select().from(hrEmployeeProfiles)
-        .where(eq(hrEmployeeProfiles.id, id));
-      if (!employee) {
-        return res.status(404).json({ message: "Employee not found" });
-      }
-      res.json(employee);
-    } catch (error: any) {
-      console.error("Error fetching HR employee:", error);
-      res.status(500).json({ message: "Failed to fetch employee" });
-    }
-  });
-
-  app.post('/api/hr/employees', isAuthenticated, async (req: any, res) => {
-    try {
-      const validation = insertHrEmployeeProfileSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json(sanitizeZodError(validation.error));
-      }
-      const [employee] = await db.insert(hrEmployeeProfiles).values(validation.data).returning();
-      res.status(201).json(employee);
-    } catch (error: any) {
-      console.error("Error creating HR employee:", error);
-      res.status(500).json({ message: "Failed to create employee" });
-    }
-  });
-
   app.patch('/api/hr/employees/:id', isAuthenticated, async (req: any, res) => {
     try {
       const { id } = req.params;
@@ -16831,64 +16495,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // HR Leave Requests
-  app.get('/api/hr/leave-requests', isAuthenticated, async (req: any, res) => {
-    try {
-      const { employeeId, status } = req.query;
-      let query = db.select().from(hrLeaveRequests);
-      
-      if (employeeId) {
-        query = query.where(eq(hrLeaveRequests.employeeId, employeeId as string)) as any;
-      }
-      if (status) {
-        query = query.where(eq(hrLeaveRequests.status, status as string)) as any;
-      }
-      
-      const requests = await query.orderBy(desc(hrLeaveRequests.createdAt));
-      res.json(requests);
-    } catch (error: any) {
-      console.error("Error fetching leave requests:", error);
-      res.status(500).json({ message: "Failed to fetch leave requests" });
-    }
-  });
-
-  app.post('/api/hr/leave-requests', isAuthenticated, async (req: any, res) => {
-    try {
-      const validation = insertHrLeaveRequestSchema.safeParse(req.body);
-      if (!validation.success) {
-        return res.status(400).json(sanitizeZodError(validation.error));
-      }
-      const [request] = await db.insert(hrLeaveRequests).values(validation.data).returning();
-      res.status(201).json(request);
-    } catch (error: any) {
-      console.error("Error creating leave request:", error);
-      res.status(500).json({ message: "Failed to create leave request" });
-    }
-  });
-
-  app.patch('/api/hr/leave-requests/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const updateData: any = { ...req.body, updatedAt: new Date() };
-      
-      if (req.body.status === 'approved') {
-        updateData.approvedBy = req.user?.id;
-        updateData.approvedAt = new Date();
-      }
-      
-      const [updated] = await db.update(hrLeaveRequests)
-        .set(updateData)
-        .where(eq(hrLeaveRequests.id, id))
-        .returning();
-      if (!updated) {
-        return res.status(404).json({ message: "Leave request not found" });
-      }
-      res.json(updated);
-    } catch (error: any) {
-      console.error("Error updating leave request:", error);
-      res.status(500).json({ message: "Failed to update leave request" });
-    }
-  });
-
   // HR Job Postings
   app.get('/api/hr/job-postings', isAuthenticated, async (req: any, res) => {
     try {

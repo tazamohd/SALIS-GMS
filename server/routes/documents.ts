@@ -104,6 +104,19 @@ router.get('/documents', async (req: Request, res: Response) => {
   }
 });
 
+// GET /documents/expiring — documents expiring within N days
+router.get('/documents/expiring', async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const daysAhead = req.query.daysAhead ? parseInt(req.query.daysAhead as string) : 30;
+    const documents = await storage.getExpiringDocuments(user.garageId, daysAhead);
+    res.json(documents);
+  } catch (err) {
+    console.error('Documents expiring error:', err);
+    res.status(500).json({ error: 'Failed to fetch expiring documents' });
+  }
+});
+
 // GET /documents/:id — single document detail
 router.get('/documents/:id', async (req: Request, res: Response) => {
   try {
