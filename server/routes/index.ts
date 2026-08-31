@@ -115,6 +115,10 @@ import financialOpsRoutes from "./financial-ops";
 import customerEngagementRoutes from "./customer-engagement";
 import serviceOperationsRoutes from "./service-operations";
 import inventoryExtendedRoutes from "./inventory-extended";
+import franchiseManagementRoutes from "./franchise-management";
+import vendorLicensingRoutes from "./vendor-licensing";
+import marketingCampaignRoutes from "./marketing-campaigns";
+import miscOperationsRoutes from "./misc-operations";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -424,6 +428,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", serviceOperationsRoutes);
   console.log("✅ Service Operations Routes Loaded");
   app.use("/api", inventoryExtendedRoutes);
+  app.use("/api", franchiseManagementRoutes);
+  app.use("/api", vendorLicensingRoutes);
+  app.use("/api", marketingCampaignRoutes);
+  app.use("/api", miscOperationsRoutes);
   console.log("✅ Inventory Extended Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
