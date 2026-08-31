@@ -100,6 +100,10 @@ import workflowHooksRoutes from "./workflow-hooks";
 import customerPortalRoutes from "./customer-portal";
 import loyaltyRoutes from "./loyalty";
 import payrollRoutes from "./payroll";
+import obdTelematicsRoutes from "./obd-telematics";
+import warehouseRoutes from "./warehouse";
+import gmbRoutes from "./gmb";
+import serviceManagementRoutes from "./service-management";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -380,6 +384,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Loyalty & Rewards Routes Loaded");
   app.use("/api", payrollRoutes);
   console.log("✅ Payroll Routes Loaded");
+  app.use("/api", obdTelematicsRoutes);
+  console.log("✅ OBD & Telematics Routes Loaded");
+  app.use("/api", warehouseRoutes);
+  console.log("✅ Warehouse & Fulfillment Routes Loaded");
+  app.use("/api", gmbRoutes);
+  console.log("✅ Google My Business Routes Loaded");
+  app.use("/api", serviceManagementRoutes);
+  console.log("✅ Service Management Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
