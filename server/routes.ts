@@ -11380,64 +11380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ========================================
-  // TECHNICIAN PERFORMANCE ROUTES
-  // ========================================
-
-  // Get metric definitions
-  app.get('/api/technician-performance/metrics', isAuthenticated, async (req: any, res) => {
-    try {
-      const metrics = await storage.getTechnicianMetricDefinitions();
-      res.json(metrics);
-    } catch (error: any) {
-      console.error("Error fetching metric definitions:", error);
-      res.status(500).json({ message: "Failed to fetch metrics" });
-    }
-  });
-
-  // Get technician's metric preferences
-  app.get('/api/technician-performance/preferences', isAuthenticated, async (req: any, res) => {
-    try {
-      const preferences = await storage.getTechnicianMetricPreferences(req.user?.id);
-      res.json(preferences);
-    } catch (error: any) {
-      console.error("Error fetching preferences:", error);
-      res.status(500).json({ message: "Failed to fetch preferences" });
-    }
-  });
-
-  // Update metric preferences
-  app.post('/api/technician-performance/preferences', isAuthenticated, async (req: any, res) => {
-    try {
-      const preference = await storage.upsertTechnicianMetricPreference({
-        userId: req.user?.id,
-        ...req.body,
-      });
-      res.json(preference);
-    } catch (error: any) {
-      console.error("Error updating preferences:", error);
-      res.status(500).json({ message: "Failed to update preferences" });
-    }
-  });
-
-  // Get performance dashboard data
-  app.get('/api/technician-performance/dashboard', isAuthenticated, async (req: any, res) => {
-    try {
-      const { technicianId, period = 'weekly' } = req.query;
-      const targetTechnicianId = technicianId || req.user?.id;
-      
-      // Get rollup data
-      const rollups = await storage.getTechnicianPerformanceRollups(
-        targetTechnicianId as string,
-        period as string
-      );
-      
-      res.json(rollups);
-    } catch (error: any) {
-      console.error("Error fetching dashboard data:", error);
-      res.status(500).json({ message: "Failed to fetch dashboard data" });
-    }
-  });
+  // REMOVED: technician performance routes -- now served by operations.ts
 
 
   // ========================================
@@ -11466,39 +11409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ========================================
-  // TELEMATICS ROUTES
-  // ========================================
-
-  // Get telematic device for vehicle
-  app.get('/api/telematics/device/:vehicleId', isAuthenticated, async (req: any, res) => {
-    try {
-      const device = await storage.getTelematicsDeviceByVehicle(req.params.vehicleId);
-      if (!device) {
-        return res.status(404).json({ message: "No telematics device found" });
-      }
-      res.json(device);
-    } catch (error: any) {
-      console.error("Error fetching telematics device:", error);
-      res.status(500).json({ message: "Failed to fetch device" });
-    }
-  });
-
-  // Get latest telematics readings
-  app.get('/api/telematics/readings/:vehicleId', isAuthenticated, async (req: any, res) => {
-    try {
-      const { streamType, hours = 24 } = req.query;
-      const readings = await storage.getTelematicsReadings(
-        req.params.vehicleId,
-        streamType as string,
-        parseInt(hours as string)
-      );
-      res.json(readings);
-    } catch (error: any) {
-      console.error("Error fetching telematics readings:", error);
-      res.status(500).json({ message: "Failed to fetch readings" });
-    }
-  });
+  // REMOVED: telematics routes -- now served by obd-telematics.ts
 
   // REMOVED: gamification routes -- now served by training.ts
 
