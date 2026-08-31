@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { optimizeSchedule, generateScheduleReport } from "../services/scheduling-optimizer";
 import { eventBus } from "../engine/event-bus";
@@ -22,7 +23,7 @@ const router = Router();
  */
 
 // Get all appointments
-router.get("/appointments", isAuthenticated, async (req, res) => {
+router.get("/appointments", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { garageId, status, date } = req.query;
     const appointments = await storage.getAppointments(
@@ -38,7 +39,7 @@ router.get("/appointments", isAuthenticated, async (req, res) => {
 });
 
 // Create appointment
-router.post("/appointments", isAuthenticated, async (req: any, res) => {
+router.post("/appointments", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: any, res) => {
   try {
     const {
       customerId,
@@ -87,7 +88,7 @@ router.post("/appointments", isAuthenticated, async (req: any, res) => {
 });
 
 // Get appointment by ID
-router.get("/appointments/:id", isAuthenticated, async (req, res) => {
+router.get("/appointments/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const appointment = await storage.getAppointment(id);
@@ -102,7 +103,7 @@ router.get("/appointments/:id", isAuthenticated, async (req, res) => {
 });
 
 // Update appointment
-router.patch("/appointments/:id", isAuthenticated, async (req, res) => {
+router.patch("/appointments/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -131,7 +132,7 @@ router.patch("/appointments/:id", isAuthenticated, async (req, res) => {
 });
 
 // Delete appointment
-router.delete("/appointments/:id", isAuthenticated, async (req, res) => {
+router.delete("/appointments/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteAppointment(id);
@@ -146,6 +147,7 @@ router.delete("/appointments/:id", isAuthenticated, async (req, res) => {
 router.post(
   "/appointments/:id/status",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: any, res) => {
     try {
       const { id } = req.params;
@@ -196,7 +198,7 @@ router.post(
 );
 
 // Get technician availability
-router.get("/availability", isAuthenticated, async (req, res) => {
+router.get("/availability", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { technicianId, date } = req.query;
 
@@ -219,7 +221,7 @@ router.get("/availability", isAuthenticated, async (req, res) => {
 });
 
 // Get calendar appointments
-router.get("/calendar-appointments", isAuthenticated, async (req, res) => {
+router.get("/calendar-appointments", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { garageId, startDate, endDate } = req.query;
 
@@ -250,6 +252,7 @@ router.get("/calendar-appointments", isAuthenticated, async (req, res) => {
 router.post(
   "/calendar-appointments",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: any, res) => {
     try {
       const { title, startTime, endTime, description, garageId, eventType } = req.body;
@@ -280,7 +283,7 @@ router.post(
 );
 
 // Get available time slots
-router.get("/time-slots", isAuthenticated, async (req, res) => {
+router.get("/time-slots", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { technicianId, date, duration } = req.query;
 
@@ -315,7 +318,7 @@ const defaultSchedulingRules = [
 ];
 
 // POST /api/scheduling/optimize - Run AI schedule optimization
-router.post("/scheduling/optimize", isAuthenticated, async (req: any, res) => {
+router.post("/scheduling/optimize", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: any, res) => {
   try {
     const { technicians: inputTechs, jobs: inputJobs } = req.body;
 
@@ -400,7 +403,7 @@ router.post("/scheduling/optimize", isAuthenticated, async (req: any, res) => {
 });
 
 // GET /api/scheduling/rules - Get scheduling rules
-router.get("/scheduling/rules", isAuthenticated, async (_req, res) => {
+router.get("/scheduling/rules", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req, res) => {
   try {
     res.json(defaultSchedulingRules);
   } catch (error) {
@@ -410,7 +413,7 @@ router.get("/scheduling/rules", isAuthenticated, async (_req, res) => {
 });
 
 // GET /api/scheduling/history - Get optimization history
-router.get("/scheduling/history", isAuthenticated, async (_req, res) => {
+router.get("/scheduling/history", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req, res) => {
   try {
     const rows = await storage.listSchedulingOptimizationRuns(20);
     res.json(rows.map((r: any) => ({

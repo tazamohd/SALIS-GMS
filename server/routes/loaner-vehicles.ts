@@ -1,13 +1,14 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertLoanerVehicleSchema, insertLoanerReservationSchema } from "../../shared/schema";
 
 const router = Router();
 
 // ── Loaner Vehicles ────────────────────────────────────────────────────
 
-router.post("/loaner-vehicles", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/loaner-vehicles", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertLoanerVehicleSchema.parse(req.body);
@@ -19,7 +20,7 @@ router.post("/loaner-vehicles", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.get("/loaner-vehicles", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/loaner-vehicles", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { status, condition } = req.query;
@@ -34,7 +35,7 @@ router.get("/loaner-vehicles", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.get("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/loaner-vehicles/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const vehicle = await storage.getLoanerVehicleById(req.params.id);
     if (!vehicle) return res.status(404).json({ error: "Loaner vehicle not found" });
@@ -45,7 +46,7 @@ router.get("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.patch("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/loaner-vehicles/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const data = insertLoanerVehicleSchema.partial().parse(req.body);
     const updated = await storage.updateLoanerVehicle(req.params.id, data);
@@ -56,7 +57,7 @@ router.patch("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.delete("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/loaner-vehicles/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     await storage.deleteLoanerVehicle(req.params.id);
     res.json({ success: true });
@@ -68,7 +69,7 @@ router.delete("/loaner-vehicles/:id", isAuthenticated, async (req: Request, res:
 
 // ── Loaner Reservations ────────────────────────────────────────────────
 
-router.post("/loaner-reservations", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/loaner-reservations", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertLoanerReservationSchema.parse(req.body);
@@ -80,7 +81,7 @@ router.post("/loaner-reservations", isAuthenticated, async (req: Request, res: R
   }
 });
 
-router.get("/loaner-reservations", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/loaner-reservations", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { status, loanerVehicleId } = req.query;
@@ -95,7 +96,7 @@ router.get("/loaner-reservations", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.get("/loaner-reservations/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/loaner-reservations/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const reservation = await storage.getLoanerReservationById(req.params.id);
     if (!reservation) return res.status(404).json({ error: "Loaner reservation not found" });
@@ -106,7 +107,7 @@ router.get("/loaner-reservations/:id", isAuthenticated, async (req: Request, res
   }
 });
 
-router.patch("/loaner-reservations/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/loaner-reservations/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const data = insertLoanerReservationSchema.partial().parse(req.body);
     const updated = await storage.updateLoanerReservation(req.params.id, data);
@@ -117,7 +118,7 @@ router.patch("/loaner-reservations/:id", isAuthenticated, async (req: Request, r
   }
 });
 
-router.delete("/loaner-reservations/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/loaner-reservations/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     await storage.deleteLoanerReservation(req.params.id);
     res.json({ success: true });

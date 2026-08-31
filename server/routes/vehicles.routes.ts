@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
@@ -192,7 +193,7 @@ router.get("/decode-vin/:vin", isAuthenticated, async (req, res) => {
 
 // ── Vehicle CRUD ───────────────────────────────────────────────────
 
-router.get("/vehicles", isAuthenticated, async (req, res) => {
+router.get("/vehicles", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { garageId } = req.query;
     const vehicles = await storage.getVehicles(garageId as string | undefined);
@@ -203,7 +204,7 @@ router.get("/vehicles", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/vehicles", isAuthenticated, async (req, res) => {
+router.post("/vehicles", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertVehicleSchema } = await import("@shared/schema");
     const validationResult = insertVehicleSchema.safeParse(req.body);
@@ -220,7 +221,7 @@ router.post("/vehicles", isAuthenticated, async (req, res) => {
   }
 });
 
-router.patch("/vehicles/:id", isAuthenticated, async (req, res) => {
+router.patch("/vehicles/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertVehicleSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -239,7 +240,7 @@ router.patch("/vehicles/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-router.delete("/vehicles/:id", isAuthenticated, async (req, res) => {
+router.delete("/vehicles/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteVehicle(id);
@@ -252,7 +253,7 @@ router.delete("/vehicles/:id", isAuthenticated, async (req, res) => {
 
 // ── Vehicle Service History ────────────────────────────────────────
 
-router.get("/vehicles/:id/service-history", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/service-history", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const history = await storage.getVehicleServiceHistory(id);
@@ -263,7 +264,7 @@ router.get("/vehicles/:id/service-history", isAuthenticated, async (req, res) =>
   }
 });
 
-router.post("/vehicles/:id/service-history", isAuthenticated, async (req: any, res) => {
+router.post("/vehicles/:id/service-history", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: any, res) => {
   try {
     const { insertVehicleServiceHistorySchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -291,7 +292,7 @@ router.post("/vehicles/:id/service-history", isAuthenticated, async (req: any, r
   }
 });
 
-router.delete("/service-history/:id", isAuthenticated, async (req, res) => {
+router.delete("/service-history/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteServiceHistory(id);
@@ -304,7 +305,7 @@ router.delete("/service-history/:id", isAuthenticated, async (req, res) => {
 
 // ── Maintenance Schedules ──────────────────────────────────────────
 
-router.get("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/maintenance-schedules", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const schedules = await storage.getMaintenanceSchedules(id);
@@ -315,7 +316,7 @@ router.get("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req, r
   }
 });
 
-router.post("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req, res) => {
+router.post("/vehicles/:id/maintenance-schedules", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -337,7 +338,7 @@ router.post("/vehicles/:id/maintenance-schedules", isAuthenticated, async (req, 
   }
 });
 
-router.patch("/maintenance-schedules/:id", isAuthenticated, async (req, res) => {
+router.patch("/maintenance-schedules/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertMaintenanceScheduleSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -356,7 +357,7 @@ router.patch("/maintenance-schedules/:id", isAuthenticated, async (req, res) => 
   }
 });
 
-router.delete("/maintenance-schedules/:id", isAuthenticated, async (req, res) => {
+router.delete("/maintenance-schedules/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteMaintenanceSchedule(id);
@@ -369,7 +370,7 @@ router.delete("/maintenance-schedules/:id", isAuthenticated, async (req, res) =>
 
 // ── Service Reminders ──────────────────────────────────────────────
 
-router.get("/vehicles/:id/service-reminders", isAuthenticated, async (req, res) => {
+router.get("/vehicles/:id/service-reminders", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.query;
@@ -381,7 +382,7 @@ router.get("/vehicles/:id/service-reminders", isAuthenticated, async (req, res) 
   }
 });
 
-router.post("/vehicles/:id/service-reminders", isAuthenticated, async (req, res) => {
+router.post("/vehicles/:id/service-reminders", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertServiceReminderSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -403,7 +404,7 @@ router.post("/vehicles/:id/service-reminders", isAuthenticated, async (req, res)
   }
 });
 
-router.patch("/service-reminders/:id", isAuthenticated, async (req, res) => {
+router.patch("/service-reminders/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { insertServiceReminderSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -422,7 +423,7 @@ router.patch("/service-reminders/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-router.delete("/service-reminders/:id", isAuthenticated, async (req, res) => {
+router.delete("/service-reminders/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteServiceReminder(id);

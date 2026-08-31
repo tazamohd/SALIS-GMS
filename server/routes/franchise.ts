@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // GET /api/franchise/locations - List all garage locations
-router.get('/franchise/locations', async (req, res) => {
+router.get('/franchise/locations', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const locations = await db.execute(sql`
       SELECT id, name, address, phone, email, "isActive", "createdAt"
@@ -19,7 +21,7 @@ router.get('/franchise/locations', async (req, res) => {
 });
 
 // GET /api/franchise/analytics - Cross-location analytics
-router.get('/franchise/analytics', async (req, res) => {
+router.get('/franchise/analytics', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // Revenue by location
     const revenueByLocation = await db.execute(sql`
@@ -68,7 +70,7 @@ router.get('/franchise/analytics', async (req, res) => {
 });
 
 // GET /api/franchise/inventory-sharing - Cross-location inventory availability
-router.get('/franchise/inventory-sharing', async (req, res) => {
+router.get('/franchise/inventory-sharing', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const inventory = await db.execute(sql`
       SELECT g.name as location, sp.name as "partName", sp."partNumber",
@@ -86,7 +88,7 @@ router.get('/franchise/inventory-sharing', async (req, res) => {
 });
 
 // GET /api/franchise/performance - Location performance comparison
-router.get('/franchise/performance', async (req, res) => {
+router.get('/franchise/performance', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const performance = await db.execute(sql`
       SELECT g.name as location,

@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
-router.get("/service-templates/all", isAuthenticated, async (_req: Request, res: Response) => {
+router.get("/service-templates/all", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (_req: Request, res: Response) => {
   try {
     const allTemplates = await storage.getAllServiceTemplates();
     res.json(allTemplates);
@@ -14,7 +15,7 @@ router.get("/service-templates/all", isAuthenticated, async (_req: Request, res:
   }
 });
 
-router.get("/service-templates", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/service-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const { garage_id } = req.query;
     if (!garage_id) return res.status(400).json({ message: "garage_id is required" });
@@ -26,7 +27,7 @@ router.get("/service-templates", isAuthenticated, async (req: Request, res: Resp
   }
 });
 
-router.get("/service-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/service-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const template = await storage.getServiceTemplate(req.params.id);
     if (!template) return res.status(404).json({ message: "Service template not found" });
@@ -37,7 +38,7 @@ router.get("/service-templates/:id", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.post("/service-templates", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/service-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const template = await storage.createServiceTemplate(req.body);
     res.status(201).json(template);
@@ -47,7 +48,7 @@ router.post("/service-templates", isAuthenticated, async (req: Request, res: Res
   }
 });
 
-router.put("/service-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.put("/service-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const template = await storage.updateServiceTemplate(req.params.id, req.body);
     res.json(template);
@@ -57,7 +58,7 @@ router.put("/service-templates/:id", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.delete("/service-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/service-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     await storage.deleteServiceTemplate(req.params.id);
     res.status(204).send();

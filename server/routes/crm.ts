@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // ---------------------------------------------------------------------------
 // GET /api/crm/customers — Customer list with visit count, total spend, etc.
 // ---------------------------------------------------------------------------
-router.get('/crm/customers', async (req, res) => {
+router.get('/crm/customers', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const search = (req.query.search as string) || '';
     const searchFilter = search
@@ -58,7 +60,7 @@ router.get('/crm/customers', async (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/crm/customers/:id — Customer detail with full history
 // ---------------------------------------------------------------------------
-router.get('/crm/customers/:id', async (req, res) => {
+router.get('/crm/customers/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -133,7 +135,7 @@ router.get('/crm/customers/:id', async (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/crm/segments — Customer segments with counts
 // ---------------------------------------------------------------------------
-router.get('/crm/segments', async (req, res) => {
+router.get('/crm/segments', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const result = await db.execute(sql`
       WITH customer_stats AS (
@@ -182,7 +184,7 @@ router.get('/crm/segments', async (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/crm/loyalty/summary — Loyalty program stats
 // ---------------------------------------------------------------------------
-router.get('/crm/loyalty/summary', async (req, res) => {
+router.get('/crm/loyalty/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     // Derive loyalty stats from real invoice / job data
     const membersResult = await db.execute(sql`
@@ -241,7 +243,7 @@ router.get('/crm/loyalty/summary', async (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/crm/loyalty/points — Award loyalty points to a customer
 // ---------------------------------------------------------------------------
-router.post('/crm/loyalty/points', async (req, res) => {
+router.post('/crm/loyalty/points', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { customerId, points, reason } = req.body;
 
@@ -267,7 +269,7 @@ router.post('/crm/loyalty/points', async (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/crm/retention — Retention metrics
 // ---------------------------------------------------------------------------
-router.get('/crm/retention', async (req, res) => {
+router.get('/crm/retention', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const repeatResult = await db.execute(sql`
       WITH cj AS (
@@ -381,7 +383,7 @@ router.get('/crm/retention', async (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/crm/campaigns — Marketing campaigns with status and ROI
 // ---------------------------------------------------------------------------
-router.get('/crm/campaigns', async (req, res) => {
+router.get('/crm/campaigns', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     // Derive campaigns from real data context — placeholder enriched structure
     const campaigns = [

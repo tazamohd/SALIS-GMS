@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const router = Router();
  * - GET /api/global-search - Perform global search
  */
 
-router.get("/search", isAuthenticated, async (req, res) => {
+router.get("/search", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const { q } = req.query;
     if (!q || (q as string).length < 2) {
@@ -33,7 +34,7 @@ router.get("/search", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/service-templates", isAuthenticated, async (req, res) => {
+router.get("/service-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement service templates
     res.json({ message: "Service templates endpoint - to be implemented" });
@@ -45,7 +46,7 @@ router.get("/service-templates", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/service-templates", isAuthenticated, async (req, res) => {
+router.post("/service-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement service template creation
     res.json({ message: "Create service template - to be implemented" });
@@ -57,7 +58,7 @@ router.post("/service-templates", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/tools", isAuthenticated, async (req, res) => {
+router.get("/tools", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement tools list
     res.json({ message: "Tools endpoint - to be implemented" });
@@ -67,7 +68,7 @@ router.get("/tools", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/tools", isAuthenticated, async (req, res) => {
+router.post("/tools", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement tool creation
     res.json({ message: "Create tool - to be implemented" });
@@ -77,7 +78,7 @@ router.post("/tools", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/notifications", isAuthenticated, async (req, res) => {
+router.get("/notifications", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement notifications
     res.json({ message: "Notifications endpoint - to be implemented" });
@@ -87,7 +88,7 @@ router.get("/notifications", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/notifications", isAuthenticated, async (req, res) => {
+router.post("/notifications", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     // TODO: Implement notification creation
     res.json({ message: "Create notification - to be implemented" });
@@ -97,7 +98,7 @@ router.post("/notifications", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/backup", isAuthenticated, async (req, res) => {
+router.post("/backup", isAuthenticated, requireRole(['ADMIN']), async (req, res) => {
   try {
     // TODO: Implement backup functionality
     res.json({ message: "Backup triggered - to be implemented" });
@@ -107,7 +108,7 @@ router.post("/backup", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/global-search", isAuthenticated, async (req, res) => {
+router.get("/global-search", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const { q } = req.query;
     if (!q || (q as string).length < 2) {

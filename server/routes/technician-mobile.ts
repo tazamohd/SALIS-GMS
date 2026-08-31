@@ -3,11 +3,13 @@ import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { validate } from '../middleware/validate';
 import { technicianClockSchema, technicianJobUpdateSchema, partsRequestSchema } from '../schemas/validation';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // GET /api/technician/my-jobs/:techId - Technician's assigned jobs
-router.get('/technician/my-jobs/:techId', async (req, res) => {
+router.get('/technician/my-jobs/:techId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const jobs = await db.execute(sql`
       SELECT j.id, j."jobNumber", j.status, j.description, j.priority, j."estimatedHours",
@@ -26,7 +28,7 @@ router.get('/technician/my-jobs/:techId', async (req, res) => {
 });
 
 // POST /api/technician/clock - Clock in/out
-router.post('/technician/clock', validate(technicianClockSchema), async (req, res) => {
+router.post('/technician/clock', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), validate(technicianClockSchema), async (req, res) => {
   const { technicianId, action, timestamp } = req.body;
   try {
     await db.execute(sql`
@@ -45,7 +47,7 @@ router.post('/technician/clock', validate(technicianClockSchema), async (req, re
 });
 
 // POST /api/technician/job-update - Update job status/notes
-router.post('/technician/job-update', validate(technicianJobUpdateSchema), async (req, res) => {
+router.post('/technician/job-update', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), validate(technicianJobUpdateSchema), async (req, res) => {
   const { jobId, status, notes, technicianId } = req.body;
   try {
     await db.execute(sql`
@@ -58,7 +60,7 @@ router.post('/technician/job-update', validate(technicianJobUpdateSchema), async
 });
 
 // POST /api/technician/parts-request - Request parts for a job
-router.post('/technician/parts-request', validate(partsRequestSchema), async (req, res) => {
+router.post('/technician/parts-request', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), validate(partsRequestSchema), async (req, res) => {
   const { jobId, technicianId, partName, quantity, urgency, notes } = req.body;
   res.json({
     success: true,
@@ -67,7 +69,7 @@ router.post('/technician/parts-request', validate(partsRequestSchema), async (re
 });
 
 // GET /api/technician/stats/:techId - Technician performance stats
-router.get('/technician/stats/:techId', async (req, res) => {
+router.get('/technician/stats/:techId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const stats = await db.execute(sql`
       SELECT

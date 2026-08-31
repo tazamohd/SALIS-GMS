@@ -2,13 +2,14 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertTowingRequestSchema, insertTowTruckSchema } from "../../shared/schema";
 
 const router = Router();
 
 // ── Towing Requests ────────────────────────────────────────────────────
 
-router.post("/towing-requests", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/towing-requests", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertTowingRequestSchema.parse(req.body);
@@ -20,7 +21,7 @@ router.post("/towing-requests", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.get("/towing-requests", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/towing-requests", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { status, serviceType } = req.query;
@@ -35,7 +36,7 @@ router.get("/towing-requests", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.get("/towing-requests/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/towing-requests/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const request = await storage.getTowingRequestById(req.params.id);
     if (!request) return res.status(404).json({ error: "Towing request not found" });
@@ -46,7 +47,7 @@ router.get("/towing-requests/:id", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.patch("/towing-requests/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/towing-requests/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const data = insertTowingRequestSchema.partial().parse(req.body);
     const updated = await storage.updateTowingRequest(req.params.id, data);
@@ -57,7 +58,7 @@ router.patch("/towing-requests/:id", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.delete("/towing-requests/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/towing-requests/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     await storage.deleteTowingRequest(req.params.id);
     res.json({ success: true });
@@ -69,7 +70,7 @@ router.delete("/towing-requests/:id", isAuthenticated, async (req: Request, res:
 
 // ── Tow Trucks ─────────────────────────────────────────────────────────
 
-router.post("/tow-trucks", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/tow-trucks", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertTowTruckSchema.parse(req.body);
@@ -81,7 +82,7 @@ router.post("/tow-trucks", isAuthenticated, async (req: Request, res: Response) 
   }
 });
 
-router.get("/tow-trucks", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/tow-trucks", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { status } = req.query;
@@ -95,7 +96,7 @@ router.get("/tow-trucks", isAuthenticated, async (req: Request, res: Response) =
   }
 });
 
-router.get("/tow-trucks/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/tow-trucks/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const truck = await storage.getTowTruckById(req.params.id);
     if (!truck) return res.status(404).json({ error: "Tow truck not found" });
@@ -106,7 +107,7 @@ router.get("/tow-trucks/:id", isAuthenticated, async (req: Request, res: Respons
   }
 });
 
-router.patch("/tow-trucks/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/tow-trucks/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const data = insertTowTruckSchema.partial().parse(req.body);
     const updated = await storage.updateTowTruck(req.params.id, data);
@@ -117,7 +118,7 @@ router.patch("/tow-trucks/:id", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.delete("/tow-trucks/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/tow-trucks/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     await storage.deleteTowTruck(req.params.id);
     res.json({ success: true });
@@ -132,7 +133,7 @@ const locationSchema = z.object({
   longitude: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid longitude format"),
 });
 
-router.patch("/tow-trucks/:id/location", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/tow-trucks/:id/location", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const { latitude, longitude } = locationSchema.parse(req.body);
     const updated = await storage.updateTowTruckLocation(req.params.id, latitude, longitude);

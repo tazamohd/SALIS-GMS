@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
-router.get("/discounts", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/discounts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const { garageId, isActive } = req.query;
     if (!garageId) return res.status(400).json({ message: "garageId is required" });
@@ -19,7 +20,7 @@ router.get("/discounts", isAuthenticated, async (req: Request, res: Response) =>
   }
 });
 
-router.get("/discounts/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/discounts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const discount = await storage.getDiscount(req.params.id);
     if (!discount) return res.status(404).json({ message: "Discount not found" });
@@ -30,7 +31,7 @@ router.get("/discounts/:id", isAuthenticated, async (req: Request, res: Response
   }
 });
 
-router.post("/discounts", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/discounts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id || "default-user";
     const discount = await storage.createDiscount({ ...req.body, createdBy: userId });
@@ -41,7 +42,7 @@ router.post("/discounts", isAuthenticated, async (req: Request, res: Response) =
   }
 });
 
-router.patch("/discounts/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/discounts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const discount = await storage.updateDiscount(req.params.id, req.body);
     res.json(discount);
@@ -51,7 +52,7 @@ router.patch("/discounts/:id", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.delete("/discounts/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/discounts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     await storage.deleteDiscount(req.params.id);
     res.status(204).send();
@@ -61,7 +62,7 @@ router.delete("/discounts/:id", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.post("/discounts/validate", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/discounts/validate", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const { code, garageId, amount } = req.body;
     const userId = (req as any).user?.id || "default-user";

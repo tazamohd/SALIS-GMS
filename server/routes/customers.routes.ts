@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
 
 // Get all customers
-router.get("/customers", isAuthenticated, async (req, res) => {
+router.get("/customers", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { garage_id, search } = req.query;
     const customers = await storage.getCustomers(garage_id as string, search as string);
@@ -17,7 +18,7 @@ router.get("/customers", isAuthenticated, async (req, res) => {
 });
 
 // Create new customer
-router.post("/customers", isAuthenticated, async (req: any, res) => {
+router.post("/customers", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: any, res) => {
   try {
     const { fullName, firstName, lastName, email, phone, garageId, nationalId, address, nationality, preferredLanguage } = req.body;
 
@@ -67,7 +68,7 @@ router.post("/customers", isAuthenticated, async (req: any, res) => {
 });
 
 // Get customer by ID
-router.get("/customers/:id", isAuthenticated, async (req, res) => {
+router.get("/customers/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const customer = await storage.getCustomer(id);
@@ -82,7 +83,7 @@ router.get("/customers/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get customer vehicles
-router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/vehicles", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const vehicles = await storage.getCustomerVehicles(id);
@@ -94,7 +95,7 @@ router.get("/customers/:id/vehicles", isAuthenticated, async (req, res) => {
 });
 
 // Get customer job cards
-router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/job-cards", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const jobCards = await storage.getCustomerJobCards(id);
@@ -106,7 +107,7 @@ router.get("/customers/:id/job-cards", isAuthenticated, async (req, res) => {
 });
 
 // Get customer invoices
-router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/invoices", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const invoices = await storage.getCustomerInvoices(id);
@@ -118,7 +119,7 @@ router.get("/customers/:id/invoices", isAuthenticated, async (req, res) => {
 });
 
 // Get customer payments
-router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/payments", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const payments = await storage.getCustomerPayments(id);
@@ -130,7 +131,7 @@ router.get("/customers/:id/payments", isAuthenticated, async (req, res) => {
 });
 
 // Get customer notes
-router.get("/customers/:id/notes", isAuthenticated, async (req, res) => {
+router.get("/customers/:id/notes", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     const notes = await storage.getCustomerNotes(id);
@@ -142,7 +143,7 @@ router.get("/customers/:id/notes", isAuthenticated, async (req, res) => {
 });
 
 // Create customer note
-router.post("/customers/:id/notes", isAuthenticated, async (req: any, res) => {
+router.post("/customers/:id/notes", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: any, res) => {
   try {
     const { insertCustomerNoteSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -174,7 +175,7 @@ router.post("/customers/:id/notes", isAuthenticated, async (req: any, res) => {
 });
 
 // Delete customer note
-router.delete("/customer-notes/:id", isAuthenticated, async (req, res) => {
+router.delete("/customer-notes/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteCustomerNote(id);

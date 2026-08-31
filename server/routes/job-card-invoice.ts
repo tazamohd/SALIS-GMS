@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
-router.post("/job-cards/:id/convert-to-invoice", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/job-cards/:id/convert-to-invoice", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
 

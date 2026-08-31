@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { randomBytes } from "crypto";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
@@ -44,7 +45,7 @@ function sanitizeZodError(error: z.ZodError) {
  */
 
 // GET /api/job-cards - List job cards
-router.get("/job-cards", isAuthenticated, async (req, res) => {
+router.get("/job-cards", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { garage_id, assigned_to } = req.query;
     const jobCards = await storage.getJobCards(garage_id as string, assigned_to as string);
@@ -56,7 +57,7 @@ router.get("/job-cards", isAuthenticated, async (req, res) => {
 });
 
 // GET /api/job-cards/:id - Get job card by ID
-router.get("/job-cards/:id", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { id } = req.params;
     const jobCard = await storage.getJobCard(id);
@@ -71,7 +72,7 @@ router.get("/job-cards/:id", isAuthenticated, async (req, res) => {
 });
 
 // GET /api/job-cards/:id/details - Get full job card details
-router.get("/job-cards/:id/details", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:id/details", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { id } = req.params;
     const jobCardDetails = await storage.getJobCardWithDetails(id);
@@ -86,7 +87,7 @@ router.get("/job-cards/:id/details", isAuthenticated, async (req, res) => {
 });
 
 // POST /api/job-cards - Create new job card
-router.post("/job-cards", isAuthenticated, async (req: any, res) => {
+router.post("/job-cards", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const userId = req.user?.id || 'default-user';
     const garageId = req.user?.garageId;
@@ -114,7 +115,7 @@ router.post("/job-cards", isAuthenticated, async (req: any, res) => {
 });
 
 // PUT /api/job-cards/:id - Update job card
-router.put("/job-cards/:id", isAuthenticated, async (req, res) => {
+router.put("/job-cards/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { id } = req.params;
     const updatedJobCard = await storage.updateJobCard(id, req.body);
@@ -126,7 +127,7 @@ router.put("/job-cards/:id", isAuthenticated, async (req, res) => {
 });
 
 // PATCH /api/job-cards/:id - Update job card status (with inventory deduction on completion)
-router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
+router.patch("/job-cards/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { id } = req.params;
     const newStatus = req.body.status;
@@ -229,7 +230,7 @@ router.patch("/job-cards/:id", isAuthenticated, async (req, res) => {
 });
 
 // GET /api/job-cards/:jobCardId/parts - Get parts for job card (direct DB query, no storage method)
-router.get("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:jobCardId/parts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { jobCardId } = req.params;
     const parts = await db.select().from(jobCardParts).where(eq(jobCardParts.jobCardId, jobCardId));
@@ -241,7 +242,7 @@ router.get("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
 });
 
 // POST /api/job-cards/:jobCardId/parts - Add part to job card (direct DB insert with zod validation)
-router.post("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => {
+router.post("/job-cards/:jobCardId/parts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { jobCardId } = req.params;
 
@@ -283,7 +284,7 @@ router.post("/job-cards/:jobCardId/parts", isAuthenticated, async (req, res) => 
 });
 
 // DELETE /api/job-cards/:jobCardId/parts/:partId - Remove part from job card
-router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, async (req, res) => {
+router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { partId } = req.params;
 
@@ -302,7 +303,7 @@ router.delete("/job-cards/:jobCardId/parts/:partId", isAuthenticated, async (req
 });
 
 // GET /api/job-cards/:jobCardId/tasks - Get task assignments for job card
-router.get("/job-cards/:jobCardId/tasks", isAuthenticated, async (req, res) => {
+router.get("/job-cards/:jobCardId/tasks", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { jobCardId } = req.params;
     const tasks = await storage.getTaskAssignments(jobCardId);
@@ -314,7 +315,7 @@ router.get("/job-cards/:jobCardId/tasks", isAuthenticated, async (req, res) => {
 });
 
 // POST /api/job-cards/:jobCardId/tasks - Create task assignment for job card
-router.post("/job-cards/:jobCardId/tasks", isAuthenticated, async (req: any, res) => {
+router.post("/job-cards/:jobCardId/tasks", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const { jobCardId } = req.params;
     const userId = req.user?.id || 'default-user';
@@ -332,7 +333,7 @@ router.post("/job-cards/:jobCardId/tasks", isAuthenticated, async (req: any, res
 });
 
 // PUT /api/tasks/:id - Update task assignment
-router.put("/tasks/:id", isAuthenticated, async (req, res) => {
+router.put("/tasks/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { id } = req.params;
     const updatedTask = await storage.updateTaskAssignment(id, req.body);
@@ -344,7 +345,7 @@ router.put("/tasks/:id", isAuthenticated, async (req, res) => {
 });
 
 // POST /api/job-cards/:id/tracking/generate - Generate public tracking token
-router.post("/job-cards/:id/tracking/generate", isAuthenticated, async (req: any, res) => {
+router.post("/job-cards/:id/tracking/generate", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const { id } = req.params;
 
@@ -386,7 +387,7 @@ router.post("/job-cards/:id/tracking/generate", isAuthenticated, async (req: any
 });
 
 // GET /api/job-cards/:id/tracking/events - Get tracking events
-router.get("/job-cards/:id/tracking/events", isAuthenticated, async (req: any, res) => {
+router.get("/job-cards/:id/tracking/events", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const { id } = req.params;
     const { visibleToCustomer } = req.query;
@@ -416,7 +417,7 @@ router.get("/job-cards/:id/tracking/events", isAuthenticated, async (req: any, r
 });
 
 // POST /api/job-cards/:id/tracking/events - Create tracking event
-router.post("/job-cards/:id/tracking/events", isAuthenticated, async (req: any, res) => {
+router.post("/job-cards/:id/tracking/events", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const { id } = req.params;
 
@@ -454,7 +455,7 @@ router.post("/job-cards/:id/tracking/events", isAuthenticated, async (req: any, 
 });
 
 // PATCH /api/job-cards/:id/eta - Update job ETA
-router.patch("/job-cards/:id/eta", isAuthenticated, async (req: any, res) => {
+router.patch("/job-cards/:id/eta", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: any, res) => {
   try {
     const { id } = req.params;
 

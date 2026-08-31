@@ -10,13 +10,15 @@ import { invoices, users, garages } from '../../shared/schema';
 import { eq, and, gte, sql, count, sum } from 'drizzle-orm';
 import { generateZATCAQRCode, validateZATCACompliance } from '../../shared/zatcaUtils';
 import { formatDualCalendar, getCurrentHijriDate, isRamadan } from '../../shared/hijriUtils';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // ---------------------------------------------------------------------------
 // GET /api/saudi/dashboard — Saudi compliance dashboard (aggregated view)
 // ---------------------------------------------------------------------------
-router.get('/saudi/dashboard', async (req: Request, res: Response) => {
+router.get('/saudi/dashboard', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -162,7 +164,7 @@ router.get('/saudi/dashboard', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // POST /api/saudi/zatca/validate-invoice/:id — Validate a specific invoice
 // ---------------------------------------------------------------------------
-router.post('/saudi/zatca/validate-invoice/:id', async (req: Request, res: Response) => {
+router.post('/saudi/zatca/validate-invoice/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -223,7 +225,7 @@ router.post('/saudi/zatca/validate-invoice/:id', async (req: Request, res: Respo
 // ---------------------------------------------------------------------------
 // GET /api/saudi/zatca/qr/:invoiceId — Generate ZATCA QR code for an invoice
 // ---------------------------------------------------------------------------
-router.get('/saudi/zatca/qr/:invoiceId', async (req: Request, res: Response) => {
+router.get('/saudi/zatca/qr/:invoiceId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -278,7 +280,7 @@ router.get('/saudi/zatca/qr/:invoiceId', async (req: Request, res: Response) => 
 // ---------------------------------------------------------------------------
 // GET /api/saudi/vat/summary — VAT summary for a period
 // ---------------------------------------------------------------------------
-router.get('/saudi/vat/summary', async (req: Request, res: Response) => {
+router.get('/saudi/vat/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -358,7 +360,7 @@ router.get('/saudi/vat/summary', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // GET /api/saudi/labor/compliance — Saudization / GOSI compliance (stub)
 // ---------------------------------------------------------------------------
-router.get('/saudi/labor/compliance', async (req: Request, res: Response) => {
+router.get('/saudi/labor/compliance', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {
@@ -414,7 +416,7 @@ router.get('/saudi/labor/compliance', async (req: Request, res: Response) => {
 // ---------------------------------------------------------------------------
 // GET /api/saudi/hijri/today — Current Hijri date information
 // ---------------------------------------------------------------------------
-router.get('/saudi/hijri/today', async (_req: Request, res: Response) => {
+router.get('/saudi/hijri/today', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req: Request, res: Response) => {
   try {
     const hijriDate = getCurrentHijriDate();
     const now = new Date();

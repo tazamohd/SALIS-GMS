@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertPurchaseOrderSchema, insertPurchaseOrderItemSchema } from "../../shared/schema";
 
 const router = Router();
@@ -16,7 +17,7 @@ function sanitizeZodError(error: z.ZodError) {
   };
 }
 
-router.get("/purchase-orders", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/purchase-orders", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const { garage_id, status } = req.query;
     const orders = await storage.getPurchaseOrders(garage_id as string, status as string);
@@ -27,7 +28,7 @@ router.get("/purchase-orders", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.get("/purchase-orders/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/purchase-orders/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const order = await storage.getPurchaseOrder(req.params.id);
     if (!order) return res.status(404).json({ message: "Purchase order not found" });
@@ -38,7 +39,7 @@ router.get("/purchase-orders/:id", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.post("/purchase-orders", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/purchase-orders", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id || "default-user";
     const result = insertPurchaseOrderSchema.safeParse(req.body);
@@ -53,7 +54,7 @@ router.post("/purchase-orders", isAuthenticated, async (req: Request, res: Respo
   }
 });
 
-router.post("/purchase-orders/with-items", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/purchase-orders/with-items", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id || "default-user";
     const { purchaseOrder, items } = req.body;
@@ -90,7 +91,7 @@ router.post("/purchase-orders/with-items", isAuthenticated, async (req: Request,
   }
 });
 
-router.patch("/purchase-orders/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/purchase-orders/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const result = insertPurchaseOrderSchema.partial().safeParse(req.body);
     if (!result.success) {
@@ -104,7 +105,7 @@ router.patch("/purchase-orders/:id", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.delete("/purchase-orders/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/purchase-orders/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     await storage.deletePurchaseOrder(req.params.id);
     res.json({ message: "Purchase order deleted successfully" });
@@ -114,7 +115,7 @@ router.delete("/purchase-orders/:id", isAuthenticated, async (req: Request, res:
   }
 });
 
-router.get("/purchase-orders/:id/items", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/purchase-orders/:id/items", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const items = await storage.getPurchaseOrderItems(req.params.id);
     res.json(items);
@@ -124,7 +125,7 @@ router.get("/purchase-orders/:id/items", isAuthenticated, async (req: Request, r
   }
 });
 
-router.post("/purchase-order-items", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/purchase-order-items", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const result = insertPurchaseOrderItemSchema.safeParse(req.body);
     if (!result.success) {
@@ -138,7 +139,7 @@ router.post("/purchase-order-items", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.delete("/purchase-order-items/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/purchase-order-items/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     await storage.deletePurchaseOrderItem(req.params.id);
     res.json({ message: "Item deleted successfully" });

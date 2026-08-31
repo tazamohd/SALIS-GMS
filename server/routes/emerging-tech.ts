@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
@@ -9,7 +10,7 @@ const router = Router();
 // ==========================================
 
 // Blockchain Vehicle History
-router.get('/emerging-tech/blockchain', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/blockchain', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const vehicleId = req.query.vehicleId as string | undefined;
     const garageId = (req as any).user?.garageId;
@@ -22,7 +23,7 @@ router.get('/emerging-tech/blockchain', isAuthenticated, async (req: Request, re
 });
 
 // AR Repair Guides
-router.get('/emerging-tech/ar-guides', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/ar-guides', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req as any).user?.garageId;
     const guides = await storage.getArRepairGuides(garageId);
@@ -34,7 +35,7 @@ router.get('/emerging-tech/ar-guides', isAuthenticated, async (req: Request, res
 });
 
 // IoT Sensors
-router.get('/emerging-tech/iot-sensors', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/iot-sensors', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const vehicleId = req.query.vehicleId as string | undefined;
     const sensors = await storage.getIotSensors(vehicleId);
@@ -46,7 +47,7 @@ router.get('/emerging-tech/iot-sensors', isAuthenticated, async (req: Request, r
 });
 
 // IoT Sensor Readings
-router.get('/emerging-tech/iot-readings', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/iot-readings', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const sensorId = req.query.sensorId as string | undefined;
     const vehicleId = req.query.vehicleId as string | undefined;
@@ -59,7 +60,7 @@ router.get('/emerging-tech/iot-readings', isAuthenticated, async (req: Request, 
 });
 
 // 3D Parts Models
-router.get('/emerging-tech/3d-models', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/3d-models', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req as any).user?.garageId;
     const models = await storage.getParts3DModels(garageId);
@@ -71,7 +72,7 @@ router.get('/emerging-tech/3d-models', isAuthenticated, async (req: Request, res
 });
 
 // Drone Inspections
-router.get('/emerging-tech/drone-inspections', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/drone-inspections', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const vehicleId = req.query.vehicleId as string | undefined;
     const garageId = (req as any).user?.garageId;
@@ -84,7 +85,7 @@ router.get('/emerging-tech/drone-inspections', isAuthenticated, async (req: Requ
 });
 
 // AI Video Analysis
-router.get('/emerging-tech/ai-video', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/ai-video', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const customerId = req.query.customerId as string | undefined;
     const vehicleId = req.query.vehicleId as string | undefined;
@@ -97,7 +98,7 @@ router.get('/emerging-tech/ai-video', isAuthenticated, async (req: Request, res:
 });
 
 // Digital Twins
-router.get('/emerging-tech/digital-twins', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/digital-twins', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const vehicleId = req.query.vehicleId as string | undefined;
     const twins = await storage.getDigitalTwins(vehicleId);
@@ -109,7 +110,7 @@ router.get('/emerging-tech/digital-twins', isAuthenticated, async (req: Request,
 });
 
 // Fraud Detection
-router.get('/emerging-tech/fraud-cases', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/fraud-cases', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const riskLevel = req.query.riskLevel as string | undefined;
     const garageId = (req as any).user?.garageId;
@@ -122,7 +123,7 @@ router.get('/emerging-tech/fraud-cases', isAuthenticated, async (req: Request, r
 });
 
 // Biometric Profiles
-router.get('/emerging-tech/biometric-profile', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/biometric-profile', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id || 'default-user';
     const profile = await storage.getBiometricProfile(userId);
@@ -134,7 +135,7 @@ router.get('/emerging-tech/biometric-profile', isAuthenticated, async (req: Requ
 });
 
 // Collaboration Sessions
-router.get('/emerging-tech/collaboration-sessions', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/collaboration-sessions', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const status = req.query.status as string | undefined;
     const garageId = (req as any).user?.garageId;
@@ -147,7 +148,7 @@ router.get('/emerging-tech/collaboration-sessions', isAuthenticated, async (req:
 });
 
 // Edge Devices
-router.get('/emerging-tech/edge-devices', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/edge-devices', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req as any).user?.garageId;
     const devices = await storage.getEdgeDevices(garageId);
@@ -159,7 +160,7 @@ router.get('/emerging-tech/edge-devices', isAuthenticated, async (req: Request, 
 });
 
 // Edge Diagnostics
-router.get('/emerging-tech/edge-diagnostics', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/edge-diagnostics', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const deviceId = req.query.deviceId as string | undefined;
     const vehicleId = req.query.vehicleId as string | undefined;
@@ -172,7 +173,7 @@ router.get('/emerging-tech/edge-diagnostics', isAuthenticated, async (req: Reque
 });
 
 // Pricing Optimization
-router.get('/emerging-tech/pricing-optimization', isAuthenticated, async (req: Request, res: Response) => {
+router.get('/emerging-tech/pricing-optimization', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const serviceType = req.query.serviceType as string | undefined;
     const garageId = (req as any).user?.garageId;
@@ -185,7 +186,7 @@ router.get('/emerging-tech/pricing-optimization', isAuthenticated, async (req: R
 });
 
 // Seed sample data for Emerging Technologies
-router.post('/emerging-tech/seed', isAuthenticated, async (req: Request, res: Response) => {
+router.post('/emerging-tech/seed', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const garageId = (req as any).user?.garageId;
     const userId = (req as any).user?.id || 'default-user';

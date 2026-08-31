@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -9,7 +11,7 @@ const router = Router();
  * Aggregated KPIs: today's revenue, jobs in progress, appointments today,
  * pending invoices, low stock items, technician utilization.
  */
-router.get('/dashboard/summary', async (req, res) => {
+router.get('/dashboard/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const todayStart = new Date();
@@ -115,7 +117,7 @@ router.get('/dashboard/summary', async (req, res) => {
  * GET /api/dashboard/recent-activity
  * Last 10 activities across all modules (job updates, payments, appointments, etc.)
  */
-router.get('/dashboard/recent-activity', async (req, res) => {
+router.get('/dashboard/recent-activity', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const activities = await db.execute(sql`
@@ -186,7 +188,7 @@ router.get('/dashboard/recent-activity', async (req, res) => {
  * GET /api/dashboard/trends
  * Weekly trends for revenue, jobs, customer visits (last 4 weeks)
  */
-router.get('/dashboard/trends', async (req, res) => {
+router.get('/dashboard/trends', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     // Revenue trend - last 4 weeks

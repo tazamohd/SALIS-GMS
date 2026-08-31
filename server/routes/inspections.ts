@@ -1,13 +1,14 @@
 import { Router, type Request, type Response } from "express";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertInspectionTemplateSchema, insertVehicleInspectionSchema } from "../../shared/schema";
 
 const router = Router();
 
 // ── Inspection Templates ───────────────────────────────────────────────
 
-router.post("/inspection-templates", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/inspection-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertInspectionTemplateSchema.parse(req.body);
@@ -23,7 +24,7 @@ router.post("/inspection-templates", isAuthenticated, async (req: Request, res: 
   }
 });
 
-router.get("/inspection-templates", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/inspection-templates", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const templates = await storage.getInspectionTemplates(user.garageId);
@@ -34,7 +35,7 @@ router.get("/inspection-templates", isAuthenticated, async (req: Request, res: R
   }
 });
 
-router.get("/inspection-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/inspection-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const template = await storage.getInspectionTemplateById(req.params.id);
     if (!template) return res.status(404).json({ error: "Inspection template not found" });
@@ -45,7 +46,7 @@ router.get("/inspection-templates/:id", isAuthenticated, async (req: Request, re
   }
 });
 
-router.patch("/inspection-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/inspection-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const data = insertInspectionTemplateSchema.partial().parse(req.body);
     const updated = await storage.updateInspectionTemplate(req.params.id, data);
@@ -56,7 +57,7 @@ router.patch("/inspection-templates/:id", isAuthenticated, async (req: Request, 
   }
 });
 
-router.delete("/inspection-templates/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/inspection-templates/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     await storage.deleteInspectionTemplate(req.params.id);
     res.json({ success: true });
@@ -68,7 +69,7 @@ router.delete("/inspection-templates/:id", isAuthenticated, async (req: Request,
 
 // ── Vehicle Inspections ────────────────────────────────────────────────
 
-router.post("/vehicle-inspections", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/vehicle-inspections", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const data = insertVehicleInspectionSchema.parse(req.body);
@@ -84,7 +85,7 @@ router.post("/vehicle-inspections", isAuthenticated, async (req: Request, res: R
   }
 });
 
-router.get("/vehicle-inspections", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/vehicle-inspections", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const { status, vehicleId, customerId } = req.query;
@@ -100,7 +101,7 @@ router.get("/vehicle-inspections", isAuthenticated, async (req: Request, res: Re
   }
 });
 
-router.get("/vehicle-inspections/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/vehicle-inspections/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const inspection = await storage.getVehicleInspectionById(req.params.id);
     if (!inspection) return res.status(404).json({ error: "Vehicle inspection not found" });
@@ -111,7 +112,7 @@ router.get("/vehicle-inspections/:id", isAuthenticated, async (req: Request, res
   }
 });
 
-router.patch("/vehicle-inspections/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/vehicle-inspections/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     const data = insertVehicleInspectionSchema.partial().parse(req.body);
     const updated = await storage.updateVehicleInspection(req.params.id, data);
@@ -122,7 +123,7 @@ router.patch("/vehicle-inspections/:id", isAuthenticated, async (req: Request, r
   }
 });
 
-router.delete("/vehicle-inspections/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/vehicle-inspections/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req: Request, res: Response) => {
   try {
     await storage.deleteVehicleInspection(req.params.id);
     res.json({ success: true });

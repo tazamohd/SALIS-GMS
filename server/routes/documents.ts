@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { storage } from '../storage';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -35,7 +37,7 @@ function toView(doc: any) {
 }
 
 // GET /documents/categories — list document categories with counts
-router.get('/documents/categories', async (_req: Request, res: Response) => {
+router.get('/documents/categories', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req: Request, res: Response) => {
   try {
     const all = await storage.listDocumentLibraryItems();
     const result = CATEGORIES.map((cat) => {
@@ -61,7 +63,7 @@ router.get('/documents/categories', async (_req: Request, res: Response) => {
 });
 
 // GET /documents/stats — aggregate statistics
-router.get('/documents/stats', async (_req: Request, res: Response) => {
+router.get('/documents/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req: Request, res: Response) => {
   try {
     const all = await storage.listDocumentLibraryItems();
     const totalStorage = all.reduce((sum: number, d: any) => sum + (d.size ?? 0), 0);
@@ -89,7 +91,7 @@ router.get('/documents/stats', async (_req: Request, res: Response) => {
 });
 
 // GET /documents — list documents (supports ?search, ?category, ?tag)
-router.get('/documents', async (req: Request, res: Response) => {
+router.get('/documents', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const { search, category, tag } = req.query;
     const rows = await storage.listDocumentLibraryItems({
@@ -105,7 +107,7 @@ router.get('/documents', async (req: Request, res: Response) => {
 });
 
 // GET /documents/expiring — documents expiring within N days
-router.get('/documents/expiring', async (req: Request, res: Response) => {
+router.get('/documents/expiring', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const daysAhead = req.query.daysAhead ? parseInt(req.query.daysAhead as string) : 30;
@@ -118,7 +120,7 @@ router.get('/documents/expiring', async (req: Request, res: Response) => {
 });
 
 // GET /documents/:id — single document detail
-router.get('/documents/:id', async (req: Request, res: Response) => {
+router.get('/documents/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const doc = await storage.getDocumentLibraryItem(req.params.id);
     if (!doc) return res.status(404).json({ error: 'Document not found' });
@@ -130,7 +132,7 @@ router.get('/documents/:id', async (req: Request, res: Response) => {
 });
 
 // POST /documents — upload document metadata (file upload is stub)
-router.post('/documents', async (req: Request, res: Response) => {
+router.post('/documents', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   const { name, type, category, size, tags, description } = req.body;
 
   if (!name || !type || !category) {
@@ -160,7 +162,7 @@ router.post('/documents', async (req: Request, res: Response) => {
 });
 
 // DELETE /documents/:id — delete a document
-router.delete('/documents/:id', async (req: Request, res: Response) => {
+router.delete('/documents/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const deleted = await storage.deleteDocumentLibraryItem(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'Document not found' });

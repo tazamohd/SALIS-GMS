@@ -1,11 +1,12 @@
 import { Router, type Request, type Response } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
 
 // Get feedback for a job card
-router.get("/feedback/job-card/:jobCardId", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/feedback/job-card/:jobCardId", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const feedback = await storage.getServiceFeedbackByJobCard(req.params.jobCardId);
     res.json(feedback);
@@ -16,7 +17,7 @@ router.get("/feedback/job-card/:jobCardId", isAuthenticated, async (req: Request
 });
 
 // Get feedback for a technician
-router.get("/feedback/technician/:technicianId", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/feedback/technician/:technicianId", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const feedback = await storage.getServiceFeedbackByTechnician(req.params.technicianId);
     const summary = await storage.getTechnicianFeedbackSummary(req.params.technicianId);
@@ -28,7 +29,7 @@ router.get("/feedback/technician/:technicianId", isAuthenticated, async (req: Re
 });
 
 // Get all feedback with filters
-router.get("/feedback", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/feedback", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const { sentiment, minRating, maxRating, isFlagged, startDate, endDate, limit, offset } = req.query;
     const filters: any = {};
@@ -50,7 +51,7 @@ router.get("/feedback", isAuthenticated, async (req: Request, res: Response) => 
 });
 
 // Get feedback analytics
-router.get("/feedback/analytics", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/feedback/analytics", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const analytics = await storage.getFeedbackAnalytics();
     res.json(analytics);
@@ -61,7 +62,7 @@ router.get("/feedback/analytics", isAuthenticated, async (req: Request, res: Res
 });
 
 // Get feedback by ID
-router.get("/feedback/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/feedback/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
   try {
     const feedback = await storage.getServiceFeedbackById(req.params.id);
     if (!feedback) {
@@ -75,7 +76,7 @@ router.get("/feedback/:id", isAuthenticated, async (req: Request, res: Response)
 });
 
 // Respond to feedback
-router.post("/feedback/:id/respond", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/feedback/:id/respond", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const { response } = req.body;
     if (!response) {
@@ -90,7 +91,7 @@ router.post("/feedback/:id/respond", isAuthenticated, async (req: Request, res: 
 });
 
 // Flag feedback
-router.post("/feedback/:id/flag", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/feedback/:id/flag", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const { reason } = req.body;
     if (!reason) {
@@ -105,7 +106,7 @@ router.post("/feedback/:id/flag", isAuthenticated, async (req: Request, res: Res
 });
 
 // Unflag feedback
-router.post("/feedback/:id/unflag", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/feedback/:id/unflag", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const updated = await storage.unflagFeedback(req.params.id);
     res.json(updated);
@@ -116,7 +117,7 @@ router.post("/feedback/:id/unflag", isAuthenticated, async (req: Request, res: R
 });
 
 // Analyze sentiment using OpenAI
-router.post("/feedback/:id/analyze-sentiment", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/feedback/:id/analyze-sentiment", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const feedback = await storage.getServiceFeedbackById(req.params.id);
     if (!feedback) {
@@ -165,7 +166,7 @@ router.post("/feedback/:id/analyze-sentiment", isAuthenticated, async (req: Requ
 });
 
 // Bulk analyze sentiment for all unanalyzed feedback
-router.post("/feedback/analyze-all", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/feedback/analyze-all", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const allFeedback = await storage.getAllServiceFeedback({ limit: 100 });
     const unanalyzed = allFeedback.filter((f: any) => !f.feedback?.sentiment && f.feedback?.comments);

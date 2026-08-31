@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { storage } from '../storage';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -49,7 +51,7 @@ function viewVehicle(v: any, account?: any) {
 }
 
 // GET /api/fleet/accounts — List all fleet accounts
-router.get('/fleet/accounts', async (_req, res) => {
+router.get('/fleet/accounts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req, res) => {
   try {
     const [accounts, vehicles] = await Promise.all([
       storage.listFleetAccounts(),
@@ -63,7 +65,7 @@ router.get('/fleet/accounts', async (_req, res) => {
 });
 
 // GET /api/fleet/accounts/:id — Fleet account detail with vehicles
-router.get('/fleet/accounts/:id', async (req, res) => {
+router.get('/fleet/accounts/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const account = await storage.getFleetAccount(req.params.id);
     if (!account) {
@@ -85,7 +87,7 @@ router.get('/fleet/accounts/:id', async (req, res) => {
 });
 
 // POST /api/fleet/accounts — Create fleet account
-router.post('/fleet/accounts', async (req, res) => {
+router.post('/fleet/accounts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   const { companyName, contactPerson, contactEmail, contactPhone, discountPercentage, paymentTerms, notes } = req.body;
   if (!companyName) {
     return res.status(400).json({ message: 'companyName is required' });
@@ -113,7 +115,7 @@ router.post('/fleet/accounts', async (req, res) => {
 });
 
 // GET /api/fleet/vehicles — All fleet vehicles
-router.get('/fleet/vehicles', async (req, res) => {
+router.get('/fleet/vehicles', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const accountId = req.query.accountId as string | undefined;
     const [vehicles, accounts] = await Promise.all([
@@ -129,7 +131,7 @@ router.get('/fleet/vehicles', async (req, res) => {
 });
 
 // GET /api/fleet/maintenance-schedule — Upcoming maintenance
-router.get('/fleet/maintenance-schedule', async (req, res) => {
+router.get('/fleet/maintenance-schedule', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const accountId = req.query.accountId as string | undefined;
     const [entries, vehicles, accounts] = await Promise.all([
@@ -162,7 +164,7 @@ router.get('/fleet/maintenance-schedule', async (req, res) => {
 });
 
 // GET /api/fleet/analytics — Fleet analytics
-router.get('/fleet/analytics', async (_req, res) => {
+router.get('/fleet/analytics', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req, res) => {
   try {
     const [accounts, vehicles, entries] = await Promise.all([
       storage.listFleetAccounts(),

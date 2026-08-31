@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import rateLimit from "express-rate-limit";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 import { z } from "zod";
 
@@ -34,6 +35,7 @@ const callCenterLimiter = rateLimit({
 router.get(
   "/call-center/queues",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -59,6 +61,7 @@ router.get(
 router.post(
   "/call-center/queues",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -98,6 +101,7 @@ router.post(
 router.get(
   "/call-center/queues/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -123,6 +127,7 @@ router.get(
 router.patch(
   "/call-center/queues/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -158,6 +163,7 @@ router.patch(
 router.delete(
   "/call-center/queues/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -184,6 +190,7 @@ router.delete(
 router.get(
   "/call-center/queues/:id/with-members",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -213,6 +220,7 @@ router.get(
 router.post(
   "/call-center/queues/:queueId/members",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -252,6 +260,7 @@ router.post(
 router.get(
   "/call-center/queues/:queueId/members",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { queueId } = req.params;
@@ -279,6 +288,7 @@ router.get(
 router.patch(
   "/call-center/queue-members/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -311,6 +321,7 @@ router.patch(
 router.delete(
   "/call-center/queue-members/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -341,6 +352,7 @@ router.delete(
 router.get(
   "/call-center/sessions",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const userGarageId = (req as any).user?.garageId;
@@ -368,6 +380,7 @@ router.get(
 router.post(
   "/call-center/sessions",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -407,6 +420,7 @@ router.post(
 router.get(
   "/call-center/sessions/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
@@ -432,6 +446,7 @@ router.get(
 router.patch(
   "/call-center/sessions/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -478,6 +493,7 @@ router.patch(
 router.post(
   "/call-center/sessions/:id/assign",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -528,6 +544,7 @@ router.post(
 router.post(
   "/call-center/sessions/:sessionId/notes",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -558,6 +575,7 @@ router.post(
 router.get(
   "/call-center/sessions/:sessionId/notes",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
@@ -578,6 +596,7 @@ router.get(
 router.post(
   "/call-center/sessions/:sessionId/recordings",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -608,6 +627,7 @@ router.post(
 router.get(
   "/call-center/sessions/:sessionId/recordings",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
@@ -628,6 +648,7 @@ router.get(
 router.get(
   "/call-center/disposition-codes",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const userGarageId = (req as any).user?.garageId;
@@ -652,6 +673,7 @@ router.get(
 router.post(
   "/call-center/disposition-codes",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -686,6 +708,7 @@ router.post(
 router.patch(
   "/call-center/disposition-codes/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -720,6 +743,7 @@ router.patch(
 router.delete(
   "/call-center/disposition-codes/:id",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -752,6 +776,7 @@ router.delete(
 router.post(
   "/call-center/performance",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   callCenterLimiter,
   async (req: Request, res: Response) => {
     try {
@@ -790,6 +815,7 @@ router.post(
 router.get(
   "/call-center/performance",
   isAuthenticated,
+  requireRole(['ADMIN', 'MANAGER', 'ADVISOR']),
   async (req: Request, res: Response) => {
     try {
       const userGarageId = (req as any).user?.garageId;

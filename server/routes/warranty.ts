@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -129,7 +131,7 @@ const claims: WarrantyClaim[] = [
 // ---------------------------------------------------------------------------
 // GET /api/warranty/contracts — List all contracts
 // ---------------------------------------------------------------------------
-router.get('/warranty/contracts', (req, res) => {
+router.get('/warranty/contracts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { status, search } = req.query;
   let filtered = [...contracts];
 
@@ -151,7 +153,7 @@ router.get('/warranty/contracts', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/warranty/contracts — Create new contract
 // ---------------------------------------------------------------------------
-router.post('/warranty/contracts', (req, res) => {
+router.post('/warranty/contracts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const {
     customerId, customerName, vehicleId, vehicleName, licensePlate,
     planType, coverageType, coverageAmount, startDate, endDate, monthlyPremium,
@@ -186,7 +188,7 @@ router.post('/warranty/contracts', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/contracts/:id — Contract detail with claims
 // ---------------------------------------------------------------------------
-router.get('/warranty/contracts/:id', (req, res) => {
+router.get('/warranty/contracts/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const id = parseInt(req.params.id);
   const contract = contracts.find(c => c.id === id);
   if (!contract) {
@@ -200,7 +202,7 @@ router.get('/warranty/contracts/:id', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/warranty/claims — Submit a warranty claim
 // ---------------------------------------------------------------------------
-router.post('/warranty/claims', (req, res) => {
+router.post('/warranty/claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { contractId, description, amount, jobCardId, notes } = req.body;
 
   const contract = contracts.find(c => c.id === contractId);
@@ -237,7 +239,7 @@ router.post('/warranty/claims', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/claims — List all claims
 // ---------------------------------------------------------------------------
-router.get('/warranty/claims', (req, res) => {
+router.get('/warranty/claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { status, search } = req.query;
   let filtered = [...claims];
 
@@ -259,7 +261,7 @@ router.get('/warranty/claims', (req, res) => {
 // ---------------------------------------------------------------------------
 // PATCH /api/warranty/claims/:id — Approve or reject a claim
 // ---------------------------------------------------------------------------
-router.patch('/warranty/claims/:id', (req, res) => {
+router.patch('/warranty/claims/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const id = parseInt(req.params.id);
   const claim = claims.find(cl => cl.id === id);
   if (!claim) {
@@ -282,7 +284,7 @@ router.patch('/warranty/claims/:id', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/stats — Dashboard statistics
 // ---------------------------------------------------------------------------
-router.get('/warranty/stats', (req, res) => {
+router.get('/warranty/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const activeContracts = contracts.filter(c => c.status === 'active').length;
   const totalContracts = contracts.length;
 
