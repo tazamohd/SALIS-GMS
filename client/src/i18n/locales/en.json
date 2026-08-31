@@ -21,7 +21,7 @@
     "emerging_technologies": "Emerging Technologies",
     "ai_automation_hub": "AI & Automation Hub",
     "system_settings": "System & Settings",
-    "finance_accounting": "Finance & Accounting"
+    "finance_accounting": "Finance & Reporting"
   },
   "common": {
     "welcome": "Welcome to SALIS AUTO Management System",
@@ -177,7 +177,7 @@
     "quality_delivery": "Quality & Delivery",
     "billing_payments": "Billing & Payments",
     "analytics_business_intelligence": "Analytics & Business Intelligence",
-    "finance_accounting": "Finance & Accounting",
+    "finance_accounting": "Finance & Reporting",
     "customer_experience_growth": "Customer Experience & Growth",
     "team_hr_management": "Team & HR Management",
     "compliance_safety": "Compliance & Safety",
@@ -284,7 +284,7 @@
     "partners_account": "Partners Account",
     "loss_account": "Loss Account",
     "financial_settings": "Financial Settings",
-    "accounting_integration": "Accounting Integration",
+    "accounting_integration": "External Accounting Sync",
     "customer_portal": "Customer Portal",
     "customer_loyalty": "Customer Loyalty",
     "service_reminders": "Service Reminders",
@@ -508,7 +508,7 @@
     "smartDamageAssessment": "Smart Damage Assessment",
     "intelligentPriceOptimizer": "Intelligent Price Optimizer",
     "mlFraudDetection": "ML Fraud Detection",
-    "accountingIntegration": "Accounting Integration",
+    "accountingIntegration": "External Accounting Sync",
     "socialMediaIntegration": "Social Media Integration",
     "googleMyBusiness": "Google My Business",
     "dataImportExport": "Data Import/Export",
@@ -1356,8 +1356,8 @@
     "scanFailed": "Scan failed"
   },
   "accounting": {
-    "title": "💼 Accounting Integration",
-    "description": "Sync with QuickBooks and Xero for automated accounting",
+    "title": "External Accounting Sync",
+    "description": "Connect with QuickBooks or Xero to export financial data",
     "totalSynced": "Total Synced",
     "records": "Records",
     "lastSync": "Last Sync",

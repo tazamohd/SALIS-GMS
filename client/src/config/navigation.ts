@@ -132,7 +132,7 @@ export const navigationConfig: NavGroup[] = [
     ],
   },
   {
-    title: "Accounting",
+    title: "Financial Reporting",
     icon: BookOpen,
     roles: ['ADMIN', 'MANAGER', 'ACCOUNTANT'],
     minPlan: 'PRO',

@@ -21,7 +21,7 @@
     "emerging_technologies": "التقنيات الناشئة",
     "ai_automation_hub": "مركز الذكاء الاصطناعي والأتمتة",
     "system_settings": "النظام والإعدادات",
-    "finance_accounting": "المالية والمحاسبة"
+    "finance_accounting": "المالية والتقارير"
   },
   "common": {
     "welcome": "مرحباً بك في نظام إدارة ساليس أوتو",
@@ -177,7 +177,7 @@
     "quality_delivery": "الجودة والتسليم",
     "billing_payments": "الفواتير والمدفوعات",
     "analytics_business_intelligence": "التحليلات وذكاء الأعمال",
-    "finance_accounting": "المالية والمحاسبة",
+    "finance_accounting": "المالية والتقارير",
     "customer_experience_growth": "تجربة العملاء والنمو",
     "team_hr_management": "الفريق وإدارة الموارد البشرية",
     "compliance_safety": "الامتثال والسلامة",

@@ -87,6 +87,7 @@ import { notificationsLegacyRoutes } from "./notifications-legacy";
 import { integrationsRoutes } from "./integrations";
 import { platformAdminRoutes } from "./platform-admin";
 import { customerPortalApiRoutes } from "./customer-portal-api";
+import iotRoutes from "./iot";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -341,6 +342,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Platform Admin Routes Loaded");
   app.use("/api", customerPortalApiRoutes);
   console.log("✅ Customer Portal API Routes Loaded");
+  app.use("/api", iotRoutes);
+  console.log("✅ IoT Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 

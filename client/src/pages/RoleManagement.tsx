@@ -53,7 +53,7 @@ import { StandardPageLayout } from "@/components/layouts";
 const roleCategories = [
   { id: "system", name: "System & Administration", nameAr: "النظام والإدارة", icon: Settings, color: "#0B1F3B" },
   { id: "operations", name: "Operations & Service", nameAr: "العمليات والخدمة", icon: Wrench, color: "#0A5ED7" },
-  { id: "finance", name: "Finance & Accounting", nameAr: "المالية والمحاسبة", icon: DollarSign, color: "#0BB3FF" },
+  { id: "finance", name: "Finance & Reporting", nameAr: "المالية والتقارير", icon: DollarSign, color: "#0BB3FF" },
   { id: "inventory", name: "Inventory & Parts", nameAr: "المخزون والقطع", icon: Package, color: "#0A5ED7" },
   { id: "customer", name: "Customer & Sales", nameAr: "العملاء والمبيعات", icon: Users, color: "#0BB3FF" },
   { id: "analytics", name: "Analytics & Reporting", nameAr: "التحليلات والتقارير", icon: BarChart3, color: "#0B1F3B" },

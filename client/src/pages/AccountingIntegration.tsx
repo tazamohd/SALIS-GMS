@@ -313,8 +313,8 @@ export default function AccountingIntegration() {
 
   return (
     <TabsPageLayout
-      title={t('accounting.title', '💼 Accounting Integration')}
-      description={t('accounting.description', 'Sync with QuickBooks and Xero for automated bookkeeping')}
+      title={t('accounting.title', 'External Accounting Sync')}
+      description={t('accounting.description', 'Connect with QuickBooks or Xero to export financial data')}
       icon={DollarSign}
       headerContent={
         <>
