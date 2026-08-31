@@ -85,6 +85,8 @@ import { nextgenRoutes } from "./nextgen";
 import { mobileApiRoutes } from "./mobile-api";
 import { notificationsLegacyRoutes } from "./notifications-legacy";
 import { integrationsRoutes } from "./integrations";
+import { platformAdminRoutes } from "./platform-admin";
+import { customerPortalApiRoutes } from "./customer-portal-api";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -335,6 +337,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Notifications Legacy Routes Loaded");
   app.use("/api", integrationsRoutes);
   console.log("✅ Integrations Routes Loaded");
+  app.use("/api", platformAdminRoutes);
+  console.log("✅ Platform Admin Routes Loaded");
+  app.use("/api", customerPortalApiRoutes);
+  console.log("✅ Customer Portal API Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
