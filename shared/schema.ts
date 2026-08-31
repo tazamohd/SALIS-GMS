@@ -1015,6 +1015,11 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  zatcaStatus: varchar("zatca_status", { length: 20 }),
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaSubmittedAt: timestamp("zatca_submitted_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({

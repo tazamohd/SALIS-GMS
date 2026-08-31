@@ -414,6 +414,147 @@ router.get('/saudi/labor/compliance', isAuthenticated, requireRole(['ADMIN', 'MA
 });
 
 // ---------------------------------------------------------------------------
+// POST /api/saudi/zatca/submit/:invoiceId — Submit invoice to ZATCA Phase 2
+// ---------------------------------------------------------------------------
+router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
+  try {
+    const user = req.user as any;
+    if (!user?.garageId) {
+      return res.status(403).json({ message: 'No garage associated with user' });
+    }
+
+    const invoiceId = req.params.invoiceId;
+    const invoiceType = (req.body.type as string) || 'standard';
+
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.id, invoiceId),
+          eq(invoices.garageId, user.garageId),
+        ),
+      )
+      .limit(1);
+
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    if (invoice.zatcaStatus === 'CLEARED' || invoice.zatcaStatus === 'REPORTED') {
+      return res.status(400).json({
+        message: `Invoice already ${invoice.zatcaStatus.toLowerCase()}`,
+        zatcaStatus: invoice.zatcaStatus,
+        zatcaClearanceId: invoice.zatcaClearanceId,
+      });
+    }
+
+    const [garage] = await db
+      .select()
+      .from(garages)
+      .where(eq(garages.id, user.garageId))
+      .limit(1);
+
+    const { submitToClearance, submitToReporting } = await import('../services/zatca-phase2');
+
+    const invoiceData = {
+      invoiceNumber: invoice.invoiceNumber,
+      issueDate: invoice.invoiceDate?.toISOString() ?? new Date().toISOString(),
+      seller: {
+        name: garage?.name ?? '',
+        vatNumber: garage?.licenseNumber ?? '',
+        address: garage?.address ?? '',
+      },
+      buyer: {},
+      lineItems: [],
+      totalAmount: parseFloat(String(invoice.totalAmount ?? '0')),
+      vatAmount: parseFloat(String(invoice.taxAmount ?? '0')),
+      subtotal: parseFloat(String(invoice.subtotal ?? '0')),
+    };
+
+    const result = invoiceType === 'simplified'
+      ? await submitToReporting(invoiceData)
+      : await submitToClearance(invoiceData);
+
+    const [updated] = await db
+      .update(invoices)
+      .set({
+        zatcaStatus: result.status,
+        zatcaClearanceId: result.clearanceId ?? null,
+        zatcaInvoiceHash: result.invoiceHash ?? null,
+        zatcaQrCode: result.qrCode ?? null,
+        zatcaSubmittedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+
+    res.json({
+      message: `Invoice ${invoice.invoiceNumber} submitted to ZATCA`,
+      invoice: {
+        id: updated.id,
+        invoiceNumber: updated.invoiceNumber,
+        zatcaStatus: updated.zatcaStatus,
+        zatcaClearanceId: updated.zatcaClearanceId,
+        zatcaSubmittedAt: updated.zatcaSubmittedAt,
+      },
+      zatcaResponse: result,
+    });
+  } catch (error) {
+    console.error('ZATCA submission error:', error);
+    res.status(500).json({ message: 'Failed to submit invoice to ZATCA' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/saudi/zatca/status/:invoiceId — Check ZATCA status for an invoice
+// ---------------------------------------------------------------------------
+router.get('/saudi/zatca/status/:invoiceId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req: Request, res: Response) => {
+  try {
+    const user = req.user as any;
+    if (!user?.garageId) {
+      return res.status(403).json({ message: 'No garage associated with user' });
+    }
+
+    const [invoice] = await db
+      .select({
+        id: invoices.id,
+        invoiceNumber: invoices.invoiceNumber,
+        zatcaStatus: invoices.zatcaStatus,
+        zatcaClearanceId: invoices.zatcaClearanceId,
+        zatcaInvoiceHash: invoices.zatcaInvoiceHash,
+        zatcaQrCode: invoices.zatcaQrCode,
+        zatcaSubmittedAt: invoices.zatcaSubmittedAt,
+      })
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.id, req.params.invoiceId),
+          eq(invoices.garageId, user.garageId),
+        ),
+      )
+      .limit(1);
+
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    res.json({
+      invoiceId: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      zatcaStatus: invoice.zatcaStatus ?? 'NOT_SUBMITTED',
+      zatcaClearanceId: invoice.zatcaClearanceId,
+      zatcaInvoiceHash: invoice.zatcaInvoiceHash,
+      zatcaQrCode: invoice.zatcaQrCode,
+      zatcaSubmittedAt: invoice.zatcaSubmittedAt,
+    });
+  } catch (error) {
+    console.error('ZATCA status check error:', error);
+    res.status(500).json({ message: 'Failed to check ZATCA status' });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/saudi/hijri/today — Current Hijri date information
 // ---------------------------------------------------------------------------
 router.get('/saudi/hijri/today', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (_req: Request, res: Response) => {
