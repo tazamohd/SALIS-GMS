@@ -104,6 +104,10 @@ import obdTelematicsRoutes from "./obd-telematics";
 import warehouseRoutes from "./warehouse";
 import gmbRoutes from "./gmb";
 import serviceManagementRoutes from "./service-management";
+import suppliersRoutes from "./suppliers";
+import arVrRoutes from "./ar-vr";
+import trainingRoutes from "./training";
+import analyticsRoutes from "./analytics";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -392,6 +396,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Google My Business Routes Loaded");
   app.use("/api", serviceManagementRoutes);
   console.log("✅ Service Management Routes Loaded");
+  app.use("/api", suppliersRoutes);
+  console.log("✅ Supplier Management Routes Loaded");
+  app.use("/api", arVrRoutes);
+  console.log("✅ AR/VR Routes Loaded");
+  app.use("/api", trainingRoutes);
+  console.log("✅ Training & Knowledge Base Routes Loaded");
+  app.use("/api", analyticsRoutes);
+  console.log("✅ Analytics & BI Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
