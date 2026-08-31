@@ -88,6 +88,16 @@ import { integrationsRoutes } from "./integrations";
 import { platformAdminRoutes } from "./platform-admin";
 import { customerPortalApiRoutes } from "./customer-portal-api";
 import iotRoutes from "./iot";
+import franchiseRoutes from "./franchise";
+import financialRoutes from "./financial";
+import saudiRoutes from "./saudi";
+import technicianMobileRoutes from "./technician-mobile";
+import aiInsightsRoutes from "./ai-insights";
+import commandCenterRoutes from "./command-center";
+import docsRoutes from "./docs";
+import workflowRoutes from "./workflow";
+import workflowHooksRoutes from "./workflow-hooks";
+import customerPortalRoutes from "./customer-portal";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -344,6 +354,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Customer Portal API Routes Loaded");
   app.use("/api", iotRoutes);
   console.log("✅ IoT Routes Loaded");
+  app.use("/api", franchiseRoutes);
+  console.log("✅ Franchise Routes Loaded");
+  app.use("/api", financialRoutes);
+  console.log("✅ Financial Reports Routes Loaded");
+  app.use("/api", saudiRoutes);
+  console.log("✅ Saudi Compliance Routes Loaded");
+  app.use("/api", technicianMobileRoutes);
+  console.log("✅ Technician Mobile Routes Loaded");
+  app.use("/api", aiInsightsRoutes);
+  console.log("✅ AI Insights Routes Loaded");
+  app.use("/api", commandCenterRoutes);
+  console.log("✅ Command Center Routes Loaded");
+  app.use("/api", docsRoutes);
+  console.log("✅ API Docs (OpenAPI) Routes Loaded");
+  app.use("/api", workflowRoutes);
+  console.log("✅ Workflow Engine Routes Loaded");
+  app.use("/api", workflowHooksRoutes);
+  console.log("✅ Workflow Hooks Routes Loaded");
+  app.use("/api", customerPortalRoutes);
+  console.log("✅ Customer Portal Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
