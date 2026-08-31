@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import {
   FileText, Plus, Trash2, Wrench, Send, CheckCircle, XCircle, Clock,
@@ -97,6 +98,7 @@ function invalidateEstimates() {
 export function Estimates() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // --- Filters ---
   const [selectedGarageId, setSelectedGarageId] = useState("all");
@@ -182,7 +184,11 @@ export function Estimates() {
     onSuccess: () => {
       invalidateEstimates();
       queryClient.invalidateQueries({ queryKey: ["/api/job-cards"] });
-      toast({ title: "Success", description: "Estimate converted to job card" });
+      toast({
+        title: "Success",
+        description: "Estimate converted to job card",
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/job-cards")}>View Job Cards</Button>,
+      });
       setViewingEstimate(null);
     },
     onError: (err: any) => {
@@ -195,7 +201,11 @@ export function Estimates() {
     onSuccess: () => {
       invalidateEstimates();
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
-      toast({ title: "Success", description: "Estimate converted to invoice" });
+      toast({
+        title: "Success",
+        description: "Estimate converted to invoice",
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/invoices")}>View Invoices</Button>,
+      });
       setViewingEstimate(null);
     },
     onError: (err: any) => {
@@ -335,6 +345,7 @@ export function Estimates() {
               onStatusChange={(status) => updateStatusMutation.mutate({ id: estimate.id, status })}
               onConvertJobCard={() => convertToJobCardMutation.mutate(estimate.id)}
               onConvertInvoice={() => convertToInvoiceMutation.mutate(estimate.id)}
+              onNavigate={setLocation}
             />
           ))}
         </div>
@@ -417,6 +428,7 @@ function EstimateRow({
   onStatusChange,
   onConvertJobCard,
   onConvertInvoice,
+  onNavigate,
 }: {
   estimate: Estimate;
   customerName: string;
@@ -428,6 +440,7 @@ function EstimateRow({
   onStatusChange: (status: string) => void;
   onConvertJobCard: () => void;
   onConvertInvoice: () => void;
+  onNavigate?: (path: string) => void;
 }) {
   const cfg = STATUS_CONFIG[estimate.status] || STATUS_CONFIG.draft;
   const Icon = cfg.icon;
@@ -554,10 +567,14 @@ function EstimateRow({
                 </>
               )}
               {estimate.convertedToJobCardId && (
-                <Badge variant="outline" className="text-blue-600">Converted to Job Card</Badge>
+                <Badge variant="outline" className="text-blue-600 cursor-pointer hover:bg-blue-50" onClick={() => onNavigate?.("/job-cards")}>
+                  <ArrowRight className="w-3 h-3 mr-1" />Converted to Job Card
+                </Badge>
               )}
               {estimate.convertedToInvoiceId && (
-                <Badge variant="outline" className="text-emerald-600">Converted to Invoice</Badge>
+                <Badge variant="outline" className="text-emerald-600 cursor-pointer hover:bg-emerald-50" onClick={() => onNavigate?.("/invoices")}>
+                  <ArrowRight className="w-3 h-3 mr-1" />Converted to Invoice
+                </Badge>
               )}
             </div>
           </div>

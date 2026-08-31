@@ -66,7 +66,7 @@ router.get("/bank-transactions", isAuthenticated, requireRole(['ADMIN', 'MANAGER
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
-    const accountId = req.query.selectedAccountId as string | undefined;
+    const accountId = (req.query.bankAccountId || req.query.selectedAccountId) as string | undefined;
     const transactions = await storage.getBankTransactions(user.garageId, accountId);
     res.json(transactions);
   } catch (err) {

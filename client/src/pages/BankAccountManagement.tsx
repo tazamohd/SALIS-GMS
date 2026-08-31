@@ -111,7 +111,7 @@ export default function BankAccountManagement() {
   });
 
   const { data: transactions = [], isLoading: transactionsLoading } = useQuery<BankTransaction[]>({
-    queryKey: ["/api/bank-transactions", selectedAccountId],
+    queryKey: [`/api/bank-transactions?bankAccountId=${selectedAccountId}`],
     enabled: !!selectedAccountId,
   });
 
@@ -180,7 +180,7 @@ export default function BankAccountManagement() {
       return await apiRequest("POST", "/api/bank-transactions", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bank-transactions"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/bank-transactions?bankAccountId=${selectedAccountId}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/bank-accounts"] });
       setIsTransactionDialogOpen(false);
       transactionForm.reset();

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -77,6 +78,7 @@ type JobCardFormData = z.infer<typeof jobCardFormSchema>;
 export function JobCards() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedJobCard, setSelectedJobCard] = useState<JobCard | null>(null);
@@ -208,6 +210,7 @@ export function JobCards() {
       toast({
         title: t('common.success', 'Success'),
         description: t('jobCards.convertedToInvoice', 'Invoice created from job card'),
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/invoices")}>View Invoices</Button>,
       });
     },
     onError: (error: any) => {
