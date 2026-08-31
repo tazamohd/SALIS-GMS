@@ -80,6 +80,11 @@ import { dynamicPricingRoutes } from "./dynamic-pricing";
 import { feedbackRoutes } from "./feedback";
 import { complianceRoutes } from "./compliance";
 import { emergingTechRoutes } from "./emerging-tech";
+import { aiEngineRoutes } from "./ai-engine";
+import { nextgenRoutes } from "./nextgen";
+import { mobileApiRoutes } from "./mobile-api";
+import { notificationsLegacyRoutes } from "./notifications-legacy";
+import { integrationsRoutes } from "./integrations";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -320,6 +325,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Compliance Routes Loaded");
   app.use("/api", emergingTechRoutes);
   console.log("✅ Emerging Tech Routes Loaded");
+  app.use("/api", aiEngineRoutes);
+  console.log("✅ AI Engine Routes Loaded");
+  app.use("/api", nextgenRoutes);
+  console.log("✅ Nextgen Routes Loaded");
+  app.use("/api", mobileApiRoutes);
+  console.log("✅ Mobile API Routes Loaded");
+  app.use("/api", notificationsLegacyRoutes);
+  console.log("✅ Notifications Legacy Routes Loaded");
+  app.use("/api", integrationsRoutes);
+  console.log("✅ Integrations Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
