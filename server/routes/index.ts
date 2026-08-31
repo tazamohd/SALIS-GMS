@@ -119,6 +119,8 @@ import franchiseManagementRoutes from "./franchise-management";
 import vendorLicensingRoutes from "./vendor-licensing";
 import marketingCampaignRoutes from "./marketing-campaigns";
 import miscOperationsRoutes from "./misc-operations";
+import coreDataOpsRoutes from "./core-data-ops";
+import extendedFeaturesRoutes from "./extended-features";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -432,7 +434,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", vendorLicensingRoutes);
   app.use("/api", marketingCampaignRoutes);
   app.use("/api", miscOperationsRoutes);
-  console.log("✅ Inventory Extended Routes Loaded");
+  app.use("/api", coreDataOpsRoutes);
+  app.use("/api", extendedFeaturesRoutes);
+  console.log("✅ All Modular Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
