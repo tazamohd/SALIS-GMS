@@ -98,6 +98,8 @@ import docsRoutes from "./docs";
 import workflowRoutes from "./workflow";
 import workflowHooksRoutes from "./workflow-hooks";
 import customerPortalRoutes from "./customer-portal";
+import loyaltyRoutes from "./loyalty";
+import payrollRoutes from "./payroll";
 import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -374,6 +376,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ Workflow Hooks Routes Loaded");
   app.use("/api", customerPortalRoutes);
   console.log("✅ Customer Portal Routes Loaded");
+  app.use("/api", loyaltyRoutes);
+  console.log("✅ Loyalty & Rewards Routes Loaded");
+  app.use("/api", payrollRoutes);
+  console.log("✅ Payroll Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
