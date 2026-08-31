@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from "express";
+import express from "express";
 import Stripe from "stripe";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
@@ -173,16 +174,18 @@ router.get("/stripe/status", isAuthenticated, requireRole(["ADMIN"]), (_req: Req
 
 // ── Stripe webhook ─────────────────────────────────────────────────────
 
-router.post("/stripe/webhook", async (req: Request, res: Response) => {
+router.post("/stripe/webhook", express.raw({ type: "application/json" }), async (req: Request, res: Response) => {
   if (!stripe) return res.status(500).json({ message: "Stripe is not configured" });
 
   try {
-    let event = req.body;
+    let event;
 
     const sig = req.headers["stripe-signature"] as string | undefined;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     if (sig && webhookSecret) {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } else {
+      event = JSON.parse(req.body.toString());
     }
 
     switch (event.type) {

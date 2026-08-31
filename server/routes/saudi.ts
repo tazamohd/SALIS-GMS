@@ -455,26 +455,52 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, requireRole(['ADM
       .where(eq(garages.id, user.garageId))
       .limit(1);
 
-    const { submitToClearance, submitToReporting } = await import('../services/zatca-phase2');
+    const { generateEInvoice, submitToClearance, submitToReporting } = await import('../services/zatca-phase2');
 
-    const invoiceData = {
+    const subtotal = parseFloat(String(invoice.subtotal ?? '0'));
+    const vatAmount = parseFloat(String(invoice.taxAmount ?? '0'));
+    const totalWithVAT = parseFloat(String(invoice.totalAmount ?? '0'));
+    const garageAddress = typeof garage?.address === 'string' ? garage.address : '';
+
+    const zatcaInvoice = {
       invoiceNumber: invoice.invoiceNumber,
-      issueDate: invoice.invoiceDate?.toISOString() ?? new Date().toISOString(),
+      invoiceType: invoiceType === 'simplified' ? 'simplified' as const : 'standard' as const,
+      invoiceSubType: invoiceType === 'simplified' ? '0200000' as const : '0100000' as const,
+      issueDate: invoice.invoiceDate?.toISOString().split('T')[0] ?? new Date().toISOString().split('T')[0],
+      currency: 'SAR',
       seller: {
         name: garage?.name ?? '',
         vatNumber: garage?.licenseNumber ?? '',
-        address: garage?.address ?? '',
+        address: {
+          street: garageAddress,
+          buildingNumber: '',
+          city: '',
+          postalCode: '',
+          district: '',
+          country: 'SA' as const,
+        },
       },
-      buyer: {},
-      lineItems: [],
-      totalAmount: parseFloat(String(invoice.totalAmount ?? '0')),
-      vatAmount: parseFloat(String(invoice.taxAmount ?? '0')),
-      subtotal: parseFloat(String(invoice.subtotal ?? '0')),
+      lineItems: [{
+        name: `Invoice ${invoice.invoiceNumber}`,
+        quantity: 1,
+        unitPrice: subtotal,
+        discount: 0,
+        taxRate: vatAmount > 0 && subtotal > 0 ? (vatAmount / subtotal) * 100 : 15,
+        taxAmount: vatAmount,
+        lineTotal: subtotal,
+      }],
+      subtotal,
+      totalTaxableAmount: subtotal,
+      totalVAT: vatAmount,
+      totalWithVAT,
+      totalDiscount: 0,
     };
 
+    const ublInvoice = generateEInvoice(zatcaInvoice);
+
     const result = invoiceType === 'simplified'
-      ? await submitToReporting(invoiceData)
-      : await submitToClearance(invoiceData);
+      ? await submitToReporting(ublInvoice)
+      : await submitToClearance(ublInvoice);
 
     const [updated] = await db
       .update(invoices)
