@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { Server } from "http";
+import type { Server } from "http";
 import express from "express";
 import path from "path";
 import fs from "fs";
@@ -20,16 +20,13 @@ import qualityControlRoutes from "./quality-control";
 import warrantyRoutes from "./warranty";
 import kioskRoutes from "./kiosk";
 // estimatesRoutes (./estimates) intentionally NOT imported: its in-memory `demoEstimates`
-// store shadowed the monolith's DB-backed /api/estimates CRUD (routes.ts:4418+). The
-// monolith handler serves now; if a modular replacement is wanted, mount
-// `./estimates.routes.ts` (DB-backed) instead of `./estimates`.
+// store is not DB-backed. The DB-backed estimates CRUD is in estimates-crud.ts.
 import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
 import smsCampaignRoutes from "./sms-campaigns";
 import documentRoutes from "./documents";
 // supplierPortalRoutes (./supplier-portal) intentionally NOT imported: its in-memory
-// demoSuppliers/demoPurchaseOrders shadowed the monolith's DB-backed /api/suppliers
-// CRUD (routes.ts:2648+). Re-mount only after the modular file uses storage.*.
+// demo data is not DB-backed. The DB-backed supplier CRUD is in suppliers.ts.
 import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";
@@ -121,7 +118,12 @@ import marketingCampaignRoutes from "./marketing-campaigns";
 import miscOperationsRoutes from "./misc-operations";
 import coreDataOpsRoutes from "./core-data-ops";
 import extendedFeaturesRoutes from "./extended-features";
-import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
+import estimatesCrudRoutes from "./estimates-crud";
+import legacyCoreRoutes from "./legacy-core";
+import staticFilesRoutes from "./static-files";
+import { createServer } from "http";
+import { auditLog } from "../auditMiddleware";
+import { initializeChatWebSocket } from "../websocket";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -173,10 +175,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", healthRoutes);
   console.log("✅ Health Check Routes Loaded");
 
+  // Static file routes (robots.txt, sitemap, openapi.json, .well-known/*, PayPal)
+  // Mounted at root (not /api) — before auth so public files don't require login
+  app.use(staticFilesRoutes);
+  console.log("✅ Static Files & PayPal Routes Loaded");
+
   // Set up authentication middleware first (session, passport)
   await setupAuth(app);
-  markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Audit logging middleware (applied after auth so user is available)
+  app.use(auditLog);
+
+  // CORS configuration for AI systems
+  app.use((req, res, next) => {
+    const allowedOrigins = [
+      'https://chat.openai.com',
+      'https://api.openai.com',
+      'https://chatgpt.com',
+      'https://gemini.google.com',
+      'https://bard.google.com',
+      'https://claude.ai',
+      'https://perplexity.ai'
+    ];
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+      res.setHeader('Access-Control-Max-Age', '86400');
+      res.setHeader('Vary', 'Origin');
+    }
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
@@ -234,8 +268,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", kioskRoutes);
   console.log("✅ Self-Service Kiosk Routes Loaded");
 
-  // Estimates routes intentionally NOT mounted here — see import block comment.
-  // Monolith serves /api/estimates with DB-backed CRUD (routes.ts:4418+).
+  // Estimates in-memory demo module (./estimates) intentionally NOT mounted — see
+  // import block comment. DB-backed estimates served by estimates-crud.ts.
 
   // Fleet Management routes
   app.use("/api", fleetManagementRoutes);
@@ -253,9 +287,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", documentRoutes);
   console.log("✅ Document Management Routes Loaded");
 
-  // Supplier Portal routes intentionally NOT mounted — see import block comment.
-  // Monolith serves /api/suppliers, /api/supplier-price-lists, /api/supplier-performance
-  // with DB-backed CRUD (routes.ts:2648+).
+  // Supplier Portal in-memory demo module (./supplier-portal) intentionally NOT mounted
+  // — see import block comment. DB-backed suppliers served by suppliers.ts.
 
   // Multi-Currency Management routes
   app.use("/api", currencyRoutes);
@@ -436,13 +469,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", miscOperationsRoutes);
   app.use("/api", coreDataOpsRoutes);
   app.use("/api", extendedFeaturesRoutes);
+  app.use("/api", estimatesCrudRoutes);
+  app.use("/api", legacyCoreRoutes);
   console.log("✅ All Modular Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
-  // Load legacy routes (they will skip setupAuth since it's already done)
-  const server = await registerLegacyRoutes(app);
-  console.log("⚠️ Legacy Routes Loaded (Background)");
-  
-  return server;
+  const httpServer = createServer(app);
+
+  // Initialize WebSocket server for chat
+  initializeChatWebSocket(httpServer);
+  console.log("✅ WebSocket Server Initialized");
+
+  return httpServer;
 }
