@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - RBAC Middleware
  *
@@ -36,6 +35,26 @@ interface CachedPermissions {
 }
 const permissionCache = new Map<string, CachedPermissions>();
 
+// Row shapes returned by the queries below. `db` is untyped (see server/db.ts),
+// so these annotations only describe what the existing selects already return.
+interface UserRoleRow {
+  roleId: string;
+  roleName: string;
+  branchId: string;
+  roleScope: string | null;
+  isSystemRole: boolean | null;
+}
+interface RolePermissionRow {
+  resource: string;
+  action: string;
+  granted: boolean;
+}
+interface PermissionOverrideRow {
+  resource: string;
+  action: string;
+  allowed: boolean;
+}
+
 export function invalidatePermissionCache(userId: string) { permissionCache.delete(userId); }
 export function clearPermissionCache() { permissionCache.clear(); }
 
@@ -49,7 +68,7 @@ export async function loadUserPermissions(
   next: NextFunction
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId: string | undefined = (req as any).user?.id;
 
     if (!userId) {
       // No user logged in, continue without permissions
@@ -66,7 +85,7 @@ export async function loadUserPermissions(
     }
 
     // Get user's roles and their permissions
-    const userRolesData = await db
+    const userRolesData: UserRoleRow[] = await db
       .select({
         roleId: userRoleBranch.roleId,
         roleName: roles.name,
@@ -86,8 +105,8 @@ export async function loadUserPermissions(
     }));
 
     // Get all permissions for the user's roles
-    const roleIds = userRolesData.map(r => r.roleId);
-    const rolePermissionsData = await db
+    const roleIds: string[] = userRolesData.map(r => r.roleId);
+    const rolePermissionsData: RolePermissionRow[] = await db
       .select({
         resource: permissions.resource,
         action: permissions.action,
@@ -104,7 +123,7 @@ export async function loadUserPermissions(
 
     // Get permission overrides for this user
     const now = new Date();
-    const overrides = await db
+    const overrides: PermissionOverrideRow[] = await db
       .select({
         resource: permissionOverrides.resource,
         action: permissionOverrides.action,
@@ -115,7 +134,7 @@ export async function loadUserPermissions(
         and(
           eq(permissionOverrides.userId, userId),
           or(
-            eq(permissionOverrides.expiresAt, null),
+            eq(permissionOverrides.expiresAt, null as unknown as Date),
             gte(permissionOverrides.expiresAt, now)
           )
         )

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,18 +58,20 @@ export default function AIChatbotAssistant() {
 
   const createConversationMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/chatbot/conversation", data);
+      const res = await apiRequest("POST", "/api/chatbot/conversation", data);
+      return await res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setConversationId(data.id);
     },
   });
 
   const sendMessageMutation = useMutation({
     mutationFn: async (data: { conversationId: string; message: string }) => {
-      return await apiRequest("POST", "/api/chatbot/message", data);
+      const res = await apiRequest("POST", "/api/chatbot/message", data);
+      return await res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setMessages((prev) => [
         ...prev,
         { role: "user", content: data.userMessage },
@@ -90,9 +91,10 @@ export default function AIChatbotAssistant() {
 
   const diagnoseMutation = useMutation({
     mutationFn: async (symptoms: string) => {
-      return await apiRequest("POST", "/api/chatbot/diagnose", { symptoms });
+      const res = await apiRequest("POST", "/api/chatbot/diagnose", { symptoms });
+      return await res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const diagnosisMessage = `${t('aiChatbot.basedOnSymptoms', 'Based on your symptoms, here\'s what I found')}:\n\n${t('aiChatbot.possibleIssues', 'Possible Issues')}:\n${data.possibleIssues.map((issue: string, i: number) => `${i + 1}. ${issue}`).join('\n')}\n\n${t('aiChatbot.recommendations', 'Recommendations')}:\n${data.recommendations.map((rec: string, i: number) => `${i + 1}. ${rec}`).join('\n')}\n\n${t('aiChatbot.urgency', 'Urgency')}: ${data.urgency.toUpperCase()}\n${t('aiChatbot.estimatedCost', 'Estimated Cost')}: ${data.estimatedCost || t('aiChatbot.contactUsForQuote', 'Contact us for quote')}`;
       
       setMessages((prev) => [...prev, { role: "assistant", content: diagnosisMessage }]);

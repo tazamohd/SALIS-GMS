@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
@@ -172,15 +171,10 @@ export default function SustainableEnergyMonitoring() {
     },
   ];
 
-  return (
-    <AnalyticsPage
-      title={t('energy.title', 'Sustainable Energy Monitoring')}
-      description={t('energy.description', 'Track solar energy generation, consumption, and environmental impact')}
-      icon={Leaf}
-      filters={filters}
-      sections={sections}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  const kpiSection = {
+    title: t('energy.keyMetrics', 'Key Metrics'),
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi, index) => (
           <Card key={index} className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
             <CardContent className="p-6">
@@ -196,35 +190,40 @@ export default function SustainableEnergyMonitoring() {
           </Card>
         ))}
       </div>
+    ),
+  };
 
-      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-            <Leaf className="w-5 h-5 text-green-600 dark:text-green-400" />
-            {t('energy.environmentalImpact', 'Environmental Impact')}
-          </CardTitle>
-          <CardDescription className="text-[#64748B]">{t('energy.sustainabilityContribution', 'Your contribution to sustainability')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm text-[#64748B] mb-2">{t('energy.co2Reduction', 'CO2 Reduction')}</p>
-              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">1.8 tons</p>
-              <Progress value={75} className="h-2" />
-            </div>
-            <div>
-              <p className="text-sm text-[#64748B] mb-2">{t('energy.treesEquivalent', 'Trees Equivalent')}</p>
-              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">95 trees</p>
-              <Progress value={65} className="h-2" />
-            </div>
-            <div>
-              <p className="text-sm text-[#64748B] mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
-              <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">$2,450</p>
-              <Progress value={82} className="h-2" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </AnalyticsPage>
+  const impactSection = {
+    title: t('energy.environmentalImpact', 'Environmental Impact'),
+    description: t('energy.sustainabilityContribution', 'Your contribution to sustainability'),
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <p className="text-sm text-[#64748B] mb-2">{t('energy.co2Reduction', 'CO2 Reduction')}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">1.8 tons</p>
+          <Progress value={75} className="h-2" />
+        </div>
+        <div>
+          <p className="text-sm text-[#64748B] mb-2">{t('energy.treesEquivalent', 'Trees Equivalent')}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">95 trees</p>
+          <Progress value={65} className="h-2" />
+        </div>
+        <div>
+          <p className="text-sm text-[#64748B] mb-2">{t('energy.costSavings', 'Cost Savings')}</p>
+          <p className="text-3xl font-bold text-[#0B1F3B] dark:text-white mb-1">$2,450</p>
+          <Progress value={82} className="h-2" />
+        </div>
+      </div>
+    ),
+  };
+
+  return (
+    <AnalyticsPage
+      title={t('energy.title', 'Sustainable Energy Monitoring')}
+      description={t('energy.description', 'Track solar energy generation, consumption, and environmental impact')}
+      icon={Leaf}
+      filters={filters}
+      sections={[kpiSection, ...sections, impactSection]}
+    />
   );
 }

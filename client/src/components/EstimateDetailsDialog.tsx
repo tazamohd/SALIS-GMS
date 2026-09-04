@@ -1,4 +1,5 @@
 import { useState, useEffect, ReactNode } from "react";
+import { useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Trash2, FileText, File, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
   const setOpen = onOpenChange || setInternalOpen;
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const { data: estimate } = useQuery<Estimate>({
     queryKey: [`/api/estimates/${estimateId}`],
@@ -140,6 +142,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
       toast({
         title: "Success",
         description: "Estimate converted to job card",
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/job-cards")}>View Job Cards</Button>,
       });
       setOpen(false);
     },
@@ -166,6 +169,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
       toast({
         title: "Success",
         description: "Estimate converted to invoice",
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/invoices")}>View Invoices</Button>,
       });
       setOpen(false);
     },
@@ -303,7 +307,7 @@ export function EstimateDetailsDialog({ estimateId, children, open: controlledOp
             )}
 
             <div className="flex gap-2 pt-4 border-t">
-              {!estimate.convertedToJobCardId && !estimate.convertedToInvoiceId && estimate.status === 'accepted' && (
+              {!estimate.convertedToJobCardId && !estimate.convertedToInvoiceId && (estimate.status === 'approved' || estimate.status === 'accepted') && (
                 <>
                   <Button
                     onClick={() => convertToJobCardMutation.mutate()}

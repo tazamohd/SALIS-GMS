@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -45,13 +44,13 @@ export default function DocumentOCR() {
   const [editMode, setEditMode] = useState(false);
   const [editedData, setEditedData] = useState<any>({});
 
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/ai/ocr-documents"],
   });
 
   const uploadMutation = useMutation({
     mutationFn: async (data: { documentType: string; fileName: string }) => {
-      return await apiRequest("/api/ai/ocr-documents/upload", "POST", data);
+      return await apiRequest("POST", "/api/ai/ocr-documents/upload", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });
@@ -72,7 +71,7 @@ export default function DocumentOCR() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return await apiRequest(`/api/ai/ocr-documents/${id}`, "PATCH", data);
+      return await apiRequest("PATCH", `/api/ai/ocr-documents/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/ai/ocr-documents"] });

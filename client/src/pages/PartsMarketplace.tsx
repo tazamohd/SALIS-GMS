@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -25,7 +24,7 @@ export default function PartsMarketplace() {
 
   const createOrder = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/marketplace/orders", "POST", data);
+      return await apiRequest("POST", "/api/marketplace/orders", data);
     },
     onSuccess: () => {
       toast({ title: t('inventory.orderPlaced', 'Order placed'), description: t('inventory.partsOrderSubmitted', 'Your parts order has been submitted.') });
@@ -274,20 +273,21 @@ export default function PartsMarketplace() {
   ];
 
   return (
-    <TabsPageLayout
-      title={t('inventory.partsMarketplace', 'Parts Marketplace')}
-      description={t('inventory.partsMarketplaceDesc', 'Order parts from eBay Motors, Amazon, and RockAuto')}
-      icon={ShoppingCart}
-      primaryAction={{
-        label: t('inventory.placeOrder', 'Place Order'),
-        icon: Plus,
-        onClick: () => setIsOrderDialogOpen(true),
-        testId: "button-place-order",
-      }}
-      headerContent={statsContent}
-      tabs={tabs}
-      defaultTab="all"
-    >
+    <>
+      <TabsPageLayout
+        title={t('inventory.partsMarketplace', 'Parts Marketplace')}
+        description={t('inventory.partsMarketplaceDesc', 'Order parts from eBay Motors, Amazon, and RockAuto')}
+        icon={ShoppingCart}
+        primaryAction={{
+          label: t('inventory.placeOrder', 'Place Order'),
+          icon: Plus,
+          onClick: () => setIsOrderDialogOpen(true),
+          testId: "button-place-order",
+        }}
+        headerContent={statsContent}
+        tabs={tabs}
+        defaultTab="all"
+      />
       <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
@@ -350,6 +350,6 @@ export default function PartsMarketplace() {
           </div>
         </DialogContent>
       </Dialog>
-    </TabsPageLayout>
+    </>
   );
 }

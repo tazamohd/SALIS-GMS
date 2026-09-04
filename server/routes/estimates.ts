@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -308,7 +309,7 @@ let nextNumber = 9;
 // ── Routes ─────────────────────────────────────────────────────────────────
 
 // GET /api/estimates/stats — Aggregate stats
-router.get('/estimates/stats', isAuthenticated, (_req, res) => {
+router.get('/estimates/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (_req, res) => {
   const total = estimates.length;
   const converted = estimates.filter(e => e.status === 'converted').length;
   const conversionRate = total > 0 ? Math.round((converted / total) * 10000) / 100 : 0;
@@ -338,7 +339,7 @@ router.get('/estimates/stats', isAuthenticated, (_req, res) => {
 });
 
 // GET /api/estimates — List all estimates
-router.get('/estimates', isAuthenticated, (req, res) => {
+router.get('/estimates', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (req, res) => {
   let result = [...estimates];
   const { status, search } = req.query;
   if (status && status !== 'all') {
@@ -360,14 +361,14 @@ router.get('/estimates', isAuthenticated, (req, res) => {
 });
 
 // GET /api/estimates/:id — Single estimate detail
-router.get('/estimates/:id', isAuthenticated, (req, res) => {
+router.get('/estimates/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (req, res) => {
   const est = estimates.find(e => e.id === req.params.id);
   if (!est) return res.status(404).json({ error: 'Estimate not found' });
   res.json(est);
 });
 
 // POST /api/estimates — Create new estimate
-router.post('/estimates', isAuthenticated, (req, res) => {
+router.post('/estimates', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (req, res) => {
   const {
     customerName, customerEmail, customerPhone,
     vehicleMake, vehicleModel, vehicleYear, vehiclePlate, vehicleVin,
@@ -428,7 +429,7 @@ router.post('/estimates', isAuthenticated, (req, res) => {
 });
 
 // PATCH /api/estimates/:id/status — Update status
-router.patch('/estimates/:id/status', isAuthenticated, (req, res) => {
+router.patch('/estimates/:id/status', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (req, res) => {
   const est = estimates.find(e => e.id === req.params.id);
   if (!est) return res.status(404).json({ error: 'Estimate not found' });
 

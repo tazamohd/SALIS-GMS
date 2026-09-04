@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Event Bus
  * In-process pub/sub system for cross-module communication.

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -56,27 +55,27 @@ export default function BusinessIntelligence() {
     setEndDate(end.toISOString().split('T')[0]);
   }, []);
 
-  const { data: profitableServices } = useQuery({
+  const { data: profitableServices } = useQuery<any>({
     queryKey: ['/api/bi/profitable-services', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
   });
 
-  const { data: peakHours } = useQuery({
+  const { data: peakHours } = useQuery<any>({
     queryKey: ['/api/bi/peak-hours', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
   });
 
-  const { data: technicianUtilization } = useQuery({
+  const { data: technicianUtilization } = useQuery<any>({
     queryKey: ['/api/bi/technician-utilization', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
   });
 
-  const { data: acquisitionCost } = useQuery({
+  const { data: acquisitionCost } = useQuery<any>({
     queryKey: ['/api/bi/customer-acquisition-cost', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
   });
 
-  const { data: customerLifetime } = useQuery({
+  const { data: customerLifetime } = useQuery<any>({
     queryKey: ['/api/bi/customer-lifetime-value', { garageId, startDate, endDate }],
     enabled: !!garageId && !!startDate && !!endDate,
   });

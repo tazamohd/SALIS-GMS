@@ -96,7 +96,7 @@ export default function VoiceCommands() {
     const lowerCommand = command.toLowerCase().trim();
     
     try {
-      const result: any = await apiRequest("/api/voice-commands/process", "POST", {
+      const result: any = await apiRequest("POST", "/api/voice-commands/process", {
         command: lowerCommand,
         rawTranscript: command,
       });

@@ -20,7 +20,17 @@ export class ChatWebSocketServer {
   private clients: Map<string, Set<AuthenticatedWebSocket>> = new Map();
 
   constructor(server: Server) {
-    this.wss = new WebSocketServer({ server, path: '/ws/chat' });
+    this.wss = new WebSocketServer({ noServer: true });
+
+    server.on('upgrade', (req, socket, head) => {
+      const pathname = new URL(req.url!, `http://${req.headers.host}`).pathname;
+      if (pathname === '/ws/chat') {
+        this.wss.handleUpgrade(req, socket, head, (ws) => {
+          this.wss.emit('connection', ws, req);
+        });
+      }
+    });
+
     this.initialize();
   }
 

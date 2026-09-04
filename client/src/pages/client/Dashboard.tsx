@@ -44,7 +44,7 @@ export default function ClientDashboard() {
   });
 
   const { data: reminders } = useQuery({
-    queryKey: ["/api/customers", user?.id, "service-reminders"],
+    queryKey: [`/api/customers/${user?.id}/service-reminders`],
     enabled: !!user?.id,
   });
 

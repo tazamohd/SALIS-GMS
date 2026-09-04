@@ -1,18 +1,29 @@
-// @ts-nocheck
 // Phase 3: Enhanced Integrations Service for SALIS AUTO
 // Real implementations for accounting, email, social media, video, and marketplace integrations
 
 import Stripe from "stripe";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
-import { 
-  accountingConnections, 
+import type { Column, SQL } from "drizzle-orm";
+import {
+  accountingConnections,
   accountingSync,
   emailCampaigns,
   socialPosts,
   videoConsultations,
   marketplaceOrders
 } from "@shared/schema";
+
+// `db` is untyped (see server/db.ts), so relational-query results and the
+// operator bag handed to `where` callbacks arrive as `any`. The aliases below
+// give them their real, schema-derived shapes — types only, no behaviour change.
+
+/** Operators drizzle passes as the 2nd argument of a `where` callback. */
+type WhereOperators = { eq: (column: Column, value: unknown) => SQL };
+
+type AccountingConnection = typeof accountingConnections.$inferSelect;
+type EmailCampaign = typeof emailCampaigns.$inferSelect;
+type MarketplaceOrder = typeof marketplaceOrders.$inferSelect;
 
 // Initialize Stripe with validation
 const STRIPE_AVAILABLE = !!process.env.STRIPE_SECRET_KEY;
@@ -25,7 +36,10 @@ let stripe: Stripe | null = null;
 if (STRIPE_AVAILABLE) {
   try {
     stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2025-09-30.clover",
+      // Pinned API version — kept exactly as-is. The bundled Stripe types only
+      // admit the SDK's own default version literal, so widen it for the
+      // compiler without altering the value sent to Stripe.
+      apiVersion: "2025-09-30.clover" as string as Stripe.LatestApiVersion,
     });
     console.log('✅ Stripe initialized successfully');
   } catch (error) {
@@ -78,8 +92,8 @@ export async function syncAccountingData(
   syncType: 'invoices' | 'payments' | 'expenses' | 'all'
 ) {
   // Get connection details
-  const connection = await db.query.accountingConnections.findFirst({
-    where: (ac, { eq }) => eq(ac.id, connectionId)
+  const connection: AccountingConnection | undefined = await db.query.accountingConnections.findFirst({
+    where: (ac: typeof accountingConnections, { eq }: WhereOperators) => eq(ac.id, connectionId)
   });
 
   if (!connection || !connection.isActive) {
@@ -120,8 +134,8 @@ export async function syncAccountingData(
 
 export async function getAccountingDashboard(garageId: string) {
   // Get all connections
-  const connections = await db.query.accountingConnections.findMany({
-    where: (ac, { eq }) => eq(ac.garageId, garageId)
+  const connections: AccountingConnection[] = await db.query.accountingConnections.findMany({
+    where: (ac: typeof accountingConnections, { eq }: WhereOperators) => eq(ac.garageId, garageId)
   });
 
   // Get recent sync history
@@ -180,8 +194,8 @@ export async function createEmailCampaign(data: {
 
 export async function sendEmailCampaign(campaignId: string) {
   // Get campaign details
-  const campaign = await db.query.emailCampaigns.findFirst({
-    where: (ec, { eq }) => eq(ec.id, campaignId)
+  const campaign: EmailCampaign | undefined = await db.query.emailCampaigns.findFirst({
+    where: (ec: typeof emailCampaigns, { eq }: WhereOperators) => eq(ec.id, campaignId)
   });
 
   if (!campaign) {
@@ -399,8 +413,8 @@ export async function placeMarketplaceOrder(data: {
 
 export async function trackMarketplaceOrder(orderId: string) {
   // In production, this would call marketplace tracking API
-  const order = await db.query.marketplaceOrders.findFirst({
-    where: (mo, { eq }) => eq(mo.id, orderId)
+  const order: MarketplaceOrder | undefined = await db.query.marketplaceOrders.findFirst({
+    where: (mo: typeof marketplaceOrders, { eq }: WhereOperators) => eq(mo.id, orderId)
   });
 
   if (!order) {

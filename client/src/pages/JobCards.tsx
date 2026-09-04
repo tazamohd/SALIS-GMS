@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter } from "lucide-react";
+import { Plus, Eye, Edit, Calendar, User, Wrench, Building2, Filter, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -77,6 +78,7 @@ type JobCardFormData = z.infer<typeof jobCardFormSchema>;
 export function JobCards() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedJobCard, setSelectedJobCard] = useState<JobCard | null>(null);
@@ -190,6 +192,31 @@ export function JobCards() {
       toast({
         title: t('common.error', 'Error'),
         description: error.message || t('jobCards.statusUpdateError', 'Failed to update status'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  const convertToInvoiceMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("POST", `/api/invoices/from-job/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ predicate: (query) => {
+        const key = query.queryKey[0];
+        return typeof key === 'string' && (key.startsWith('/api/job-cards') || key.startsWith('/api/invoices'));
+      }});
+      setIsDetailsOpen(false);
+      toast({
+        title: t('common.success', 'Success'),
+        description: t('jobCards.convertedToInvoice', 'Invoice created from job card'),
+        action: <Button variant="link" className="p-0 h-auto" onClick={() => setLocation("/invoices")}>View Invoices</Button>,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message || t('jobCards.convertError', 'Failed to create invoice'),
         variant: "destructive",
       });
     },
@@ -684,7 +711,17 @@ export function JobCards() {
               </div>
             </div>
           )}
-          <DialogFooter>
+          <DialogFooter className="flex gap-2">
+            {selectedJobCard?.status === "completed" && (
+              <Button
+                onClick={() => convertToInvoiceMutation.mutate(selectedJobCard.id)}
+                disabled={convertToInvoiceMutation.isPending}
+                className="bg-[#0A5ED7] hover:bg-[#0A5ED7]/90 text-white"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                {t('jobCards.createInvoice', 'Create Invoice')}
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => setIsDetailsOpen(false)}

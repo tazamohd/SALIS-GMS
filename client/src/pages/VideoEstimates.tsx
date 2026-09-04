@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
+import { StandardTablePage } from "@/components/layouts/StandardTablePage";
+import { Column } from "@/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Video, Play, CheckCircle } from "lucide-react";
@@ -33,7 +33,7 @@ export default function VideoEstimates() {
 
   const approveEstimate = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video-estimates/${id}/approve`, "PATCH", {});
+      return await apiRequest("PATCH", `/api/video-estimates/${id}/approve`, {});
     },
     onSuccess: () => {
       toast({ title: t('videoEstimates.estimateApproved', 'Estimate approved'), description: t('videoEstimates.estimateApprovedDesc', 'Video estimate has been approved.') });
@@ -55,24 +55,24 @@ export default function VideoEstimates() {
 
   const columns: Column<any>[] = [
     {
-      header: t('vehicles.vehicle', 'Vehicle'),
-      accessorKey: "vehicleId",
-      cell: (row) => <span className="text-[#0B1F3B] dark:text-white">{row.vehicleId || t('common.notAvailable', 'N/A')}</span>,
+      label: t('vehicles.vehicle', 'Vehicle'),
+      key: "vehicleId",
+      render: (row: any) => <span className="text-[#0B1F3B] dark:text-white">{row.vehicleId || t('common.notAvailable', 'N/A')}</span>,
     },
     {
-      header: t('videoEstimates.estimatedCost', 'Estimated Cost'),
-      accessorKey: "estimatedCost",
-      cell: (row) => <span className="text-[#0B1F3B] dark:text-white font-semibold">${row.estimatedCost || 0}</span>,
+      label: t('videoEstimates.estimatedCost', 'Estimated Cost'),
+      key: "estimatedCost",
+      render: (row: any) => <span className="text-[#0B1F3B] dark:text-white font-semibold">${row.estimatedCost || 0}</span>,
     },
     {
-      header: t('common.status', 'Status'),
-      accessorKey: "status",
-      cell: (row) => getStatusBadge(row.status),
+      label: t('common.status', 'Status'),
+      key: "status",
+      render: (row: any) => getStatusBadge(row.status),
     },
     {
-      header: t('common.actions', 'Actions'),
-      accessorKey: "id",
-      cell: (row) => (
+      label: t('common.actions', 'Actions'),
+      key: "id",
+      render: (row: any) => (
         <div className="flex items-center gap-2">
           {row.videoUrl && (
             <Button

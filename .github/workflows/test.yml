@@ -7,6 +7,36 @@ on:
     branches: [main, pr-branch]
 
 jobs:
+  # Static verification: no database needed, so this fails fast on a type,
+  # lint, or build error without waiting on a Postgres service container.
+  build:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    env:
+      SESSION_SECRET: ci-test-secret-not-used-for-anything-real-just-needs-to-exist
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck (tsc)
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  # The vitest suite boots the full route tree, so it needs a real Postgres.
   test:
     name: Vitest (Postgres 16)
     runs-on: ubuntu-latest

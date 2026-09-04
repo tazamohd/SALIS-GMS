@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PartsNetworkLayout from "./PartsNetworkLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,13 +82,10 @@ export default function SendQuotationRequest() {
 
   const createRequest = useMutation({
     mutationFn: async (data: RequestFormValues) => {
-      return apiRequest("/api/parts-network/requests", {
-        method: "POST",
-        body: JSON.stringify({
-          ...data,
-          alternativeBrands,
-          targetRegions,
-        }),
+      return apiRequest("POST", "/api/parts-network/requests", {
+        ...data,
+        alternativeBrands,
+        targetRegions,
       });
     },
     onSuccess: () => {

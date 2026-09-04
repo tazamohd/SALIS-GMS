@@ -3,11 +3,13 @@ import { db } from '../db';
 import { sql } from 'drizzle-orm';
 import { validate } from '../middleware/validate';
 import { bookAppointmentSchema } from '../schemas/validation';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // GET /api/portal/vehicles/:customerId - Customer's vehicles
-router.get('/portal/vehicles/:customerId', async (req, res) => {
+router.get('/portal/vehicles/:customerId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const vehicles = await db.execute(sql`
       SELECT id, make, model, year, "licensePlate", vin, color, "currentMileage"
@@ -19,7 +21,7 @@ router.get('/portal/vehicles/:customerId', async (req, res) => {
 });
 
 // GET /api/portal/jobs/:customerId - Customer's job history
-router.get('/portal/jobs/:customerId', async (req, res) => {
+router.get('/portal/jobs/:customerId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const jobs = await db.execute(sql`
       SELECT j.id, j."jobNumber", j.status, j.description, j."totalCost",
@@ -34,7 +36,7 @@ router.get('/portal/jobs/:customerId', async (req, res) => {
 });
 
 // GET /api/portal/invoices/:customerId - Customer's invoices
-router.get('/portal/invoices/:customerId', async (req, res) => {
+router.get('/portal/invoices/:customerId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const invoices = await db.execute(sql`
       SELECT id, "invoiceNumber", status, "totalAmount", "taxAmount",
@@ -47,7 +49,7 @@ router.get('/portal/invoices/:customerId', async (req, res) => {
 });
 
 // POST /api/portal/appointments - Book appointment
-router.post('/portal/appointments', validate(bookAppointmentSchema), async (req, res) => {
+router.post('/portal/appointments', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), validate(bookAppointmentSchema), async (req, res) => {
   const { customerId, vehicleId, serviceType, preferredDate, preferredTime, notes } = req.body;
   try {
     const result = await db.execute(sql`
@@ -62,7 +64,7 @@ router.post('/portal/appointments', validate(bookAppointmentSchema), async (req,
 });
 
 // GET /api/portal/appointments/:customerId - Customer's appointments
-router.get('/portal/appointments/:customerId', async (req, res) => {
+router.get('/portal/appointments/:customerId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const appointments = await db.execute(sql`
       SELECT a.id, a."serviceType", a."scheduledDate", a."scheduledTime", a.status, a.notes,
@@ -77,7 +79,7 @@ router.get('/portal/appointments/:customerId', async (req, res) => {
 });
 
 // GET /api/portal/service-history/:vehicleId - Vehicle service history
-router.get('/portal/service-history/:vehicleId', async (req, res) => {
+router.get('/portal/service-history/:vehicleId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), async (req, res) => {
   try {
     const history = await db.execute(sql`
       SELECT j.id, j."jobNumber", j.description, j.status, j."totalCost",

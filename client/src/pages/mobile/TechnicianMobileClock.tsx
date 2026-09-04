@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Clock, LogIn, LogOut, Calendar, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TechnicianMobileClock() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -15,11 +17,14 @@ export default function TechnicianMobileClock() {
     return () => clearInterval(interval);
   }, []);
 
+  const timeClockUrl = `/api/technicians/${user?.id}/time-clock`;
+
   const { data: timeEntries } = useQuery<{ data: any[] }>({
-    queryKey: ["/api/time-clock/entries"],
+    queryKey: [timeClockUrl],
+    enabled: !!user?.id,
   });
 
-  const todayEntry = timeEntries?.data?.find(entry => 
+  const todayEntry = timeEntries?.data?.find(entry =>
     !entry.clockOutTime && new Date(entry.clockInTime).toDateString() === new Date().toDateString()
   );
 
@@ -27,20 +32,16 @@ export default function TechnicianMobileClock() {
 
   const clockMutation = useMutation({
     mutationFn: async (type: "in" | "out") => {
-      if (type === "in") {
-        return apiRequest("/api/time-clock/clock-in", "POST", {
-          clockInTime: new Date().toISOString(),
-          location: "Mobile App",
-        });
-      } else {
-        return apiRequest("/api/time-clock/clock-out", "POST", {
-          entryId: todayEntry.id,
-          clockOutTime: new Date().toISOString(),
-        });
-      }
+      return apiRequest("POST", timeClockUrl, {
+        action: type === "in" ? "clock_in" : "clock_out",
+        clockInTime: type === "in" ? new Date().toISOString() : undefined,
+        clockOutTime: type === "out" ? new Date().toISOString() : undefined,
+        entryId: type === "out" ? todayEntry?.id : undefined,
+        location: "Mobile App",
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/time-clock/entries"] });
+      queryClient.invalidateQueries({ queryKey: [timeClockUrl] });
       toast({
         title: isClockedIn ? "Clocked Out" : "Clocked In",
         description: `Successfully ${isClockedIn ? "ended" : "started"} your shift`,
@@ -77,11 +78,11 @@ export default function TechnicianMobileClock() {
           <Clock className="h-16 w-16 mx-auto mb-4 opacity-80" />
           <div className="text-5xl font-bold mb-2">{formatTime(currentTime)}</div>
           <div className="text-sm opacity-80">
-            {currentTime.toLocaleDateString("en-US", { 
-              weekday: "long", 
-              year: "numeric", 
-              month: "long", 
-              day: "numeric" 
+            {currentTime.toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
             })}
           </div>
         </CardContent>
@@ -101,7 +102,7 @@ export default function TechnicianMobileClock() {
               <p className="text-center text-xs text-[#64748B] mb-4">
                 Since {new Date(todayEntry.clockInTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
               </p>
-              <Button 
+              <Button
                 className="w-full bg-red-600 hover:bg-red-700 text-white"
                 size="lg"
                 onClick={() => clockMutation.mutate("out")}
@@ -117,7 +118,7 @@ export default function TechnicianMobileClock() {
               <p className="text-center text-sm text-[#64748B] mb-4">
                 Ready to start your shift?
               </p>
-              <Button 
+              <Button
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
                 size="lg"
                 onClick={() => clockMutation.mutate("in")}
@@ -141,7 +142,7 @@ export default function TechnicianMobileClock() {
         </CardHeader>
         <CardContent className="space-y-2">
           {todayEntries.map((entry, index) => (
-            <div 
+            <div
               key={entry.id || index}
               className="flex justify-between items-center py-2 border-b border-[#E2E8F0] dark:border-[#232A36] last:border-0"
               data-testid={`time-entry-${index}`}
@@ -158,7 +159,7 @@ export default function TechnicianMobileClock() {
                 </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full ${
-                entry.clockOutTime 
+                entry.clockOutTime
                   ? "bg-[#F8FAFC] dark:bg-[#0E1117] text-[#64748B]"
                   : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
               }`}>

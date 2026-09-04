@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -338,7 +337,7 @@ export default function MarketingHub() {
 
       <div className="grid gap-4">
         {PLATFORMS.map(platform => {
-          const accounts = accounts.filter(a => a.providerId === platform.id);
+          const platformAccounts = (accounts as any[]).filter((a: any) => a.providerId === platform.id);
           const PlatformIcon = platform.icon;
           
           return (
@@ -352,15 +351,15 @@ export default function MarketingHub() {
                     <div>
                       <h4 className="font-semibold text-[#0B1F3B] dark:text-white">{platform.name}</h4>
                       <p className="text-sm text-[#64748B] capitalize">{platform.type} {t('marketing.advertising', 'advertising')}</p>
-                      {accounts.length > 0 && (
+                      {platformAccounts.length > 0 && (
                         <p className="text-xs text-[#64748B] mt-1">
-                          {t('marketing.accountsConnected', '{{count}} account(s) connected', { count: accounts.length })}
+                          {t('marketing.accountsConnected', '{{count}} account(s) connected', { count: platformAccounts.length })}
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {accounts.length === 0 ? (
+                    {platformAccounts.length === 0 ? (
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -383,9 +382,9 @@ export default function MarketingHub() {
                   </div>
                 </div>
 
-                {accounts.length > 0 && (
+                {platformAccounts.length > 0 && (
                   <div className="mt-4 space-y-2">
-                    {accounts.map(account => (
+                    {platformAccounts.map((account: any) => (
                       <div 
                         key={account.id} 
                         className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"

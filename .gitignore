@@ -11,3 +11,34 @@ user_credentials.csv
 .env.*
 *.pem
 *.key
+
+# Screenshot / gallery artifacts (use docs/ for documentation images)
+GUI PRTSCN/
+screenshots/
+ui-screens/
+gallery.html
+
+# Replit artifacts
+attached_assets/*
+# ...except the logo: it is a real build dependency imported via the @assets
+# alias by Landing/Login/Register/WelcomePage, so the production build fails
+# without it. Uses `/*` above because git cannot re-include a file whose
+# parent directory is itself excluded.
+!attached_assets/Logo_blue_orange_1760743036292.png
+replit.md
+.replit
+replit.nix
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# Build / cache
+*.tsbuildinfo
+.cache/

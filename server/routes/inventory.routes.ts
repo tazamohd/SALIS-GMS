@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
@@ -15,7 +16,7 @@ function sanitizeZodError(error: any) {
 }
 
 // Get all spare parts
-router.get("/spare-parts", isAuthenticated, async (req, res) => {
+router.get("/spare-parts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const parts = await storage.getSpareParts();
     res.json(parts);
@@ -26,7 +27,7 @@ router.get("/spare-parts", isAuthenticated, async (req, res) => {
 });
 
 // Get spare part by ID
-router.get("/spare-parts/:id", isAuthenticated, async (req, res) => {
+router.get("/spare-parts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { id } = req.params;
     const part = await storage.getSparePart(id);
@@ -41,7 +42,7 @@ router.get("/spare-parts/:id", isAuthenticated, async (req, res) => {
 });
 
 // Create spare part
-router.post("/spare-parts", isAuthenticated, async (req: any, res) => {
+router.post("/spare-parts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
   try {
     const { insertSparePartSchema } = await import("@shared/schema");
     const userId = req.user?.id || "default-user";
@@ -65,7 +66,7 @@ router.post("/spare-parts", isAuthenticated, async (req: any, res) => {
 });
 
 // Update spare part
-router.patch("/spare-parts/:id", isAuthenticated, async (req, res) => {
+router.patch("/spare-parts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { insertSparePartSchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -84,7 +85,7 @@ router.patch("/spare-parts/:id", isAuthenticated, async (req, res) => {
 });
 
 // Delete spare part
-router.delete("/spare-parts/:id", isAuthenticated, async (req, res) => {
+router.delete("/spare-parts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteSparePart(id);
@@ -96,7 +97,7 @@ router.delete("/spare-parts/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get spare part inventories
-router.get("/spare-part-inventories", isAuthenticated, async (req, res) => {
+router.get("/spare-part-inventories", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { garage_id, spare_part_id } = req.query;
     if (!garage_id) {
@@ -114,7 +115,7 @@ router.get("/spare-part-inventories", isAuthenticated, async (req, res) => {
 });
 
 // Create spare part inventory
-router.post("/spare-part-inventories", isAuthenticated, async (req, res) => {
+router.post("/spare-part-inventories", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { insertSparePartInventorySchema } = await import("@shared/schema");
 
@@ -132,7 +133,7 @@ router.post("/spare-part-inventories", isAuthenticated, async (req, res) => {
 });
 
 // Update spare part inventory
-router.patch("/spare-part-inventories/:id", isAuthenticated, async (req, res) => {
+router.patch("/spare-part-inventories/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const { insertSparePartInventorySchema } = await import("@shared/schema");
     const { id } = req.params;
@@ -151,7 +152,7 @@ router.patch("/spare-part-inventories/:id", isAuthenticated, async (req, res) =>
 });
 
 // Get stock alerts
-router.get("/stock-alerts", isAuthenticated, async (req: any, res) => {
+router.get("/stock-alerts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
   try {
     const { garageId, status } = req.query;
     if (!garageId) {
@@ -166,7 +167,7 @@ router.get("/stock-alerts", isAuthenticated, async (req: any, res) => {
 });
 
 // Create stock alert
-router.post("/stock-alerts", isAuthenticated, async (req: any, res) => {
+router.post("/stock-alerts", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
   try {
     const alert = await storage.createStockAlert(req.body);
     res.status(201).json(alert);
@@ -177,7 +178,7 @@ router.post("/stock-alerts", isAuthenticated, async (req: any, res) => {
 });
 
 // Update stock alert
-router.patch("/stock-alerts/:id", isAuthenticated, async (req: any, res) => {
+router.patch("/stock-alerts/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
   try {
     const { id } = req.params;
     const alert = await storage.updateStockAlert(id, req.body);
@@ -189,7 +190,7 @@ router.patch("/stock-alerts/:id", isAuthenticated, async (req: any, res) => {
 });
 
 // Acknowledge stock alert
-router.post("/stock-alerts/:id/acknowledge", isAuthenticated, async (req: any, res) => {
+router.post("/stock-alerts/:id/acknowledge", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id || "default-user";

@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { Server } from "http";
+import type { Server } from "http";
 import express from "express";
 import path from "path";
 import fs from "fs";
@@ -20,16 +20,13 @@ import qualityControlRoutes from "./quality-control";
 import warrantyRoutes from "./warranty";
 import kioskRoutes from "./kiosk";
 // estimatesRoutes (./estimates) intentionally NOT imported: its in-memory `demoEstimates`
-// store shadowed the monolith's DB-backed /api/estimates CRUD (routes.ts:4418+). The
-// monolith handler serves now; if a modular replacement is wanted, mount
-// `./estimates.routes.ts` (DB-backed) instead of `./estimates`.
+// store is not DB-backed. The DB-backed estimates CRUD is in estimates-crud.ts.
 import fleetManagementRoutes from "./fleet";
 import whatsappRoutes from "./whatsapp";
 import smsCampaignRoutes from "./sms-campaigns";
 import documentRoutes from "./documents";
 // supplierPortalRoutes (./supplier-portal) intentionally NOT imported: its in-memory
-// demoSuppliers/demoPurchaseOrders shadowed the monolith's DB-backed /api/suppliers
-// CRUD (routes.ts:2648+). Re-mount only after the modular file uses storage.*.
+// demo data is not DB-backed. The DB-backed supplier CRUD is in suppliers.ts.
 import currencyRoutes from "./currency";
 import apiDocsRoutes from "./api-docs";
 import backupRoutes from "./backup";
@@ -60,7 +57,73 @@ import { forecastingDemandRoutes } from "./forecasting-demand";
 import { productivityRoutes } from "./productivity";
 import { obdDiagnosticsRoutes } from "./obd-diagnostics";
 import { subscriptionsRoutes } from "./subscriptions";
-import { registerRoutes as registerLegacyRoutes, markAuthInitialized } from "../routes";
+import { bankAccountRoutes } from "./bank-accounts";
+import { lossEntryRoutes } from "./loss-entries";
+import { jobCardInvoiceRoutes } from "./job-card-invoice";
+import { towingRoutes } from "./towing";
+import { loanerVehicleRoutes } from "./loaner-vehicles";
+import { localizationRoutes } from "./localization";
+import { serviceTemplateRoutes } from "./service-templates";
+import { discountRoutes } from "./discounts";
+import { purchaseOrderRoutes } from "./purchase-orders";
+import { catalogRoutes } from "./catalogs";
+import { refundRoutes } from "./refunds";
+import { inspectionRoutes } from "./inspections";
+import { paymentRoutes } from "./payments";
+import { callCenterRoutes } from "./call-center";
+import { securityRoutes } from "./security";
+import { chatRoutes } from "./chat";
+import { dynamicPricingRoutes } from "./dynamic-pricing";
+import { feedbackRoutes } from "./feedback";
+import { complianceRoutes } from "./compliance";
+import { emergingTechRoutes } from "./emerging-tech";
+import { aiEngineRoutes } from "./ai-engine";
+import { nextgenRoutes } from "./nextgen";
+import { mobileApiRoutes } from "./mobile-api";
+import { notificationsLegacyRoutes } from "./notifications-legacy";
+import { integrationsRoutes } from "./integrations";
+import { platformAdminRoutes } from "./platform-admin";
+import { customerPortalApiRoutes } from "./customer-portal-api";
+import iotRoutes from "./iot";
+import franchiseRoutes from "./franchise";
+import financialRoutes from "./financial";
+import saudiRoutes from "./saudi";
+import technicianMobileRoutes from "./technician-mobile";
+import aiInsightsRoutes from "./ai-insights";
+import commandCenterRoutes from "./command-center";
+import docsRoutes from "./docs";
+import workflowRoutes from "./workflow";
+import workflowHooksRoutes from "./workflow-hooks";
+import customerPortalRoutes from "./customer-portal";
+import loyaltyRoutes from "./loyalty";
+import payrollRoutes from "./payroll";
+import obdTelematicsRoutes from "./obd-telematics";
+import warehouseRoutes from "./warehouse";
+import gmbRoutes from "./gmb";
+import serviceManagementRoutes from "./service-management";
+import suppliersRoutes from "./suppliers";
+import arVrRoutes from "./ar-vr";
+import trainingRoutes from "./training";
+import analyticsRoutes from "./analytics";
+import schedulingExtendedRoutes from "./scheduling-extended";
+import customerSupportRoutes from "./customer-support";
+import operationsRoutes from "./operations";
+import financialOpsRoutes from "./financial-ops";
+import customerEngagementRoutes from "./customer-engagement";
+import serviceOperationsRoutes from "./service-operations";
+import inventoryExtendedRoutes from "./inventory-extended";
+import franchiseManagementRoutes from "./franchise-management";
+import vendorLicensingRoutes from "./vendor-licensing";
+import marketingCampaignRoutes from "./marketing-campaigns";
+import miscOperationsRoutes from "./misc-operations";
+import coreDataOpsRoutes from "./core-data-ops";
+import extendedFeaturesRoutes from "./extended-features";
+import estimatesCrudRoutes from "./estimates-crud";
+import legacyCoreRoutes from "./legacy-core";
+import staticFilesRoutes from "./static-files";
+import { createServer } from "http";
+import { auditLog } from "../auditMiddleware";
+import { initializeChatWebSocket } from "../websocket";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Initializing Hybrid Router...");
@@ -112,10 +175,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", healthRoutes);
   console.log("✅ Health Check Routes Loaded");
 
+  // Static file routes (robots.txt, sitemap, openapi.json, .well-known/*, PayPal)
+  // Mounted at root (not /api) — before auth so public files don't require login
+  app.use(staticFilesRoutes);
+  console.log("✅ Static Files & PayPal Routes Loaded");
+
   // Set up authentication middleware first (session, passport)
   await setupAuth(app);
-  markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
+
+  // Audit logging middleware (applied after auth so user is available)
+  app.use(auditLog);
+
+  // CORS configuration for AI systems
+  app.use((req, res, next) => {
+    const allowedOrigins = [
+      'https://chat.openai.com',
+      'https://api.openai.com',
+      'https://chatgpt.com',
+      'https://gemini.google.com',
+      'https://bard.google.com',
+      'https://claude.ai',
+      'https://perplexity.ai'
+    ];
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+      res.setHeader('Access-Control-Max-Age', '86400');
+      res.setHeader('Vary', 'Origin');
+    }
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
@@ -173,8 +268,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", kioskRoutes);
   console.log("✅ Self-Service Kiosk Routes Loaded");
 
-  // Estimates routes intentionally NOT mounted here — see import block comment.
-  // Monolith serves /api/estimates with DB-backed CRUD (routes.ts:4418+).
+  // Estimates in-memory demo module (./estimates) intentionally NOT mounted — see
+  // import block comment. DB-backed estimates served by estimates-crud.ts.
 
   // Fleet Management routes
   app.use("/api", fleetManagementRoutes);
@@ -192,9 +287,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api", documentRoutes);
   console.log("✅ Document Management Routes Loaded");
 
-  // Supplier Portal routes intentionally NOT mounted — see import block comment.
-  // Monolith serves /api/suppliers, /api/supplier-price-lists, /api/supplier-performance
-  // with DB-backed CRUD (routes.ts:2648+).
+  // Supplier Portal in-memory demo module (./supplier-portal) intentionally NOT mounted
+  // — see import block comment. DB-backed suppliers served by suppliers.ts.
 
   // Multi-Currency Management routes
   app.use("/api", currencyRoutes);
@@ -260,12 +354,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("✅ OBD Diagnostics Routes Loaded");
   app.use("/api", subscriptionsRoutes);
   console.log("✅ Subscriptions Routes Loaded");
+  app.use("/api", bankAccountRoutes);
+  console.log("✅ Bank Account Routes Loaded");
+  app.use("/api", lossEntryRoutes);
+  console.log("✅ Loss Entry Routes Loaded");
+  app.use("/api", jobCardInvoiceRoutes);
+  console.log("✅ Job Card → Invoice Routes Loaded");
+  app.use("/api", towingRoutes);
+  console.log("✅ Towing Routes Loaded");
+  app.use("/api", loanerVehicleRoutes);
+  console.log("✅ Loaner Vehicle Routes Loaded");
+  app.use("/api", localizationRoutes);
+  console.log("✅ Localization Routes Loaded");
+  app.use("/api", serviceTemplateRoutes);
+  console.log("✅ Service Template Routes Loaded");
+  app.use("/api", discountRoutes);
+  console.log("✅ Discount Routes Loaded");
+  app.use("/api", purchaseOrderRoutes);
+  console.log("✅ Purchase Order Routes Loaded");
+  app.use("/api", catalogRoutes);
+  console.log("✅ Catalog Routes Loaded");
+  app.use("/api", refundRoutes);
+  console.log("✅ Refund Routes Loaded");
+  app.use("/api", inspectionRoutes);
+  console.log("✅ Inspection Routes Loaded");
+  app.use("/api", paymentRoutes);
+  console.log("✅ Payment Routes Loaded");
+  app.use("/api", callCenterRoutes);
+  console.log("✅ Call Center Routes Loaded");
+  app.use("/api", securityRoutes);
+  console.log("✅ Security Routes Loaded");
+  app.use("/api", chatRoutes);
+  console.log("✅ Chat Routes Loaded");
+  app.use("/api", dynamicPricingRoutes);
+  console.log("✅ Dynamic Pricing Routes Loaded");
+  app.use("/api", feedbackRoutes);
+  console.log("✅ Feedback Routes Loaded");
+  app.use("/api", complianceRoutes);
+  console.log("✅ Compliance Routes Loaded");
+  app.use("/api", emergingTechRoutes);
+  console.log("✅ Emerging Tech Routes Loaded");
+  app.use("/api", aiEngineRoutes);
+  console.log("✅ AI Engine Routes Loaded");
+  app.use("/api", nextgenRoutes);
+  console.log("✅ Nextgen Routes Loaded");
+  app.use("/api", mobileApiRoutes);
+  console.log("✅ Mobile API Routes Loaded");
+  app.use("/api", notificationsLegacyRoutes);
+  console.log("✅ Notifications Legacy Routes Loaded");
+  app.use("/api", integrationsRoutes);
+  console.log("✅ Integrations Routes Loaded");
+  app.use("/api", platformAdminRoutes);
+  console.log("✅ Platform Admin Routes Loaded");
+  app.use("/api", customerPortalApiRoutes);
+  console.log("✅ Customer Portal API Routes Loaded");
+  app.use("/api", iotRoutes);
+  console.log("✅ IoT Routes Loaded");
+  app.use("/api", franchiseRoutes);
+  console.log("✅ Franchise Routes Loaded");
+  app.use("/api", financialRoutes);
+  console.log("✅ Financial Reports Routes Loaded");
+  app.use("/api", saudiRoutes);
+  console.log("✅ Saudi Compliance Routes Loaded");
+  app.use("/api", technicianMobileRoutes);
+  console.log("✅ Technician Mobile Routes Loaded");
+  app.use("/api", aiInsightsRoutes);
+  console.log("✅ AI Insights Routes Loaded");
+  app.use("/api", commandCenterRoutes);
+  console.log("✅ Command Center Routes Loaded");
+  app.use("/api", docsRoutes);
+  console.log("✅ API Docs (OpenAPI) Routes Loaded");
+  app.use("/api", workflowRoutes);
+  console.log("✅ Workflow Engine Routes Loaded");
+  app.use("/api", workflowHooksRoutes);
+  console.log("✅ Workflow Hooks Routes Loaded");
+  app.use("/api", customerPortalRoutes);
+  console.log("✅ Customer Portal Routes Loaded");
+  app.use("/api", loyaltyRoutes);
+  console.log("✅ Loyalty & Rewards Routes Loaded");
+  app.use("/api", payrollRoutes);
+  console.log("✅ Payroll Routes Loaded");
+  app.use("/api", obdTelematicsRoutes);
+  console.log("✅ OBD & Telematics Routes Loaded");
+  app.use("/api", warehouseRoutes);
+  console.log("✅ Warehouse & Fulfillment Routes Loaded");
+  app.use("/api", gmbRoutes);
+  console.log("✅ Google My Business Routes Loaded");
+  app.use("/api", serviceManagementRoutes);
+  console.log("✅ Service Management Routes Loaded");
+  app.use("/api", suppliersRoutes);
+  console.log("✅ Supplier Management Routes Loaded");
+  app.use("/api", arVrRoutes);
+  console.log("✅ AR/VR Routes Loaded");
+  app.use("/api", trainingRoutes);
+  console.log("✅ Training & Knowledge Base Routes Loaded");
+  app.use("/api", analyticsRoutes);
+  console.log("✅ Analytics & BI Routes Loaded");
+  app.use("/api", schedulingExtendedRoutes);
+  console.log("✅ Scheduling Extended Routes Loaded");
+  app.use("/api", customerSupportRoutes);
+  console.log("✅ Customer Support & Comms Routes Loaded");
+  app.use("/api", operationsRoutes);
+  console.log("✅ Operations & Misc Routes Loaded");
+  app.use("/api", financialOpsRoutes);
+  console.log("✅ Financial Ops Routes Loaded");
+  app.use("/api", customerEngagementRoutes);
+  console.log("✅ Customer Engagement Routes Loaded");
+  app.use("/api", serviceOperationsRoutes);
+  console.log("✅ Service Operations Routes Loaded");
+  app.use("/api", inventoryExtendedRoutes);
+  app.use("/api", franchiseManagementRoutes);
+  app.use("/api", vendorLicensingRoutes);
+  app.use("/api", marketingCampaignRoutes);
+  app.use("/api", miscOperationsRoutes);
+  app.use("/api", coreDataOpsRoutes);
+  app.use("/api", extendedFeaturesRoutes);
+  app.use("/api", estimatesCrudRoutes);
+  app.use("/api", legacyCoreRoutes);
+  console.log("✅ All Modular Routes Loaded");
 
   // Misc TODO-stub routes intentionally NOT mounted — see import block comment.
 
-  // Load legacy routes (they will skip setupAuth since it's already done)
-  const server = await registerLegacyRoutes(app);
-  console.log("⚠️ Legacy Routes Loaded (Background)");
-  
-  return server;
+  const httpServer = createServer(app);
+
+  // Initialize WebSocket server for chat
+  initializeChatWebSocket(httpServer);
+  console.log("✅ WebSocket Server Initialized");
+
+  return httpServer;
 }

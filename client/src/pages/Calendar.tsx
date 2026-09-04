@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Calendar as BigCalendar, dateFnsLocalizer, View, SlotInfo } from 'react-big-calendar';
@@ -19,7 +18,7 @@ import { CalendarIcon, Users, Clock, AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertAppointmentSchema, type InsertAppointment } from "@shared/schema";
-import type { Appointment, User, Customer, Vehicle } from "@shared/schema";
+import type { Appointment, User, Vehicle } from "@shared/schema";
 import { StandardPageLayout } from "@/components/layouts";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -68,18 +67,16 @@ export default function Calendar() {
     defaultValues: {
       appointmentNumber: '',
       garageId: '',
-      customerId: '',
       customerName: '',
       customerPhone: '',
-      customerEmail: '',
-      vehicleId: '',
       serviceType: '',
-      appointmentDate: new Date().toISOString(),
+      appointmentDate: new Date() as any,
+      createdBy: '',
       duration: 60,
       status: 'scheduled',
       assignedTo: '',
       notes: '',
-    },
+    } as any,
   });
 
   const { data: garages = [] } = useQuery<any[]>({
@@ -91,7 +88,7 @@ export default function Calendar() {
     enabled: !!selectedGarageId,
   });
 
-  const { data: customers = [] } = useQuery<Customer[]>({
+  const { data: customers = [] } = useQuery<any[]>({
     queryKey: ['/api/customers'],
   });
 
@@ -114,10 +111,7 @@ export default function Calendar() {
 
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<InsertAppointment> }) => {
-      return await apiRequest(`/api/appointments/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
+      return await apiRequest('PATCH', `/api/appointments/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
@@ -137,21 +131,15 @@ export default function Calendar() {
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (data: InsertAppointment & { syncToCalendar?: boolean; sendEmail?: boolean }) => {
-      const appointment = await apiRequest('/api/appointments', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      const appointment = await apiRequest('POST', '/api/appointments', data);
 
       if (data.syncToCalendar) {
         try {
-          await apiRequest('/api/integrations/google-calendar/sync-appointment', {
-            method: 'POST',
-            body: JSON.stringify({
-              appointmentDate: data.appointmentDate,
-              service: data.serviceType,
-              notes: data.notes,
-              customerEmail: data.customerEmail,
-            }),
+          await apiRequest('POST', '/api/integrations/google-calendar/sync-appointment', {
+            appointmentDate: data.appointmentDate,
+            service: data.serviceType,
+            notes: data.notes,
+            customerEmail: data.customerEmail,
           });
         } catch (error) {
           console.error('Failed to sync to Google Calendar:', error);
@@ -160,19 +148,16 @@ export default function Calendar() {
 
       if (data.sendEmail && data.customerEmail) {
         try {
-          await apiRequest('/api/integrations/gmail/send-appointment-confirmation', {
-            method: 'POST',
-            body: JSON.stringify({
-              appointment: {
-                service: data.serviceType,
-                appointmentDate: data.appointmentDate,
-                notes: data.notes,
-              },
-              customer: {
-                fullName: data.customerName,
-                email: data.customerEmail,
-              },
-            }),
+          await apiRequest('POST', '/api/integrations/gmail/send-appointment-confirmation', {
+            appointment: {
+              service: data.serviceType,
+              appointmentDate: data.appointmentDate,
+              notes: data.notes,
+            },
+            customer: {
+              fullName: data.customerName,
+              email: data.customerEmail,
+            },
           });
         } catch (error) {
           console.error('Failed to send confirmation email:', error);
@@ -240,18 +225,16 @@ export default function Calendar() {
     form.reset({
       appointmentNumber: `APT-${Date.now()}`,
       garageId: selectedGarageId,
-      customerId: '',
       customerName: '',
       customerPhone: '',
-      customerEmail: '',
-      vehicleId: '',
       serviceType: '',
-      appointmentDate: slotInfo.start.toISOString(),
+      appointmentDate: slotInfo.start as any,
+      createdBy: '',
       duration: duration > 0 ? duration : 60,
       status: 'scheduled',
       assignedTo: selectedTechnicianId !== 'all' ? selectedTechnicianId : '',
       notes: '',
-    });
+    } as any);
     
     setCreateDialogOpen(true);
   }, [selectedGarageId, selectedTechnicianId, form]);
@@ -275,7 +258,7 @@ export default function Calendar() {
     updateAppointmentMutation.mutate({
       id: event.id,
       data: {
-        appointmentDate: start.toISOString(),
+        appointmentDate: start as any,
         duration,
       },
     });
@@ -290,7 +273,7 @@ export default function Calendar() {
     updateAppointmentMutation.mutate({
       id: event.id,
       data: {
-        appointmentDate: start.toISOString(),
+        appointmentDate: start as any,
         duration,
       },
     });
@@ -402,17 +385,17 @@ export default function Calendar() {
             <DragAndDropCalendar
               localizer={localizer}
               events={events}
-              startAccessor="start"
-              endAccessor="end"
+              startAccessor={(event: any) => event.start}
+              endAccessor={(event: any) => event.end}
               view={view}
               onView={handleViewChange}
               date={date}
               onNavigate={handleNavigate}
               onSelectSlot={handleSelectSlot}
-              onSelectEvent={handleSelectEvent}
-              onEventDrop={handleEventDrop}
-              onEventResize={handleEventResize}
-              eventPropGetter={eventStyleGetter}
+              onSelectEvent={handleSelectEvent as any}
+              onEventDrop={handleEventDrop as any}
+              onEventResize={handleEventResize as any}
+              eventPropGetter={eventStyleGetter as any}
               selectable
               resizable
               popup
@@ -484,10 +467,10 @@ export default function Calendar() {
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitAppointment)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmitAppointment as any)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="customerId"
                   render={({ field }) => (
                     <FormItem>
@@ -520,7 +503,7 @@ export default function Calendar() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
@@ -545,7 +528,7 @@ export default function Calendar() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="serviceType"
                   render={({ field }) => (
                     <FormItem>
@@ -559,7 +542,7 @@ export default function Calendar() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="assignedTo"
                   render={({ field }) => (
                     <FormItem>
@@ -584,7 +567,7 @@ export default function Calendar() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="duration"
                   render={({ field }) => (
                     <FormItem>
@@ -603,7 +586,7 @@ export default function Calendar() {
                 />
 
                 <FormField
-                  control={form.control}
+                  control={form.control as any}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
@@ -626,13 +609,13 @@ export default function Calendar() {
               </div>
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('calendar.notesOptional', 'Notes (Optional)')}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} placeholder={t('calendar.notesPlaceholder', 'Additional notes...')} data-testid="input-notes" />
+                      <Textarea {...field} value={field.value ?? ""} placeholder={t('calendar.notesPlaceholder', 'Additional notes...')} data-testid="input-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

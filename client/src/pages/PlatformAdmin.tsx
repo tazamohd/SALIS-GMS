@@ -1195,7 +1195,7 @@ function RBACTab() {
     { name: "Service Manager", code: "MANAGER", users: 384, color: "#059669", description: "Service operations, HR, limited finance" },
     { name: "Service Advisor", code: "ADVISOR", users: 612, color: "#d97706", description: "Customer intake, job cards, estimates" },
     { name: "Technician", code: "TECHNICIAN", users: 1840, color: "#64748b", description: "Assigned jobs, time clock, parts lookup" },
-    { name: "Accountant", code: "ACCOUNTANT", users: 298, color: "#0891b2", description: "Finance, invoices, reports, accounting" },
+    { name: "Accountant", code: "ACCOUNTANT", users: 298, color: "#0891b2", description: "Finance, invoices, reports, financial reporting" },
     { name: "Purchase Agent", code: "PURCHASE_AGENT", users: 184, color: "#7c3aed", description: "Purchase orders, suppliers, inventory" },
     { name: "HR Manager", code: "HR_MANAGER", users: 97, color: "#be185d", description: "Staff, payroll, leave, performance" },
     { name: "Customer", code: "CUSTOMER", users: 1260, color: "#84cc16", description: "Customer portal, booking, vehicle history" },

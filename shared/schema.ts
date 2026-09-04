@@ -1015,6 +1015,11 @@ export const invoices = pgTable("invoices", {
     .references(() => users.id),
   sentAt: timestamp("sent_at"),
   paidAt: timestamp("paid_at"),
+  zatcaStatus: varchar("zatca_status", { length: 20 }),
+  zatcaClearanceId: varchar("zatca_clearance_id", { length: 100 }),
+  zatcaInvoiceHash: text("zatca_invoice_hash"),
+  zatcaQrCode: text("zatca_qr_code"),
+  zatcaSubmittedAt: timestamp("zatca_submitted_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => ({
@@ -10958,4 +10963,82 @@ export const insertMobileDeviceSchema = createInsertSchema(mobileDevices).omit({
   garageId: true,
   createdAt: true,
   updatedAt: true,
+});
+
+// Bank Accounts — internal bank account records for finance module.
+// Backs the Bank Account Management page (/bank-accounts).
+export const bankAccounts = pgTable("bank_accounts", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  accountName: varchar("account_name", { length: 200 }).notNull(),
+  bankName: varchar("bank_name", { length: 200 }).notNull(),
+  accountNumber: varchar("account_number", { length: 50 }).notNull(),
+  iban: varchar("iban", { length: 34 }),
+  swiftCode: varchar("swift_code", { length: 11 }),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  accountType: varchar("account_type", { length: 20 }).notNull(), // checking | savings | business | merchant
+  openingBalance: decimal("opening_balance", { precision: 15, scale: 2 }).default("0").notNull(),
+  currentBalance: decimal("current_balance", { precision: 15, scale: 2 }).default("0").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("bank_accounts_garage_idx").on(table.garageId),
+}));
+export type BankAccount = typeof bankAccounts.$inferSelect;
+export type InsertBankAccount = typeof bankAccounts.$inferInsert;
+export const insertBankAccountSchema = createInsertSchema(bankAccounts).omit({
+  id: true, garageId: true, createdAt: true, updatedAt: true,
+});
+
+// Bank Transactions — individual transactions against bank accounts.
+export const bankTransactions = pgTable("bank_transactions", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  bankAccountId: uuid("bank_account_id").references(() => bankAccounts.id).notNull(),
+  transactionType: varchar("transaction_type", { length: 20 }).notNull(), // deposit | withdrawal | transfer | fee | interest
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  description: text("description").notNull(),
+  referenceNumber: varchar("reference_number", { length: 100 }),
+  transactionDate: date("transaction_date").notNull(),
+  category: varchar("category", { length: 100 }),
+  reconciled: boolean("reconciled").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("bank_transactions_garage_idx").on(table.garageId),
+  accountIdx: index("bank_transactions_account_idx").on(table.bankAccountId),
+}));
+export type BankTransaction = typeof bankTransactions.$inferSelect;
+export type InsertBankTransaction = typeof bankTransactions.$inferInsert;
+export const insertBankTransactionSchema = createInsertSchema(bankTransactions).omit({
+  id: true, garageId: true, createdAt: true,
+});
+
+// Loss Entries — tracks business losses (inventory, bad debt, theft, etc.).
+// Backs the Loss Account page (/loss-account).
+export const lossEntries = pgTable("loss_entries", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").references(() => garages.id).notNull(),
+  lossType: varchar("loss_type", { length: 30 }).notNull(), // inventory | service | equipment | bad_debt | theft | damage | obsolete | other
+  description: text("description").notNull(),
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 10 }).default("SAR").notNull(),
+  lossDate: date("loss_date").notNull(),
+  referenceId: varchar("reference_id", { length: 100 }),
+  referenceType: varchar("reference_type", { length: 50 }),
+  recoveredAmount: decimal("recovered_amount", { precision: 15, scale: 2 }).default("0").notNull(),
+  insuranceClaimed: boolean("insurance_claimed").default(false).notNull(),
+  insuranceAmount: decimal("insurance_amount", { precision: 15, scale: 2 }),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | recovered | written_off
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  garageIdx: index("loss_entries_garage_idx").on(table.garageId),
+}));
+export type LossEntry = typeof lossEntries.$inferSelect;
+export type InsertLossEntry = typeof lossEntries.$inferInsert;
+export const insertLossEntrySchema = createInsertSchema(lossEntries).omit({
+  id: true, garageId: true, createdAt: true, updatedAt: true,
 });

@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -220,7 +222,7 @@ const stats: WhatsAppStats = {
 // --- Routes ---
 
 // Send a WhatsApp message using a template
-router.post('/whatsapp/send', (req, res) => {
+router.post('/whatsapp/send', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (req, res) => {
   const { templateId, customerPhone, customerName, variables } = req.body;
 
   if (!templateId || !customerPhone || !customerName) {
@@ -283,12 +285,12 @@ router.post('/whatsapp/send', (req, res) => {
 });
 
 // List message templates
-router.get('/whatsapp/templates', (_req, res) => {
+router.get('/whatsapp/templates', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (_req, res) => {
   res.json({ templates });
 });
 
 // Get recent conversations
-router.get('/whatsapp/conversations', (_req, res) => {
+router.get('/whatsapp/conversations', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (_req, res) => {
   const sorted = [...conversations].sort(
     (a, b) => new Date(b.lastMessageTime).getTime() - new Date(a.lastMessageTime).getTime()
   );
@@ -305,7 +307,7 @@ router.post('/whatsapp/webhook', (req, res) => {
 });
 
 // Stats: messages sent today, delivery rate, response rate, opt-out count
-router.get('/whatsapp/stats', (_req, res) => {
+router.get('/whatsapp/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR']), (_req, res) => {
   res.json({ stats });
 });
 

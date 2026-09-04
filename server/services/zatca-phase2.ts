@@ -227,19 +227,13 @@ export async function submitToClearance(
   ublInvoice: UBLInvoiceXML,
   csid: string = ''
 ): Promise<ClearanceResponse> {
-  // TODO: Replace with actual ZATCA Fatoora API endpoint
-  // Production: https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/clearance/single
-  // Sandbox:    https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single
+  const isProduction = process.env.ZATCA_ENV === 'production';
   const ZATCA_CLEARANCE_URL =
     process.env.ZATCA_API_URL ||
-    'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single';
+    (isProduction
+      ? 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/clearance/single'
+      : 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/clearance/single');
 
-  // TODO: Obtain real CSID through ZATCA onboarding process
-  // The CSID is generated via:
-  // 1. Generate CSR (Certificate Signing Request)
-  // 2. Submit to ZATCA compliance API
-  // 3. Complete compliance checks
-  // 4. Receive production CSID
   const authToken = csid || process.env.ZATCA_CSID || '';
 
   const requestBody = {
@@ -248,37 +242,34 @@ export async function submitToClearance(
     invoice: ublInvoice.encodedInvoice,
   };
 
-  try {
-    // TODO: Uncomment when integrating with real ZATCA API
-    // const response = await fetch(ZATCA_CLEARANCE_URL, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Accept': 'application/json',
-    //     'Accept-Version': 'V2',
-    //     'Accept-Language': 'en',
-    //     'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
-    //   },
-    //   body: JSON.stringify(requestBody),
-    // });
-    // const data = await response.json();
-    // return mapClearanceResponse(data);
-
-    // Stub response for development
-    console.log('[ZATCA Phase 2] Clearance submission prepared:', {
-      endpoint: ZATCA_CLEARANCE_URL,
-      invoiceHash: ublInvoice.hash,
-    });
-
+  if (!authToken) {
+    console.log('[ZATCA Phase 2] No CSID configured — returning stub clearance response');
     return {
       status: 'CLEARED',
-      clearanceId: `CLR-${Date.now()}`,
+      clearanceId: `CLR-STUB-${Date.now()}`,
       invoiceHash: ublInvoice.hash,
       qrCode: ublInvoice.encodedInvoice.substring(0, 100),
-      warnings: [],
+      warnings: ['ZATCA_CSID not configured — this is a stub response'],
       errors: [],
       timestamp: new Date().toISOString(),
     };
+  }
+
+  try {
+    const response = await fetch(ZATCA_CLEARANCE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Version': 'V2',
+        'Accept-Language': 'en',
+        'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json() as any;
+    return mapClearanceResponse(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return {
@@ -286,6 +277,147 @@ export async function submitToClearance(
       errors: [`Clearance submission failed: ${message}`],
       timestamp: new Date().toISOString(),
     };
+  }
+}
+
+/**
+ * Submit a simplified invoice (B2C) for reporting to ZATCA.
+ * Reporting differs from clearance: the invoice is reported after issuance,
+ * not cleared in real-time.
+ */
+export async function submitToReporting(
+  ublInvoice: UBLInvoiceXML,
+  csid: string = ''
+): Promise<ClearanceResponse> {
+  const isProduction = process.env.ZATCA_ENV === 'production';
+  const ZATCA_REPORTING_URL =
+    process.env.ZATCA_REPORTING_URL ||
+    (isProduction
+      ? 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core/invoices/reporting/single'
+      : 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/invoices/reporting/single');
+
+  const authToken = csid || process.env.ZATCA_CSID || '';
+
+  if (!authToken) {
+    console.log('[ZATCA Phase 2] No CSID configured — returning stub reporting response');
+    return {
+      status: 'REPORTED',
+      clearanceId: `RPT-STUB-${Date.now()}`,
+      invoiceHash: ublInvoice.hash,
+      warnings: ['ZATCA_CSID not configured — this is a stub response'],
+      errors: [],
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  try {
+    const response = await fetch(ZATCA_REPORTING_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Version': 'V2',
+        'Accept-Language': 'en',
+        'Authorization': `Basic ${Buffer.from(authToken + ':').toString('base64')}`,
+      },
+      body: JSON.stringify({
+        invoiceHash: ublInvoice.hash,
+        uuid: extractUUIDFromXml(ublInvoice.xml),
+        invoice: ublInvoice.encodedInvoice,
+      }),
+    });
+
+    const data = await response.json() as any;
+    return mapClearanceResponse(data);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return {
+      status: 'ERROR',
+      errors: [`Reporting submission failed: ${message}`],
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+/**
+ * Onboard a taxpayer with ZATCA to obtain a Compliance CSID.
+ * Flow: Generate CSR → Submit to ZATCA compliance API → Receive CSID.
+ */
+export async function requestComplianceCSID(
+  csr: string,
+  otp: string
+): Promise<{ csid: string; requestId: string; tokenType: string } | { error: string }> {
+  const isProduction = process.env.ZATCA_ENV === 'production';
+  const CSID_URL = isProduction
+    ? 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core/compliance'
+    : 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/compliance';
+
+  try {
+    const response = await fetch(CSID_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Version': 'V2',
+        'OTP': otp,
+      },
+      body: JSON.stringify({ csr }),
+    });
+
+    const data = await response.json() as any;
+
+    if (!response.ok) {
+      return { error: data.message || `CSID request failed with status ${response.status}` };
+    }
+
+    return {
+      csid: data.binarySecurityToken || '',
+      requestId: data.requestID || '',
+      tokenType: data.tokenType || 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3',
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { error: `CSID request failed: ${message}` };
+  }
+}
+
+/**
+ * Exchange a compliance CSID for a production CSID after passing compliance checks.
+ */
+export async function requestProductionCSID(
+  complianceRequestId: string,
+  complianceCsid: string
+): Promise<{ csid: string; requestId: string } | { error: string }> {
+  const isProduction = process.env.ZATCA_ENV === 'production';
+  const PROD_CSID_URL = isProduction
+    ? 'https://gw-fatoora.zatca.gov.sa/e-invoicing/core/production/csids'
+    : 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal/production/csids';
+
+  try {
+    const response = await fetch(PROD_CSID_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Version': 'V2',
+        'Authorization': `Basic ${Buffer.from(complianceCsid + ':').toString('base64')}`,
+      },
+      body: JSON.stringify({ compliance_request_id: complianceRequestId }),
+    });
+
+    const data = await response.json() as any;
+
+    if (!response.ok) {
+      return { error: data.message || `Production CSID request failed with status ${response.status}` };
+    }
+
+    return {
+      csid: data.binarySecurityToken || '',
+      requestId: data.requestID || '',
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { error: `Production CSID request failed: ${message}` };
   }
 }
 
@@ -327,6 +459,29 @@ export function generateComplianceQR(
 }
 
 // ─── Internal Helpers ──────────────────────────────────────────────────────────
+
+function mapClearanceResponse(data: any): ClearanceResponse {
+  const status = data.clearanceStatus || data.reportingStatus || data.status;
+  const mapped: ClearanceResponse = {
+    status: status === 'CLEARED' || status === 'REPORTED' ? status : (status === 'PASS' ? 'CLEARED' : 'REJECTED'),
+    clearanceId: data.clearedInvoice ? `CLR-${Date.now()}` : undefined,
+    invoiceHash: data.invoiceHash,
+    qrCode: data.clearedInvoice,
+    warnings: Array.isArray(data.validationResults?.warningMessages)
+      ? data.validationResults.warningMessages.map((w: any) => w.message || w)
+      : [],
+    errors: Array.isArray(data.validationResults?.errorMessages)
+      ? data.validationResults.errorMessages.map((e: any) => e.message || e)
+      : [],
+    timestamp: new Date().toISOString(),
+  };
+
+  if (mapped.errors && mapped.errors.length > 0 && mapped.status !== 'CLEARED' && mapped.status !== 'REPORTED') {
+    mapped.status = 'REJECTED';
+  }
+
+  return mapped;
+}
 
 function buildLineItemXml(item: ZATCALineItem, lineId: number): string {
   const lineTotal = item.quantity * item.unitPrice - item.discount;

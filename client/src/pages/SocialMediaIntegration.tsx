@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -30,7 +29,7 @@ export default function SocialMediaIntegration() {
 
   const createPost = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/social/posts", "POST", data);
+      return await apiRequest("POST", "/api/social/posts", data);
     },
     onSuccess: () => {
       toast({ title: t('social.postCreated', 'Post created'), description: t('social.postScheduled', 'Your post has been scheduled.') });
@@ -279,20 +278,21 @@ export default function SocialMediaIntegration() {
   ];
 
   return (
-    <TabsPageLayout
-      title={t('nav.social_media_integration', 'Social Media & Reviews')}
-      description={t('social.pageDescription', 'Manage social posts and respond to customer reviews')}
-      icon={Share2}
-      primaryAction={{
-        label: t('social.createPost', 'Create Post'),
-        icon: Plus,
-        onClick: () => setIsCreateDialogOpen(true),
-        testId: "button-create-post",
-      }}
-      headerContent={statsContent}
-      tabs={tabs}
-      defaultTab="posts"
-    >
+    <>
+      <TabsPageLayout
+        title={t('nav.social_media_integration', 'Social Media & Reviews')}
+        description={t('social.pageDescription', 'Manage social posts and respond to customer reviews')}
+        icon={Share2}
+        primaryAction={{
+          label: t('social.createPost', 'Create Post'),
+          icon: Plus,
+          onClick: () => setIsCreateDialogOpen(true),
+          testId: "button-create-post",
+        }}
+        headerContent={statsContent}
+        tabs={tabs}
+        defaultTab="posts"
+      />
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-xl bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
@@ -339,6 +339,6 @@ export default function SocialMediaIntegration() {
           </div>
         </DialogContent>
       </Dialog>
-    </TabsPageLayout>
+    </>
   );
 }

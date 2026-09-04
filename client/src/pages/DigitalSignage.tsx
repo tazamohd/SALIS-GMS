@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -19,11 +18,11 @@ export default function DigitalSignage() {
   const { toast } = useToast();
   const [openDisplayDialog, setOpenDisplayDialog] = useState(false);
 
-  const { data: displays = [], isLoading: loadingDisplays } = useQuery({
+  const { data: displays = [], isLoading: loadingDisplays } = useQuery<any[]>({
     queryKey: ["/api/signage/displays"],
   });
 
-  const { data: content = [], isLoading: loadingContent } = useQuery({
+  const { data: content = [], isLoading: loadingContent } = useQuery<any[]>({
     queryKey: ["/api/signage/content"],
   });
 
@@ -34,10 +33,7 @@ export default function DigitalSignage() {
       displayType: string;
       resolution: string;
     }) => {
-      return await apiRequest("/api/signage/displays", {
-        method: "POST",
-        body: JSON.stringify(displayData),
-      });
+      return await apiRequest("POST", "/api/signage/displays", displayData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/signage/displays"] });
@@ -195,45 +191,46 @@ export default function DigitalSignage() {
   );
 
   return (
-    <TabsPageLayout
-      title={t('signage.digitalSignage', 'Digital Signage')}
-      description={t('signage.manageWaitingRoomDisplays', 'Manage waiting room displays and content')}
-      icon={Monitor}
-      primaryAction={{
-        label: t('signage.addDisplay', 'Add Display'),
-        icon: Plus,
-        onClick: () => setOpenDisplayDialog(true),
-        testId: "button-add-display",
-      }}
-      headerContent={statsContent}
-      tabs={[
-        {
-          id: "displays",
-          label: t('signage.displays', 'Displays'),
-          icon: Monitor,
-          content: displaysTab,
-        },
-        {
-          id: "content",
-          label: t('signage.content', 'Content'),
-          icon: Play,
-          content: contentTab,
-        },
-        {
-          id: "settings",
-          label: t('common.settings', 'Settings'),
-          icon: Settings,
-          content: (
-            <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-              <CardContent className="p-6 text-center text-[#64748B]">
-                {t('common.comingSoon', 'Settings coming soon')}
-              </CardContent>
-            </Card>
-          ),
-        },
-      ]}
-      defaultTab="displays"
-    >
+    <>
+      <TabsPageLayout
+        title={t('signage.digitalSignage', 'Digital Signage')}
+        description={t('signage.manageWaitingRoomDisplays', 'Manage waiting room displays and content')}
+        icon={Monitor}
+        primaryAction={{
+          label: t('signage.addDisplay', 'Add Display'),
+          icon: Plus,
+          onClick: () => setOpenDisplayDialog(true),
+          testId: "button-add-display",
+        }}
+        headerContent={statsContent}
+        tabs={[
+          {
+            id: "displays",
+            label: t('signage.displays', 'Displays'),
+            icon: Monitor,
+            content: displaysTab,
+          },
+          {
+            id: "content",
+            label: t('signage.content', 'Content'),
+            icon: Play,
+            content: contentTab,
+          },
+          {
+            id: "settings",
+            label: t('common.settings', 'Settings'),
+            icon: Settings,
+            content: (
+              <Card className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
+                <CardContent className="p-6 text-center text-[#64748B]">
+                  {t('common.comingSoon', 'Settings coming soon')}
+                </CardContent>
+              </Card>
+            ),
+          },
+        ]}
+        defaultTab="displays"
+      />
       <Dialog open={openDisplayDialog} onOpenChange={setOpenDisplayDialog}>
         <DialogContent className="bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
           <DialogHeader>
@@ -271,6 +268,6 @@ export default function DigitalSignage() {
           </form>
         </DialogContent>
       </Dialog>
-    </TabsPageLayout>
+    </>
   );
 }

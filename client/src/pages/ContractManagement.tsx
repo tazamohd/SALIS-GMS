@@ -44,7 +44,7 @@ export default function ContractManagement() {
 
   const triggerRenewalMutation = useMutation({
     mutationFn: async (contractId: string) => 
-      apiRequest(`/api/contracts/${contractId}/trigger-renewal`, "POST"),
+      apiRequest("POST", `/api/contracts/${contractId}/trigger-renewal`),
     onSuccess: () => {
       toast({
         title: t('payments.contracts.renewalInitiated', 'Renewal Initiated'),
@@ -56,7 +56,7 @@ export default function ContractManagement() {
 
   const acceptRenewalMutation = useMutation({
     mutationFn: async ({ renewalId, contractId }: { renewalId: string; contractId: string }) => 
-      apiRequest(`/api/contracts/${contractId}/accept-renewal`, "POST", { renewalId }),
+      apiRequest("POST", `/api/contracts/${contractId}/accept-renewal`, { renewalId }),
     onSuccess: () => {
       toast({
         title: t('payments.contracts.renewalAccepted', 'Renewal Accepted'),

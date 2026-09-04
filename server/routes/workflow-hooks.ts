@@ -12,13 +12,15 @@ import { jobCards, invoices, appointments, sparePartInventories, spareParts } fr
 import { eq, and, lte, sql } from 'drizzle-orm';
 import { validate } from '../middleware/validate';
 import { jobTransitionSchema, appointmentCheckInSchema, inventoryCheckSchema } from '../schemas/validation';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // ─── POST /api/job-cards/:id/transition ───────────────────────────────────
 // Validated state transition for job cards via the workflow engine.
 
-router.post('/job-cards/:id/transition', validate(jobTransitionSchema), async (req: Request, res: Response) => {
+router.post('/job-cards/:id/transition', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), validate(jobTransitionSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -110,7 +112,7 @@ router.post('/job-cards/:id/transition', validate(jobTransitionSchema), async (r
 // ─── POST /api/appointments/:id/check-in ──────────────────────────────────
 // Checks in an appointment and auto-creates a draft job card.
 
-router.post('/appointments/:id/check-in', validate(appointmentCheckInSchema), async (req: Request, res: Response) => {
+router.post('/appointments/:id/check-in', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), validate(appointmentCheckInSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -221,7 +223,7 @@ router.post('/appointments/:id/check-in', validate(appointmentCheckInSchema), as
 // ─── POST /api/inventory/check-levels ─────────────────────────────────────
 // Checks all inventory levels and emits low-stock events for items below threshold.
 
-router.post('/inventory/check-levels', validate(inventoryCheckSchema), async (req: Request, res: Response) => {
+router.post('/inventory/check-levels', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), validate(inventoryCheckSchema), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user?.garageId) {

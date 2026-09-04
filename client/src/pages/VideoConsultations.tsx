@@ -1,8 +1,8 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { StandardTablePage, Column } from "@/components/layouts/StandardTablePage";
+import { StandardTablePage } from "@/components/layouts/StandardTablePage";
+import { Column } from "@/components/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ export default function VideoConsultations() {
 
   const createConsultation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/video/consultations", "POST", data);
+      return await apiRequest("POST", "/api/video/consultations", data);
     },
     onSuccess: () => {
       toast({ title: t('videoConsultations.consultationScheduled', 'Consultation scheduled'), description: t('videoConsultations.meetingLinkSent', 'Video meeting link sent to customer.') });
@@ -34,7 +34,7 @@ export default function VideoConsultations() {
 
   const startMeeting = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/video/consultations/${id}/start`, "POST", {});
+      return await apiRequest("POST", `/api/video/consultations/${id}/start`, {});
     },
     onSuccess: (data: any) => {
       if (data.meetingUrl) {
@@ -115,9 +115,9 @@ export default function VideoConsultations() {
 
   const columns: Column<typeof mockConsultations[0]>[] = [
     {
-      header: t('customers.customer', 'Customer'),
-      accessorKey: "customerName",
-      cell: (row) => (
+      label: t('customers.customer', 'Customer'),
+      key: "customerName",
+      render: (row) => (
         <div>
           <div className="font-semibold text-[#0B1F3B] dark:text-white">{row.customerName}</div>
           <div className="text-sm text-[#64748B]">{row.jobCardNumber}</div>
@@ -125,33 +125,33 @@ export default function VideoConsultations() {
       ),
     },
     {
-      header: t('technicians.technician', 'Technician'),
-      accessorKey: "technicianName",
+      label: t('technicians.technician', 'Technician'),
+      key: "technicianName",
     },
     {
-      header: t('videoConsultations.platform', 'Platform'),
-      accessorKey: "platform",
-      cell: (row) => <Badge variant="outline">{row.platform}</Badge>,
+      label: t('videoConsultations.platform', 'Platform'),
+      key: "platform",
+      render: (row) => <Badge variant="outline">{row.platform}</Badge>,
     },
     {
-      header: t('common.scheduled', 'Scheduled'),
-      accessorKey: "scheduledAt",
-      cell: (row) => new Date(row.scheduledAt).toLocaleString(),
+      label: t('common.scheduled', 'Scheduled'),
+      key: "scheduledAt",
+      render: (row) => new Date(row.scheduledAt).toLocaleString(),
     },
     {
-      header: t('videoConsultations.duration', 'Duration'),
-      accessorKey: "duration",
-      cell: (row) => `${row.duration} ${t('common.min', 'min')}`,
+      label: t('videoConsultations.duration', 'Duration'),
+      key: "duration",
+      render: (row) => `${row.duration} ${t('common.min', 'min')}`,
     },
     {
-      header: t('common.status', 'Status'),
-      accessorKey: "status",
-      cell: (row) => getStatusBadge(row.status),
+      label: t('common.status', 'Status'),
+      key: "status",
+      render: (row) => getStatusBadge(row.status),
     },
     {
-      header: t('common.actions', 'Actions'),
-      accessorKey: "id",
-      cell: (row) => (
+      label: t('common.actions', 'Actions'),
+      key: "id",
+      render: (row) => (
         <div className="flex items-center gap-2">
           {row.status === "scheduled" && (
             <>
@@ -166,7 +166,7 @@ export default function VideoConsultations() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => copyMeetingLink(row.meetingUrl)}
+                onClick={() => copyMeetingLink(row.meetingUrl!)}
                 data-testid={`button-copy-${row.id}`}
               >
                 <Copy className="h-3 w-3" />

@@ -2,11 +2,13 @@ import { Router } from 'express';
 import { db } from '../db';
 import { spareParts, sparePartInventories, purchaseOrders, purchaseOrderItems, suppliers, supplierPerformance } from '../../shared/schema';
 import { eq, sql, and, lte, desc } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // GET /api/inventory/overview — Stock summary
-router.get('/inventory/overview', async (req, res) => {
+router.get('/inventory/overview', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -100,7 +102,7 @@ router.get('/inventory/overview', async (req, res) => {
 });
 
 // GET /api/inventory/items — All inventory items with stock levels, reorder points, supplier info
-router.get('/inventory/items', async (req, res) => {
+router.get('/inventory/items', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -162,7 +164,7 @@ router.get('/inventory/items', async (req, res) => {
 });
 
 // GET /api/inventory/low-stock — Items below minimum threshold
-router.get('/inventory/low-stock', async (req, res) => {
+router.get('/inventory/low-stock', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -211,7 +213,7 @@ router.get('/inventory/low-stock', async (req, res) => {
 });
 
 // POST /api/inventory/reorder — Create purchase order for restocking
-router.post('/inventory/reorder', async (req, res) => {
+router.post('/inventory/reorder', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const user = (req as any).user;
     const garageId = user?.garageId;
@@ -281,7 +283,7 @@ router.post('/inventory/reorder', async (req, res) => {
 });
 
 // GET /api/inventory/suppliers — Supplier list with performance metrics
-router.get('/inventory/suppliers', async (req, res) => {
+router.get('/inventory/suppliers', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -329,7 +331,7 @@ router.get('/inventory/suppliers', async (req, res) => {
 });
 
 // GET /api/inventory/turnover — Inventory turnover analysis by category
-router.get('/inventory/turnover', async (req, res) => {
+router.get('/inventory/turnover', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 
@@ -371,7 +373,7 @@ router.get('/inventory/turnover', async (req, res) => {
 });
 
 // GET /api/inventory/valuation — Total inventory value
-router.get('/inventory/valuation', async (req, res) => {
+router.get('/inventory/valuation', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
   try {
     const garageId = (req as any).user?.garageId;
 

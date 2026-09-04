@@ -1,12 +1,13 @@
-// @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Wrench, Award, Clock, Settings, LogOut } from "lucide-react";
 import { Link } from "wouter";
 import type { User as UserType } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TechnicianMobileProfile() {
+  const { logoutMutation } = useAuth();
   const { data: user } = useQuery<UserType>({
     queryKey: ["/api/auth/user"],
   });
@@ -18,10 +19,10 @@ export default function TechnicianMobileProfile() {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-              {user?.name?.charAt(0).toUpperCase() || "T"}
+              {user?.fullName?.charAt(0).toUpperCase() || "T"}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{user?.name || "Technician"}</h2>
+              <h2 className="text-xl font-bold">{user?.fullName || "Technician"}</h2>
               <p className="text-sm text-white/80">{user?.email}</p>
               <p className="text-xs text-white/60 mt-1">Technician Portal</p>
             </div>
@@ -105,7 +106,7 @@ export default function TechnicianMobileProfile() {
         variant="destructive"
         className="w-full bg-[#F97316] hover:bg-[#F97316]/90"
         onClick={() => {
-          window.location.href = "/api/auth/logout";
+          logoutMutation.mutate();
         }}
         data-testid="button-logout"
       >

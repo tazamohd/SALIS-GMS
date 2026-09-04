@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -30,25 +29,25 @@ export default function FleetTracking() {
     alertOnExit: false,
   });
 
-  const { data: vehicles = [] } = useQuery({
+  const { data: vehicles = [] } = useQuery<any[]>({
     queryKey: ['/api/vehicles'],
   });
 
-  const { data: geofences = [], isLoading: geofencesLoading } = useQuery({
+  const { data: geofences = [], isLoading: geofencesLoading } = useQuery<any[]>({
     queryKey: ['/api/fleet/geofences'],
   });
 
-  const { data: routes = [], isLoading: routesLoading } = useQuery({
+  const { data: routes = [], isLoading: routesLoading } = useQuery<any[]>({
     queryKey: ['/api/fleet/routes'],
   });
 
-  const { data: geofenceEvents = [] } = useQuery({
+  const { data: geofenceEvents = [] } = useQuery<any[]>({
     queryKey: ['/api/fleet/geofence-events'],
   });
 
   const createGeofenceMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('/api/fleet/geofences', 'POST', data);
+      return await apiRequest('POST', '/api/fleet/geofences', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });
@@ -78,7 +77,7 @@ export default function FleetTracking() {
 
   const deleteGeofenceMutation = useMutation({
     mutationFn: async (id: string) => {
-      return await apiRequest(`/api/fleet/geofences/${id}`, 'DELETE', {});
+      return await apiRequest('DELETE', `/api/fleet/geofences/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/fleet/geofences'] });

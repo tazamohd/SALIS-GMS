@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -378,7 +377,7 @@ export default function MarketingAutomation() {
         ]}
         activeTab={selectedTab}
         onTabChange={setSelectedTab}
-        actions={
+        headerContent={
           <Button
             onClick={() => setIsCreateDialogOpen(true)}
             className="bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0952b8] hover:to-[#09a3e8] text-white"

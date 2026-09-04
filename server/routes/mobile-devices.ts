@@ -6,6 +6,7 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { insertMobileDeviceSchema } from "../../shared/schema";
 
 const router = Router();
@@ -19,7 +20,7 @@ const patchSchema = z.object({
   lastSync: z.coerce.date().nullable().optional(),
 });
 
-router.get("/mobile-devices", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/mobile-devices", isAuthenticated, requireRole(['ADMIN']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {
@@ -31,7 +32,7 @@ router.get("/mobile-devices", isAuthenticated, async (req: Request, res: Respons
   }
 });
 
-router.post("/mobile-devices", isAuthenticated, async (req: Request, res: Response) => {
+router.post("/mobile-devices", isAuthenticated, requireRole(['ADMIN']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = insertMobileDeviceSchema.safeParse(req.body);
@@ -45,7 +46,7 @@ router.post("/mobile-devices", isAuthenticated, async (req: Request, res: Respon
   }
 });
 
-router.patch("/mobile-devices/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.patch("/mobile-devices/:id", isAuthenticated, requireRole(['ADMIN']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   const parsed = patchSchema.safeParse(req.body);
@@ -60,7 +61,7 @@ router.patch("/mobile-devices/:id", isAuthenticated, async (req: Request, res: R
   }
 });
 
-router.delete("/mobile-devices/:id", isAuthenticated, async (req: Request, res: Response) => {
+router.delete("/mobile-devices/:id", isAuthenticated, requireRole(['ADMIN']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   try {

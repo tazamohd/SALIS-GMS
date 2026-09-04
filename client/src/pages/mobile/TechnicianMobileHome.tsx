@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ export default function TechnicianMobileHome() {
 
   const completedToday = jobCards?.data?.filter(
     (job) => job.status === "completed" && 
-      new Date(job.updatedAt).toDateString() === new Date().toDateString()
+      new Date(job.updatedAt || Date.now()).toDateString() === new Date().toDateString()
   )?.length || 0;
 
   const pendingJobs = jobCards?.data?.filter((job) => job.status === "pending")?.length || 0;

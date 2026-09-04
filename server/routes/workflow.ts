@@ -7,11 +7,13 @@ import { Router, Request, Response } from 'express';
 import { workflowEngine } from '../engine/workflow-engine';
 import { eventBus } from '../engine/event-bus';
 import type { EntityType } from '../engine/state-machines';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // POST /api/workflow/transition — Execute a validated state transition
-router.post('/workflow/transition', async (req: Request, res: Response) => {
+router.post('/workflow/transition', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -60,7 +62,7 @@ router.post('/workflow/transition', async (req: Request, res: Response) => {
 });
 
 // GET /api/workflow/transitions/:entityType/:status — Get available next states
-router.get('/workflow/transitions/:entityType/:status', async (req: Request, res: Response) => {
+router.get('/workflow/transitions/:entityType/:status', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     const { entityType, status } = req.params;
@@ -82,7 +84,7 @@ router.get('/workflow/transitions/:entityType/:status', async (req: Request, res
 });
 
 // POST /api/workflow/emit — Emit a custom workflow event
-router.post('/workflow/emit', async (req: Request, res: Response) => {
+router.post('/workflow/emit', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   try {
     const user = req.user as any;
     if (!user) {
@@ -114,7 +116,7 @@ router.post('/workflow/emit', async (req: Request, res: Response) => {
 });
 
 // GET /api/workflow/subscriptions — List all registered event subscriptions (debug/monitoring)
-router.get('/workflow/subscriptions', async (_req: Request, res: Response) => {
+router.get('/workflow/subscriptions', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (_req: Request, res: Response) => {
   try {
     const subscriptions = eventBus.getSubscriptions();
     res.json(subscriptions);

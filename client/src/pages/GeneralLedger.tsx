@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -50,7 +49,7 @@ export default function GeneralLedger() {
   const [dateRange, setDateRange] = useState("this-month");
 
   // Fetch real GL data from API
-  const { data: glData } = useQuery({
+  const { data: glData } = useQuery<any>({
     queryKey: ["/api/financial/general-ledger"],
     queryFn: async () => {
       const res = await fetch("/api/financial/general-ledger", { credentials: "include" });
@@ -59,7 +58,7 @@ export default function GeneralLedger() {
     },
   });
 
-  const { data: tbData } = useQuery({
+  const { data: tbData } = useQuery<any>({
     queryKey: ["/api/financial/trial-balance"],
     queryFn: async () => {
       const res = await fetch("/api/financial/trial-balance", { credentials: "include" });
@@ -200,7 +199,7 @@ export default function GeneralLedger() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {accountSummaries.map((account) => (
+              {accountSummaries.map((account: any) => (
                 <TableRow key={account.code} data-testid={`row-account-${account.code}`}>
                   <TableCell className="font-mono">{account.code}</TableCell>
                   <TableCell className="font-medium">{account.name}</TableCell>
@@ -324,7 +323,7 @@ export default function GeneralLedger() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {ledgerEntries.map((entry) => (
+              {ledgerEntries.map((entry: any) => (
                 <TableRow key={entry.id} data-testid={`row-ledger-${entry.id}`}>
                   <TableCell className="font-mono text-sm">{entry.date}</TableCell>
                   <TableCell>
@@ -401,8 +400,8 @@ export default function GeneralLedger() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {["Asset", "Liability", "Equity", "Revenue", "Expense"].map((type) => {
-          const typeAccounts = accountSummaries.filter((a) => a.type === type);
-          const typeTotal = typeAccounts.reduce((sum, a) => sum + a.balance, 0);
+          const typeAccounts = accountSummaries.filter((a: any) => a.type === type);
+          const typeTotal = typeAccounts.reduce((sum: number, a: any) => sum + a.balance, 0);
 
           return (
             <Card key={type} data-testid={`card-type-${type.toLowerCase()}`}>
@@ -416,7 +415,7 @@ export default function GeneralLedger() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {typeAccounts.map((account) => (
+                  {typeAccounts.map((account: any) => (
                     <div
                       key={account.code}
                       className="flex justify-between items-center py-1 border-b last:border-0"

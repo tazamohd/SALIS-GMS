@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SALIS AUTO - Workflow Engine
  * Central orchestrator that validates state transitions and fires events.
@@ -27,13 +26,28 @@ export interface TransitionResponse {
   event?: WorkflowEvent;
 }
 
+/**
+ * Status-agnostic view of a state machine. `stateMachines` is a union of
+ * `StateMachine<S>` instances with different `S`, which makes the shared
+ * parameters resolve to `never` at the call site; this structural type keeps
+ * the same runtime object while accepting plain status strings.
+ */
+interface AnyStateMachine {
+  canTransition(from: string, to: string, userRoles?: string[]): TransitionResult;
+  getAvailableTransitions(
+    from: string,
+    userRoles?: string[]
+  ): Array<{ to: string; label: string }>;
+  isValidStatus(status: string): boolean;
+}
+
 class WorkflowEngine {
   /**
    * Process a state transition request.
    * Validates the transition, emits events, and triggers cross-module automations.
    */
   async processTransition(request: TransitionRequest): Promise<TransitionResponse> {
-    const machine = stateMachines[request.entityType];
+    const machine: AnyStateMachine | undefined = stateMachines[request.entityType];
     if (!machine) {
       return {
         success: false,
@@ -110,7 +124,7 @@ class WorkflowEngine {
     currentStatus: string,
     userRoles: string[] = []
   ): Array<{ to: string; label: string }> {
-    const machine = stateMachines[entityType];
+    const machine: AnyStateMachine | undefined = stateMachines[entityType];
     if (!machine) return [];
     return machine.getAvailableTransitions(currentStatus as any, userRoles);
   }
@@ -119,7 +133,7 @@ class WorkflowEngine {
    * Validate if a status value is valid for an entity type
    */
   isValidStatus(entityType: EntityType, status: string): boolean {
-    const machine = stateMachines[entityType];
+    const machine: AnyStateMachine | undefined = stateMachines[entityType];
     if (!machine) return false;
     return machine.isValidStatus(status);
   }

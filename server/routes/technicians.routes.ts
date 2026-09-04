@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 import { storage } from "../storage";
 
 const router = Router();
 
 // Get all technicians
-router.get("/technicians", isAuthenticated, async (req, res) => {
+router.get("/technicians", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { garage_id } = req.query;
     const technicians = await storage.getTechnicians(garage_id as string);
@@ -17,7 +18,7 @@ router.get("/technicians", isAuthenticated, async (req, res) => {
 });
 
 // Create technician
-router.post("/technicians", isAuthenticated, async (req, res) => {
+router.post("/technicians", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const technicianData = {
       ...req.body,
@@ -33,7 +34,7 @@ router.post("/technicians", isAuthenticated, async (req, res) => {
 });
 
 // Delete technician
-router.delete("/technicians/:id", isAuthenticated, async (req, res) => {
+router.delete("/technicians/:id", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const { id } = req.params;
     await storage.deleteUser(id);
@@ -45,7 +46,7 @@ router.delete("/technicians/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get technician profile
-router.get("/technician-profiles/:userId", isAuthenticated, async (req, res) => {
+router.get("/technician-profiles/:userId", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { userId } = req.params;
     const profile = await storage.getTechnicianProfile(userId);
@@ -60,7 +61,7 @@ router.get("/technician-profiles/:userId", isAuthenticated, async (req, res) => 
 });
 
 // Create technician profile
-router.post("/technician-profiles", isAuthenticated, async (req, res) => {
+router.post("/technician-profiles", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const profile = await storage.createTechnicianProfile(req.body);
     res.status(201).json(profile);
@@ -71,7 +72,7 @@ router.post("/technician-profiles", isAuthenticated, async (req, res) => {
 });
 
 // Update technician profile
-router.patch("/technician-profiles/:userId", isAuthenticated, async (req, res) => {
+router.patch("/technician-profiles/:userId", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const { userId } = req.params;
     const profile = await storage.updateTechnicianProfile(userId, req.body);
@@ -83,7 +84,7 @@ router.patch("/technician-profiles/:userId", isAuthenticated, async (req, res) =
 });
 
 // Get technician's job cards
-router.get("/technicians/:technicianId/job-cards", isAuthenticated, async (req, res) => {
+router.get("/technicians/:technicianId/job-cards", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { technicianId } = req.params;
     const jobCards = await storage.getTechnicianJobCards(technicianId);
@@ -95,7 +96,7 @@ router.get("/technicians/:technicianId/job-cards", isAuthenticated, async (req, 
 });
 
 // Get technician's time clock entries
-router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+router.get("/technicians/:technicianId/time-clock", isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ADVISOR', 'TECHNICIAN']), async (req, res) => {
   try {
     const { technicianId } = req.params;
     const entries = await storage.getTechnicianTimeClockEntries(technicianId);
@@ -107,7 +108,7 @@ router.get("/technicians/:technicianId/time-clock", isAuthenticated, async (req,
 });
 
 // POST clock in/out
-router.post("/technicians/:technicianId/time-clock", isAuthenticated, async (req, res) => {
+router.post("/technicians/:technicianId/time-clock", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   try {
     const { technicianId } = req.params;
     const entryData = {

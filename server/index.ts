@@ -98,9 +98,8 @@ app.use((req, res, next) => {
     }
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Setup Vite (dev) or static serving (prod) BEFORE listen so that
+  // Vite's HMR upgrade handler is registered before any connections arrive.
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {

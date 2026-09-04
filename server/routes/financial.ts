@@ -5,6 +5,8 @@
  */
 
 import { Router, Request, Response } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 import { db } from '../db';
 import {
   invoices, invoiceItems, payments, purchaseOrders, purchaseOrderItems,
@@ -39,7 +41,7 @@ function requireGarageId(req: Request, res: Response): string | null {
 
 // ─── GET /api/financial/general-ledger ────────────────────────────────────
 
-router.get('/financial/general-ledger', async (req: Request, res: Response) => {
+router.get('/financial/general-ledger', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -260,7 +262,7 @@ router.get('/financial/general-ledger', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/balance-sheet ─────────────────────────────────────
 
-router.get('/financial/balance-sheet', async (req: Request, res: Response) => {
+router.get('/financial/balance-sheet', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -392,7 +394,7 @@ router.get('/financial/balance-sheet', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/income-statement ──────────────────────────────────
 
-router.get('/financial/income-statement', async (req: Request, res: Response) => {
+router.get('/financial/income-statement', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -509,7 +511,7 @@ router.get('/financial/income-statement', async (req: Request, res: Response) =>
 
 // ─── GET /api/financial/trial-balance ─────────────────────────────────────
 
-router.get('/financial/trial-balance', async (req: Request, res: Response) => {
+router.get('/financial/trial-balance', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -597,7 +599,7 @@ router.get('/financial/trial-balance', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/cash-flow ─────────────────────────────────────────
 
-router.get('/financial/cash-flow', async (req: Request, res: Response) => {
+router.get('/financial/cash-flow', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -713,7 +715,7 @@ router.get('/financial/cash-flow', async (req: Request, res: Response) => {
 
 // ─── GET /api/financial/accounts-receivable ───────────────────────────────
 
-router.get('/financial/accounts-receivable', async (req: Request, res: Response) => {
+router.get('/financial/accounts-receivable', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;
@@ -818,7 +820,7 @@ router.get('/financial/accounts-receivable', async (req: Request, res: Response)
 
 // ─── GET /api/financial/accounts-payable ──────────────────────────────────
 
-router.get('/financial/accounts-payable', async (req: Request, res: Response) => {
+router.get('/financial/accounts-payable', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: Request, res: Response) => {
   try {
     const garageId = requireGarageId(req, res);
     if (!garageId) return;

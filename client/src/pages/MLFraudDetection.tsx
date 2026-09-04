@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ import { AnalyticsPage } from '@/components/layouts';
 
 export default function MLFraudDetection() {
   const { t } = useTranslation();
-  const { data: fraudCasesResponse, isLoading } = useQuery({ queryKey: ['/api/nextgen/fraud-detection-cases'] });
+  const { data: fraudCasesResponse, isLoading } = useQuery<any>({ queryKey: ['/api/nextgen/fraud-detection-cases'] });
   const backendCases = fraudCasesResponse?.data || [];
 
   const fraudStats = [
@@ -25,7 +24,7 @@ export default function MLFraudDetection() {
     risk: c.riskScore > 70 ? 'high' : c.riskScore > 40 ? 'medium' : 'low',
     amount: `$${c.transactionAmount || 0}`,
     status: c.status || 'pending',
-    detected: new Date(c.detectedAt).toRelativeTimeString?.() || t('mlFraud.recently', 'Recently'),
+    detected: c.detectedAt ? new Date(c.detectedAt).toLocaleDateString() : t('mlFraud.recently', 'Recently'),
   })) : [
     { id: 'demo-1', type: t('mlFraud.paymentAnomaly', 'Payment Anomaly (Demo)'), risk: 'high', amount: '$2,450', status: 'investigating', detected: t('mlFraud.twoHoursAgo', '2 hours ago') },
     { id: 'demo-2', type: t('mlFraud.duplicateTransaction', 'Duplicate Transaction (Demo)'), risk: 'medium', amount: '$890', status: 'resolved', detected: t('mlFraud.fiveHoursAgo', '5 hours ago') },
@@ -94,7 +93,7 @@ export default function MLFraudDetection() {
             </div>
           ) : (
             <div className="space-y-4">
-              {cases.map((fraudCase) => (
+              {cases.map((fraudCase: any) => (
                 <div
                   key={fraudCase.id}
                   className="p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg hover:shadow-md transition-shadow bg-[#F8FAFC] dark:bg-[#0E1117]"
@@ -198,9 +197,7 @@ export default function MLFraudDetection() {
       title={t('mlFraud.title', 'ML Fraud Detection')}
       description={t('mlFraud.description', 'Machine learning-powered fraud detection with real-time transaction analysis')}
       icon={Shield}
-      metrics={metricsCards}
-    >
-      {content}
-    </AnalyticsPage>
+      sections={[{ title: t('mlFraud.overview', 'Overview'), content }]}
+    />
   );
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,7 +74,7 @@ export default function SafetyIncidents() {
             });
           },
           className: "bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] hover:from-[#0A5ED7]/90 hover:to-[#0BB3FF]/90 text-white",
-        },
+        } as any,
       ]}
     >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

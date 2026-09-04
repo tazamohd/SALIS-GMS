@@ -1,4 +1,8 @@
 import { Router } from 'express';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
+import { storage } from '../storage';
+import { insertWarrantySchema, insertWarrantyClaimSchema } from '@shared/schema';
 
 const router = Router();
 
@@ -129,7 +133,7 @@ const claims: WarrantyClaim[] = [
 // ---------------------------------------------------------------------------
 // GET /api/warranty/contracts — List all contracts
 // ---------------------------------------------------------------------------
-router.get('/warranty/contracts', (req, res) => {
+router.get('/warranty/contracts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { status, search } = req.query;
   let filtered = [...contracts];
 
@@ -151,7 +155,7 @@ router.get('/warranty/contracts', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/warranty/contracts — Create new contract
 // ---------------------------------------------------------------------------
-router.post('/warranty/contracts', (req, res) => {
+router.post('/warranty/contracts', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const {
     customerId, customerName, vehicleId, vehicleName, licensePlate,
     planType, coverageType, coverageAmount, startDate, endDate, monthlyPremium,
@@ -186,7 +190,7 @@ router.post('/warranty/contracts', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/contracts/:id — Contract detail with claims
 // ---------------------------------------------------------------------------
-router.get('/warranty/contracts/:id', (req, res) => {
+router.get('/warranty/contracts/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const id = parseInt(req.params.id);
   const contract = contracts.find(c => c.id === id);
   if (!contract) {
@@ -200,7 +204,7 @@ router.get('/warranty/contracts/:id', (req, res) => {
 // ---------------------------------------------------------------------------
 // POST /api/warranty/claims — Submit a warranty claim
 // ---------------------------------------------------------------------------
-router.post('/warranty/claims', (req, res) => {
+router.post('/warranty/claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { contractId, description, amount, jobCardId, notes } = req.body;
 
   const contract = contracts.find(c => c.id === contractId);
@@ -237,7 +241,7 @@ router.post('/warranty/claims', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/claims — List all claims
 // ---------------------------------------------------------------------------
-router.get('/warranty/claims', (req, res) => {
+router.get('/warranty/claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const { status, search } = req.query;
   let filtered = [...claims];
 
@@ -259,7 +263,7 @@ router.get('/warranty/claims', (req, res) => {
 // ---------------------------------------------------------------------------
 // PATCH /api/warranty/claims/:id — Approve or reject a claim
 // ---------------------------------------------------------------------------
-router.patch('/warranty/claims/:id', (req, res) => {
+router.patch('/warranty/claims/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const id = parseInt(req.params.id);
   const claim = claims.find(cl => cl.id === id);
   if (!claim) {
@@ -282,7 +286,7 @@ router.patch('/warranty/claims/:id', (req, res) => {
 // ---------------------------------------------------------------------------
 // GET /api/warranty/stats — Dashboard statistics
 // ---------------------------------------------------------------------------
-router.get('/warranty/stats', (req, res) => {
+router.get('/warranty/stats', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), (req, res) => {
   const activeContracts = contracts.filter(c => c.status === 'active').length;
   const totalContracts = contracts.length;
 
@@ -330,6 +334,206 @@ router.get('/warranty/stats', (req, res) => {
     totalClaims: claims.length,
     claimsByMonth,
   });
+});
+
+// ===========================================================================
+// Module 41 — Warranty Tracking (DB-backed, extracted from monolith routes.ts)
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Warranties  (/api/warranties/*)
+// ---------------------------------------------------------------------------
+
+router.post('/warranties', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const data = insertWarrantySchema.parse({
+      ...req.body,
+      garageId: user.garageId,
+      createdBy: user.id,
+    });
+    const warranty = await storage.createWarranty(data);
+    res.json(warranty);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/warranties', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const warranties = await storage.getWarrantiesByGarage(user.garageId);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching warranties:", error);
+    res.status(500).json({ message: "Failed to fetch warranties" });
+  }
+});
+
+router.get('/warranties/active', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const warranties = await storage.getActiveWarranties(user.garageId);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching active warranties:", error);
+    res.status(500).json({ message: "Failed to fetch active warranties" });
+  }
+});
+
+router.get('/warranties/expired', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const warranties = await storage.getExpiredWarranties(user.garageId);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching expired warranties:", error);
+    res.status(500).json({ message: "Failed to fetch expired warranties" });
+  }
+});
+
+router.get('/warranties/expiring', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const daysThreshold = parseInt(req.query.days as string) || 30;
+    const warranties = await storage.getExpiringWarranties(user.garageId, daysThreshold);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching expiring warranties:", error);
+    res.status(500).json({ message: "Failed to fetch expiring warranties" });
+  }
+});
+
+router.get('/warranties/vehicle/:vehicleId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const warranties = await storage.getWarrantiesByVehicle(req.params.vehicleId);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching warranties by vehicle:", error);
+    res.status(500).json({ message: "Failed to fetch warranties" });
+  }
+});
+
+router.get('/warranties/customer/:customerId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const warranties = await storage.getWarrantiesByCustomer(req.params.customerId);
+    res.json(warranties);
+  } catch (error) {
+    console.error("Error fetching warranties by customer:", error);
+    res.status(500).json({ message: "Failed to fetch warranties" });
+  }
+});
+
+router.get('/warranties/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const warranty = await storage.getWarrantyById(req.params.id);
+    if (!warranty) {
+      return res.status(404).json({ error: "Warranty not found" });
+    }
+    res.json(warranty);
+  } catch (error) {
+    console.error("Error fetching warranty:", error);
+    res.status(500).json({ message: "Failed to fetch warranty" });
+  }
+});
+
+router.patch('/warranties/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const data = insertWarrantySchema.partial().parse(req.body);
+    const warranty = await storage.updateWarranty(req.params.id, data);
+    res.json(warranty);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.delete('/warranties/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    await storage.deleteWarranty(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting warranty:", error);
+    res.status(500).json({ message: "Failed to delete warranty" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Warranty Claims  (/api/warranty-claims/*)
+// ---------------------------------------------------------------------------
+
+router.post('/warranty-claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const data = insertWarrantyClaimSchema.parse({
+      ...req.body,
+      submittedBy: user.id,
+    });
+    const claim = await storage.createWarrantyClaim(data);
+    res.json(claim);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/warranty-claims', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const claims = await storage.getWarrantyClaimsByGarage(user.garageId);
+    res.json(claims);
+  } catch (error) {
+    console.error("Error fetching warranty claims:", error);
+    res.status(500).json({ message: "Failed to fetch warranty claims" });
+  }
+});
+
+router.get('/warranty-claims/warranty/:warrantyId', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const claims = await storage.getWarrantyClaimsByWarranty(req.params.warrantyId);
+    res.json(claims);
+  } catch (error) {
+    console.error("Error fetching warranty claims by warranty:", error);
+    res.status(500).json({ message: "Failed to fetch warranty claims" });
+  }
+});
+
+router.get('/warranty-claims/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    const claim = await storage.getWarrantyClaimById(req.params.id);
+    if (!claim) {
+      return res.status(404).json({ error: "Warranty claim not found" });
+    }
+    res.json(claim);
+  } catch (error) {
+    console.error("Error fetching warranty claim:", error);
+    res.status(500).json({ message: "Failed to fetch warranty claim" });
+  }
+});
+
+router.patch('/warranty-claims/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req: any, res) => {
+  try {
+    const user = req.user;
+    const data = insertWarrantyClaimSchema.partial().parse(req.body);
+
+    // If status is being changed to approved/rejected, add reviewedBy
+    if (data.status && ['approved', 'rejected'].includes(data.status)) {
+      data.reviewedBy = user.id;
+    }
+
+    const claim = await storage.updateWarrantyClaim(req.params.id, data);
+    res.json(claim);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.delete('/warranty-claims/:id', isAuthenticated, requireRole(['ADMIN', 'MANAGER', 'ACCOUNTANT']), async (req, res) => {
+  try {
+    await storage.deleteWarrantyClaim(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting warranty claim:", error);
+    res.status(500).json({ message: "Failed to delete warranty claim" });
+  }
 });
 
 export default router;

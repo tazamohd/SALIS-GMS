@@ -66,6 +66,9 @@ import {
   leaderboardSnapshots,
   mobileDevices,
   subscriptions,
+  bankAccounts,
+  bankTransactions,
+  lossEntries,
   type User,
   type UpsertUser,
   type Garage,
@@ -1090,8 +1093,8 @@ export interface IStorage {
   deleteNotificationSchedule(id: string): Promise<void>;
   
   // Notification preferences - Module 24
-  getNotificationPreferences(userId: string): Promise<any | undefined>;
-  upsertNotificationPreferences(userId: string, eventMap: string): Promise<any>;
+  getNotificationPreferencesSimple(userId: string): Promise<any | undefined>;
+  upsertNotificationPreferencesSimple(userId: string, eventMap: string): Promise<any>;
 
   // Calendar & Scheduling - Module 26
   // Technician availability
@@ -1483,11 +1486,11 @@ export interface IStorage {
   updateLoyaltyProgram(id: string, data: any): Promise<any>;
   deleteLoyaltyProgram(id: string): Promise<void>;
   
-  createLoyaltyAccount(data: any): Promise<any>;
-  getLoyaltyAccounts(programId?: string, customerId?: string): Promise<any[]>;
+  createCustomerLoyaltyAccount(data: any): Promise<any>;
+  getCustomerLoyaltyAccounts(programId?: string, customerId?: string): Promise<any[]>;
   getLoyaltyAccountById(id: string): Promise<any | undefined>;
-  updateLoyaltyAccount(id: string, data: any): Promise<any>;
-  getLoyaltyAccountByCustomer(customerId: string): Promise<any | undefined>;
+  updateCustomerLoyaltyAccount(id: string, data: any): Promise<any>;
+  getCustomerLoyaltyAccountByCustomer(customerId: string): Promise<any | undefined>;
   
   createLoyaltyTransaction(data: any): Promise<any>;
   getLoyaltyTransactions(accountId: string): Promise<any[]>;
@@ -1753,7 +1756,6 @@ export interface IStorage {
   
   // Supporting tables for emerging technologies
   createIotAlert(data: any): Promise<any>;
-  getIotAlerts(sensorId?: string, vehicleId?: string): Promise<any[]>;
   createDroneMedia(data: any): Promise<any>;
   getDroneMedia(inspectionId: string): Promise<any[]>;
   createTwinSimulation(data: any): Promise<any>;
@@ -4575,7 +4577,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Notification Preferences - Module 24
-  async getNotificationPreferences(userId: string) {
+  async getNotificationPreferencesSimple(userId: string) {
     const { notificationPreferences } = await import("@shared/schema");
     const [prefs] = await db
       .select()
@@ -4584,7 +4586,7 @@ export class DatabaseStorage implements IStorage {
     return prefs;
   }
 
-  async upsertNotificationPreferences(userId: string, eventMap: string) {
+  async upsertNotificationPreferencesSimple(userId: string, eventMap: string) {
     const { notificationPreferences } = await import("@shared/schema");
     const [prefs] = await db
       .insert(notificationPreferences)
@@ -8368,7 +8370,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(loyaltyProgram.id, id));
   }
 
-  async createLoyaltyAccount(data: InsertCustomerLoyaltyAccount): Promise<CustomerLoyaltyAccount> {
+  async createCustomerLoyaltyAccount(data: InsertCustomerLoyaltyAccount): Promise<CustomerLoyaltyAccount> {
     const referralCode = `REF-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
     const [account] = await db.insert(customerLoyaltyAccounts)
       .values({ ...data, referralCode })
@@ -8376,7 +8378,7 @@ export class DatabaseStorage implements IStorage {
     return account;
   }
 
-  async getLoyaltyAccounts(programId?: string, customerId?: string): Promise<CustomerLoyaltyAccount[]> {
+  async getCustomerLoyaltyAccounts(programId?: string, customerId?: string): Promise<CustomerLoyaltyAccount[]> {
     const conditions: any[] = [];
     
     if (programId) {
@@ -8405,7 +8407,7 @@ export class DatabaseStorage implements IStorage {
     return account;
   }
 
-  async updateLoyaltyAccount(id: string, data: Partial<InsertCustomerLoyaltyAccount>): Promise<CustomerLoyaltyAccount> {
+  async updateCustomerLoyaltyAccount(id: string, data: Partial<InsertCustomerLoyaltyAccount>): Promise<CustomerLoyaltyAccount> {
     const [account] = await db.update(customerLoyaltyAccounts)
       .set(data)
       .where(eq(customerLoyaltyAccounts.id, id))
@@ -8413,7 +8415,7 @@ export class DatabaseStorage implements IStorage {
     return account;
   }
 
-  async getLoyaltyAccountByCustomer(customerId: string): Promise<CustomerLoyaltyAccount | undefined> {
+  async getCustomerLoyaltyAccountByCustomer(customerId: string): Promise<CustomerLoyaltyAccount | undefined> {
     const [account] = await db.select()
       .from(customerLoyaltyAccounts)
       .where(eq(customerLoyaltyAccounts.customerId, customerId));
@@ -8432,7 +8434,7 @@ export class DatabaseStorage implements IStorage {
       const totalPointsEarned = account.totalPointsEarned ?? 0;
       const newPoints = currentPoints + data.points;
       const newTotalEarned = data.points > 0 ? totalPointsEarned + data.points : totalPointsEarned;
-      await this.updateLoyaltyAccount(data.accountId, {
+      await this.updateCustomerLoyaltyAccount(data.accountId, {
         currentPoints: newPoints,
         totalPointsEarned: newTotalEarned
       });
@@ -8505,7 +8507,7 @@ export class DatabaseStorage implements IStorage {
     const account = await this.getLoyaltyAccountById(data.accountId);
     if (account) {
       const currentPoints = account.currentPoints ?? 0;
-      await this.updateLoyaltyAccount(data.accountId, {
+      await this.updateCustomerLoyaltyAccount(data.accountId, {
         currentPoints: currentPoints - data.pointsRedeemed
       });
     }
@@ -9628,17 +9630,6 @@ export class DatabaseStorage implements IStorage {
     return alert;
   }
 
-  async getIotAlerts(sensorId?: string, vehicleId?: string): Promise<any[]> {
-    const conditions = [];
-    if (sensorId) conditions.push(eq(iotAlerts.sensorId, sensorId));
-    if (vehicleId) conditions.push(eq(iotAlerts.vehicleId, vehicleId));
-    
-    if (conditions.length === 0) {
-      return await db.select().from(iotAlerts).orderBy(desc(iotAlerts.createdAt)).limit(100);
-    }
-    return await db.select().from(iotAlerts).where(and(...conditions)).orderBy(desc(iotAlerts.createdAt)).limit(100);
-  }
-
   async createDroneMedia(data: any): Promise<any> {
     const [media] = await db.insert(droneMedia).values(data).returning();
     return media;
@@ -10728,7 +10719,7 @@ export class DatabaseStorage implements IStorage {
     await db.delete(backupJobs).where(eq(backupJobs.id, id));
   }
 
-  async getLatestBackup(garageId: string): Promise<BackupJob | undefined> {
+  async getLatestBackupJob(garageId: string): Promise<BackupJob | undefined> {
     const [backup] = await db.select().from(backupJobs)
       .where(and(
         eq(backupJobs.garageId, garageId),
@@ -10739,7 +10730,7 @@ export class DatabaseStorage implements IStorage {
     return backup;
   }
 
-  async getBackupStats(garageId: string): Promise<any> {
+  async getBackupJobStats(garageId: string): Promise<any> {
     const allBackups = await db.select().from(backupJobs)
       .where(eq(backupJobs.garageId, garageId));
     
@@ -11673,7 +11664,7 @@ export class DatabaseStorage implements IStorage {
     return notification;
   }
 
-  async markNotificationAsRead(id: string): Promise<PushNotification> {
+  async markPushNotificationAsRead(id: string): Promise<PushNotification> {
     const [notification] = await db.update(pushNotifications)
       .set({ status: 'read', readAt: new Date() })
       .where(eq(pushNotifications.id, id))
@@ -12121,6 +12112,67 @@ const result = await db
       .update(smartContracts)
       .set(patch)
       .where(and(eq(smartContracts.id, id), eq(smartContracts.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  // ---------- Bank Accounts (Bank Account Management page) ----------
+  async getBankAccounts(garageId: string) {
+    return await db.select().from(bankAccounts).where(eq(bankAccounts.garageId, garageId)).orderBy(desc(bankAccounts.createdAt));
+  }
+
+  async createBankAccount(garageId: string, data: any) {
+    const [row] = await db.insert(bankAccounts).values({ ...data, garageId }).returning();
+    return row;
+  }
+
+  async updateBankAccount(id: string, garageId: string, patch: any) {
+    const [row] = await db
+      .update(bankAccounts)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(and(eq(bankAccounts.id, id), eq(bankAccounts.garageId, garageId)))
+      .returning();
+    return row;
+  }
+
+  // ---------- Bank Transactions ----------
+  async getBankTransactions(garageId: string, bankAccountId?: string) {
+    const conditions = [eq(bankTransactions.garageId, garageId)];
+    if (bankAccountId) conditions.push(eq(bankTransactions.bankAccountId, bankAccountId));
+    return await db.select().from(bankTransactions).where(and(...conditions)).orderBy(desc(bankTransactions.createdAt));
+  }
+
+  async createBankTransaction(garageId: string, data: any) {
+    const [row] = await db.insert(bankTransactions).values({ ...data, garageId }).returning();
+    // Update the bank account's current balance
+    const account = await db.select().from(bankAccounts)
+      .where(and(eq(bankAccounts.id, data.bankAccountId), eq(bankAccounts.garageId, garageId)));
+    if (account[0]) {
+      const current = parseFloat(account[0].currentBalance ?? "0");
+      const amount = parseFloat(data.amount);
+      const delta = ["deposit", "interest"].includes(data.transactionType) ? amount : -amount;
+      await db.update(bankAccounts)
+        .set({ currentBalance: String(current + delta), updatedAt: new Date() })
+        .where(eq(bankAccounts.id, data.bankAccountId));
+    }
+    return row;
+  }
+
+  // ---------- Loss Entries (Loss Account page) ----------
+  async getLossEntries(garageId: string) {
+    return await db.select().from(lossEntries).where(eq(lossEntries.garageId, garageId)).orderBy(desc(lossEntries.createdAt));
+  }
+
+  async createLossEntry(garageId: string, data: any) {
+    const [row] = await db.insert(lossEntries).values({ ...data, garageId }).returning();
+    return row;
+  }
+
+  async writeOffLossEntry(id: string, garageId: string) {
+    const [row] = await db
+      .update(lossEntries)
+      .set({ status: "written_off", updatedAt: new Date() })
+      .where(and(eq(lossEntries.id, id), eq(lossEntries.garageId, garageId)))
       .returning();
     return row;
   }

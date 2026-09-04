@@ -1,12 +1,13 @@
-// @ts-nocheck
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Phone, MapPin, Bell, Lock, LogOut, Settings } from "lucide-react";
 import { Link } from "wouter";
 import type { User as UserType } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CustomerMobileProfile() {
+  const { logoutMutation } = useAuth();
   const { data: user } = useQuery<UserType>({
     queryKey: ["/api/auth/user"],
   });
@@ -35,10 +36,10 @@ export default function CustomerMobileProfile() {
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-              {user?.name?.charAt(0).toUpperCase() || "U"}
+              {user?.fullName?.charAt(0).toUpperCase() || "U"}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">{user?.name || "User"}</h2>
+              <h2 className="text-xl font-bold">{user?.fullName || "User"}</h2>
               <p className="text-sm opacity-90">{user?.email}</p>
               <p className="text-xs opacity-75 mt-1">Customer Account</p>
             </div>
@@ -107,7 +108,7 @@ export default function CustomerMobileProfile() {
         variant="destructive"
         className="w-full"
         onClick={() => {
-          window.location.href = "/api/auth/logout";
+          logoutMutation.mutate();
         }}
         data-testid="button-logout"
       >

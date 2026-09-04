@@ -12,6 +12,7 @@ import {
   getServiceDistribution,
 } from "../ai/business-intelligence";
 import { isAuthenticated } from "../auth";
+import { requireRole } from "../middleware/requireRole";
 
 const router = Router();
 
@@ -29,7 +30,7 @@ function parseTimeRange(tr: string | undefined) {
 // per-tech efficiency rankings. Mirrors the client-side RoleGate on the page.
 const MANAGEMENT_TYPES = new Set(["admin", "manager", "owner", "accountant", "staff"]);
 
-router.get("/analytics/performance", isAuthenticated, async (req: Request, res: Response) => {
+router.get("/analytics/performance", isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user?.garageId) return res.status(403).json({ message: "No garage associated" });
   if (user.userType && !MANAGEMENT_TYPES.has(user.userType)) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -27,24 +26,22 @@ export default function Integrations() {
   const { t } = useTranslation();
   const { toast } = useToast();
 
-  const { data: connections = [], isLoading: connectionsLoading } = useQuery({
+  const { data: connections = [], isLoading: connectionsLoading } = useQuery<any[]>({
     queryKey: ['/api/integrations/connections'],
   });
 
-  const { data: syncLogs = [], isLoading: logsLoading } = useQuery({
+  const { data: syncLogs = [], isLoading: logsLoading } = useQuery<any[]>({
     queryKey: ['/api/integrations/sync-logs'],
   });
 
-  const { data: accountingTransactions = [], isLoading: accountingLoading } = useQuery({
+  const { data: accountingTransactions = [], isLoading: accountingLoading } = useQuery<any[]>({
     queryKey: ['/api/integrations/accounting/transactions'],
   });
 
   const toggleConnectionMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      return await apiRequest(`/api/integrations/connections/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ isActive }),
-      });
+      const res = await apiRequest('PATCH', `/api/integrations/connections/${id}`, { isActive });
+      return await res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/connections'] });
@@ -64,11 +61,10 @@ export default function Integrations() {
 
   const syncAccountingMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/integrations/accounting/sync', {
-        method: 'POST',
-      });
+      const res = await apiRequest('POST', '/api/integrations/accounting/sync');
+      return await res.json();
     },
-    onSuccess: (result) => {
+    onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/integrations/sync-logs'] });
       if (result.success) {
         toast({
@@ -93,11 +89,10 @@ export default function Integrations() {
 
   const obdScanMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/integrations/obd/scan', {
-        method: 'POST',
-      });
+      const res = await apiRequest('POST', '/api/integrations/obd/scan');
+      return await res.json();
     },
-    onSuccess: (result) => {
+    onSuccess: (result: any) => {
       if (result.success) {
         toast({
           title: t('common.success', 'Success'),

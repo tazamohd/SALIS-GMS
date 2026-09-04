@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -57,17 +56,17 @@ export default function BusinessIntelligenceDashboard() {
     schedule: "manual",
   });
 
-  const { data: dashboardMetrics } = useQuery({
+  const { data: dashboardMetrics } = useQuery<any>({
     queryKey: ["/api/analytics/dashboard-metrics", selectedPeriod],
   });
 
-  const { data: customReports = [] } = useQuery({
+  const { data: customReports = [] } = useQuery<any[]>({
     queryKey: ["/api/analytics/custom-reports"],
   });
 
   const createReportMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/analytics/custom-reports", "POST", data);
+      return await apiRequest("POST", "/api/analytics/custom-reports", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/analytics/custom-reports"] });
@@ -82,7 +81,7 @@ export default function BusinessIntelligenceDashboard() {
 
   const runReportMutation = useMutation({
     mutationFn: async (reportId: string) => {
-      return await apiRequest(`/api/analytics/custom-reports/${reportId}/run`, "POST");
+      return await apiRequest("POST", `/api/analytics/custom-reports/${reportId}/run`);
     },
     onSuccess: () => {
       toast({

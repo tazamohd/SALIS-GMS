@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnalyticsPage } from "@/components/layouts";
@@ -140,47 +139,43 @@ export default function StaffPerformanceReview() {
     },
   ];
 
+  const topPerformersSection = {
+    title: t('staffReview.topPerformers', 'Top Performers'),
+    description: t('staffReview.topPerformersDesc', 'Highest-scoring team members this period'),
+    content: (
+      <div className="space-y-4">
+        {topPerformers.map((performer, index) => (
+          <div
+            key={performer.name}
+            className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
+            data-testid={`performer-${index}`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-bold text-white">
+                #{index + 1}
+              </div>
+              <div>
+                <p className="font-semibold text-[#0B1F3B] dark:text-white">{performer.name}</p>
+                <p className="text-sm text-[#64748B]">{performer.role}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{performer.score}</p>
+              <p className="text-sm text-[#64748B]">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+  };
+
   return (
     <AnalyticsPage
       title={t('staffReview.title', 'Staff Performance Review')}
       description={t('staffReview.description', 'Comprehensive performance analytics and reviews')}
       icon={Award}
       filters={filters}
-      sections={sections}
-    >
-      <Card className="mb-6 bg-white dark:bg-[#151A23] border-[#E2E8F0] dark:border-[#232A36]">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[#0B1F3B] dark:text-white">
-            <TrendingUp className="w-5 h-5 text-[#0A5ED7]" />
-            {t('staffReview.topPerformers', 'Top Performers')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topPerformers.map((performer, index) => (
-              <div
-                key={performer.name}
-                className="flex items-center justify-between p-4 border border-[#E2E8F0] dark:border-[#232A36] rounded-lg bg-[#F8FAFC] dark:bg-[#0E1117]"
-                data-testid={`performer-${index}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-[#0A5ED7] to-[#0BB3FF] font-bold text-white">
-                    #{index + 1}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#0B1F3B] dark:text-white">{performer.name}</p>
-                    <p className="text-sm text-[#64748B]">{performer.role}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-[#0B1F3B] dark:text-white">{performer.score}</p>
-                  <p className="text-sm text-[#64748B]">{performer.tasks} {t('staffReview.tasksCompleted', 'tasks completed')}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </AnalyticsPage>
+      sections={[...sections, topPerformersSection]}
+    />
   );
 }

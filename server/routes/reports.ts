@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { isAuthenticated } from '../auth';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 // GET /api/reports/revenue - Revenue report with date range
-router.get('/reports/revenue', async (req, res) => {
+router.get('/reports/revenue', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   const { from, to, groupBy = 'month' } = req.query;
   try {
@@ -24,7 +26,7 @@ router.get('/reports/revenue', async (req, res) => {
 });
 
 // GET /api/reports/technician-performance
-router.get('/reports/technician-performance', async (req, res) => {
+router.get('/reports/technician-performance', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const performance = await db.execute(sql`
@@ -44,7 +46,7 @@ router.get('/reports/technician-performance', async (req, res) => {
 });
 
 // GET /api/reports/inventory-turnover
-router.get('/reports/inventory-turnover', async (req, res) => {
+router.get('/reports/inventory-turnover', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const turnover = await db.execute(sql`
@@ -65,7 +67,7 @@ router.get('/reports/inventory-turnover', async (req, res) => {
 });
 
 // GET /api/reports/customer-analytics
-router.get('/reports/customer-analytics', async (req, res) => {
+router.get('/reports/customer-analytics', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const customers = await db.execute(sql`
@@ -86,7 +88,7 @@ router.get('/reports/customer-analytics', async (req, res) => {
 });
 
 // GET /api/reports/summary - Executive summary
-router.get('/reports/summary', async (req, res) => {
+router.get('/reports/summary', isAuthenticated, requireRole(['ADMIN', 'MANAGER']), async (req, res) => {
   const garageId = (req as any).user?.garageId || '1';
   try {
     const [revenue, jobs, customers, inventory] = await Promise.all([
