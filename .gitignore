@@ -19,7 +19,12 @@ ui-screens/
 gallery.html
 
 # Replit artifacts
-attached_assets/
+attached_assets/*
+# ...except the logo: it is a real build dependency imported via the @assets
+# alias by Landing/Login/Register/WelcomePage, so the production build fails
+# without it. Uses `/*` above because git cannot re-include a file whose
+# parent directory is itself excluded.
+!attached_assets/Logo_blue_orange_1760743036292.png
 replit.md
 .replit
 replit.nix
