@@ -462,6 +462,19 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, requireRole(['ADM
     const totalWithVAT = parseFloat(String(invoice.totalAmount ?? '0'));
     const garageAddress = typeof garage?.address === 'string' ? garage.address : '';
 
+    // ZATCA accepts a fixed set of payment methods; the invoice record itself does
+    // not carry one (it lives on `payments`), so allow an optional caller override.
+    const PAYMENT_METHODS = {
+      cash: 'cash',
+      card: 'credit',
+      credit: 'credit',
+      transfer: 'bank_transfer',
+      bank_transfer: 'bank_transfer',
+      check: 'other',
+    } as const;
+    const paymentMethod =
+      PAYMENT_METHODS[req.body.paymentMethod as keyof typeof PAYMENT_METHODS] ?? 'cash';
+
     const zatcaInvoice = {
       invoiceNumber: invoice.invoiceNumber,
       invoiceType: invoiceType === 'simplified' ? 'simplified' as const : 'standard' as const,
@@ -481,19 +494,21 @@ router.post('/saudi/zatca/submit/:invoiceId', isAuthenticated, requireRole(['ADM
         },
       },
       lineItems: [{
-        name: `Invoice ${invoice.invoiceNumber}`,
+        description: `Invoice ${invoice.invoiceNumber}`,
         quantity: 1,
         unitPrice: subtotal,
+        taxCategory: 'S' as const,
+        taxPercent: vatAmount > 0 && subtotal > 0
+          ? Number(((vatAmount / subtotal) * 100).toFixed(2))
+          : 15,
         discount: 0,
-        taxRate: vatAmount > 0 && subtotal > 0 ? (vatAmount / subtotal) * 100 : 15,
-        taxAmount: vatAmount,
-        lineTotal: subtotal,
       }],
       subtotal,
       totalTaxableAmount: subtotal,
       totalVAT: vatAmount,
       totalWithVAT,
       totalDiscount: 0,
+      paymentMethod,
     };
 
     const ublInvoice = generateEInvoice(zatcaInvoice);
