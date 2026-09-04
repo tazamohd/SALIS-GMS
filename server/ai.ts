@@ -1,19 +1,9 @@
-import OpenAI from "openai";
-
-// This is using Replit's AI Integrations service, which provides OpenAI-compatible API access without requiring your own OpenAI API key.
-// The newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-// The OpenAI SDK throws at construction when neither apiKey nor OPENAI_API_KEY
-// is set. When the AI integration is not configured, every call site guards on
-// AI_INTEGRATIONS_OPENAI_API_KEY and falls back before touching this client, so a
-// placeholder keeps import-time safe (e.g. the test suite booting the full route
-// tree) without changing runtime behavior when a real key is present.
-export const openai = new OpenAI({
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || "not-configured"
-});
-
-export const AI_MODEL = "gpt-5";
-export const AI_MAX_TOKENS = 8192;
+// Single shared OpenAI client and config live in ./ai/client; re-exported here
+// for the existing call sites that import from "../ai".
+export { openai, AI_MODEL, AI_MAX_TOKENS, AI_AVAILABLE } from "./ai/client";
+import { openai } from "./ai/client";
+import { AI_MODEL, AI_MAX_TOKENS } from "./ai/client";
+import { compactHistory, compactRecords } from "./ai/compaction";
 
 interface JobEstimationInput {
   serviceType: string;
@@ -136,7 +126,12 @@ Vehicle: ${input.vehicleMake} ${input.vehicleModel} (${input.vehicleYear})
 Current Mileage: ${input.mileage}
 
 Service History:
-${input.serviceHistory.map(s => `- ${s.date}: ${s.serviceType} - ${s.description}`).join('\n')}
+${(() => {
+  const { kept, omittedCount } = compactRecords(input.serviceHistory, 15);
+  const lines = kept.map(s => `- ${s.date}: ${s.serviceType} - ${s.description}`);
+  if (omittedCount > 0) lines.unshift(`- (${omittedCount} older record(s) omitted)`);
+  return lines.join('\n');
+})()}
 
 Identify potential upcoming maintenance needs or issues. Provide your analysis in JSON format:
 {
@@ -362,7 +357,7 @@ Always be professional, friendly, and helpful.`;
         role: "system",
         content: systemPrompt
       },
-      ...conversationHistory,
+      ...compactHistory(conversationHistory),
       {
         role: "user",
         content: message
