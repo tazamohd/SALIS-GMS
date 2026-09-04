@@ -109,7 +109,7 @@ export async function seedUsers() {
     }
 
     // Get all roles
-    const allRoles = await db.select().from(roles);
+    const allRoles: Array<typeof roles.$inferSelect> = await db.select().from(roles);
     const roleMap = new Map(allRoles.map(r => [r.name, r]));
 
     console.log(`\nCreating ${testUsers.length} test users...\n`);

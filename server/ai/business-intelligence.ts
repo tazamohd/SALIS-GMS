@@ -12,6 +12,40 @@ import { eq, and, gte, lte, sql, count, desc } from 'drizzle-orm';
 import { openai, AI_MODEL, AI_MAX_TOKENS } from '../ai';
 import type { AIInsight, RevenueForecast, DemandPrediction } from '../../shared/workflows';
 
+// ─── Row shapes for aggregate queries ────────────────────────────────────────
+// `db` is untyped (see server/db.ts), so aggregate SELECTs come back as `any`.
+// These schema-derived shapes give the projections real types without changing
+// any runtime behaviour.
+type JobCard = typeof jobCards.$inferSelect;
+type User = typeof users.$inferSelect;
+type SparePart = typeof spareParts.$inferSelect;
+
+/** { month: 'YYYY-MM', revenue } — grouped paid-invoice totals. */
+type MonthlyRevenueRow = { month: string; revenue: number };
+
+/** Job counts grouped by `jobCards.serviceType`. */
+type ServiceCountRow = { serviceType: JobCard['serviceType']; count: number };
+
+/** Per-technician job rollup (LEFT JOIN, so the user columns may be null). */
+type TechnicianStatsRow = {
+  id: User['id'] | null;
+  name: string | null;
+  jobs: number;
+  completed: number;
+  avgHours: number;
+};
+
+/** Job counts grouped by calendar day. */
+type DailyJobCountRow = { day: string | null; isoDate: string; count: number };
+
+/** Stock rollup per spare part. */
+type PartsStockRow = {
+  id: SparePart['id'];
+  name: SparePart['name'];
+  current: number;
+  minThreshold: number;
+};
+
 /**
  * Generate comprehensive business insights from cross-department data
  */
@@ -198,7 +232,7 @@ export async function generateRevenueForecast(garageId: string): Promise<Revenue
 
   try {
     // Get last 6 months of revenue data
-    const monthlyRevenue = await db.select({
+    const monthlyRevenue: MonthlyRevenueRow[] = await db.select({
       month: sql<string>`TO_CHAR(${invoices.invoiceDate}, 'YYYY-MM')`,
       revenue: sql<number>`COALESCE(SUM(${invoices.totalAmount}::numeric), 0)`,
     })
@@ -247,7 +281,7 @@ export async function generateDemandPredictions(garageId: string): Promise<Deman
 
   try {
     // Get service type distribution from last 3 months
-    const serviceDistribution = await db.select({
+    const serviceDistribution: ServiceCountRow[] = await db.select({
       serviceType: jobCards.serviceType,
       count: count(),
     })
@@ -286,7 +320,7 @@ export async function generateDemandPredictions(garageId: string): Promise<Deman
  * Returns [{ month: 'YYYY-MM', revenue: number }].
  */
 export async function getRevenueByMonth(garageId: string, months = 6) {
-  const rows = await db.select({
+  const rows: MonthlyRevenueRow[] = await db.select({
     month: sql<string>`TO_CHAR(${invoices.invoiceDate}, 'YYYY-MM')`,
     revenue: sql<number>`COALESCE(SUM(${invoices.totalAmount}::numeric), 0)`,
   })
@@ -306,7 +340,7 @@ export async function getRevenueByMonth(garageId: string, months = 6) {
  * Returns [{ id, name, jobs, completed, avgHours, efficiency }] where efficiency ≈ completion ratio %.
  */
 export async function getTechnicianStats(garageId: string, days = 30, limit = 6) {
-  const rows = await db.select({
+  const rows: TechnicianStatsRow[] = await db.select({
     id: users.id,
     name: sql<string>`COALESCE(${users.fullName}, CONCAT(${users.firstName}, ' ', ${users.lastName}), ${users.email})`,
     jobs: count(),
@@ -343,7 +377,7 @@ export async function getTechnicianStats(garageId: string, days = 30, limit = 6)
  * Distribution of jobs by serviceType within a recent window. Returns percent shares.
  */
 export async function getServiceDistribution(garageId: string, days = 30) {
-  const rows = await db.select({
+  const rows: ServiceCountRow[] = await db.select({
     serviceType: jobCards.serviceType,
     count: count(),
   })
@@ -367,7 +401,7 @@ export async function getServiceDistribution(garageId: string, days = 30) {
  * Daily job counts for the last N days. Returns [{ day, count }] ordered ascending.
  */
 export async function getDailyJobCounts(garageId: string, days = 30) {
-  const rows = await db.select({
+  const rows: DailyJobCountRow[] = await db.select({
     day: sql<string>`TO_CHAR(${jobCards.createdAt}, 'Dy')`,
     isoDate: sql<string>`TO_CHAR(${jobCards.createdAt}, 'YYYY-MM-DD')`,
     count: count(),
@@ -397,7 +431,7 @@ export async function getPartsForecastSnapshot(garageId: string, limit = 10) {
   // `sparePartInventories` joins via `sparePartId` (not `partId`). Both were
   // hidden by @ts-nocheck and made this handler 500 on any garage.
   // Using a LEFT join from inventories → parts so empty inventories return [].
-  const rows = await db.select({
+  const rows: PartsStockRow[] = await db.select({
     id: spareParts.id,
     name: spareParts.name,
     current: sql<number>`COALESCE(SUM(${sparePartInventories.stockQuantity}), 0)`,

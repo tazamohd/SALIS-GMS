@@ -6,14 +6,14 @@ async function assignUserRoles() {
   console.log('🎭 Assigning users to roles...\n');
 
   // Get all roles
-  const allRoles = await db.select().from(roles);
+  const allRoles: Array<typeof roles.$inferSelect> = await db.select().from(roles);
   const roleMap = new Map(allRoles.map(r => [r.name, r]));
   
   // Get first branch of each garage for role assignment
-  const garagesBranches = await db.select().from(branches);
+  const garagesBranches: Array<typeof branches.$inferSelect> = await db.select().from(branches);
   
   // Get all users
-  const allUsers = await db.select().from(users);
+  const allUsers: Array<typeof users.$inferSelect> = await db.select().from(users);
   
   console.log(`Found ${allUsers.length} users to process`);
   console.log(`Found ${allRoles.length} roles: ${allRoles.map(r => r.name).join(', ')}\n`);

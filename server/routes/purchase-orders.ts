@@ -44,7 +44,7 @@ router.post("/purchase-orders", isAuthenticated, requireRole(['ADMIN', 'MANAGER'
     const userId = (req as any).user?.id || "default-user";
     const result = insertPurchaseOrderSchema.safeParse(req.body);
     if (!result.success) {
-      return res.status(400).json({ message: "Validation error", ...sanitizeZodError(result.error) });
+      return res.status(400).json({ ...sanitizeZodError(result.error) });
     }
     const order = await storage.createPurchaseOrder({ ...result.data, createdBy: userId } as any);
     res.status(201).json(order);
@@ -95,7 +95,7 @@ router.patch("/purchase-orders/:id", isAuthenticated, requireRole(['ADMIN', 'MAN
   try {
     const result = insertPurchaseOrderSchema.partial().safeParse(req.body);
     if (!result.success) {
-      return res.status(400).json({ message: "Validation error", ...sanitizeZodError(result.error) });
+      return res.status(400).json({ ...sanitizeZodError(result.error) });
     }
     const order = await storage.updatePurchaseOrder(req.params.id, result.data);
     res.json(order);
@@ -129,7 +129,7 @@ router.post("/purchase-order-items", isAuthenticated, requireRole(['ADMIN', 'MAN
   try {
     const result = insertPurchaseOrderItemSchema.safeParse(req.body);
     if (!result.success) {
-      return res.status(400).json({ message: "Validation error", ...sanitizeZodError(result.error) });
+      return res.status(400).json({ ...sanitizeZodError(result.error) });
     }
     const item = await storage.createPurchaseOrderItem(result.data);
     res.status(201).json(item);

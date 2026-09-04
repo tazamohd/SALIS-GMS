@@ -12,6 +12,17 @@ import { faker } from '@faker-js/faker';
 import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
 
+// Schema-derived row types (single source of truth: shared/schema.ts)
+type SaasPlan = typeof schema.saasPlans.$inferSelect;
+type Garage = typeof schema.garages.$inferSelect;
+type Branch = typeof schema.branches.$inferSelect;
+type User = typeof schema.users.$inferSelect;
+type Vehicle = typeof schema.vehicles.$inferSelect;
+type SparePart = typeof schema.spareParts.$inferSelect;
+type JobCard = typeof schema.jobCards.$inferSelect;
+type Appointment = typeof schema.appointments.$inferSelect;
+type Invoice = typeof schema.invoices.$inferSelect;
+
 const IMAGES = {
   garages: [
     'modern_automotive_ga_97a83bd4.jpg',
@@ -98,7 +109,7 @@ export async function seedAllData() {
     
     // Skip if data exists
     const existingGarages = await db.select().from(schema.garages);
-    let garages, branches, saasPlans;
+    let garages: Garage[], branches: Branch[], saasPlans: SaasPlan[];
     
     if (existingGarages.length > 0) {
       console.log('  ℹ️  Garages already exist, skipping core structure...');
@@ -175,7 +186,7 @@ export async function seedAllData() {
     console.log('-'.repeat(70));
     
     const existingUsers = await db.select().from(schema.users);
-    let users, customers, technicians;
+    let users: User[], customers: User[], technicians: User[];
     
     if (existingUsers.length >= 50) {
       console.log('  ℹ️  Users already exist, skipping user creation...');
@@ -300,8 +311,8 @@ export async function seedAllData() {
     console.log('-'.repeat(70));
     
     const existingVehicles = await db.select().from(schema.vehicles);
-    let vehicles;
-    
+    let vehicles: Vehicle[];
+
     if (existingVehicles.length >= 200) {
       console.log('  ℹ️  Vehicles already exist, skipping...');
       vehicles = existingVehicles;
@@ -474,8 +485,8 @@ export async function seedAllData() {
     console.log('-'.repeat(70));
     
     const existingParts = await db.select().from(schema.spareParts);
-    let spareParts;
-    
+    let spareParts: SparePart[];
+
     if (existingParts.length >= 100) {
       console.log('  ℹ️  Parts already exist, skipping...');
       spareParts = existingParts;
@@ -542,8 +553,8 @@ export async function seedAllData() {
     console.log('-'.repeat(70));
     
     const existingJobCards = await db.select().from(schema.jobCards);
-    let jobCards;
-    
+    let jobCards: JobCard[];
+
     if (existingJobCards.length >= 100) {
       console.log('  ℹ️  Job cards already exist, skipping...');
       jobCards = existingJobCards;
@@ -603,8 +614,8 @@ export async function seedAllData() {
     
     // Create Appointments
     const existingAppointments = await db.select().from(schema.appointments);
-    let appointments;
-    
+    let appointments: Appointment[];
+
     if (existingAppointments.length >= 100) {
       console.log('  ℹ️  Appointments already exist, skipping...');
       appointments = existingAppointments;
@@ -664,8 +675,8 @@ export async function seedAllData() {
     console.log('-'.repeat(70));
     
     const existingInvoices = await db.select().from(schema.invoices);
-    let invoices;
-    
+    let invoices: Invoice[];
+
     if (existingInvoices.length >= 100) {
       console.log('  ℹ️  Invoices already exist, skipping...');
       invoices = existingInvoices;

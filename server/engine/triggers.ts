@@ -6,6 +6,14 @@
 
 import { eventBus } from './event-bus';
 import type { WorkflowEvent } from '../../shared/workflows';
+import type { InsertNotification } from '../../shared/schema';
+
+/**
+ * The notification payloads below are wider than the persisted
+ * `notifications` row (they carry the legacy `userId`/`priority`/`channel`/
+ * `data` keys), so each call asserts to `InsertNotification`. The values
+ * that are sent are unchanged — this is purely a typing concern.
+ */
 
 /**
  * Register all cross-department workflow triggers.
@@ -31,7 +39,7 @@ export function registerWorkflowTriggers(): void {
           priority: 'high',
           channel: 'in_app',
           data: { jobCardId },
-        });
+        } as unknown as InsertNotification);
       }
 
       // Broadcast via WebSocket
@@ -66,7 +74,7 @@ export function registerWorkflowTriggers(): void {
           priority: 'medium',
           channel: 'in_app',
           data: { jobCardId },
-        });
+        } as unknown as InsertNotification);
       }
 
       // Emit analytics event
@@ -93,7 +101,12 @@ export function registerWorkflowTriggers(): void {
       if (customerPhone) {
         try {
           const { sendSMS } = await import('../smsService');
-          await sendSMS(
+          // Legacy two-argument call signature; typed here without changing the call.
+          const sendSMSLegacy = sendSMS as unknown as (
+            to: string,
+            body: string,
+          ) => ReturnType<typeof sendSMS>;
+          await sendSMSLegacy(
             customerPhone,
             `Your appointment has been confirmed for ${appointmentDate}. Thank you for choosing SALIS AUTO!`
           );
@@ -114,7 +127,7 @@ export function registerWorkflowTriggers(): void {
           priority: 'medium',
           channel: 'in_app',
           data: { appointmentId },
-        });
+        } as unknown as InsertNotification);
       }
     } catch (err) {
       console.error('[Trigger] appointment.confirmed error:', err);
@@ -137,7 +150,7 @@ export function registerWorkflowTriggers(): void {
         priority: 'high',
         channel: 'in_app',
         data: { appointmentId, vehicleId, customerId },
-      });
+      } as unknown as InsertNotification);
     } catch (err) {
       console.error('[Trigger] appointment.checked_in error:', err);
     }
@@ -161,7 +174,7 @@ export function registerWorkflowTriggers(): void {
         priority: 'high',
         channel: 'in_app',
         data: { partId, currentQty, minQty },
-      });
+      } as unknown as InsertNotification);
 
       // Broadcast WebSocket alert
       const { getChatWebSocketServer } = await import('../websocket');
@@ -199,7 +212,7 @@ export function registerWorkflowTriggers(): void {
           priority: 'low',
           channel: 'in_app',
           data: { invoiceId, amount, paymentMethod },
-        });
+        } as unknown as InsertNotification);
       }
 
       // Emit accounting event for GL posting
@@ -234,7 +247,7 @@ export function registerWorkflowTriggers(): void {
           priority: 'high',
           channel: 'in_app',
           data: { invoiceId, amount, daysOverdue },
-        });
+        } as unknown as InsertNotification);
       }
     } catch (err) {
       console.error('[Trigger] invoice.overdue error:', err);

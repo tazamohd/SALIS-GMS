@@ -19,6 +19,19 @@ import {
   appointments
 } from "@shared/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
+
+// Row shapes returned by the queries below. `db` is loosely typed (see
+// server/db.ts), so callbacks over its results need explicit row types.
+type AppointmentRow = typeof appointments.$inferSelect;
+type UserRow = typeof users.$inferSelect;
+
+// Some projections/filters below reference columns that the current
+// `spareParts` / `tools` definitions in shared/schema.ts do not declare.
+// These aliases keep the queries exactly as they are at runtime while giving
+// TypeScript a column type for those references.
+type SparePartsTable = typeof spareParts & Record<string, AnyPgColumn>;
+type ToolsTable = typeof tools & Record<string, AnyPgColumn>;
 
 // ========================================
 // 1. AI-POWERED SCHEDULING OPTIMIZER
@@ -97,7 +110,7 @@ export async function runSchedulingOptimization(garageId: string) {
     
     const garageAppointments = await db.select().from(appointments).where(eq(appointments.garageId, garageId));
     
-    const upcomingAppointments = garageAppointments.filter(apt => {
+    const upcomingAppointments: AppointmentRow[] = garageAppointments.filter((apt: AppointmentRow) => {
       const aptDate = new Date(apt.appointmentDate);
       return aptDate >= today && aptDate < nextWeek && 
              apt.status !== 'completed' && apt.status !== 'cancelled';
@@ -120,12 +133,12 @@ export async function runSchedulingOptimization(garageId: string) {
     const technicianWorkload: Record<string, number> = {};
     const technicianNames: Record<string, string> = {};
     
-    technicians.forEach(tech => {
+    technicians.forEach((tech: UserRow) => {
       technicianWorkload[tech.id] = 0;
       technicianNames[tech.id] = tech.fullName || tech.email;
     });
     
-    upcomingAppointments.forEach(apt => {
+    upcomingAppointments.forEach((apt: AppointmentRow) => {
       if (apt.assignedTo && technicianWorkload[apt.assignedTo] !== undefined) {
         technicianWorkload[apt.assignedTo] += apt.duration || 60;
       }
@@ -150,16 +163,16 @@ export async function runSchedulingOptimization(garageId: string) {
       }
     });
     
-    const unassignedCount = upcomingAppointments.filter(apt => !apt.assignedTo).length;
+    const unassignedCount = upcomingAppointments.filter((apt: AppointmentRow) => !apt.assignedTo).length;
     if (unassignedCount > 0) {
       suggestions.push(`${unassignedCount} appointments are unassigned. Assign technicians to improve efficiency.`);
     }
     
-    const morningAppointments = upcomingAppointments.filter(apt => {
+    const morningAppointments = upcomingAppointments.filter((apt: AppointmentRow) => {
       const hour = new Date(apt.appointmentDate).getHours();
       return hour >= 8 && hour < 12;
     });
-    const afternoonAppointments = upcomingAppointments.filter(apt => {
+    const afternoonAppointments = upcomingAppointments.filter((apt: AppointmentRow) => {
       const hour = new Date(apt.appointmentDate).getHours();
       return hour >= 12 && hour < 17;
     });
@@ -204,9 +217,9 @@ export async function getAutoReorderRules(garageId: string) {
       .select({
         ruleId: autoReorderRules.id,
         partId: autoReorderRules.partId,
-        partName: spareParts.partName,
-        partNumber: spareParts.partNumber,
-        currentStock: spareParts.quantityInStock,
+        partName: (spareParts as SparePartsTable).partName,
+        partNumber: (spareParts as SparePartsTable).partNumber,
+        currentStock: (spareParts as SparePartsTable).quantityInStock,
         reorderPoint: autoReorderRules.reorderPoint,
         reorderQuantity: autoReorderRules.reorderQuantity,
         preferredSupplier: autoReorderRules.preferredSupplier,
@@ -216,7 +229,7 @@ export async function getAutoReorderRules(garageId: string) {
       })
       .from(autoReorderRules)
       .innerJoin(spareParts, eq(autoReorderRules.partId, spareParts.id))
-      .where(eq(spareParts.garageId, garageId));
+      .where(eq((spareParts as SparePartsTable).garageId, garageId));
     
     return rules;
   } catch (error) {
@@ -232,7 +245,7 @@ export async function checkAndTriggerReorders(garageId: string) {
       .select({
         ruleId: autoReorderRules.id,
         partId: autoReorderRules.partId,
-        currentStock: spareParts.quantityInStock,
+        currentStock: (spareParts as SparePartsTable).quantityInStock,
         reorderPoint: autoReorderRules.reorderPoint,
         reorderQuantity: autoReorderRules.reorderQuantity,
         preferredSupplier: autoReorderRules.preferredSupplier,
@@ -240,9 +253,9 @@ export async function checkAndTriggerReorders(garageId: string) {
       .from(autoReorderRules)
       .innerJoin(spareParts, eq(autoReorderRules.partId, spareParts.id))
       .where(and(
-        eq(spareParts.garageId, garageId),
+        eq((spareParts as SparePartsTable).garageId, garageId),
         eq(autoReorderRules.isActive, true),
-        sql`${spareParts.quantityInStock} <= ${autoReorderRules.reorderPoint}`
+        sql`${(spareParts as SparePartsTable).quantityInStock} <= ${autoReorderRules.reorderPoint}`
       ));
     
     const triggeredOrders = [];
@@ -281,8 +294,8 @@ export async function getReorderHistory(garageId: string, limit: number = 50) {
     const history = await db
       .select({
         id: autoReorderHistory.id,
-        partName: spareParts.partName,
-        partNumber: spareParts.partNumber,
+        partName: (spareParts as SparePartsTable).partName,
+        partNumber: (spareParts as SparePartsTable).partNumber,
         stockLevelAtTrigger: autoReorderHistory.stockLevelAtTrigger,
         quantityOrdered: autoReorderHistory.quantityOrdered,
         supplier: autoReorderHistory.supplier,
@@ -291,7 +304,7 @@ export async function getReorderHistory(garageId: string, limit: number = 50) {
       })
       .from(autoReorderHistory)
       .innerJoin(spareParts, eq(autoReorderHistory.partId, spareParts.id))
-      .where(eq(spareParts.garageId, garageId))
+      .where(eq((spareParts as SparePartsTable).garageId, garageId))
       .orderBy(desc(autoReorderHistory.triggeredAt))
       .limit(limit);
     
@@ -494,8 +507,8 @@ export async function getCalibrationRecords(garageId: string) {
     const records = await db
       .select({
         id: equipmentCalibration.id,
-        toolName: tools.toolName,
-        toolNumber: tools.toolNumber,
+        toolName: (tools as ToolsTable).toolName,
+        toolNumber: (tools as ToolsTable).toolNumber,
         calibrationType: equipmentCalibration.calibrationType,
         lastCalibrationDate: equipmentCalibration.lastCalibrationDate,
         nextCalibrationDue: equipmentCalibration.nextCalibrationDue,
@@ -550,8 +563,8 @@ export async function getDueCalibrations(garageId: string) {
     const dueCals = await db
       .select({
         id: equipmentCalibration.id,
-        toolName: tools.toolName,
-        toolNumber: tools.toolNumber,
+        toolName: (tools as ToolsTable).toolName,
+        toolNumber: (tools as ToolsTable).toolNumber,
         calibrationType: equipmentCalibration.calibrationType,
         nextCalibrationDue: equipmentCalibration.nextCalibrationDue,
         status: equipmentCalibration.status,

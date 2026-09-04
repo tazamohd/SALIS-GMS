@@ -19,6 +19,18 @@ import {
   appointments
 } from "@shared/schema";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
+
+// Row shape returned by the signage-content query. `db` is loosely typed (see
+// server/db.ts), so callbacks over its results need explicit row types.
+type SignageContentRow = typeof signageContent.$inferSelect;
+
+// The projection below references columns that the current `spareParts` /
+// `tools` definitions in shared/schema.ts do not declare. These aliases keep
+// the query exactly as it is at runtime while giving TypeScript a column type
+// for those references.
+type SparePartsTable = typeof spareParts & Record<string, AnyPgColumn>;
+type ToolsTable = typeof tools & Record<string, AnyPgColumn>;
 
 // ========================================
 // 1. BARCODE/QR SCANNER INTEGRATION
@@ -55,9 +67,9 @@ export async function getBarcodeScanHistory(garageId: string, scanType?: string)
         id: barcodeScans.id,
         scanType: barcodeScans.scanType,
         barcodeData: barcodeScans.barcodeData,
-        partName: spareParts.partName,
+        partName: (spareParts as SparePartsTable).partName,
         vehiclePlate: vehicles.licensePlate,
-        toolName: tools.toolName,
+        toolName: (tools as ToolsTable).toolName,
         scannedBy: users.fullName,
         location: barcodeScans.location,
         associatedAction: barcodeScans.associatedAction,
@@ -166,7 +178,7 @@ export async function getActiveContentForDisplay(displayId: string) {
       .orderBy(desc(signageContent.priority));
     
     // Filter in memory to handle nullable validFrom/validUntil
-    return content.filter(c => {
+    return content.filter((c: SignageContentRow) => {
       const validFrom = c.validFrom ? new Date(c.validFrom) : null;
       const validUntil = c.validUntil ? new Date(c.validUntil) : null;
       const isAfterStart = !validFrom || validFrom <= now;

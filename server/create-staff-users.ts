@@ -8,9 +8,9 @@ async function createStaffUsers() {
   console.log('👥 Creating staff users for all roles...\n');
 
   // Get all roles, branches, and garages
-  const allRoles = await db.select().from(roles);
-  const allBranches = await db.select().from(branches);
-  const allGarages = await db.select().from(garages);
+  const allRoles: Array<typeof roles.$inferSelect> = await db.select().from(roles);
+  const allBranches: Array<typeof branches.$inferSelect> = await db.select().from(branches);
+  const allGarages: Array<typeof garages.$inferSelect> = await db.select().from(garages);
 
   const roleMap = new Map(allRoles.map(r => [r.name, r]));
   
